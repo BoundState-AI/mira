@@ -761,23 +761,36 @@ except ImportError:
     MIULBuilderV3 = None
 
 
+from fastapi import Form
+
+
 @app.post("/api/miul/v3-extract")
 async def miul_v3_extract(
     background_tasks: BackgroundTasks,
-    files: List[UploadFile] = File(...),
-    dt_session_id: Optional[str] = None,
-    project_name: Optional[str] = None,
+    drawings: List[UploadFile] = File(...),
+    drawing_tree: Optional[UploadFile] = File(None),
+    nha_overrides: Optional[UploadFile] = File(None),
+    project: Optional[str] = Form(None),
+    miul_number: Optional[str] = Form(None),
+    min_pressure: Optional[str] = Form(None),
+    max_pressure: Optional[str] = Form(None),
+    min_temperature: Optional[str] = Form(None),
+    max_temperature: Optional[str] = Form(None),
+    o2_concentration: Optional[str] = Form(None),
+    service_media: Optional[str] = Form(None),
 ):
     """
     MIUL v3 extraction endpoint.
 
-    Accepts drawing PDFs (and optional DT session ID from DT Editor).
+    Accepts drawing PDFs and optional Drawing Tree PDF.
     Returns an Excel file with the complete MIUL.
 
     Args:
-        files: List of drawing PDF files
-        dt_session_id: Optional session ID from DT Editor (provides hierarchy)
-        project_name: Optional project name for the MIUL
+        drawings: List of drawing PDF files
+        drawing_tree: Optional Drawing Tree PDF file
+        nha_overrides: Optional NHA overrides JSON file
+        project: Optional project name
+        Plus environment parameters for MIUL metadata
     """
     if not MIUL_AVAILABLE:
         raise HTTPException(status_code=503, detail="MIUL module not available")
@@ -785,22 +798,30 @@ async def miul_v3_extract(
     if not BUILDER_AVAILABLE:
         raise HTTPException(status_code=503, detail="MIUL Builder not available (missing pandas/openpyxl)")
 
-    if not files:
-        raise HTTPException(status_code=400, detail="No files provided")
+    if not drawings:
+        raise HTTPException(status_code=400, detail="No drawings provided")
 
     # Create temp directory for PDFs
     import shutil
     temp_dir = Path(tempfile.mkdtemp(prefix="miul_"))
 
     try:
-        # Save uploaded files to temp directory
-        for upload in files:
+        # Save drawing files to temp directory
+        for upload in drawings:
             if upload.filename and upload.filename.lower().endswith('.pdf'):
                 file_path = temp_dir / upload.filename
                 content = await upload.read()
                 with open(file_path, 'wb') as f:
                     f.write(content)
-                logger.info(f"Saved {upload.filename} to temp dir")
+                logger.info(f"Saved drawing {upload.filename} to temp dir")
+
+        # Save drawing tree file if provided
+        if drawing_tree and drawing_tree.filename:
+            dt_path = temp_dir / drawing_tree.filename
+            content = await drawing_tree.read()
+            with open(dt_path, 'wb') as f:
+                f.write(content)
+            logger.info(f"Saved drawing tree {drawing_tree.filename}")
 
         # Check we have PDFs
         pdf_count = len(list(temp_dir.glob("*.pdf")))
@@ -812,17 +833,20 @@ async def miul_v3_extract(
         # Initialize builder
         builder = MIULBuilderV3()
 
-        # If DT session provided, use that hierarchy instead of extracting
-        if dt_session_id and dt_session_id in dt_sessions:
-            session = dt_sessions[dt_session_id]
-            if session["status"] == "complete" and session.get("tree"):
-                logger.info(f"Using DT session {dt_session_id} with {len(session['tree'])} entries")
-                builder.dt_tree = {
-                    "top_level": session.get("top_level", ""),
-                    "tree": session["tree"]
+        # Load NHA overrides if provided
+        if nha_overrides and nha_overrides.filename:
+            import json
+            override_content = await nha_overrides.read()
+            try:
+                overrides_data = json.loads(override_content.decode('utf-8'))
+                # Filter out metadata keys starting with _
+                builder.nha_overrides = {
+                    k: v for k, v in overrides_data.items()
+                    if not k.startswith('_')
                 }
-                # Generate NHA overrides from DT session
-                builder.nha_overrides = builder.generate_nha_overrides_from_dt()
+                logger.info(f"Loaded {len(builder.nha_overrides)} NHA overrides")
+            except json.JSONDecodeError as e:
+                logger.warning(f"Failed to parse NHA overrides: {e}")
 
         # Extract drawings
         builder.extract_directory(temp_dir)
@@ -831,18 +855,18 @@ async def miul_v3_extract(
         df = builder.build_miul()
 
         # Use project name or derive from first drawing
-        project = project_name or "MIUL"
-        if not project_name and builder.drawings:
+        project_name = project or miul_number or "MIUL"
+        if project_name == "MIUL" and builder.drawings:
             first_dwg = list(builder.drawings.keys())[0]
             # Extract prefix (e.g., MER from MER07540-001)
             import re
             match = re.match(r'^([A-Z]+)', first_dwg.upper())
             if match:
-                project = match.group(1)
+                project_name = match.group(1)
 
         # Export to Excel temp file (builder has full formatting)
         excel_path = temp_dir / "output.xlsx"
-        builder.export_to_excel(df, excel_path, project=project)
+        builder.export_to_excel(df, excel_path, project=project_name)
 
         # Read back into BytesIO for streaming
         excel_buffer = io.BytesIO()
@@ -852,7 +876,7 @@ async def miul_v3_extract(
 
         # Generate filename
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"MIUL_{project}_{timestamp}.xlsx"
+        filename = f"MIUL_{project_name}_{timestamp}.xlsx"
 
         logger.info(f"MIUL extraction complete: {len(df)} rows, returning {filename}")
 
@@ -879,16 +903,19 @@ async def miul_v3_extract(
 
 @app.post("/api/miul/extract")
 async def miul_extract_legacy(
-    files: List[UploadFile] = File(...),
-    dt_session_id: Optional[str] = None,
-    project_name: Optional[str] = None,
+    background_tasks: BackgroundTasks,
+    drawings: List[UploadFile] = File(...),
+    drawing_tree: Optional[UploadFile] = File(None),
+    nha_overrides: Optional[UploadFile] = File(None),
+    project: Optional[str] = Form(None),
 ):
     """Legacy MIUL extraction endpoint - redirects to v3."""
     return await miul_v3_extract(
-        background_tasks=BackgroundTasks(),
-        files=files,
-        dt_session_id=dt_session_id,
-        project_name=project_name,
+        background_tasks=background_tasks,
+        drawings=drawings,
+        drawing_tree=drawing_tree,
+        nha_overrides=nha_overrides,
+        project=project,
     )
 
 
