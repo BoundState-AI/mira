@@ -432,6 +432,7 @@ class DTExportRequest(BaseModel):
 
 
 @app.post("/api/dt/upload")
+@app.post("/api/miul/extract-dt")  # Alias for frontend compatibility
 async def dt_upload(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...)
