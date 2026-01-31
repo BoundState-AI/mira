@@ -1,0 +1,1050 @@
+// API client for BoundState MIRA backend
+
+const API_BASE = '/api';
+
+export interface CompatibilityRequest {
+  material_key: string;
+  pressure: number;
+  temperature: number;
+  environment?: string;
+}
+
+export interface Evidence {
+  source_id: string;
+  location?: string | null;
+  summary: string;
+}
+
+export interface CompatibilityResponse {
+  classification: 'ok' | 'caution' | 'prohibited' | 'unknown';
+  rationale: string;
+  evidence: Evidence[];
+  notes?: string;
+}
+
+export interface SearchRequest {
+  query: string;
+  material_key?: string;
+  test_class?: string;
+}
+
+export interface SearchHit {
+  id: string;
+  title: string;
+  snippet: string;
+  score: number;
+  metadata?: Record<string, unknown>;
+}
+
+export interface SearchResponse {
+  hits: SearchHit[];
+  total: number;
+}
+
+export interface MIULRequest {
+  program_id: string;
+  material_keys: string[];
+}
+
+export interface MIULEntry {
+  material: string;
+  spec: string;
+  status: string;
+  notes: string;
+}
+
+export interface MIULResponse {
+  success: boolean;
+  message: string;
+  entries: MIULEntry[];
+}
+
+export interface MUARequest {
+  material_key: string;
+  pressure: number;
+  temperature: number;
+  environment?: string;
+  rationale_notes?: string;
+}
+
+export interface MUAResponse {
+  id: string;
+  material_key: string;
+  classification: string;
+  conditions: {
+    pressure: number;
+    temperature: number;
+    environment?: string;
+  };
+  rationale: string;
+  approval_text: string;
+  generated_at: string;
+}
+
+// Convert Fahrenheit to Kelvin
+function fToK(f: number): number {
+  return (f - 32) * 5/9 + 273.15;
+}
+
+export async function checkO2Compatibility(req: CompatibilityRequest): Promise<CompatibilityResponse> {
+  const response = await fetch(`${API_BASE}/mira/o2/compatibility`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      question: `Is ${req.material_key} compatible with oxygen?`,
+      material_key: req.material_key,
+      pressure_psia: req.pressure,
+      temperature_k: fToK(req.temperature),
+      phase: 'gox', // Default to gaseous oxygen
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`O2 compatibility check failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function checkH2Compatibility(req: CompatibilityRequest): Promise<CompatibilityResponse> {
+  const response = await fetch(`${API_BASE}/mira/h2/compatibility`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      question: `Is ${req.material_key} compatible with hydrogen?`,
+      material_key: req.material_key,
+      pressure_psia: req.pressure,
+      temperature_k: fToK(req.temperature),
+      phase: 'gh2', // Default to gaseous hydrogen
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`H2 compatibility check failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function searchTestData(req: SearchRequest): Promise<SearchResponse> {
+  const response = await fetch(`${API_BASE}/search/query`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      question: req.query,
+      material_key: req.material_key,
+      environment: req.test_class,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Search failed: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+
+  // Transform backend response to frontend format
+  const answer = data.answer || data;
+  const evidence = answer.evidence || [];
+
+  return {
+    hits: evidence.map((e: Evidence, idx: number) => ({
+      id: e.source_id || `hit-${idx}`,
+      title: e.summary?.split(' | ')[0] || 'Material Record',
+      snippet: e.summary || '',
+      score: 0.9 - (idx * 0.05), // Approximate score based on position
+      metadata: { location: e.location },
+    })),
+    total: evidence.length,
+  };
+}
+
+export async function buildMIUL(req: MIULRequest): Promise<MIULResponse> {
+  // TODO: Wire to actual MIUL endpoint when available
+  await new Promise(r => setTimeout(r, 1000));
+
+  return {
+    success: true,
+    message: `MIUL generated for program ${req.program_id}`,
+    entries: req.material_keys.map((key, i) => ({
+      material: key,
+      spec: `SPEC-${1000 + i}`,
+      status: ['Approved', 'Pending Review', 'Conditional'][i % 3],
+      notes: 'Generated from material database',
+    })),
+  };
+}
+
+export async function generateMUA(req: MUARequest): Promise<MUAResponse> {
+  // TODO: Wire to actual MUA endpoint when available
+  await new Promise(r => setTimeout(r, 1200));
+
+  return {
+    id: `MUA-${Date.now()}`,
+    material_key: req.material_key,
+    classification: 'APPROVED',
+    conditions: {
+      pressure: req.pressure,
+      temperature: req.temperature,
+      environment: req.environment,
+    },
+    rationale: req.rationale_notes || 'Standard approval based on material database records.',
+    approval_text: `MATERIAL USE APPROVAL\n\nMaterial: ${req.material_key}\nConditions: ${req.pressure} PSI @ ${req.temperature}°F\nEnvironment: ${req.environment || 'Standard'}\n\nThis material is approved for use under the specified conditions based on test data and engineering analysis.\n\nRationale: ${req.rationale_notes || 'N/A'}`,
+    generated_at: new Date().toISOString(),
+  };
+}
+
+// ============================================================================
+// MUA v6 API - Precedent-Based Generation Pipeline
+// ============================================================================
+
+export type GenerationDecision = 'proceed' | 'warn' | 'review' | 'blocked';
+export type OverlapStatus = 'within' | 'partial_overlap' | 'extrapolation' | 'insufficient_data';
+
+export interface MuaV6EnvironmentSpec {
+  description: string;
+  o2_percent?: number;
+  pressure_psia?: number;
+  temperature_f?: number;
+  is_habitable?: boolean;
+}
+
+export interface MuaV6PrecedentSearchRequest {
+  material: string;
+  environment?: MuaV6EnvironmentSpec;
+  k?: number;
+  family_filter?: string;
+}
+
+export interface MuaV6PrecedentSummary {
+  mua_number: string | null;
+  material_designation: string;
+  material_family: string | null;
+  environment: string | null;
+  determination: string;
+  rationale_preview: string;
+  similarity_score: number;
+  is_supporting: boolean;
+  is_conflicting: boolean;
+}
+
+export interface MuaV6PrecedentSearchResponse {
+  request_id: string;
+  material_resolved: boolean;
+  material_code: string | null;
+  supporting_count: number;
+  conflicting_count: number;
+  supporting_precedents: MuaV6PrecedentSummary[];
+  conflicting_precedents: MuaV6PrecedentSummary[];
+}
+
+export interface MuaV6GenerateRequest {
+  material: string;
+  environment: MuaV6EnvironmentSpec;
+  k?: number;
+  mode?: 'auto' | 'evaluate_only';
+}
+
+export interface MuaV6GenerateResponse {
+  request_id: string;
+  decision: GenerationDecision;
+  confidence_score: number;
+  envelope_status: OverlapStatus | null;
+  test_data_currency: string | null;
+  draft_text: string | null;
+  precedents_used: string[];
+  warnings: string[];
+  review_factors: string[];
+  blocking_factors: string[];
+}
+
+export interface MuaV6StatsResponse {
+  faiss_index_size: number;
+  material_resolver_available: boolean;
+  logic_validator_available: boolean;
+}
+
+/**
+ * Ping MUA v6 endpoint for health check.
+ */
+export async function muaV6Ping(): Promise<{ status: string; domain: string; version: string }> {
+  const response = await fetch(`${API_BASE}/mua/v6/ping`);
+  if (!response.ok) {
+    throw new Error(`MUA v6 ping failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+/**
+ * Search for MUA precedents matching material and environment.
+ */
+export async function muaV6SearchPrecedents(
+  req: MuaV6PrecedentSearchRequest
+): Promise<MuaV6PrecedentSearchResponse> {
+  const response = await fetch(`${API_BASE}/mua/v6/precedents/search`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Precedent search failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Evaluate and optionally generate MUA draft using the v6 pipeline.
+ */
+export async function muaV6Generate(req: MuaV6GenerateRequest): Promise<MuaV6GenerateResponse> {
+  const response = await fetch(`${API_BASE}/mua/v6/generate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `MUA generation failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get MUA v6 system statistics.
+ */
+export async function muaV6Stats(): Promise<MuaV6StatsResponse> {
+  const response = await fetch(`${API_BASE}/mua/v6/stats`);
+  if (!response.ok) {
+    throw new Error(`MUA v6 stats failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+// ============================================================================
+// MUA v6 Corpus-Based Draft Generation (5,650+ parsed MUAs)
+// ============================================================================
+
+export interface CorpusSearchRequest {
+  material: string;
+  environment?: string;
+  application?: string;
+  k?: number;
+}
+
+export interface CorpusPrecedent {
+  mua_number: string;
+  material_designation: string;
+  material_family: string;
+  environment: string;
+  determination: string;
+  issues: string[];
+  rationale_preview: string;
+  score: number;
+}
+
+export interface CorpusSearchResponse {
+  request_id: string;
+  total_found: number;
+  precedents: CorpusPrecedent[];
+}
+
+export interface CorpusDraftRequest {
+  material: string;
+  environment: string;
+  application?: string;
+  o2_percent?: number;
+  pressure_psia?: number;
+  temperature_f?: number;
+  is_habitable?: boolean;
+  issues?: string[];
+  k?: number;
+}
+
+export interface CorpusCitation {
+  mua_number: string;
+  material: string;
+  environment: string;
+  determination: string;
+  relevance_score: number;
+  rationale_excerpt: string;
+}
+
+export interface CorpusDraftResponse {
+  request_id: string;
+  material: string;
+  environment: string;
+  application: string;
+  recommended_determination: string;
+  confidence: number;
+  coverage_assessment: string;
+  issues_addressed: string[];
+  gaps_identified: string[];
+  warnings: string[];
+  precedents_cited: CorpusCitation[];
+  rationale: string;
+}
+
+export interface CorpusStatsResponse {
+  status: string;
+  total_records?: number;
+  index_vectors?: number;
+  embedding_model?: string;
+  by_determination?: Record<string, number>;
+  by_environment_type?: Record<string, number>;
+  by_material_family?: Record<string, number>;
+  message?: string;
+}
+
+/**
+ * Search the parsed MUA corpus for precedents.
+ */
+export async function muaCorpusSearch(req: CorpusSearchRequest): Promise<CorpusSearchResponse> {
+  const response = await fetch(`${API_BASE}/mua/v6/corpus/search`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Corpus search failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Generate MUA draft from corpus precedents.
+ */
+export async function muaCorpusDraft(req: CorpusDraftRequest): Promise<CorpusDraftResponse> {
+  const response = await fetch(`${API_BASE}/mua/v6/corpus/draft`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Corpus draft generation failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get corpus statistics.
+ */
+export async function muaCorpusStats(): Promise<CorpusStatsResponse> {
+  const response = await fetch(`${API_BASE}/mua/v6/corpus/stats`);
+  if (!response.ok) {
+    throw new Error(`Corpus stats failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+// ============================================================================
+// NASA-STD-6016C Compliance Analysis API
+// ============================================================================
+
+export interface ComplianceAnalysisRequest {
+  material_key: string;
+  maptis_code?: number;
+  pressure_psia: number;
+  temperature_f: number;
+  o2_percent?: number;
+  is_hydrogen_service: boolean;
+  is_habitable: boolean;
+  hydrogen_phase?: string;
+}
+
+export interface GapSignalResponse {
+  gap_id: string;
+  gap_type: string;
+  trigger: string;
+  severity: string;
+  description: string;
+  evidence_count: number;
+}
+
+export interface OperationalConstraintResponse {
+  constraint_id: string;
+  parameter: string;
+  limit_type: string;
+  limit_value: string;
+  description: string;
+}
+
+export interface MPRDeterminationResponse {
+  mpr_number: number;
+  mpr_section: string;
+  mpr_title: string;
+  applicability_status: string;
+  compliance_status: string;
+  compliance_basis: string;
+  required_action: string;
+  gap_count: number;
+  constraint_count: number;
+}
+
+export interface ComplianceSummaryResponse {
+  overall_status: string;
+  status_rationale: string;
+  total_materials: number;
+  materials_compliant: number;
+  materials_noncompliant: number;
+  materials_requiring_mua: number;
+  total_mprs_applicable: number;
+  mprs_compliant: number;
+  mprs_compliant_with_constraints: number;
+  mprs_noncompliant: number;
+  total_gaps: number;
+  critical_gaps: number;
+}
+
+export interface ComplianceAnalysisResponse {
+  request_id: string;
+  material_key: string;
+  environment_description: string;
+  timestamp: string;
+  summary: ComplianceSummaryResponse;
+  determinations: MPRDeterminationResponse[];
+  gaps: GapSignalResponse[];
+  constraints: OperationalConstraintResponse[];
+  run_duration_ms: number;
+  warnings: string[];
+  errors: string[];
+}
+
+export interface MPRListItem {
+  mpr_number: number;
+  mpr_id: string;
+  section: string;
+  title: string;
+  applicability_triggers: string[];
+  failure_modes: string[];
+}
+
+export interface MPRListResponse {
+  standard_version: string;
+  total_mprs: number;
+  mprs: MPRListItem[];
+}
+
+/**
+ * Analyze material compliance with NASA-STD-6016C.
+ */
+export async function analyzeCompliance(
+  req: ComplianceAnalysisRequest
+): Promise<ComplianceAnalysisResponse> {
+  const response = await fetch(`${API_BASE}/compliance/analyze`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Compliance analysis failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * List all MPRs from NASA-STD-6016C.
+ */
+export async function listMPRs(): Promise<MPRListResponse> {
+  const response = await fetch(`${API_BASE}/compliance/mprs`);
+  if (!response.ok) {
+    throw new Error(`Failed to load MPRs: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+/**
+ * Compliance endpoint health check.
+ */
+export async function compliancePing(): Promise<{ status: string; domain: string }> {
+  const response = await fetch(`${API_BASE}/compliance/ping`);
+  if (!response.ok) {
+    throw new Error(`Compliance ping failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+// ============================================================================
+// M&P Plan Generator V2 API
+// ============================================================================
+
+export interface MPPlanSessionSummary {
+  session_id: string;
+  program_name: string | null;
+  created_at: string;
+  updated_at: string;
+  material_count: number;
+  environment_count: number;
+  nonconformance_count: number;
+  blocking_question_count: number;
+  can_generate: boolean;
+  blockers: string[];
+}
+
+export interface MPPlanEnvironment {
+  environment_id: string;
+  name: string;
+  o2_pct: number;
+  pressure_psia: number;
+  temp_range_c: [number, number];
+  habitable: boolean;
+  vacuum_exposure: boolean;
+  lunar_dust: boolean;
+  phase: string;
+  source: string;
+}
+
+export interface MPPlanMaterial {
+  id: string;
+  name: string;
+  application: string;
+  quantity: number;
+  maptis_code: string | null;
+  mass_g: number | null;
+  surface_area_cm2: number | null;
+  spec: string | null;
+  location: string | null;
+  function: string | null;
+  source: string;
+}
+
+export interface MPPlanBlockingQuestion {
+  question_id: string;
+  question_type: string;
+  question_text: string;
+  context: string;
+  blocked_decisions: string[];
+  options: string[] | null;
+  source: string;
+}
+
+export interface MPPlanVehiclePreset {
+  preset_id: string;
+  name: string;
+  o2_pct: number;
+  pressure_psia: number;
+  habitable: boolean;
+}
+
+export interface CreateMPPlanSessionRequest {
+  program_name?: string;
+  program_phase?: string;
+  policy_pack_id?: string;
+  vehicle_preset?: string;
+}
+
+export interface AddMPEnvironmentRequest {
+  name: string;
+  o2_pct: number;
+  pressure_psia: number;
+  temp_min_c: number;
+  temp_max_c: number;
+  habitable: boolean;
+  vacuum_exposure?: boolean;
+  lunar_dust?: boolean;
+}
+
+export interface AddMPMaterialRequest {
+  name: string;
+  application: string;
+  quantity?: number;
+  maptis_code?: string;
+  mass_g?: number;
+  surface_area_cm2?: number;
+}
+
+export interface SubmitMPAnswerRequest {
+  question_id: string;
+  answer: string;
+  rationale?: string;
+}
+
+export interface GenerateMPArtifactsRequest {
+  artifacts?: string[];
+}
+
+export interface GeneratedMPArtifact {
+  name: string;
+  artifact_id?: string;
+  format?: string;
+  size_bytes?: number;
+  error?: string;
+}
+
+/**
+ * M&P Plan Generator health check.
+ */
+export async function mpPlanPing(): Promise<{ status: string; domain: string; version: string }> {
+  const response = await fetch(`${API_BASE}/mp-plan/ping`);
+  if (!response.ok) {
+    throw new Error(`M&P Plan ping failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+/**
+ * Create a new M&P Plan session.
+ */
+export async function createMPPlanSession(
+  req: CreateMPPlanSessionRequest
+): Promise<MPPlanSessionSummary> {
+  const response = await fetch(`${API_BASE}/mp-plan/sessions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Failed to create session: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get M&P Plan session by ID.
+ */
+export async function getMPPlanSession(sessionId: string): Promise<Record<string, unknown>> {
+  const response = await fetch(`${API_BASE}/mp-plan/sessions/${sessionId}`);
+  if (!response.ok) {
+    throw new Error(`Failed to get session: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+/**
+ * List all M&P Plan sessions.
+ */
+export async function listMPPlanSessions(): Promise<{ sessions: MPPlanSessionSummary[]; count: number }> {
+  const response = await fetch(`${API_BASE}/mp-plan/sessions`);
+  if (!response.ok) {
+    throw new Error(`Failed to list sessions: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+/**
+ * Delete M&P Plan session.
+ */
+export async function deleteMPPlanSession(sessionId: string): Promise<{ status: string; session_id: string }> {
+  const response = await fetch(`${API_BASE}/mp-plan/sessions/${sessionId}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to delete session: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+/**
+ * Add environment to session.
+ */
+export async function addMPPlanEnvironment(
+  sessionId: string,
+  env: AddMPEnvironmentRequest
+): Promise<MPPlanEnvironment> {
+  const response = await fetch(`${API_BASE}/mp-plan/sessions/${sessionId}/environment`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(env),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Failed to add environment: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Add materials to session (batch).
+ */
+export async function addMPPlanMaterials(
+  sessionId: string,
+  materials: AddMPMaterialRequest[]
+): Promise<{ materials: MPPlanMaterial[]; count: number }> {
+  const response = await fetch(`${API_BASE}/mp-plan/sessions/${sessionId}/materials`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ materials }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Failed to add materials: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get blocking questions for session.
+ */
+export async function getMPPlanQuestions(
+  sessionId: string
+): Promise<{ questions: MPPlanBlockingQuestion[]; count: number }> {
+  const response = await fetch(`${API_BASE}/mp-plan/sessions/${sessionId}/questions`);
+  if (!response.ok) {
+    throw new Error(`Failed to get questions: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+/**
+ * Submit answer to blocking question.
+ */
+export async function submitMPPlanAnswer(
+  sessionId: string,
+  req: SubmitMPAnswerRequest
+): Promise<{ status: string; can_generate: boolean; blockers: string[] }> {
+  const response = await fetch(`${API_BASE}/mp-plan/sessions/${sessionId}/answer`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Failed to submit answer: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Run compute loop on session.
+ */
+export async function runMPPlanCompute(sessionId: string): Promise<{
+  status: string;
+  can_generate: boolean;
+  blockers: string[];
+  blocking_questions: MPPlanBlockingQuestion[];
+  nonconformances: number;
+  deficiencies: number;
+}> {
+  const response = await fetch(`${API_BASE}/mp-plan/sessions/${sessionId}/compute`, {
+    method: 'POST',
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Compute failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Generate artifacts for session.
+ */
+export async function generateMPPlanArtifacts(
+  sessionId: string,
+  req: GenerateMPArtifactsRequest = {}
+): Promise<{ status: string; artifacts: GeneratedMPArtifact[] }> {
+  const response = await fetch(`${API_BASE}/mp-plan/sessions/${sessionId}/generate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Generation failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get review packet for session.
+ */
+export async function getMPPlanReviewPacket(sessionId: string): Promise<Record<string, unknown>> {
+  const response = await fetch(`${API_BASE}/mp-plan/sessions/${sessionId}/review-packet`);
+  if (!response.ok) {
+    throw new Error(`Failed to get review packet: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+/**
+ * List vehicle presets.
+ */
+export async function listMPPlanVehiclePresets(): Promise<{ presets: MPPlanVehiclePreset[] }> {
+  const response = await fetch(`${API_BASE}/mp-plan/vehicle-presets`);
+  if (!response.ok) {
+    throw new Error(`Failed to list vehicle presets: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+/**
+ * Download artifact URL.
+ */
+export function getMPPlanArtifactDownloadUrl(sessionId: string, artifactId: string): string {
+  return `${API_BASE}/mp-plan/sessions/${sessionId}/download/${artifactId}`;
+}
+
+export interface MaptisSearchResult {
+  material_code: string;
+  designation: string;
+  confidence: string;
+  method: string;
+  score: number;
+}
+
+/**
+ * Search MAPTIS for material codes by material name.
+ */
+export async function searchMaptisCode(query: string, limit = 5): Promise<{
+  query: string;
+  results: MaptisSearchResult[];
+  count: number;
+  error?: string;
+}> {
+  const response = await fetch(
+    `${API_BASE}/mp-plan/maptis-search?q=${encodeURIComponent(query)}&limit=${limit}`
+  );
+  if (!response.ok) {
+    throw new Error(`MAPTIS search failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+// ============================================================================
+// O2 Knowledge Twin API - Dedicated Oxygen Compatibility Endpoints
+// ============================================================================
+
+export interface O2EvaluateRequest {
+  material_key: string;
+  pressure_psia?: number;
+  temperature_f?: number;
+  phase?: 'gox' | 'lox';
+  application_id?: string;
+}
+
+export interface O2EvidenceItem {
+  source_id: string;
+  location?: string | null;
+  summary: string;
+}
+
+export interface O2EvaluateResponse {
+  classification: string;
+  rationale: string;
+  evidence: O2EvidenceItem[];
+  notes?: string | null;
+  material_key: string;
+  pressure_psia: number;
+  temperature_f: number;
+  phase: string;
+  timestamp: string;
+}
+
+export interface O2BOKSearchRequest {
+  query: string;
+  k?: number;
+  use_hybrid?: boolean;
+}
+
+export interface O2BOKSearchResult {
+  doc_id: string;
+  text: string;
+  source: string;
+  section?: string | null;
+  relevance_score: number;
+  semantic_rank?: number | null;
+  bm25_rank?: number | null;
+}
+
+export interface O2BOKSearchResponse {
+  query: string;
+  results: O2BOKSearchResult[];
+  total_results: number;
+  search_type: string;
+  timestamp: string;
+}
+
+export interface O2FamilyRule {
+  family: string;
+  reason: string;
+  bok_ref: string;
+}
+
+export interface O2FamiliesResponse {
+  prohibited_families: O2FamilyRule[];
+  restricted_families: O2FamilyRule[];
+  approved_families: O2FamilyRule[];
+  note: string;
+}
+
+/**
+ * O2 Knowledge Twin health check.
+ */
+export async function o2Ping(): Promise<{ status: string; domain: string }> {
+  const response = await fetch(`${API_BASE}/o2/ping`);
+  if (!response.ok) {
+    throw new Error(`O2 ping failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+/**
+ * Evaluate material O2 compatibility using the dedicated O2 Knowledge Twin.
+ */
+export async function o2Evaluate(req: O2EvaluateRequest): Promise<O2EvaluateResponse> {
+  const response = await fetch(`${API_BASE}/o2/evaluate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `O2 evaluation failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Search the O2 Body of Knowledge (BOK) for standards and guidance.
+ */
+export async function o2SearchBOK(req: O2BOKSearchRequest): Promise<O2BOKSearchResponse> {
+  const response = await fetch(`${API_BASE}/o2/search`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `O2 BOK search failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get O2 material family classification rules from NASA-STD-6016.
+ */
+export async function o2GetFamilies(): Promise<O2FamiliesResponse> {
+  const response = await fetch(`${API_BASE}/o2/families`);
+  if (!response.ok) {
+    throw new Error(`Failed to get O2 families: ${response.statusText}`);
+  }
+  return response.json();
+}

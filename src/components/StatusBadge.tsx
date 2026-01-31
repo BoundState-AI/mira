@@ -1,0 +1,35 @@
+import { cn } from '@/lib/utils';
+
+type Status = 'OK' | 'CAUTION' | 'PROHIBITED' | 'UNKNOWN' | string;
+
+interface StatusBadgeProps {
+  status: Status;
+  className?: string;
+}
+
+const statusStyles: Record<string, string> = {
+  OK: 'status-ok',
+  APPROVED: 'status-ok',
+  CAUTION: 'status-caution',
+  'PENDING REVIEW': 'status-caution',
+  CONDITIONAL: 'status-caution',
+  PROHIBITED: 'status-prohibited',
+  UNKNOWN: 'status-unknown',
+};
+
+export function StatusBadge({ status, className }: StatusBadgeProps) {
+  const normalizedStatus = status.toUpperCase();
+  const styleClass = statusStyles[normalizedStatus] || 'status-unknown';
+  
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center px-3 py-1 rounded-sm text-xs font-medium tracking-wide uppercase',
+        styleClass,
+        className
+      )}
+    >
+      {status}
+    </span>
+  );
+}
