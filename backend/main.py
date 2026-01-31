@@ -183,7 +183,13 @@ from fastapi import UploadFile, File, HTTPException, BackgroundTasks
 
 # MIUL imports
 try:
-    from miul import VisionClient, extract_drawing_page, pdf_to_images, postprocess_extraction
+    from miul import (
+        VisionClient,
+        extract_drawing_page,
+        extract_drawing_tree,
+        pdf_to_images,
+        postprocess_extraction,
+    )
     MIUL_AVAILABLE = True
 except ImportError as e:
     MIUL_AVAILABLE = False
@@ -191,6 +197,7 @@ except ImportError as e:
 
 # In-memory job storage (replace with Redis/DB in production)
 miul_jobs: Dict[str, Dict[str, Any]] = {}
+dt_sessions: Dict[str, Dict[str, Any]] = {}  # DT Editor sessions
 
 
 class MIULExtractRequest(BaseModel):
@@ -398,6 +405,310 @@ async def miul_extract_base64(request: MIULExtractRequest):
     except Exception as e:
         logging.error(f"MIUL base64 extract error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ---------------------------------------------------------------------------
+# Drawing Tree (DT) Editor endpoints (LIVE)
+# ---------------------------------------------------------------------------
+
+class DTNodeUpdate(BaseModel):
+    """Update to a single DT node."""
+    drawing_number: str
+    parent: Optional[str] = None
+    title: Optional[str] = None
+    type: Optional[str] = None  # "ASSEMBLY" or "DETAIL"
+
+
+class DTTreeUpdate(BaseModel):
+    """Bulk update to DT tree."""
+    top_level: Optional[str] = None
+    tree: List[Dict[str, Any]]
+
+
+class DTExportRequest(BaseModel):
+    """Request to export DT as NHA overrides."""
+    project_name: Optional[str] = None
+    include_metadata: bool = True
+
+
+@app.post("/api/dt/upload")
+async def dt_upload(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...)
+):
+    """
+    Upload a Drawing Tree PDF and extract hierarchy.
+    Returns session_id to retrieve/edit the extracted tree.
+    """
+    if not MIUL_AVAILABLE:
+        raise HTTPException(status_code=503, detail="MIUL module not available")
+
+    if not file.filename.lower().endswith('.pdf'):
+        raise HTTPException(status_code=400, detail="Only PDF files are supported")
+
+    session_id = str(uuid.uuid4())
+    content = await file.read()
+
+    # Store session
+    dt_sessions[session_id] = {
+        "status": "processing",
+        "filename": file.filename,
+        "tree": None,
+        "top_level": None,
+        "error": None,
+        "created_at": None,
+        "modified": False
+    }
+
+    # Process in background
+    background_tasks.add_task(process_dt_pdf, session_id, content, file.filename)
+
+    return {
+        "session_id": session_id,
+        "status": "processing",
+        "message": f"Extracting Drawing Tree from {file.filename}"
+    }
+
+
+async def process_dt_pdf(session_id: str, pdf_content: bytes, filename: str):
+    """Background task to extract Drawing Tree hierarchy."""
+    import datetime
+
+    try:
+        client = VisionClient()
+
+        # Save to temp file
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+            tmp.write(pdf_content)
+            tmp_path = Path(tmp.name)
+
+        try:
+            # Extract drawing tree
+            result = extract_drawing_tree(tmp_path, client)
+
+            if result and result.get("tree"):
+                dt_sessions[session_id]["tree"] = result.get("tree", [])
+                dt_sessions[session_id]["top_level"] = result.get("top_level", "")
+                dt_sessions[session_id]["status"] = "complete"
+                dt_sessions[session_id]["created_at"] = datetime.datetime.now().isoformat()
+                logging.info(f"DT extraction complete: {len(result.get('tree', []))} entries")
+            else:
+                dt_sessions[session_id]["status"] = "failed"
+                dt_sessions[session_id]["error"] = "No tree structure found in PDF"
+
+        finally:
+            tmp_path.unlink(missing_ok=True)
+
+    except Exception as e:
+        logging.error(f"DT extraction error: {e}")
+        dt_sessions[session_id]["status"] = "failed"
+        dt_sessions[session_id]["error"] = str(e)
+
+
+@app.get("/api/dt/session/{session_id}")
+async def dt_get_session(session_id: str):
+    """Get DT session with extracted/edited tree."""
+    if session_id not in dt_sessions:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    session = dt_sessions[session_id]
+    return {
+        "session_id": session_id,
+        "status": session["status"],
+        "filename": session.get("filename"),
+        "top_level": session.get("top_level"),
+        "tree": session.get("tree"),
+        "entry_count": len(session.get("tree") or []),
+        "modified": session.get("modified", False),
+        "created_at": session.get("created_at"),
+        "error": session.get("error")
+    }
+
+
+@app.put("/api/dt/session/{session_id}")
+async def dt_update_session(session_id: str, update: DTTreeUpdate):
+    """
+    Update the DT tree (user edits).
+    Replaces entire tree with provided data.
+    """
+    if session_id not in dt_sessions:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    session = dt_sessions[session_id]
+
+    if session["status"] != "complete":
+        raise HTTPException(status_code=400, detail="Session not ready for editing")
+
+    # Update tree
+    session["tree"] = update.tree
+    if update.top_level is not None:
+        session["top_level"] = update.top_level
+    session["modified"] = True
+
+    return {
+        "session_id": session_id,
+        "status": "updated",
+        "entry_count": len(update.tree),
+        "top_level": session["top_level"]
+    }
+
+
+@app.patch("/api/dt/session/{session_id}/node")
+async def dt_update_node(session_id: str, node: DTNodeUpdate):
+    """
+    Update a single node in the DT tree.
+    More efficient for individual edits.
+    """
+    if session_id not in dt_sessions:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    session = dt_sessions[session_id]
+
+    if session["status"] != "complete":
+        raise HTTPException(status_code=400, detail="Session not ready for editing")
+
+    tree = session.get("tree", [])
+
+    # Find and update the node
+    found = False
+    for entry in tree:
+        if entry.get("drawing_number") == node.drawing_number:
+            if node.parent is not None:
+                entry["parent"] = node.parent if node.parent else None
+            if node.title is not None:
+                entry["title"] = node.title
+            if node.type is not None:
+                entry["type"] = node.type
+            found = True
+            break
+
+    if not found:
+        # Add new node
+        new_entry = {
+            "drawing_number": node.drawing_number,
+            "parent": node.parent,
+            "title": node.title or "",
+            "type": node.type or "DETAIL"
+        }
+        tree.append(new_entry)
+
+    session["modified"] = True
+
+    return {
+        "session_id": session_id,
+        "status": "node_updated" if found else "node_added",
+        "drawing_number": node.drawing_number
+    }
+
+
+@app.delete("/api/dt/session/{session_id}/node/{drawing_number}")
+async def dt_delete_node(session_id: str, drawing_number: str):
+    """Delete a node from the DT tree."""
+    if session_id not in dt_sessions:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    session = dt_sessions[session_id]
+
+    if session["status"] != "complete":
+        raise HTTPException(status_code=400, detail="Session not ready for editing")
+
+    tree = session.get("tree", [])
+    original_count = len(tree)
+
+    # Remove the node
+    session["tree"] = [e for e in tree if e.get("drawing_number") != drawing_number]
+
+    if len(session["tree"]) < original_count:
+        session["modified"] = True
+        return {"status": "deleted", "drawing_number": drawing_number}
+    else:
+        raise HTTPException(status_code=404, detail="Node not found in tree")
+
+
+@app.post("/api/dt/session/{session_id}/export")
+async def dt_export_nha(session_id: str, request: DTExportRequest = None):
+    """
+    Export DT tree as NHA overrides JSON.
+    This JSON can be used with MIULBuilderV3 for accurate hierarchy.
+    """
+    import datetime
+
+    if session_id not in dt_sessions:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    session = dt_sessions[session_id]
+
+    if session["status"] != "complete":
+        raise HTTPException(status_code=400, detail="Session not ready for export")
+
+    tree = session.get("tree", [])
+    top_level = session.get("top_level", "")
+
+    # Build NHA overrides: child -> parent mapping
+    nha_overrides = {}
+
+    for entry in tree:
+        child = entry.get("drawing_number", "").strip()
+        parent = (entry.get("parent") or "").strip()
+
+        if child and parent:
+            nha_overrides[child] = parent
+
+    # Add top-level if present
+    if top_level:
+        # Top level's "parent" is the project/system
+        project = request.project_name if request else None
+        if not project:
+            # Extract prefix from top-level PN
+            import re
+            match = re.match(r'^([A-Z]+)', top_level.upper())
+            project = match.group(1) if match else "SYSTEM"
+        nha_overrides[top_level] = project
+
+    result = {
+        "nha_overrides": nha_overrides,
+        "entry_count": len(nha_overrides),
+        "top_level": top_level
+    }
+
+    # Add metadata if requested
+    if request is None or request.include_metadata:
+        result["_metadata"] = {
+            "session_id": session_id,
+            "filename": session.get("filename"),
+            "generated": datetime.datetime.now().isoformat(),
+            "project": request.project_name if request else None,
+            "modified": session.get("modified", False)
+        }
+
+    return result
+
+
+@app.delete("/api/dt/session/{session_id}")
+async def dt_delete_session(session_id: str):
+    """Delete a DT session."""
+    if session_id not in dt_sessions:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    del dt_sessions[session_id]
+    return {"status": "deleted", "session_id": session_id}
+
+
+@app.get("/api/dt/sessions")
+async def dt_list_sessions():
+    """List all DT sessions."""
+    sessions = []
+    for sid, session in dt_sessions.items():
+        sessions.append({
+            "session_id": sid,
+            "status": session["status"],
+            "filename": session.get("filename"),
+            "top_level": session.get("top_level"),
+            "entry_count": len(session.get("tree") or []),
+            "modified": session.get("modified", False),
+            "created_at": session.get("created_at")
+        })
+    return {"sessions": sessions, "total": len(sessions)}
 
 
 # ---------------------------------------------------------------------------
