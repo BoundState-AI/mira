@@ -11,11 +11,24 @@ export function AppLayout({ children }: AppLayoutProps) {
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
-          {/* Mobile header - DEBUG: bright red background */}
-          <header style={{ background: 'red', padding: '20px', position: 'relative', zIndex: 9999 }}>
-            <SidebarTrigger className="text-white" />
-            <span style={{ color: 'white', fontWeight: 'bold' }}>
-              MIRA V3 - DEBUG HEADER
+          {/* Mobile header */}
+          <header
+            className="md:hidden"
+            style={{
+              background: '#18181b',
+              padding: '12px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              borderBottom: '1px solid #3f3f46',
+              position: 'sticky',
+              top: 0,
+              zIndex: 50
+            }}
+          >
+            <SidebarTrigger />
+            <span style={{ color: '#a1a1aa', fontSize: '11px', fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              MIRA V3
             </span>
           </header>
           <main className="flex-1 p-4 md:p-8 overflow-auto">
