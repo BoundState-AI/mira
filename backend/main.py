@@ -172,25 +172,232 @@ async def material_summary(material_key: str):
 
 
 # ---------------------------------------------------------------------------
-# MIUL endpoints (stub)
+# MIUL endpoints (LIVE - using v3 vision extraction)
 # ---------------------------------------------------------------------------
 
+import base64
+import tempfile
+import logging
+from pathlib import Path
+from fastapi import UploadFile, File, HTTPException, BackgroundTasks
+
+# MIUL imports
+try:
+    from miul import VisionClient, extract_drawing_page, pdf_to_images, postprocess_extraction
+    MIUL_AVAILABLE = True
+except ImportError as e:
+    MIUL_AVAILABLE = False
+    logging.warning(f"MIUL module not available: {e}")
+
+# In-memory job storage (replace with Redis/DB in production)
+miul_jobs: Dict[str, Dict[str, Any]] = {}
+
+
+class MIULExtractRequest(BaseModel):
+    """Request to extract a drawing from base64 PDF."""
+    pdf_base64: str
+    page_index: int = 0
+    filename: Optional[str] = None
+
+
 @app.post("/api/miul/upload")
-async def miul_upload():
-    """MIUL upload - stub."""
-    return {"status": "stub", "message": "MIUL upload not yet implemented"}
+async def miul_upload(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...)
+):
+    """
+    Upload a PDF and start extraction.
+    Returns a job_id to poll for status.
+    """
+    if not MIUL_AVAILABLE:
+        raise HTTPException(status_code=503, detail="MIUL module not available - check dependencies")
+
+    if not file.filename.lower().endswith('.pdf'):
+        raise HTTPException(status_code=400, detail="Only PDF files are supported")
+
+    job_id = str(uuid.uuid4())
+
+    # Read file content
+    content = await file.read()
+
+    # Store job
+    miul_jobs[job_id] = {
+        "status": "processing",
+        "filename": file.filename,
+        "pages": [],
+        "result": None,
+        "error": None
+    }
+
+    # Process in background
+    background_tasks.add_task(process_miul_pdf, job_id, content, file.filename)
+
+    return {
+        "job_id": job_id,
+        "status": "processing",
+        "message": f"Processing {file.filename}"
+    }
+
+
+async def process_miul_pdf(job_id: str, pdf_content: bytes, filename: str):
+    """Background task to process PDF extraction."""
+    try:
+        client = VisionClient()
+
+        # Save to temp file
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+            tmp.write(pdf_content)
+            tmp_path = Path(tmp.name)
+
+        try:
+            # Get page count
+            images = pdf_to_images(tmp_path)
+            num_pages = len(images)
+
+            miul_jobs[job_id]["pages"] = [{"index": i, "status": "pending"} for i in range(num_pages)]
+
+            # Extract first page (or all pages for multi-page)
+            results = []
+            for page_idx in range(num_pages):
+                miul_jobs[job_id]["pages"][page_idx]["status"] = "processing"
+
+                result = extract_drawing_page(tmp_path, page_idx, client)
+                if result:
+                    result = postprocess_extraction(result)
+                    results.append(result)
+                    miul_jobs[job_id]["pages"][page_idx]["status"] = "complete"
+                else:
+                    miul_jobs[job_id]["pages"][page_idx]["status"] = "failed"
+
+            # Merge results
+            if results:
+                merged = results[0]
+                for r in results[1:]:
+                    # Merge EPL parts
+                    merged.get("parts_list", []).extend(r.get("parts_list", []))
+                    # Merge notes
+                    merged.get("notes", []).extend(r.get("notes", []))
+
+                miul_jobs[job_id]["result"] = merged
+                miul_jobs[job_id]["status"] = "complete"
+            else:
+                miul_jobs[job_id]["status"] = "failed"
+                miul_jobs[job_id]["error"] = "No extraction results"
+
+        finally:
+            # Cleanup temp file
+            tmp_path.unlink(missing_ok=True)
+
+    except Exception as e:
+        logging.error(f"MIUL extraction error: {e}")
+        miul_jobs[job_id]["status"] = "failed"
+        miul_jobs[job_id]["error"] = str(e)
 
 
 @app.get("/api/miul/status/{job_id}")
 async def miul_status(job_id: str):
-    """MIUL job status - stub."""
-    return {"job_id": job_id, "status": "not_found"}
+    """Get MIUL job status and results."""
+    if job_id not in miul_jobs:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    job = miul_jobs[job_id]
+    return {
+        "job_id": job_id,
+        "status": job["status"],
+        "filename": job.get("filename"),
+        "pages": job.get("pages", []),
+        "result": job.get("result"),
+        "error": job.get("error")
+    }
 
 
 @app.post("/miul/parse")
-async def miul_parse():
-    """MIUL parse - stub."""
-    return {"status": "stub", "message": "MIUL parse not yet implemented"}
+async def miul_parse(file: UploadFile = File(...)):
+    """
+    Parse a single PDF and return extraction immediately.
+    For smaller files - synchronous extraction.
+    """
+    if not MIUL_AVAILABLE:
+        raise HTTPException(status_code=503, detail="MIUL module not available")
+
+    if not file.filename.lower().endswith('.pdf'):
+        raise HTTPException(status_code=400, detail="Only PDF files are supported")
+
+    content = await file.read()
+
+    try:
+        client = VisionClient()
+
+        # Save to temp file
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+            tmp.write(content)
+            tmp_path = Path(tmp.name)
+
+        try:
+            # Extract first page
+            result = extract_drawing_page(tmp_path, 0, client)
+            if result:
+                result = postprocess_extraction(result)
+                return {
+                    "status": "success",
+                    "filename": file.filename,
+                    "extraction": result
+                }
+            else:
+                return {
+                    "status": "failed",
+                    "filename": file.filename,
+                    "error": "No extraction result"
+                }
+        finally:
+            tmp_path.unlink(missing_ok=True)
+
+    except Exception as e:
+        logging.error(f"MIUL parse error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/miul/extract-base64")
+async def miul_extract_base64(request: MIULExtractRequest):
+    """
+    Extract drawing data from a base64-encoded PDF.
+    Useful for frontend that already has the file in memory.
+    """
+    if not MIUL_AVAILABLE:
+        raise HTTPException(status_code=503, detail="MIUL module not available")
+
+    try:
+        pdf_bytes = base64.b64decode(request.pdf_base64)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid base64 encoding")
+
+    try:
+        client = VisionClient()
+
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+            tmp.write(pdf_bytes)
+            tmp_path = Path(tmp.name)
+
+        try:
+            result = extract_drawing_page(tmp_path, request.page_index, client)
+            if result:
+                result = postprocess_extraction(result)
+                return {
+                    "status": "success",
+                    "page_index": request.page_index,
+                    "extraction": result
+                }
+            else:
+                return {
+                    "status": "failed",
+                    "error": "No extraction result"
+                }
+        finally:
+            tmp_path.unlink(missing_ok=True)
+
+    except Exception as e:
+        logging.error(f"MIUL base64 extract error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ---------------------------------------------------------------------------
