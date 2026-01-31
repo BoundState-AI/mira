@@ -363,10 +363,8 @@ export default function DTTreeEditor() {
       try {
         const formData = new FormData();
         formData.append("dt_file", file);
-        formData.append("max_iterations", "3");
 
-        setExtractionProgress("Analyzing drawing tree with Claude Vision...");
-
+        // Start extraction (returns session_id immediately)
         const response = await fetch("/api/miul/extract-dt", {
           method: "POST",
           body: formData,
@@ -377,35 +375,66 @@ export default function DTTreeEditor() {
           throw new Error(`Extraction failed: ${errorText}`);
         }
 
-        setExtractionProgress("Processing extraction results...");
-        const result = await response.json();
-
-        if (!result.tree || result.tree.length === 0) {
-          throw new Error("Extraction returned empty tree");
+        const { session_id } = await response.json();
+        if (!session_id) {
+          throw new Error("No session_id returned from extraction");
         }
 
-        // Load into editor
-        const flatTree: TreeData = {
-          top_level: result.top_level,
-          tree: result.tree,
-        };
+        setExtractionProgress("Analyzing drawing tree with Claude Vision...");
 
-        setTreeData(flatTree);
+        // Poll for results (vision extraction takes 60-90s)
+        const maxAttempts = 60; // 2 minutes max
+        const pollInterval = 2000; // 2 seconds
 
-        // Expand all assemblies by default
-        const assemblies = flatTree.tree
-          .filter((n) => n.type === "ASSEMBLY")
-          .map((n) => n.drawing_number);
-        setExpandedNodes(new Set(assemblies));
+        for (let attempt = 0; attempt < maxAttempts; attempt++) {
+          await new Promise(resolve => setTimeout(resolve, pollInterval));
 
-        // Initialize history
-        setHistory([{ tree: flatTree.tree, description: "Extracted from PDF" }]);
-        setHistoryIndex(0);
+          const statusRes = await fetch(`/api/dt/session/${session_id}`);
+          if (!statusRes.ok) {
+            throw new Error("Failed to check extraction status");
+          }
 
-        toast({
-          title: "Extraction Complete",
-          description: `${flatTree.tree.length} nodes extracted from ${file.name}. Review and correct if needed.`,
-        });
+          const session = await statusRes.json();
+
+          if (session.status === "complete") {
+            setExtractionProgress("Processing extraction results...");
+
+            if (!session.tree || session.tree.length === 0) {
+              throw new Error("Extraction returned empty tree");
+            }
+
+            // Load into editor
+            const flatTree: TreeData = {
+              top_level: session.top_level,
+              tree: session.tree,
+            };
+
+            setTreeData(flatTree);
+
+            // Expand all assemblies by default
+            const assemblies = flatTree.tree
+              .filter((n) => n.type === "ASSEMBLY")
+              .map((n) => n.drawing_number);
+            setExpandedNodes(new Set(assemblies));
+
+            // Initialize history
+            setHistory([{ tree: flatTree.tree, description: "Extracted from PDF" }]);
+            setHistoryIndex(0);
+
+            toast({
+              title: "Extraction Complete",
+              description: `${flatTree.tree.length} nodes extracted from ${file.name}. Review and correct if needed.`,
+            });
+            return;
+          } else if (session.status === "failed") {
+            throw new Error(session.error || "Extraction failed");
+          }
+
+          // Still processing - update progress
+          setExtractionProgress(`Analyzing drawing tree with Claude Vision... (${attempt * 2}s)`);
+        }
+
+        throw new Error("Extraction timed out after 2 minutes");
       } catch (err) {
         toast({
           title: "Extraction Failed",

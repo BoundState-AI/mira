@@ -435,7 +435,8 @@ class DTExportRequest(BaseModel):
 @app.post("/api/miul/extract-dt")  # Alias for frontend compatibility
 async def dt_upload(
     background_tasks: BackgroundTasks,
-    file: UploadFile = File(...)
+    file: UploadFile = File(None),
+    dt_file: UploadFile = File(None),  # Frontend sends as dt_file
 ):
     """
     Upload a Drawing Tree PDF and extract hierarchy.
@@ -444,16 +445,21 @@ async def dt_upload(
     if not MIUL_AVAILABLE:
         raise HTTPException(status_code=503, detail="MIUL module not available")
 
-    if not file.filename.lower().endswith('.pdf'):
+    # Accept either 'file' or 'dt_file' field name
+    upload = file or dt_file
+    if not upload:
+        raise HTTPException(status_code=400, detail="No file provided")
+
+    if not upload.filename.lower().endswith('.pdf'):
         raise HTTPException(status_code=400, detail="Only PDF files are supported")
 
     session_id = str(uuid.uuid4())
-    content = await file.read()
+    content = await upload.read()
 
     # Store session
     dt_sessions[session_id] = {
         "status": "processing",
-        "filename": file.filename,
+        "filename": upload.filename,
         "tree": None,
         "top_level": None,
         "error": None,
@@ -462,12 +468,12 @@ async def dt_upload(
     }
 
     # Process in background
-    background_tasks.add_task(process_dt_pdf, session_id, content, file.filename)
+    background_tasks.add_task(process_dt_pdf, session_id, content, upload.filename)
 
     return {
         "session_id": session_id,
         "status": "processing",
-        "message": f"Extracting Drawing Tree from {file.filename}"
+        "message": f"Extracting Drawing Tree from {upload.filename}"
     }
 
 
