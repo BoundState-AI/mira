@@ -6,6 +6,7 @@ Minimal endpoints to support frontend deployment.
 
 import os
 import logging
+from datetime import datetime
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -743,6 +744,152 @@ async def dt_list_sessions():
             "created_at": session.get("created_at")
         })
     return {"sessions": sessions, "total": len(sessions)}
+
+
+# ---------------------------------------------------------------------------
+# MIUL v3 Builder endpoint (LIVE)
+# ---------------------------------------------------------------------------
+
+from fastapi.responses import StreamingResponse
+import io
+
+# Import builder (requires pandas/openpyxl)
+try:
+    from miul import MIULBuilderV3, BUILDER_AVAILABLE
+except ImportError:
+    BUILDER_AVAILABLE = False
+    MIULBuilderV3 = None
+
+
+@app.post("/api/miul/v3-extract")
+async def miul_v3_extract(
+    background_tasks: BackgroundTasks,
+    files: List[UploadFile] = File(...),
+    dt_session_id: Optional[str] = None,
+    project_name: Optional[str] = None,
+):
+    """
+    MIUL v3 extraction endpoint.
+
+    Accepts drawing PDFs (and optional DT session ID from DT Editor).
+    Returns an Excel file with the complete MIUL.
+
+    Args:
+        files: List of drawing PDF files
+        dt_session_id: Optional session ID from DT Editor (provides hierarchy)
+        project_name: Optional project name for the MIUL
+    """
+    if not MIUL_AVAILABLE:
+        raise HTTPException(status_code=503, detail="MIUL module not available")
+
+    if not BUILDER_AVAILABLE:
+        raise HTTPException(status_code=503, detail="MIUL Builder not available (missing pandas/openpyxl)")
+
+    if not files:
+        raise HTTPException(status_code=400, detail="No files provided")
+
+    # Create temp directory for PDFs
+    import shutil
+    temp_dir = Path(tempfile.mkdtemp(prefix="miul_"))
+
+    try:
+        # Save uploaded files to temp directory
+        for upload in files:
+            if upload.filename and upload.filename.lower().endswith('.pdf'):
+                file_path = temp_dir / upload.filename
+                content = await upload.read()
+                with open(file_path, 'wb') as f:
+                    f.write(content)
+                logger.info(f"Saved {upload.filename} to temp dir")
+
+        # Check we have PDFs
+        pdf_count = len(list(temp_dir.glob("*.pdf")))
+        if pdf_count == 0:
+            raise HTTPException(status_code=400, detail="No PDF files found in upload")
+
+        logger.info(f"Starting MIUL v3 extraction with {pdf_count} PDFs")
+
+        # Initialize builder
+        builder = MIULBuilderV3()
+
+        # If DT session provided, use that hierarchy instead of extracting
+        if dt_session_id and dt_session_id in dt_sessions:
+            session = dt_sessions[dt_session_id]
+            if session["status"] == "complete" and session.get("tree"):
+                logger.info(f"Using DT session {dt_session_id} with {len(session['tree'])} entries")
+                builder.dt_tree = {
+                    "top_level": session.get("top_level", ""),
+                    "tree": session["tree"]
+                }
+                # Generate NHA overrides from DT session
+                builder.nha_overrides = builder.generate_nha_overrides_from_dt()
+
+        # Extract drawings
+        builder.extract_directory(temp_dir)
+
+        # Build MIUL DataFrame
+        df = builder.build_miul()
+
+        # Use project name or derive from first drawing
+        project = project_name or "MIUL"
+        if not project_name and builder.drawings:
+            first_dwg = list(builder.drawings.keys())[0]
+            # Extract prefix (e.g., MER from MER07540-001)
+            import re
+            match = re.match(r'^([A-Z]+)', first_dwg.upper())
+            if match:
+                project = match.group(1)
+
+        # Export to Excel temp file (builder has full formatting)
+        excel_path = temp_dir / "output.xlsx"
+        builder.export_to_excel(df, excel_path, project=project)
+
+        # Read back into BytesIO for streaming
+        excel_buffer = io.BytesIO()
+        with open(excel_path, 'rb') as f:
+            excel_buffer.write(f.read())
+        excel_buffer.seek(0)
+
+        # Generate filename
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"MIUL_{project}_{timestamp}.xlsx"
+
+        logger.info(f"MIUL extraction complete: {len(df)} rows, returning {filename}")
+
+        # Return Excel file
+        return StreamingResponse(
+            excel_buffer,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+
+    except Exception as e:
+        logger.error(f"MIUL v3 extraction error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+    finally:
+        # Cleanup temp directory
+        try:
+            shutil.rmtree(temp_dir)
+        except Exception as e:
+            logger.warning(f"Failed to cleanup temp dir: {e}")
+
+
+@app.post("/api/miul/extract")
+async def miul_extract_legacy(
+    files: List[UploadFile] = File(...),
+    dt_session_id: Optional[str] = None,
+    project_name: Optional[str] = None,
+):
+    """Legacy MIUL extraction endpoint - redirects to v3."""
+    return await miul_v3_extract(
+        background_tasks=BackgroundTasks(),
+        files=files,
+        dt_session_id=dt_session_id,
+        project_name=project_name,
+    )
 
 
 # ---------------------------------------------------------------------------
