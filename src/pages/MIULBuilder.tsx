@@ -126,7 +126,8 @@ export default function MIULBuilder() {
         form.append('service_media', selectedMedia.join(', '));
 
         // Use v3 pipeline (enhanced multi-location material search)
-        const endpoint = '/api/miul/v3-extract';
+        // Call Railway directly to avoid Vercel proxy timeout (extraction takes 2-3 min)
+        const endpoint = 'https://mira-production-33c3.up.railway.app/api/miul/v3-extract';
         const pipelineDesc = "v3: PDF → Vision → OCR Correction → Material Form → MIUL";
 
         toast({ title: "MIUL Pipeline Running", description: pipelineDesc });
