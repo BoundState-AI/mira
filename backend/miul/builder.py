@@ -1190,6 +1190,11 @@ class MIULBuilderV3:
         2. Detect duplicate PNs in same assembly EPL (likely OCR errors)
         3. Clean up CAGE codes that leaked into Designation
         """
+        # Handle empty DataFrame
+        if df.empty or "Part Number" not in df.columns:
+            LOGGER.warning("[MIULBuilder] Empty or malformed DataFrame in postprocess")
+            return df
+
         initial = len(df)
 
         # Remove DELETED-like rows (EH-FITTED, FELT FED, etc.)
