@@ -5,13 +5,31 @@ Minimal endpoints to support frontend deployment.
 """
 
 import os
+import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional, Any, Dict
 import uuid
 
+# Configure logging for Railway visibility
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
 app = FastAPI(title="BoundState MIRA API", version="0.1.0")
+
+# Log startup info
+@app.on_event("startup")
+async def startup_event():
+    port = os.environ.get("PORT", "not set")
+    logger.info(f"=== MIRA Backend Starting ===")
+    logger.info(f"PORT environment variable: {port}")
+    logger.info(f"ANTHROPIC_API_KEY set: {'yes' if os.environ.get('ANTHROPIC_API_KEY') else 'NO'}")
+    logger.info(f"Python path: {os.getcwd()}")
+    logger.info(f"=== Startup complete ===")
 
 # CORS - allow all origins for now
 app.add_middleware(
@@ -29,12 +47,21 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
+    logger.info("Root endpoint called")
     return {"status": "ok", "service": "mira-backend", "version": "0.1.0"}
 
 
 @app.get("/health")
 async def health():
+    logger.info("Health check called")
     return {"status": "healthy"}
+
+
+@app.get("/api/health")
+async def api_health():
+    """Health check under /api path for Vercel proxy."""
+    logger.info("API health check called")
+    return {"status": "healthy", "service": "mira-backend"}
 
 
 # ---------------------------------------------------------------------------
