@@ -15,19 +15,27 @@ export function AppLayout({ children }: AppLayoutProps) {
           <header
             className="md:hidden"
             style={{
-              background: '#18181b',
+              background: '#27272a',
               padding: '12px 16px',
               display: 'flex',
               alignItems: 'center',
               gap: '12px',
-              borderBottom: '1px solid #3f3f46',
+              borderBottom: '1px solid #52525b',
               position: 'sticky',
               top: 0,
               zIndex: 50
             }}
           >
-            <SidebarTrigger />
-            <span style={{ color: '#a1a1aa', fontSize: '11px', fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            <SidebarTrigger
+              style={{
+                background: '#3f3f46',
+                border: '1px solid #52525b',
+                borderRadius: '6px',
+                padding: '8px',
+                color: 'white'
+              }}
+            />
+            <span style={{ color: '#d4d4d8', fontSize: '12px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
               MIRA V3
             </span>
           </header>
