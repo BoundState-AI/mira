@@ -279,6 +279,39 @@ class VisionClient:
             LOGGER.error(f"Vision API error: {e}")
             return {}
 
+    def call_pdf(self, pdf_b64: str, prompt: str, page_index: int = None) -> Dict[str, Any]:
+        """Call Claude API with PDF directly (native PDF support)."""
+        if not self.client:
+            return {}
+
+        try:
+            content = [
+                {
+                    "type": "document",
+                    "source": {
+                        "type": "base64",
+                        "media_type": "application/pdf",
+                        "data": pdf_b64,
+                    },
+                },
+                {"type": "text", "text": prompt},
+            ]
+
+            # Add page hint if specified
+            if page_index is not None:
+                content[1]["text"] = f"Focus on page {page_index + 1}.\n\n{prompt}"
+
+            response = self.client.messages.create(
+                model=self.model,
+                max_tokens=8192,
+                temperature=0,
+                messages=[{"role": "user", "content": content}],
+            )
+            return self._parse_json_response(response.content[0].text)
+        except Exception as e:
+            LOGGER.error(f"PDF API error: {e}")
+            return {}
+
     @staticmethod
     def _parse_json_response(text: str) -> Dict[str, Any]:
         """Extract JSON from model response."""
@@ -309,11 +342,12 @@ class VisionClient:
 # =============================================================================
 
 def pdf_to_images(pdf_path: Path, max_dimension: int = 7500) -> List[str]:
-    """Convert PDF pages to base64 images."""
+    """Convert PDF pages to base64 images. Returns empty list if fitz unavailable."""
     try:
         import fitz
     except ImportError:
-        raise ImportError("PyMuPDF required: pip install PyMuPDF")
+        LOGGER.warning("PyMuPDF not available - using native PDF support")
+        return []  # Empty list signals to use native PDF support
 
     doc = fitz.open(pdf_path)
     images: List[str] = []
@@ -333,6 +367,20 @@ def pdf_to_images(pdf_path: Path, max_dimension: int = 7500) -> List[str]:
 
     doc.close()
     return images
+
+
+def get_pdf_page_count(pdf_path: Path) -> int:
+    """Get page count from PDF without fitz (using simple heuristic)."""
+    try:
+        import fitz
+        doc = fitz.open(pdf_path)
+        count = len(doc)
+        doc.close()
+        return count
+    except ImportError:
+        # Fallback: assume single page for now
+        # Native PDF extraction will handle multi-page
+        return 1
 
 
 # =============================================================================
@@ -511,13 +559,21 @@ def extract_drawing_page(
     if client is None:
         client = VisionClient()
 
+    # Try image-based extraction first (if fitz available)
     images = pdf_to_images(pdf_path)
 
-    if page_idx >= len(images):
-        LOGGER.warning(f"Page {page_idx} not found in {pdf_path.name}")
-        return {}
-
-    raw = client.call_vision(images[page_idx], V3_EXTRACTION_PROMPT)
+    if images:
+        # Use image-based extraction
+        if page_idx >= len(images):
+            LOGGER.warning(f"Page {page_idx} not found in {pdf_path.name}")
+            return {}
+        raw = client.call_vision(images[page_idx], V3_EXTRACTION_PROMPT)
+    else:
+        # Fallback to native PDF extraction
+        LOGGER.info(f"Using native PDF extraction for {pdf_path.name}")
+        with open(pdf_path, "rb") as f:
+            pdf_b64 = base64.b64encode(f.read()).decode()
+        raw = client.call_pdf(pdf_b64, V3_EXTRACTION_PROMPT, page_index=page_idx)
 
     if not raw:
         LOGGER.warning(f"No extraction result for {pdf_path.name} page {page_idx}")
