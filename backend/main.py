@@ -851,8 +851,24 @@ async def miul_v3_extract(
         # Extract drawings
         builder.extract_directory(temp_dir)
 
+        # Check if any drawings were extracted
+        if not builder.drawings:
+            raise HTTPException(
+                status_code=400,
+                detail=f"No drawings could be extracted from {pdf_count} PDFs. Check that files are valid engineering drawings."
+            )
+
+        logger.info(f"Extracted {len(builder.drawings)} drawings")
+
         # Build MIUL DataFrame
         df = builder.build_miul()
+
+        # Validate DataFrame
+        if df is None or df.empty:
+            raise HTTPException(
+                status_code=500,
+                detail="MIUL generation produced empty results. Check extraction logs."
+            )
 
         # Use project name or derive from first drawing
         project_name = project or miul_number or "MIUL"
