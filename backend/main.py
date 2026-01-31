@@ -29,6 +29,7 @@ async def startup_event():
     logger.info(f"=== MIRA Backend Starting ===")
     logger.info(f"PORT environment variable: {port}")
     logger.info(f"ANTHROPIC_API_KEY set: {'yes' if os.environ.get('ANTHROPIC_API_KEY') else 'NO'}")
+    logger.info(f"DATABASE_URL set: {'yes' if os.environ.get('DATABASE_URL') else 'NO'}")
     logger.info(f"Python path: {os.getcwd()}")
     logger.info(f"=== Startup complete ===")
 
@@ -40,6 +41,20 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ---------------------------------------------------------------------------
+# Knowledge Twins - Hybrid Query Router
+# ---------------------------------------------------------------------------
+
+try:
+    from mira.api.routers.hybrid_query import router as hybrid_query_router
+    app.include_router(hybrid_query_router)
+    HYBRID_QUERY_AVAILABLE = True
+    logger.info("Hybrid Query router loaded successfully")
+except ImportError as e:
+    HYBRID_QUERY_AVAILABLE = False
+    logger.warning(f"Hybrid Query router not available: {e}")
 
 
 # ---------------------------------------------------------------------------
