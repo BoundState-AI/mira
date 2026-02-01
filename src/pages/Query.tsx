@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Search, Sparkles, Info, List, Table as TableIcon, Eye, ArrowUpDown, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,13 +39,6 @@ import {
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-const exampleQueries = [
-  "Show me oxygen-compatible metals for cryogenic service",
-  "Materials rated for 3000 psi GOX with low permeability",
-  "Compare Inconel 718 vs Hastelloy C-276 mechanical properties",
-  "Test results for polymers exposed to hydrazine",
-];
-
 interface MaterialResult {
   materialkey: string;
   material_key: string | number;
@@ -74,6 +68,7 @@ interface MaterialResult {
 }
 
 export default function Query() {
+  const { t } = useTranslation('query');
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<MaterialResult[]>([]);
   const [debugInfo, setDebugInfo] = useState<{ servedPath: string; pipeline: string } | null>(null);
@@ -82,6 +77,9 @@ export default function Query() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [selectedMaterial, setSelectedMaterial] = useState<MaterialResult | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // Get example queries from translations
+  const exampleQueries = t('exampleQueries', { returnObjects: true }) as string[];
 
   const handleSearch = async () => {
     if (!query.trim()) return;
@@ -231,7 +229,7 @@ export default function Query() {
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="h-auto p-0 hover:bg-transparent"
         >
-          Material Name
+          {t('table.materialName')}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -246,7 +244,7 @@ export default function Query() {
     },
     {
       accessorKey: "o2_rating",
-      header: "O2",
+      header: t('table.o2'),
       cell: ({ row }) => {
         const rating = row.original.o2_rating;
         if (!rating || rating === "No data") {
@@ -257,7 +255,7 @@ export default function Query() {
     },
     {
       accessorKey: "flamm_rating",
-      header: "Flammability",
+      header: t('table.flammability'),
       cell: ({ row }) => {
         const rating = row.original.flamm_rating;
         if (!rating || rating === "No data") {
@@ -268,7 +266,7 @@ export default function Query() {
     },
     {
       accessorKey: "corr_rating",
-      header: "Corrosion",
+      header: t('table.corrosion'),
       cell: ({ row }) => {
         const rating = row.original.corr_rating;
         if (!rating || rating === "No data") {
@@ -279,7 +277,7 @@ export default function Query() {
     },
     {
       accessorKey: "scc_rating",
-      header: "Stress Corr",
+      header: t('table.stressCorr'),
       cell: ({ row }) => {
         const rating = row.original.scc_rating;
         if (!rating || rating === "No data") {
@@ -290,7 +288,7 @@ export default function Query() {
     },
     {
       accessorKey: "tvs_rating",
-      header: "Outgassing",
+      header: t('table.outgassing'),
       cell: ({ row }) => {
         const rating = row.original.tvs_rating;
         if (!rating || rating === "No data") {
@@ -308,7 +306,7 @@ export default function Query() {
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="h-auto p-0 hover:bg-transparent"
         >
-          Match Score
+          {t('table.matchScore')}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -364,14 +362,14 @@ export default function Query() {
         <div className="max-w-4xl mx-auto px-6 py-12">
           <div className="mb-8">
             <h1 className="text-4xl font-serif font-bold mb-1 text-balance flex items-center gap-3">
-              MIRA
+              {t('pageTitle')}
               <PageHelp content={helpContent.query} />
             </h1>
             <p className="text-lg text-muted-foreground mb-1">
-              Materials Intelligence & Risk Analysis
+              {t('pageSubtitle')}
             </p>
             <p className="text-sm text-muted-foreground">
-              Ask MAPTIS questions in natural language
+              {t('pageDescription')}
             </p>
           </div>
 
@@ -382,7 +380,7 @@ export default function Query() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                placeholder="Describe what you're looking for..."
+                placeholder={t('placeholder')}
                 className="pl-10 h-12 text-base"
               />
             </div>
@@ -398,20 +396,20 @@ export default function Query() {
                   <div className="flex items-start gap-2">
                     <Info className="h-4 w-4 mt-0.5 text-primary shrink-0" />
                     <p className="text-sm text-muted-foreground">
-                      <span className="text-primary font-medium">Hybrid Search Active.</span> Queries are parsed for intent, constraints, and entities before semantic search.
+                      <span className="text-primary font-medium">{t('hybridSearch.title')}</span> {t('hybridSearch.description')}
                     </p>
                   </div>
                   {query.trim() ? (
                     <div className="p-3 bg-primary/5 border border-primary/20 rounded-md text-sm">
-                      <p className="font-medium mb-2">Your query:</p>
+                      <p className="font-medium mb-2">{t('hybridSearch.yourQuery')}</p>
                       <p className="text-muted-foreground italic">"{query}"</p>
                       <p className="text-xs text-primary mt-3">
-                        Intent classification + constraint extraction active
+                        {t('hybridSearch.intentActive')}
                       </p>
                     </div>
                   ) : (
                     <div className="p-3 bg-muted rounded-md text-sm font-mono text-muted-foreground">
-                      <p className="mb-2 font-medium">Parsed constraints:</p>
+                      <p className="mb-2 font-medium">{t('hybridSearch.parsedConstraints')}</p>
                       intent: comparison<br/>
                       materials: [Inconel 718, Hastelloy C-276]<br/>
                       properties: mechanical
@@ -426,7 +424,7 @@ export default function Query() {
               disabled={isSearching || !query.trim()}
               className="h-12 px-6"
             >
-              {isSearching ? "Searching..." : "Search"}
+              {isSearching ? t('searching') : t('search')}
             </Button>
           </div>
 
@@ -452,9 +450,9 @@ export default function Query() {
         {results.length === 0 && !isSearching && (
           <div className="text-center py-16">
             <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-medium mb-2">No search yet</h3>
+            <h3 className="text-lg font-medium mb-2">{t('noSearch.title')}</h3>
             <p className="text-muted-foreground text-sm">
-              Try one of the example queries above to get started
+              {t('noSearch.hint')}
             </p>
           </div>
         )}
@@ -489,20 +487,20 @@ export default function Query() {
                 <TabsList>
                   <TabsTrigger value="cards" className="gap-2">
                     <List className="h-4 w-4" />
-                    Cards
+                    {t('results.cards')}
                   </TabsTrigger>
                   <TabsTrigger value="table" className="gap-2">
                     <TableIcon className="h-4 w-4" />
-                    Table
+                    {t('results.table')}
                   </TabsTrigger>
                 </TabsList>
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-muted-foreground">
-                    Found {results.length} materials
+                    {t('results.found', { count: results.length })}
                   </p>
                   <Button variant="outline" size="sm">
                     <Download className="h-4 w-4 mr-2" />
-                    Export CSV
+                    {t('results.exportCsv')}
                   </Button>
                 </div>
               </div>
@@ -519,11 +517,11 @@ export default function Query() {
                           {result.canonical_name}
                         </h3>
                         <p className="text-sm text-muted-foreground font-mono">
-                          Code: {result.material_code || (result.material_key ? `MAT-${result.material_key}` : 'N/A')}
+                          {t('results.code')}: {result.material_code || (result.material_key ? `MAT-${result.material_key}` : 'N/A')}
                         </p>
                       </div>
                       <Badge variant="outline" className="shrink-0">
-                        Score: {result.ui_percent ?? 0}%
+                        {t('results.score')}: {result.ui_percent ?? 0}%
                       </Badge>
                     </div>
 
@@ -533,7 +531,7 @@ export default function Query() {
                       ))}
                       {result.temperature_range && (
                         <Badge variant="outline">
-                          Temp: {result.temperature_range.min_f || 'N/A'}F to {result.temperature_range.max_f || 'N/A'}F
+                          {t('results.temp')}: {result.temperature_range.min_f || 'N/A'}F to {result.temperature_range.max_f || 'N/A'}F
                         </Badge>
                       )}
                     </div>
@@ -550,7 +548,7 @@ export default function Query() {
                         className="h-auto p-0"
                         onClick={() => handleViewDetails(result)}
                       >
-                        View details
+                        {t('results.viewDetails')}
                       </Button>
                       <span className="text-muted-foreground">
                         {result.row_uid}
@@ -603,7 +601,7 @@ export default function Query() {
                             colSpan={columns.length}
                             className="h-24 text-center"
                           >
-                            No results found
+                            {t('results.noResults')}
                           </TableCell>
                         </TableRow>
                       )}
@@ -621,81 +619,81 @@ export default function Query() {
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-serif">
-              {selectedMaterial?.canonical_name || 'Material Details'}
+              {selectedMaterial?.canonical_name || t('dialog.title')}
             </DialogTitle>
           </DialogHeader>
 
           {selectedMaterial && (
             <div className="space-y-6">
               <div>
-                <h3 className="font-semibold mb-3">Basic Information</h3>
+                <h3 className="font-semibold mb-3">{t('dialog.basicInfo')}</h3>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p className="text-muted-foreground">Material Code</p>
+                    <p className="text-muted-foreground">{t('dialog.materialCode')}</p>
                     <p className="font-mono font-bold">{selectedMaterial.material_code || (selectedMaterial.material_key ? `MAT-${selectedMaterial.material_key}` : 'N/A')}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Material Key</p>
+                    <p className="text-muted-foreground">{t('dialog.materialKey')}</p>
                     <p className="font-mono">{selectedMaterial.material_key || 'N/A'}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Material Type</p>
-                    <p>{selectedMaterial.material_type_name || 'Unknown'}</p>
+                    <p className="text-muted-foreground">{t('dialog.materialType')}</p>
+                    <p>{selectedMaterial.material_type_name || t('dialog.unknown')}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Match Score</p>
+                    <p className="text-muted-foreground">{t('dialog.matchScore')}</p>
                     <p>{selectedMaterial.ui_percent}%</p>
                   </div>
                 </div>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-3">MAPTIS Ratings</h3>
+                <h3 className="font-semibold mb-3">{t('dialog.maptisRatings')}</h3>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <p className="text-muted-foreground text-xs mb-1">Flammability</p>
+                    <p className="text-muted-foreground text-xs mb-1">{t('dialog.flammability')}</p>
                     {selectedMaterial.flamm_rating && selectedMaterial.flamm_rating !== 'No data' ? (
                       <Badge className={getRatingBadgeClass(selectedMaterial.flamm_rating)}>{selectedMaterial.flamm_rating}</Badge>
                     ) : <span className="text-xs text-muted-foreground">-</span>}
                   </div>
                   <div>
-                    <p className="text-muted-foreground text-xs mb-1">Corrosion</p>
+                    <p className="text-muted-foreground text-xs mb-1">{t('dialog.corrosion')}</p>
                     {selectedMaterial.corr_rating && selectedMaterial.corr_rating !== 'No data' ? (
                       <Badge className={getRatingBadgeClass(selectedMaterial.corr_rating)}>{selectedMaterial.corr_rating}</Badge>
                     ) : <span className="text-xs text-muted-foreground">-</span>}
                   </div>
                   <div>
-                    <p className="text-muted-foreground text-xs mb-1">SCC</p>
+                    <p className="text-muted-foreground text-xs mb-1">{t('dialog.scc')}</p>
                     {selectedMaterial.scc_rating && selectedMaterial.scc_rating !== 'No data' ? (
                       <Badge className={getRatingBadgeClass(selectedMaterial.scc_rating)}>{selectedMaterial.scc_rating}</Badge>
                     ) : <span className="text-xs text-muted-foreground">-</span>}
                   </div>
                   <div>
-                    <p className="text-muted-foreground text-xs mb-1">TVS</p>
+                    <p className="text-muted-foreground text-xs mb-1">{t('dialog.tvs')}</p>
                     {selectedMaterial.tvs_rating && selectedMaterial.tvs_rating !== 'No data' ? (
                       <Badge className={getRatingBadgeClass(selectedMaterial.tvs_rating)}>{selectedMaterial.tvs_rating}</Badge>
                     ) : <span className="text-xs text-muted-foreground">-</span>}
                   </div>
                   <div>
-                    <p className="text-muted-foreground text-xs mb-1">Toxicity</p>
+                    <p className="text-muted-foreground text-xs mb-1">{t('dialog.toxicity')}</p>
                     {selectedMaterial.tox_rating && selectedMaterial.tox_rating !== 'No data' ? (
                       <Badge className={getRatingBadgeClass(selectedMaterial.tox_rating)}>{selectedMaterial.tox_rating}</Badge>
                     ) : <span className="text-xs text-muted-foreground">-</span>}
                   </div>
                   <div>
-                    <p className="text-muted-foreground text-xs mb-1">Fluid Systems</p>
+                    <p className="text-muted-foreground text-xs mb-1">{t('dialog.fluidSystems')}</p>
                     {selectedMaterial.fs_rating && selectedMaterial.fs_rating !== 'No data' ? (
                       <Badge className={getRatingBadgeClass(selectedMaterial.fs_rating)}>{selectedMaterial.fs_rating}</Badge>
                     ) : <span className="text-xs text-muted-foreground">-</span>}
                   </div>
                   <div>
-                    <p className="text-muted-foreground text-xs mb-1">O2 Compatibility</p>
+                    <p className="text-muted-foreground text-xs mb-1">{t('dialog.o2Compatibility')}</p>
                     {selectedMaterial.o2_rating && selectedMaterial.o2_rating !== 'No data' ? (
                       <Badge className={getRatingBadgeClass(selectedMaterial.o2_rating)}>{selectedMaterial.o2_rating}</Badge>
                     ) : <span className="text-xs text-muted-foreground">-</span>}
                   </div>
                   <div>
-                    <p className="text-muted-foreground text-xs mb-1">Mechanical Impact</p>
+                    <p className="text-muted-foreground text-xs mb-1">{t('dialog.mechanicalImpact')}</p>
                     {selectedMaterial.mech_rating && selectedMaterial.mech_rating !== 'No data' ? (
                       <Badge className={getRatingBadgeClass(selectedMaterial.mech_rating)}>{selectedMaterial.mech_rating}</Badge>
                     ) : <span className="text-xs text-muted-foreground">-</span>}
@@ -705,9 +703,9 @@ export default function Query() {
 
               {selectedMaterial.yield_strength && selectedMaterial.yield_strength > 0 && (
                 <div>
-                  <h3 className="font-semibold mb-3">Mechanical Properties</h3>
+                  <h3 className="font-semibold mb-3">{t('dialog.mechanicalProperties')}</h3>
                   <div className="text-sm">
-                    <p className="text-muted-foreground">Yield Strength</p>
+                    <p className="text-muted-foreground">{t('dialog.yieldStrength')}</p>
                     <p>{selectedMaterial.yield_strength.toLocaleString()} ksi</p>
                   </div>
                 </div>
@@ -715,7 +713,7 @@ export default function Query() {
 
               <div className="flex justify-end gap-2 pt-4 border-t">
                 <Button onClick={() => setIsDialogOpen(false)}>
-                  Close
+                  {t('dialog.close')}
                 </Button>
               </div>
             </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -21,63 +22,19 @@ import {
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
-// Rating display configuration
-const RATING_CONFIG: Record<string, {
-  label: string
+// Rating display configuration (labels/descriptions loaded from i18n)
+const RATING_STYLES: Record<string, {
   icon: typeof CheckCircle2
   color: string
   bgColor: string
   borderColor: string
-  description: string
 }> = {
-  'A': {
-    label: 'Excellent',
-    icon: CheckCircle2,
-    color: 'text-green-600',
-    bgColor: 'bg-green-50',
-    borderColor: 'border-green-500',
-    description: 'Approved, high heritage'
-  },
-  'B': {
-    label: 'Good',
-    icon: CheckCircle2,
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50',
-    borderColor: 'border-blue-500',
-    description: 'Approved, moderate heritage'
-  },
-  'C': {
-    label: 'Fair',
-    icon: AlertTriangle,
-    color: 'text-yellow-600',
-    bgColor: 'bg-yellow-50',
-    borderColor: 'border-yellow-500',
-    description: 'Approved, limited heritage'
-  },
-  'D': {
-    label: 'Poor',
-    icon: AlertTriangle,
-    color: 'text-orange-600',
-    bgColor: 'bg-orange-50',
-    borderColor: 'border-orange-500',
-    description: 'Conditionally approved'
-  },
-  'X': {
-    label: 'Fail',
-    icon: XCircle,
-    color: 'text-red-600',
-    bgColor: 'bg-red-50',
-    borderColor: 'border-red-500',
-    description: 'Not approved'
-  },
-  'U': {
-    label: 'Unknown',
-    icon: HelpCircle,
-    color: 'text-gray-600',
-    bgColor: 'bg-gray-50',
-    borderColor: 'border-gray-500',
-    description: 'Rating not available'
-  }
+  'A': { icon: CheckCircle2, color: 'text-green-600', bgColor: 'bg-green-50', borderColor: 'border-green-500' },
+  'B': { icon: CheckCircle2, color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-500' },
+  'C': { icon: AlertTriangle, color: 'text-yellow-600', bgColor: 'bg-yellow-50', borderColor: 'border-yellow-500' },
+  'D': { icon: AlertTriangle, color: 'text-orange-600', bgColor: 'bg-orange-50', borderColor: 'border-orange-500' },
+  'X': { icon: XCircle, color: 'text-red-600', bgColor: 'bg-red-50', borderColor: 'border-red-500' },
+  'U': { icon: HelpCircle, color: 'text-gray-600', bgColor: 'bg-gray-50', borderColor: 'border-gray-500' }
 }
 
 interface Material {
@@ -147,6 +104,7 @@ interface HybridQueryResponse {
 }
 
 export default function KnowledgeTwins() {
+  const { t } = useTranslation('knowledgeTwins')
   const [mode, setMode] = useState<'browse' | 'ask'>('browse')
   const [activeFluid, setActiveFluid] = useState<'oxygen' | 'hydrogen'>('oxygen')
   const [query, setQuery] = useState('')
@@ -156,6 +114,16 @@ export default function KnowledgeTwins() {
   const [hybridResponse, setHybridResponse] = useState<HybridQueryResponse | null>(null)
   const [llmProvider, setLlmProvider] = useState<'ollama' | 'haiku'>('ollama')
   const [error, setError] = useState<string | null>(null)
+
+  // Get rating config with translated labels
+  const getRatingConfig = (rating: string) => {
+    const style = RATING_STYLES[rating] || RATING_STYLES['U']
+    return {
+      ...style,
+      label: t(`ratings.${rating}.label`, rating),
+      description: t(`ratings.${rating}.description`, '')
+    }
+  }
 
   const handleSearch = async () => {
     if (!query.trim()) return
@@ -267,7 +235,7 @@ export default function KnowledgeTwins() {
   const sortedRatings = ratingOrder.filter(rating => groupedMaterials[rating])
 
   const getRatingBadge = (rating: string, size: 'sm' | 'lg' = 'sm') => {
-    const config = RATING_CONFIG[rating] || RATING_CONFIG['U']
+    const config = getRatingConfig(rating)
     const Icon = config.icon
 
     if (size === 'lg') {
@@ -298,12 +266,12 @@ export default function KnowledgeTwins() {
           <div className="flex items-center gap-3 mb-1">
             <Brain className="h-6 w-6 text-primary" />
             <h1 className="text-2xl font-serif font-bold flex items-center gap-3">
-              Knowledge Twins
+              {t('title')}
               <PageHelp content={helpContent.knowledgeTwins} />
             </h1>
           </div>
           <p className="text-sm text-muted-foreground">
-            Evidence-based O2/H2 material compatibility using NASA Body of Knowledge
+            {t('description')}
           </p>
         </div>
       </div>
@@ -315,11 +283,11 @@ export default function KnowledgeTwins() {
           <TabsList className="grid w-full max-w-md grid-cols-2">
             <TabsTrigger value="oxygen">
               <Droplet className="h-4 w-4 mr-2" />
-              Oxygen (O2)
+              {t('fluidTypes.oxygen')}
             </TabsTrigger>
             <TabsTrigger value="hydrogen">
               <Flame className="h-4 w-4 mr-2" />
-              Hydrogen (H2)
+              {t('fluidTypes.hydrogen')}
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -331,33 +299,33 @@ export default function KnowledgeTwins() {
             onClick={() => setMode('browse')}
             size="sm"
           >
-            Browse Materials
+            {t('modes.browse')}
           </Button>
           <Button
             variant={mode === 'ask' ? 'default' : 'outline'}
             onClick={() => setMode('ask')}
             size="sm"
           >
-            Ask Question
+            {t('modes.ask')}
           </Button>
 
           {/* LLM Provider Toggle (only in Ask mode) */}
           {mode === 'ask' && (
             <div className="ml-4 flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">LLM:</span>
+              <span className="text-muted-foreground">{t('llm.label')}</span>
               <Button
                 variant={llmProvider === 'ollama' ? 'default' : 'outline'}
                 onClick={() => setLlmProvider('ollama')}
                 size="sm"
               >
-                Local (Ollama)
+                {t('llm.ollama')}
               </Button>
               <Button
                 variant={llmProvider === 'haiku' ? 'default' : 'outline'}
                 onClick={() => setLlmProvider('haiku')}
                 size="sm"
               >
-                Claude Haiku
+                {t('llm.haiku')}
               </Button>
             </div>
           )}
@@ -370,8 +338,8 @@ export default function KnowledgeTwins() {
               <Input
                 placeholder={
                   mode === 'ask'
-                    ? `Ask a question about ${activeFluid} compatibility (e.g., "Can I use aluminum in ${activeFluid} service?")`
-                    : `Search ${activeFluid} compatibility (e.g., "materials compatible with ${activeFluid} at 20psi")`
+                    ? t('search.placeholderAsk', { fluid: activeFluid })
+                    : t('search.placeholderBrowse', { fluid: activeFluid })
                 }
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -384,12 +352,12 @@ export default function KnowledgeTwins() {
                 {loading ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    {mode === 'ask' ? 'Thinking...' : 'Searching...'}
+                    {mode === 'ask' ? t('search.thinking') : t('search.searching')}
                   </>
                 ) : (
                   <>
                     <Search className="h-4 w-4 mr-2" />
-                    {mode === 'ask' ? 'Ask' : 'Search'}
+                    {mode === 'ask' ? t('search.buttonAsk') : t('search.buttonSearch')}
                   </>
                 )}
               </Button>
@@ -404,7 +372,7 @@ export default function KnowledgeTwins() {
               <div className="flex items-center gap-3 text-red-600">
                 <XCircle className="h-6 w-6" />
                 <div>
-                  <div className="font-bold">{mode === 'ask' ? 'Question Error' : 'Search Error'}</div>
+                  <div className="font-bold">{mode === 'ask' ? t('errors.questionError') : t('errors.searchError')}</div>
                   <div className="text-sm">{error}</div>
                 </div>
               </div>
@@ -431,7 +399,7 @@ export default function KnowledgeTwins() {
                     ) : (
                       <AlertTriangle className="h-5 w-5 text-yellow-600" />
                     )}
-                    Decision: {hybridResponse.deterministic_decision}
+                    {t('hybridResults.decision')}: {hybridResponse.deterministic_decision}
                     <Badge variant="outline" className="ml-2">{hybridResponse.decision_source}</Badge>
                   </CardTitle>
                 </CardHeader>
@@ -447,7 +415,7 @@ export default function KnowledgeTwins() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Sparkles className="h-5 w-5 text-blue-600" />
-                    MIRA Analysis
+                    {t('hybridResults.miraAnalysis')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -456,7 +424,7 @@ export default function KnowledgeTwins() {
                   </div>
                   {hybridResponse.constraints && (
                     <div className="mt-4 pt-4 border-t border-blue-200">
-                      <p className="text-xs text-muted-foreground font-semibold mb-2">Extracted Constraints:</p>
+                      <p className="text-xs text-muted-foreground font-semibold mb-2">{t('hybridResults.extractedConstraints')}</p>
                       <pre className="text-xs bg-white p-3 rounded border border-blue-200 overflow-x-auto">
                         {JSON.stringify(hybridResponse.constraints, null, 2)}
                       </pre>
@@ -471,7 +439,7 @@ export default function KnowledgeTwins() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <HelpCircle className="h-5 w-5 text-blue-600" />
-                  Evidence Summary
+                  {t('hybridResults.evidenceSummary')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -480,38 +448,38 @@ export default function KnowledgeTwins() {
                     <div className="text-2xl font-bold text-blue-600">
                       {hybridResponse.evidence_summary.mua_precedents_found}
                     </div>
-                    <div className="text-xs text-muted-foreground">MUA Precedents</div>
+                    <div className="text-xs text-muted-foreground">{t('hybridResults.muaPrecedents')}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">
                       {hybridResponse.evidence_summary.test_results_found}
                     </div>
-                    <div className="text-xs text-muted-foreground">Test Results</div>
+                    <div className="text-xs text-muted-foreground">{t('hybridResults.testResults')}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-purple-600">
                       {hybridResponse.evidence_summary.requirements_evaluated}
                     </div>
-                    <div className="text-xs text-muted-foreground">Requirements</div>
+                    <div className="text-xs text-muted-foreground">{t('hybridResults.requirements')}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-orange-600">
                       {hybridResponse.evidence_summary.semantic_results_found}
                     </div>
-                    <div className="text-xs text-muted-foreground">Semantic Results</div>
+                    <div className="text-xs text-muted-foreground">{t('hybridResults.semanticResults')}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-indigo-600">
                       {hybridResponse.evidence_summary.high_confidence_semantic}
                     </div>
-                    <div className="text-xs text-muted-foreground">High Confidence</div>
+                    <div className="text-xs text-muted-foreground">{t('hybridResults.highConfidence')}</div>
                   </div>
                 </div>
                 {hybridResponse.insufficient_data && (
                   <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <div className="flex items-center gap-2 text-yellow-800">
                       <AlertTriangle className="h-4 w-4" />
-                      <span className="text-sm font-semibold">Insufficient Data</span>
+                      <span className="text-sm font-semibold">{t('hybridResults.insufficientData')}</span>
                     </div>
                   </div>
                 )}
@@ -524,7 +492,7 @@ export default function KnowledgeTwins() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <CheckCircle2 className="h-5 w-5 text-green-600" />
-                    Material Compatibility Decisions
+                    {t('hybridResults.materialDecisions')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -538,7 +506,7 @@ export default function KnowledgeTwins() {
                         <p className="text-sm text-gray-700 mb-3">{decision.reasoning}</p>
                         {decision.citations && decision.citations.length > 0 && (
                           <div className="text-xs text-muted-foreground">
-                            <span className="font-semibold">Citations: </span>
+                            <span className="font-semibold">{t('hybridResults.citations')} </span>
                             {decision.citations.join(', ')}
                           </div>
                         )}
@@ -554,7 +522,7 @@ export default function KnowledgeTwins() {
               <Card className="border-2 border-orange-500">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <span>Semantic Search Results</span>
+                    <span>{t('hybridResults.semanticSearchResults')}</span>
                     <Badge variant="secondary">{hybridResponse.semantic_evidence.total_results}</Badge>
                   </CardTitle>
                 </CardHeader>
@@ -567,7 +535,7 @@ export default function KnowledgeTwins() {
                             {result.source}
                           </Badge>
                           <Badge variant="secondary">
-                            {(result.score * 100).toFixed(0)}% match
+                            {(result.score * 100).toFixed(0)}% {t('hybridResults.match')}
                           </Badge>
                         </div>
                         <p className="text-sm text-gray-700 leading-relaxed">{result.text}</p>
@@ -589,15 +557,15 @@ export default function KnowledgeTwins() {
               <div className="space-y-4">
                 <div>
                   <h2 className="text-xl font-bold mb-1">
-                    Recommended Materials
+                    {t('results.recommendedMaterials')}
                   </h2>
                   <p className="text-sm text-muted-foreground">
-                    Materials with {activeFluid} compatibility ratings from MAPTIS database
+                    {t('results.materialsDescription', { fluid: activeFluid })}
                   </p>
                 </div>
 
                 {sortedRatings.map((rating) => {
-                  const config = RATING_CONFIG[rating]
+                  const config = getRatingConfig(rating)
                   const materialsInRating = groupedMaterials[rating]
                   const Icon = config.icon
 
@@ -631,25 +599,25 @@ export default function KnowledgeTwins() {
                                     <div className="grid grid-cols-4 gap-3 mb-3">
                                       {material.flamm_rating && material.flamm_rating !== 'No data' && (
                                         <div>
-                                          <div className="text-xs text-muted-foreground mb-1">FLAMM</div>
+                                          <div className="text-xs text-muted-foreground mb-1">{t('ratingLabels.FLAMM')}</div>
                                           {getRatingBadge(material.flamm_rating)}
                                         </div>
                                       )}
                                       {material.corr_rating && material.corr_rating !== 'No data' && (
                                         <div>
-                                          <div className="text-xs text-muted-foreground mb-1">CORR</div>
+                                          <div className="text-xs text-muted-foreground mb-1">{t('ratingLabels.CORR')}</div>
                                           {getRatingBadge(material.corr_rating)}
                                         </div>
                                       )}
                                       {material.scc_rating && material.scc_rating !== 'No data' && (
                                         <div>
-                                          <div className="text-xs text-muted-foreground mb-1">SCC</div>
+                                          <div className="text-xs text-muted-foreground mb-1">{t('ratingLabels.SCC')}</div>
                                           {getRatingBadge(material.scc_rating)}
                                         </div>
                                       )}
                                       {material.tvs_rating && material.tvs_rating !== 'No data' && (
                                         <div>
-                                          <div className="text-xs text-muted-foreground mb-1">TVS</div>
+                                          <div className="text-xs text-muted-foreground mb-1">{t('ratingLabels.TVS')}</div>
                                           {getRatingBadge(material.tvs_rating)}
                                         </div>
                                       )}
@@ -682,10 +650,10 @@ export default function KnowledgeTwins() {
               <div className="space-y-4">
                 <div>
                   <h2 className="text-xl font-bold mb-1">
-                    Standards Guidance
+                    {t('results.standardsGuidance')}
                   </h2>
                   <p className="text-sm text-muted-foreground">
-                    Supporting documentation from NASA {activeFluid.toUpperCase()} Body of Knowledge
+                    {t('results.standardsDescription', { fluid: activeFluid.toUpperCase() })}
                   </p>
                 </div>
 
@@ -704,7 +672,7 @@ export default function KnowledgeTwins() {
                             </div>
                           </div>
                           <Badge variant="outline" className="ml-4">
-                            Score: {(result.relevance_score * 100).toFixed(0)}%
+                            {t('score')}: {(result.relevance_score * 100).toFixed(0)}%
                           </Badge>
                         </CardTitle>
                       </CardHeader>
@@ -727,9 +695,9 @@ export default function KnowledgeTwins() {
           <Card>
             <CardContent className="pt-8 pb-8 text-center">
               <Search className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-50" />
-              <h3 className="text-lg font-bold mb-1">No results found</h3>
+              <h3 className="text-lg font-bold mb-1">{t('results.noResults')}</h3>
               <p className="text-sm text-muted-foreground">
-                Try adjusting your search query or switching fluids
+                {t('results.noResultsHint')}
               </p>
             </CardContent>
           </Card>

@@ -1,0 +1,69 @@
+{
+  "title": "ナレッジツイン",
+  "description": "NASA知識ベースを活用したO2/H2材料適合性の証拠に基づく評価",
+  "fluidTypes": {
+    "oxygen": "酸素 (O2)",
+    "hydrogen": "水素 (H2)"
+  },
+  "modes": {
+    "browse": "材料を閲覧",
+    "ask": "質問する"
+  },
+  "llm": {
+    "label": "LLM:",
+    "ollama": "ローカル (Ollama)",
+    "haiku": "Claude Haiku"
+  },
+  "search": {
+    "placeholderBrowse": "{{fluid}}適合性を検索（例：「20psiで{{fluid}}と互換性のある材料」）",
+    "placeholderAsk": "{{fluid}}適合性について質問（例：「アルミニウムは{{fluid}}サービスで使用できますか？」）",
+    "buttonSearch": "検索",
+    "buttonAsk": "質問",
+    "searching": "検索中...",
+    "thinking": "考え中..."
+  },
+  "errors": {
+    "searchError": "検索エラー",
+    "questionError": "質問エラー"
+  },
+  "results": {
+    "recommendedMaterials": "推奨材料",
+    "materialsDescription": "MAPTISデータベースからの{{fluid}}適合性評価を持つ材料",
+    "standardsGuidance": "規格ガイダンス",
+    "standardsDescription": "NASA {{fluid}}知識ベースからのサポート文書",
+    "noResults": "結果が見つかりません",
+    "noResultsHint": "検索クエリを調整するか、流体を切り替えてみてください"
+  },
+  "ratings": {
+    "A": { "label": "優秀", "description": "承認済み、高い実績" },
+    "B": { "label": "良好", "description": "承認済み、中程度の実績" },
+    "C": { "label": "普通", "description": "承認済み、限定的な実績" },
+    "D": { "label": "不良", "description": "条件付き承認" },
+    "X": { "label": "不合格", "description": "未承認" },
+    "U": { "label": "不明", "description": "評価なし" }
+  },
+  "ratingLabels": {
+    "FLAMM": "可燃性",
+    "CORR": "腐食性",
+    "SCC": "SCC",
+    "TVS": "TVS"
+  },
+  "hybridResults": {
+    "decision": "決定",
+    "miraAnalysis": "MIRA分析",
+    "extractedConstraints": "抽出された制約:",
+    "evidenceSummary": "証拠の要約",
+    "muaPrecedents": "MUA前例",
+    "testResults": "試験結果",
+    "requirements": "要件",
+    "semanticResults": "意味検索結果",
+    "highConfidence": "高信頼度",
+    "insufficientData": "データ不足",
+    "materialDecisions": "材料適合性の決定",
+    "confidence": "信頼度",
+    "citations": "引用:",
+    "semanticSearchResults": "意味検索結果",
+    "match": "一致"
+  },
+  "score": "スコア"
+}

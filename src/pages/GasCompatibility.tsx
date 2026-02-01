@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
 import { StatusBadge } from '@/components/StatusBadge';
 import { EvidenceTable } from '@/components/EvidenceTable';
@@ -25,6 +26,7 @@ import helpContent from '@/config/helpContent';
 type GasType = 'O2' | 'H2';
 
 export default function GasCompatibility() {
+  const { t } = useTranslation('gasCompatibility');
   const [gasType, setGasType] = useState<GasType>('O2');
   const [materialKey, setMaterialKey] = useState('');
   const [pressure, setPressure] = useState('');
@@ -128,8 +130,8 @@ export default function GasCompatibility() {
   return (
     <div>
       <PageHeader
-        title="Gas Compatibility"
-        description="Check material compatibility for oxygen or hydrogen service"
+        title={t('title')}
+        description={t('description')}
         helpContent={helpContent.gasCompatibility}
       />
 
@@ -137,15 +139,15 @@ export default function GasCompatibility() {
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="compatibility" className="flex items-center gap-2">
             <Search className="h-4 w-4" />
-            Compatibility Check
+            {t('tabs.compatibility')}
           </TabsTrigger>
           <TabsTrigger value="bok" className="flex items-center gap-2">
             <BookOpen className="h-4 w-4" />
-            O2 Standards Search
+            {t('tabs.bok')}
           </TabsTrigger>
           <TabsTrigger value="families" className="flex items-center gap-2">
             <Layers className="h-4 w-4" />
-            Material Families
+            {t('tabs.families')}
           </TabsTrigger>
         </TabsList>
 
@@ -160,7 +162,7 @@ export default function GasCompatibility() {
                 onClick={() => setGasType('O2')}
                 className="flex-1"
               >
-                O₂ Oxygen
+                {t('gasTypes.o2')}
               </Button>
               <Button
                 type="button"
@@ -168,43 +170,43 @@ export default function GasCompatibility() {
                 onClick={() => setGasType('H2')}
                 className="flex-1"
               >
-                H₂ Hydrogen
+                {t('gasTypes.h2')}
               </Button>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="space-y-2">
-                <Label htmlFor="material">Material</Label>
+                <Label htmlFor="material">{t('form.material')}</Label>
                 <Input
                   id="material"
-                  placeholder="e.g., SS316, INCONEL 718"
+                  placeholder={t('form.materialPlaceholder')}
                   value={materialKey}
                   onChange={(e) => setMaterialKey(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="pressure">Pressure (PSIA)</Label>
+                <Label htmlFor="pressure">{t('form.pressure')}</Label>
                 <Input
                   id="pressure"
                   type="number"
-                  placeholder="e.g., 3000"
+                  placeholder={t('form.pressurePlaceholder')}
                   value={pressure}
                   onChange={(e) => setPressure(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="temperature">Temperature (°F)</Label>
+                <Label htmlFor="temperature">{t('form.temperature')}</Label>
                 <Input
                   id="temperature"
                   type="number"
-                  placeholder="e.g., 70"
+                  placeholder={t('form.temperaturePlaceholder')}
                   value={temperature}
                   onChange={(e) => setTemperature(e.target.value)}
                 />
               </div>
               {gasType === 'O2' && (
                 <div className="space-y-2">
-                  <Label htmlFor="phase">Phase</Label>
+                  <Label htmlFor="phase">{t('form.phase')}</Label>
                   <div className="flex gap-2">
                     <Button
                       type="button"
@@ -213,7 +215,7 @@ export default function GasCompatibility() {
                       onClick={() => setPhase('gox')}
                       className="flex-1"
                     >
-                      GOX (Gas)
+                      {t('form.gox')}
                     </Button>
                     <Button
                       type="button"
@@ -222,7 +224,7 @@ export default function GasCompatibility() {
                       onClick={() => setPhase('lox')}
                       className="flex-1"
                     >
-                      LOX (Liquid)
+                      {t('form.lox')}
                     </Button>
                   </div>
                 </div>
@@ -231,7 +233,7 @@ export default function GasCompatibility() {
 
             <Button type="submit" disabled={loading || !materialKey || !pressure || !temperature}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Check Compatibility
+              {t('form.checkCompatibility')}
             </Button>
           </form>
 
@@ -245,7 +247,7 @@ export default function GasCompatibility() {
                       <div className="flex items-center gap-3">
                         <StatusBadge status={o2Result?.classification?.toLowerCase() || result?.classification || 'unknown'} />
                         <span className="text-sm text-muted-foreground">
-                          {gasType === 'O2' ? `Oxygen Service (${phase.toUpperCase()})` : 'Hydrogen Service'}
+                          {gasType === 'O2' ? t('results.oxygenService', { phase: phase.toUpperCase() }) : t('results.hydrogenService')}
                         </span>
                         {o2Result && (
                           <Badge variant="outline" className="text-xs">
@@ -267,7 +269,7 @@ export default function GasCompatibility() {
               {(o2Result?.evidence?.length || result?.evidence?.length) ? (
                 <div className="space-y-3">
                   <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                    Supporting Evidence
+                    {t('results.supportingEvidence')}
                   </h3>
                   <EvidenceTable evidence={o2Result?.evidence || result?.evidence || []} />
                 </div>
@@ -282,24 +284,23 @@ export default function GasCompatibility() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BookOpen className="h-5 w-5" />
-                O2 Body of Knowledge Search
+                {t('bokSearch.title')}
               </CardTitle>
               <CardDescription>
-                Search NASA standards and guidance documents for oxygen compatibility information.
-                Includes NASA-STD-6016, NASA-STD-6001B, JSC-27301F, and KSC-KTI-5210C.
+                {t('bokSearch.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleBOKSearch} className="flex gap-4">
                 <Input
-                  placeholder="Search O2 standards... (e.g., 'ignition temperature aluminum')"
+                  placeholder={t('bokSearch.placeholder')}
                   value={bokQuery}
                   onChange={(e) => setBokQuery(e.target.value)}
                   className="flex-1"
                 />
                 <Button type="submit" disabled={bokLoading || !bokQuery.trim()}>
                   {bokLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Search
+                  {t('search')}
                 </Button>
               </form>
             </CardContent>
@@ -309,7 +310,7 @@ export default function GasCompatibility() {
             <div className="space-y-4 animate-fade-in">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                  {bokResults.total_results} Results ({bokResults.search_type} search)
+                  {t('bokSearch.results', { count: bokResults.total_results, type: bokResults.search_type })}
                 </h3>
               </div>
 
@@ -325,7 +326,7 @@ export default function GasCompatibility() {
                               <span className="text-xs text-muted-foreground">{result.section}</span>
                             )}
                             <span className="text-xs text-muted-foreground ml-auto">
-                              Score: {(result.relevance_score * 100).toFixed(1)}%
+                              {t('bokSearch.score', { score: (result.relevance_score * 100).toFixed(1) })}
                             </span>
                           </div>
                           <p className="text-sm text-foreground leading-relaxed">
@@ -347,11 +348,10 @@ export default function GasCompatibility() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Layers className="h-5 w-5" />
-                O2 Material Family Classifications
+                {t('families.title')}
               </CardTitle>
               <CardDescription>
-                Material families and their O2 compatibility status per NASA-STD-6016.
-                Classification is based on MAPTIS material family, not string matching.
+                {t('families.description')}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -367,7 +367,7 @@ export default function GasCompatibility() {
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-400">
                     <CheckCircle className="h-5 w-5" />
-                    Approved ({families.approved_families?.length ?? 0})
+                    {t('families.approved')} ({families.approved_families?.length ?? 0})
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -392,12 +392,12 @@ export default function GasCompatibility() {
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-yellow-700 dark:text-yellow-400">
                     <AlertTriangle className="h-5 w-5" />
-                    Restricted ({families.restricted_families?.length ?? 0})
+                    {t('families.restricted')} ({families.restricted_families?.length ?? 0})
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {!families.restricted_families?.length ? (
-                    <p className="text-sm text-muted-foreground">No restricted families defined</p>
+                    <p className="text-sm text-muted-foreground">{t('families.noRestricted')}</p>
                   ) : (
                     families.restricted_families.map((family, idx) => (
                       <div key={idx} className="space-y-1">
@@ -421,12 +421,12 @@ export default function GasCompatibility() {
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-red-700 dark:text-red-400">
                     <XCircle className="h-5 w-5" />
-                    Prohibited ({families.prohibited_families?.length ?? 0})
+                    {t('families.prohibited')} ({families.prohibited_families?.length ?? 0})
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {!families.prohibited_families?.length ? (
-                    <p className="text-sm text-muted-foreground">No prohibited families defined</p>
+                    <p className="text-sm text-muted-foreground">{t('families.noProhibited')}</p>
                   ) : (
                     families.prohibited_families.map((family, idx) => (
                       <div key={idx} className="space-y-1">
@@ -448,7 +448,7 @@ export default function GasCompatibility() {
           ) : (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">
-                Failed to load material families. The O2 Knowledge Twin may not be available.
+                {t('families.loadError')}
               </CardContent>
             </Card>
           )}

@@ -1,0 +1,66 @@
+{
+  "pageTitle": "MIRA",
+  "pageSubtitle": "Intelligence Matériaux & Analyse des Risques",
+  "pageDescription": "Posez des questions à MAPTIS en langage naturel",
+  "placeholder": "Décrivez ce que vous recherchez...",
+  "searching": "Recherche en cours...",
+  "search": "Rechercher",
+  "exampleQueries": [
+    "Afficher les métaux compatibles oxygène pour service cryogénique",
+    "Matériaux classés pour 3000 psi GOX à faible perméabilité",
+    "Comparer les propriétés mécaniques Inconel 718 vs Hastelloy C-276",
+    "Résultats d'essais pour polymères exposés à l'hydrazine"
+  ],
+  "hybridSearch": {
+    "title": "Recherche Hybride Active.",
+    "description": "Les requêtes sont analysées pour l'intention, les contraintes et les entités avant la recherche sémantique.",
+    "yourQuery": "Votre requête :",
+    "intentActive": "Classification d'intention + extraction de contraintes active",
+    "parsedConstraints": "Contraintes analysées :"
+  },
+  "noSearch": {
+    "title": "Aucune recherche effectuée",
+    "hint": "Essayez l'un des exemples ci-dessus pour commencer"
+  },
+  "results": {
+    "found": "{{count}} matériaux trouvés",
+    "noResults": "Aucun résultat trouvé",
+    "exportCsv": "Exporter CSV",
+    "cards": "Cartes",
+    "table": "Tableau",
+    "score": "Score",
+    "code": "Code",
+    "viewDetails": "Voir les détails",
+    "temp": "Temp"
+  },
+  "table": {
+    "materialName": "Nom du Matériau",
+    "o2": "O2",
+    "flammability": "Inflammabilité",
+    "corrosion": "Corrosion",
+    "stressCorr": "Corr. Contrainte",
+    "outgassing": "Dégazage",
+    "matchScore": "Score de Correspondance"
+  },
+  "dialog": {
+    "title": "Détails du Matériau",
+    "basicInfo": "Informations de Base",
+    "materialCode": "Code Matériau",
+    "materialKey": "Clé Matériau",
+    "materialType": "Type de Matériau",
+    "matchScore": "Score de Correspondance",
+    "unknown": "Inconnu",
+    "maptisRatings": "Évaluations MAPTIS",
+    "flammability": "Inflammabilité",
+    "corrosion": "Corrosion",
+    "scc": "SCC",
+    "tvs": "TVS",
+    "toxicity": "Toxicité",
+    "fluidSystems": "Systèmes Fluides",
+    "o2Compatibility": "Compatibilité O2",
+    "mechanicalImpact": "Impact Mécanique",
+    "mechanicalProperties": "Propriétés Mécaniques",
+    "yieldStrength": "Limite d'Élasticité",
+    "close": "Fermer"
+  }
+}

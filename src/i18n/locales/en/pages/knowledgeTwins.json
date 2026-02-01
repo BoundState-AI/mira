@@ -1,0 +1,69 @@
+{
+  "title": "Knowledge Twins",
+  "description": "Evidence-based O2/H2 material compatibility using NASA Body of Knowledge",
+  "fluidTypes": {
+    "oxygen": "Oxygen (O2)",
+    "hydrogen": "Hydrogen (H2)"
+  },
+  "modes": {
+    "browse": "Browse Materials",
+    "ask": "Ask Question"
+  },
+  "llm": {
+    "label": "LLM:",
+    "ollama": "Local (Ollama)",
+    "haiku": "Claude Haiku"
+  },
+  "search": {
+    "placeholderBrowse": "Search {{fluid}} compatibility (e.g., \"materials compatible with {{fluid}} at 20psi\")",
+    "placeholderAsk": "Ask a question about {{fluid}} compatibility (e.g., \"Can I use aluminum in {{fluid}} service?\")",
+    "buttonSearch": "Search",
+    "buttonAsk": "Ask",
+    "searching": "Searching...",
+    "thinking": "Thinking..."
+  },
+  "errors": {
+    "searchError": "Search Error",
+    "questionError": "Question Error"
+  },
+  "results": {
+    "recommendedMaterials": "Recommended Materials",
+    "materialsDescription": "Materials with {{fluid}} compatibility ratings from MAPTIS database",
+    "standardsGuidance": "Standards Guidance",
+    "standardsDescription": "Supporting documentation from NASA {{fluid}} Body of Knowledge",
+    "noResults": "No results found",
+    "noResultsHint": "Try adjusting your search query or switching fluids"
+  },
+  "ratings": {
+    "A": { "label": "Excellent", "description": "Approved, high heritage" },
+    "B": { "label": "Good", "description": "Approved, moderate heritage" },
+    "C": { "label": "Fair", "description": "Approved, limited heritage" },
+    "D": { "label": "Poor", "description": "Conditionally approved" },
+    "X": { "label": "Fail", "description": "Not approved" },
+    "U": { "label": "Unknown", "description": "Rating not available" }
+  },
+  "ratingLabels": {
+    "FLAMM": "FLAMM",
+    "CORR": "CORR",
+    "SCC": "SCC",
+    "TVS": "TVS"
+  },
+  "hybridResults": {
+    "decision": "Decision",
+    "miraAnalysis": "MIRA Analysis",
+    "extractedConstraints": "Extracted Constraints:",
+    "evidenceSummary": "Evidence Summary",
+    "muaPrecedents": "MUA Precedents",
+    "testResults": "Test Results",
+    "requirements": "Requirements",
+    "semanticResults": "Semantic Results",
+    "highConfidence": "High Confidence",
+    "insufficientData": "Insufficient Data",
+    "materialDecisions": "Material Compatibility Decisions",
+    "confidence": "confidence",
+    "citations": "Citations:",
+    "semanticSearchResults": "Semantic Search Results",
+    "match": "match"
+  },
+  "score": "Score"
+}

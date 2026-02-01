@@ -1,0 +1,48 @@
+{
+  "title": "Compatibilité des gaz",
+  "description": "Vérifier la compatibilité des matériaux pour le service oxygène ou hydrogène",
+  "search": "Rechercher",
+  "tabs": {
+    "compatibility": "Vérification de compatibilité",
+    "bok": "Recherche normes O2",
+    "families": "Familles de matériaux"
+  },
+  "gasTypes": {
+    "o2": "O₂ Oxygène",
+    "h2": "H₂ Hydrogène"
+  },
+  "form": {
+    "material": "Matériau",
+    "materialPlaceholder": "ex: SS316, INCONEL 718",
+    "pressure": "Pression (PSIA)",
+    "pressurePlaceholder": "ex: 3000",
+    "temperature": "Température (°F)",
+    "temperaturePlaceholder": "ex: 70",
+    "phase": "Phase",
+    "gox": "GOX (Gaz)",
+    "lox": "LOX (Liquide)",
+    "checkCompatibility": "Vérifier la compatibilité"
+  },
+  "results": {
+    "oxygenService": "Service oxygène ({{phase}})",
+    "hydrogenService": "Service hydrogène",
+    "supportingEvidence": "Preuves à l'appui"
+  },
+  "bokSearch": {
+    "title": "Recherche dans la base O2",
+    "description": "Rechercher dans les normes NASA et documents de guidage pour les informations de compatibilité oxygène. Inclut NASA-STD-6016, NASA-STD-6001B, JSC-27301F et KSC-KTI-5210C.",
+    "placeholder": "Rechercher les normes O2... (ex: 'température d'ignition aluminium')",
+    "results": "{{count}} résultats (recherche {{type}})",
+    "score": "Score : {{score}}%"
+  },
+  "families": {
+    "title": "Classifications des familles de matériaux O2",
+    "description": "Familles de matériaux et leur statut de compatibilité O2 selon NASA-STD-6016. La classification est basée sur la famille de matériaux MAPTIS, pas sur la correspondance de chaînes.",
+    "approved": "Approuvé",
+    "restricted": "Restreint",
+    "prohibited": "Interdit",
+    "noRestricted": "Aucune famille restreinte définie",
+    "noProhibited": "Aucune famille interdite définie",
+    "loadError": "Échec du chargement des familles de matériaux. Le jumeau de connaissances O2 peut ne pas être disponible."
+  }
+}

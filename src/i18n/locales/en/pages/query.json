@@ -1,0 +1,66 @@
+{
+  "pageTitle": "MIRA",
+  "pageSubtitle": "Materials Intelligence & Risk Analysis",
+  "pageDescription": "Ask MAPTIS questions in natural language",
+  "placeholder": "Describe what you're looking for...",
+  "searching": "Searching...",
+  "search": "Search",
+  "exampleQueries": [
+    "Show me oxygen-compatible metals for cryogenic service",
+    "Materials rated for 3000 psi GOX with low permeability",
+    "Compare Inconel 718 vs Hastelloy C-276 mechanical properties",
+    "Test results for polymers exposed to hydrazine"
+  ],
+  "hybridSearch": {
+    "title": "Hybrid Search Active.",
+    "description": "Queries are parsed for intent, constraints, and entities before semantic search.",
+    "yourQuery": "Your query:",
+    "intentActive": "Intent classification + constraint extraction active",
+    "parsedConstraints": "Parsed constraints:"
+  },
+  "noSearch": {
+    "title": "No search yet",
+    "hint": "Try one of the example queries above to get started"
+  },
+  "results": {
+    "found": "Found {{count}} materials",
+    "noResults": "No results found",
+    "exportCsv": "Export CSV",
+    "cards": "Cards",
+    "table": "Table",
+    "score": "Score",
+    "code": "Code",
+    "viewDetails": "View details",
+    "temp": "Temp"
+  },
+  "table": {
+    "materialName": "Material Name",
+    "o2": "O2",
+    "flammability": "Flammability",
+    "corrosion": "Corrosion",
+    "stressCorr": "Stress Corr",
+    "outgassing": "Outgassing",
+    "matchScore": "Match Score"
+  },
+  "dialog": {
+    "title": "Material Details",
+    "basicInfo": "Basic Information",
+    "materialCode": "Material Code",
+    "materialKey": "Material Key",
+    "materialType": "Material Type",
+    "matchScore": "Match Score",
+    "unknown": "Unknown",
+    "maptisRatings": "MAPTIS Ratings",
+    "flammability": "Flammability",
+    "corrosion": "Corrosion",
+    "scc": "SCC",
+    "tvs": "TVS",
+    "toxicity": "Toxicity",
+    "fluidSystems": "Fluid Systems",
+    "o2Compatibility": "O2 Compatibility",
+    "mechanicalImpact": "Mechanical Impact",
+    "mechanicalProperties": "Mechanical Properties",
+    "yieldStrength": "Yield Strength",
+    "close": "Close"
+  }
+}

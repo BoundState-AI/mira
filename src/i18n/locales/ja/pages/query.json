@@ -1,0 +1,66 @@
+{
+  "pageTitle": "MIRA",
+  "pageSubtitle": "材料インテリジェンス＆リスク分析",
+  "pageDescription": "MAPTISに自然言語で質問",
+  "placeholder": "探しているものを説明してください...",
+  "searching": "検索中...",
+  "search": "検索",
+  "exampleQueries": [
+    "極低温サービス用の酸素適合金属を表示",
+    "低透過性の3000 psi GOX対応材料",
+    "インコネル718とハステロイC-276の機械的特性を比較",
+    "ヒドラジンに曝露されたポリマーの試験結果"
+  ],
+  "hybridSearch": {
+    "title": "ハイブリッド検索が有効",
+    "description": "クエリは意図、制約、エンティティを解析してからセマンティック検索を実行します。",
+    "yourQuery": "あなたのクエリ：",
+    "intentActive": "意図分類＋制約抽出が有効",
+    "parsedConstraints": "解析された制約："
+  },
+  "noSearch": {
+    "title": "まだ検索していません",
+    "hint": "上記のクエリ例を試してください"
+  },
+  "results": {
+    "found": "{{count}}件の材料が見つかりました",
+    "noResults": "結果が見つかりません",
+    "exportCsv": "CSVエクスポート",
+    "cards": "カード",
+    "table": "テーブル",
+    "score": "スコア",
+    "code": "コード",
+    "viewDetails": "詳細を表示",
+    "temp": "温度"
+  },
+  "table": {
+    "materialName": "材料名",
+    "o2": "O2",
+    "flammability": "可燃性",
+    "corrosion": "腐食",
+    "stressCorr": "応力腐食",
+    "outgassing": "アウトガス",
+    "matchScore": "マッチスコア"
+  },
+  "dialog": {
+    "title": "材料詳細",
+    "basicInfo": "基本情報",
+    "materialCode": "材料コード",
+    "materialKey": "材料キー",
+    "materialType": "材料タイプ",
+    "matchScore": "マッチスコア",
+    "unknown": "不明",
+    "maptisRatings": "MAPTIS評価",
+    "flammability": "可燃性",
+    "corrosion": "腐食",
+    "scc": "SCC",
+    "tvs": "TVS",
+    "toxicity": "毒性",
+    "fluidSystems": "流体システム",
+    "o2Compatibility": "O2適合性",
+    "mechanicalImpact": "機械的衝撃",
+    "mechanicalProperties": "機械的特性",
+    "yieldStrength": "降伏強度",
+    "close": "閉じる"
+  }
+}

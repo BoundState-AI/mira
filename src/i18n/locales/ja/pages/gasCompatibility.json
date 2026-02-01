@@ -1,0 +1,48 @@
+{
+  "title": "ガス適合性",
+  "description": "酸素または水素サービスの材料適合性をチェック",
+  "search": "検索",
+  "tabs": {
+    "compatibility": "適合性チェック",
+    "bok": "O2規格検索",
+    "families": "材料ファミリー"
+  },
+  "gasTypes": {
+    "o2": "O₂ 酸素",
+    "h2": "H₂ 水素"
+  },
+  "form": {
+    "material": "材料",
+    "materialPlaceholder": "例：SS316、INCONEL 718",
+    "pressure": "圧力 (PSIA)",
+    "pressurePlaceholder": "例：3000",
+    "temperature": "温度 (°F)",
+    "temperaturePlaceholder": "例：70",
+    "phase": "相",
+    "gox": "GOX（気体）",
+    "lox": "LOX（液体）",
+    "checkCompatibility": "適合性をチェック"
+  },
+  "results": {
+    "oxygenService": "酸素サービス（{{phase}}）",
+    "hydrogenService": "水素サービス",
+    "supportingEvidence": "裏付け証拠"
+  },
+  "bokSearch": {
+    "title": "O2知識ベース検索",
+    "description": "酸素適合性情報についてNASA規格およびガイダンス文書を検索します。NASA-STD-6016、NASA-STD-6001B、JSC-27301F、KSC-KTI-5210Cを含みます。",
+    "placeholder": "O2規格を検索...（例：「アルミニウム発火温度」）",
+    "results": "{{count}}件の結果（{{type}}検索）",
+    "score": "スコア：{{score}}%"
+  },
+  "families": {
+    "title": "O2材料ファミリー分類",
+    "description": "NASA-STD-6016に基づく材料ファミリーとそのO2適合性ステータス。分類は文字列マッチングではなく、MAPTIS材料ファミリーに基づいています。",
+    "approved": "承認済み",
+    "restricted": "制限付き",
+    "prohibited": "禁止",
+    "noRestricted": "制限付きファミリーは定義されていません",
+    "noProhibited": "禁止ファミリーは定義されていません",
+    "loadError": "材料ファミリーの読み込みに失敗しました。O2ナレッジツインが利用できない可能性があります。"
+  }
+}

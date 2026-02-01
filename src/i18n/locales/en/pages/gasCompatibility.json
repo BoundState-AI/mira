@@ -1,0 +1,48 @@
+{
+  "title": "Gas Compatibility",
+  "description": "Check material compatibility for oxygen or hydrogen service",
+  "search": "Search",
+  "tabs": {
+    "compatibility": "Compatibility Check",
+    "bok": "O2 Standards Search",
+    "families": "Material Families"
+  },
+  "gasTypes": {
+    "o2": "O₂ Oxygen",
+    "h2": "H₂ Hydrogen"
+  },
+  "form": {
+    "material": "Material",
+    "materialPlaceholder": "e.g., SS316, INCONEL 718",
+    "pressure": "Pressure (PSIA)",
+    "pressurePlaceholder": "e.g., 3000",
+    "temperature": "Temperature (°F)",
+    "temperaturePlaceholder": "e.g., 70",
+    "phase": "Phase",
+    "gox": "GOX (Gas)",
+    "lox": "LOX (Liquid)",
+    "checkCompatibility": "Check Compatibility"
+  },
+  "results": {
+    "oxygenService": "Oxygen Service ({{phase}})",
+    "hydrogenService": "Hydrogen Service",
+    "supportingEvidence": "Supporting Evidence"
+  },
+  "bokSearch": {
+    "title": "O2 Body of Knowledge Search",
+    "description": "Search NASA standards and guidance documents for oxygen compatibility information. Includes NASA-STD-6016, NASA-STD-6001B, JSC-27301F, and KSC-KTI-5210C.",
+    "placeholder": "Search O2 standards... (e.g., 'ignition temperature aluminum')",
+    "results": "{{count}} Results ({{type}} search)",
+    "score": "Score: {{score}}%"
+  },
+  "families": {
+    "title": "O2 Material Family Classifications",
+    "description": "Material families and their O2 compatibility status per NASA-STD-6016. Classification is based on MAPTIS material family, not string matching.",
+    "approved": "Approved",
+    "restricted": "Restricted",
+    "prohibited": "Prohibited",
+    "noRestricted": "No restricted families defined",
+    "noProhibited": "No prohibited families defined",
+    "loadError": "Failed to load material families. The O2 Knowledge Twin may not be available."
+  }
+}
