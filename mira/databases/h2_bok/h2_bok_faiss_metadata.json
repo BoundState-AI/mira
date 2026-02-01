@@ -1,0 +1,6898 @@
+[
+  {
+    "idx": 0,
+    "doc_id": "19970033338_p0_0",
+    "section": "0.0",
+    "title": "NSS\n1740.16\nNational\nAeronautics\nand\nSpace\nAdministration\nSAFETY\nSTANDARD\nFOR\nHYDROGEN\nAND\nHYDROGEN\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 1,
+    "text_length": 267
+  },
+  {
+    "idx": 1,
+    "doc_id": "19970033338_p1_0",
+    "section": "1.0",
+    "title": "PREFACE\nThis safetystandardestablishesa uniform Agencyprocessfor hydrogensystem\ndesign,materialssele...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 2,
+    "text_length": 939
+  },
+  {
+    "idx": 2,
+    "doc_id": "19970033338_p2_0",
+    "section": "2.0",
+    "title": "ACKNOWLEDGMENTS\nTheNASA HydrogenSafetyHandbookoriginally waspreparedby PaulM. Ordin,\nConsultingEngin...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 3,
+    "text_length": 1599
+  },
+  {
+    "idx": 3,
+    "doc_id": "19970033338_p4_0",
+    "section": "4.0",
+    "title": "Paragraph\nTABLE\nOF\nCONTENTS\nPage\n100\n101\n102\n103\n104\n105\n106\n107\n108\n200\n201\n202\n203\n204\n205\n206\n300...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 5,
+    "text_length": 876
+  },
+  {
+    "idx": 4,
+    "doc_id": "19970033338_p8_0",
+    "section": "8.0",
+    "title": "Figures\nLIST\nOF FIGURES\n(continued)\nPage\nA2.6\nA2.7\nA2.8\nA2.9\nA4.1\nA4.2\nA4.3\nA4.4\nA4.5\nA4.6\nA5.1\nA5.2...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 9,
+    "text_length": 1364
+  },
+  {
+    "idx": 5,
+    "doc_id": "19970033338_p9_0",
+    "section": "9.0",
+    "title": "Figures\nLIST\nOF\nFIGURES\n(continued)\nPage\nA5.5\nA6.1\nA6.2\nA6.3\nA6.4\nTotal\nLinear\nThermal\nContraction\na...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 10,
+    "text_length": 305
+  },
+  {
+    "idx": 6,
+    "doc_id": "19970033338_p10_0",
+    "section": "10.0",
+    "title": "Tables\nLIST\nOF\nTABLES\nPage\nAI.1\nA1.2\nA1.3\nA1.4\nA1.5\nA1.6\nA2.1\nA2.2\nA2.3\nA2.4\nA2.5\nA3.1\nA3.2\nA3.3\nA3....",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 11,
+    "text_length": 1229
+  },
+  {
+    "idx": 7,
+    "doc_id": "19970033338_p12_0",
+    "section": "12.0",
+    "title": "Tables\nLIST\nOF\nTABLES\n(continued)\nPage\nA3.8\nA4.1\nA5.1\nA5.2\nA5.3\nA5.4\nA5.5\nA5.6\nA5.7\nA5.8\nA5.9\nA6.1\nA...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 13,
+    "text_length": 1285
+  },
+  {
+    "idx": 8,
+    "doc_id": "19970033338_p14_0",
+    "section": "14.0",
+    "title": "CHAPTER 1:\nBASIC HYDROGEN SAFETY GUIDELINES\nNote:\nHydrogen\nshall\nbe stored,\nhandled,\nand\nused\nso lif...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 15,
+    "text_length": 1998
+  },
+  {
+    "idx": 9,
+    "doc_id": "19970033338_p16_0",
+    "section": "16.0",
+    "title": "d.\ne.\nf.\n(2)\n29 CFR\n1910.103\n(1996)\nsets\nrequirements\nfor\nLH2\nsystems\nexcept\nfor\nthe requirements\nfo...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 17,
+    "text_length": 1878
+  },
+  {
+    "idx": 10,
+    "doc_id": "19970033338_p19_0",
+    "section": "19.0",
+    "title": "104c\nC.\nd.\nSafety\nSystems.\nSafety\nsystems\nshould\nbe installed\nto detect\nand\ncounteract\nor control\nth...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 20,
+    "text_length": 1426
+  },
+  {
+    "idx": 11,
+    "doc_id": "19970033338_p23_0",
+    "section": "23.0",
+    "title": "200c\nc.\nHydrogen\nProperties.\nSelected\nthermophysical\nproperties\nof various\nstates\nof hydrogen,\nprima...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 24,
+    "text_length": 2249
+  },
+  {
+    "idx": 12,
+    "doc_id": "19970033338_p24_0",
+    "section": "24.0",
+    "title": "201\nTYPESOF HAZARDS\na.\nGeneral.\nThe\nhazards\nassociated\nwith\nthe\nuse of hydrogen\ncan\nbe characterized...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 25,
+    "text_length": 1594
+  },
+  {
+    "idx": 13,
+    "doc_id": "19970033338_p26_0",
+    "section": "26.0",
+    "title": "e.\nLeaks.\nf.\nLeaks\ncan\noccur\nwithin\na system\nor to the surroundings.\nHazards\ncan\narise\nby air\nor con...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 27,
+    "text_length": 2182
+  },
+  {
+    "idx": 14,
+    "doc_id": "19970033338_p27_0",
+    "section": "27.0",
+    "title": "20If\ng,\nh,\naround\nhydrogen\nstorage\nfacilities\nshould\nbe carefully\nexamined\nbecause\nit is preferred\nt...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 28,
+    "text_length": 2201
+  },
+  {
+    "idx": 15,
+    "doc_id": "19970033338_p28_0",
+    "section": "28.0",
+    "title": "k.\n.\nExample:\nA dangerous\npurging\npractice\nthat\nled to an\nexplosion\noccurred\nwhen\nonly\na portion\nof ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 29,
+    "text_length": 1806
+  },
+  {
+    "idx": 16,
+    "doc_id": "19970033338_p32_0",
+    "section": "32.0",
+    "title": "C2t\n(3)\n(4)\nare dependent\non the ignition\nenergy,\ntemperature,\npressure,\npresence\nof diluents,\nand s...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 33,
+    "text_length": 1993
+  },
+  {
+    "idx": 17,
+    "doc_id": "19970033338_p37_0",
+    "section": "37.0",
+    "title": "202b\n(1)\n(2)\n(3)\n(4)\nThe\nignition\nof GH_-air\nmixtures\nusually\nresults\nin\nordinary\ndeflagration.\nTabl...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 38,
+    "text_length": 2049
+  },
+  {
+    "idx": 18,
+    "doc_id": "19970033338_p38_0",
+    "section": "38.0",
+    "title": "(5)\n(6)\n(7)\nsuch\nas drills\nand\npneumatic\nchisels\ncan\ngenerate\nhigh-\nenergy\nsparks.\nImpact\nsparks\nare...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 39,
+    "text_length": 1587
+  },
+  {
+    "idx": 19,
+    "doc_id": "19970033338_p44_0",
+    "section": "44.0",
+    "title": ".\nh.\ni.\nI\n=\nJoe\nooo4qbv_\n(Eq\n1)\nwhere:\nI0\n=\ninitial\nintensity\n(energy/time.area)\nw\n=\nwater\nvapor\n(pe...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 45,
+    "text_length": 1377
+  },
+  {
+    "idx": 20,
+    "doc_id": "19970033338_p49_0",
+    "section": "49.0",
+    "title": "CHAPTER 3:\nMATERIALS FORHYDROGEN SERVICE\nNote:\nAwareness\nof the unique\nproperties\nof hydrogen\nand\nth...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 50,
+    "text_length": 1188
+  },
+  {
+    "idx": 21,
+    "doc_id": "19970033338_p50_0",
+    "section": "50.0",
+    "title": "300a\nb.\nC.\nNote:\nMany\nhydrogen\nmaterial\nproblems\ninvolve\nwelds\nor the\nuse\nof an improper\nmaterial,\ns...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 51,
+    "text_length": 2194
+  },
+  {
+    "idx": 22,
+    "doc_id": "19970033338_p51_0",
+    "section": "51.0",
+    "title": "d.\nsuitable\nfor\nLH2 or SLH2service.\nNickel\nsteels\nwith\n3.5,\n5,\nand\n9 percent\nnickel\nare considered\ns...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 52,
+    "text_length": 1408
+  },
+  {
+    "idx": 23,
+    "doc_id": "19970033338_p52_0",
+    "section": "52.0",
+    "title": "300d\ne.\nf.\ng.\nh.\nambient\nto cryogenic\ntemperatures\n(NASA\nTM\n104438\n1992).\nFilled\nTeflon\n\u00ae materials,...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 53,
+    "text_length": 1973
+  },
+  {
+    "idx": 24,
+    "doc_id": "19970033338_p53_0",
+    "section": "53.0",
+    "title": "i\u00b0\nj.\nroom\ntemperature\n(or higher),\nand\ntemperature\ngradients\nare\npossible\nwithin\nthe\nequipment.\nMan...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 54,
+    "text_length": 2049
+  },
+  {
+    "idx": 25,
+    "doc_id": "19970033338_p54_0",
+    "section": "54.0",
+    "title": "3ooj\nproperties\nused\nfor\ndesign\nshould\nbe based\non tests\nconducted\nunder\nconditions\nthat simulate\nse...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 55,
+    "text_length": 1894
+  },
+  {
+    "idx": 26,
+    "doc_id": "19970033338_p55_0",
+    "section": "55.0",
+    "title": "C.\npremature\nfailures\nin some\nmetals;\nthe failures\nmay\noccur\nwith\nlittle\nor no warning.\nCracks\nstart...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 56,
+    "text_length": 1841
+  },
+  {
+    "idx": 27,
+    "doc_id": "19970033338_p56_0",
+    "section": "56.0",
+    "title": "301c\nd.\ne.\nf.\n(5)\nEmbrittlement\nleading\nto an increased\ncrack\ngrowth\nrate\nresults\nin a decreased\nfat...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 57,
+    "text_length": 1901
+  },
+  {
+    "idx": 28,
+    "doc_id": "19970033338_p57_0",
+    "section": "57.0",
+    "title": "g.\nboundaries,\ninterstitial\nor vacancy\nclusters,\nvoids\nor gas bubbles,\noxygen\nor oxide\ninclusions,\nc...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 58,
+    "text_length": 1741
+  },
+  {
+    "idx": 29,
+    "doc_id": "19970033338_p58_0",
+    "section": "58.0",
+    "title": "301g\n(d)\nA metal\nor alloy\nis almost\ncertain\nto have\na lower\nresistance\nto fatigue\nthan\nif hydrogen\nw...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 59,
+    "text_length": 1685
+  },
+  {
+    "idx": 30,
+    "doc_id": "19970033338_p59_0",
+    "section": "59.0",
+    "title": "b.\n(b)\nThe\nmodes\nof plastic\ndeformation,\nparticularly\ncertain\nunconventional\nmodes\nencountered\nat ve...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 60,
+    "text_length": 1791
+  },
+  {
+    "idx": 31,
+    "doc_id": "19970033338_p60_0",
+    "section": "60.0",
+    "title": "302b\nunsatisfactory\nfor\nLH2 service.\nIn contrast,\nthe\nCharpy\nimpact\nstrength\nfor\n304 stainless\nsteel...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 61,
+    "text_length": 2245
+  },
+  {
+    "idx": 32,
+    "doc_id": "19970033338_p61_0",
+    "section": "61.0",
+    "title": "(2)\nAbout\n90 percent\nof the total\ncontraction\nfrom\nroom\ntemperature,\n300\nK (80 \u00b0F),\nto a temperature...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 62,
+    "text_length": 710
+  },
+  {
+    "idx": 33,
+    "doc_id": "19970033338_p69_0",
+    "section": "69.0",
+    "title": "402b\nC.\nd.\n(2)\nLH2 containers,\nstatic\nand\nmobile,\nand\nassociated\npiping\nshall\nbe electrically\nbonded...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 70,
+    "text_length": 1763
+  },
+  {
+    "idx": 34,
+    "doc_id": "19970033338_p70_0",
+    "section": "70.0",
+    "title": "e.\nElimination\nof Ignition\nSources.\n(1)\nLightning\nprotection\nin the form\nof lightning\nrods,\naerial\nc...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 71,
+    "text_length": 1671
+  },
+  {
+    "idx": 35,
+    "doc_id": "19970033338_p72_0",
+    "section": "72.0",
+    "title": "f.\ng.\n(d)\nOnly\nflame\narrestors\nspecifically\ndesigned\nfor\nhydrogen\napplications\nshall\nbe used.\nFlame\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 73,
+    "text_length": 1691
+  },
+  {
+    "idx": 36,
+    "doc_id": "19970033338_p73_0",
+    "section": "73.0",
+    "title": "403a\nb,\n(1)\nBuildings\nshall\nbe constructed\nof light,\nnoncombustible\nmaterials\non a substantial\nflame...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 74,
+    "text_length": 1578
+  },
+  {
+    "idx": 37,
+    "doc_id": "19970033338_p74_0",
+    "section": "74.0",
+    "title": "C.\nd.\nhazard\nby providing\nan inert\natmosphere\nof nitrogen,\ncarbon\ndioxide,\nhelium,\nsteam,\nor other\ni...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 75,
+    "text_length": 1671
+  },
+  {
+    "idx": 38,
+    "doc_id": "19970033338_p77_0",
+    "section": "77.0",
+    "title": "404\n404\nCONTROL\nROOMS\na.\nStructure.\n(1)\nA pillbox,\nor concrete\nbunker,\ntype\nof control\nroom\nremote\nf...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 78,
+    "text_length": 1558
+  },
+  {
+    "idx": 39,
+    "doc_id": "19970033338_p79_0",
+    "section": "79.0",
+    "title": "405b\nb.\nC\u00b0\nd.\nStorage\nType.\n(1)\nStorage\nfor\nnonpropellant\nuse\nat consumer\nsites\nshall\nbe\nin accordan...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 80,
+    "text_length": 1648
+  },
+  {
+    "idx": 40,
+    "doc_id": "19970033338_p81_0",
+    "section": "81.0",
+    "title": "405e\nf.\n(a)\nLocated\n6.1\nm (20 fl)\nfrom\nflammable\nliquids\nand\nreadily\ncombustible\nmaterials\n(b)\nLocat...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 82,
+    "text_length": 1560
+  },
+  {
+    "idx": 41,
+    "doc_id": "19970033338_p82_0",
+    "section": "82.0",
+    "title": "(3)\n(4)\n(a)\nHazard\nGroup\nIII materials\nare\nthe\nliquid\npropellants\nfor\nwhich\nthe hazards\nresult\nfrom\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 83,
+    "text_length": 1664
+  },
+  {
+    "idx": 42,
+    "doc_id": "19970033338_p83_0",
+    "section": "83.0",
+    "title": "405f\n(b)\nTable\nA3.8\ngives\nthe\nQD guidelines\nfor\nLH_\nand\nother\npropellants\nand\noxidizers\nfrom\nHazard\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 84,
+    "text_length": 1530
+  },
+  {
+    "idx": 43,
+    "doc_id": "19970033338_p84_0",
+    "section": "84.0",
+    "title": "406\nEXCLUSION AREAS\na.\nGeneral.\nStandards\nand\nguidelines\nfor\nthe location\nof hydrogen\nsystems\neffect...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 85,
+    "text_length": 1939
+  },
+  {
+    "idx": 44,
+    "doc_id": "19970033338_p86_0",
+    "section": "86.0",
+    "title": "(2)\n(3)\n(4)\n(5)\nname\n\"Hydrogen\".\nEach\nmanifold\nhydrogen\nsupply\nunit\nshall\nbe legibly\nmarked\nwith\nthe...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 87,
+    "text_length": 1706
+  },
+  {
+    "idx": 45,
+    "doc_id": "19970033338_p87_0",
+    "section": "87.0",
+    "title": "407a\n(1)\n(2)\n(3)\n(4)\n(5)\n(6)\n407a\nBarricades\nserve\ntwo\npurposes:\nto protect\nuncontrolled\nareas\nfrom\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 88,
+    "text_length": 2030
+  },
+  {
+    "idx": 46,
+    "doc_id": "19970033338_p90_0",
+    "section": "90.0",
+    "title": "(2)\n(3)\nflammable\nmaterials.\nIncluding\nbarriers\nand\ninsulated\nareas\nwithin\nthe impoundment\nareas\npro...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 91,
+    "text_length": 1953
+  },
+  {
+    "idx": 47,
+    "doc_id": "19970033338_p95_0",
+    "section": "95.0",
+    "title": "409d\n{3)\n(4)\n(5)\n(6)\n(7)\nLabels\nwith\nwhite\nletters\non a red\nfield\nshould\nbe used\nfor piping\nand\ncomp...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 96,
+    "text_length": 1271
+  },
+  {
+    "idx": 48,
+    "doc_id": "19970033338_p98_0",
+    "section": "98.0",
+    "title": "411\nEXAMINATION, INSPECTION, AND RECERTIFICATION\na.\nGeneral.\n(1)\nAll\nstorage\nand piping\ninstallation...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 99,
+    "text_length": 1994
+  },
+  {
+    "idx": 49,
+    "doc_id": "19970033338_p102_0",
+    "section": "102.0",
+    "title": "CHAPTER 5:\nHYDROGENSTORAGEVESSELS,PIPING, AND\nCOMPONENTS\nNote: All\nvessels,\npiping,\nfittings,\nvents,...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 103,
+    "text_length": 1362
+  },
+  {
+    "idx": 50,
+    "doc_id": "19970033338_p103_0",
+    "section": "103.0",
+    "title": "501\n501\nSTORAGE\nVESSELS\na.\nFixed\nand\nMobile\nStorage\nSystems\nfor\nGH2.\nContainers\nfor\nGH2 storage\nshal...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 104,
+    "text_length": 1896
+  },
+  {
+    "idx": 51,
+    "doc_id": "19970033338_p104_0",
+    "section": "104.0",
+    "title": "b.\nof the power.\nThis\nis in addition\nto manually\noperated\nmain\nshutoff\nvalves.\nThe\nvalve\ncabinets\nsh...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 105,
+    "text_length": 1838
+  },
+  {
+    "idx": 52,
+    "doc_id": "19970033338_p105_0",
+    "section": "105.0",
+    "title": "501b\n(3)\n(4)\n(5)\n(6)\n(7)\n(a)\nA vacuum\nequal\nto that\nrequired\nunder\noperating\nconditions\n(b)\nHigh\nvac...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 106,
+    "text_length": 1701
+  },
+  {
+    "idx": 53,
+    "doc_id": "19970033338_p108_0",
+    "section": "108.0",
+    "title": "(4)\n(5)\nthrough\nthe solids\nthat\ntend\nto accumulate\nat the\nfilter\nentrance.\nMaterials\nSelection.\n(a)\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 109,
+    "text_length": 1677
+  },
+  {
+    "idx": 54,
+    "doc_id": "19970033338_p111_0",
+    "section": "111.0",
+    "title": "501d\ne.\naccommodate\nproof\nand\nverification.\nTests\nshould\nbe performed\nto\nconfirm\nthe design,\nmanufac...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 112,
+    "text_length": 2208
+  },
+  {
+    "idx": 55,
+    "doc_id": "19970033338_p112_0",
+    "section": "112.0",
+    "title": "(2)\n(3)\n(4)\n(5)\n(6)\n(7)\n(8)\n{9)\nspecify\nspecific\nmaterials\nto be used\nin piping\nsystems;\nbut\nprovide...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 113,
+    "text_length": 2132
+  },
+  {
+    "idx": 56,
+    "doc_id": "19970033338_p113_0",
+    "section": "113.0",
+    "title": "502a\nb.\n(10)\nThe\nmetal\ncomponents\nof a hydrogen\nsystem\nshall\nbe\nelectrically\nbonded\nin accordance\nwi...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 114,
+    "text_length": 1973
+  },
+  {
+    "idx": 57,
+    "doc_id": "19970033338_p114_0",
+    "section": "114.0",
+    "title": "C\u00b0\nd.\nPipin_\n(1)\n(3)\nPiping\n(1)\n(2)\nfor\nGH2.\nMaterials\nfor\nGH2\npiping\nsystems\nand\ncomponents\nmust\nbe...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 115,
+    "text_length": 2167
+  },
+  {
+    "idx": 58,
+    "doc_id": "19970033338_p115_0",
+    "section": "115.0",
+    "title": "502d\n(3)\n(4)\n(5)\n(6)\nAn\nLH_ or SLH2\nsystem\nbuilt\nof stainless\nsteel\nhas a thermal\ncontraction\nof abo...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 116,
+    "text_length": 1790
+  },
+  {
+    "idx": 59,
+    "doc_id": "19970033338_p116_0",
+    "section": "116.0",
+    "title": "e.\n(7)\nInsulation\nfor\nLH2 or SLH2\npiping\nshall\nhave\na\nself-extinguishing\nfire\nrating.\nOther\nfluid\nli...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 117,
+    "text_length": 1970
+  },
+  {
+    "idx": 60,
+    "doc_id": "19970033338_p117_0",
+    "section": "117.0",
+    "title": "502e\nf.\n(4)\nAny\ncompound\nor lubricant\nused\nin threaded\njoints\nshall\nbe\nsuitable\nfor\nthe service\ncond...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 118,
+    "text_length": 1531
+  },
+  {
+    "idx": 61,
+    "doc_id": "19970033338_p118_0",
+    "section": "118.0",
+    "title": "(b)\nWelded\nJoints.\n2\n3\nWelding\nis the first\npreference\nfor\nall hydrogen\nsystems,\nand\nall forms\nof we...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 119,
+    "text_length": 1868
+  },
+  {
+    "idx": 62,
+    "doc_id": "19970033338_p119_0",
+    "section": "119.0",
+    "title": "503a\n(c)\n(d)\n(e)\nThreaded\nJoints.\nThreaded\njoints\nwith\na suitable\nthread\nseal\nare\nacceptable\nfor\nuse...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 120,
+    "text_length": 1848
+  },
+  {
+    "idx": 63,
+    "doc_id": "19970033338_p120_0",
+    "section": "120.0",
+    "title": "(2)\n(3)\n(4)\n(g)\nSoft\nSolder\nJoints.\nSoft solder\njoints\nare\nnot\npermissible\nin hydrogen\nsystems.\nSoft...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 121,
+    "text_length": 1978
+  },
+  {
+    "idx": 64,
+    "doc_id": "19970033338_p121_0",
+    "section": "121.0",
+    "title": "503a\n(5)\n(6)\nASME\nBPVC\n(1995),\nexcept\nthe\ndesign\npressure\nshould\nbe at\nleast\nequal\nto the\ntest\npress...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 122,
+    "text_length": 1720
+  },
+  {
+    "idx": 65,
+    "doc_id": "19970033338_p125_0",
+    "section": "125.0",
+    "title": "503a\n(b)\n(c)\nduring\noperations\nshould\nbe provided\nwith\ntethered\nend\nplates,\ncaps,\nplugs,\nor covers\nt...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 126,
+    "text_length": 1685
+  },
+  {
+    "idx": 66,
+    "doc_id": "19970033338_p126_0",
+    "section": "126.0",
+    "title": "b.\nthe hose\nis considered\nacceptable\nas a bend\nradius.\n2\nEach\nend of the LH2 discharge\nhose\nshould\nb...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 127,
+    "text_length": 1542
+  },
+  {
+    "idx": 67,
+    "doc_id": "19970033338_p127_0",
+    "section": "127.0",
+    "title": "503b\n(2)\n(3)\ntemperature\nchanges,\nand\nvibration\nmay\nreduce\ngasket\nmaterial\nresilience\nand\ncause\na le...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 128,
+    "text_length": 1634
+  },
+  {
+    "idx": 68,
+    "doc_id": "19970033338_p128_0",
+    "section": "128.0",
+    "title": "(b)\n(c)\n(d)\n(e)\nValve\nseats\nmay\nbe Kel-F \u00ae or\nmodified\nTeflon\n\u00ae\n(Fluorogreen\n\u00ae is preferred).\n2\nGlan...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 129,
+    "text_length": 1962
+  },
+  {
+    "idx": 69,
+    "doc_id": "19970033338_p129_0",
+    "section": "129.0",
+    "title": "504\n504\nOVERPRESSURE\nPROTECTION\nOF\nSTORAGE\nVESSELS\nAND\nPIPING\nSYSTEMS\na.\nGeneral.\nSafety\ndevices\nsha...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 130,
+    "text_length": 2018
+  },
+  {
+    "idx": 70,
+    "doc_id": "19970033338_p131_0",
+    "section": "131.0",
+    "title": "504b\nC.\n(lO)\nThe\ninstallation\ndesign\nshall\ninclude\na study\nof the discharge\npiping\nand\npipe\nsupports...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 132,
+    "text_length": 2160
+  },
+  {
+    "idx": 71,
+    "doc_id": "19970033338_p140_0",
+    "section": "140.0",
+    "title": "4\nHydrogenshouldnot berecirculatedif\ncontaminationcannotbeprevented.\n(6)\nPermanent\nliquid\nstorage\nfa...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 141,
+    "text_length": 1900
+  },
+  {
+    "idx": 72,
+    "doc_id": "19970033338_p141_0",
+    "section": "141.0",
+    "title": "5o7a\nb.\nwith\nthe\ncalculated\npeak\ndemand\ndivided\nequally\namong\nthe\nunits\nwhen\npumps\nlarger\nthan\n3.7 k...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 142,
+    "text_length": 2331
+  },
+  {
+    "idx": 73,
+    "doc_id": "19970033338_p142_0",
+    "section": "142.0",
+    "title": "C.\nd.\ne.\nf.\ng.\nh.\n(3)\nCryogenic\npumps\ndo not\nhandle\nall gases\nequally\nwell.\nThe\ncapacity\nfor\npumping...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 143,
+    "text_length": 2406
+  },
+  {
+    "idx": 74,
+    "doc_id": "19970033338_p144_0",
+    "section": "144.0",
+    "title": "600a\nb.\n(4)\nThe\ndesign\nof a reliable\nhydrogen\ndetection\nand\nmonitoring\nsystem\nfollows:\n(a)\nEvaluate\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 145,
+    "text_length": 1773
+  },
+  {
+    "idx": 75,
+    "doc_id": "19970033338_p152_0",
+    "section": "152.0",
+    "title": "700b\nC.\nd.\ne.\n(5)\nEnsure\nsafe\noperation\nof cryogenic\nsystems\nthrough\nperiodic\nleak\nand\nflange\n.joint...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 153,
+    "text_length": 2213
+  },
+  {
+    "idx": 76,
+    "doc_id": "19970033338_p153_0",
+    "section": "153.0",
+    "title": "f.\nthe insulation\nto remove\nabsorbed\nmoisture\nor other\ngases\nfor\nmajor\nrepairs\nor modifications.\nWar...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 154,
+    "text_length": 1954
+  },
+  {
+    "idx": 77,
+    "doc_id": "19970033338_p154_0",
+    "section": "154.0",
+    "title": "700t\"\n(e)\n(f)\ncleaning,\nthe level\nof cleanliness,\nthe inspection\nprocedures,\nand\nthe\ntesting\nfor\neac...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 155,
+    "text_length": 1880
+  },
+  {
+    "idx": 78,
+    "doc_id": "19970033338_p155_0",
+    "section": "155.0",
+    "title": "(g)\n(h)\nand\nflushed\na second\ntime\nwith\ndemineralized\nwater.\n2\nThe\nsystem\nshould\nbe dried\nby evacuati...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 156,
+    "text_length": 1677
+  },
+  {
+    "idx": 79,
+    "doc_id": "19970033338_p157_0",
+    "section": "157.0",
+    "title": "(2)\n(3)\n(4)\n(5)\n(6)\nProperly\ninsulated\ngloves\nshould\nbe worn\nwhen\nhandling\nanything\nthat\nconies\nin c...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 158,
+    "text_length": 1800
+  },
+  {
+    "idx": 80,
+    "doc_id": "19970033338_p162_0",
+    "section": "162.0",
+    "title": "701d\n(2)\n(3)\n{4)\n{8)\n(6)\nThe\nlargest\ncircumferential\ntemperature\ngradients,\nand\nconsequently\nthe hig...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 163,
+    "text_length": 2151
+  },
+  {
+    "idx": 81,
+    "doc_id": "19970033338_p163_0",
+    "section": "163.0",
+    "title": "(c)\nFigure\nA4.5\nshows\nthe\nmaximum\nLH_ and\nLN_ flow\nrates\nto avoid\nexcessive\nthermal\nstress\nfrom\nrapi...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 164,
+    "text_length": 1504
+  },
+  {
+    "idx": 82,
+    "doc_id": "19970033338_p164_0",
+    "section": "164.0",
+    "title": "CHAPTER 8:\nTRANSPORTATION\nNote:\nStandards\nand\nguidelines\nfor\nthe\ntransportation\nof hydrogen\nare\nfor\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 165,
+    "text_length": 1393
+  },
+  {
+    "idx": 83,
+    "doc_id": "19970033338_p165_0",
+    "section": "165.0",
+    "title": "800c\n(4)\n(a)\nA tank\nprimarily\nintended\nfor\nthe carriage\nof liquids\nor\ngases\nthat\nincludes\nappurtenan...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 166,
+    "text_length": 1825
+  },
+  {
+    "idx": 84,
+    "doc_id": "19970033338_p170_0",
+    "section": "170.0",
+    "title": "803\nTRANSPORTATIONEMERGENCIES\na.\nInitial\nActions.\nThe\nfirst\nconcern\nshall\nbe to prevent\ndeath\nor inj...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 171,
+    "text_length": 1920
+  },
+  {
+    "idx": 85,
+    "doc_id": "19970033338_p172_0",
+    "section": "172.0",
+    "title": "90_\nC,\nd.\ne.\nfo\n(4)\nAppropriate\nmedical\nresponse\n(5)\nSummoning\noutside\nassistance\n(6)\nEstablishing\ns...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 173,
+    "text_length": 1443
+  },
+  {
+    "idx": 86,
+    "doc_id": "19970033338_p184_0",
+    "section": "184.0",
+    "title": "ASTM F310-70. Standard\nPractice\nfor Sampling\nCryogenic\nAerospace\nFluids.\nAmerican\nSociety\nfor Testin...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 185,
+    "text_length": 2435
+  },
+  {
+    "idx": 87,
+    "doc_id": "19970033338_p185_0",
+    "section": "185.0",
+    "title": "CGA G-5.4. Standard\nfor\nHydrogen\nPiping\nSystems\nat Consumer\nLocations.\nCompressed\nGas\nAssociation.\nA...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 186,
+    "text_length": 2005
+  },
+  {
+    "idx": 88,
+    "doc_id": "19970033338_p186_0",
+    "section": "186.0",
+    "title": "KSC-SPEC-Z-0020.Specification\nfor\nWelding\nof Aerospace\nGround\nSupport\nEquipment\nand\nRelated\nFaciliti...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 187,
+    "text_length": 1848
+  },
+  {
+    "idx": 89,
+    "doc_id": "19970033338_p189_0",
+    "section": "189.0",
+    "title": "Rosen,B., V. H. Dayan,andR. L. Proffitt.\nHydrogen\nLeaks\nand\nFire\nDetection,\nA\nSurvey.\nNASA,\nWashingt...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 190,
+    "text_length": 2222
+  },
+  {
+    "idx": 90,
+    "doc_id": "19970033338_p211_0",
+    "section": "211.0",
+    "title": "ADDENDUM:\nSAMPLE\nMATERIAL\nSAFETY\nDATA\nSHEETS\nFOR\nGASEOUS\nAND\nLIQUEFIED\nHYDROGEN...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 212,
+    "text_length": 79
+  },
+  {
+    "idx": 91,
+    "doc_id": "19970033338_p212_0",
+    "section": "212.0",
+    "title": "HYDROGEN- HYDROGEN,TECHNICAL\nMATERIALSAFETYDATA SHEET\nFSC:6830\nNIIN: (tobesuppliedby manufacturer)\nM...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 213,
+    "text_length": 1447
+  },
+  {
+    "idx": 92,
+    "doc_id": "19970033338_p213_0",
+    "section": "213.0",
+    "title": "Physical/Chemical\nCharacteristics\nAppearanceAndOdor:COLORLESGASAT NORMALTEMPERATUREAND PRESSURE;\nODO...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 214,
+    "text_length": 1651
+  },
+  {
+    "idx": 93,
+    "doc_id": "19970033338_p214_0",
+    "section": "214.0",
+    "title": "SALIVATION,VOMITING& UNCONSCIOUSNESS.\nEYE:NOEVIDENCEOFADVERSE\nEFFECTS.\nCarcinogenicity- NTP:NO\nCarci...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 215,
+    "text_length": 2462
+  },
+  {
+    "idx": 94,
+    "doc_id": "19970033338_p217_0",
+    "section": "217.0",
+    "title": "LIQUID HYDROGEN- CRYOGENICLIQUID\nMATERIAL SAFETYDATA SHEET\nFSC:9135\nNIIN: (tobesuppliedbymanufacture...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 218,
+    "text_length": 1656
+  },
+  {
+    "idx": 95,
+    "doc_id": "19970033338_p218_0",
+    "section": "218.0",
+    "title": "PercentVolatilesBy Volume:100\nAutoignitionTemperature:968F\nFireandExplosionHazardData\nFlashPoint:FLA...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 219,
+    "text_length": 1992
+  },
+  {
+    "idx": 96,
+    "doc_id": "19970033338_p227_0",
+    "section": "227.0",
+    "title": "105\nI04\n\"_\nlOS\nN-I\n0\nm\nID\nlOe\n101\nWater\nVapor. peroent\n0\n100\n200\n300\n400\n500\n600\nDistance.\nft\nFigure...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 228,
+    "text_length": 629
+  },
+  {
+    "idx": 97,
+    "doc_id": "19970033338_p235_0",
+    "section": "235.0",
+    "title": "Table A2.5\nCritical RadiantFlux Levels\nRadiantflux\nW/cm2(Btu/h/fl_)\nEffect\n0.473\n(1500)\n1.167\n(3700)...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 236,
+    "text_length": 912
+  },
+  {
+    "idx": 98,
+    "doc_id": "19970033338_p238_0",
+    "section": "238.0",
+    "title": "Table\nA3.2\nQuantity-Distance\nRequirements\nfor\nNonpropellant\nGH2\nS_stems\nfor\nOutdoor\nLocations\n_\nSize...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 239,
+    "text_length": 3577
+  },
+  {
+    "idx": 99,
+    "doc_id": "19970033338_p240_0",
+    "section": "240.0",
+    "title": "Table A3.4\nQuantity-Distance_Requirementsfor NonpropellantLH_Systemsfor OutdoorLocationsb_\nType\nof O...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 241,
+    "text_length": 2825
+  },
+  {
+    "idx": 100,
+    "doc_id": "19970033338_p241_0",
+    "section": "241.0",
+    "title": "Table A3.5\nLiquid PropellantHazardandCompatibilityGroups\nf\nHazard\nPropellant\nGroup s\nStorage\nCompati...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 242,
+    "text_length": 2198
+  },
+  {
+    "idx": 101,
+    "doc_id": "19970033338_p243_0",
+    "section": "243.0",
+    "title": "Table\nA3.7\nSafe\nQuantity-Distance\nRelationships\nfor\nLH2 Storage\nfor Hazard\nGroup\nIII Materials\n'\nPou...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 244,
+    "text_length": 1451
+  },
+  {
+    "idx": 102,
+    "doc_id": "19970033338_p244_0",
+    "section": "244.0",
+    "title": "Table\nA3.7\n(continued)\nSafe\nQuantity-Distance\nRelationships\nfor\nLH2 Storage\nfor\nHazard\nGroup\nIII Mat...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 245,
+    "text_length": 1823
+  },
+  {
+    "idx": 103,
+    "doc_id": "19970033338_p254_0",
+    "section": "254.0",
+    "title": "Size of\nspill\n(,gal)\nTable\nA4.1\nSummary\nof Liquefied\nHydrogen\nSpill\nData\nSurface\nVaporization\nDisper...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 255,
+    "text_length": 1286
+  },
+  {
+    "idx": 104,
+    "doc_id": "19970033338_p256_0",
+    "section": "256.0",
+    "title": ".g\nZ\nv\nr-\nea\nCa3\n\"G\no__\nE\nE'-\nO\n3,34 Stainless\nSteel\n9% Nickel Steel\n201 Stainiess\nSteel\nC1020 Carbo...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 257,
+    "text_length": 586
+  },
+  {
+    "idx": 105,
+    "doc_id": "19970033338_p257_0",
+    "section": "257.0",
+    "title": "450\n400\n350\n300\n250\nn\n_\n200\n150\n......\n1O0\n5O\n0\n0\nI\ni\n..................\n''\ni\n.........\n!\nYield\nI\nI]...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 258,
+    "text_length": 481
+  },
+  {
+    "idx": 106,
+    "doc_id": "19970033338_p258_0",
+    "section": "258.0",
+    "title": "700\n_I\n600\n5OO\n---\"400\ni\nP__,_\n@\n300-\n2O0\n100\n0\nr\nI\n!\n0\n50\n100\n150\n200\n250\n300\nTemperature\n(K)\nFigur...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 259,
+    "text_length": 446
+  },
+  {
+    "idx": 107,
+    "doc_id": "19970033338_p259_0",
+    "section": "259.0",
+    "title": "1.8xl\nO-s.\n1,5x10 .5\n1.4x10 s\n_-\n12xi0\n4\n1,0x10\"\nO\n(.3\n.o\n_8,0x!0\n--\nI,,LI\ne\"\n6.0xI0\n_ \"_......\n2,0x...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 260,
+    "text_length": 509
+  },
+  {
+    "idx": 108,
+    "doc_id": "19970033338_p260_0",
+    "section": "260.0",
+    "title": "\\\n2D\n_\n1,5\nNy!on\ni\n304 Stainless\nSteel\n0,2 % Carbon\nSteei\nInvar\n!\no.o,,F\ni\n0\n50\n_O0\n150\n200\nTempera,...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 261,
+    "text_length": 567
+  },
+  {
+    "idx": 109,
+    "doc_id": "19970033338_p261_0",
+    "section": "261.0",
+    "title": "Table AS.1\nSummaryof MaterialCompatabilityfor HydrogenService\nMaterial\nService\nGH2\nLH2\nSLH2\nRemarks\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 262,
+    "text_length": 1405
+  },
+  {
+    "idx": 110,
+    "doc_id": "19970033338_p262_0",
+    "section": "262.0",
+    "title": "Application\nTable\nA5.2\nA Selection\nof Recommended\nMaterials\nfor Typical\nApplications\na\nTypical\nmater...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 263,
+    "text_length": 3152
+  },
+  {
+    "idx": 111,
+    "doc_id": "19970033338_p263_0",
+    "section": "263.0",
+    "title": "Table\nA5.3\nMinimum\nTemperatures\nand Basic Allowable\nStresses\nin Tension\nfor Selected\nMetals _\nSpecif...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 264,
+    "text_length": 2825
+  },
+  {
+    "idx": 112,
+    "doc_id": "19970033338_p264_0",
+    "section": "264.0",
+    "title": "Table\nA5.3\n(continued)\nMinimum\nTemperatures\nand\nBasic\nAllowable\nStresses\nin Tension\nfor Selected\nMet...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 265,
+    "text_length": 3208
+  },
+  {
+    "idx": 113,
+    "doc_id": "19970033338_p265_0",
+    "section": "265.0",
+    "title": "Material\nTable\nA5.4\nElastic\nProperties\nof Selected\nMaterials\nat Room\nTemperature\nand\nLiquid\nHydrogen...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 266,
+    "text_length": 1287
+  },
+  {
+    "idx": 114,
+    "doc_id": "19970033338_p266_0",
+    "section": "266.0",
+    "title": "Table A5.5\nMechanicalPropertiesof SelectedMaterialsat RoomTemperature\nandLiquid HydrogenTemperature\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 267,
+    "text_length": 1178
+  },
+  {
+    "idx": 115,
+    "doc_id": "19970033338_p267_0",
+    "section": "267.0",
+    "title": "Table\nA5.6\nThermal\nProperties\nof Selected\nMaterials\nat Room\nTemperature\nand Liquid\nHydrogen\nTemperat...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 268,
+    "text_length": 2152
+  },
+  {
+    "idx": 116,
+    "doc_id": "19970033338_p268_0",
+    "section": "268.0",
+    "title": "Characteristic\nTable\nA5.7\nTypical\nCharacteristics\nof Hydrogen\nEmbrittlement\nTypes\nEnvironmental\nInte...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 269,
+    "text_length": 1613
+  },
+  {
+    "idx": 117,
+    "doc_id": "19970033338_p269_0",
+    "section": "269.0",
+    "title": "TableA5.8\nSusceptibilityof Materialsto Embrittlementin Hydrogenat 10,000psiand72\u00b0F_\nStrength\nratio.\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 270,
+    "text_length": 1778
+  },
+  {
+    "idx": 118,
+    "doc_id": "19970033338_p270_0",
+    "section": "270.0",
+    "title": "543,\nAmerican\nSociety\nfor\nTesting\nand Materials,\nPhiladelphia,\nPA\n(1974)\npp.\n170-197.\nStress concent...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 271,
+    "text_length": 215
+  },
+  {
+    "idx": 119,
+    "doc_id": "19970033338_p271_0",
+    "section": "271.0",
+    "title": "AIIo},\n2(111\n2024\n6061\n6063\nNickel\nTable\nA5.9\nComparison\nof Air,\nHelium,\nand\nHydrogen\nExposure\non Se...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility",
+      "compatibility_table"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 272,
+    "text_length": 2363
+  },
+  {
+    "idx": 120,
+    "doc_id": "19970033338_p276_0",
+    "section": "276.0",
+    "title": "Table A6.1\nTypical HydrogenGasDetectors\nType of Detector\nDescription\nCatalytic\nA palladiumand/or pla...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 277,
+    "text_length": 1538
+  },
+  {
+    "idx": 121,
+    "doc_id": "19970033338_p284_0",
+    "section": "284.0",
+    "title": "REFERENCES\nASME B31.3. Process\nPiping.\nAmerican\nSociety\nof Mechanical\nEngineers,\nNew\nYork,\nNY\n(1996)...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 285,
+    "text_length": 1984
+  },
+  {
+    "idx": 122,
+    "doc_id": "19970033338_p285_0",
+    "section": "285.0",
+    "title": "GrayH. R., \"Testingfor HydrogenEnvironmentEmbrittlement:ExperimentalVariables,\"\nHydrogen\nEmbrittleme...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 286,
+    "text_length": 2304
+  },
+  {
+    "idx": 123,
+    "doc_id": "19970033338_p286_0",
+    "section": "286.0",
+    "title": "McCarty, R. D., J. Herd, andH. M. Roder.\nDesign\nData).\nNBS\nMonograph\n168\n(1981).\nSelected\nProperties...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 287,
+    "text_length": 2209
+  },
+  {
+    "idx": 124,
+    "doc_id": "19970033338_p287_0",
+    "section": "287.0",
+    "title": "Robinson,S. L.\n\"HydrogenCompatibilityof StructuralMaterialsfor EnergyStorageand\nTransmissionApplicat...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 288,
+    "text_length": 1556
+  },
+  {
+    "idx": 125,
+    "doc_id": "19970033338_p295_0",
+    "section": "295.0",
+    "title": "EXAMPLE 4:\nAnalysisof heatleakon LH2andortho-to-paraconversionandresultingeffectson\nSLH_systems.\nInp...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 296,
+    "text_length": 375
+  },
+  {
+    "idx": 126,
+    "doc_id": "19970033338_p298_0",
+    "section": "298.0",
+    "title": "EXAMPLE 5\"\nAmountof solid insulation(notvacuum)requiredfor a specifiedtest\nline.\nSection\nof\nPipe\nI n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 299,
+    "text_length": 894
+  },
+  {
+    "idx": 127,
+    "doc_id": "19970033338_p309_0",
+    "section": "309.0",
+    "title": "EXAMPLE 9:\nAnalysisof theheatleak into a LH_ or SLH2transferline andanalysisof thequantity\nof LH2con...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 310,
+    "text_length": 775
+  },
+  {
+    "idx": 128,
+    "doc_id": "19970033338_p310_0",
+    "section": "310.0",
+    "title": "Theflow rateof Example5 is\n7.1134.103\nkg\n.f 2.21b/.\n1\n4.3hr.3600s/h\n_\nkg\n] 2in.\nlb\n=0.505--\ns. in.\nA...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 311,
+    "text_length": 1457
+  },
+  {
+    "idx": 129,
+    "doc_id": "19970033338_p317_0",
+    "section": "317.0",
+    "title": "EXAMPLE\n12:\nTypical\nmaterial\nthat might\nbe included\nin certificate\ntraining\nfor liquid\nhydrogen\nhand...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 318,
+    "text_length": 553
+  },
+  {
+    "idx": 130,
+    "doc_id": "19970033338_p320_0",
+    "section": "320.0",
+    "title": "HYDROGEN\nIN\nSYSTEMS\n\u2022\nIn LH2 systems,\nvents\nand valves\ncan ice up and\nfail\n\u2022\nHydrogen\nsystems\nshould...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 321,
+    "text_length": 990
+  },
+  {
+    "idx": 131,
+    "doc_id": "19970033338_p326_0",
+    "section": "326.0",
+    "title": "h.\nfor\npressure\nlevels\nfrom\n101.3\nto 0.7\nkPa\n(14.7\nto 0.1\npsi):\nand\nit is\nabout\n2.0\nbelow\n0.7\nkPa\n(0...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 327,
+    "text_length": 1885
+  },
+  {
+    "idx": 132,
+    "doc_id": "19970033338_p328_0",
+    "section": "328.0",
+    "title": "d\u00b0\n.\nVapor\ncloud\nignition\ncan\nlead\nto two\nvery\ndifferent\ntypes\nof\nbehavior\nrelative\nto the blast\nwav...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 329,
+    "text_length": 1998
+  },
+  {
+    "idx": 133,
+    "doc_id": "19970033338_p329_0",
+    "section": "329.0",
+    "title": "(3)\n(4)\n(5)\nThe\nnature\nof the hazards\nis different\nbecause\nground-handling\nsystems\nhave\nfewer\nweight...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 330,
+    "text_length": 1692
+  },
+  {
+    "idx": 134,
+    "doc_id": "19970033338_p337_0",
+    "section": "337.0",
+    "title": "APPENDIX D\nCODES,\nSTANDARDS\nAND\nNASA\nDIRECTIVES\nD.1\nGENERAL\na.\nb.\nc\u00b0\nd,\ne.\nf,\nAppendix\nD gives\na bri...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 338,
+    "text_length": 1974
+  },
+  {
+    "idx": 135,
+    "doc_id": "19970033338_p338_0",
+    "section": "338.0",
+    "title": "establishingconsensusamongqualifiedgroups.TheAmericanSociety\nof MechanicalEngineers(ASME),andanANSI ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 339,
+    "text_length": 1838
+  },
+  {
+    "idx": 136,
+    "doc_id": "19970033338_p340_0",
+    "section": "340.0",
+    "title": "b.\n(4)\nASME\n(1)\n(3)\nThe\nfollowing\nspecifications\nare made\nwith\nregard\nto the piping\nassociated\nwith\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 341,
+    "text_length": 1958
+  },
+  {
+    "idx": 137,
+    "doc_id": "19970033338_p342_0",
+    "section": "342.0",
+    "title": "C.\nASME\nB31.3,\nProcess\nPiping\n(formerly,\n\"Chemical\nPlant\nand Petroleum\nRefinery\nPiping\").\n(1)\nASME\nB...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 343,
+    "text_length": 2077
+  },
+  {
+    "idx": 138,
+    "doc_id": "19970033338_p343_0",
+    "section": "343.0",
+    "title": "d,\nand maximum\nallowable\nstress\nvalues\nas a function\nof operating\ntemperature\n(see summary\nin Table\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 344,
+    "text_length": 2253
+  },
+  {
+    "idx": 139,
+    "doc_id": "19970033338_p344_0",
+    "section": "344.0",
+    "title": "(4)\n(5)\nthe practical\nneeds\nof a commercial\noperation.\n(One\nof the\nactivities\nof the NFPA\nis the dev...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 345,
+    "text_length": 2569
+  },
+  {
+    "idx": 140,
+    "doc_id": "19970033338_p346_0",
+    "section": "346.0",
+    "title": "(3)\nd,\nfor the sole\npurpose\nof storing\nLH2 and refilling\nportable\ncontainers,\ntrailers,\nmobile\nsuppl...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 347,
+    "text_length": 1987
+  },
+  {
+    "idx": 141,
+    "doc_id": "19970033338_p347_0",
+    "section": "347.0",
+    "title": "1910.116\n1910.119\n1910.120\nStandardsorganizations\nProcesssafetymanagementof highlyhazardous\nchemical...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 348,
+    "text_length": 1904
+  },
+  {
+    "idx": 142,
+    "doc_id": "19970033338_p349_0",
+    "section": "349.0",
+    "title": "(8)\nfire,\ndeflagration,\nor vapor-phase\nexplosion.\nHazardous\nfragmentation\nof the container,\nits prot...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 350,
+    "text_length": 1697
+  },
+  {
+    "idx": 143,
+    "doc_id": "19970033338_p350_0",
+    "section": "350.0",
+    "title": "C\u00b0\n(9)\nSeparation\ndistances\nshall\nbe measured\nfrom\nthe closest\nhazard\nsource\n(containers,\nbuildings,...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 351,
+    "text_length": 1427
+  },
+  {
+    "idx": 144,
+    "doc_id": "19970033338_p352_0",
+    "section": "352.0",
+    "title": "b.\nCHAPTER\nI - RESEARCH\nAND\nSPECIAL\nPROGRAMS\nADMINISTRATION,\nDEPARTMENT\nOF\nTRANSPORTATION\nSUBCHAPTER...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 353,
+    "text_length": 1081
+  },
+  {
+    "idx": 145,
+    "doc_id": "19970033338_p353_0",
+    "section": "353.0",
+    "title": "(1)\nThetransportationof hazardousmaterialsby, andtheiroffering\nto thefollowing:\n(a)\nCarriers\nby rail...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 354,
+    "text_length": 1305
+  },
+  {
+    "idx": 146,
+    "doc_id": "19970033338_p354_0",
+    "section": "354.0",
+    "title": "Table\nD1 (continued)\nSelection\nof Federal\nRegulations\nfor Hydrogen\nTransportation\n49 CFR\nPart\nNo.\nDe...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 355,
+    "text_length": 1938
+  },
+  {
+    "idx": 147,
+    "doc_id": "19970033338_p355_0",
+    "section": "355.0",
+    "title": "Table\nD1 (continued)\nSelection\nof Federal\nRegulations\nfor Hydrogen\nTransportation\n49 CFR\nPart\nNo.\nDe...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 356,
+    "text_length": 1718
+  },
+  {
+    "idx": 148,
+    "doc_id": "19970033338_p356_0",
+    "section": "356.0",
+    "title": "Table\nD1 (continued)\nSelection\nof Federal\nRegulations\nfor Hydrogen\nTransportation\n49 CFR\nPart\nNo.\nDe...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 357,
+    "text_length": 1823
+  },
+  {
+    "idx": 149,
+    "doc_id": "19970033338_p357_0",
+    "section": "357.0",
+    "title": "177.834\nGeneralrequirements(LoadingandUnloading) (includesClass2\n(gases)andDivision2.1(flammablegas\"...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 358,
+    "text_length": 115
+  },
+  {
+    "idx": 150,
+    "doc_id": "19970033338_p358_0",
+    "section": "358.0",
+    "title": "Table\nD1 (continued)\nSelection\nof Federal\nRegulations\nfor Hydrogen\nTransportation\n49 CFR\nPart\nNo.\nDe...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 359,
+    "text_length": 1375
+  },
+  {
+    "idx": 151,
+    "doc_id": "19970033338_p363_0",
+    "section": "363.0",
+    "title": "ensurethe necessary\ndischarge\nand\nundisturbed\nfunctioning\nof the\nsafety\nvalve.\nThe\nmaterial\nof all p...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 364,
+    "text_length": 2384
+  },
+  {
+    "idx": 152,
+    "doc_id": "19970033338_p364_0",
+    "section": "364.0",
+    "title": "d\u00b0\nThe\nstrength\nproperties\nof the material\nused\nfor\nthe bursting\nelements\nshould\nexhibit\nthe\nleast\np...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 365,
+    "text_length": 1082
+  },
+  {
+    "idx": 153,
+    "doc_id": "19970033338_p370_0",
+    "section": "370.0",
+    "title": "APPENDIX F\nABBREVIATIONS\nAND\nACRONYMS\nAHJ\nAISI\nANSI\nAPI\nASME\nASTM\nBPVC\nCBrF:_\nCCD\nCFR\nCF\nCGA\nCH3Br\nC...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 371,
+    "text_length": 1026
+  },
+  {
+    "idx": 154,
+    "doc_id": "19970033338_p371_0",
+    "section": "371.0",
+    "title": "LeRC\nLFL\nLH_\nLN2\nLNG\nLOX\nMAWP\nMSDS\nMSFC\nNASA\nN2\nNBP\nNBS\nNBT\nNFPA\nNHB\nNHS\nNIST\nNMI\nNSS\nNTP\nQD\nSI\nSLH2...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 372,
+    "text_length": 1034
+  },
+  {
+    "idx": 155,
+    "doc_id": "19970033338_p372_0",
+    "section": "372.0",
+    "title": "APPENDIX G\nGLOSSARY\nACCEPTANCE\nTEST.\nA standard\ntest\nthat\nleads\nto certification\nof a component\nor\ns...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 373,
+    "text_length": 2715
+  },
+  {
+    "idx": 156,
+    "doc_id": "19970033338_p373_0",
+    "section": "373.0",
+    "title": "CERTIFICATION.\nThe\nprocess\nthat results\nin the\ndocumented\nstatus\nthat qualifies\na\nvessel\nor system\nt...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 374,
+    "text_length": 2540
+  },
+  {
+    "idx": 157,
+    "doc_id": "19970033338_p374_0",
+    "section": "374.0",
+    "title": "FAILURE MODE AND EFFECTSANALYSIS (FMEA). A systematic,\nmethodicalanalysisperformedto identify anddoc...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 375,
+    "text_length": 2156
+  },
+  {
+    "idx": 158,
+    "doc_id": "19970033338_p375_0",
+    "section": "375.0",
+    "title": "INTRALINE SEPARATION. Theminimumdistanceto bemaintainedbetween\noperatingbuildingsandsiteswithin anop...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 376,
+    "text_length": 2682
+  },
+  {
+    "idx": 159,
+    "doc_id": "19970033338_p376_0",
+    "section": "376.0",
+    "title": "PRESSUREVESSEL. Any vesselusedfor thestorageor handlingof gasor liquid\nunderpositivepressure. Compon...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 377,
+    "text_length": 2571
+  },
+  {
+    "idx": 160,
+    "doc_id": "19970033338_p378_0",
+    "section": "378.0",
+    "title": "REFERENCES\nASME B31.3. Process\nPiping.\nAmerican\nSociety\nof Mechanical\nEngineers,\nNew\nYork,\nNY\n(1996)...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 379,
+    "text_length": 1985
+  },
+  {
+    "idx": 161,
+    "doc_id": "19970033338_p379_0",
+    "section": "379.0",
+    "title": "GrayH. R., \"Testingfor HydrogenEnvironmentEmbrittlement:ExperimentalVariables,\"\nHydrogen\nEmbrittleme...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 380,
+    "text_length": 2311
+  },
+  {
+    "idx": 162,
+    "doc_id": "19970033338_p380_0",
+    "section": "380.0",
+    "title": "McCarty, R. D., J. Hord, andH. M. Roder. Selected\nProperties\nof Hydrogen\n(Engineering\nDesign\nData).\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 381,
+    "text_length": 2207
+  },
+  {
+    "idx": 163,
+    "doc_id": "19970033338_p381_0",
+    "section": "381.0",
+    "title": "Robinson,S. L.\n\"Hydrogen\nCompatibility\nof Structural\nMaterials\nfor\nEnergy\nStorage\nand\nTransmission\nA...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 382,
+    "text_length": 1586
+  },
+  {
+    "idx": 164,
+    "doc_id": "19970033338_p382_0",
+    "section": "382.0",
+    "title": "APPENDIX\nH\nINDEX\nA\nAcceptance\ntest,\n5-10\nAccess\ncontrol,\n4-23\nAccident\ninvestigation,\n7-1\nAccidents,...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 383,
+    "text_length": 2136
+  },
+  {
+    "idx": 165,
+    "doc_id": "19970033338_p383_0",
+    "section": "383.0",
+    "title": "D\nDecontamination,\n7-6, 7-7\nDeflagration,\n2-4, 2-15,\n2-16,\n2-17,\n2-20.\n4-29,\n5-36\nventing,\n5-36\nDelu...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 384,
+    "text_length": 2123
+  },
+  {
+    "idx": 166,
+    "doc_id": "19970033338_p384_0",
+    "section": "384.0",
+    "title": "F\nFacility\ndesign,\n1-1, 4-3,\n4-6,\n7-7\nmodification\nor rehabilitation,\n4-4\nFail modes,\n5-31\nFail-safe...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 385,
+    "text_length": 2199
+  },
+  {
+    "idx": 167,
+    "doc_id": "19970033338_p385_0",
+    "section": "385.0",
+    "title": "normal,2-1,2-2,2-27\nproperties,2-2\nsolid, 1-3\nI\nIce. 2-24\nIgnition.\n2-4,\n2-5,\n2-7.\n2-14.2-15,\n2-19,\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 386,
+    "text_length": 1875
+  },
+  {
+    "idx": 168,
+    "doc_id": "19970033338_p386_0",
+    "section": "386.0",
+    "title": "O\nOperating\nprocedures,\n1-7, 4-5, 7-1,\n7-2,\n8-5,\n10-3\ngeneral,\n8-5\nmodifications,\nrepairs,\nor\ndecomm...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "19970033338.pdf",
+    "page_number": 387,
+    "text_length": 2012
+  },
+  {
+    "idx": 169,
+    "doc_id": "hfto-mypp-safety-codes-standards_p1_0",
+    "section": "1.0",
+    "title": "Hydrogen and Fuel Cell Technologies Office Multi-Year Program Plan | 2024 \n140 \nconsequences of pote...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility",
+      "compatibility_table"
+    ],
+    "source_document": "hfto-mypp-safety-codes-standards.pdf",
+    "page_number": 2,
+    "text_length": 2560
+  },
+  {
+    "idx": 170,
+    "doc_id": "hfto-mypp-safety-codes-standards_p2_0",
+    "section": "2.0",
+    "title": "Hydrogen and Fuel Cell Technologies Office Multi-Year Program Plan | 2024 \n141 \nHydrogen Behavior an...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility",
+      "compatibility_table"
+    ],
+    "source_document": "hfto-mypp-safety-codes-standards.pdf",
+    "page_number": 3,
+    "text_length": 2991
+  },
+  {
+    "idx": 171,
+    "doc_id": "hfto-mypp-safety-codes-standards_p3_0",
+    "section": "3.0",
+    "title": "Hydrogen and Fuel Cell Technologies Office Multi-Year Program Plan | 2024 \n142 \ndomestic and interna...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility",
+      "compatibility_table"
+    ],
+    "source_document": "hfto-mypp-safety-codes-standards.pdf",
+    "page_number": 4,
+    "text_length": 1567
+  },
+  {
+    "idx": 172,
+    "doc_id": "hfto-mypp-safety-codes-standards_p4_0",
+    "section": "4.0",
+    "title": "Hydrogen and Fuel Cell Technologies Office Multi-Year Program Plan | 2024 \n143 \nNear-Term Priorities...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility",
+      "compatibility_table"
+    ],
+    "source_document": "hfto-mypp-safety-codes-standards.pdf",
+    "page_number": 5,
+    "text_length": 3146
+  },
+  {
+    "idx": 173,
+    "doc_id": "hfto-mypp-safety-codes-standards_p7_0",
+    "section": "7.0",
+    "title": "Hydrogen and Fuel Cell Technologies Office Multi-Year Program Plan | 2024 \n146 \nperformed in support...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility",
+      "compatibility_table"
+    ],
+    "source_document": "hfto-mypp-safety-codes-standards.pdf",
+    "page_number": 8,
+    "text_length": 3079
+  },
+  {
+    "idx": 174,
+    "doc_id": "hfto-mypp-safety-codes-standards_p11_0",
+    "section": "11.0",
+    "title": "Hydrogen and Fuel Cell Technologies Office Multi-Year Program Plan | 2024 \n150 \nfacilitate and promo...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility",
+      "compatibility_table"
+    ],
+    "source_document": "hfto-mypp-safety-codes-standards.pdf",
+    "page_number": 12,
+    "text_length": 3713
+  },
+  {
+    "idx": 175,
+    "doc_id": "hfto-mypp-safety-codes-standards_p12_0",
+    "section": "12.0",
+    "title": "Hydrogen and Fuel Cell Technologies Office Multi-Year Program Plan | 2024 \n151 \ndissemination of rel...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility",
+      "compatibility_table"
+    ],
+    "source_document": "hfto-mypp-safety-codes-standards.pdf",
+    "page_number": 13,
+    "text_length": 2202
+  },
+  {
+    "idx": 176,
+    "doc_id": "hfto-mypp-safety-codes-standards_p13_0",
+    "section": "13.0",
+    "title": "Hydrogen and Fuel Cell Technologies Office Multi-Year Program Plan | 2024 \n152 \nThe SCS subprogram\u2019s...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility",
+      "compatibility_table"
+    ],
+    "source_document": "hfto-mypp-safety-codes-standards.pdf",
+    "page_number": 14,
+    "text_length": 2186
+  },
+  {
+    "idx": 177,
+    "doc_id": "hfto-mypp-safety-codes-standards_p14_0",
+    "section": "14.0",
+    "title": "Hydrogen and Fuel Cell Technologies Office Multi-Year Program Plan | 2024 \n153 \nDevelop portfolio of...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility",
+      "compatibility_table"
+    ],
+    "source_document": "hfto-mypp-safety-codes-standards.pdf",
+    "page_number": 15,
+    "text_length": 1888
+  },
+  {
+    "idx": 178,
+    "doc_id": "SAND2012_7321_p0_0",
+    "section": "0.0",
+    "title": "SANDIA REPORT \nSAND2012-7321 \nUnlimited Release \nPrinted September 2012 \n \n \n \nTechnical Reference f...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 1,
+    "text_length": 633
+  },
+  {
+    "idx": 179,
+    "doc_id": "SAND2012_7321_p2_0",
+    "section": "2.0",
+    "title": "3 \nSAND2012-7321 \nUnlimited Release \nPrinted September 2012 \n \n \nTechnical Reference for Hydrogen Co...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 3,
+    "text_length": 1299
+  },
+  {
+    "idx": 180,
+    "doc_id": "SAND2012_7321_p4_0",
+    "section": "4.0",
+    "title": "5 \nCONTENTS \n \nDesignation \nNominal composition \nSection Revision \n \nIntroduction \n \nI \n03/08 \n \nPla...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 5,
+    "text_length": 1251
+  },
+  {
+    "idx": 181,
+    "doc_id": "SAND2012_7321_p5_0",
+    "section": "5.0",
+    "title": "6 \n \nCONTENTS (cont.) \n \nDesignation \nNominal composition \nSection Revision \n \nAluminum Alloys \n \nNo...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 6,
+    "text_length": 454
+  },
+  {
+    "idx": 182,
+    "doc_id": "SAND2012_7321_p6_0",
+    "section": "6.0",
+    "title": "I - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nIntroduction \nThe Technical Refer...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 7,
+    "text_length": 3602
+  },
+  {
+    "idx": 183,
+    "doc_id": "SAND2012_7321_p7_0",
+    "section": "7.0",
+    "title": "Introduction \nI - 2 \nFor the purposes of this Technical Reference, the susceptibility of structural ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 8,
+    "text_length": 3817
+  },
+  {
+    "idx": 184,
+    "doc_id": "SAND2012_7321_p8_0",
+    "section": "8.0",
+    "title": "Introduction \n \n \nI - 3 \n \nmicrostructure in a general sense from the perspective of product forms, ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 9,
+    "text_length": 3092
+  },
+  {
+    "idx": 185,
+    "doc_id": "SAND2012_7321_p9_0",
+    "section": "9.0",
+    "title": "Introduction \nI - 4 \nThe permeability (\u03a6) is used to calculate the steady-state flux of hydrogen per...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 10,
+    "text_length": 2683
+  },
+  {
+    "idx": 186,
+    "doc_id": "SAND2012_7321_p10_0",
+    "section": "10.0",
+    "title": "Introduction \n \n \nI - 5 \n \n3. Mechanical Properties: Effects of Gaseous Hydrogen \nThese subsections ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 11,
+    "text_length": 3196
+  },
+  {
+    "idx": 187,
+    "doc_id": "SAND2012_7321_p11_0",
+    "section": "11.0",
+    "title": "Introduction \nI - 6 \n \nThe following nomenclature is used for notched tensile specimens: \n\u03c3s (MPa) \n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 12,
+    "text_length": 2667
+  },
+  {
+    "idx": 188,
+    "doc_id": "SAND2012_7321_p12_0",
+    "section": "12.0",
+    "title": "Introduction \n \n \nI - 7 \n \n3.2.2 Threshold stress-intensity factor  \nThe threshold stress-intensity ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 13,
+    "text_length": 3343
+  },
+  {
+    "idx": 189,
+    "doc_id": "SAND2012_7321_p13_0",
+    "section": "13.0",
+    "title": "Introduction \nI - 8 \n3.4 Creep \nCreep is a high-temperature failure mode, where materials can deform...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 14,
+    "text_length": 3067
+  },
+  {
+    "idx": 190,
+    "doc_id": "SAND2012_7321_p14_0",
+    "section": "14.0",
+    "title": "Introduction \n \n \nI - 9 \n \n5. \nASTM DS-56H, Metals and Alloys in the UNIFIED NUMBERING SYSTEM (SAE H...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 15,
+    "text_length": 1574
+  },
+  {
+    "idx": 191,
+    "doc_id": "SAND2012_7321_p16_0",
+    "section": "16.0",
+    "title": "1100 - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nPlain Carbon Ferritic Steels: ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 17,
+    "text_length": 3179
+  },
+  {
+    "idx": 192,
+    "doc_id": "SAND2012_7321_p17_0",
+    "section": "17.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n1100 - 2 \n1.1 Composition and microstructure \nTable 1.1.1 ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 18,
+    "text_length": 2828
+  },
+  {
+    "idx": 193,
+    "doc_id": "SAND2012_7321_p18_0",
+    "section": "18.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n \n \n1100 - 3 \n \ndefects in metals, and the total hydrogen ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 19,
+    "text_length": 3230
+  },
+  {
+    "idx": 194,
+    "doc_id": "SAND2012_7321_p19_0",
+    "section": "19.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n1100 - 4 \ntoughness remains high, where most values are ne...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 20,
+    "text_length": 3405
+  },
+  {
+    "idx": 195,
+    "doc_id": "SAND2012_7321_p20_0",
+    "section": "20.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n \n \n1100 - 5 \n \nvs \uf044K relationships in hydrogen are notice...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 21,
+    "text_length": 3438
+  },
+  {
+    "idx": 196,
+    "doc_id": "SAND2012_7321_p21_0",
+    "section": "21.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n1100 - 6 \nfor SA 105 steel in 100 MPa hydrogen gas over a ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 22,
+    "text_length": 3394
+  },
+  {
+    "idx": 197,
+    "doc_id": "SAND2012_7321_p22_0",
+    "section": "22.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n \n \n1100 - 7 \n \nsteel. The general trends of the fatigue c...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 23,
+    "text_length": 3271
+  },
+  {
+    "idx": 198,
+    "doc_id": "SAND2012_7321_p23_0",
+    "section": "23.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n1100 - 8 \nThe trends for smooth tensile specimen propertie...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 24,
+    "text_length": 3463
+  },
+  {
+    "idx": 199,
+    "doc_id": "SAND2012_7321_p24_0",
+    "section": "24.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n \n \n1100 - 9 \n \n5. References \n1. \n\"Classification and Des...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 25,
+    "text_length": 3318
+  },
+  {
+    "idx": 200,
+    "doc_id": "SAND2012_7321_p25_0",
+    "section": "25.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n1100 - 10 \n16. \nRJ Walter and WT Chandler, \"Cyclic-Load Cr...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 26,
+    "text_length": 1994
+  },
+  {
+    "idx": 201,
+    "doc_id": "SAND2012_7321_p26_0",
+    "section": "26.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n \n \n1100 - 11 \n \nTable 1.1.1. Allowable composition ranges...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 27,
+    "text_length": 1716
+  },
+  {
+    "idx": 202,
+    "doc_id": "SAND2012_7321_p27_0",
+    "section": "27.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n1100 - 12 \nTable 1.1.2. Compositions (wt%) of carbon steel...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 28,
+    "text_length": 2125
+  },
+  {
+    "idx": 203,
+    "doc_id": "SAND2012_7321_p28_0",
+    "section": "28.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n \n \n1100 - 13 \n \nTable 1.1.3. Heat treatments and mechanic...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 29,
+    "text_length": 1620
+  },
+  {
+    "idx": 204,
+    "doc_id": "SAND2012_7321_p29_0",
+    "section": "29.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n1100 - 14 \nTable 2.1. Hydrogen permeability (\uf046) and solubi...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 30,
+    "text_length": 837
+  },
+  {
+    "idx": 205,
+    "doc_id": "SAND2012_7321_p30_0",
+    "section": "30.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n \n \n1100 - 15 \n \nTable 3.1.1.1. Smooth tensile properties ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 31,
+    "text_length": 1587
+  },
+  {
+    "idx": 206,
+    "doc_id": "SAND2012_7321_p31_0",
+    "section": "31.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n1100 - 16 \nTable 3.1.1.2. Smooth tensile properties of car...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 32,
+    "text_length": 1736
+  },
+  {
+    "idx": 207,
+    "doc_id": "SAND2012_7321_p32_0",
+    "section": "32.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n \n \n1100 - 17 \n \nTable 3.1.2.2. Notched tensile properties...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 33,
+    "text_length": 801
+  },
+  {
+    "idx": 208,
+    "doc_id": "SAND2012_7321_p33_0",
+    "section": "33.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n1100 - 18 \nTable 3.2.1.1. Fracture toughness for carbon st...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 34,
+    "text_length": 1595
+  },
+  {
+    "idx": 209,
+    "doc_id": "SAND2012_7321_p34_0",
+    "section": "34.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n \n \n1100 - 19 \n \n \nTable 3.2.2.1. Threshold stress-intensi...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 35,
+    "text_length": 1948
+  },
+  {
+    "idx": 210,
+    "doc_id": "SAND2012_7321_p35_0",
+    "section": "35.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n1100 - 20 \nTable 4.2.2. Smooth tensile properties of A516 ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 36,
+    "text_length": 1796
+  },
+  {
+    "idx": 211,
+    "doc_id": "SAND2012_7321_p36_0",
+    "section": "36.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n \n \n1100 - 21 \n \nTable 4.2.4. Notched tensile properties o...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 37,
+    "text_length": 1120
+  },
+  {
+    "idx": 212,
+    "doc_id": "SAND2012_7321_p37_0",
+    "section": "37.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n1100 - 22 \nTable 4.2.5. Fracture toughness for carbon stee...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 38,
+    "text_length": 1179
+  },
+  {
+    "idx": 213,
+    "doc_id": "SAND2012_7321_p38_0",
+    "section": "38.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n \n \n1100 - 23 \n \n1000/T (K-1)\n1.1\n1.2\n1.3\n1.4\n1.5\n1.6\n1.7\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 39,
+    "text_length": 714
+  },
+  {
+    "idx": 214,
+    "doc_id": "SAND2012_7321_p39_0",
+    "section": "39.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n1100 - 24 \nDisplacement rate  (mm/s)\n1e-5\n1e-4\n1e-3\n1e-2\nF...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 40,
+    "text_length": 623
+  },
+  {
+    "idx": 215,
+    "doc_id": "SAND2012_7321_p40_0",
+    "section": "40.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n \n \n1100 - 25 \n \nFracture toughness  (MPa\uf0d7m1/2)\n0\n40\n80\n12...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 41,
+    "text_length": 1016
+  },
+  {
+    "idx": 216,
+    "doc_id": "SAND2012_7321_p41_0",
+    "section": "41.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n1100 - 26 \nStress intensity factor range, \uf044K  (MPa\uf0d7m1/2)\n1...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 42,
+    "text_length": 990
+  },
+  {
+    "idx": 217,
+    "doc_id": "SAND2012_7321_p42_0",
+    "section": "42.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n \n \n1100 - 27 \n \nStress intensity factor range, \uf044K  (MPa\uf0d7m...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 43,
+    "text_length": 954
+  },
+  {
+    "idx": 218,
+    "doc_id": "SAND2012_7321_p43_0",
+    "section": "43.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n1100 - 28 \nStress intensity factor range, \uf044K  (MPa\uf0d7m1/2)\n1...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 44,
+    "text_length": 1107
+  },
+  {
+    "idx": 219,
+    "doc_id": "SAND2012_7321_p44_0",
+    "section": "44.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n \n \n1100 - 29 \n \nStress intensity factor range, \uf044K  (MPa m...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 45,
+    "text_length": 1243
+  },
+  {
+    "idx": 220,
+    "doc_id": "SAND2012_7321_p45_0",
+    "section": "45.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n1100 - 30 \nStress intensity factor range, \uf044K  (MPa\uf0d7m1/2)\n1...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 46,
+    "text_length": 1248
+  },
+  {
+    "idx": 221,
+    "doc_id": "SAND2012_7321_p46_0",
+    "section": "46.0",
+    "title": "Plain Carbon Ferritc Steels \nC-Mn Alloys \n \n \n1100 - 31 \n \nStress intensity factor range, \uf044K  (MPa\uf0d7m...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 47,
+    "text_length": 641
+  },
+  {
+    "idx": 222,
+    "doc_id": "SAND2012_7321_p48_0",
+    "section": "48.0",
+    "title": "1211 - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nLow-Alloy Ferritic Steels: \nTe...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 49,
+    "text_length": 3452
+  },
+  {
+    "idx": 223,
+    "doc_id": "SAND2012_7321_p49_0",
+    "section": "49.0",
+    "title": "Low-Alloy Ferritic Steels \nTempered Cr-Mo Alloys \n1211 - 2 \nAdditionally, Table 1.1.3 includes the y...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 50,
+    "text_length": 2090
+  },
+  {
+    "idx": 224,
+    "doc_id": "SAND2012_7321_p50_0",
+    "section": "50.0",
+    "title": "Low-Alloy Ferritic Steels \nTempered Cr-Mo Alloys \n \n \n \n1211 - 3 \n \n3. Mechanical Properties: Effect...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 51,
+    "text_length": 2988
+  },
+  {
+    "idx": 225,
+    "doc_id": "SAND2012_7321_p51_0",
+    "section": "51.0",
+    "title": "Low-Alloy Ferritic Steels \nTempered Cr-Mo Alloys \n1211 - 4 \nEffect of gas pressure \nHydrogen gas pre...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 52,
+    "text_length": 2972
+  },
+  {
+    "idx": 226,
+    "doc_id": "SAND2012_7321_p52_0",
+    "section": "52.0",
+    "title": "Low-Alloy Ferritic Steels \nTempered Cr-Mo Alloys \n \n \n \n1211 - 5 \n \n3.5 Impact \nNo known published d...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 53,
+    "text_length": 2265
+  },
+  {
+    "idx": 227,
+    "doc_id": "SAND2012_7321_p53_0",
+    "section": "53.0",
+    "title": "Low-Alloy Ferritic Steels \nTempered Cr-Mo Alloys \n1211 - 6 \nTable 1.1.1. Allowable compositional ran...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 54,
+    "text_length": 756
+  },
+  {
+    "idx": 228,
+    "doc_id": "SAND2012_7321_p54_0",
+    "section": "54.0",
+    "title": "Low-Alloy Ferritic Steels \nTempered Cr-Mo Alloys \n \n \n \n1211 - 7 \n \nTable 1.1.2. Compositions (wt%) ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 55,
+    "text_length": 1689
+  },
+  {
+    "idx": 229,
+    "doc_id": "SAND2012_7321_p55_0",
+    "section": "55.0",
+    "title": "Low-Alloy Ferritic Steels \nTempered Cr-Mo Alloys \n1211 - 8 \nTable 3.1.1.1. Smooth tensile properties...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 56,
+    "text_length": 1169
+  },
+  {
+    "idx": 230,
+    "doc_id": "SAND2012_7321_p56_0",
+    "section": "56.0",
+    "title": "Low-Alloy Ferritic Steels \nTempered Cr-Mo Alloys \n \n \n \n1211 - 9 \n \nTable 3.2.1.1. Values of fractur...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 57,
+    "text_length": 1255
+  },
+  {
+    "idx": 231,
+    "doc_id": "SAND2012_7321_p57_0",
+    "section": "57.0",
+    "title": "Low-Alloy Ferritic Steels \nTempered Cr-Mo Alloys \n1211 - 10 \nYield strength, Sy  (MPa)\n1000\n1050\n110...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 58,
+    "text_length": 766
+  },
+  {
+    "idx": 232,
+    "doc_id": "SAND2012_7321_p58_0",
+    "section": "58.0",
+    "title": "Low-Alloy Ferritic Steels \nTempered Cr-Mo Alloys \n \n \n \n1211 - 11 \n \nH2 gas pressure  (MPa)\n0.00\n0.0...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 59,
+    "text_length": 750
+  },
+  {
+    "idx": 233,
+    "doc_id": "SAND2012_7321_p59_0",
+    "section": "59.0",
+    "title": "Low-Alloy Ferritic Steels \nTempered Cr-Mo Alloys \n1211 - 12 \nTemperature  (K)\n150\n200\n250\n300\n350\n40...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 60,
+    "text_length": 770
+  },
+  {
+    "idx": 234,
+    "doc_id": "SAND2012_7321_p60_0",
+    "section": "60.0",
+    "title": "Low-Alloy Ferritic Steels \nTempered Cr-Mo Alloys \n \n \n \n1211 - 13 \n \n \nFrequency  (Hz)\n0.01\n0.1\n1\n10...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 61,
+    "text_length": 822
+  },
+  {
+    "idx": 235,
+    "doc_id": "SAND2012_7321_p62_0",
+    "section": "62.0",
+    "title": "1212 - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nLow-Alloy Ferritic Steels: \nTe...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 63,
+    "text_length": 3364
+  },
+  {
+    "idx": 236,
+    "doc_id": "SAND2012_7321_p63_0",
+    "section": "63.0",
+    "title": "Low-Alloy Ferritic Steels \nTempered Ni-Cr-Mo Alloys \n1212 - 2 \n1.1 Composition and microstructure \nT...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 64,
+    "text_length": 2670
+  },
+  {
+    "idx": 237,
+    "doc_id": "SAND2012_7321_p64_0",
+    "section": "64.0",
+    "title": "Low-Alloy Ferritc Steels \nTempered Ni-Cr-Mo Alloys \n \n1212 - 3 \n \nThe reduction of area measured in ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 65,
+    "text_length": 3410
+  },
+  {
+    "idx": 238,
+    "doc_id": "SAND2012_7321_p65_0",
+    "section": "65.0",
+    "title": "Low-Alloy Ferritic Steels \nTempered Ni-Cr-Mo Alloys \n1212 - 4 \nEffect of yield strength \nYield stren...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 66,
+    "text_length": 3531
+  },
+  {
+    "idx": 239,
+    "doc_id": "SAND2012_7321_p66_0",
+    "section": "66.0",
+    "title": "Low-Alloy Ferritc Steels \nTempered Ni-Cr-Mo Alloys \n \n1212 - 5 \n \nEffect of thermal aging \nAging in ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 67,
+    "text_length": 3639
+  },
+  {
+    "idx": 240,
+    "doc_id": "SAND2012_7321_p67_0",
+    "section": "67.0",
+    "title": "Low-Alloy Ferritic Steels \nTempered Ni-Cr-Mo Alloys \n1212 - 6 \n3.3 Fatigue \n3.3.1 Low-cycle and high...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 68,
+    "text_length": 2478
+  },
+  {
+    "idx": 241,
+    "doc_id": "SAND2012_7321_p68_0",
+    "section": "68.0",
+    "title": "Low-Alloy Ferritc Steels \nTempered Ni-Cr-Mo Alloys \n \n1212 - 7 \n \neds., The American Institute of Mi...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 69,
+    "text_length": 3071
+  },
+  {
+    "idx": 242,
+    "doc_id": "SAND2012_7321_p69_0",
+    "section": "69.0",
+    "title": "Low-Alloy Ferritic Steels \nTempered Ni-Cr-Mo Alloys \n1212 - 8 \n19. WG Clark, \"The Effect of Hydrogen...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 70,
+    "text_length": 1485
+  },
+  {
+    "idx": 243,
+    "doc_id": "SAND2012_7321_p70_0",
+    "section": "70.0",
+    "title": "Low-Alloy Ferritc Steels \nTempered Ni-Cr-Mo Alloys \n \n1212 - 9 \n \nTable 1.1.2. Compositions (wt%) of...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 71,
+    "text_length": 2043
+  },
+  {
+    "idx": 244,
+    "doc_id": "SAND2012_7321_p71_0",
+    "section": "71.0",
+    "title": "Low-Alloy Ferritic Steels \nTempered Ni-Cr-Mo Alloys \n1212 - 10 \nTable 1.1.3. Heat treatments and mec...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 72,
+    "text_length": 1925
+  },
+  {
+    "idx": 245,
+    "doc_id": "SAND2012_7321_p72_0",
+    "section": "72.0",
+    "title": "Low-Alloy Ferritc Steels \nTempered Ni-Cr-Mo Alloys \n \n1212 - 11 \n \nTable 3.1.1.1. Smooth tensile pro...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 73,
+    "text_length": 1402
+  },
+  {
+    "idx": 246,
+    "doc_id": "SAND2012_7321_p73_0",
+    "section": "73.0",
+    "title": "Low-Alloy Ferritic Steels \nTempered Ni-Cr-Mo Alloys \n1212 - 12 \nTable 3.1.2.1. Notched tensile prope...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 74,
+    "text_length": 1752
+  },
+  {
+    "idx": 247,
+    "doc_id": "SAND2012_7321_p74_0",
+    "section": "74.0",
+    "title": "Low-Alloy Ferritc Steels \nTempered Ni-Cr-Mo Alloys \n \n1212 - 13 \n \nTable 3.2.2.1. Values of threshol...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 75,
+    "text_length": 700
+  },
+  {
+    "idx": 248,
+    "doc_id": "SAND2012_7321_p75_0",
+    "section": "75.0",
+    "title": "Low-Alloy Ferritic Steels \nTempered Ni-Cr-Mo Alloys \n1212 - 14 \nLoading rate, dK/dt  (MPa\u221am/min)\n0.1...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 76,
+    "text_length": 700
+  },
+  {
+    "idx": 249,
+    "doc_id": "SAND2012_7321_p76_0",
+    "section": "76.0",
+    "title": "Low-Alloy Ferritc Steels \nTempered Ni-Cr-Mo Alloys \n \n1212 - 15 \n \n[Mn + 0.5Si + S + P]  (wt%)\n0.0\n0...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 77,
+    "text_length": 1063
+  },
+  {
+    "idx": 250,
+    "doc_id": "SAND2012_7321_p77_0",
+    "section": "77.0",
+    "title": "Low-Alloy Ferritic Steels \nTempered Ni-Cr-Mo Alloys \n1212 - 16 \nMn or Co  (wt%)\n0.0\n0.5\n1.0\n1.5\n2.0\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 78,
+    "text_length": 729
+  },
+  {
+    "idx": 251,
+    "doc_id": "SAND2012_7321_p78_0",
+    "section": "78.0",
+    "title": "Low-Alloy Ferritc Steels \nTempered Ni-Cr-Mo Alloys \n \n1212 - 17 \n \nH2 gas pressure  (MPa)\n0\n2\n4\n6\n8\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 79,
+    "text_length": 591
+  },
+  {
+    "idx": 252,
+    "doc_id": "SAND2012_7321_p79_0",
+    "section": "79.0",
+    "title": "Low-Alloy Ferritic Steels \nTempered Ni-Cr-Mo Alloys \n1212 - 18 \nTemperature  (K)\n200\n240\n280\n320\n360...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 80,
+    "text_length": 849
+  },
+  {
+    "idx": 253,
+    "doc_id": "SAND2012_7321_p80_0",
+    "section": "80.0",
+    "title": "Low-Alloy Ferritc Steels \nTempered Ni-Cr-Mo Alloys \n \n1212 - 19 \n \nGas pressure  (MPa)\n0\n20\n40\n60\n80...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 81,
+    "text_length": 810
+  },
+  {
+    "idx": 254,
+    "doc_id": "SAND2012_7321_p82_0",
+    "section": "82.0",
+    "title": "1401 - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nHigh-Alloy Ferritic Steels: \n9...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 83,
+    "text_length": 1660
+  },
+  {
+    "idx": 255,
+    "doc_id": "SAND2012_7321_p83_0",
+    "section": "83.0",
+    "title": "High-Alloy Ferritc Steels \n9Ni-4Co \n1401 - 2 \n3.2 Fracture mechanics  \nNo known published data in ga...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 84,
+    "text_length": 2724
+  },
+  {
+    "idx": 256,
+    "doc_id": "SAND2012_7321_p84_0",
+    "section": "84.0",
+    "title": "High-Alloy Ferritc Steels \n9Ni-4Co \n \n1401 - 3 \n \n9. ASTM. Metals and Alloys in the UNIFIED NUMBERIN...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 85,
+    "text_length": 1862
+  },
+  {
+    "idx": 257,
+    "doc_id": "SAND2012_7321_p86_0",
+    "section": "86.0",
+    "title": "1500 - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nHigh-Alloy Ferritic Steels: \nF...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 87,
+    "text_length": 2856
+  },
+  {
+    "idx": 258,
+    "doc_id": "SAND2012_7321_p87_0",
+    "section": "87.0",
+    "title": "High-Alloy Ferritc Steels \nFerritic Stainless Steels \n1500 - 2 \n2. Permeability, Diffusivity and Sol...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 88,
+    "text_length": 3754
+  },
+  {
+    "idx": 259,
+    "doc_id": "SAND2012_7321_p88_0",
+    "section": "88.0",
+    "title": "High-Alloy Ferritc Steels \nFerritic Stainless Steels \n \n1500 - 3 \n \n3. Mechanical Properties: Effect...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 89,
+    "text_length": 3195
+  },
+  {
+    "idx": 260,
+    "doc_id": "SAND2012_7321_p89_0",
+    "section": "89.0",
+    "title": "High-Alloy Ferritc Steels \nFerritic Stainless Steels \n1500 - 4 \nmaterial tested in hydrogen gas at r...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 90,
+    "text_length": 2738
+  },
+  {
+    "idx": 261,
+    "doc_id": "SAND2012_7321_p90_0",
+    "section": "90.0",
+    "title": "High-Alloy Ferritc Steels \nFerritic Stainless Steels \n \n1500 - 5 \n \n10. MR Louthan and RG Derrick. H...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 91,
+    "text_length": 1155
+  },
+  {
+    "idx": 262,
+    "doc_id": "SAND2012_7321_p91_0",
+    "section": "91.0",
+    "title": "High-Alloy Ferritc Steels \nFerritic Stainless Steels \n1500 - 6 \nTable 1.1.1. Nominal compositional r...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 92,
+    "text_length": 1410
+  },
+  {
+    "idx": 263,
+    "doc_id": "SAND2012_7321_p92_0",
+    "section": "92.0",
+    "title": "High-Alloy Ferritc Steels \nFerritic Stainless Steels \n \n \n1500 - 7  \n \nTable 2.1. Permeability, diff...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 93,
+    "text_length": 1130
+  },
+  {
+    "idx": 264,
+    "doc_id": "SAND2012_7321_p93_0",
+    "section": "93.0",
+    "title": "High-Alloy Ferritc Steels \nFerritic Stainless Steels \n1500 - 8 \nTable 3.1.1.1. Smooth tensile proper...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 94,
+    "text_length": 1308
+  },
+  {
+    "idx": 265,
+    "doc_id": "SAND2012_7321_p94_0",
+    "section": "94.0",
+    "title": "High-Alloy Ferritc Steels \nFerritic Stainless Steels \n \n \n1500 - 9 \n \nFigure 2.2. Diffusivity of 29-...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 95,
+    "text_length": 480
+  },
+  {
+    "idx": 266,
+    "doc_id": "SAND2012_7321_p96_0",
+    "section": "96.0",
+    "title": "1600 - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nHigh-Alloy Ferritic Steels: \nD...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 97,
+    "text_length": 2989
+  },
+  {
+    "idx": 267,
+    "doc_id": "SAND2012_7321_p97_0",
+    "section": "97.0",
+    "title": "High-Alloy Ferritic Steels \nDuplex Stainless Steels \n1600 - 2 \n1.2 Common designations \nDuplex stain...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 98,
+    "text_length": 3624
+  },
+  {
+    "idx": 268,
+    "doc_id": "SAND2012_7321_p98_0",
+    "section": "98.0",
+    "title": "High-Alloy Ferritic Steels \nDuplex Stainless Steels \n \n1600 - 3  \ntensile ductility was found to rem...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 99,
+    "text_length": 3822
+  },
+  {
+    "idx": 269,
+    "doc_id": "SAND2012_7321_p99_0",
+    "section": "99.0",
+    "title": "High-Alloy Ferritic Steels \nDuplex Stainless Steels \n1600 - 4 \ncenter of a tensile specimen than fer...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 100,
+    "text_length": 3123
+  },
+  {
+    "idx": 270,
+    "doc_id": "SAND2012_7321_p100_0",
+    "section": "100.0",
+    "title": "High-Alloy Ferritic Steels \nDuplex Stainless Steels \n \n1600 - 5  \n3.4 Creep \nNo known published data...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 101,
+    "text_length": 2860
+  },
+  {
+    "idx": 271,
+    "doc_id": "SAND2012_7321_p101_0",
+    "section": "101.0",
+    "title": "High-Alloy Ferritic Steels \nDuplex Stainless Steels \n1600 - 6 \nH2 shielding gas [24]. Hydrogen-beari...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 102,
+    "text_length": 3425
+  },
+  {
+    "idx": 272,
+    "doc_id": "SAND2012_7321_p102_0",
+    "section": "102.0",
+    "title": "High-Alloy Ferritic Steels \nDuplex Stainless Steels \n \n1600 - 7  \n19. AW Loginow and EH Phelps. Stee...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 103,
+    "text_length": 1637
+  },
+  {
+    "idx": 273,
+    "doc_id": "SAND2012_7321_p103_0",
+    "section": "103.0",
+    "title": "High-Alloy Ferritc Steels \nDuplex Stainless Steels \n1600 - 8 \n \nTable 1.1.1. Compositions (wt%) of s...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 104,
+    "text_length": 1446
+  },
+  {
+    "idx": 274,
+    "doc_id": "SAND2012_7321_p104_0",
+    "section": "104.0",
+    "title": "High-Alloy Ferritic Steels \nDuplex Stainless Steels \n \n \n1600 - 9 \nTable 1.1.2. Compositions (wt%) o...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 105,
+    "text_length": 1301
+  },
+  {
+    "idx": 275,
+    "doc_id": "SAND2012_7321_p105_0",
+    "section": "105.0",
+    "title": "High-Alloy Ferritic Steels \nDuplex Stainless Steels \n1600 - 10 \nTable 1.1.3. Austenite content and t...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 106,
+    "text_length": 1311
+  },
+  {
+    "idx": 276,
+    "doc_id": "SAND2012_7321_p106_0",
+    "section": "106.0",
+    "title": "High-Alloy Ferritic Steels \nDuplex Stainless Steels \n \n1600 - 11 \nTable 3.2.1.1. Fracture toughness ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 107,
+    "text_length": 1111
+  },
+  {
+    "idx": 277,
+    "doc_id": "SAND2012_7321_p107_0",
+    "section": "107.0",
+    "title": "High-Alloy Ferritic Steels \nDuplex Stainless Steels \n1600 - 12 \n \nFigure 3.1.1.1. Relative reduction...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 108,
+    "text_length": 712
+  },
+  {
+    "idx": 278,
+    "doc_id": "SAND2012_7321_p108_0",
+    "section": "108.0",
+    "title": "High-Alloy Ferritic Steels \nDuplex Stainless Steels \n \n1600 - 13 \n \nFigure 3.1.1.3. Reduction of are...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 109,
+    "text_length": 635
+  },
+  {
+    "idx": 279,
+    "doc_id": "SAND2012_7321_p109_0",
+    "section": "109.0",
+    "title": "High-Alloy Ferritic Steels \nDuplex Stainless Steels \n1600 - 14 \n \nFigure 4.1.1. Reduction of area fo...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 110,
+    "text_length": 229
+  },
+  {
+    "idx": 280,
+    "doc_id": "SAND2012_7321_p110_0",
+    "section": "110.0",
+    "title": "1700 - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nHigh-Alloy Ferritic Steels: \nS...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 111,
+    "text_length": 2572
+  },
+  {
+    "idx": 281,
+    "doc_id": "SAND2012_7321_p111_0",
+    "section": "111.0",
+    "title": "High-Alloy Ferritic Steels \nSemi-Austenitic Stainless Steels \n1700 - 2 \n3. Mechanical Properties: Ef...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 112,
+    "text_length": 1634
+  },
+  {
+    "idx": 282,
+    "doc_id": "SAND2012_7321_p112_0",
+    "section": "112.0",
+    "title": "High-Alloy Ferritic Steels \nSemi-Austenitic Stainless Steels \n \n1700 - 3  \n4.2 Heat treatment \nThese...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 113,
+    "text_length": 2087
+  },
+  {
+    "idx": 283,
+    "doc_id": "SAND2012_7321_p113_0",
+    "section": "113.0",
+    "title": "High-Alloy Ferritic Steels \nSemi-Austenitic Stainless Steels \n1700 - 4 \nTable 1.1.1. Compositions (w...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 114,
+    "text_length": 1282
+  },
+  {
+    "idx": 284,
+    "doc_id": "SAND2012_7321_p114_0",
+    "section": "114.0",
+    "title": "High-Alloy Ferritic Steels \nSemi-Austenitic Stainless Steels \n \n1700 - 5  \nTable 3.1.1.1. Smooth ten...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 115,
+    "text_length": 1402
+  },
+  {
+    "idx": 285,
+    "doc_id": "SAND2012_7321_p116_0",
+    "section": "116.0",
+    "title": "1810 - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nHigh-Alloy Ferritic Steels: \nM...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 117,
+    "text_length": 2658
+  },
+  {
+    "idx": 286,
+    "doc_id": "SAND2012_7321_p117_0",
+    "section": "117.0",
+    "title": "High-Alloy Ferritic Steels \nPrecipitation Hardening Martensitic Stainless \n1810 - 2 \nelectrochemical...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 118,
+    "text_length": 2319
+  },
+  {
+    "idx": 287,
+    "doc_id": "SAND2012_7321_p118_0",
+    "section": "118.0",
+    "title": "High-Alloy Ferritic Steels \nPrecipitation Hardening Martensitic Stainless \n \n1810 - 3  \n3.6 Disk rup...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 119,
+    "text_length": 2641
+  },
+  {
+    "idx": 288,
+    "doc_id": "SAND2012_7321_p119_0",
+    "section": "119.0",
+    "title": "High-Alloy Ferritic Steels \nPrecipitation Hardening Martensitic Stainless \n1810 - 4 \n6. \nGT Murray. ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 120,
+    "text_length": 1086
+  },
+  {
+    "idx": 289,
+    "doc_id": "SAND2012_7321_p120_0",
+    "section": "120.0",
+    "title": "High-Alloy Ferritic Steels \nPrecipitation Hardening Martensitic Stainless \n \n1810 - 5  \nTable 1.1.1....",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 121,
+    "text_length": 962
+  },
+  {
+    "idx": 290,
+    "doc_id": "SAND2012_7321_p121_0",
+    "section": "121.0",
+    "title": "High-Alloy Ferritic Steels \nPrecipitation Hardening Martensitic Stainless \n1810 - 6 \nTable 2.1. Hydr...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 122,
+    "text_length": 1460
+  },
+  {
+    "idx": 291,
+    "doc_id": "SAND2012_7321_p122_0",
+    "section": "122.0",
+    "title": "1820 - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nHigh-Alloy Ferritic Steels: \nM...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 123,
+    "text_length": 2621
+  },
+  {
+    "idx": 292,
+    "doc_id": "SAND2012_7321_p123_0",
+    "section": "123.0",
+    "title": "High-Alloy Ferritic Steels \nMartensitic Stainless Alloys \n1820 - 2 \n3. Mechanical Properties: Effect...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 124,
+    "text_length": 1800
+  },
+  {
+    "idx": 293,
+    "doc_id": "SAND2012_7321_p124_0",
+    "section": "124.0",
+    "title": "High-Alloy Ferritic Steels \nMartensitic Stainless Alloys \n \n1810 - 3  \n3. \nRJ Walter and WT Chandler...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 125,
+    "text_length": 1757
+  },
+  {
+    "idx": 294,
+    "doc_id": "SAND2012_7321_p125_0",
+    "section": "125.0",
+    "title": "High-Alloy Ferritic Steels \nMartensitic Stainless Alloys \n1820 - 4 \nTable 3.1.1.1. Smooth tensile pr...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 126,
+    "text_length": 1488
+  },
+  {
+    "idx": 295,
+    "doc_id": "SAND2012_7321_p126_0",
+    "section": "126.0",
+    "title": "2101 - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nAustenitic Steels: \n300-Series...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 127,
+    "text_length": 3179
+  },
+  {
+    "idx": 296,
+    "doc_id": "SAND2012_7321_p127_0",
+    "section": "127.0",
+    "title": "Austenitic Stainless Steels \nType 304 Alloys  \n2101 - 2 \n1.1 Composition and microstructure \nTable 1...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 128,
+    "text_length": 2865
+  },
+  {
+    "idx": 297,
+    "doc_id": "SAND2012_7321_p128_0",
+    "section": "128.0",
+    "title": "Austenitic Stainless Steels \nType 304 Alloys \n \n2101 - 3 \nembrittlement.  Hydrogen has a negligible ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 129,
+    "text_length": 3380
+  },
+  {
+    "idx": 298,
+    "doc_id": "SAND2012_7321_p129_0",
+    "section": "129.0",
+    "title": "Austenitic Stainless Steels \nType 304 Alloys  \n2101 - 4 \n3.3 Fatigue \nNo known published data in hyd...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 130,
+    "text_length": 2525
+  },
+  {
+    "idx": 299,
+    "doc_id": "SAND2012_7321_p130_0",
+    "section": "130.0",
+    "title": "Austenitic Stainless Steels \nType 304 Alloys \n \n2101 - 5 \n5. References \n1. GR Caskey. Hydrogen Dama...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 131,
+    "text_length": 3323
+  },
+  {
+    "idx": 300,
+    "doc_id": "SAND2012_7321_p131_0",
+    "section": "131.0",
+    "title": "Austenitic Stainless Steels \nType 304 Alloys  \n2101 - 6 \nMaterials: Hydrogen Effects in Metals, 1980...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 132,
+    "text_length": 2413
+  },
+  {
+    "idx": 301,
+    "doc_id": "SAND2012_7321_p132_0",
+    "section": "132.0",
+    "title": "Austenitic Stainless Steels \nType 304 Alloys \n \n2101 - 7 \nTable 1.1.1. Specification limits for type...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 133,
+    "text_length": 1460
+  },
+  {
+    "idx": 302,
+    "doc_id": "SAND2012_7321_p133_0",
+    "section": "133.0",
+    "title": "Austenitic Stainless Steels \nType 304 Alloys  \n2101 - 8 \nTable 2.1. Average permeability and solubil...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 134,
+    "text_length": 1529
+  },
+  {
+    "idx": 303,
+    "doc_id": "SAND2012_7321_p134_0",
+    "section": "134.0",
+    "title": "Austenitic Stainless Steels \nType 304 Alloys \n \n2101 - 9 \nTable 3.1.1.1. Smooth tensile properties o...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 135,
+    "text_length": 1718
+  },
+  {
+    "idx": 304,
+    "doc_id": "SAND2012_7321_p135_0",
+    "section": "135.0",
+    "title": "Austenitic Stainless Steels \nType 304 Alloys  \n2101 - 10 \nTable 3.1.1.2. Smooth tensile properties o...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 136,
+    "text_length": 1582
+  },
+  {
+    "idx": 305,
+    "doc_id": "SAND2012_7321_p136_0",
+    "section": "136.0",
+    "title": "Austenitic Stainless Steels \nType 304 Alloys \n \n2101 - 11 \nTable 3.1.2.1. Notched tensile properties...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 137,
+    "text_length": 1592
+  },
+  {
+    "idx": 306,
+    "doc_id": "SAND2012_7321_p137_0",
+    "section": "137.0",
+    "title": "Austenitic Stainless Steels \nType 304 Alloys  \n2101 - 12 \nTable 3.2.2.1. Threshold stress intensity ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 138,
+    "text_length": 1290
+  },
+  {
+    "idx": 307,
+    "doc_id": "SAND2012_7321_p138_0",
+    "section": "138.0",
+    "title": "Austenitic Stainless Steels \nType 304 Alloys \n \n2101 - 13 \nTable 4.3.1. Smooth tensile properties of...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 139,
+    "text_length": 1431
+  },
+  {
+    "idx": 308,
+    "doc_id": "SAND2012_7321_p139_0",
+    "section": "139.0",
+    "title": "Austenitic Stainless Steels \nType 304 Alloys  \n2101 - 14 \nTable 4.3.2. Notched tensile properties of...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 140,
+    "text_length": 1601
+  },
+  {
+    "idx": 309,
+    "doc_id": "SAND2012_7321_p140_0",
+    "section": "140.0",
+    "title": "Austenitic Stainless Steels \nType 304 Alloys \n \n2101 - 15 \n10\n100\n1.5\n2\n2.5\n3\n3.5\n[12]\n[11]\n[13]\nSol...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 141,
+    "text_length": 873
+  },
+  {
+    "idx": 310,
+    "doc_id": "SAND2012_7321_p141_0",
+    "section": "141.0",
+    "title": "Austenitic Stainless Steels \nType 304 Alloys  \n2101 - 16 \n0\n0.2\n0.4\n0.6\n0.8\n1\n50\n100\n150\n200\n250\n300...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 142,
+    "text_length": 1186
+  },
+  {
+    "idx": 311,
+    "doc_id": "SAND2012_7321_p142_0",
+    "section": "142.0",
+    "title": "Austenitic Stainless Steels \nType 304 Alloys \n \n2101 - 17 \n0\n100\n200\n300\n400\n500\n600\n700\n800\n0\n40\n80...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 143,
+    "text_length": 1029
+  },
+  {
+    "idx": 312,
+    "doc_id": "SAND2012_7321_p144_0",
+    "section": "144.0",
+    "title": "2103 - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nAustenitic Steels: \n300-Series...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 145,
+    "text_length": 2662
+  },
+  {
+    "idx": 313,
+    "doc_id": "SAND2012_7321_p145_0",
+    "section": "145.0",
+    "title": "Austenitic Stainless Steels \nType 316 Alloys  \n2103 - 2 \n2. Permeability, Diffusivity and Solubility...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 146,
+    "text_length": 3528
+  },
+  {
+    "idx": 314,
+    "doc_id": "SAND2012_7321_p146_0",
+    "section": "146.0",
+    "title": "Austenitic Stainless Steels \nType 316 Alloys \n \n2103 - 3 \nductility due to thermal precharging with ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 147,
+    "text_length": 3045
+  },
+  {
+    "idx": 315,
+    "doc_id": "SAND2012_7321_p147_0",
+    "section": "147.0",
+    "title": "Austenitic Stainless Steels \nType 316 Alloys  \n2103 - 4 \n3.5 Impact \nNo known published data in hydr...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 148,
+    "text_length": 3061
+  },
+  {
+    "idx": 316,
+    "doc_id": "SAND2012_7321_p148_0",
+    "section": "148.0",
+    "title": "Austenitic Stainless Steels \nType 316 Alloys \n \n2103 - 5 \n(Table 4.3.1) and notched (Table 4.3.2) ge...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 149,
+    "text_length": 3151
+  },
+  {
+    "idx": 317,
+    "doc_id": "SAND2012_7321_p149_0",
+    "section": "149.0",
+    "title": "Austenitic Stainless Steels \nType 316 Alloys  \n2103 - 6 \n13. GR Caskey. Hydrogen Solution in Stainle...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 150,
+    "text_length": 3422
+  },
+  {
+    "idx": 318,
+    "doc_id": "SAND2012_7321_p150_0",
+    "section": "150.0",
+    "title": "Austenitic Stainless Steels \nType 316 Alloys \n \n2103 - 7 \n28. RP Jewitt, RJ Walter, WT Chandler and ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 151,
+    "text_length": 1629
+  },
+  {
+    "idx": 319,
+    "doc_id": "SAND2012_7321_p151_0",
+    "section": "151.0",
+    "title": "Austenitic Stainless Steels \nType 316 Alloys  \n2103 - 8 \nTable 1.1.1. Composition of several heats o...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 152,
+    "text_length": 1626
+  },
+  {
+    "idx": 320,
+    "doc_id": "SAND2012_7321_p152_0",
+    "section": "152.0",
+    "title": "Austenitic Stainless Steels \nType 316 Alloys \n \n2103 - 9 \nTable 3.1.1.1. Tensile properties of 316 s...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 153,
+    "text_length": 1156
+  },
+  {
+    "idx": 321,
+    "doc_id": "SAND2012_7321_p153_0",
+    "section": "153.0",
+    "title": "Austenitic Stainless Steels \nType 316 Alloys  \n2103 - 10 \nTable 3.1.1.2. Effect of internal hydrogen...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 154,
+    "text_length": 1690
+  },
+  {
+    "idx": 322,
+    "doc_id": "SAND2012_7321_p154_0",
+    "section": "154.0",
+    "title": "Austenitic Stainless Steels \nType 316 Alloys \n \n2103 - 11 \nTable 3.2.2.1. Threshold stress intensity...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 155,
+    "text_length": 1434
+  },
+  {
+    "idx": 323,
+    "doc_id": "SAND2012_7321_p155_0",
+    "section": "155.0",
+    "title": "Austenitic Stainless Steels \nType 316 Alloys  \n2103 - 12 \nTable 4.2.2. Notched tensile properties of...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 156,
+    "text_length": 1625
+  },
+  {
+    "idx": 324,
+    "doc_id": "SAND2012_7321_p156_0",
+    "section": "156.0",
+    "title": "Austenitic Stainless Steels \nType 316 Alloys \n \n2103 - 13 \nTable 4.3.2. Notched tensile properties o...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 157,
+    "text_length": 1443
+  },
+  {
+    "idx": 325,
+    "doc_id": "SAND2012_7321_p157_0",
+    "section": "157.0",
+    "title": "Austenitic Stainless Steels \nType 316 Alloys  \n2103 - 14 \n1\n10\n100\n1000\n0.8\n1\n1.2\n1.4\n1.6\n1.8\n2\n2.2\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 158,
+    "text_length": 991
+  },
+  {
+    "idx": 326,
+    "doc_id": "SAND2012_7321_p158_0",
+    "section": "158.0",
+    "title": "Austenitic Stainless Steels \nType 316 Alloys \n \n2103 - 15 \n0.00\n0.20\n0.40\n0.60\n0.80\n1.00\n50\n100\n150\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 159,
+    "text_length": 922
+  },
+  {
+    "idx": 327,
+    "doc_id": "SAND2012_7321_p159_0",
+    "section": "159.0",
+    "title": "Austenitic Stainless Steels \nType 316 Alloys  \n2103 - 16 \n0\n100\n200\n300\n400\n500\n600\n700\n250\n500\n750\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 160,
+    "text_length": 1015
+  },
+  {
+    "idx": 328,
+    "doc_id": "SAND2012_7321_p160_0",
+    "section": "160.0",
+    "title": "2104 - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nAustenitic Steels: \n300-Series...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 161,
+    "text_length": 2740
+  },
+  {
+    "idx": 329,
+    "doc_id": "SAND2012_7321_p161_0",
+    "section": "161.0",
+    "title": "Austenitic Stainless Steels \nTypes 321 & 347 \n2104 - 2 \n1.2 Common designations  \nType 321: UNS32100...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 162,
+    "text_length": 3235
+  },
+  {
+    "idx": 330,
+    "doc_id": "SAND2012_7321_p162_0",
+    "section": "162.0",
+    "title": "Austenitic Stainless Steels \nTypes 321 & 347 \n \n2104 - 3  \nductility are minimized at low temperatur...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 163,
+    "text_length": 3186
+  },
+  {
+    "idx": 331,
+    "doc_id": "SAND2012_7321_p163_0",
+    "section": "163.0",
+    "title": "Austenitic Stainless Steels \nTypes 321 & 347 \n2104 - 4 \nwere subjected to tension-compression loadin...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 164,
+    "text_length": 2516
+  },
+  {
+    "idx": 332,
+    "doc_id": "SAND2012_7321_p164_0",
+    "section": "164.0",
+    "title": "Austenitic Stainless Steels \nTypes 321 & 347 \n \n2104 - 5  \n3. \nC SanMarchi, BP Somerday, X Tang and ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 165,
+    "text_length": 2099
+  },
+  {
+    "idx": 333,
+    "doc_id": "SAND2012_7321_p165_0",
+    "section": "165.0",
+    "title": "Austenitic Stainless Steels \nTypes 321 & 347 \n2104 - 6 \nTable 1.1.1. Allowable composition ranges (w...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 166,
+    "text_length": 1065
+  },
+  {
+    "idx": 334,
+    "doc_id": "SAND2012_7321_p166_0",
+    "section": "166.0",
+    "title": "Austenitic Stainless Steels \n \nTypes 321 & 347 \n2104 - 7 \nTable 2.1. Parameters in permeability, dif...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 167,
+    "text_length": 880
+  },
+  {
+    "idx": 335,
+    "doc_id": "SAND2012_7321_p167_0",
+    "section": "167.0",
+    "title": "Austenitic Stainless Steels \nTypes 321 & 347 \n2104 - 8 \nTable 3.1.1.1. Smooth tensile properties of ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 168,
+    "text_length": 2142
+  },
+  {
+    "idx": 336,
+    "doc_id": "SAND2012_7321_p168_0",
+    "section": "168.0",
+    "title": "Austenitic Stainless Steels \nTypes 321 & 347 \n \n2104 - 9  \nTable 3.1.2.1. Notched tensile properties...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 169,
+    "text_length": 1881
+  },
+  {
+    "idx": 337,
+    "doc_id": "SAND2012_7321_p169_0",
+    "section": "169.0",
+    "title": "Austenitic Stainless Steels \nTypes 321 & 347 \n2104 - 10 \nTable 3.1.2.3. Notched tensile properties o...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 170,
+    "text_length": 1203
+  },
+  {
+    "idx": 338,
+    "doc_id": "SAND2012_7321_p170_0",
+    "section": "170.0",
+    "title": "Austenitic Stainless Steels \nTypes 321 & 347 \n \n2104 - 11  \nCycles to Failure\n102\n103\n104\nStrain Ran...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 171,
+    "text_length": 1252
+  },
+  {
+    "idx": 339,
+    "doc_id": "SAND2012_7321_p171_0",
+    "section": "171.0",
+    "title": "Austenitic Stainless Steels \nTypes 321 & 347 \n2104 - 12 \nTime to Rupture  (hr)\n10-1\n100\n101\n102\n103\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 172,
+    "text_length": 499
+  },
+  {
+    "idx": 340,
+    "doc_id": "SAND2012_7321_p172_0",
+    "section": "172.0",
+    "title": "2201 - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nNitrogen-Strengthened Stainles...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 173,
+    "text_length": 2145
+  },
+  {
+    "idx": 341,
+    "doc_id": "SAND2012_7321_p173_0",
+    "section": "173.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n22-13-5 \n2201 - 2 \nThe solubility of hydrogen in ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 174,
+    "text_length": 3124
+  },
+  {
+    "idx": 342,
+    "doc_id": "SAND2012_7321_p174_0",
+    "section": "174.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n22-13-5 \n \n2201 - 3 \ngreater than the loss due to...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 175,
+    "text_length": 2377
+  },
+  {
+    "idx": 343,
+    "doc_id": "SAND2012_7321_p175_0",
+    "section": "175.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n22-13-5 \n2201 - 4 \n4. Fabrication \n4.1 Primary pr...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 176,
+    "text_length": 2885
+  },
+  {
+    "idx": 344,
+    "doc_id": "SAND2012_7321_p176_0",
+    "section": "176.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n22-13-5 \n \n2201 - 5 \nMaterials in Hydrogen. Black...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 177,
+    "text_length": 1734
+  },
+  {
+    "idx": 345,
+    "doc_id": "SAND2012_7321_p177_0",
+    "section": "177.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n22-13-5 \n2201 - 6 \nTable 1.1.1. Composition of se...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 178,
+    "text_length": 1036
+  },
+  {
+    "idx": 346,
+    "doc_id": "SAND2012_7321_p178_0",
+    "section": "178.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n22-13-5 \n \n2201 - 7 \nTable 3.1.1.1. Tensile prope...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 179,
+    "text_length": 1295
+  },
+  {
+    "idx": 347,
+    "doc_id": "SAND2012_7321_p179_0",
+    "section": "179.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n22-13-5 \n2201 - 8 \nTable 3.2.1.1. Fracture toughn...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 180,
+    "text_length": 895
+  },
+  {
+    "idx": 348,
+    "doc_id": "SAND2012_7321_p180_0",
+    "section": "180.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n22-13-5 \n \n2201 - 9 \nTable 4.1.1. Smooth tensile ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 181,
+    "text_length": 1621
+  },
+  {
+    "idx": 349,
+    "doc_id": "SAND2012_7321_p181_0",
+    "section": "181.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n22-13-5 \n2201 - 10 \n0\n500\n1000\n1500\n2000\n0\n40\n80\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 182,
+    "text_length": 1054
+  },
+  {
+    "idx": 350,
+    "doc_id": "SAND2012_7321_p182_0",
+    "section": "182.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n22-13-5 \n \n2201 - 11 \n0\n500\n1000\n1500\n2000\n2500\n0...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 183,
+    "text_length": 1180
+  },
+  {
+    "idx": 351,
+    "doc_id": "SAND2012_7321_p183_0",
+    "section": "183.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n22-13-5 \n2201 - 12 \n0\n10\n20\n30\n40\n50\n60\n70\n80\n \ne...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 184,
+    "text_length": 1316
+  },
+  {
+    "idx": 352,
+    "doc_id": "SAND2012_7321_p184_0",
+    "section": "184.0",
+    "title": "2202 - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nNitrogen-Strengthened Stainles...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 185,
+    "text_length": 2888
+  },
+  {
+    "idx": 353,
+    "doc_id": "SAND2012_7321_p185_0",
+    "section": "185.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n2202 - 2 \n2. Permeability, Diffusivity an...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 186,
+    "text_length": 3372
+  },
+  {
+    "idx": 354,
+    "doc_id": "SAND2012_7321_p186_0",
+    "section": "186.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n \n2202 - 3 \nThe effect of hydrogen on ten...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 187,
+    "text_length": 4288
+  },
+  {
+    "idx": 355,
+    "doc_id": "SAND2012_7321_p187_0",
+    "section": "187.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n2202 - 4 \nhydrogen at low (77 K) and elev...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 188,
+    "text_length": 2978
+  },
+  {
+    "idx": 356,
+    "doc_id": "SAND2012_7321_p188_0",
+    "section": "188.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n \n2202 - 5 \n3.4 Creep \nNo known data in h...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 189,
+    "text_length": 2852
+  },
+  {
+    "idx": 357,
+    "doc_id": "SAND2012_7321_p189_0",
+    "section": "189.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n2202 - 6 \nhydrogen content increases due ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 190,
+    "text_length": 3403
+  },
+  {
+    "idx": 358,
+    "doc_id": "SAND2012_7321_p190_0",
+    "section": "190.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n \n2202 - 7 \n12. AD LeClaire. Permeation o...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 191,
+    "text_length": 3450
+  },
+  {
+    "idx": 359,
+    "doc_id": "SAND2012_7321_p191_0",
+    "section": "191.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n2202 - 8 \n28. RE Stoltz and AJ West. Hydr...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 192,
+    "text_length": 527
+  },
+  {
+    "idx": 360,
+    "doc_id": "SAND2012_7321_p192_0",
+    "section": "192.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n \n2202 - 9 \nTable 1.1.1. Specification li...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 193,
+    "text_length": 1897
+  },
+  {
+    "idx": 361,
+    "doc_id": "SAND2012_7321_p193_0",
+    "section": "193.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n2202 - 10 \nTable 2.1. Average permeabilit...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 194,
+    "text_length": 1251
+  },
+  {
+    "idx": 362,
+    "doc_id": "SAND2012_7321_p194_0",
+    "section": "194.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n \n2202 - 11 \nTable 2.2. Hydrogen solubili...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 195,
+    "text_length": 714
+  },
+  {
+    "idx": 363,
+    "doc_id": "SAND2012_7321_p195_0",
+    "section": "195.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n2202 - 12 \nTable 3.1.1.1. Smooth tensile ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 196,
+    "text_length": 1796
+  },
+  {
+    "idx": 364,
+    "doc_id": "SAND2012_7321_p196_0",
+    "section": "196.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n \n2202 - 13 \nTable 3.1.1.2. Smooth tensil...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 197,
+    "text_length": 1412
+  },
+  {
+    "idx": 365,
+    "doc_id": "SAND2012_7321_p197_0",
+    "section": "197.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n2202 - 14 \nTable 3.1.1.3. Smooth tensile ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 198,
+    "text_length": 1186
+  },
+  {
+    "idx": 366,
+    "doc_id": "SAND2012_7321_p198_0",
+    "section": "198.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n \n2202 - 15 \nTable 3.1.1.4. Smooth tensil...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 199,
+    "text_length": 1133
+  },
+  {
+    "idx": 367,
+    "doc_id": "SAND2012_7321_p199_0",
+    "section": "199.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n2202 - 16 \nTable 3.1.1.5. Smooth tensile ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 200,
+    "text_length": 1561
+  },
+  {
+    "idx": 368,
+    "doc_id": "SAND2012_7321_p200_0",
+    "section": "200.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n \n2202 - 17 \n \nTable 3.2.1.1. Fracture to...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 201,
+    "text_length": 1318
+  },
+  {
+    "idx": 369,
+    "doc_id": "SAND2012_7321_p201_0",
+    "section": "201.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n2202 - 18 \nTable 3.5.1. Impact fracture d...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 202,
+    "text_length": 1519
+  },
+  {
+    "idx": 370,
+    "doc_id": "SAND2012_7321_p202_0",
+    "section": "202.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n \n2202 - 19 \nTable 4.3.1. Smooth tensile ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 203,
+    "text_length": 1879
+  },
+  {
+    "idx": 371,
+    "doc_id": "SAND2012_7321_p203_0",
+    "section": "203.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n2202 - 20 \n10-16\n10-15\n10-14\n10-13\n10-12\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 204,
+    "text_length": 851
+  },
+  {
+    "idx": 372,
+    "doc_id": "SAND2012_7321_p204_0",
+    "section": "204.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n \n2202 - 21 \n0\n200\n400\n600\n800\n1000\n1200\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 205,
+    "text_length": 1339
+  },
+  {
+    "idx": 373,
+    "doc_id": "SAND2012_7321_p205_0",
+    "section": "205.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n2202 - 22 \n0\n200\n400\n600\n800\n1000\n \n 0.12...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 206,
+    "text_length": 1367
+  },
+  {
+    "idx": 374,
+    "doc_id": "SAND2012_7321_p206_0",
+    "section": "206.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n \n2202 - 23 \n0\n200\n400\n600\n800\n1000\n1200\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 207,
+    "text_length": 1068
+  },
+  {
+    "idx": 375,
+    "doc_id": "SAND2012_7321_p207_0",
+    "section": "207.0",
+    "title": "Nitrogen-Strengthened Austenitic Stainless Steels \n21-6-9 \n2202 - 24 \n0\n500\n1000\n1500\n2000\n2500\n0\n0....",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 208,
+    "text_length": 1172
+  },
+  {
+    "idx": 376,
+    "doc_id": "SAND2012_7321_p208_0",
+    "section": "208.0",
+    "title": "2301 - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nPrecipitation-Strengthened Sta...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 209,
+    "text_length": 3491
+  },
+  {
+    "idx": 377,
+    "doc_id": "SAND2012_7321_p209_0",
+    "section": "209.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286 \n2301 - 2 \npresence of internal hydrog...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 210,
+    "text_length": 3538
+  },
+  {
+    "idx": 378,
+    "doc_id": "SAND2012_7321_p210_0",
+    "section": "210.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286 \n \n \n2301- 3 \nHydrogen concentration m...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 211,
+    "text_length": 3474
+  },
+  {
+    "idx": 379,
+    "doc_id": "SAND2012_7321_p211_0",
+    "section": "211.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286 \n2301 - 4 \nAging tensile specimens aft...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 212,
+    "text_length": 3445
+  },
+  {
+    "idx": 380,
+    "doc_id": "SAND2012_7321_p212_0",
+    "section": "212.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286 \n \n \n2301- 5 \naustenitic alloys [19]. ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 213,
+    "text_length": 3469
+  },
+  {
+    "idx": 381,
+    "doc_id": "SAND2012_7321_p213_0",
+    "section": "213.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286 \n2301 - 6 \n3.5 Impact \nCharpy impact  ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 214,
+    "text_length": 3143
+  },
+  {
+    "idx": 382,
+    "doc_id": "SAND2012_7321_p214_0",
+    "section": "214.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286 \n \n \n2301- 7 \nfor 16 hours) are not ap...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 215,
+    "text_length": 3511
+  },
+  {
+    "idx": 383,
+    "doc_id": "SAND2012_7321_p215_0",
+    "section": "215.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286 \n2301 - 8 \n5. J Qian, J Chen, J Chen, ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 216,
+    "text_length": 3566
+  },
+  {
+    "idx": 384,
+    "doc_id": "SAND2012_7321_p216_0",
+    "section": "216.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286 \n \n \n2301- 9 \nMaterials: Hydrogen Effe...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 217,
+    "text_length": 3298
+  },
+  {
+    "idx": 385,
+    "doc_id": "SAND2012_7321_p217_0",
+    "section": "217.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286 \n2301 - 10 \n33. J Papp, RF Hehemann an...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 218,
+    "text_length": 2272
+  },
+  {
+    "idx": 386,
+    "doc_id": "SAND2012_7321_p218_0",
+    "section": "218.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286  \n \n \n2301 - 11  \nTable 1.1.1. Specifi...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 219,
+    "text_length": 1041
+  },
+  {
+    "idx": 387,
+    "doc_id": "SAND2012_7321_p219_0",
+    "section": "219.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286 \n2301 - 12 \nTable 1.1.2. Specification...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 220,
+    "text_length": 1020
+  },
+  {
+    "idx": 388,
+    "doc_id": "SAND2012_7321_p220_0",
+    "section": "220.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286  \n \n \n \n2301 - 13  \nTable 2.1. Permeab...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 221,
+    "text_length": 1624
+  },
+  {
+    "idx": 389,
+    "doc_id": "SAND2012_7321_p221_0",
+    "section": "221.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286 \n2301 - 14 \nTable 3.1.1.1. Smooth tens...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 222,
+    "text_length": 1600
+  },
+  {
+    "idx": 390,
+    "doc_id": "SAND2012_7321_p222_0",
+    "section": "222.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286  \n \n \n \n2301 - 15  \nTable 3.1.1.2. Smo...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 223,
+    "text_length": 2353
+  },
+  {
+    "idx": 391,
+    "doc_id": "SAND2012_7321_p223_0",
+    "section": "223.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286 \n2301 - 16 \nTable 3.1.1.3. Smooth tens...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 224,
+    "text_length": 1858
+  },
+  {
+    "idx": 392,
+    "doc_id": "SAND2012_7321_p224_0",
+    "section": "224.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286  \n \n \n \n2301 - 17  \nTable 3.1.2.1. Not...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 225,
+    "text_length": 974
+  },
+  {
+    "idx": 393,
+    "doc_id": "SAND2012_7321_p225_0",
+    "section": "225.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286 \n2301 - 18 \nTable 3.2.1.1. Fracture to...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 226,
+    "text_length": 1192
+  },
+  {
+    "idx": 394,
+    "doc_id": "SAND2012_7321_p226_0",
+    "section": "226.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286  \n \n \n \n2301 - 19  \nTable 3.2.2.1. Thr...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 227,
+    "text_length": 1135
+  },
+  {
+    "idx": 395,
+    "doc_id": "SAND2012_7321_p227_0",
+    "section": "227.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286 \n2301 - 20 \nTable 4.2.1. Smooth tensil...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 228,
+    "text_length": 1993
+  },
+  {
+    "idx": 396,
+    "doc_id": "SAND2012_7321_p228_0",
+    "section": "228.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286  \n \n \n \n2301 - 21  \nTable 4.3.1. Smoot...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 229,
+    "text_length": 1509
+  },
+  {
+    "idx": 397,
+    "doc_id": "SAND2012_7321_p229_0",
+    "section": "229.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286 \n2301 - 22 \nTable 4.3.2. Smooth tensil...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 230,
+    "text_length": 1009
+  },
+  {
+    "idx": 398,
+    "doc_id": "SAND2012_7321_p230_0",
+    "section": "230.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286  \n \n \n \n2301 - 23  \n10-13\n10-12\n10-11\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 231,
+    "text_length": 1049
+  },
+  {
+    "idx": 399,
+    "doc_id": "SAND2012_7321_p231_0",
+    "section": "231.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286 \n2301 - 24 \n0\n200\n400\n600\n800\n1000\n120...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 232,
+    "text_length": 1153
+  },
+  {
+    "idx": 400,
+    "doc_id": "SAND2012_7321_p232_0",
+    "section": "232.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286  \n \n \n \n2301 - 25  \n0\n0.2\n0.4\n0.6\n0.8\n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 233,
+    "text_length": 929
+  },
+  {
+    "idx": 401,
+    "doc_id": "SAND2012_7321_p233_0",
+    "section": "233.0",
+    "title": "Preciptiation-Strengthened Austenitic Stainless Steels \nA-286 \n2301 - 26 \n0\n0.2\n0.4\n0.6\n0.8\n1\n0\n5\n10...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 234,
+    "text_length": 1215
+  },
+  {
+    "idx": 402,
+    "doc_id": "SAND2012_7321_p234_0",
+    "section": "234.0",
+    "title": "2401 - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nSpecialty Alloys: \nFe-Ni-Co Se...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 235,
+    "text_length": 2759
+  },
+  {
+    "idx": 403,
+    "doc_id": "SAND2012_7321_p235_0",
+    "section": "235.0",
+    "title": "Speality Austenitic Stainless Steels \nFe-Ni-Co Sealing Alloys \n2401 - 2 \nstudies, the diffusivity an...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 236,
+    "text_length": 2357
+  },
+  {
+    "idx": 404,
+    "doc_id": "SAND2012_7321_p236_0",
+    "section": "236.0",
+    "title": "Speality Austenitic Stainless Steels \nFe-Ni-Co Sealing Alloys \n \n \n \n2401 - 3  \n3.6 Disk rupture tes...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 237,
+    "text_length": 1669
+  },
+  {
+    "idx": 405,
+    "doc_id": "SAND2012_7321_p237_0",
+    "section": "237.0",
+    "title": "Speality Austenitic Stainless Steels \nFe-Ni-Co Sealing Alloys \n2401 - 4 \nTable 1.1.1. Nominal compos...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 238,
+    "text_length": 1405
+  },
+  {
+    "idx": 406,
+    "doc_id": "SAND2012_7321_p238_0",
+    "section": "238.0",
+    "title": "Speality Austenitic Stainless Steels \nFe-Ni-Co Sealing Alloys \n \n \n \n2401 - 5  \nTable 2.2. Solubilit...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 239,
+    "text_length": 893
+  },
+  {
+    "idx": 407,
+    "doc_id": "SAND2012_7321_p239_0",
+    "section": "239.0",
+    "title": "Speality Austenitic Stainless Steels \nFe-Ni-Co Sealing Alloys \n2401 - 6 \n \nFigure 2.2. Diffusivity a...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 240,
+    "text_length": 480
+  },
+  {
+    "idx": 408,
+    "doc_id": "SAND2012_7321_p240_0",
+    "section": "240.0",
+    "title": "3101 - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nAluminum Alloys: \nNon-Heat Tre...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 241,
+    "text_length": 2981
+  },
+  {
+    "idx": 409,
+    "doc_id": "SAND2012_7321_p241_0",
+    "section": "241.0",
+    "title": "Non-Heat Treatable Aluminum Alloys \nPure Aluminum Alloys \n3101 - 2 \n1.2 Common designations  \nUNS A9...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 242,
+    "text_length": 3526
+  },
+  {
+    "idx": 410,
+    "doc_id": "SAND2012_7321_p242_0",
+    "section": "242.0",
+    "title": "Non-Heat Treatable Aluminum Alloys \nPure Aluminum Alloys \n \n \n \n3101 - 3  \n3. Mechanical Properties:...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 243,
+    "text_length": 2672
+  },
+  {
+    "idx": 411,
+    "doc_id": "SAND2012_7321_p243_0",
+    "section": "243.0",
+    "title": "Non-Heat Treatable Aluminum Alloys \nPure Aluminum Alloys \n3101 - 4 \n4. PJ Ferreira, IM Robertson and...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 244,
+    "text_length": 3134
+  },
+  {
+    "idx": 412,
+    "doc_id": "SAND2012_7321_p244_0",
+    "section": "244.0",
+    "title": "Non-Heat Treatable Aluminum Alloys \nPure Aluminum Alloys \n \n \n \n3101 - 5  \nTable 3.1.1.1. Smooth ten...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 245,
+    "text_length": 1084
+  },
+  {
+    "idx": 413,
+    "doc_id": "SAND2012_7321_p246_0",
+    "section": "246.0",
+    "title": "3210 - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nAluminum Alloys: \nHeat-Treatab...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 247,
+    "text_length": 2550
+  },
+  {
+    "idx": 414,
+    "doc_id": "SAND2012_7321_p247_0",
+    "section": "247.0",
+    "title": "Aluminum Alloys \n2XXX-series \n3210 - 2 \n2. Permeability, Diffusivity and Solubility  \nThe solubility...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 248,
+    "text_length": 1926
+  },
+  {
+    "idx": 415,
+    "doc_id": "SAND2012_7321_p248_0",
+    "section": "248.0",
+    "title": "Aluminum Alloys \n2XXX-series \n \n3210 - 3  \nlarger than dissolved from exposure to high-pressure gase...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 249,
+    "text_length": 2917
+  },
+  {
+    "idx": 416,
+    "doc_id": "SAND2012_7321_p249_0",
+    "section": "249.0",
+    "title": "Aluminum Alloys \n2XXX-series \n3210 - 4 \n13. PN Anyalebechi. Techniques for determination of the hydr...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 250,
+    "text_length": 1615
+  },
+  {
+    "idx": 417,
+    "doc_id": "SAND2012_7321_p250_0",
+    "section": "250.0",
+    "title": "3230 - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nAluminum Alloys: \nHeat-Treatab...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 251,
+    "text_length": 2602
+  },
+  {
+    "idx": 418,
+    "doc_id": "SAND2012_7321_p251_0",
+    "section": "251.0",
+    "title": "Aluminum Alloys \n7XXX-series \n3230 - 2 \n3. Mechanical Properties: Effects of Gaseous Hydrogen \n3.1 T...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 252,
+    "text_length": 2102
+  },
+  {
+    "idx": 419,
+    "doc_id": "SAND2012_7321_p252_0",
+    "section": "252.0",
+    "title": "Aluminum Alloys \n7XXX-series \n \n3230 - 3  \nmuch larger than the amount dissolved from exposure to hi...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 253,
+    "text_length": 2405
+  },
+  {
+    "idx": 420,
+    "doc_id": "SAND2012_7321_p253_0",
+    "section": "253.0",
+    "title": "Aluminum Alloys \n7XXX-series \n3230 - 4 \nTable 1.1.1. Allowable composition ranges (wt%) for 7XXX-ser...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 254,
+    "text_length": 1527
+  },
+  {
+    "idx": 421,
+    "doc_id": "SAND2012_7321_p254_0",
+    "section": "254.0",
+    "title": "4001 - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nCopper Alloys: \nPure Copper (c...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 255,
+    "text_length": 2715
+  },
+  {
+    "idx": 422,
+    "doc_id": "SAND2012_7321_p255_0",
+    "section": "255.0",
+    "title": "Copper Alloys \nPure Copper Alloys \n4001 - 2 \n3. Mechanical Properties: Effects of Gaseous Hydrogen \n...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 256,
+    "text_length": 3290
+  },
+  {
+    "idx": 423,
+    "doc_id": "SAND2012_7321_p256_0",
+    "section": "256.0",
+    "title": "Copper Alloys \nPure Copper Alloys \n \n4001 - 3  \n3.4 Creep \nNo known published data in hydrogen gas. ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 257,
+    "text_length": 2454
+  },
+  {
+    "idx": 424,
+    "doc_id": "SAND2012_7321_p257_0",
+    "section": "257.0",
+    "title": "Copper Alloys \nPure Copper Alloys \n4001 - 4 \n12. W Eichenauer, W Loser and H Witte. Solubility and r...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 258,
+    "text_length": 880
+  },
+  {
+    "idx": 425,
+    "doc_id": "SAND2012_7321_p258_0",
+    "section": "258.0",
+    "title": "Copper Alloys \nPure Copper Alloys \n \n4001 - 5  \nTable 2.1. Permeability, diffusivity and solubility ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 259,
+    "text_length": 1621
+  },
+  {
+    "idx": 426,
+    "doc_id": "SAND2012_7321_p259_0",
+    "section": "259.0",
+    "title": "Copper Alloys \nPure Copper Alloys \n4001 - 6 \nTable 3.1.1.1. Smooth tensile properties of copper at r...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 260,
+    "text_length": 978
+  },
+  {
+    "idx": 427,
+    "doc_id": "SAND2012_7321_p260_0",
+    "section": "260.0",
+    "title": "Copper Alloys \nPure Copper Alloys \n \n4001 - 7  \nTable 3.1.2.1. Notch tensile properties of copper at...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 261,
+    "text_length": 1099
+  },
+  {
+    "idx": 428,
+    "doc_id": "SAND2012_7321_p261_0",
+    "section": "261.0",
+    "title": "Copper Alloys \nPure Copper Alloys \n4001 - 8 \n \nFigure 2.2. Diffusivity relationships (Table 2.1) for...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 262,
+    "text_length": 577
+  },
+  {
+    "idx": 429,
+    "doc_id": "SAND2012_7321_p262_0",
+    "section": "262.0",
+    "title": "5110 - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nNickel Alloys: \nSolid-Solution...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 263,
+    "text_length": 3487
+  },
+  {
+    "idx": 430,
+    "doc_id": "SAND2012_7321_p263_0",
+    "section": "263.0",
+    "title": "Nickel Alloys \nSolid-Solution Ni-Cr Alloys  \n5110 - 2 \n1.1 Composition and microstructure \nThe solid...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 264,
+    "text_length": 3782
+  },
+  {
+    "idx": 431,
+    "doc_id": "SAND2012_7321_p264_0",
+    "section": "264.0",
+    "title": "Nickel Alloys \nSolid-Solution Ni-Cr Alloys \n \n5110 - 3  \ncalculated values of solubility given in Ta...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 265,
+    "text_length": 3544
+  },
+  {
+    "idx": 432,
+    "doc_id": "SAND2012_7321_p265_0",
+    "section": "265.0",
+    "title": "Nickel Alloys \nSolid-Solution Ni-Cr Alloys  \n5110 - 4 \nSymons, for example, studied the effect of Cr...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 266,
+    "text_length": 3878
+  },
+  {
+    "idx": 433,
+    "doc_id": "SAND2012_7321_p266_0",
+    "section": "266.0",
+    "title": "Nickel Alloys \nSolid-Solution Ni-Cr Alloys \n \n5110 - 5  \ndifferences may reflect the difference in s...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 267,
+    "text_length": 2746
+  },
+  {
+    "idx": 434,
+    "doc_id": "SAND2012_7321_p267_0",
+    "section": "267.0",
+    "title": "Nickel Alloys \nSolid-Solution Ni-Cr Alloys  \n5110 - 6 \nhydrogen-assisted fracture in Ni-Cr alloys in...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 268,
+    "text_length": 3030
+  },
+  {
+    "idx": 435,
+    "doc_id": "SAND2012_7321_p268_0",
+    "section": "268.0",
+    "title": "Nickel Alloys \nSolid-Solution Ni-Cr Alloys \n \n5110 - 7  \n12. JA Kargol and B Ladna. The roles of ord...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 269,
+    "text_length": 3353
+  },
+  {
+    "idx": 436,
+    "doc_id": "SAND2012_7321_p269_0",
+    "section": "269.0",
+    "title": "Nickel Alloys \nSolid-Solution Ni-Cr Alloys  \n5110 - 8 \n29. J-P Fidelle. Present status of the disk p...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 270,
+    "text_length": 1468
+  },
+  {
+    "idx": 437,
+    "doc_id": "SAND2012_7321_p270_0",
+    "section": "270.0",
+    "title": "Nickel Alloys \nSolid-Solution Ni-Cr Alloys \n \n5110 - 9  \nTable 1.1.1. Compositions (wt%) of common c...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 271,
+    "text_length": 1790
+  },
+  {
+    "idx": 438,
+    "doc_id": "SAND2012_7321_p271_0",
+    "section": "271.0",
+    "title": "Nickel Alloys \nSolid-Solution Ni-Cr Alloys  \n5110 - 10 \nTable 1.1.2. Compositions (wt%) of solid-sol...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 272,
+    "text_length": 1545
+  },
+  {
+    "idx": 439,
+    "doc_id": "SAND2012_7321_p272_0",
+    "section": "272.0",
+    "title": "Nickel Alloys \nSolid-Solution Ni-Cr Alloys \n \n5110 - 11  \nTable 2.1. Permeability, diffusivity and s...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 273,
+    "text_length": 1289
+  },
+  {
+    "idx": 440,
+    "doc_id": "SAND2012_7321_p273_0",
+    "section": "273.0",
+    "title": "Nickel Alloys \nSolid-Solution Ni-Cr Alloys  \n5110 - 12 \nTable 2.2. Solubility of hydrogen in several...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 274,
+    "text_length": 1014
+  },
+  {
+    "idx": 441,
+    "doc_id": "SAND2012_7321_p274_0",
+    "section": "274.0",
+    "title": "Nickel Alloys \nSolid-Solution Ni-Cr Alloys \n \n5110 - 13  \nTable 3.1.1.1. Tensile properties of solid...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 275,
+    "text_length": 1688
+  },
+  {
+    "idx": 442,
+    "doc_id": "SAND2012_7321_p275_0",
+    "section": "275.0",
+    "title": "Nickel Alloys \nSolid-Solution Ni-Cr Alloys  \n5110 - 14 \nTable 3.1.1.2. Tensile properties of solid-s...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 276,
+    "text_length": 1561
+  },
+  {
+    "idx": 443,
+    "doc_id": "SAND2012_7321_p276_0",
+    "section": "276.0",
+    "title": "Nickel Alloys \nSolid-Solution Ni-Cr Alloys \n \n5110 - 15  \nTable 3.1.2.1. Notched tensile properties ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 277,
+    "text_length": 2261
+  },
+  {
+    "idx": 444,
+    "doc_id": "SAND2012_7321_p277_0",
+    "section": "277.0",
+    "title": "Nickel Alloys \nSolid-Solution Ni-Cr Alloys  \n5110 - 16 \nTable 3.2.1. Fracture toughness of solid-sol...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 278,
+    "text_length": 1747
+  },
+  {
+    "idx": 445,
+    "doc_id": "SAND2012_7321_p278_0",
+    "section": "278.0",
+    "title": "Nickel Alloys \nSolid-Solution Ni-Cr Alloys \n \n5110 - 17  \nTable 4.3.1. Tensile properties of welded ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 279,
+    "text_length": 1902
+  },
+  {
+    "idx": 446,
+    "doc_id": "SAND2012_7321_p279_0",
+    "section": "279.0",
+    "title": "Nickel Alloys \nSolid-Solution Ni-Cr Alloys  \n5110 - 18 \n \n \nFigure 2.1. Permeability for several sol...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 280,
+    "text_length": 508
+  },
+  {
+    "idx": 447,
+    "doc_id": "SAND2012_7321_p280_0",
+    "section": "280.0",
+    "title": "Nickel Alloys \nSolid-Solution Ni-Cr Alloys \n \n5110 - 19  \n \nFigure 2.3. Solubility of several solid-...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 281,
+    "text_length": 780
+  },
+  {
+    "idx": 448,
+    "doc_id": "SAND2012_7321_p281_0",
+    "section": "281.0",
+    "title": "Nickel Alloys \nSolid-Solution Ni-Cr Alloys  \n5110 - 20 \n \nFigure 3.3.1. Low-cycle fatigue in gaseous...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 282,
+    "text_length": 155
+  },
+  {
+    "idx": 449,
+    "doc_id": "SAND2012_7321_p282_0",
+    "section": "282.0",
+    "title": "8100 - 1 \nTechnical Reference on Hydrogen Compatibility of Materials \nNonmetals: \nPolymers (code 810...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 283,
+    "text_length": 2783
+  },
+  {
+    "idx": 450,
+    "doc_id": "SAND2012_7321_p283_0",
+    "section": "283.0",
+    "title": "Nonmetals \nPolymers \n8100 - 2 \nThe permeability (\u03a6) is determined from Fick\u2019s first law for diffusio...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 284,
+    "text_length": 2708
+  },
+  {
+    "idx": 451,
+    "doc_id": "SAND2012_7321_p284_0",
+    "section": "284.0",
+    "title": "Nonmetals \nPolymers \n \n \n8100 - 3  \n3. References \n1. \nS Pauly. Permeability and Diffusion Data. in:...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 285,
+    "text_length": 1223
+  },
+  {
+    "idx": 452,
+    "doc_id": "SAND2012_7321_p285_0",
+    "section": "285.0",
+    "title": "Nonmetals \nPolymers \n8100 - 4 \nTable 2.1. Hydrogen transport properties for some common plastics fro...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 286,
+    "text_length": 1066
+  },
+  {
+    "idx": 453,
+    "doc_id": "SAND2012_7321_p286_0",
+    "section": "286.0",
+    "title": "Nonmetals \nPolymers \n \n \n8100 - 5  \nTable 2.3. Hydrogen transport properties for some common elastom...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 287,
+    "text_length": 1215
+  },
+  {
+    "idx": 454,
+    "doc_id": "SAND2012_7321_p287_0",
+    "section": "287.0",
+    "title": "Nonmetals \nPolymers \n8100 - 6 \nTable 2.4. Relationships for temperature dependence of hydrogen trans...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "SAND2012_7321.pdf",
+    "page_number": 288,
+    "text_length": 1436
+  },
+  {
+    "idx": 455,
+    "doc_id": "vii_3_keller_p0_0",
+    "section": "0.0",
+    "title": "1150\nDOE Hydrogen Program \nFY 2007 Annual Progress Report\nObjectives \n1.\t\nTechnical Reference on Hyd...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility",
+      "compatibility_table"
+    ],
+    "source_document": "vii_3_keller.pdf",
+    "page_number": 1,
+    "text_length": 3780
+  },
+  {
+    "idx": 456,
+    "doc_id": "vii_3_keller_p1_0",
+    "section": "1.0",
+    "title": "1151\nFY 2007 Annual Progress Report\nDOE Hydrogen Program \nVII.  Safety, Codes & Standards\nKeller \u2013 S...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "vii_3_keller.pdf",
+    "page_number": 2,
+    "text_length": 4579
+  },
+  {
+    "idx": 457,
+    "doc_id": "vii_3_keller_p2_0",
+    "section": "2.0",
+    "title": "Keller \u2013 Sandia National Laboratories\nVII.  Safety, Codes & Standards\n1152\nDOE Hydrogen Program \nFY ...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "vii_3_keller.pdf",
+    "page_number": 3,
+    "text_length": 4967
+  },
+  {
+    "idx": 458,
+    "doc_id": "vii_3_keller_p3_0",
+    "section": "3.0",
+    "title": "1153\nFY 2007 Annual Progress Report\nDOE Hydrogen Program \nVII.  Safety, Codes & Standards\nKeller \u2013 S...",
+    "tags": [
+      "hydrogen",
+      "h2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "vii_3_keller.pdf",
+    "page_number": 4,
+    "text_length": 2202
+  }
+]

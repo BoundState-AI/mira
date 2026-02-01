@@ -1,0 +1,13 @@
+{
+  "total_sections": 228,
+  "indexed_sections": 204,
+  "embedding_model": "all-MiniLM-L6-v2",
+  "embedding_dimension": 384,
+  "index_type": "IndexFlatL2",
+  "avg_section_chars": 2157,
+  "source_documents": [
+    "NASA-STD-6001",
+    "KSC-KTI-5210C",
+    "NASA-STD-6016"
+  ]
+}

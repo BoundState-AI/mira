@@ -1,0 +1,12 @@
+{
+  "total_sections": 228,
+  "material_compatibility_sections": 204,
+  "compatibility_tables": 0,
+  "oxygen_specific_sections": 97,
+  "flammability_sections": 89,
+  "source_documents": [
+    "KSC-KTI-5210C",
+    "NASA-STD-6016",
+    "NASA-STD-6001"
+  ]
+}
