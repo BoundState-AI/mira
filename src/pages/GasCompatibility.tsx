@@ -367,11 +367,11 @@ export default function GasCompatibility() {
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-400">
                     <CheckCircle className="h-5 w-5" />
-                    Approved ({families.approved_families.length})
+                    Approved ({families.approved_families?.length ?? 0})
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {families.approved_families.map((family, idx) => (
+                  {(families.approved_families ?? []).map((family, idx) => (
                     <div key={idx} className="space-y-1">
                       <div className="flex items-center gap-2">
                         <Badge variant="outline" className="bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-400">
@@ -392,11 +392,11 @@ export default function GasCompatibility() {
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-yellow-700 dark:text-yellow-400">
                     <AlertTriangle className="h-5 w-5" />
-                    Restricted ({families.restricted_families.length})
+                    Restricted ({families.restricted_families?.length ?? 0})
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {families.restricted_families.length === 0 ? (
+                  {!families.restricted_families?.length ? (
                     <p className="text-sm text-muted-foreground">No restricted families defined</p>
                   ) : (
                     families.restricted_families.map((family, idx) => (
@@ -421,11 +421,11 @@ export default function GasCompatibility() {
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-red-700 dark:text-red-400">
                     <XCircle className="h-5 w-5" />
-                    Prohibited ({families.prohibited_families.length})
+                    Prohibited ({families.prohibited_families?.length ?? 0})
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {families.prohibited_families.length === 0 ? (
+                  {!families.prohibited_families?.length ? (
                     <p className="text-sm text-muted-foreground">No prohibited families defined</p>
                   ) : (
                     families.prohibited_families.map((family, idx) => (
