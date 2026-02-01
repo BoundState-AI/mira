@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -195,6 +196,7 @@ interface PrecedentEvalResult {
 }
 
 export default function MUAGenerator() {
+  const { t } = useTranslation('muaGenerator');
   // Main mode tab
   const [mainMode, setMainMode] = useState<"synthesis" | "interactive" | "batch" | "precedent" | "v6" | "corpus">("corpus");
 

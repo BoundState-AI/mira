@@ -1,0 +1,99 @@
+{
+  "title": "Générateur de Plan M&P",
+  "description": "Générer des plans Matériaux & Processus pour le matériel de vol",
+  "badge": "Propulsé par IA",
+  "tabs": {
+    "newSession": "Nouvelle Session",
+    "resumeSession": "Reprendre Session"
+  },
+  "session": {
+    "title": "Gestion de Session",
+    "programName": "Nom du Programme",
+    "programPlaceholder": "ex: ORION, SLS",
+    "hardwareName": "Nom du Matériel",
+    "hardwarePlaceholder": "ex: Assemblage Valve Double Mouvement",
+    "uploadMiul": "Télécharger MIUL Enrichi",
+    "dragDropFile": "Glissez-déposez votre fichier MIUL enrichi ici, ou cliquez pour parcourir",
+    "supportedFormats": "Supporte les fichiers .xlsx du MIUL Builder",
+    "startSession": "Démarrer Session Plan M&P",
+    "resumeTitle": "Reprendre Session Précédente",
+    "noSessions": "Aucune session précédente trouvée",
+    "sessionId": "ID Session",
+    "created": "Créé",
+    "status": "Statut",
+    "resume": "Reprendre"
+  },
+  "wizard": {
+    "steps": {
+      "setup": "Configuration",
+      "materials": "Matériaux",
+      "questions": "Questions",
+      "generate": "Générer"
+    },
+    "next": "Suivant",
+    "back": "Retour",
+    "skipQuestions": "Passer les Questions",
+    "generatePlan": "Générer Plan M&P"
+  },
+  "materials": {
+    "title": "Revue des Matériaux",
+    "description": "Vérifier et confirmer les matériaux extraits de votre MIUL",
+    "count": "{{count}} matériaux trouvés",
+    "noMaterials": "Aucun matériau trouvé dans le MIUL téléchargé",
+    "columns": {
+      "material": "Matériau",
+      "code": "Code MAPTIS",
+      "partNumber": "Numéro de Pièce",
+      "flammability": "INFLAM",
+      "corrosion": "CORR",
+      "scc": "SCC",
+      "o2Compat": "O2",
+      "status": "Statut"
+    },
+    "status": {
+      "complete": "Complet",
+      "gapsFound": "Lacunes Trouvées",
+      "needsReview": "Révision Nécessaire"
+    }
+  },
+  "questions": {
+    "title": "Questions de Clarification",
+    "description": "Répondez à ces questions pour améliorer la précision du plan",
+    "noQuestions": "Aucune question supplémentaire nécessaire",
+    "skip": "Passer cette question",
+    "placeholder": "Entrez votre réponse..."
+  },
+  "generate": {
+    "title": "Générer le Plan",
+    "description": "Vérifier les paramètres et générer votre Plan M&P",
+    "generating": "Génération du Plan M&P...",
+    "progress": "{{percent}}% terminé",
+    "success": "Plan M&P généré avec succès !",
+    "download": "Télécharger le Plan",
+    "downloadExcel": "Télécharger Excel",
+    "downloadPdf": "Télécharger PDF",
+    "viewSummary": "Voir le Résumé",
+    "newPlan": "Créer Nouveau Plan"
+  },
+  "artifacts": {
+    "title": "Artefacts Générés",
+    "mpPlan": "Document Plan M&P",
+    "muaSummary": "Résumé MUA",
+    "complianceReport": "Rapport de Conformité",
+    "materialsList": "Liste des Matériaux"
+  },
+  "toast": {
+    "sessionStarted": "Session démarrée avec succès",
+    "sessionResumed": "Session reprise",
+    "materialsParsed": "{{count}} matériaux analysés depuis MIUL",
+    "planGenerated": "Plan M&P généré avec succès",
+    "downloadStarted": "Téléchargement démarré",
+    "error": {
+      "noFile": "Veuillez télécharger un fichier MIUL",
+      "invalidFile": "Format de fichier invalide. Veuillez télécharger un fichier Excel",
+      "sessionFailed": "Échec du démarrage de la session",
+      "generateFailed": "Échec de la génération du plan",
+      "downloadFailed": "Échec du téléchargement du fichier"
+    }
+  }
+}

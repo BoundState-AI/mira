@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FlaskConical, ChevronRight } from "lucide-react";
@@ -15,6 +16,7 @@ interface TestClass {
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export default function TestClasses() {
+  const { t } = useTranslation('testClasses');
   const [testClasses, setTestClasses] = useState<TestClass[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
@@ -92,11 +94,11 @@ export default function TestClasses() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-serif font-bold mb-1 flex items-center gap-3">
-          Test Classes Browser
+          {t('title')}
           <PageHelp content={helpContent.testClasses} />
         </h1>
         <p className="text-sm text-muted-foreground">
-          {isLoading ? 'Loading...' : `${testClasses.length} test types | ${totalTests.toLocaleString()} total test records`}
+          {isLoading ? t('common:loading', 'Loading...') : `${testClasses.length} test types | ${totalTests.toLocaleString()} total test records`}
         </p>
       </div>
 

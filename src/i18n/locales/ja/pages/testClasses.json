@@ -1,0 +1,81 @@
+{
+  "title": "テストクラス",
+  "description": "テストタイプ別に整理された材料テストデータを閲覧",
+  "search": "テストクラスを検索...",
+  "noResults": "テストクラスが見つかりません",
+  "viewTests": "テストを表示",
+  "testCount": "{{count}}件のテスト",
+  "classes": {
+    "tensile": {
+      "name": "引張試験",
+      "description": "極限引張強さ、降伏強度、伸びを測定"
+    },
+    "compression": {
+      "name": "圧縮試験",
+      "description": "圧縮強度と弾性率特性を評価"
+    },
+    "hardness": {
+      "name": "硬度試験",
+      "description": "ロックウェル、ブリネル、ビッカース尺度で材料硬度を測定"
+    },
+    "impact": {
+      "name": "衝撃試験",
+      "description": "シャルピーまたはアイゾット衝撃試験で材料靭性を評価"
+    },
+    "fatigue": {
+      "name": "疲労試験",
+      "description": "繰り返し荷重下での疲労寿命と耐久限度を決定"
+    },
+    "creep": {
+      "name": "クリープ試験",
+      "description": "一定応力下での時間依存変形を測定"
+    },
+    "corrosion": {
+      "name": "腐食試験",
+      "description": "各種環境での耐食性を評価"
+    },
+    "scc": {
+      "name": "応力腐食割れ",
+      "description": "特定環境でのSCC感受性を試験"
+    },
+    "flammability": {
+      "name": "可燃性試験",
+      "description": "材料の可燃性と耐火特性を評価"
+    },
+    "outgassing": {
+      "name": "アウトガス試験",
+      "description": "宇宙・真空用途での揮発性排出を測定"
+    },
+    "oxygen": {
+      "name": "酸素適合性",
+      "description": "酸素サービス（GOX/LOX）での材料安全性を評価"
+    },
+    "hydrogen": {
+      "name": "水素適合性",
+      "description": "水素脆化感受性とHEE指数を評価"
+    },
+    "thermal": {
+      "name": "熱分析",
+      "description": "熱伝導率、膨張、安定性を測定"
+    },
+    "electrical": {
+      "name": "電気特性",
+      "description": "導電率、抵抗率、誘電特性を試験"
+    }
+  },
+  "filters": {
+    "all": "すべてのクラス",
+    "mechanical": "機械的",
+    "environmental": "環境的",
+    "compatibility": "適合性",
+    "physical": "物理的"
+  },
+  "table": {
+    "testId": "テストID",
+    "material": "材料",
+    "date": "日付",
+    "facility": "施設",
+    "result": "結果",
+    "status": "ステータス"
+  }
+}

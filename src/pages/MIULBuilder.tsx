@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,7 @@ const SLS_DEFAULTS = {
 };
 
 export default function MIULBuilder() {
+  const { t } = useTranslation('miulBuilder');
   const { toast } = useToast();
   const [drawingFiles, setDrawingFiles] = useState<FileList | null>(null);
   const [bomFile, setBomFile] = useState<File | null>(null);

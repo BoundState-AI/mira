@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Button } from '@/components/ui/button';
@@ -62,6 +63,7 @@ function getSeverityColor(severity: string): string {
 }
 
 export default function ComplianceAnalysis() {
+  const { t } = useTranslation('complianceAnalysis');
   const [materialKey, setMaterialKey] = useState('');
   const [maptisCode, setMaptisCode] = useState('');
   const [pressure, setPressure] = useState('14.7');

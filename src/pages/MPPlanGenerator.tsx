@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Button } from '@/components/ui/button';
@@ -56,6 +57,7 @@ interface MaterialRow {
 }
 
 export default function MPPlanGenerator() {
+  const { t } = useTranslation('mpPlanGenerator');
   // State
   const [step, setStep] = useState<Step>('setup');
   const [loading, setLoading] = useState(false);

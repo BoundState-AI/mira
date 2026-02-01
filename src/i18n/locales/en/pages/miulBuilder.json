@@ -1,0 +1,132 @@
+{
+  "title": "MIUL Builder",
+  "description": "Generate Material Identification Usage Lists from engineering drawings",
+  "badge": "3-Pass AI Extraction",
+  "tabs": {
+    "compliant": "Compliant MIUL",
+    "bom": "BOM Upload",
+    "pdf": "PDF Drawings"
+  },
+  "environment": {
+    "title": "Use Environment Configuration",
+    "description": "Configure the operating environment for material evaluation",
+    "useDefaults": "Use SLS Defaults",
+    "pressure": "Pressure (PSIA)",
+    "pressurePlaceholder": "e.g., 3000",
+    "temperature": "Temperature (°F)",
+    "temperaturePlaceholder": "e.g., 70",
+    "media": "Media/Fluid",
+    "mediaPlaceholder": "e.g., GOX, LOX, GH2",
+    "o2Concentration": "O2 Concentration (%)",
+    "habitableLocation": "Habitable Location",
+    "phase": "Phase",
+    "phases": {
+      "gas": "Gas",
+      "liquid": "Liquid",
+      "cryogenic": "Cryogenic"
+    }
+  },
+  "upload": {
+    "title": "Upload Files",
+    "dragDrop": "Drag and drop files here, or click to browse",
+    "supportedFormats": "Supports PDF drawings and Excel BOMs",
+    "drawingTree": "Drawing Tree (auto-detected)",
+    "drawings": "Engineering Drawings",
+    "bom": "Bill of Materials",
+    "clear": "Clear All",
+    "filesSelected": "{{count}} files selected"
+  },
+  "program": {
+    "title": "Program Information",
+    "name": "Program Name",
+    "namePlaceholder": "e.g., ORION, SLS, Gateway",
+    "hardware": "Hardware Name",
+    "hardwarePlaceholder": "e.g., Dual Motion Valve Assembly"
+  },
+  "steps": {
+    "upload": "Upload",
+    "generate": "Generate",
+    "enrich": "Enrich",
+    "muas": "MUAs"
+  },
+  "generate": {
+    "title": "Generate Base MIUL",
+    "description": "Extract materials from uploaded drawings using AI vision",
+    "button": "Generate Base MIUL",
+    "generating": "Extracting materials...",
+    "progress": "{{percent}}% complete",
+    "passInfo": {
+      "pass1": "Pass 1: Extracting materials from drawings",
+      "pass2": "Pass 2: Identifying helicoils and fasteners",
+      "pass3": "Pass 3: Detecting finishes and coatings"
+    }
+  },
+  "enrich": {
+    "title": "Enrich with MAPTIS Ratings",
+    "description": "Lookup MAPTIS codes and populate rating columns",
+    "button": "Enrich with MAPTIS",
+    "enriching": "Looking up ratings...",
+    "materialsFound": "{{count}} materials found",
+    "ratingsPopulated": "{{count}} ratings populated",
+    "gapsIdentified": "{{count}} gaps identified"
+  },
+  "muas": {
+    "title": "Generate MUAs",
+    "description": "Generate Material Usage Agreements for materials with gaps",
+    "button": "Generate MUAs",
+    "generating": "Generating MUAs...",
+    "required": "{{count}} MUAs required",
+    "generated": "{{count}} MUAs generated"
+  },
+  "results": {
+    "title": "Extraction Results",
+    "materials": "Materials",
+    "helicoils": "Helicoils",
+    "finishes": "Finishes",
+    "hardware": "Hardware",
+    "total": "Total Items",
+    "exportExcel": "Export Excel",
+    "exportCsv": "Export CSV",
+    "viewDetails": "View Details"
+  },
+  "table": {
+    "partNumber": "Part Number",
+    "material": "Material",
+    "maptisCode": "MAPTIS Code",
+    "quantity": "Qty",
+    "parent": "Parent",
+    "flammability": "FLAM",
+    "corrosion": "CORR",
+    "scc": "SCC",
+    "tvs": "TVS",
+    "toxicity": "TOX",
+    "fluidSystems": "FS",
+    "o2Compat": "O2",
+    "status": "Status"
+  },
+  "status": {
+    "complete": "Complete",
+    "partial": "Partial",
+    "needsEnrichment": "Needs Enrichment",
+    "needsMua": "Needs MUA",
+    "noMatch": "No Match"
+  },
+  "toast": {
+    "filesUploaded": "{{count}} files uploaded",
+    "extractionComplete": "Extraction complete: {{count}} materials found",
+    "enrichmentComplete": "Enrichment complete: {{count}} ratings populated",
+    "muasGenerated": "{{count}} MUAs generated",
+    "exportStarted": "Export started",
+    "error": {
+      "noFiles": "Please upload files first",
+      "extractionFailed": "Material extraction failed",
+      "enrichmentFailed": "MAPTIS enrichment failed",
+      "muaFailed": "MUA generation failed",
+      "invalidFormat": "Invalid file format"
+    }
+  },
+  "info": {
+    "compliantMiul": "Compliant MIUL uses 3-pass AI extraction to identify materials, helicoils, finishes, and hardware with anti-hallucination validation.",
+    "drawingTreeTip": "Tip: Name your Drawing Tree PDF with 'Drawing Tree' in the filename for auto-detection."
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "title": "Drawing Tree Editor",
+  "description": "Drag and drop to correct hierarchy relationships",
+  "toolbar": {
+    "extractPdf": "Extract PDF",
+    "loadJson": "Load JSON",
+    "export": "Export",
+    "expandAll": "Expand All",
+    "collapseAll": "Collapse All",
+    "undo": "Undo"
+  },
+  "upload": {
+    "title": "No Drawing Tree Loaded",
+    "description": "Extract from PDF or load JSON",
+    "extractFromPdf": "Extract from PDF",
+    "loadFromJson": "Load JSON"
+  },
+  "tree": {
+    "assembly": "ASM",
+    "detail": "DTL",
+    "dragTip": "Hold the grip icon and drag to move nodes. Works on touch screens!"
+  },
+  "extraction": {
+    "extracting": "Extracting...",
+    "uploading": "Uploading PDF to extraction service...",
+    "analyzing": "Analyzing drawing tree with Claude Vision...",
+    "processing": "Processing extraction results...",
+    "progress": "Analyzing drawing tree... ({{seconds}}s)"
+  },
+  "history": {
+    "title": "Edit History",
+    "loadedFromFile": "Loaded from file",
+    "extractedFromPdf": "Extracted from PDF",
+    "moved": "Moved {{node}} from {{from}} to {{to}}"
+  },
+  "toast": {
+    "treeLoaded": "Tree Loaded",
+    "nodesLoaded": "{{count}} nodes loaded from {{filename}}",
+    "extractionComplete": "Extraction Complete",
+    "nodesExtracted": "{{count}} nodes extracted. Review and correct if needed.",
+    "exported": "Exported",
+    "savedAs": "Saved as {{filename}}",
+    "nodeMoved": "Node Moved",
+    "nodeMovedDesc": "{{node}} is now under {{parent}}",
+    "undone": "Undone",
+    "error": {
+      "loadingFile": "Error Loading File",
+      "extractionFailed": "Extraction Failed",
+      "invalidMove": "Invalid Move",
+      "cannotMoveToDescendant": "Cannot move a node under its own descendant",
+      "unrecognizedFormat": "Unrecognized JSON format",
+      "extractionTimeout": "Extraction timed out after 2 minutes",
+      "emptyTree": "Extraction returned empty tree"
+    }
+  },
+  "nodeTypes": {
+    "assembly": "Assembly",
+    "detail": "Detail"
+  }
+}

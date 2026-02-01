@@ -1,0 +1,60 @@
+{
+  "title": "Éditeur d'Arborescence des Dessins",
+  "description": "Glisser-déposer pour corriger les relations hiérarchiques",
+  "toolbar": {
+    "extractPdf": "Extraire PDF",
+    "loadJson": "Charger JSON",
+    "export": "Exporter",
+    "expandAll": "Tout Développer",
+    "collapseAll": "Tout Réduire",
+    "undo": "Annuler"
+  },
+  "upload": {
+    "title": "Aucune Arborescence Chargée",
+    "description": "Extraire depuis PDF ou charger JSON",
+    "extractFromPdf": "Extraire depuis PDF",
+    "loadFromJson": "Charger JSON"
+  },
+  "tree": {
+    "assembly": "ASM",
+    "detail": "DTL",
+    "dragTip": "Maintenez l'icône de poignée et glissez pour déplacer les nœuds. Fonctionne sur écrans tactiles !"
+  },
+  "extraction": {
+    "extracting": "Extraction...",
+    "uploading": "Téléchargement du PDF vers le service d'extraction...",
+    "analyzing": "Analyse de l'arborescence avec Claude Vision...",
+    "processing": "Traitement des résultats d'extraction...",
+    "progress": "Analyse de l'arborescence... ({{seconds}}s)"
+  },
+  "history": {
+    "title": "Historique des Modifications",
+    "loadedFromFile": "Chargé depuis fichier",
+    "extractedFromPdf": "Extrait depuis PDF",
+    "moved": "Déplacé {{node}} de {{from}} vers {{to}}"
+  },
+  "toast": {
+    "treeLoaded": "Arborescence Chargée",
+    "nodesLoaded": "{{count}} nœuds chargés depuis {{filename}}",
+    "extractionComplete": "Extraction Terminée",
+    "nodesExtracted": "{{count}} nœuds extraits. Vérifier et corriger si nécessaire.",
+    "exported": "Exporté",
+    "savedAs": "Enregistré sous {{filename}}",
+    "nodeMoved": "Nœud Déplacé",
+    "nodeMovedDesc": "{{node}} est maintenant sous {{parent}}",
+    "undone": "Annulé",
+    "error": {
+      "loadingFile": "Erreur de Chargement du Fichier",
+      "extractionFailed": "Échec de l'Extraction",
+      "invalidMove": "Déplacement Invalide",
+      "cannotMoveToDescendant": "Impossible de déplacer un nœud sous son propre descendant",
+      "unrecognizedFormat": "Format JSON non reconnu",
+      "extractionTimeout": "Extraction expirée après 2 minutes",
+      "emptyTree": "L'extraction a retourné une arborescence vide"
+    }
+  },
+  "nodeTypes": {
+    "assembly": "Assemblage",
+    "detail": "Détail"
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "title": "Classes de Tests",
+  "description": "Parcourir les données de tests matériaux organisées par type de test",
+  "search": "Rechercher classes de tests...",
+  "noResults": "Aucune classe de test trouvée",
+  "viewTests": "Voir les Tests",
+  "testCount": "{{count}} tests",
+  "classes": {
+    "tensile": {
+      "name": "Essai de Traction",
+      "description": "Mesurer la résistance à la traction ultime, limite d'élasticité et allongement"
+    },
+    "compression": {
+      "name": "Essai de Compression",
+      "description": "Évaluer la résistance à la compression et les propriétés du module"
+    },
+    "hardness": {
+      "name": "Essai de Dureté",
+      "description": "Mesurer la dureté du matériau selon les échelles Rockwell, Brinell ou Vickers"
+    },
+    "impact": {
+      "name": "Essai d'Impact",
+      "description": "Évaluer la ténacité du matériau par les essais Charpy ou Izod"
+    },
+    "fatigue": {
+      "name": "Essai de Fatigue",
+      "description": "Déterminer la durée de vie en fatigue et les limites d'endurance sous charge cyclique"
+    },
+    "creep": {
+      "name": "Essai de Fluage",
+      "description": "Mesurer la déformation dépendante du temps sous contrainte constante"
+    },
+    "corrosion": {
+      "name": "Essai de Corrosion",
+      "description": "Évaluer la résistance à la corrosion dans divers environnements"
+    },
+    "scc": {
+      "name": "Corrosion Sous Contrainte",
+      "description": "Tester la susceptibilité à la CSC dans des environnements spécifiques"
+    },
+    "flammability": {
+      "name": "Essai d'Inflammabilité",
+      "description": "Évaluer l'inflammabilité et les propriétés de résistance au feu"
+    },
+    "outgassing": {
+      "name": "Essai de Dégazage",
+      "description": "Mesurer les émissions volatiles pour les applications spatiales et sous vide"
+    },
+    "oxygen": {
+      "name": "Compatibilité Oxygène",
+      "description": "Évaluer la sécurité du matériau pour service oxygène (GOX/LOX)"
+    },
+    "hydrogen": {
+      "name": "Compatibilité Hydrogène",
+      "description": "Évaluer la susceptibilité à la fragilisation par l'hydrogène et l'indice HEE"
+    },
+    "thermal": {
+      "name": "Analyse Thermique",
+      "description": "Mesurer la conductivité thermique, l'expansion et la stabilité"
+    },
+    "electrical": {
+      "name": "Propriétés Électriques",
+      "description": "Tester la conductivité, résistivité et propriétés diélectriques"
+    }
+  },
+  "filters": {
+    "all": "Toutes les Classes",
+    "mechanical": "Mécanique",
+    "environmental": "Environnemental",
+    "compatibility": "Compatibilité",
+    "physical": "Physique"
+  },
+  "table": {
+    "testId": "ID Test",
+    "material": "Matériau",
+    "date": "Date",
+    "facility": "Installation",
+    "result": "Résultat",
+    "status": "Statut"
+  }
+}

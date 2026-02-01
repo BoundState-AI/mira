@@ -1,0 +1,99 @@
+{
+  "title": "M&Pプランジェネレーター",
+  "description": "フライトハードウェアの材料&プロセス計画を生成",
+  "badge": "AI搭載",
+  "tabs": {
+    "newSession": "新規セッション",
+    "resumeSession": "セッション再開"
+  },
+  "session": {
+    "title": "セッション管理",
+    "programName": "プログラム名",
+    "programPlaceholder": "例：ORION、SLS",
+    "hardwareName": "ハードウェア名",
+    "hardwarePlaceholder": "例：デュアルモーションバルブアセンブリ",
+    "uploadMiul": "エンリッチ済みMIULをアップロード",
+    "dragDropFile": "エンリッチ済みMIULファイルをここにドラッグ＆ドロップ、またはクリックして参照",
+    "supportedFormats": "MIUL Builderからの.xlsxファイルをサポート",
+    "startSession": "M&Pプランセッションを開始",
+    "resumeTitle": "前回のセッションを再開",
+    "noSessions": "以前のセッションが見つかりません",
+    "sessionId": "セッションID",
+    "created": "作成日",
+    "status": "ステータス",
+    "resume": "再開"
+  },
+  "wizard": {
+    "steps": {
+      "setup": "セットアップ",
+      "materials": "材料",
+      "questions": "質問",
+      "generate": "生成"
+    },
+    "next": "次へ",
+    "back": "戻る",
+    "skipQuestions": "質問をスキップ",
+    "generatePlan": "M&Pプランを生成"
+  },
+  "materials": {
+    "title": "材料レビュー",
+    "description": "MIULから抽出された材料を確認・承認",
+    "count": "{{count}}件の材料が見つかりました",
+    "noMaterials": "アップロードされたMIULに材料が見つかりません",
+    "columns": {
+      "material": "材料",
+      "code": "MAPTISコード",
+      "partNumber": "部品番号",
+      "flammability": "可燃性",
+      "corrosion": "腐食",
+      "scc": "SCC",
+      "o2Compat": "O2",
+      "status": "ステータス"
+    },
+    "status": {
+      "complete": "完了",
+      "gapsFound": "ギャップあり",
+      "needsReview": "要確認"
+    }
+  },
+  "questions": {
+    "title": "確認質問",
+    "description": "プランの精度を向上させるための質問にお答えください",
+    "noQuestions": "追加の質問は不要です",
+    "skip": "この質問をスキップ",
+    "placeholder": "回答を入力..."
+  },
+  "generate": {
+    "title": "プラン生成",
+    "description": "設定を確認してM&Pプランを生成",
+    "generating": "M&Pプランを生成中...",
+    "progress": "{{percent}}% 完了",
+    "success": "M&Pプランが正常に生成されました！",
+    "download": "プランをダウンロード",
+    "downloadExcel": "Excelをダウンロード",
+    "downloadPdf": "PDFをダウンロード",
+    "viewSummary": "サマリーを表示",
+    "newPlan": "新規プランを作成"
+  },
+  "artifacts": {
+    "title": "生成された成果物",
+    "mpPlan": "M&Pプラン文書",
+    "muaSummary": "MUAサマリー",
+    "complianceReport": "コンプライアンスレポート",
+    "materialsList": "材料リスト"
+  },
+  "toast": {
+    "sessionStarted": "セッションが正常に開始されました",
+    "sessionResumed": "セッションを再開しました",
+    "materialsParsed": "MIULから{{count}}件の材料を解析しました",
+    "planGenerated": "M&Pプランが正常に生成されました",
+    "downloadStarted": "ダウンロードを開始しました",
+    "error": {
+      "noFile": "MIULファイルをアップロードしてください",
+      "invalidFile": "無効なファイル形式です。Excelファイルをアップロードしてください",
+      "sessionFailed": "セッションの開始に失敗しました",
+      "generateFailed": "プランの生成に失敗しました",
+      "downloadFailed": "ファイルのダウンロードに失敗しました"
+    }
+  }
+}

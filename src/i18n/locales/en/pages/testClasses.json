@@ -1,0 +1,81 @@
+{
+  "title": "Test Classes",
+  "description": "Browse material test data organized by test type",
+  "search": "Search test classes...",
+  "noResults": "No test classes found",
+  "viewTests": "View Tests",
+  "testCount": "{{count}} tests",
+  "classes": {
+    "tensile": {
+      "name": "Tensile Testing",
+      "description": "Measure ultimate tensile strength, yield strength, and elongation"
+    },
+    "compression": {
+      "name": "Compression Testing",
+      "description": "Evaluate compressive strength and modulus properties"
+    },
+    "hardness": {
+      "name": "Hardness Testing",
+      "description": "Measure material hardness using Rockwell, Brinell, or Vickers scales"
+    },
+    "impact": {
+      "name": "Impact Testing",
+      "description": "Assess material toughness through Charpy or Izod impact tests"
+    },
+    "fatigue": {
+      "name": "Fatigue Testing",
+      "description": "Determine fatigue life and endurance limits under cyclic loading"
+    },
+    "creep": {
+      "name": "Creep Testing",
+      "description": "Measure time-dependent deformation under constant stress"
+    },
+    "corrosion": {
+      "name": "Corrosion Testing",
+      "description": "Evaluate corrosion resistance in various environments"
+    },
+    "scc": {
+      "name": "Stress Corrosion Cracking",
+      "description": "Test susceptibility to SCC in specific environments"
+    },
+    "flammability": {
+      "name": "Flammability Testing",
+      "description": "Assess material flammability and fire resistance properties"
+    },
+    "outgassing": {
+      "name": "Outgassing Testing",
+      "description": "Measure volatile emissions for space and vacuum applications"
+    },
+    "oxygen": {
+      "name": "Oxygen Compatibility",
+      "description": "Evaluate material safety for oxygen service (GOX/LOX)"
+    },
+    "hydrogen": {
+      "name": "Hydrogen Compatibility",
+      "description": "Assess hydrogen embrittlement susceptibility and HEE index"
+    },
+    "thermal": {
+      "name": "Thermal Analysis",
+      "description": "Measure thermal conductivity, expansion, and stability"
+    },
+    "electrical": {
+      "name": "Electrical Properties",
+      "description": "Test conductivity, resistivity, and dielectric properties"
+    }
+  },
+  "filters": {
+    "all": "All Classes",
+    "mechanical": "Mechanical",
+    "environmental": "Environmental",
+    "compatibility": "Compatibility",
+    "physical": "Physical"
+  },
+  "table": {
+    "testId": "Test ID",
+    "material": "Material",
+    "date": "Date",
+    "facility": "Facility",
+    "result": "Result",
+    "status": "Status"
+  }
+}

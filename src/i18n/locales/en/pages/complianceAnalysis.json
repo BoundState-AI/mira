@@ -1,0 +1,70 @@
+{
+  "title": "Compliance Analysis",
+  "description": "Analyze material compliance with NASA-STD-6016C requirements",
+  "form": {
+    "materialInputs": "Material Inputs",
+    "materialKey": "Material Key",
+    "materialKeyRequired": "Material Key *",
+    "materialKeyPlaceholder": "e.g., SS316, Ti-6Al-4V",
+    "maptisCode": "MAPTIS Code (optional)",
+    "maptisCodePlaceholder": "e.g., 12345",
+    "pressure": "Pressure (PSIA)",
+    "pressurePlaceholder": "14.7",
+    "temperature": "Temperature (°F)",
+    "temperaturePlaceholder": "70",
+    "environmentOptions": "Environment Options",
+    "o2Concentration": "O₂ Concentration (%)",
+    "o2Placeholder": "21",
+    "hydrogenService": "Hydrogen Service (H₂)",
+    "habitableEnvironment": "Habitable Environment",
+    "analyzeCompliance": "Analyze Compliance"
+  },
+  "results": {
+    "overallStatus": "Overall Compliance Status",
+    "environmentDescription": "Environment: {{description}}",
+    "summaryStats": {
+      "mprsCompliant": "MPRs Compliant",
+      "withConstraints": "With Constraints",
+      "nonCompliant": "Non-Compliant",
+      "gaps": "Gaps ({{critical}} Critical)"
+    },
+    "mprDeterminations": "MPR Determinations ({{count}})",
+    "mprTitle": "MPR-{{number}}: {{title}}",
+    "section": "Section {{section}}",
+    "requiredAction": "Required: {{action}}",
+    "gapsCount": "{{count}} gaps",
+    "constraintsCount": "{{count}} constraints",
+    "gapSignals": "Gap Signals ({{count}})",
+    "operationalConstraints": "Operational Constraints ({{count}})",
+    "constraintTable": {
+      "parameter": "Parameter",
+      "limit": "Limit",
+      "description": "Description"
+    },
+    "warnings": "Warnings",
+    "requestId": "Request ID: {{id}}",
+    "analysisTime": "Analysis time: {{ms}}ms"
+  },
+  "status": {
+    "compliant": "Compliant",
+    "compliantWithConstraints": "Compliant with Constraints",
+    "noncompliant": "Non-Compliant",
+    "unknown": "Unknown"
+  },
+  "severity": {
+    "critical": "Critical",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
+  },
+  "gaps": {
+    "gapType": "Gap Type",
+    "trigger": "Trigger: {{trigger}}",
+    "evidence": "{{count}} evidence"
+  },
+  "error": {
+    "title": "Error",
+    "analysisFailed": "Compliance analysis failed"
+  },
+  "loading": "Analyzing..."
+}

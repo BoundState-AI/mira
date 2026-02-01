@@ -1,0 +1,303 @@
+{
+  "title": "MUAジェネレーター",
+  "description": "LLM搭載の合成でNASA-STD-6016準拠の材料使用契約書を生成",
+  "badge": "MUA BOK V3",
+  "tabs": {
+    "corpus": "コーパスドラフト",
+    "v6": "V6パイプライン",
+    "synthesis": "AI合成",
+    "precedent": "先例エンジン",
+    "interactive": "インタラクティブ",
+    "batch": "バッチ"
+  },
+  "corpus": {
+    "title": "コーパスベースMUAドラフトジェネレーター",
+    "description": "<strong>5,650以上の解析済み過去MUA</strong>からMUAドラフトを生成。システムはセマンティック検索で関連する先例を見つけ、カバレッジを分析し、完全な出所追跡付きで根拠を合成します。",
+    "form": {
+      "materialEnvironment": "材料と環境",
+      "materialDesignation": "材料名称",
+      "materialPlaceholder": "例：6061-T6アルミニウム、インコネル718、バイトン",
+      "environmentDescription": "環境説明",
+      "environmentPlaceholder": "例：濃縮酸素、キャビン空気、真空",
+      "applicationContext": "用途コンテキスト",
+      "applicationPlaceholder": "意図する使用方法を記述...",
+      "o2Percent": "O2 %",
+      "pressurePsia": "圧力 (PSIA)",
+      "tempF": "温度 (°F)",
+      "habitableLocation": "居住可能区域",
+      "issuesToAddress": "対処する課題"
+    },
+    "issues": {
+      "flammability": "可燃性",
+      "corrosion": "腐食",
+      "scc": "SCC",
+      "toxicity": "毒性",
+      "offgassing": "アウトガス",
+      "o2Compat": "O2適合性"
+    },
+    "actions": {
+      "searchPrecedents": "先例を検索",
+      "searching": "検索中...",
+      "generateDraft": "ドラフトを生成",
+      "generating": "生成中...",
+      "reset": "リセット"
+    },
+    "results": {
+      "searchResults": "先例検索結果",
+      "found": "{{count}}件発見",
+      "generatedDraft": "生成されたドラフト",
+      "confidence": "{{percent}}% 信頼度",
+      "coverage": "カバレッジ",
+      "issuesAddressed": "対処された課題",
+      "gapsIdentified": "識別されたギャップ",
+      "warnings": "警告",
+      "precedentsCited": "引用された先例 ({{count}})",
+      "synthesizedRationale": "合成された根拠"
+    },
+    "determinations": {
+      "approved": "承認",
+      "conditional": "条件付き",
+      "requiresReview": "レビュー必要"
+    },
+    "emptyState": "材料と環境の詳細を入力し、「ドラフトを生成」をクリックして過去の先例に基づくMUAを作成してください。"
+  },
+  "v6": {
+    "title": "MUA V6エビデンスパイプライン",
+    "description": "6段階のエビデンスファーストパイプライン：材料解決 → 先例検索 → MAPTISテストデータ → エンベロープマッチング → 決定エンジン → ロジック検証。信頼度スコアと引用付きの構造化決定を返します。",
+    "form": {
+      "queryParameters": "クエリパラメーター",
+      "materialDesignation": "材料名称",
+      "materialPlaceholder": "例：INCONEL 625、304 SS、ナイロン6/6",
+      "environmentDescription": "環境説明",
+      "environmentPlaceholder": "例：高圧でのガス状酸素サービス",
+      "o2Percent": "O2 %",
+      "pressurePsia": "圧力 (PSIA)",
+      "tempF": "温度 (°F)",
+      "habitableLocation": "居住可能区域",
+      "resultsK": "結果数 (k)",
+      "generationMode": "生成モード",
+      "evaluateOnly": "評価のみ（決定を返す）",
+      "auto": "自動（PROCEEDの場合ドラフトを生成）"
+    },
+    "actions": {
+      "searchPrecedents": "先例を検索",
+      "searching": "検索中...",
+      "evaluateGenerate": "評価/生成",
+      "evaluating": "評価中...",
+      "reset": "リセット"
+    },
+    "results": {
+      "searchResults": "先例検索結果",
+      "requestId": "ID: {{id}}",
+      "evaluationResult": "評価結果",
+      "decision": "決定",
+      "confidence": "信頼度",
+      "envelopeStatus": "エンベロープステータス",
+      "supporting": "支持",
+      "conflicting": "矛盾",
+      "precedents": "先例",
+      "reasoning": "理由",
+      "draftText": "ドラフトテキスト"
+    },
+    "decisions": {
+      "proceed": "進行",
+      "warn": "警告",
+      "review": "レビュー",
+      "blocked": "ブロック"
+    },
+    "envelope": {
+      "within": "エンベロープ内",
+      "partialOverlap": "部分的重複",
+      "extrapolation": "外挿",
+      "insufficientData": "データ不足"
+    }
+  },
+  "synthesis": {
+    "title": "AI合成モード",
+    "description": "先例分析からAI搭載の合成を使用してMUA根拠を生成",
+    "form": {
+      "material": "材料",
+      "materialPlaceholder": "例：Ti-6Al-4V、インコネル718",
+      "issue": "課題タイプ",
+      "application": "用途",
+      "applicationPlaceholder": "用途/ユースケースを記述",
+      "environment": "環境",
+      "environmentPlaceholder": "運用環境の詳細",
+      "location": "場所",
+      "massQuantity": "質量/数量",
+      "program": "プログラム"
+    },
+    "issues": {
+      "flam": "FLAM - 可燃性",
+      "scc": "SCC - 応力腐食割れ",
+      "corr": "CORR - 腐食",
+      "tvs": "TVS - 総揮発性成分",
+      "tox": "TOX - 毒性",
+      "fs": "FS - 流体システム"
+    },
+    "locations": {
+      "habitable": "居住可能",
+      "nonHabitable": "非居住"
+    },
+    "actions": {
+      "synthesize": "MUAを合成",
+      "synthesizing": "合成中...",
+      "copyRationale": "根拠をコピー",
+      "copied": "コピーしました！",
+      "reset": "リセット"
+    },
+    "results": {
+      "category": "カテゴリー",
+      "confidence": "信頼度",
+      "precedentsUsed": "使用された先例 ({{count}})",
+      "applicabilityAnalysis": "適用可能性分析",
+      "synthesizedRationale": "合成された根拠",
+      "warnings": "警告"
+    },
+    "applicability": {
+      "yes": "適用可能",
+      "partial": "部分的",
+      "no": "適用不可"
+    }
+  },
+  "precedent": {
+    "title": "V4先例エンジン",
+    "description": "階層マッチングで先例の適切性を評価",
+    "form": {
+      "material": "材料",
+      "media": "媒体/流体",
+      "o2Percent": "O2 %",
+      "tempMax": "最高温度 (°F)",
+      "pressureMax": "最大圧力 (PSIA)",
+      "deviations": "逸脱タイプ",
+      "location": "場所クラス"
+    },
+    "deviationTypes": {
+      "flam": "FLAM",
+      "scc": "SCC",
+      "corr": "CORR",
+      "tvs": "TVS",
+      "tox": "TOX",
+      "fs": "FS"
+    },
+    "actions": {
+      "evaluate": "先例を評価",
+      "evaluating": "評価中...",
+      "reset": "リセット"
+    },
+    "results": {
+      "adequacy": "適切性",
+      "totalCandidates": "総候補数",
+      "tier1Matches": "Tier 1マッチ",
+      "tier2Matches": "Tier 2マッチ",
+      "tier3Matches": "Tier 3マッチ",
+      "recommendedBase": "推奨ベース",
+      "reasoning": "選択理由",
+      "statistics": "統計",
+      "approved": "承認済み",
+      "rejected": "却下",
+      "approvalRate": "承認率"
+    }
+  },
+  "interactive": {
+    "title": "インタラクティブモード",
+    "description": "先例を検索し、マッチを選択し、あなたの入力でMUAを生成",
+    "steps": {
+      "search": "1. 検索",
+      "select": "2. 選択",
+      "generate": "3. 生成"
+    },
+    "form": {
+      "material": "材料",
+      "materialPlaceholder": "材料を検索...",
+      "issues": "課題タイプ",
+      "environment": "環境",
+      "application": "用途"
+    },
+    "actions": {
+      "search": "先例を検索",
+      "searching": "検索中...",
+      "generate": "選択から生成",
+      "generating": "生成中...",
+      "reset": "やり直す"
+    },
+    "results": {
+      "precedentsFound": "{{count}}件の先例が見つかりました",
+      "selected": "{{count}}件選択済み",
+      "selectPrecedents": "MUA生成に使用する適用可能な先例を選択",
+      "generatedDraft": "生成されたMUAドラフト"
+    }
+  },
+  "batch": {
+    "title": "バッチモード",
+    "description": "エンリッチ済みMIULから複数の材料のMUAを生成",
+    "form": {
+      "uploadMiul": "エンリッチ済みMIULをアップロード",
+      "dragDrop": "エンリッチ済みMIUL Excelファイルをドラッグ＆ドロップ",
+      "programName": "プログラム名",
+      "hardwareName": "ハードウェア名"
+    },
+    "actions": {
+      "generate": "MUAを生成",
+      "generating": "生成中...",
+      "downloadExcel": "MUA付きExcelをダウンロード",
+      "downloadJson": "JSONをダウンロード"
+    },
+    "results": {
+      "processed": "{{count}}件の材料を処理",
+      "generated": "{{count}}件のMUAを生成",
+      "viewResults": "結果を表示"
+    },
+    "progress": "MUAを生成中... {{percent}}%"
+  },
+  "toast": {
+    "searchComplete": "検索完了",
+    "foundPrecedents": "{{count}}件の先例が見つかりました",
+    "synthesisComplete": "MUAを合成しました",
+    "synthesisFromPrecedents": "{{count}}件の適用可能な先例から根拠を生成しました",
+    "evaluationComplete": "評価完了",
+    "draftGenerated": "ドラフトを生成しました",
+    "copied": "コピーしました",
+    "rationalecopied": "根拠をクリップボードにコピーしました",
+    "muaDraftCopied": "MUAドラフトをクリップボードにコピーしました",
+    "downloadComplete": "ダウンロード完了",
+    "excelDownloaded": "MUA付きExcelファイルをダウンロードしました",
+    "batchComplete": "MUAを生成しました",
+    "batchSuccess": "{{count}}件のMUAドキュメントを正常に生成しました",
+    "error": {
+      "missingMaterial": "材料がありません",
+      "enterMaterial": "材料名称を入力してください",
+      "missingApplication": "用途がありません",
+      "enterApplication": "用途/ユースケースを記述してください",
+      "missingFields": "入力が不足しています",
+      "materialEnvRequired": "材料と環境説明は必須です",
+      "noFile": "ファイルがありません",
+      "uploadMiul": "最初にエンリッチ済みMIULファイルをアップロードしてください",
+      "invalidFile": "無効なファイル",
+      "excelRequired": "Excelファイル（.xlsxまたは.xls）をアップロードしてください",
+      "noPrecedents": "先例が選択されていません",
+      "selectPrecedent": "使用する先例を少なくとも1つ選択してください",
+      "searchFailed": "検索に失敗しました",
+      "synthesisFailed": "合成に失敗しました",
+      "synthesisIssue": "合成の問題",
+      "couldNotGenerate": "MUAを生成できませんでした",
+      "evaluationFailed": "評価に失敗しました",
+      "generationFailed": "生成に失敗しました",
+      "copyFailed": "コピーに失敗しました",
+      "couldNotCopy": "クリップボードにコピーできませんでした",
+      "downloadFailed": "ダウンロードに失敗しました"
+    }
+  },
+  "common": {
+    "required": "必須",
+    "optional": "任意",
+    "loading": "読み込み中...",
+    "noResults": "結果が見つかりません",
+    "score": "スコア",
+    "category": "カテゴリー",
+    "material": "材料",
+    "environment": "環境",
+    "determination": "判定",
+    "rationale": "根拠"
+  }
+}

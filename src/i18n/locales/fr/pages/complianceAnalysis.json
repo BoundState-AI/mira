@@ -1,0 +1,70 @@
+{
+  "title": "Analyse de Conformité",
+  "description": "Analyser la conformité des matériaux aux exigences NASA-STD-6016C",
+  "form": {
+    "materialInputs": "Entrées Matériau",
+    "materialKey": "Clé Matériau",
+    "materialKeyRequired": "Clé Matériau *",
+    "materialKeyPlaceholder": "ex: SS316, Ti-6Al-4V",
+    "maptisCode": "Code MAPTIS (optionnel)",
+    "maptisCodePlaceholder": "ex: 12345",
+    "pressure": "Pression (PSIA)",
+    "pressurePlaceholder": "14.7",
+    "temperature": "Température (°F)",
+    "temperaturePlaceholder": "70",
+    "environmentOptions": "Options d'Environnement",
+    "o2Concentration": "Concentration O₂ (%)",
+    "o2Placeholder": "21",
+    "hydrogenService": "Service Hydrogène (H₂)",
+    "habitableEnvironment": "Environnement Habitable",
+    "analyzeCompliance": "Analyser la Conformité"
+  },
+  "results": {
+    "overallStatus": "Statut de Conformité Global",
+    "environmentDescription": "Environnement : {{description}}",
+    "summaryStats": {
+      "mprsCompliant": "MPRs Conformes",
+      "withConstraints": "Avec Contraintes",
+      "nonCompliant": "Non-Conformes",
+      "gaps": "Lacunes ({{critical}} Critiques)"
+    },
+    "mprDeterminations": "Déterminations MPR ({{count}})",
+    "mprTitle": "MPR-{{number}} : {{title}}",
+    "section": "Section {{section}}",
+    "requiredAction": "Requis : {{action}}",
+    "gapsCount": "{{count}} lacunes",
+    "constraintsCount": "{{count}} contraintes",
+    "gapSignals": "Signaux de Lacunes ({{count}})",
+    "operationalConstraints": "Contraintes Opérationnelles ({{count}})",
+    "constraintTable": {
+      "parameter": "Paramètre",
+      "limit": "Limite",
+      "description": "Description"
+    },
+    "warnings": "Avertissements",
+    "requestId": "ID Requête : {{id}}",
+    "analysisTime": "Temps d'analyse : {{ms}}ms"
+  },
+  "status": {
+    "compliant": "Conforme",
+    "compliantWithConstraints": "Conforme avec Contraintes",
+    "noncompliant": "Non-Conforme",
+    "unknown": "Inconnu"
+  },
+  "severity": {
+    "critical": "Critique",
+    "high": "Élevé",
+    "medium": "Moyen",
+    "low": "Faible"
+  },
+  "gaps": {
+    "gapType": "Type de Lacune",
+    "trigger": "Déclencheur : {{trigger}}",
+    "evidence": "{{count}} preuves"
+  },
+  "error": {
+    "title": "Erreur",
+    "analysisFailed": "L'analyse de conformité a échoué"
+  },
+  "loading": "Analyse..."
+}

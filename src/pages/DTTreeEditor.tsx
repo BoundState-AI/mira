@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import {
   DndContext,
   DragEndEvent,
@@ -271,6 +272,7 @@ function DragOverlayNode({ node }: { node: TreeNode }) {
 // ============================================================================
 
 export default function DTTreeEditor() {
+  const { t } = useTranslation('dtTreeEditor');
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pdfInputRef = useRef<HTMLInputElement>(null);

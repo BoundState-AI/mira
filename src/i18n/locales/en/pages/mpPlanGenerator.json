@@ -1,0 +1,99 @@
+{
+  "title": "M&P Plan Generator",
+  "description": "Generate Materials & Process Plans for flight hardware",
+  "badge": "AI-Powered",
+  "tabs": {
+    "newSession": "New Session",
+    "resumeSession": "Resume Session"
+  },
+  "session": {
+    "title": "Session Management",
+    "programName": "Program Name",
+    "programPlaceholder": "e.g., ORION, SLS",
+    "hardwareName": "Hardware Name",
+    "hardwarePlaceholder": "e.g., Dual Motion Valve Assembly",
+    "uploadMiul": "Upload Enriched MIUL",
+    "dragDropFile": "Drag and drop your enriched MIUL file here, or click to browse",
+    "supportedFormats": "Supports .xlsx files from MIUL Builder",
+    "startSession": "Start M&P Plan Session",
+    "resumeTitle": "Resume Previous Session",
+    "noSessions": "No previous sessions found",
+    "sessionId": "Session ID",
+    "created": "Created",
+    "status": "Status",
+    "resume": "Resume"
+  },
+  "wizard": {
+    "steps": {
+      "setup": "Setup",
+      "materials": "Materials",
+      "questions": "Questions",
+      "generate": "Generate"
+    },
+    "next": "Next",
+    "back": "Back",
+    "skipQuestions": "Skip Questions",
+    "generatePlan": "Generate M&P Plan"
+  },
+  "materials": {
+    "title": "Materials Review",
+    "description": "Review and confirm materials extracted from your MIUL",
+    "count": "{{count}} materials found",
+    "noMaterials": "No materials found in the uploaded MIUL",
+    "columns": {
+      "material": "Material",
+      "code": "MAPTIS Code",
+      "partNumber": "Part Number",
+      "flammability": "FLAM",
+      "corrosion": "CORR",
+      "scc": "SCC",
+      "o2Compat": "O2",
+      "status": "Status"
+    },
+    "status": {
+      "complete": "Complete",
+      "gapsFound": "Gaps Found",
+      "needsReview": "Needs Review"
+    }
+  },
+  "questions": {
+    "title": "Clarifying Questions",
+    "description": "Answer these questions to improve plan accuracy",
+    "noQuestions": "No additional questions needed",
+    "skip": "Skip this question",
+    "placeholder": "Enter your answer..."
+  },
+  "generate": {
+    "title": "Generate Plan",
+    "description": "Review settings and generate your M&P Plan",
+    "generating": "Generating M&P Plan...",
+    "progress": "{{percent}}% complete",
+    "success": "M&P Plan generated successfully!",
+    "download": "Download Plan",
+    "downloadExcel": "Download Excel",
+    "downloadPdf": "Download PDF",
+    "viewSummary": "View Summary",
+    "newPlan": "Create New Plan"
+  },
+  "artifacts": {
+    "title": "Generated Artifacts",
+    "mpPlan": "M&P Plan Document",
+    "muaSummary": "MUA Summary",
+    "complianceReport": "Compliance Report",
+    "materialsList": "Materials List"
+  },
+  "toast": {
+    "sessionStarted": "Session started successfully",
+    "sessionResumed": "Session resumed",
+    "materialsParsed": "{{count}} materials parsed from MIUL",
+    "planGenerated": "M&P Plan generated successfully",
+    "downloadStarted": "Download started",
+    "error": {
+      "noFile": "Please upload a MIUL file",
+      "invalidFile": "Invalid file format. Please upload an Excel file",
+      "sessionFailed": "Failed to start session",
+      "generateFailed": "Failed to generate plan",
+      "downloadFailed": "Failed to download file"
+    }
+  }
+}
