@@ -1,0 +1,93 @@
+{
+  "appName": "MIRA V3",
+  "buttons": {
+    "search": "検索",
+    "submit": "送信",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "export": "エクスポート",
+    "exportCsv": "CSVエクスポート",
+    "generate": "生成",
+    "next": "次へ",
+    "back": "戻る",
+    "reset": "リセット",
+    "clear": "クリア",
+    "apply": "適用",
+    "close": "閉じる",
+    "add": "追加",
+    "remove": "削除",
+    "delete": "削除",
+    "edit": "編集",
+    "view": "表示",
+    "copy": "コピー",
+    "download": "ダウンロード",
+    "upload": "アップロード",
+    "refresh": "更新"
+  },
+  "status": {
+    "loading": "読み込み中...",
+    "error": "エラー",
+    "success": "成功",
+    "pending": "保留中",
+    "processing": "処理中...",
+    "complete": "完了",
+    "failed": "失敗",
+    "noResults": "結果が見つかりません",
+    "noData": "データがありません"
+  },
+  "labels": {
+    "material": "材料",
+    "materials": "材料",
+    "rating": "評価",
+    "status": "ステータス",
+    "description": "説明",
+    "name": "名前",
+    "type": "タイプ",
+    "date": "日付",
+    "actions": "アクション",
+    "details": "詳細",
+    "results": "結果",
+    "total": "合計",
+    "selected": "選択済み",
+    "all": "すべて",
+    "none": "なし",
+    "yes": "はい",
+    "no": "いいえ"
+  },
+  "ratings": {
+    "A": {
+      "label": "優秀",
+      "description": "承認済み、高い実績"
+    },
+    "B": {
+      "label": "良好",
+      "description": "一部制限付きで承認"
+    },
+    "C": {
+      "label": "条件付き",
+      "description": "追加テストが必要"
+    },
+    "X": {
+      "label": "非推奨",
+      "description": "使用が承認されていません"
+    }
+  },
+  "errors": {
+    "generic": "エラーが発生しました",
+    "networkError": "ネットワークエラーが発生しました。再試行してください。",
+    "notFound": "見つかりません",
+    "unauthorized": "アクセス権限がありません",
+    "validation": "入力内容を確認してください"
+  },
+  "tooltips": {
+    "resetOrder": "メニューの順序をリセット",
+    "reorderMenu": "メニュー項目を並べ替え",
+    "doneReordering": "並べ替え完了"
+  },
+  "messages": {
+    "copied": "クリップボードにコピーしました",
+    "saved": "変更を保存しました",
+    "deleted": "項目を削除しました",
+    "confirmDelete": "本当に削除しますか？"
+  }
+}

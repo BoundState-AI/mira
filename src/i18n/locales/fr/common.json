@@ -1,0 +1,93 @@
+{
+  "appName": "MIRA V3",
+  "buttons": {
+    "search": "Rechercher",
+    "submit": "Soumettre",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "export": "Exporter",
+    "exportCsv": "Exporter CSV",
+    "generate": "Générer",
+    "next": "Suivant",
+    "back": "Retour",
+    "reset": "Réinitialiser",
+    "clear": "Effacer",
+    "apply": "Appliquer",
+    "close": "Fermer",
+    "add": "Ajouter",
+    "remove": "Retirer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "copy": "Copier",
+    "download": "Télécharger",
+    "upload": "Téléverser",
+    "refresh": "Actualiser"
+  },
+  "status": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "pending": "En attente",
+    "processing": "Traitement...",
+    "complete": "Terminé",
+    "failed": "Échoué",
+    "noResults": "Aucun résultat trouvé",
+    "noData": "Aucune donnée disponible"
+  },
+  "labels": {
+    "material": "Matériau",
+    "materials": "Matériaux",
+    "rating": "Évaluation",
+    "status": "Statut",
+    "description": "Description",
+    "name": "Nom",
+    "type": "Type",
+    "date": "Date",
+    "actions": "Actions",
+    "details": "Détails",
+    "results": "Résultats",
+    "total": "Total",
+    "selected": "Sélectionné",
+    "all": "Tout",
+    "none": "Aucun",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "ratings": {
+    "A": {
+      "label": "Excellent",
+      "description": "Approuvé, héritage élevé"
+    },
+    "B": {
+      "label": "Bon",
+      "description": "Approuvé avec certaines restrictions"
+    },
+    "C": {
+      "label": "Conditionnel",
+      "description": "Nécessite des tests supplémentaires"
+    },
+    "X": {
+      "label": "Non recommandé",
+      "description": "Non approuvé pour utilisation"
+    }
+  },
+  "errors": {
+    "generic": "Une erreur est survenue",
+    "networkError": "Erreur réseau. Veuillez réessayer.",
+    "notFound": "Non trouvé",
+    "unauthorized": "Accès non autorisé",
+    "validation": "Veuillez vérifier vos données"
+  },
+  "tooltips": {
+    "resetOrder": "Réinitialiser l'ordre du menu",
+    "reorderMenu": "Réorganiser les éléments du menu",
+    "doneReordering": "Réorganisation terminée"
+  },
+  "messages": {
+    "copied": "Copié dans le presse-papiers",
+    "saved": "Modifications enregistrées",
+    "deleted": "Élément supprimé",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer ceci ?"
+  }
+}

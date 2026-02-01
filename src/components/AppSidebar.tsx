@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback, DragEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Droplet, FlaskConical, FileStack, FileCheck, MessageSquare, Brain, ShieldCheck, ClipboardList, FolderTree, GripVertical, RotateCcw, LucideIcon } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { BoundStateLogo } from '@/components/BoundStateLogo';
+import { LanguageSelector } from '@/components/LanguageSelector';
 import {
   Sidebar,
   SidebarContent,
@@ -22,21 +24,21 @@ import {
 
 interface NavItem {
   id: string;
-  title: string;
+  titleKey: string;
   url: string;
   icon: LucideIcon;
 }
 
 const DEFAULT_NAV_ITEMS: NavItem[] = [
-  { id: 'mp-plan', title: 'M&P Plan', url: '/mp-plan', icon: ClipboardList },
-  { id: 'query', title: 'Query', url: '/query', icon: MessageSquare },
-  { id: 'test-classes', title: 'Test Classes', url: '/test-classes', icon: FlaskConical },
-  { id: 'miul', title: 'MIUL Builder', url: '/miul', icon: FileStack },
-  { id: 'dt-editor', title: 'DT Editor', url: '/dt-editor', icon: FolderTree },
-  { id: 'mua', title: 'MUA Generator', url: '/mua', icon: FileCheck },
-  { id: 'compliance', title: 'Compliance', url: '/compliance', icon: ShieldCheck },
-  { id: 'gas-compatibility', title: 'Gas Compatibility', url: '/gas-compatibility', icon: Droplet },
-  { id: 'knowledge-twins', title: 'Knowledge Twins', url: '/', icon: Brain },
+  { id: 'mp-plan', titleKey: 'mpPlan', url: '/mp-plan', icon: ClipboardList },
+  { id: 'query', titleKey: 'query', url: '/query', icon: MessageSquare },
+  { id: 'test-classes', titleKey: 'testClasses', url: '/test-classes', icon: FlaskConical },
+  { id: 'miul', titleKey: 'miulBuilder', url: '/miul', icon: FileStack },
+  { id: 'dt-editor', titleKey: 'dtEditor', url: '/dt-editor', icon: FolderTree },
+  { id: 'mua', titleKey: 'muaGenerator', url: '/mua', icon: FileCheck },
+  { id: 'compliance', titleKey: 'compliance', url: '/compliance', icon: ShieldCheck },
+  { id: 'gas-compatibility', titleKey: 'gasCompatibility', url: '/gas-compatibility', icon: Droplet },
+  { id: 'knowledge-twins', titleKey: 'knowledgeTwins', url: '/', icon: Brain },
 ];
 
 const STORAGE_KEY = 'mira-sidebar-order';
@@ -75,6 +77,8 @@ function saveOrder(items: NavItem[]) {
 }
 
 export function AppSidebar() {
+  const { t } = useTranslation('navigation');
+  const { t: tCommon } = useTranslation('common');
   const [items, setItems] = useState<NavItem[]>(DEFAULT_NAV_ITEMS);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dropTargetIndex, setDropTargetIndex] = useState<number | null>(null);
@@ -152,7 +156,7 @@ export function AppSidebar() {
                     <RotateCcw className="h-3 w-3" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="right">Reset menu order</TooltipContent>
+                <TooltipContent side="right">{tCommon('tooltips.resetOrder')}</TooltipContent>
               </Tooltip>
             )}
             <Tooltip>
@@ -171,9 +175,10 @@ export function AppSidebar() {
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="right">
-                {isReorderMode ? 'Done reordering' : 'Reorder menu items'}
+                {isReorderMode ? tCommon('tooltips.doneReordering') : tCommon('tooltips.reorderMenu')}
               </TooltipContent>
             </Tooltip>
+            <LanguageSelector />
           </div>
         </div>
       </SidebarHeader>
@@ -217,7 +222,7 @@ export function AppSidebar() {
                         <GripVertical className="h-4 w-4 text-sidebar-foreground/40 flex-shrink-0 -ml-1" />
                       )}
                       <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
+                      <span>{t(item.titleKey)}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

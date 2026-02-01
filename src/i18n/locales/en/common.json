@@ -1,0 +1,93 @@
+{
+  "appName": "MIRA V3",
+  "buttons": {
+    "search": "Search",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "export": "Export",
+    "exportCsv": "Export CSV",
+    "generate": "Generate",
+    "next": "Next",
+    "back": "Back",
+    "reset": "Reset",
+    "clear": "Clear",
+    "apply": "Apply",
+    "close": "Close",
+    "add": "Add",
+    "remove": "Remove",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "copy": "Copy",
+    "download": "Download",
+    "upload": "Upload",
+    "refresh": "Refresh"
+  },
+  "status": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "pending": "Pending",
+    "processing": "Processing...",
+    "complete": "Complete",
+    "failed": "Failed",
+    "noResults": "No results found",
+    "noData": "No data available"
+  },
+  "labels": {
+    "material": "Material",
+    "materials": "Materials",
+    "rating": "Rating",
+    "status": "Status",
+    "description": "Description",
+    "name": "Name",
+    "type": "Type",
+    "date": "Date",
+    "actions": "Actions",
+    "details": "Details",
+    "results": "Results",
+    "total": "Total",
+    "selected": "Selected",
+    "all": "All",
+    "none": "None",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "ratings": {
+    "A": {
+      "label": "Excellent",
+      "description": "Approved, high heritage"
+    },
+    "B": {
+      "label": "Good",
+      "description": "Approved with some restrictions"
+    },
+    "C": {
+      "label": "Conditional",
+      "description": "Requires additional testing"
+    },
+    "X": {
+      "label": "Not Recommended",
+      "description": "Not approved for use"
+    }
+  },
+  "errors": {
+    "generic": "An error occurred",
+    "networkError": "Network error. Please try again.",
+    "notFound": "Not found",
+    "unauthorized": "Unauthorized access",
+    "validation": "Please check your input"
+  },
+  "tooltips": {
+    "resetOrder": "Reset menu order",
+    "reorderMenu": "Reorder menu items",
+    "doneReordering": "Done reordering"
+  },
+  "messages": {
+    "copied": "Copied to clipboard",
+    "saved": "Changes saved",
+    "deleted": "Item deleted",
+    "confirmDelete": "Are you sure you want to delete this?"
+  }
+}
