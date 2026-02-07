@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+"""
+Module:   Init  
+Purpose: API routers exposed by the BoundState service.
+
+BoundState AI 2025
+Version: 1.0.0
+Classification: BoundState Proprietary
+
+Co-Authored-By: Claude "Beth" <noreply@anthropic.com>
+Co-Authored-By: Fran OpenAI 5 <noreply@openai.com>
+Co-Authored-By: Grok 4.0 <noreply@x.ai>
+Co-Authored-By: Dr. Joseph Wilde, BoundState AI
+
+Compliance: NASA-CSET, SWE-013, SWE-032
+Safety Critical: True
+"""
+
+from __future__ import annotations
+
+from .search import router as search_router
+from .mira import router as mira_router
+from .aegis import router as aegis_router
+from .miul import router as miul_router
+from .bom import router as bom_router
+from .mua import router as mua_router
+from .mua_v6 import router as mua_v6_router
+from .hybrid_query import router as hybrid_query_router
+from .ui_endpoints import router as ui_router
+from .test_classes import router as test_classes_router
+from .compliance import router as compliance_router
+from .mp_plan import router as mp_plan_router
+from .o2 import router as o2_router
+from .mira_v4 import router as mira_v4_router
+import uuid
+
+__all__ = [
+    "search_router",
+    "mira_router",
+    "aegis_router",
+    "miul_router",
+    "bom_router",
+    "mua_router",
+    "mua_v6_router",
+    "hybrid_query_router",
+    "ui_router",
+    "test_classes_router",
+    "compliance_router",
+    "mp_plan_router",
+    "o2_router",
+    "mira_v4_router",
+]
+
+
+__safety_critical__ = True  # NASA SWE-032 compliance

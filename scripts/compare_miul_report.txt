@@ -1,0 +1,401 @@
+Loading Excel files...
+  Human: C:/Users/jwilde2/Desktop/DMLLV/Copy of DMLLV_MIUL_James.xlsx
+  V3:    C:/Users/jwilde2/Desktop/DMLLV/DMLLV_MIUL_v3.xlsx
+
+====================================================================================================
+  1. ROW COUNTS
+====================================================================================================
+  Human rows:  139
+  V3 rows:     143
+  Difference:  +4
+
+====================================================================================================
+  2. UNIQUE PART NUMBERS
+====================================================================================================
+  Unique in Human: 89
+  Unique in V3:    112
+  In common:       48
+
+  Parts in HUMAN but NOT in V3 (41):
+    - 01-885-06K                      Desc: ROD END, .375, .3750-24 RH THREAD                   NHA: MER07540-001
+    - 11-885-06K                      Desc: ROD END, .375, .3750-24 LH THREAD                   NHA: MER07540-001
+    - 16007                           Desc: BEARING, DEEP GROOVE, ⌀62mm OD, ⌀35mm ID            NHA: MER07543-001
+    - 2949T32                         Desc: HOIST RING, LIFTING, .3750-16 THD, 500LB            NHA: MER07543-001
+    - 5.                              Desc: LUBRICANT, LOX COMPATABLE                           NHA: MER07540-001; MER07560-001
+    - 50854SCS                        Desc: SPRING, COMPRESSION, 1.575 LG                       NHA: MER07584-001
+    - 51109                           Desc: BEARING, THRUST, ⌀65mm OD X ⌀45mm ID X 14mm         NHA: MER07543-001
+    - 6824                            Desc: BEARING, SINGLE ROW RADIAL, OPEN, ⌀150mm OD, ⌀120mm ID  NHA: MER07543-001
+    - 6915                            Desc: BEARING, THIN SECTION, ⌀105mm OD X ⌀75mm ID X 16mm ID  NHA: MER07543-001
+    - 97022A388                       Desc: RING SHIM, ⌀1.5 OD, ⌀1.0 ID, .010 THICK             NHA: MER07543-001
+    - AS4307K04                       Desc: UNION FITTING, -04, (.250), .4375-20 UNJF 3A THD    NHA: MER07570-001
+    - EH-22-C86                       Desc: RETAINING RING, INTERNAL, 22mm                      NHA: MER07573-001
+    - F-400521-04                     Desc: SEAL, K-PORT, GOLD PLATE, .25 NOM DIA PORT          NHA: MER07570-001
+    - M12133/2-100                    Desc: WASHER, SPRING TENSION, BELLEVILLE SPRING, ⌀1.0 ID  NHA: MER07543-001
+    - M12133/2-255                    Desc: WASHER, SPRING TENSION, BELLEVILLE SPRING, .250 ID; WASHER, SPRING TENSION, BELLEVILLE DISC SPRING, .250 ID  NHA: MER07560-001; MER07565-001
+    - M81935/3-6C                     Desc: LOCKING DEVICE FOR ROD END BEARINGS, ⌀.375          NHA: MER07540-001
+    - MER07540                        Desc: MER07540 Material Identification Usage List         NHA: 
+    - MER07540-003                    Desc: CONNECTING ROD ASSEMBLY                             NHA: MER07540-001
+    - MER07576                        Desc: ACTUATOR INTERNAL WELD ASSEMBLY                     NHA: MER07573-001
+    - MER07576-003                    Desc: ACTUATOR INTERNAL WELD ASSEMBLY                     NHA: MER07576
+    - MS14198N6                       Desc: LOCK, ROD END, EXTRA STRENGTH, HIGH PROFILE LUG     NHA: MER07540-001
+    - MS21209C4-10                    Desc: INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .2500-20 THD, .250 LG  NHA: MER07563-001
+    - MS21209C4-15                    Desc: INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .2500-20 THD, .375 LG  NHA: MER07563-001
+    - MS21209C5-15                    Desc: INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .3125-18 THD, .469 LG  NHA: MER07563-001
+    - MS21209C6-20                    Desc: INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .3750-16 THD, .75 LG  NHA: MER07563-001
+    - MS9390-440                      Desc: PIN, STRAIGHT, HEADLESS, DOWEL, .250 OD, .75 LG     NHA: MER07540-001
+    - NAS1149E0432R                   Desc: WASHER, FLAT, ⌀.265 ID, .032 THK; WASHER, FLAT, ⌀.250 NOM  NHA: MER07540-001; MER07543-001
+    - NAS1351N4-20                    Desc: SHCS, .2500-28 UNRF-3A, 1.250 LG                    NHA: MER07540-001
+    - NAS1351N4H16                    Desc: SHCS, DRILLED, .2500-28 UNRF-3A, 1.00 LG            NHA: MER07543-001
+    - NAS1352N4-10                    Desc: SHCS, .2500-20 UNRC-3A, .625 LG                     NHA: MER07565-001
+    - NAS1352N4-12                    Desc: SHCS, .2500-20 UNRC-3A, .750 LG                     NHA: MER07543-001
+    - NAS1352N4-14                    Desc: SHCS, .2500-20 UNRC-3A, .875 LG                     NHA: MER07543-001
+    - NAS1352N5-12                    Desc: SHCS, .3125-24 UNRF-3A, .750 LG                     NHA: MER07540-001
+    - NAS1352N5-16                    Desc: SHCS, .3125-18 UNRC-3A, 1.000 LG                    NHA: MER07560-001
+    - NAS509-4C                       Desc: NUT, JAM, DRILLED, .2500-28 UNJF-3B                 NHA: MER07543-001
+    - NAS509L6C                       Desc: NUT, JAM, DRILLED, .3750-24 LH THREAD               NHA: MER07540-001
+    - NAS6706U13                      Desc: BOLT, TENSION, HEX HEAD, CLOSE TOL, .3750-24 UNJF THD, 1.4 LG; BOLT, TENSION, HEX HEAD, CLOSE TOL, .3750-24 UNJF-3A, 1.390 LG  NHA: MER07540-001; MER07570-001
+    - NASM20995N32                    Desc: WIRE, SAFETY OR LOCK                                NHA: MER07543-001
+    - WHM-244-S86                     Desc: RETAINING RING, INTERNAL, 2-7/16 ID                 NHA: MER07543-001
+    - WHM-275-S86                     Desc: RETAINING RING, INTERNAL, 2 3/4                     NHA: MER07584-001
+    - WSM-137-C86 10.                 Desc: RETAINING RING, EXTERIOR                            NHA: MER07540-001
+
+  Parts in V3 but NOT in HUMAN (64):
+    - 01-885-08N                      Desc: ROD END, .375, .3750-24 RH THREAD                   NHA: MER07540-001
+    - 1                               Desc: VALVE BODY SUB-ASSEMBLY, 10 INCH VALVE              NHA: MER07543-001
+    - 10                              Desc: RING, INTERMEDIATE, ROTATIONAL, 10 INCH VALVE       NHA: MER07543-001
+    - 11                              Desc: SLIDER, ROTARY TANG, 10 INCH VALVE                  NHA: MER07543-001
+    - 11-885-606                      Desc: ROD END, .375, .3750-24 LH THREAD                   NHA: MER07540-001
+    - 12                              Desc: PIN, TRANSLATING, 10 INCH VALVE                     NHA: MER07543-001
+    - 13                              Desc: WASHER, SPRING TENSION, BELLEVILLE SPRING, Ø.25 ID  NHA: MER07543-001
+    - 14                              Desc: COVER, BEARING, 10 INCH VALVE                       NHA: MER07543-001
+    - 15                              Desc: BEARING, DEEP GROOVE, Ø62mm OD, Ø25mm ID            NHA: MER07543-001
+    - 16                              Desc: RETAINING RING, INTERNAL, 2-7/16 ID                 NHA: MER07543-001
+    - 17                              Desc: BEARING DISC, 10 INCH VALVE                         NHA: MER07543-001
+    - 18                              Desc: WASHER, SPRING TENSION, BELLEVILLE SPRING, Ø1.0 ID  NHA: MER07543-001
+    - 19                              Desc: RING SET, Ø1.5 OD, Ø1.0 ID, .010 THICK              NHA: MER07543-001
+    - 2                               Desc: SHAFT, OFFSET, SUB-ASSEMBLY, 10 INCH VALVE          NHA: MER07543-001
+    - 20                              Desc: LOWER CAM MOUNT, 10 INCH VALVE                      NHA: MER07543-001
+    - 22                              Desc: SHCS, .2500-20 UNJC-3A, .875 LG                     NHA: MER07543-001
+    - 23                              Desc: WASHER, FLAT, Ø.250 NOM; SHCS, .2500-20 UNJC-3A, .750 LG  NHA: MER07543-001
+    - 24                              Desc: POPPET SUB-ASSEMBLY, 10 INCH VALVE                  NHA: MER07543-001
+    - 25                              Desc: HOIST RING, LIFTING, .3750-16 THD, 500LB            NHA: MER07543-001
+    - 26                              Desc: LUBRICANT, LOW COMPATIBLE                           NHA: MER07543-001
+    - 27                              Desc: SHCS, DRILLED, .2500-28 UNJF-3A, 1.00 LG            NHA: MER07543-001
+    - 28                              Desc: NUT, JAM, DRILLED, .2500-28 UNJF-3B                 NHA: MER07543-001
+    - 29                              Desc: WIRE, SAFETY OR LOCK                                NHA: MER07543-001
+    - 3                               Desc: BEARING, THRUST, Ø66mm OD X Ø45mm ID X 14mm         NHA: MER07543-001
+    - 4                               Desc: SHAFT, CENTER, 10 INCH VALVE                        NHA: MER07543-001
+    - 5                               Desc: BEARING, THIN SECTION, Ø105mm OD X Ø75mm ID X 16mm ID  NHA: MER07543-001
+    - 5...                            Desc: LUBRICANT, LOW COMPATIBLE                           NHA: MER07540-001
+    - 50854/5CS                       Desc: SPRING, COMPRESSION, 1.875 LG                       NHA: MER07584-001
+    - 6                               Desc: BEARING, SINGLE ROW RADIAL, OPEN, Ø165mm OD, Ø120mm ID  NHA: MER07543-001
+    - 7                               Desc: OFFSET ROTARY SHAFT, LOWER, 10 INCH VALVE           NHA: MER07543-001
+    - 8                               Desc: OFFSET ROTARY SHAFT, UPPER, 10 INCH VALVE           NHA: MER07543-001
+    - 9                               Desc: TEFLON; LUBRICANT, LOX COMPATIBLE                   NHA: MER07543-001; MER07560-001
+    - AR                              Desc: LUBRICANT, LOX COMPATIBLE                           NHA: MER07565-001
+    - AR293K04                        Desc: FITTING, ADAPTER, UNION, FLARED TO BOSS, .25 NOM DIA PORT  NHA: MER07570-001
+    - AS4207K04                       Desc: UNION FITTING, .04 (.250), .4375-20 UNJF 3A THD     NHA: MER07570-001
+    - EH-2-C-65                       Desc: RETAINING RING, INTERNAL, 25mm                      NHA: MER07573-001
+    - F-4006241-04                    Desc: SEAL, K-PORT, GOLD PLATE, .25 NOM DIA PORT          NHA: MER07570-001
+    - M1213302-250                    Desc: WASHER, SPRING TENSION, BELLEVILLE SPRING, CRES     NHA: MER07570-001
+    - M121332-255                     Desc: WASHER, SPRING TENSION, BELLEVILLE SPRING, .250 ID  NHA: MER07560-001
+    - MER07540-ICD                    Desc: INTERFACE CONTROL DRAWING, 10 INCH VALVE            NHA: 
+    - MER07575-001                    Desc: ACTUATOR INTERNAL WELD ASSEMBLY                     NHA: MER07573-001
+    - MER70570-001                    Desc: BRACKET, ANGLE, ACTUATOR                            NHA: MER07570-001
+    - MER70570-002                    Desc: MOUNT BRACKET, ACTUATOR, 10 INCH VALVE              NHA: MER07570-001
+    - MER70575-001                    Desc: ACTUATOR WELD ASSEMBLY                              NHA: MER07570-001
+    - MFR07585-001                    Desc: POPPET, VALVE, 10 INCH                              NHA: 
+    - MS14188N8                       Desc: LOCK, ROD END, EXTRA STRENGTH, HIGH PROFILE LUG     NHA: MER07540-001
+    - MS19953-6C                      Desc: LOCKING DEVICE FOR ROD END BEARINGS, Ø.375          NHA: MER07540-001
+    - MS21902C10-10                   Desc: INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, 1.000-8, 1.000 LG  NHA: MER07567-001
+    - MS21902C4-10                    Desc: INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .2500-20, .390 LG  NHA: MER07567-001
+    - MS3390-440                      Desc: PIN, STRAIGHT, HEADLESS, DOWEL, .550 OD, .75 LG     NHA: MER07540-001
+    - MSH2090C9-10                    Desc: INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .2500-20 THD, .350 LG  NHA: MER07563-001
+    - MSH2090C9-15                    Desc: INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .3125-18 THD, .669 LG; INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .2500-20 THD, .375 LG  NHA: MER07563-001
+    - MSH2090C9-20                    Desc: INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .3750-16 THD, .79 LG  NHA: MER07563-001
+    - MT11833-X35                     Desc: WASHER, SPRING TENSION, BELLEVILLE DISC SPRING, .250 ID  NHA: MER07565-001
+    - NAS1149E0420R                   Desc: WASHER, FLAT, Ø.266 ID, .032 THK                    NHA: MER07540-001
+    - NAS1149E05H6R                   Desc: FLAT WASHER, .328 ID NOM, .063 THK                  NHA: MER07560-001
+    - NAS1351N4L-20                   Desc: SHCS, .2500-28 UNEF-3A, 1.250 LG                    NHA: MER07540-001
+    - NAS1352N6-16                    Desc: SHCS, .375-24 UNEF-3A, .750 LG                      NHA: MER07540-001
+    - NAS1523H3-16                    Desc: SHCS, .3125-18 UNRC-3A, 1.000 LG                    NHA: MER07560-001
+    - NAS1523M4-10                    Desc: SHCS, .2500-20 UNRC-3A, .625 LG                     NHA: MER07565-001
+    - NAS6706013                      Desc: BOLT, TENSION, HEX HEAD, CLOSE TOL, .3750-24 UNEF THD, 1.4 LG  NHA: MER07540-001
+    - NAS679G113                      Desc: BOLT, TENSION, HEX HEAD, CLOSE TOL, .3750-24 UNJF-3A, 1.390 LG  NHA: MER07570-001
+    - WFM-137-C86                     Desc: RETAINING RING, EXTERIOR                            NHA: MER07540-001
+    - WHA-275-588                     Desc: RETAINING RING, INTERNAL, 2 3/4                     NHA: MER07584-001
+
+====================================================================================================
+  3. DUPLICATE PART NUMBERS
+====================================================================================================
+  Human: 46 part numbers appear >1 time
+  V3:    27 part numbers appear >1 time
+
+====================================================================================================
+  4. ROW-LEVEL MATCHING (key: PN + NHA + Designation)
+====================================================================================================
+  Matched rows (same key):  15
+  Unmatched human rows:     124
+  Unmatched v3 rows:        128
+
+====================================================================================================
+  5. FIELD-BY-FIELD COMPARISON
+====================================================================================================
+  Strategy: For each common PN, match rows by NHA+Designation, then compare.
+
+
+----------------------------------------------------------------------------------------------------
+  5a. MATCH RATES PER FIELD
+----------------------------------------------------------------------------------------------------
+  Field                             Match /  Total     Rate
+  ------------------------------ --------   ------  -------
+  Designation                          15 /     15   100.0%
+  Material Specification                8 /     15    53.3%
+  Part Description                     10 /     15    66.7%
+  NHA                                  15 /     15   100.0%
+  Drawing Source                       15 /     15   100.0%
+  Change Letter                        15 /     15   100.0%
+  Process Specification                15 /     15   100.0%
+
+----------------------------------------------------------------------------------------------------
+  5b. ALL MISMATCHES BY FIELD
+----------------------------------------------------------------------------------------------------
+
+  --- Designation (0 mismatches) ---
+    (all matched!)
+
+  --- Material Specification (7 mismatches) ---
+    Part: MER07550-001               NHA: MER07540-001      
+      Human: <empty>
+      V3:    33982
+
+    Part: MER07567-001               NHA: MER07565-001      
+      Human: <empty>
+      V3:    33062
+
+    Part: MER07569-001               NHA: MER07560-001      
+      Human: <empty>
+      V3:    33@B2
+
+    Part: MER07570-001               NHA: MER07540-001      
+      Human: <empty>
+      V3:    33982
+
+    Part: MER07571-001               NHA: MER07540-001      
+      Human: <empty>
+      V3:    33982
+
+    Part: MS21043-6                  NHA: MER07540-001      
+      Human: AMS5525, AMS5731, AMS5732, AMS5737, OR AMS5853
+      V3:    <empty>
+
+    Part: MS21043-6                  NHA: MER07570-001      
+      Human: AMS5525, AMS5731, AMS5732, AMS5737, OR AMS5853
+      V3:    <empty>
+
+
+  --- Part Description (5 mismatches) ---
+    Part: ASME B18.3, ASTM F879      NHA: MER07560-001      
+      Human: SBHCS, .2500-20, 1.125 LG
+      V3:    SHWCS, .2500-20, 1.125 LG
+
+    Part: ASME B18.3, ASTM F879      NHA: MER07570-001      
+      Human: SBHCS, .2500-20 UNC-2A, .75 LG
+      V3:    SHCS, .2500-20 UNC-2A, .75 LG
+
+    Part: MER07564-001               NHA: MER07563-001      
+      Human: BODY, VALVE, 10 INCH VALVE
+      V3:    BODY, 10 INCH VALVE
+
+    Part: MS21043-6                  NHA: MER07540-001      
+      Human: NUT SELF-LOCKING, 800°F, REDUCED HEX, .3750-24 UNJF THD
+      V3:    NUT, HEX LOCKING, SOFT, REDUCED HGT, .3750-24 UNEF THD
+
+    Part: MS21043-6                  NHA: MER07570-001      
+      Human: NUT SELF-LOCKING, 800°F, REDUCED HEXAGON, .3750-24 UNJF-3B
+      V3:    NUT, SELF-LOCKING, 6007, REDUCED HEXAGON, .3750-24 UNJF-3B
+
+
+  --- NHA (0 mismatches) ---
+    (all matched!)
+
+  --- Drawing Source (0 mismatches) ---
+    (all matched!)
+
+  --- Change Letter (0 mismatches) ---
+    (all matched!)
+
+  --- Process Specification (0 mismatches) ---
+    (all matched!)
+
+====================================================================================================
+  6. MATERIAL COVERAGE GAPS
+====================================================================================================
+
+  6a. Human has Designation but V3 does NOT (0):
+    (none)
+
+  6b. V3 has Designation but HUMAN does NOT (0):
+    (none)
+
+====================================================================================================
+  7. UNMATCHED ROWS
+====================================================================================================
+
+  7a. Human rows with no V3 match (74):
+    Part: MER07540-001               NHA: MER07540            Desig: <empty>               DrawSrc: MER07540-001
+    Part: MER07543-001               NHA: MER07540-001        Desig: <empty>               DrawSrc: MER07540-001
+    Part: MER07543-001               NHA: MER07540-001        Desig: <empty>               DrawSrc: MER07543-001
+    Part: MER07545-001               NHA: MER07563-001        Desig: 7075-T651 ALUMINUM    DrawSrc: MER07545-001
+    Part: MER07545-001               NHA: MER07543-001        Desig: 7075 AL               DrawSrc: MER07543-001
+    Part: MER07546-001               NHA: MER07563-001        Desig: A286                  DrawSrc: MER07546-001
+    Part: MER07546-001               NHA: MER07543-001        Desig: A286                  DrawSrc: MER07543-001
+    Part: MER07548-001               NHA: MER07570-001        Desig: 7075 AL               DrawSrc: MER07570-001
+    Part: MER07548-001               NHA: MER07570-001        Desig: 7075-T651 ALUMINUM    DrawSrc: MER07548-001
+    Part: MER07550-001               NHA: MER07540-001        Desig: A286 CRES             DrawSrc: MER07550-001
+    Part: MER07553-001               NHA: MER07543-001        Desig: A286                  DrawSrc: MER07543-001
+    Part: MER07553-001               NHA: MER07543-001        Desig: A286 CRES             DrawSrc: MER07553-001
+    Part: MER07554-001               NHA: MER07543-001        Desig: A286                  DrawSrc: MER07543-001
+    Part: MER07554-001               NHA: MER07543-001        Desig: A286 CRES             DrawSrc: MER07554-001
+    Part: MER07555-001               NHA: MER07543-001        Desig: AL/BRONZE ALLOY       DrawSrc: MER07543-001
+    Part: MER07555-001               NHA: MER07543-001        Desig: ALUMINUM BRONZE ALLOY  DrawSrc: MER07555-001
+    Part: MER07556-001               NHA: MER07543-001        Desig: A286                  DrawSrc: MER07543-001
+    Part: MER07556-001               NHA: MER07543-001        Desig: A286 CRES             DrawSrc: MER07556-001
+    Part: MER07557-001               NHA: MER07543-001        Desig: A286                  DrawSrc: MER07543-001
+    Part: MER07557-001               NHA: MER07543-001        Desig: A286 STAINLESS STEEL  DrawSrc: MER07557-001
+    Part: MER07558-001               NHA: MER07543-001        Desig: A286                  DrawSrc: MER07543-001
+    Part: MER07558-001               NHA: MER07543-001        Desig: A286 STAINLESS STEEL  DrawSrc: MER07558-001
+    Part: MER07559-001               NHA: MER07543-001        Desig: A286                  DrawSrc: MER07543-001
+    Part: MER07559-001               NHA: MER07543-001        Desig: A286 STAINLESS STEEL  DrawSrc: MER07559-001
+    Part: MER07560-001               NHA: MER07540-001        Desig: <empty>               DrawSrc: MER07560-001
+    Part: MER07560-001               NHA: MER07543-001        Desig: <empty>               DrawSrc: MER07543-001
+    Part: MER07561-001               NHA: MER07560-001        Desig: 7075 AL               DrawSrc: MER07560-001
+    Part: MER07561-001               NHA: MER07543-001        Desig: 7075-T651 ALUMINUM    DrawSrc: MER07561-001
+    Part: MER07562-001               NHA: MER07560-001        Desig: PCTFE                 DrawSrc: MER07560-001
+    Part: MER07562-001               NHA: MER07560-001        Desig: PCTFE                 DrawSrc: MER07562-001
+    Part: MER07563-001               NHA: MER07560-001        Desig: MISC                  DrawSrc: MER07560-001
+    Part: MER07563-001               NHA: MER07560-001        Desig: <empty>               DrawSrc: MER07563-001
+    Part: MER07564-001               NHA: MER07560-001        Desig: 7075-T651 ALUMINUM    DrawSrc: MER07564-001
+    Part: MER07565-001               NHA: MER07563-001        Desig: <empty>               DrawSrc: MER07565-001
+    Part: MER07565-001               NHA: MER07543-001        Desig: <empty>               DrawSrc: MER07543-001
+    Part: MER07566-001               NHA: MER07565-001        Desig: A286                  DrawSrc: MER07565-001
+    Part: MER07566-001               NHA: MER07565-001        Desig: A286 CRES             DrawSrc: MER07566-001
+    Part: MER07567-001               NHA: MER07565-001        Desig: 7075 ALUMINUM         DrawSrc: MER07567-001
+    Part: MER07568-001               NHA: MER07565-001        Desig: 7075 ALUMINUM         DrawSrc: MER07568-001
+    Part: MER07569-001               NHA: MER07543-001        Desig: 7075 ALUMINUM         DrawSrc: MER07569-001
+    Part: MER07570-001               NHA: MER07540-001        Desig: <empty>               DrawSrc: MER07570-001
+    Part: MER07571-001               NHA: MER07540-001        Desig: A286 CRES             DrawSrc: MER07571-001
+    Part: MER07572-001               NHA: MER07570-001        Desig: A286                  DrawSrc: MER07570-001
+    Part: MER07572-001               NHA: MER07570-001        Desig: A286 CRES             DrawSrc: MER07572-001
+    Part: MER07573-001               NHA: MER07570-001        Desig: INCONEL               DrawSrc: MER07570-001
+    Part: MER07573-001               NHA: MER07570-001        Desig: <empty>               DrawSrc: MER07573-001
+    Part: MER07574-001               NHA: MER07573-001        Desig: INCONEL 625           DrawSrc: MER07573-001
+    Part: MER07574-001               NHA: MER07570-001        Desig: INCONEL 625           DrawSrc: MER07574-001
+    Part: MER07576-001               NHA: MER07573-001        Desig: <empty>               DrawSrc: MER07573-001
+    Part: MER07576-005               NHA: MER07576            Desig: <empty>               DrawSrc: MER07576
+    Part: MER07576-007               NHA: MER07576            Desig: <empty>               DrawSrc: MER07576
+    Part: MER07577-001               NHA: MER07576            Desig: INCONEL 625           DrawSrc: MER07576
+    Part: MER07577-001               NHA: MER07573-001        Desig: INCONEL 625           DrawSrc: MER07577-001
+    Part: MER07578-001               NHA: MER07573-001        Desig: VESPEL SP-3 POLYIMIDE RESIN  DrawSrc: MER07573-001
+    Part: MER07578-001               NHA: MER07576            Desig: VESPEL SP-3 POLYIMIDE RESIN  DrawSrc: MER07578-001
+    Part: MER07579-001               NHA: MER07573-001        Desig: VESPEL SP-3 POLYIMIDE RESIN  DrawSrc: MER07573-001
+    Part: MER07579-001               NHA: MER07576            Desig: VESPEL SP-3 POLYIMIDE RESIN  DrawSrc: MER07579-001
+    Part: MER07580-001               NHA: MER07573-001        Desig: INCONEL 625           DrawSrc: MER07580-001
+    Part: MER07581-001               NHA: MER07576            Desig: INCONEL 625           DrawSrc: MER07576
+    Part: MER07581-001               NHA: MER07576            Desig: INCONEL 625           DrawSrc: MER07581-001
+    Part: MER07582-001               NHA: MER07576            Desig: INCONEL 718           DrawSrc: MER07576
+    Part: MER07582-001               NHA: MER07576            Desig: INCONEL 718           DrawSrc: MER07582-001
+    Part: MER07583-001               NHA: MER07576            Desig: INCONEL 718           DrawSrc: MER07576
+    Part: MER07583-001               NHA: MER07576            Desig: INCONEL 718           DrawSrc: MER07583-001
+    Part: MER07584-001               NHA: MER07563-001        Desig: A286                  DrawSrc: MER07584-001
+    Part: MER07584-001               NHA: MER07543-001        Desig: A286                  DrawSrc: MER07543-001
+    Part: MER07585-001               NHA: MER07584-001        Desig: A286 CRES             DrawSrc: MER07585-001
+    Part: MER07586-001               NHA: MER07584-001        Desig: A286 CRES             DrawSrc: MER07586-001
+    Part: MER07587-001               NHA: MER07584-001        Desig: A286 CRES             DrawSrc: MER07587-001
+    Part: MER07588-001               NHA: MER07584-001        Desig: INCONEL 718           DrawSrc: MER07588-001
+    Part: MS20995N32                 NHA: MER07540-001        Desig: NICKEL ALLOY          DrawSrc: MER07540-001
+    Part: NAS1149E0516R              NHA: MER07540-001        Desig: A286 (160 KSI)        DrawSrc: MER07540-001
+    Part: NAS1149E0516R              NHA: MER07560-001        Desig: A286                  DrawSrc: MER07560-001
+    Part: NAS509-6C                  NHA: MER07540-001        Desig: A286 (150 KSI)        DrawSrc: MER07540-001
+
+  7b. V3 rows with no Human match (60):
+    Part: MER07540-001               NHA: <empty>             Desig: <empty>               DrawSrc: MER07540-001
+    Part: MER07543-001               NHA: MER07540-001        Desig: A286 SST. RECOMMENDED SOURCE: SMALLEY STEEL RING CO WWW.SMALLEY.COM PHONE: 847-719-5900 ALTERNATE: ROTOR CLIP WWW.ROTORCLIP.COM PHONE: 732-469-7333  DrawSrc: MER07540-001
+    Part: MER07543-001               NHA: <empty>             Desig: <empty>               DrawSrc: MER07543-001
+    Part: MER07545-001               NHA: <empty>             Desig: ALUMINUM ALLOY 7075-T651  DrawSrc: MER07545-001
+    Part: MER07546-001               NHA: <empty>             Desig: A286, UNS S66286      DrawSrc: MER07546-001
+    Part: MER07548-001               NHA: <empty>             Desig: ALUMINUM ALLOY 7075-T651  DrawSrc: MER07548-001
+    Part: MER07550-001               NHA: MER07540-001        Desig: A286 CRES, UNS S66286  DrawSrc: MER07540-001
+    Part: MER07550-001               NHA: <empty>             Desig: A286 CRES, UNS S66286  DrawSrc: MER07550-001
+    Part: MER07553-001               NHA: <empty>             Desig: A286 CRES             DrawSrc: MER07553-001
+    Part: MER07554-001               NHA: <empty>             Desig: A286 CRES             DrawSrc: MER07554-001
+    Part: MER07555-001               NHA: <empty>             Desig: ALUMINUM BRONZE       DrawSrc: MER07555-001
+    Part: MER07556-001               NHA: <empty>             Desig: A286 CRES, UNS S66286  DrawSrc: MER07556-001
+    Part: MER07557-001               NHA: <empty>             Desig: A286 CRES             DrawSrc: MER07557-001
+    Part: MER07558-001               NHA: <empty>             Desig: A286 CRES             DrawSrc: MER07558-001
+    Part: MER07559-001               NHA: <empty>             Desig: A286 SST              DrawSrc: MER07559-001
+    Part: MER07560-001               NHA: <empty>             Desig: <empty>               DrawSrc: MER07560-001
+    Part: MER07561-001               NHA: <empty>             Desig: ALUMINUM ALLOY 7075-T651  DrawSrc: MER07561-001
+    Part: MER07562-001               NHA: <empty>             Desig: PCTFE                 DrawSrc: MER07562-001
+    Part: MER07563-001               NHA: <empty>             Desig: <empty>               DrawSrc: MER07563-001
+    Part: MER07564-001               NHA: <empty>             Desig: ALUMINUM ALLOY 356-T6/T51  DrawSrc: MER07564-001
+    Part: MER07565-001               NHA: <empty>             Desig: <empty>               DrawSrc: MER07565-001
+    Part: MER07565-001               NHA: MER07565-001        Desig: A286                  DrawSrc: MER07565-001
+    Part: MER07566-001               NHA: <empty>             Desig: A286 CRES             DrawSrc: MER07566-001
+    Part: MER07567-001               NHA: <empty>             Desig: <empty>               DrawSrc: MER07567-001
+    Part: MER07568-001               NHA: MER07567-001        Desig: PER A/L               DrawSrc: MER07567-001
+    Part: MER07568-001               NHA: <empty>             Desig: ALUMINUM ALLOY 7075-T651  DrawSrc: MER07568-001
+    Part: MER07569-001               NHA: <empty>             Desig: ALUMINUM ALLOY 7075-T651  DrawSrc: MER07569-001
+    Part: MER07570-001               NHA: <empty>             Desig: <empty>               DrawSrc: MER07570-001
+    Part: MER07571-001               NHA: <empty>             Desig: A286 CRES             DrawSrc: MER07571-001
+    Part: MER07572-001               NHA: <empty>             Desig: A286 CRES             DrawSrc: MER07572-001
+    Part: MER07573-001               NHA: <empty>             Desig: <empty>               DrawSrc: MER07573-001
+    Part: MER07574-001               NHA: MER07573-001        Desig: INCONEL 718           DrawSrc: MER07573-001
+    Part: MER07574-001               NHA: <empty>             Desig: INCONEL 625           DrawSrc: MER07574-001
+    Part: MER07576-001               NHA: <empty>             Desig: <empty>               DrawSrc: MER07576-001
+    Part: MER07576-005               NHA: MER07576-001        Desig: <empty>               DrawSrc: MER07576-001
+    Part: MER07576-007               NHA: MER07576-001        Desig: INCONEL 718           DrawSrc: MER07576-001
+    Part: MER07577-001               NHA: MER07576-001        Desig: INCONEL 625           DrawSrc: MER07576-001
+    Part: MER07577-001               NHA: <empty>             Desig: INCONEL 625, UNS N06625  DrawSrc: MER07577-001
+    Part: MER07578-001               NHA: MER07573-001        Desig: VESPEL SP-21          DrawSrc: MER07573-001
+    Part: MER07578-001               NHA: MER07576-001        Desig: VESPEL SP-3, Type HM OR Type HP POLYIMIDE RESIN  DrawSrc: MER07576-001
+    Part: MER07578-001               NHA: <empty>             Desig: VESPEL SP-3, Type HM OR Type HP POLYIMIDE RESIN  DrawSrc: MER07578-001
+    Part: MER07579-001               NHA: MER07573-001        Desig: VESPEL SP-21          DrawSrc: MER07573-001
+    Part: MER07579-001               NHA: <empty>             Desig: VESPEL SP-3, TYPE IIIM OR TYPE IIIP, POLYIMIDE RESIN  DrawSrc: MER07579-001
+    Part: MER07580-001               NHA: MER07560-001        Desig: 7075 AL               DrawSrc: MER07560-001
+    Part: MER07580-001               NHA: <empty>             Desig: INCONEL 625           DrawSrc: MER07580-001
+    Part: MER07581-001               NHA: MER07576-001        Desig: INCONEL 625           DrawSrc: MER07576-001
+    Part: MER07581-001               NHA: <empty>             Desig: INCONEL 625           DrawSrc: MER07581-001
+    Part: MER07582-001               NHA: MER07560-001        Desig: PCTFE                 DrawSrc: MER07560-001
+    Part: MER07582-001               NHA: <empty>             Desig: INCONEL 718           DrawSrc: MER07582-001
+    Part: MER07583-001               NHA: MER07560-001        Desig: MISC                  DrawSrc: MER07560-001
+    Part: MER07583-001               NHA: <empty>             Desig: INCONEL 718           DrawSrc: MER07583-001
+    Part: MER07584-001               NHA: <empty>             Desig: <empty>               DrawSrc: MER07584-001
+    Part: MER07585-001               NHA: MER07576-001        Desig: INCONEL 718           DrawSrc: MER07576-001
+    Part: MER07586-001               NHA: <empty>             Desig: A286 CRES             DrawSrc: MER07586-001
+    Part: MER07587-001               NHA: <empty>             Desig: A286 CRES             DrawSrc: MER07587-001
+    Part: MER07588-001               NHA: <empty>             Desig: INCONEL 718           DrawSrc: MER07588-001
+    Part: MS20995N32                 NHA: MER07540-001        Desig: NICKEL                DrawSrc: MER07540-001
+    Part: NAS1149E0516R              NHA: MER07540-001        Desig: A286 (180 KSI)        DrawSrc: MER07540-001
+    Part: NAS509-6C                  NHA: MER07540-001        Desig: A286 (180 KSI)        DrawSrc: MER07540-001
+    Part: NAS509-6C                  NHA: MER07540-001        Desig: A286 (180 KSI)        DrawSrc: MER07540-001
+
+====================================================================================================
+  8. SUMMARY
+====================================================================================================
+  Total row-pairs compared:       15
+  Total field comparisons:        105
+  Total field matches:            93
+  Total field mismatches:         12
+  Overall field match rate:       88.6%
+
+  Parts only in Human:            41
+  Parts only in V3:               64
+  Human rows unmatched:           74
+  V3 rows unmatched:              60
+  Human has material, V3 missing: 0
+  V3 has material, Human missing: 0
+
+====================================================================================================
+  Report complete.
+====================================================================================================

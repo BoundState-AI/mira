@@ -1,0 +1,126 @@
+# ============================================
+# BoundState Backend - .gitignore
+# ============================================
+
+# --- SECRETS (NEVER COMMIT) ---
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+
+# --- LARGE DATA DIRECTORIES ---
+data/
+raw/
+EM32/
+sandbox/
+temp/
+uploads/
+logs/
+C:/
+
+# --- FAISS INDEXES (binary, rebuild from DB) ---
+mira/databases/
+mira/MIRA_V2/data/faiss_indexes/
+mira/MIRA_V2/data/bok_embeddings/
+mira/MIRA_V2/data/mua_embeddings/
+
+# --- GENERATED OUTPUT ---
+bok_triage_output/
+bok_ultimate_output/
+discovery_index/
+test_discovery_index/
+athena_files/
+data_laundering/
+
+# --- FRONTEND BUILD ARTIFACTS ---
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# --- PYTHON ARTIFACTS ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# --- LOG FILES ---
+*.log
+
+# --- DOCS: Binary files (PDFs, Office docs — not source code) ---
+docs/**/*.pdf
+docs/**/*.docx
+docs/**/*.xlsx
+docs/**/*.pptx
+docs/**/*.png
+docs/**/*.PNG
+docs/**/*.mpp
+docs/**/*.fts
+
+# --- ROOT-LEVEL JUNK FILES ---
+# (transient outputs, one-off scratch)
+nul
+*BoundStatesearch_results.txt
+/search_output.txt
+/SESSION_STATUS.md
+/h2_evidence.json
+/pfas_smiles.json
+/triage_results.json
+/ingestion_report_*.json
+/gpe_test_*.log
+/miul_*.txt
+/miul_*.csv
+/miul_*.xlsx
+/MIUL_*.xlsx
+/test_result.txt
+/test_error.txt
+/rebuild_result.txt
+/miul_parts_list.csv
+/mua_batch_parse.log
+
+# --- ROOT-LEVEL SCRATCH SCRIPTS ---
+# (debug/verify/check — not production code)
+/analyze_miul_output.py
+/check_*.py
+/compare_results.py
+/debug_*.py
+/fetch_fluorine.py
+/list_tables.py
+/lookup_*.py
+/populate_miul_codes.py
+/read_miul*.py
+/rebuild_miul.py
+/review_triage.py
+/run_gpe_test.py
+/run_triage.py
+/show_*.py
+/test_family_patterns.py
+/test_gpe_extraction.py
+/test_hierarchy_fix.py
+/test_james_comparison.py
+/test_miul_fixes.py
+/test_spec_*.py
+/update_headers*.py
+/update_miul_with_07584.py
+/verify_*.py
+
+# --- EDITOR / OS ---
+.vscode/
+.idea/
+.claude/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db

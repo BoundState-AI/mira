@@ -1,0 +1,380 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "H2EvidenceObject",
+  "description": "Hydrogen compatibility evidence for Knowledge Twin v2.1 - aligned with Fran's spec",
+  "type": "object",
+  "required": [
+    "material_name",
+    "hee_index",
+    "source"
+  ],
+  "properties": {
+    "material_name": {
+      "type": "string",
+      "description": "Alloy name as written in source"
+    },
+    "uns_number": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[ACGHJKMNRSTW][0-9]{5}$"
+    },
+    "material_family": {
+      "type": "string",
+      "enum": [
+        "austenitic_ss",
+        "nitrogen_ss",
+        "ph_ss",
+        "martensitic_ss",
+        "ferritic_ss",
+        "duplex_ss",
+        "nickel_superalloy",
+        "iron_superalloy",
+        "cobalt_superalloy",
+        "nickel_alloy",
+        "low_alloy_steel",
+        "carbon_steel",
+        "aluminum",
+        "copper",
+        "titanium",
+        "unknown"
+      ]
+    },
+    "heat_treatment": {
+      "type": "object",
+      "properties": {
+        "condition": {
+          "type": "string",
+          "enum": [
+            "annealed",
+            "solution_treated",
+            "solution_treated_aged",
+            "quenched_tempered",
+            "normalized",
+            "as_received",
+            "cold_worked",
+            "unknown"
+          ]
+        },
+        "solution_temp_c": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "solution_time_hr": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "age_temp_c": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "age_time_hr": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Raw heat treatment text if parsing unclear"
+        }
+      }
+    },
+    "product_form": {
+      "type": "string",
+      "enum": [
+        "plate",
+        "bar",
+        "rolled_bar",
+        "forging",
+        "sheet",
+        "tubing",
+        "wire",
+        "casting",
+        "PM",
+        "unknown"
+      ]
+    },
+    "weld_state": {
+      "type": "string",
+      "enum": [
+        "base_metal",
+        "weld_metal",
+        "HAZ",
+        "fusion_zone"
+      ],
+      "default": "base_metal"
+    },
+    "grain_direction": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "longitudinal",
+        "transverse",
+        "short_transverse",
+        null
+      ]
+    },
+    "strength": {
+      "type": "object",
+      "description": "Material strength - needed for R004 high-strength rule",
+      "properties": {
+        "yield_mpa": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "uts_mpa": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "properties": {
+        "phase": {
+          "type": "string",
+          "enum": [
+            "GH2",
+            "LH2",
+            "unknown"
+          ],
+          "description": "GH2=gaseous hydrogen, LH2=liquid hydrogen (cryogenic). CRITICAL: crossing -150°C is a regime change."
+        },
+        "pressure_mpa": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "temperature_c": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "reference_gas": {
+          "type": "string",
+          "enum": [
+            "helium",
+            "air",
+            "nitrogen",
+            "argon",
+            "unknown"
+          ]
+        }
+      }
+    },
+    "loading": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "static",
+            "cyclic",
+            "impact",
+            "unknown"
+          ],
+          "description": "Loading mode - cyclic is generally worse than static"
+        },
+        "strain_rate_per_s": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "stress_mpa": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "r_ratio": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "For cyclic: min/max stress ratio"
+        }
+      }
+    },
+    "test": {
+      "type": "object",
+      "properties": {
+        "specimen_type": {
+          "type": "string",
+          "enum": [
+            "smooth",
+            "notched",
+            "precracked",
+            "unknown"
+          ]
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "ASTM G129, ASTM E1681, etc."
+        },
+        "kt_factor": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Stress concentration factor for notched specimens"
+        }
+      }
+    },
+    "he_mechanism": {
+      "type": "string",
+      "enum": [
+        "HEE",
+        "IHE",
+        "HRE",
+        "unknown"
+      ],
+      "description": "CRITICAL - do not mix mechanisms. HEE=external gas, IHE=internal/charged hydrogen, HRE=hydride formation"
+    },
+    "metrics": {
+      "type": "object",
+      "description": "Property ratios (H2/reference). All on 0-1 scale.",
+      "properties": {
+        "nts_ratio": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1.5
+        },
+        "ra_ratio": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1.5
+        },
+        "el_ratio": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1.5
+        },
+        "yield_ratio": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1.5
+        },
+        "tensile_ratio": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1.5
+        },
+        "kth_ratio": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1.5,
+          "description": "Threshold stress intensity ratio"
+        }
+      }
+    },
+    "hee_index": {
+      "type": "number",
+      "description": "Primary embrittlement metric (0-1 scale, use NTS ratio if available)",
+      "minimum": 0,
+      "maximum": 1.5
+    },
+    "hee_band": {
+      "type": "string",
+      "description": "NASA classification: negligible(0.97-1.0), small(0.90-0.96), high(0.70-0.89), severe(0.50-0.69), extreme(<0.50)",
+      "enum": [
+        "negligible",
+        "small",
+        "high",
+        "severe",
+        "extreme"
+      ]
+    },
+    "grade": {
+      "type": "string",
+      "enum": [
+        "primary_test",
+        "secondary_summary",
+        "guideline_statement"
+      ],
+      "description": "CRITICAL: primary_test=direct test result, secondary_summary=aggregated from multiple tests, guideline_statement=general guidance without specific test. Guideline statements must NEVER dominate over primary tests."
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "document"
+      ],
+      "properties": {
+        "document": {
+          "type": "string"
+        },
+        "table": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "figure": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "page": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "authors": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Any qualifications, footnotes, or caveats from the source"
+    }
+  }
+}

@@ -1,0 +1,349 @@
+{
+  "_meta": {
+    "source": "NSS 1740.16, Table A5.8",
+    "title": "Susceptibility of Materials to Embrittlement in Hydrogen",
+    "test_conditions": {
+      "pressure_psi": 10000,
+      "temperature_f": 72,
+      "medium": "GH2",
+      "reference": "He"
+    },
+    "threshold_rule": "H2/He notched strength ratio >= 0.75 indicates H2 compatible",
+    "citation": "Chandler, W.T. and R.J. Walter, 'Testing to Determine the Effect of High Pressure Hydrogen Environments on the Mechanical Properties of Metals,' in Hydrogen Embrittlement Testing, ASTM A-93",
+    "levels": {
+      "negligible": {"min_ratio": 0.90, "color": "green", "label": "Negligible embrittlement"},
+      "slight": {"min_ratio": 0.75, "color": "light_green", "label": "Slight embrittlement"},
+      "severe": {"min_ratio": 0.50, "color": "orange", "label": "Severe embrittlement"},
+      "extreme": {"min_ratio": 0.0, "color": "red", "label": "Extreme embrittlement"}
+    },
+    "version": "1.0.0",
+    "created_by": "Dr. Joseph Wilde / Beth (Claude)",
+    "created_at": "2025-02-04"
+  },
+  "materials": [
+    {
+      "id": "a58_001",
+      "name": "18Ni-250 Maraging Steel",
+      "h2_he_ratio": 0.12,
+      "level": "extreme",
+      "maptis_patterns": ["MARAGING"],
+      "maptis_exclude": [],
+      "notes": "Notched ratio 0.12, unnotched 0.68. Extreme loss of ductility."
+    },
+    {
+      "id": "a58_002",
+      "name": "410 Stainless Steel",
+      "h2_he_ratio": 0.22,
+      "level": "extreme",
+      "maptis_patterns": ["STAINLESS STEEL 410", "CRES 410"],
+      "maptis_exclude": ["410CB", "410S"],
+      "notes": "Martensitic SS. Notched ratio 0.22."
+    },
+    {
+      "id": "a58_003",
+      "name": "1042 Steel (quenched and tempered)",
+      "h2_he_ratio": 0.22,
+      "level": "extreme",
+      "maptis_patterns": ["STEEL 1042", "1042 STEEL"],
+      "maptis_exclude": [],
+      "notes": "QT condition. Normalized condition (0.75) is separate entry."
+    },
+    {
+      "id": "a58_004",
+      "name": "17-7 PH Stainless Steel",
+      "h2_he_ratio": 0.23,
+      "level": "extreme",
+      "maptis_patterns": ["17-7PH", "17-7 PH", "STAINLESS STEEL 17-7"],
+      "maptis_exclude": [],
+      "notes": "Precipitation-hardening martensitic SS."
+    },
+    {
+      "id": "a58_005",
+      "name": "Fe-9Ni-4Co-0.20C",
+      "h2_he_ratio": 0.24,
+      "level": "extreme",
+      "maptis_patterns": ["FE-9NI-4CO", "9NI-4CO"],
+      "maptis_exclude": [],
+      "notes": "High-strength steel. Notched ratio 0.24."
+    },
+    {
+      "id": "a58_006",
+      "name": "H-11 Tool Steel",
+      "h2_he_ratio": 0.25,
+      "level": "extreme",
+      "maptis_patterns": ["H-11", "H11 TOOL"],
+      "maptis_exclude": [],
+      "notes": "Hot-work tool steel."
+    },
+    {
+      "id": "a58_007",
+      "name": "Rene 41",
+      "h2_he_ratio": 0.27,
+      "level": "extreme",
+      "maptis_patterns": ["RENE 41", "RENE  41"],
+      "maptis_exclude": [],
+      "notes": "Nickel superalloy. Severe embrittlement despite being Ni-based."
+    },
+    {
+      "id": "a58_008",
+      "name": "Electro-Formed Nickel",
+      "h2_he_ratio": 0.31,
+      "level": "extreme",
+      "maptis_patterns": ["ELECTRO-FORMED NICKEL", "ELECTROFORMED NICKEL"],
+      "maptis_exclude": [],
+      "notes": "Electrodeposited Ni. Fine grain structure highly susceptible."
+    },
+    {
+      "id": "a58_009",
+      "name": "4140 Steel",
+      "h2_he_ratio": 0.40,
+      "level": "extreme",
+      "maptis_patterns": ["STEEL 4140", "4140 STEEL", "AISI 4140"],
+      "maptis_exclude": [],
+      "notes": "Cr-Mo low-alloy steel."
+    },
+    {
+      "id": "a58_010",
+      "name": "Inconel 718",
+      "h2_he_ratio": 0.46,
+      "level": "extreme",
+      "maptis_patterns": ["INCONEL 718", "INCONEL  718"],
+      "maptis_exclude": [],
+      "notes": "Precipitation-strengthened Ni superalloy. Significant HEE."
+    },
+    {
+      "id": "a58_011",
+      "name": "440C Stainless Steel",
+      "h2_he_ratio": 0.50,
+      "level": "severe",
+      "maptis_patterns": ["STAINLESS STEEL 440C", "CRES 440C"],
+      "maptis_exclude": [],
+      "notes": "Martensitic high-carbon SS."
+    },
+    {
+      "id": "a58_012",
+      "name": "Ti-6Al-4V (STA)",
+      "h2_he_ratio": 0.58,
+      "level": "severe",
+      "maptis_patterns": ["TI-6AL-4V", "TITANIUM 6AL-4V", "TI 6AL-4V", "TI6AL4V"],
+      "maptis_exclude": [],
+      "notes": "Solution-treated and aged. Annealed condition (0.79) is separate. Condition-dependent."
+    },
+    {
+      "id": "a58_013",
+      "name": "430F Stainless Steel",
+      "h2_he_ratio": 0.68,
+      "level": "severe",
+      "maptis_patterns": ["STAINLESS STEEL 430F", "CRES 430F"],
+      "maptis_exclude": [],
+      "notes": "Ferritic SS free-machining."
+    },
+    {
+      "id": "a58_014",
+      "name": "Nickel 270",
+      "h2_he_ratio": 0.70,
+      "level": "severe",
+      "maptis_patterns": ["NICKEL 270"],
+      "maptis_exclude": [],
+      "notes": "High-purity Ni. Significant ductility loss."
+    },
+    {
+      "id": "a58_015",
+      "name": "A515 Steel",
+      "h2_he_ratio": 0.73,
+      "level": "severe",
+      "maptis_patterns": ["A515", "STEEL A515"],
+      "maptis_exclude": [],
+      "notes": "Carbon steel for elevated temperature service."
+    },
+    {
+      "id": "a58_016",
+      "name": "HY-100 Steel",
+      "h2_he_ratio": 0.73,
+      "level": "severe",
+      "maptis_patterns": ["HY-100", "HY100"],
+      "maptis_exclude": [],
+      "notes": "High-yield quenched and tempered steel."
+    },
+    {
+      "id": "a58_017",
+      "name": "A372 Steel (Class IV)",
+      "h2_he_ratio": 0.74,
+      "level": "severe",
+      "maptis_patterns": ["A372"],
+      "maptis_exclude": [],
+      "notes": "Pressure vessel forging steel. Just below 0.75 threshold."
+    },
+    {
+      "id": "a58_018",
+      "name": "1042 Steel (normalized)",
+      "h2_he_ratio": 0.75,
+      "level": "slight",
+      "maptis_patterns": ["STEEL 1042", "1042 STEEL"],
+      "maptis_exclude": [],
+      "notes": "Same alloy as a58_003 but normalized condition. At 0.75 threshold."
+    },
+    {
+      "id": "a58_019",
+      "name": "A533-B Steel",
+      "h2_he_ratio": 0.78,
+      "level": "slight",
+      "maptis_patterns": ["A533"],
+      "maptis_exclude": [],
+      "notes": "Mn-Mo-Ni pressure vessel steel."
+    },
+    {
+      "id": "a58_020",
+      "name": "Ti-6Al-4V (annealed)",
+      "h2_he_ratio": 0.79,
+      "level": "slight",
+      "maptis_patterns": ["TI-6AL-4V", "TITANIUM 6AL-4V", "TI 6AL-4V"],
+      "maptis_exclude": [],
+      "notes": "Annealed condition. STA condition (0.58) is worse. Condition-critical."
+    },
+    {
+      "id": "a58_021",
+      "name": "AISI 1020 Steel",
+      "h2_he_ratio": 0.79,
+      "level": "slight",
+      "maptis_patterns": ["STEEL 1020", "1020 STEEL", "AISI 1020"],
+      "maptis_exclude": ["C10200"],
+      "notes": "Low-carbon steel. Exclude copper alloy C10200."
+    },
+    {
+      "id": "a58_022",
+      "name": "HY-50 Steel",
+      "h2_he_ratio": 0.80,
+      "level": "slight",
+      "maptis_patterns": ["HY-50", "HY50"],
+      "maptis_exclude": [],
+      "notes": "Medium-yield quenched and tempered steel."
+    },
+    {
+      "id": "a58_023",
+      "name": "Ti-5Al-2.5Sn (ELI)",
+      "h2_he_ratio": 0.81,
+      "level": "slight",
+      "maptis_patterns": ["TI-5AL-2.5SN", "TITANIUM 5AL-2.5SN"],
+      "maptis_exclude": [],
+      "notes": "Extra-low interstitial alpha Ti alloy."
+    },
+    {
+      "id": "a58_024",
+      "name": "Armco Iron",
+      "h2_he_ratio": 0.86,
+      "level": "slight",
+      "maptis_patterns": ["ARMCO IRON"],
+      "maptis_exclude": [],
+      "notes": "High-purity commercial iron."
+    },
+    {
+      "id": "a58_025",
+      "name": "304 ELC Stainless Steel",
+      "h2_he_ratio": 0.87,
+      "level": "slight",
+      "maptis_patterns": ["STAINLESS STEEL 304", "CRES 304", "SS 304"],
+      "maptis_exclude": [],
+      "notes": "Austenitic SS. Extra-low carbon variant tested. Applies to 304/304L family."
+    },
+    {
+      "id": "a58_026",
+      "name": "305 Stainless Steel",
+      "h2_he_ratio": 0.89,
+      "level": "slight",
+      "maptis_patterns": ["STAINLESS STEEL 305", "CRES 305"],
+      "maptis_exclude": [],
+      "notes": "Austenitic SS. Higher Ni than 304 reduces work-hardening."
+    },
+    {
+      "id": "a58_027",
+      "name": "Be-Cu Alloy 25",
+      "h2_he_ratio": 0.93,
+      "level": "negligible",
+      "maptis_patterns": ["BERYLLIUM COPPER", "BE-CU", "ALLOY 25"],
+      "maptis_exclude": [],
+      "notes": "Copper beryllium alloy C17200."
+    },
+    {
+      "id": "a58_028",
+      "name": "Titanium (pure)",
+      "h2_he_ratio": 0.95,
+      "level": "negligible",
+      "maptis_patterns": ["TITANIUM CP", "COMMERCIALLY PURE TITANIUM"],
+      "maptis_exclude": ["TI-6AL", "TI-5AL", "TI-3AL"],
+      "notes": "Commercially pure Ti. Alloy variants differ significantly."
+    },
+    {
+      "id": "a58_029",
+      "name": "310 Stainless Steel",
+      "h2_he_ratio": 0.93,
+      "level": "negligible",
+      "maptis_patterns": ["STAINLESS STEEL 310", "CRES 310"],
+      "maptis_exclude": [],
+      "notes": "High-Cr high-Ni austenitic SS."
+    },
+    {
+      "id": "a58_030",
+      "name": "A-286",
+      "h2_he_ratio": 0.97,
+      "level": "negligible",
+      "maptis_patterns": ["A-286", "A286", "CRES A-286"],
+      "maptis_exclude": [],
+      "notes": "Iron-base superalloy. Excellent H2 compatibility."
+    },
+    {
+      "id": "a58_031",
+      "name": "7075-T73 Aluminum",
+      "h2_he_ratio": 0.98,
+      "level": "negligible",
+      "maptis_patterns": ["AL 7075", "ALUMINUM 7075"],
+      "maptis_exclude": [],
+      "notes": "High-strength Al alloy. T73 temper tested."
+    },
+    {
+      "id": "a58_032",
+      "name": "316 Stainless Steel",
+      "h2_he_ratio": 1.00,
+      "level": "negligible",
+      "maptis_patterns": ["STAINLESS STEEL 316", "CRES 316", "SS 316"],
+      "maptis_exclude": [],
+      "notes": "Austenitic SS. Gold standard for H2 service. Ratio 1.00."
+    },
+    {
+      "id": "a58_033",
+      "name": "OFHC Copper",
+      "h2_he_ratio": 1.00,
+      "level": "negligible",
+      "maptis_patterns": ["OFHC COPPER", "OXYGEN FREE"],
+      "maptis_exclude": [],
+      "notes": "Oxygen-free high-conductivity copper."
+    },
+    {
+      "id": "a58_034",
+      "name": "NARloy-Z",
+      "h2_he_ratio": 1.10,
+      "level": "negligible",
+      "maptis_patterns": ["NARLOY"],
+      "maptis_exclude": [],
+      "notes": "NASA Cu-Ag-Zr alloy for thrust chambers."
+    },
+    {
+      "id": "a58_035",
+      "name": "6061-T6 Aluminum",
+      "h2_he_ratio": 1.10,
+      "level": "negligible",
+      "maptis_patterns": ["AL 6061", "ALUMINUM 6061"],
+      "maptis_exclude": [],
+      "notes": "General-purpose Al alloy."
+    },
+    {
+      "id": "a58_036",
+      "name": "1100 Aluminum",
+      "h2_he_ratio": 1.40,
+      "level": "negligible",
+      "maptis_patterns": ["AL 1100", "ALUMINUM 1100"],
+      "maptis_exclude": [],
+      "notes": "Commercially pure Al. Highest ratio in table."
+    }
+  ]
+}

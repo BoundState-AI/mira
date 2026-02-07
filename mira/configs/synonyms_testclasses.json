@@ -1,0 +1,123 @@
+{
+  "TVS Outgassing": {
+    "aliases": ["outgassing", "vacuum outgas", "volatile condensables", "space contamination"],
+    "acronyms": ["TML", "CVCM", "VCM", "ASTM E595"],
+    "tokens": ["total mass loss", "collected volatile condensable material", "condensables", "residue"]
+  },
+  "Flammability": {
+    "aliases": ["flame test", "burn test", "ignition", "combustibility", "self-extinguishing"],
+    "acronyms": ["UL94", "LOI", "NASA-STD-6001"],
+    "tokens": ["upward flame", "downward flame", "afterflame", "drip", "flame spread"]
+  },
+  "Mechanical Impact": {
+    "aliases": ["impact resistance", "drop test", "puncture", "strike/blow"],
+    "acronyms": ["Izod", "Charpy"],
+    "tokens": ["energy absorption", "impact strength", "toughness index"]
+  },
+  "Toxicity": {
+    "aliases": ["smoke toxicity", "gas toxicity", "off-gas toxicity"],
+    "acronyms": ["LC50", "FED"],
+    "tokens": ["toxic gas generation", "exposure limits", "irritancy", "asphyxiant"]
+  },
+  "Stress Corrosion Cracking": {
+    "aliases": ["SCC", "environmental cracking", "stress-assisted corrosion"],
+    "acronyms": [],
+    "tokens": ["sensitization", "delayed failure", "intergranular cracking"]
+  },
+  "Corrosion": {
+    "aliases": ["chemical corrosion", "oxidation", "pitting", "galvanic corrosion"],
+    "acronyms": ["ASTM B117"],
+    "tokens": ["salt fog", "salt spray", "coating durability", "corrosion rate"]
+  },
+  "Fluid Compatibility": {
+    "aliases": ["chemical compatibility", "propellant compatibility", "immersion compatibility"],
+    "acronyms": [],
+    "tokens": ["swelling", "softening", "mass change", "volume change", "fluids interaction"]
+  },
+  "Odor": {
+    "aliases": ["odor rating", "olfactory rating", "odor acceptability"],
+    "acronyms": [],
+    "tokens": ["odor intensity", "odor threshold", "panel"]
+  },
+  "Flash Fire": {
+    "aliases": ["flash exposure", "fire exposure", "burn behavior"],
+    "acronyms": [],
+    "tokens": ["flash point", "fire point", "ignition temperature", "burn time"]
+  },
+  "Tensile Strength": {
+    "aliases": ["tensile/yield", "tension test", "stress–strain"],
+    "acronyms": ["UTS", "YS", "E"],
+    "tokens": ["ultimate tensile", "yield strength", "elongation at break", "modulus"]
+  },
+  "Pneumatic Impact": {
+    "aliases": ["gas blast", "pressure surge", "air hammer"],
+    "acronyms": [],
+    "tokens": ["pneumatic shock", "impulse loading", "impact resistance"]
+  },
+  "Promoted Combustion": {
+    "aliases": ["oxygen compatibility burn", "oxygen-rich combustion", "oxygen index"],
+    "acronyms": ["GOX", "LOX", "OI"],
+    "tokens": ["promoted ignition", "enriched O₂ burn", "oxygen service"]
+  },
+  "Particle Impact": {
+    "aliases": ["micrometeoroid/debris impact", "ballistic impact", "spallation"],
+    "acronyms": ["MMOD"],
+    "tokens": ["hypervelocity impact", "crater", "ballistic limit", "spall"]
+  },
+  "Electrical Overload": {
+    "aliases": ["overcurrent", "overload failure", "dielectric breakdown"],
+    "acronyms": [],
+    "tokens": ["arc-over", "short-circuit", "thermal runaway"]
+  },
+  "VCM Optical": {
+    "aliases": ["optical contamination", "vacuum condensable deposition"],
+    "acronyms": ["VCM"],
+    "tokens": ["witness plate", "transmission loss", "haze", "deposit"]
+  },
+  "Electric Wire Insulation": {
+    "aliases": ["wire insulation integrity", "jacket performance"],
+    "acronyms": [],
+    "tokens": ["dielectric strength", "breakdown voltage", "abrasion", "cut-through"]
+  },
+  "Low Cycle Fatigue": {
+    "aliases": ["high-strain fatigue", "strain-controlled fatigue", "cyclic plasticity"],
+    "acronyms": ["LCF", "ε–N"],
+    "tokens": ["plastic strain amplitude", "Coffin–Manson", "cycles to failure"]
+  },
+  "Fungus": {
+    "aliases": ["fungal growth resistance", "microbiological growth"],
+    "acronyms": [],
+    "tokens": ["nutrient rating", "MIL-STD fungus", "biodegradation"]
+  },
+  "Fracture Mechanics": {
+    "aliases": ["fracture toughness", "crack propagation analysis"],
+    "acronyms": ["K_IC", "J_IC", "R-curve"],
+    "tokens": ["critical flaw size", "crack initiation", "crack growth resistance"]
+  },
+  "Creep Rupture": {
+    "aliases": ["stress rupture", "time-dependent failure"],
+    "acronyms": [],
+    "tokens": ["creep rate", "Larson–Miller", "rupture life"]
+  },
+  "High Cycle Fatigue": {
+    "aliases": ["low-strain fatigue", "stress-controlled fatigue"],
+    "acronyms": ["HCF", "S–N"],
+    "tokens": ["endurance limit", "gigacycle fatigue", "Basquin"]
+  },
+  "Friction Heat": {
+    "aliases": ["frictional heating", "tribological heating"],
+    "acronyms": [],
+    "tokens": ["PV factor", "interface temperature rise", "sliding heat"]
+  },
+  "Crack Growth": {
+    "aliases": ["fatigue crack growth", "subcritical crack growth"],
+    "acronyms": [],
+    "tokens": ["da/dN", "Paris law", "ΔKth", "crack growth rate"]
+  },
+  "Arc Tracking": {
+    "aliases": ["tracking resistance", "surface tracking", "arc propagation"],
+    "acronyms": ["CTI"],
+    "tokens": ["carbonization", "insulation tracking", "path length"]
+  }
+}
+

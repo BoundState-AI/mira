@@ -1,0 +1,322 @@
+# PFAS Literature Domain Pack
+# SENTINEL configuration for PFAS (Per- and Polyfluoroalkyl Substances) research
+#
+# Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
+# Co-Authored-By: Dr. Joseph Wilde, BoundState AI
+
+domain_id: pfas-literature
+version: "1.0.0"
+
+# Evidence Taxonomy - Categorizes document types by evidentiary value
+evidence_taxonomy:
+  primary:
+    - peer_reviewed_study
+    - regulatory_document
+    - toxicology_report
+    - environmental_study
+  supporting:
+    - technical_manual
+    - datasheet
+    - specification
+    - test_report
+  contextual:
+    - internal_memo
+    - email
+    - conference_paper
+    - review_article
+  noise:
+    - marketing_brochure
+    - web_content
+    - press_release
+
+# Evidence Derivation Rules - Map document features to evidence types
+evidence_derivation:
+  - rule_id: peer_review_detection
+    conditions:
+      - field: doc_type
+        operator: eq
+        value: journal_article
+      - field: flags.has_spec_references
+        operator: eq
+        value: true
+    result:
+      - peer_reviewed_study
+    validate_with_llm: true
+
+  - rule_id: regulatory_doc_detection
+    conditions:
+      - field: doc_type
+        operator: eq
+        value: regulation
+    any_of:
+      - field: entities.standards
+        operator: contains
+        value: EPA
+      - field: entities.standards
+        operator: contains
+        value: FDA
+    result:
+      - regulatory_document
+    validate_with_llm: true
+
+  - rule_id: toxicology_detection
+    conditions:
+      - field: flags.has_test_conditions
+        operator: eq
+        value: true
+    any_of:
+      - field: tags
+        operator: contains
+        value: toxicology
+      - field: tags
+        operator: contains
+        value: health_effects
+      - field: entities.hazards
+        operator: not_empty
+        value: true
+    result:
+      - toxicology_report
+    validate_with_llm: true
+
+  - rule_id: environmental_study_detection
+    conditions:
+      - field: flags.has_measurements
+        operator: eq
+        value: true
+    any_of:
+      - field: tags
+        operator: contains
+        value: environmental
+      - field: tags
+        operator: contains
+        value: groundwater
+      - field: tags
+        operator: contains
+        value: bioaccumulation
+    result:
+      - environmental_study
+    validate_with_llm: true
+
+# Constraints - Hard drops eliminate, soft drops penalize
+constraints:
+  hard_drop:
+    - rule_id: exclude_marketing
+      name: Exclude Marketing Content
+      description: Marketing materials lack scientific rigor for PFAS research
+      conditions:
+        - field: flags.is_noise_candidate
+          operator: eq
+          value: true
+      priority: 10
+
+    - rule_id: exclude_press_releases
+      name: Exclude Press Releases
+      description: Press releases are not primary evidence sources
+      conditions:
+        - field: doc_type
+          operator: eq
+          value: press_release
+      priority: 20
+
+    - rule_id: require_pfas_relevance
+      name: Require PFAS Relevance
+      description: Document must mention PFAS or related compounds
+      conditions:
+        - field: entities.chemicals
+          operator: is_empty
+          value: true
+        - field: tags
+          operator: not_contains
+          value: pfas
+      requires_semantic_check: true
+      semantic_check_prompt: "Does this document discuss PFAS, PFOA, PFOS, or other per- and polyfluoroalkyl substances?"
+      priority: 5
+
+  soft_drop:
+    - rule_id: deprioritize_old_studies
+      name: Deprioritize Pre-2010 Studies
+      description: PFAS science has evolved significantly; older studies may have outdated methods
+      conditions:
+        - field: date_value
+          operator: lt
+          value: "2010-01-01"
+      penalty_weight: 0.3
+      priority: 50
+
+    - rule_id: prefer_peer_reviewed
+      name: Prefer Peer-Reviewed Sources
+      description: Non-peer-reviewed sources receive scoring penalty
+      conditions:
+        - field: derived_evidence_types
+          operator: not_contains
+          value: peer_reviewed_study
+      penalty_weight: 0.2
+      priority: 60
+
+# Intent Frames - Query intent classification
+intent_frames:
+  - frame_id: health_impact_001
+    category: risk_assessment
+    decision_question: "What are the health effects of this PFAS compound?"
+    surface_patterns:
+      - health effects
+      - toxicity
+      - carcinogenic
+      - health risk
+      - exposure limits
+      - safe levels
+    evidence_requirements:
+      types:
+        - toxicology_report
+        - peer_reviewed_study
+      min_count: 2
+      required_entity_classes:
+        - chemicals
+        - hazards
+    constraint_ids:
+      - exclude_marketing
+      - require_pfas_relevance
+    quality_tier_default: premium
+
+  - frame_id: regulatory_compliance_001
+    category: compliance_check
+    decision_question: "What are the regulatory requirements for this PFAS compound?"
+    surface_patterns:
+      - regulation
+      - compliance
+      - EPA limit
+      - MCL
+      - drinking water standard
+      - cleanup level
+    evidence_requirements:
+      types:
+        - regulatory_document
+        - specification
+      min_count: 1
+      required_entity_classes:
+        - standards
+    constraint_ids:
+      - exclude_marketing
+    quality_tier_default: standard
+
+  - frame_id: environmental_fate_001
+    category: material_lookup
+    decision_question: "How does this PFAS compound behave in the environment?"
+    surface_patterns:
+      - environmental fate
+      - degradation
+      - bioaccumulation
+      - persistence
+      - groundwater
+      - soil transport
+    evidence_requirements:
+      types:
+        - environmental_study
+        - peer_reviewed_study
+      min_count: 2
+      required_entity_classes:
+        - chemicals
+    constraint_ids:
+      - exclude_marketing
+      - require_pfas_relevance
+    quality_tier_default: standard
+
+  - frame_id: treatment_methods_001
+    category: process_check
+    decision_question: "What treatment methods are effective for this PFAS compound?"
+    surface_patterns:
+      - treatment
+      - remediation
+      - removal
+      - destruction
+      - granular activated carbon
+      - ion exchange
+      - incineration
+    evidence_requirements:
+      types:
+        - test_report
+        - peer_reviewed_study
+        - technical_manual
+      min_count: 2
+      required_entity_classes:
+        - processes
+    constraint_ids:
+      - exclude_marketing
+    quality_tier_default: standard
+
+  - frame_id: analytical_methods_001
+    category: specification_lookup
+    decision_question: "How is this PFAS compound detected and measured?"
+    surface_patterns:
+      - detection method
+      - analytical method
+      - EPA Method
+      - LC-MS
+      - measurement
+      - quantification
+    evidence_requirements:
+      types:
+        - specification
+        - test_report
+        - regulatory_document
+      min_count: 1
+      required_entity_classes:
+        - standards
+    constraint_ids:
+      - exclude_marketing
+    quality_tier_default: standard
+
+# Model Policy - Which models for which stages
+model_policy:
+  intent_classification:
+    primary: sonnet
+    escalate_to: opus
+    escalation_trigger:
+      confidence_lt: 0.7
+      query_complexity: high
+
+  synthesis:
+    primary: sonnet
+    escalate_to: opus
+    escalation_trigger:
+      confidence_lt: 0.6
+      evidence_conflict_detected: true
+
+  feature_extraction:
+    primary: haiku
+
+  semantic_checks:
+    primary: haiku
+    escalate_to: sonnet
+    escalation_trigger:
+      confidence_lt: 0.8
+
+  anomaly_explanation:
+    primary: sonnet
+
+  confidence_calibration:
+    primary: sonnet
+
+# Scoring Policy
+scoring_policy:
+  soft_drop_penalty_weight: 0.2
+  soft_drop_penalty_function: multiplicative
+  soft_drop_penalty_cap: 0.5
+  log_penalty_in_audit: true
+
+# LLM Policies - Control LLM usage at each layer
+llm_policies:
+  l0_derivation_validation: true
+  l2_intent_always_llm: true
+  l3_semantic_checks_enabled: true
+  l4_anomaly_explanation: true
+  l5_confidence_calibration: true
+
+# Retrieval Determinism - Ensure reproducible results
+retrieval_determinism:
+  index_snapshot_required: true
+  search_params_locked: true
+  tie_breaking: doc_id_ascending
+  random_seed: 42
+  nprobe: 32
+  ef_search: 128

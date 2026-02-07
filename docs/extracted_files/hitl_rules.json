@@ -1,0 +1,175 @@
+{
+  "version": "1.0.0",
+  "description": "HITL flagging rules for MIUL designation validation",
+  "rules": [
+    {
+      "rule_id": "GARBLED_DESIGNATION",
+      "priority": "P0",
+      "description": "Designation contains extraction artifacts",
+      "detection": "Check if designation matches known garbled patterns",
+      "patterns": [
+        {
+          "regex": "^(?:SEMBLY|SSEMBLY|EMBLY)",
+          "reason": "Truncated 'ASSEMBLY'"
+        },
+        {
+          "regex": "^MM\\s",
+          "reason": "Leading garbage characters"
+        },
+        {
+          "regex": "^[A-Z]{1,2}\\s[A-Z]",
+          "reason": "Possible column shift artifact"
+        }
+      ],
+      "action": "FLAG_FOR_REEXTRACT",
+      "auto_fixable": false,
+      "hitl_prompt": "Designation appears garbled. Please verify from source drawing.",
+      "ui_color": "red"
+    },
+    {
+      "rule_id": "NOTE_REF_AS_PN",
+      "priority": "P0",
+      "description": "Part number is actually a drawing note reference (e.g., '5.', '6.')",
+      "detection": "PN matches ^\\d{1,2}\\.$ pattern",
+      "patterns": [
+        {
+          "regex": "^\\d{1,2}\\.$",
+          "field": "part_number"
+        }
+      ],
+      "action": "FLAG_MATERIAL_TYPE",
+      "auto_fixable": false,
+      "hitl_prompt": "This is a drawing note reference, not a part number. Typically a consumable (lubricant, sealant). Please specify the exact material from the drawing note.",
+      "ui_color": "orange"
+    },
+    {
+      "rule_id": "TRAILING_NOTE_REF",
+      "priority": "P1",
+      "description": "Part number has trailing note reference that should be stripped",
+      "detection": "PN ends with space + digit(s) + period",
+      "patterns": [
+        {
+          "regex": "\\s+\\d+\\.$",
+          "field": "part_number"
+        }
+      ],
+      "action": "AUTO_STRIP",
+      "auto_fixable": true,
+      "fix": "re.sub(r'\\s+\\d+\\.$', '', part_number)",
+      "ui_color": "yellow"
+    },
+    {
+      "rule_id": "GENERIC_INCONEL",
+      "priority": "P1",
+      "description": "Inconel without specific alloy number",
+      "detection": "Designation is exactly 'INCONEL' or 'INCONEL ALLOY'",
+      "patterns": [
+        {
+          "exact": [
+            "INCONEL",
+            "INCONEL ALLOY"
+          ]
+        }
+      ],
+      "action": "FLAG_FOR_SPECIFICITY",
+      "auto_fixable": false,
+      "hitl_prompt": "Which Inconel alloy? Options: 625 (weld/corrosion), 718 (strength/springs), X-750 (springs/bolts), 600 (general purpose). Check source drawing.",
+      "context_hints": {
+        "WELD": "Probably 625 (best weldability)",
+        "BELLOWS": "Probably 718 (spring properties)",
+        "BELLEVILLE": "Probably 718 (spring properties)",
+        "SPRING": "Probably X-750 or 718",
+        "WIRE": "Probably X-750 per AMS 5698"
+      },
+      "ui_color": "orange"
+    },
+    {
+      "rule_id": "GENERIC_NICKEL",
+      "priority": "P1",
+      "description": "Generic 'NICKEL ALLOY' without specific designation",
+      "detection": "Designation is exactly 'NICKEL ALLOY'",
+      "patterns": [
+        {
+          "exact": [
+            "NICKEL ALLOY"
+          ]
+        }
+      ],
+      "action": "FLAG_OR_AUTO_RESOLVE",
+      "auto_fixable": "conditional",
+      "auto_resolve": {
+        "MS20995": "INCONEL X-750",
+        "NASM20995": "INCONEL X-750"
+      },
+      "hitl_prompt": "Which nickel alloy? If safety wire (MS20995), it's Inconel X-750.",
+      "ui_color": "orange"
+    },
+    {
+      "rule_id": "GENERIC_A286",
+      "priority": "P2",
+      "description": "A286 without CRES suffix or strength class",
+      "detection": "Designation is exactly 'A286'",
+      "patterns": [
+        {
+          "exact": [
+            "A286"
+          ]
+        }
+      ],
+      "action": "FLAG_FOR_ENRICHMENT",
+      "auto_fixable": "conditional",
+      "auto_resolve_via": "std_parts_db",
+      "hitl_prompt": "A286 needs: CRES suffix confirmed, strength class (KSI) if fastener, and AMS spec number.",
+      "notes": "Almost always A286 CRES (UNS S66286). Std parts DB resolves most cases.",
+      "ui_color": "yellow"
+    },
+    {
+      "rule_id": "MISC_DESIGNATION",
+      "priority": "P2",
+      "description": "MISC placeholder designation on assembly",
+      "detection": "Designation is exactly 'MISC'",
+      "patterns": [
+        {
+          "exact": [
+            "MISC"
+          ]
+        }
+      ],
+      "action": "FLAG_FOR_CLARIFICATION",
+      "auto_fixable": false,
+      "hitl_prompt": "MISC typically means assembly with multiple material types. Options: (1) Mark as 'VARIOUS', (2) Specify primary material, (3) Leave as MISC with note.",
+      "ui_color": "orange"
+    },
+    {
+      "rule_id": "MISSING_DESIGNATION",
+      "priority": "P2",
+      "description": "Detail part (non-assembly) with no designation",
+      "detection": "Designation is empty AND description does not contain 'ASSEMBLY' or 'SUB-ASSEMBLY'",
+      "action": "FLAG_FOR_MATERIAL",
+      "auto_fixable": "conditional",
+      "auto_resolve_via": "std_parts_db",
+      "hitl_prompt": "No material designation found. Check source drawing or specify material.",
+      "ui_color": "red"
+    },
+    {
+      "rule_id": "MISSING_DESCRIPTION",
+      "priority": "P1",
+      "description": "Part has no description or nomenclature",
+      "detection": "Part Description is empty/null",
+      "action": "FLAG_FOR_DESCRIPTION",
+      "auto_fixable": false,
+      "hitl_prompt": "Part description is missing. Check source drawing.",
+      "ui_color": "red"
+    },
+    {
+      "rule_id": "ASSEMBLY_NO_MATERIAL_OK",
+      "priority": "INFO",
+      "description": "Assembly or sub-assembly with no material \u2014 expected behavior",
+      "detection": "Designation is empty AND description contains 'ASSEMBLY' or 'SUB-ASSEMBLY'",
+      "action": "NO_ACTION",
+      "auto_fixable": false,
+      "notes": "Assemblies don't carry material designation. Material is on child detail parts.",
+      "ui_color": "green"
+    }
+  ]
+}

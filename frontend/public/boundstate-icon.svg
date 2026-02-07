@@ -1,0 +1,15 @@
+<svg width="48" height="48" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Quantum Well Icon - For light backgrounds -->
+
+  <path
+    d="M 25 35 L 25 75 Q 25 80 30 80 L 70 80 Q 75 80 75 75 L 75 55 L 75 50 L 70 45 L 65 40"
+    stroke="#1e3a8a"
+    stroke-width="4"
+    stroke-linecap="square"
+    fill="none"
+  />
+
+  <line x1="32" y1="70" x2="68" y2="70" stroke="#3b82f6" stroke-width="3" />
+
+  <line x1="38" y1="58" x2="62" y2="58" stroke="#60a5fa" stroke-width="2" opacity="0.7" />
+</svg>

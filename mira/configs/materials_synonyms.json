@@ -1,0 +1,1276 @@
+{
+  "oxygen": [
+    "o2",
+    "gox",
+    "lox",
+    "gaseous oxygen",
+    "liquid oxygen",
+    "oxygen service",
+    "oxygen compatible",
+    "oxygen-cleaned",
+    "oxygen safe",
+    "NASASTD-6001",
+    "NASA-STD-6001"
+  ],
+  "cryogenic": [
+    "cryo",
+    "low temperature",
+    "ln2",
+    "liquid nitrogen",
+    "-320f",
+    "-196c",
+    "77k"
+  ],
+  "vacuum": [
+    "astm e595",
+    "outgassing",
+    "tml",
+    "cvcm",
+    "space vacuum",
+    "uhv"
+  ],
+  "hydrazine": [
+    "n2h4",
+    "mmh",
+    "monomethylhydrazine",
+    "udmh",
+    "nitrogen tetroxide",
+    "nto",
+    "monopropellant",
+    "bipropellant"
+  ],
+  "hydrogen": [
+    "h2",
+    "gh2",
+    "lh2",
+    "gaseous hydrogen",
+    "liquid hydrogen"
+  ],
+  "nitrogen": [
+    "n2",
+    "gn2",
+    "ln2",
+    "gaseous nitrogen",
+    "liquid nitrogen"
+  ],
+  "helium": [
+    "he",
+    "gaseous helium"
+  ],
+  "aluminum": [
+    "al",
+    "aluminium",
+    "al alloy",
+    "aluminum alloy",
+    "6061",
+    "7075",
+    "2024",
+    "5052",
+    "5083",
+    "6061-t6",
+    "7075-t6"
+  ],
+  "stainless steel": [
+    "ss",
+    "stainless",
+    "cres",
+    "304",
+    "316",
+    "316l",
+    "17-4",
+    "15-5",
+    "13-8",
+    "410"
+  ],
+  "titanium": [
+    "ti",
+    "ti-6al-4v",
+    "grade 5",
+    "cp-ti"
+  ],
+  "nickel alloy": [
+    "inconel",
+    "alloy 625",
+    "625",
+    "718",
+    "alloy 718",
+    "hastelloy",
+    "monel",
+    "invar"
+  ],
+  "ptfe": [
+    "teflon",
+    "polytetrafluoroethylene"
+  ],
+  "peek": [
+    "polyetheretherketone",
+    "peek 450g"
+  ],
+  "pei": [
+    "ultem",
+    "polyetherimide"
+  ],
+  "pfa": [
+    "perfluoroalkoxy"
+  ],
+  "fep": [
+    "fluorinated ethylene propylene"
+  ],
+  "pvdf": [
+    "polyvinylidene fluoride"
+  ],
+  "acetal": [
+    "pom",
+    "delrin"
+  ],
+  "polyethylene": [
+    "hdpe",
+    "uhmwpe"
+  ],
+  "viton": [
+    "fkm",
+    "fluoroelastomer"
+  ],
+  "silicone": [
+    "vmq"
+  ],
+  "neoprene": [
+    "cr"
+  ],
+  "nasa-std-6001": [
+    "nasa std 6001",
+    "nasa std-6001",
+    "oxygen flammability"
+  ],
+  "nasa-std-6016": [
+    "nasa std 6016",
+    "nasa std-6016",
+    "materials and processes"
+  ],
+  "astm e595": [
+    "e595",
+    "outgassing test",
+    "total mass loss",
+    "tml",
+    "cvcm"
+  ],
+  "flammability": [
+    "burn",
+    "ignition",
+    "fire resistance",
+    "flame propagation",
+    "combustion"
+  ],
+  "toxicity": [
+    "smoke",
+    "toxic",
+    "offgassing"
+  ],
+  "scc": [
+    "stress corrosion",
+    "chloride scc",
+    "environmental cracking"
+  ],
+  "corrosion": [
+    "salt fog",
+    "salt spray",
+    "galvanic"
+  ],
+  "vented container in ssf modale": [
+    "non-cmsive environment"
+  ],
+  "d card": [
+    "daughmboard PWB"
+  ],
+  "unit": [
+    "PEU",
+    "gm",
+    "Map",
+    "SCU",
+    "APU",
+    "VSU",
+    "PART",
+    "BCDU",
+    "CPU",
+    "HDRR-EU",
+    "TEU",
+    "BDPU",
+    "PGSC-DDS IU",
+    "DRIRU",
+    "ATU"
+  ],
+  "polyphenylene oxide": [
+    "PPO",
+    "pH"
+  ],
+  "space station freedom": [
+    "SSF",
+    "SSP"
+  ],
+  "oxide": [
+    "CO",
+    "PP0",
+    "PAEPO",
+    "N&",
+    "PPO"
+  ],
+  "ias bus topology": [
+    "HIGH POWER ABC"
+  ],
+  "in": [
+    "OUT",
+    "IOZ",
+    "12.7",
+    "24",
+    "Continued",
+    "sec",
+    "DRAW",
+    "15lbs",
+    "ft",
+    "in",
+    "inf",
+    "rb/ra",
+    "0000",
+    "lOZ",
+    "rdr"
+  ],
+  "sec": [
+    "al",
+    "ln",
+    "25",
+    "FT",
+    "cc",
+    "inches",
+    "an",
+    "in",
+    "rnm",
+    "mm",
+    "frames",
+    "Hg",
+    "Flelds",
+    "lbm",
+    "BTU",
+    "Vol",
+    "OR"
+  ],
+  "flash": [
+    "FIRE",
+    "PIRE"
+  ],
+  "fire": [
+    "FWSH",
+    "FUSH",
+    "FLASR",
+    "ASH",
+    "FLASII",
+    "FULSH",
+    "FLASH"
+  ],
+  "milgr": [
+    "hi3",
+    "h3",
+    "m3",
+    "rn3",
+    "r3",
+    "n3",
+    "s3"
+  ],
+  "m3": [
+    "gr",
+    "zg",
+    "pg",
+    "Xllgr",
+    "fa",
+    "Mllgr",
+    "sg",
+    "pq",
+    "mn",
+    "lgr",
+    "m9",
+    "04mg",
+    "kg",
+    "ng",
+    "flilgr",
+    "650g",
+    "ag"
+  ],
+  "tx2": [
+    "NAc",
+    "KAC",
+    "MAc",
+    "EIAC",
+    "MAC",
+    "HAC",
+    "UAC",
+    "WAC",
+    "K4C",
+    "MC",
+    "FAC"
+  ],
+  "mac": [
+    "TXZ",
+    "PSC",
+    "Tx2",
+    "CTX2",
+    "MICROG",
+    "TX2"
+  ],
+  "indow for audio tgltminat unit": [
+    "MU"
+  ],
+  "multi-layer anti-glare coating": [
+    "lralin 85 or Ocli HEA"
+  ],
+  "sh blackened w i t h  bbonol-c": [
+    "copper sulfide process"
+  ],
+  "wire mesh": [
+    ".005 THICK"
+  ],
+  "optical glass": [
+    "INORGANIC"
+  ],
+  "space station freelxm": [
+    "SSF"
+  ],
+  "space stmion freedom program": [
+    "WPOl"
+  ],
+  "mnerul usage agreement": [
+    "MUA"
+  ],
+  "flowoa 32902": [
+    "4ZTI"
+  ],
+  "mmbrul usage agreement": [
+    "MUA"
+  ],
+  "lexgth": [
+    "W3DTH"
+  ],
+  "w3dth": [
+    "LEXGTH"
+  ],
+  "066": [
+    "CTD",
+    "1.68"
+  ],
+  "ctd": [
+    "066"
+  ],
+  "ztloo": [
+    "UNITS"
+  ],
+  "units": [
+    "ZT100",
+    "USA",
+    "ZTlOO",
+    "Flight",
+    "PTCUs",
+    "SMU",
+    "metric"
+  ],
+  "zt100": [
+    "UNITS"
+  ],
+  "audio": [
+    "vn",
+    "VDEO"
+  ],
+  "vdeo": [
+    "AUDIO"
+  ],
+  "vn": [
+    "AUDIO"
+  ],
+  "harris circuit card assemblies": [
+    "CCA's"
+  ],
+  "ed to es-900060-2 requirements": [
+    "unkded eye"
+  ],
+  "face mount devices": [
+    ".050 and .025 inch pitch devices"
+  ],
+  "d on the type of material used": [
+    "Conathane"
+  ],
+  "that have close pitch spacing": [
+    ".050 and closer pitch devices"
+  ],
+  "g a criteria for small bubbles": [
+    "bubbles less than .010 inch in diameter"
+  ],
+  "exist between leads or to the": [
+    "continued on page 3"
+  ],
+  "he unaided eye or at low power": [
+    "4x"
+  ],
+  "and retest pf iavds equipment": [
+    "Re-ATP"
+  ],
+  "rmal coating used is colorless": [
+    "clear"
+  ],
+  "009 inch": [
+    "11128th of an inch"
+  ],
+  "21": [
+    "07",
+    "11",
+    "Same",
+    "06",
+    "41",
+    "04",
+    "M22759",
+    "90",
+    "347",
+    "61",
+    "95",
+    "97",
+    "02",
+    "23",
+    "05",
+    "AMPS",
+    "P5",
+    "03",
+    "92"
+  ],
+  "96": [
+    "11",
+    "25",
+    "090",
+    "072",
+    "kfZ6",
+    "LtMD",
+    "28",
+    "24",
+    "05",
+    "21",
+    "02",
+    "067",
+    "LMD",
+    "16",
+    "23",
+    "063",
+    "30",
+    "01",
+    "10"
+  ],
+  "amp": [
+    "18",
+    "MINUTE",
+    "s t a n c i ~ y  v a l u e",
+    "TRANS",
+    "1553",
+    "MIN",
+    "MAX"
+  ],
+  "1553": [
+    "Amp"
+  ],
+  "090": [
+    "23",
+    "96"
+  ],
+  "the audio interface unit": [
+    "AIU"
+  ],
+  "a system": [
+    "PAVDS"
+  ],
+  "ot meet ssp 30233 reqairements": [
+    "using the worst case ragngs in MAPTIS"
+  ],
+  "h n c s": [
+    "11"
+  ],
+  "m 0 lbnn 01 011 c a l m": [
+    "No1 smvn ad om"
+  ],
+  "c is p a  ualnllnc l l l k f 5": [
+    "Ib"
+  ],
+  "11 iqld": [
+    "Y I"
+  ],
+  "adhesive": [
+    "item 1",
+    "Loctite",
+    "TGF&SW",
+    "Bacon",
+    "EA 9394 A D",
+    "item I",
+    "ACRYLIC BASE",
+    "RTV 566",
+    "ES70092",
+    "without the Cab-o-Sil",
+    "3M #2216",
+    "SCOTCH* 966"
+  ],
+  "coat": [
+    "Sn",
+    "item 4",
+    "wire",
+    "ruvr srut ruu",
+    "WHITE",
+    "M.C. 63091",
+    "<.0003\"",
+    "ISI"
+  ],
+  "akj use weight vs ml weight": [
+    "Toxicity"
+  ],
+  "nly a very small cross section": [
+    "edges"
+  ],
+  "total weight": [
+    "grams"
+  ],
+  "- meh32": [
+    "92-044 1"
+  ],
+  "diallyl phthalate": [
+    "DAP"
+  ],
+  "89905": [
+    "gold",
+    "891 98",
+    "89198",
+    "89 198"
+  ],
+  "meh32": [
+    "85,0543",
+    "91-0057",
+    "82-0370",
+    "92-0439",
+    "9 1-0605",
+    "85-0222",
+    "83-0554",
+    "92-0441",
+    "91-0276",
+    "90-0069",
+    "91-0568",
+    "84-0728",
+    "92-0440",
+    "92-0442",
+    "85-0 R P/N AM(RP-138, 8998",
+    "85-0543"
+  ],
+  "audio interface unit": [
+    "AIU"
+  ],
+  "conversion chromate": [
+    "CLASS 1AITHICKER",
+    "CLASS lA/THICKER"
+  ],
+  "thermofit ht-tms": [
+    "RAYCHEM SPECIFICATION RT-1800/1"
+  ],
+  "beryllium copper c17200": [
+    "BERYLCO 25"
+  ],
+  "plating tin-lead": [
+    "ELEC DEPOSIT"
+  ],
+  "namask km dry film solder mask": [
+    "DFSM"
+  ],
+  "ka series connector with pins": [
+    "4  ROW",
+    "4 ROW"
+  ],
+  "nn made from diallyl phthalate": [
+    "DAP"
+  ],
+  "m m b": [
+    "MUAS"
+  ],
+  "r g a": [
+    "~ ~ Z A ~ O N ~ C O N ~ ~ U C ~ ~"
+  ],
+  "as e l e c t h i  cud h o i b": [
+    "wedgdocks"
+  ],
+  "he harris audio interface unit": [
+    "A?XJ"
+  ],
+  "and 15": [
+    "Conathane CE- 1 155 and sylg&d 184"
+  ],
+  "these two items are thirty": [
+    "30"
+  ],
+  "vent": [
+    "draia",
+    "DRAIN",
+    "158",
+    "draim",
+    "drain"
+  ],
+  "drain": [
+    "Fill",
+    "vent",
+    "Purge",
+    "VENT"
+  ],
+  "doc": [
+    "Dwg",
+    "PART",
+    "17",
+    "WG",
+    "21\u00b0p",
+    "DWG",
+    "PAKT"
+  ],
+  "part": [
+    "DWO",
+    "NUMBLR",
+    "NUUBZR",
+    "DVC",
+    "DWG",
+    "DIIO",
+    "NUMeER",
+    "YWUUI",
+    "XDEM",
+    "DYC",
+    "NUnUR",
+    "MLIBEI",
+    "Att",
+    "OWQ",
+    "HIJWU",
+    "DRWG",
+    "UWBER"
+  ],
+  "152": [
+    "E- 19",
+    "B4",
+    "G2"
+  ],
+  "b4": [
+    "152",
+    "l52",
+    "10"
+  ],
+  "m22759": [
+    "73",
+    "11",
+    "16",
+    "21",
+    "12",
+    "23"
+  ],
+  "11": [
+    "07",
+    "1996",
+    "LKEI",
+    "582",
+    "ZSO",
+    "15",
+    "91",
+    "2250",
+    "21",
+    "89",
+    "88",
+    "t250",
+    "J490B",
+    "k230",
+    "64",
+    "2759",
+    "H22759",
+    "32",
+    "A250",
+    "81381"
+  ],
+  "sn50": [
+    "60"
+  ],
+  "60": [
+    "1211",
+    "norme  OR NF-T 46.002",
+    "S1150",
+    "62",
+    "17.3",
+    "lent",
+    "SN50",
+    "nom WNOR NF-T 46.002",
+    "18H",
+    "374",
+    "SN30",
+    "S150",
+    "10C",
+    "03",
+    "SH50",
+    "SM50"
+  ],
+  "62": [
+    "27",
+    "29",
+    "I.0.U",
+    "63",
+    "60",
+    "75",
+    "31",
+    "49"
+  ],
+  "63": [
+    "J779h",
+    "55",
+    "26",
+    "67",
+    "Shore A",
+    "06900",
+    "ALL",
+    "62",
+    "37",
+    "f97",
+    "!too"
+  ],
+  "manuf": [
+    "DES",
+    "DESIGN"
+  ],
+  "design": [
+    "MFG",
+    "GNER",
+    "PFGR",
+    "MANUF",
+    "ER",
+    "SEE HAZARD REPORT P - I",
+    "WGR",
+    "0,076mm",
+    "lANUF"
+  ],
+  "glass": [
+    "EPOSSY",
+    "BPpOXY",
+    "Eprrxy",
+    "POLY",
+    "poxy",
+    "SAMPLE",
+    "SlL",
+    "FOIL",
+    "epozy",
+    "KAPTON",
+    "PTFE",
+    "DAP",
+    "EPOXY",
+    "ONATE",
+    "growth chambers and syringes"
+  ],
+  "epoxy": [
+    "Class",
+    "metal",
+    "EPOXY 240",
+    "ARMSTR0NQ C-1",
+    "Gl",
+    "EA 934",
+    "SS",
+    "rglass",
+    "Glass",
+    "ass",
+    "BOARD",
+    "OLASS",
+    "Chemglaze 9922 A/B",
+    "GLAS",
+    "49",
+    "fibre"
+  ],
+  "828": [
+    "40p",
+    "EM308",
+    "VEWID",
+    "VERSAM",
+    "VBRS",
+    "V125",
+    "Versdd",
+    "VERMID",
+    "VeWID",
+    "EH",
+    "V40",
+    "EM",
+    "VERSAl"
+  ],
+  "versam": [
+    "828"
+  ],
+  "063": [
+    "96"
+  ],
+  "s audio tednal unit": [
+    "Am"
+  ],
+  "m 4 md 15": [
+    "Cozaaelame a-B 159 and Sylgad 1 M"
+  ],
+  "gr": [
+    "16",
+    "30",
+    "PE",
+    "ams",
+    "m3",
+    "qm"
+  ],
+  "the audio terminal unit": [
+    "AT'U",
+    "MQ"
+  ],
+  "rp system": [
+    "PAVDS"
+  ],
+  "laboratory msdlub": [
+    "MSSfClapola Rack, 683-5Bld"
+  ],
+  "4": [
+    "3 ~",
+    "3H",
+    "3 A - 1",
+    "~",
+    "see reports in annex",
+    "7 - -'a+",
+    "J A - I",
+    "3G",
+    "see Table 2",
+    "P1",
+    "in",
+    "X"
+  ],
+  "0 lano on w t  pattern": [
+    "NOT WOWN ON DWC"
+  ],
+  "s  ifewllitmenis of wlld 53004": [
+    "JK"
+  ],
+  "0 land on ckl pattern": [
+    "NOT SHOW ON O K"
+  ],
+  "nhb 5300 4": [
+    "3J"
+  ],
+  "or better ratings for toxicity": [
+    "ief. MC 061 96"
+  ],
+  "atu use weight vs ml weight": [
+    "Toxicity"
+  ],
+  "hd5003": [
+    "f3-3",
+    "B-3"
+  ],
+  "electrical insulating compound": [
+    "conformal coating"
+  ],
+  "89414": [
+    "Tape",
+    "651 22"
+  ],
+  "weighmnit": [
+    "pounds"
+  ],
+  "element": [
+    "Bbttom stacke",
+    "pounds",
+    "TOP STACK"
+  ],
+  "00140": [
+    "68624",
+    "030"
+  ],
+  "69434": [
+    "69439"
+  ],
+  "phthatate": [
+    "DAP"
+  ],
+  "/ gold plated pins and sockets": [
+    "89 198"
+  ],
+  "audio terminal unit": [
+    "ATU"
+  ],
+  "thermofit kynar": [
+    "RAYCHEM SPECIFICATION RT-850 CLEAR",
+    "RAYCHEM $PECIFICATION RT-850 CLEAR"
+  ],
+  "teflon": [
+    "BRASS",
+    "he did not identify them",
+    "FIY'",
+    "MS28774-01",
+    "AG",
+    "fluid lines",
+    "WOVEN 00RETEX THREAD",
+    "Lox Compatibility",
+    "AWG",
+    "TFB",
+    "00016",
+    "PTFE",
+    "Silver",
+    "kloid",
+    "R10470",
+    "FEP"
+  ],
+  "lemo b series": [
+    "MADE FROM VICTREX 450G THERMOCOMP"
+  ],
+  "polytetrafluoroethylene": [
+    "PTPE",
+    "PTFE",
+    "I'Ik1."
+  ],
+  "er c17200/c17300 flat products": [
+    "BAR,SHEET,STRIP,PLATE,WIRE"
+  ],
+  "ate rial usage agreements": [
+    "MUAs"
+  ],
+  "dle on the audio terminal unit": [
+    "MU"
+  ],
+  "mkmpbme ofthe audio temhl unit": [
+    "KW"
+  ],
+  "he metallic microphone housing": [
+    "non-hcrmetic",
+    "nokhemetic"
+  ],
+  "57 inches": [
+    "977.52 cu inches"
+  ],
+  "with the silicon glass display": [
+    "window"
+  ],
+  "and plastic keys": [
+    "buttons"
+  ],
+  "- wireless interface unit": [
+    "Contains the Wireless UCS Coupler WUC"
+  ],
+  "heat resistant polyimide": [
+    "NOMEX"
+  ],
+  "eh02": [
+    "83-740",
+    "92-0335",
+    "90-047.1",
+    "89-0062",
+    "91-0726",
+    "90-0016",
+    "90-0470",
+    "91-0424",
+    "83-261",
+    "1-80-Ol",
+    "91-0148",
+    "85-0015",
+    "83-0490",
+    "91-0934",
+    "84-368",
+    "87-0462",
+    "Xr",
+    "Fo",
+    "89-0482"
+  ],
+  "eh44": [
+    "94-0070",
+    "94-0123",
+    "93-0192",
+    "94-0056",
+    "94-0129",
+    "BAMS1",
+    "93-0174",
+    "95-0022",
+    "93-0117",
+    "93-0043",
+    "95-0153",
+    "93-0165",
+    "93-0147",
+    "93-0103",
+    "95-0079",
+    "Mr",
+    "93-0134",
+    "94-0120",
+    "94-0057"
+  ],
+  "eho2": [
+    "84-0487",
+    "83-0560",
+    "90-0470",
+    "MW",
+    "91-0424",
+    "88-0911",
+    "MR",
+    "91-0044",
+    "Dennis",
+    "91-0148",
+    "90-1115",
+    "87-0462",
+    "1-78-4",
+    "89-0482",
+    "90-0203",
+    "90-1113",
+    "90-0518",
+    "86-0111",
+    "86-138"
+  ],
+  "ehoz": [
+    "9O-XXXX",
+    "89-0062",
+    "91-0726",
+    "91-0424",
+    "90-0489",
+    "a6-0040",
+    "84-183",
+    "88-0911",
+    "89-0513",
+    "1 -79- 34",
+    "91-0148",
+    "90-0564",
+    "87-0462",
+    "89-0482",
+    "90-0203",
+    "~Z-0042",
+    "B8-0464",
+    "90-1113"
+  ],
+  "sq inches": [
+    "Similar"
+  ],
+  "f 1 hr at 75fplus 4 hr at 150f": [
+    "Conformal coat"
+  ],
+  "h aromatic polyamide": [
+    "ARAMID"
+  ],
+  "sting after a room t e m p e m": [
+    "75 &grtts F"
+  ],
+  "1 1 20 parts cv-2942": [
+    "PART A"
+  ],
+  "1 part cv-2942": [
+    "PART B"
+  ],
+  "1 20 parts cv-2942": [
+    "PART A"
+  ],
+  "iz": [
+    "LAM",
+    "we Second pew if r+guurd.",
+    "EHOPS",
+    "IOO"
+  ],
+  "mal coating": [
+    "CE-1155 - reference MUA number 1010-0004"
+  ],
+  "kable for about 1 hour at 24 c": [
+    "75.2 F"
+  ],
+  "25 c": [
+    "77 F]",
+    "77 F"
+  ],
+  "to 200 c": [
+    "-85 to 392 F"
+  ],
+  "24 hours at 125 c": [
+    "275 F"
+  ],
+  "specific gravity at 25 c": [
+    "77 F"
+  ],
+  "viscosity at 25 c": [
+    "77 F"
+  ],
+  "pot life at 25 c": [
+    "77 F"
+  ],
+  "as cured - 7 days at 25 c": [
+    "77 F"
+  ],
+  "125 c": [
+    "275 F"
+  ],
+  "at 25 c": [
+    "77 F"
+  ],
+  "tack-free time at 25 c": [
+    "77 F"
+  ],
+  "-65 c": [
+    "84 F"
+  ],
+  "range of -65 to 200 c": [
+    "-85 to 392 F"
+  ],
+  "300 c": [
+    "572 F"
+  ],
+  "l5oc": [
+    "77t0302F"
+  ],
+  "after 24 hours at 25 c": [
+    "77 F"
+  ],
+  "65 c": [
+    "149 F"
+  ],
+  "for 4 hours of 100 c": [
+    "212 F"
+  ],
+  "for 1 hour or 150 c": [
+    "302 F"
+  ],
+  "containen at or below 32 c": [
+    "77 F"
+  ],
+  "9-02": [
+    "1 10-gm"
+  ],
+  "1-lb": [
+    "5-kg"
+  ],
+  "proper shipping nane": [
+    "49CFR 172.101"
+  ],
+  "hazard nkye": [
+    "49CFR 172.101"
+  ],
+  "id no": [
+    "49CFR 172.101"
+  ],
+  "hazard cuss": [
+    "49CFR 172.101"
+  ],
+  "rcra hazard cuss": [
+    "4OCFR 261"
+  ],
+  "priority pollutants": [
+    "4OCFR 122.53"
+  ],
+  "health": [
+    "NFPA"
+  ],
+  "fujnability": [
+    "NFPA"
+  ],
+  "warning": [
+    "NFPA"
+  ],
+  "1200": [
+    "CARCINOGENS IDENTIFIED WITH AN ASTERISK",
+    "Rinttd",
+    "800"
+  ],
+  "a single prolonged exposure": [
+    "24 TO 48 HOURS"
+  ],
+  "tion i11 - effects of exposure": [
+    "CONTINUED"
+  ],
+  "flash point": [
+    "METHOD USED",
+    "Closed Cup",
+    "OC",
+    "COC",
+    "Method Used"
+  ],
+  "incoxpatability": [
+    "HATERIAL TO AVOID"
+  ],
+  "xechxvical": [
+    "GENERAL"
+  ],
+  "traces of forkaldehyde": [
+    "CARCINOGEN"
+  ],
+  "02": [
+    "05298",
+    "11",
+    "42",
+    "25",
+    "07",
+    "69",
+    "24",
+    "70",
+    "28",
+    "3901b",
+    "08",
+    "02",
+    "DO",
+    "Mr",
+    "15",
+    "14.3 psia",
+    "0001LB",
+    "N2",
+    "16",
+    "05"
+  ],
+  "062": [
+    "61428"
+  ],
+  "polyimide": [
+    "Upton",
+    "KAPTON",
+    "Kapton",
+    "GI",
+    "KAPTON*-H",
+    "05946",
+    "KAPTON* HN",
+    "UPTON*-MT",
+    "KAPTON*"
+  ],
+  "12": [
+    "07",
+    "100",
+    "1996",
+    "?O",
+    "U23053",
+    "15",
+    "91",
+    "00011",
+    "841",
+    "so5",
+    "88",
+    "M49055",
+    "WZ2759",
+    "l7",
+    "2759",
+    "H22759",
+    "PS1023",
+    "48",
+    "09",
+    "18"
+  ],
+  "isted on": [
+    "GF"
+  ],
+  "tox": [
+    "-0001",
+    "IJOI",
+    "FLAM",
+    "STRESS",
+    "Feat",
+    "FLAN",
+    "LAM"
+  ],
+  "space station program": [
+    "S S P",
+    "SSP"
+  ],
+  "uch as electrical card holders": [
+    "wedgc-l&"
+  ],
+  "nylon 6/6": [
+    "66"
+  ],
+  "without a special cure": [
+    "720 Xi at 75 degrees F"
+  ],
+  "for 6 hours at 11 0 d e p s  c": [
+    "this resulted in a \"C\" raring for TVS"
+  ],
+  "24 hours at 93 degrees c": [
+    "200 degrees F"
+  ]
+}

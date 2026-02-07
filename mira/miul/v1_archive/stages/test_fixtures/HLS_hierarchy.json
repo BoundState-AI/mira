@@ -1,0 +1,280 @@
+{
+  "miul_number": "HLS",
+  "top_assembly": "MER07540-001",
+  "nodes": {
+    "MER07540-001": {
+      "part_number": "MER07540-001",
+      "description": "VALVE ASSEMBLY, 10 INCH",
+      "parent_pn": "",
+      "is_assembly": true
+    },
+    "MER07543-001": {
+      "part_number": "MER07543-001",
+      "description": "SHAFT SUB-ASSEMBLY, 10 INCH VALVE",
+      "parent_pn": "MER07540-001",
+      "is_assembly": true
+    },
+    "MER07567-001": {
+      "part_number": "MER07567-001",
+      "description": "SHAFT, OFFSET, INSERT HELICAL, COIL, 10 INCH VALVE",
+      "parent_pn": "MER07540-001",
+      "is_assembly": false
+    },
+    "MER07548-001": {
+      "part_number": "MER07548-001",
+      "description": "MOUNT BRACKET, ACTUATOR, 10 INCH VALVE",
+      "parent_pn": "MER07540-001",
+      "is_assembly": false
+    },
+    "MER07584-001": {
+      "part_number": "MER07584-001",
+      "description": "POPPET SUB-ASSEMBLY, 10 INCH",
+      "parent_pn": "",
+      "is_assembly": false
+    },
+    "MER07583-001": {
+      "part_number": "MER07583-001",
+      "description": "BELLOWS, EXTERNAL, ACTUATOR",
+      "parent_pn": "",
+      "is_assembly": true
+    },
+    "MER07560-001": {
+      "part_number": "MER07560-001",
+      "description": "VALVE BODY SUB-ASSEMBLY 10 INCH VALVE",
+      "parent_pn": "MER07583-001",
+      "is_assembly": true
+    },
+    "MER07563-001": {
+      "part_number": "MER07563-001",
+      "description": "VALVE BODY, INSERT ASSY, HELICAL COIL, 10 INCH VALVE",
+      "parent_pn": "MER07560-001",
+      "is_assembly": true
+    },
+    "MER07565-001": {
+      "part_number": "MER07565-001",
+      "description": "SHAFT, OFFSET, SUB-ASSEMBLY, 10 INCH VALVE",
+      "parent_pn": "MER07563-001",
+      "is_assembly": true
+    },
+    "MER07566-001": {
+      "part_number": "MER07566-001",
+      "description": "ROTARY TANG, OFFSET SHAFT, 10 INCH VALVE",
+      "parent_pn": "MER07565-001",
+      "is_assembly": false
+    },
+    "MER07561-001": {
+      "part_number": "MER07561-001",
+      "description": "RING, RETAINING, VALVE",
+      "parent_pn": "MER07560-001",
+      "is_assembly": false
+    },
+    "MER07562-001": {
+      "part_number": "MER07562-001",
+      "description": "SEAT, 10 INCH VALVE",
+      "parent_pn": "MER07560-001",
+      "is_assembly": false
+    },
+    "MER07570-001": {
+      "part_number": "MER07570-001",
+      "description": "ACTUATOR ASSEMBLY, 10 INCH STROKE",
+      "parent_pn": "",
+      "is_assembly": true
+    },
+    "MER07573-001": {
+      "part_number": "MER07573-001",
+      "description": "ACTUATOR WELD ASSEMBLY",
+      "parent_pn": "MER07570-001",
+      "is_assembly": true
+    },
+    "MER07574-001": {
+      "part_number": "MER07574-001",
+      "description": "HOUSING, ACTUATOR",
+      "parent_pn": "MER07573-001",
+      "is_assembly": false
+    },
+    "MER07577-001": {
+      "part_number": "MER07577-001",
+      "description": "MOUNT CAP, ACTUATOR",
+      "parent_pn": "MER07573-001",
+      "is_assembly": false
+    },
+    "MER07581-001": {
+      "part_number": "MER07581-001",
+      "description": "SHAFT, PISTON, ACTUATOR",
+      "parent_pn": "MER07570-001",
+      "is_assembly": true
+    },
+    "MER07545-001": {
+      "part_number": "MER07545-001",
+      "description": "LOWER CAM MOUNT 10 INCH VALVE",
+      "parent_pn": "MER07581-001",
+      "is_assembly": false
+    },
+    "MER07572-001": {
+      "part_number": "MER07572-001",
+      "description": "BRACKET, ANGLE, ACTUATOR",
+      "parent_pn": "MER07570-001",
+      "is_assembly": false
+    },
+    "MER07582-001": {
+      "part_number": "MER07582-001",
+      "description": "BELLOWS, INTERNAL, ACTUATOR",
+      "parent_pn": "",
+      "is_assembly": true
+    },
+    "MER07555-001": {
+      "part_number": "MER07555-001",
+      "description": "PIN, TRANSL.RING, 10 INCH VALVE",
+      "parent_pn": "MER07582-001",
+      "is_assembly": true
+    },
+    "MER07556-001": {
+      "part_number": "MER07556-001",
+      "description": "RING, INTERMEDIATE, ROTATIONAL",
+      "parent_pn": "MER07555-001",
+      "is_assembly": false
+    },
+    "MER07550-001": {
+      "part_number": "MER07550-001",
+      "description": "DRIVE LINK",
+      "parent_pn": "",
+      "is_assembly": true
+    },
+    "MER07571-001": {
+      "part_number": "MER07571-001",
+      "description": "CONNECTING ROD, ACTUATOR, 10 INCH VALVE",
+      "parent_pn": "MER07550-001",
+      "is_assembly": false
+    },
+    "MER07553-001": {
+      "part_number": "MER07553-001",
+      "description": "COVER, BEARING, 10 INCH VALVE",
+      "parent_pn": "",
+      "is_assembly": true
+    },
+    "MER07554-001": {
+      "part_number": "MER07554-001",
+      "description": "SLIDER, ROTARY RING, 10 INCH VALVE",
+      "parent_pn": "MER07553-001",
+      "is_assembly": false
+    },
+    "MER07558-001": {
+      "part_number": "MER07558-001",
+      "description": "OFFSET ROTARY SHAFT, LOWER, 10 INCH VALVE",
+      "parent_pn": "",
+      "is_assembly": true
+    },
+    "MER07557-001": {
+      "part_number": "MER07557-001",
+      "description": "SHAFT, CENTRAL, 10 INCH VALVE",
+      "parent_pn": "MER07558-001",
+      "is_assembly": false
+    },
+    "MER07559-001": {
+      "part_number": "MER07559-001",
+      "description": "OFFSET ROTARY SHAFT, 10 INCH VALVE",
+      "parent_pn": "",
+      "is_assembly": false
+    },
+    "MER07546-001": {
+      "part_number": "MER07546-001",
+      "description": "PRELOAD DISC",
+      "parent_pn": "",
+      "is_assembly": false
+    },
+    "MER07564-001": {
+      "part_number": "MER07564-001",
+      "description": "BODY, VALVE, 10 INCH",
+      "parent_pn": "",
+      "is_assembly": false
+    },
+    "MER07568-001": {
+      "part_number": "MER07568-001",
+      "description": "SHAFT, OFFSET, 10 INCH VALVE",
+      "parent_pn": "",
+      "is_assembly": false
+    },
+    "MER07569-001": {
+      "part_number": "MER07569-001",
+      "description": "BRACE, BEAM",
+      "parent_pn": "",
+      "is_assembly": false
+    },
+    "MER07579-001": {
+      "part_number": "MER07579-001",
+      "description": "BUSHING, ACTUATOR, LARGE",
+      "parent_pn": "",
+      "is_assembly": true
+    },
+    "MER07578-001": {
+      "part_number": "MER07578-001",
+      "description": "BUSHING, ACTUATOR, SMALL",
+      "parent_pn": "MER07579-001",
+      "is_assembly": false
+    },
+    "MER07580-001": {
+      "part_number": "MER07580-001",
+      "description": "CAP, ACTUATOR",
+      "parent_pn": "",
+      "is_assembly": false
+    },
+    "MER07585-001": {
+      "part_number": "MER07585-001",
+      "description": "POPPET, VALVE, 10 INCH",
+      "parent_pn": "",
+      "is_assembly": false
+    },
+    "MER07587-001": {
+      "part_number": "MER07587-001",
+      "description": "INTERFACE RING, COUPLER SUB-EXPPET",
+      "parent_pn": "",
+      "is_assembly": true
+    },
+    "MER07586-001": {
+      "part_number": "MER07586-001",
+      "description": "COUPLING, POPPET",
+      "parent_pn": "MER07587-001",
+      "is_assembly": false
+    },
+    "MER07588-001": {
+      "part_number": "MER07588-001",
+      "description": "PUSHER, BALL POPPET",
+      "parent_pn": "",
+      "is_assembly": false
+    },
+    "MER07540-003": {
+      "part_number": "MER07540-003",
+      "description": "CONNECTING ROD ASSEMBLY",
+      "parent_pn": "",
+      "is_assembly": false
+    }
+  },
+  "root_nodes": [
+    "MER07540-001",
+    "MER07584-001",
+    "MER07583-001",
+    "MER07570-001",
+    "MER07582-001",
+    "MER07550-001",
+    "MER07553-001",
+    "MER07558-001",
+    "MER07559-001",
+    "MER07546-001",
+    "MER07564-001",
+    "MER07568-001",
+    "MER07569-001",
+    "MER07579-001",
+    "MER07580-001",
+    "MER07585-001",
+    "MER07587-001",
+    "MER07588-001",
+    "MER07540-003"
+  ],
+  "metadata": {
+    "source_file": "MER07540-DT.DRW_-.5_REWORK.pdf",
+    "extracted_at": "2025-01-20T00:00:00",
+    "extractor_version": "1.0.0",
+    "stage": "parse_dt",
+    "note": "Hierarchy extracted from reference MIUL_HLS.xlsx for validation"
+  }
+}

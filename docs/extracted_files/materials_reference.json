@@ -1,0 +1,788 @@
+[
+  {
+    "designation": "7075-T651 ALUMINUM",
+    "family": "aluminum",
+    "uns": "A97075",
+    "spec_primary": "ASTM B211",
+    "spec_alternate": ["SAE AMS-QQ-A-225/9", "SAE AMS 4078"],
+    "common_forms": ["BAR", "PLATE", "FORGING"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "High-strength aerospace aluminum. T651 = stress relieved by stretching."
+  },
+  {
+    "designation": "7075-T73 ALUMINUM",
+    "family": "aluminum",
+    "uns": "A97075",
+    "spec_primary": "SAE AMS 4147",
+    "spec_alternate": ["ASTM B247"],
+    "common_forms": ["FORGING", "PLATE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Overaged temper for stress corrosion resistance. Lower strength than T6."
+  },
+  {
+    "designation": "6061-T6 ALUMINUM",
+    "family": "aluminum",
+    "uns": "A96061",
+    "spec_primary": "ASTM B209",
+    "spec_alternate": ["SAE AMS-QQ-A-250/11", "SAE AMS 4027"],
+    "common_forms": ["SHEET", "PLATE", "BAR", "TUBE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "General purpose aerospace aluminum. Good weldability."
+  },
+  {
+    "designation": "2024-T3 ALUMINUM",
+    "family": "aluminum",
+    "uns": "A92024",
+    "spec_primary": "SAE AMS-QQ-A-250/4",
+    "spec_alternate": ["SAE AMS 4037", "ASTM B209"],
+    "common_forms": ["SHEET", "PLATE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "High strength Al-Cu alloy. Poor corrosion resistance, usually clad."
+  },
+  {
+    "designation": "2219-T87 ALUMINUM",
+    "family": "aluminum",
+    "uns": "A92219",
+    "spec_primary": "SAE AMS 4066",
+    "spec_alternate": ["ASTM B209"],
+    "common_forms": ["PLATE", "FORGING"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Excellent cryogenic properties. Weldable. Used for LH2/LOX tanks."
+  },
+  {
+    "designation": "5052-H32 ALUMINUM",
+    "family": "aluminum",
+    "uns": "A95052",
+    "spec_primary": "ASTM B209",
+    "spec_alternate": ["SAE AMS 4015"],
+    "common_forms": ["SHEET", "PLATE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Non-heat-treatable. Good formability and corrosion resistance."
+  },
+  {
+    "designation": "ALUMINUM BRONZE ALLOY",
+    "family": "copper",
+    "uns": "C95400",
+    "spec_primary": "ASTM B505",
+    "spec_alternate": ["SAE AMS 4880"],
+    "common_forms": ["BAR", "CASTING"],
+    "is_specific": false,
+    "hitl_required": true,
+    "hitl_question": "Which aluminum bronze? C95400? C95500? Need UNS or spec.",
+    "notes": "Aluminum bronze family. Used for bearings, bushings, wear surfaces."
+  },
+  {
+    "designation": "A286 CRES",
+    "family": "iron_nickel_superalloy",
+    "uns": "S66286",
+    "spec_primary": "SAE AMS 5731",
+    "spec_alternate": ["SAE AMS 5737", "SAE AMS 5525", "SAE AMS 5726"],
+    "common_forms": ["BAR", "FORGING", "SHEET", "WIRE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "strength_classes": {
+      "130 KSI": {"spec": "SAE AMS 5731", "condition": "Solution treated + aged"},
+      "140 KSI": {"spec": "SAE AMS 5732", "condition": "Solution treated + aged"},
+      "150 KSI": {"spec": "SAE AMS 5525", "condition": "Cold drawn wire"},
+      "160 KSI": {"spec": "SAE AMS 5726", "condition": "High strength bolting"},
+      "180 KSI": {"spec": "SAE AMS 5737", "condition": "High strength fastener grade"},
+      "200 KSI": {"spec": "SAE AMS 5853", "condition": "Maximum strength"}
+    },
+    "notes": "Iron-nickel superalloy. Excellent for LOX/GOX service. Non-magnetic after aging."
+  },
+  {
+    "designation": "A286",
+    "family": "iron_nickel_superalloy",
+    "uns": "S66286",
+    "spec_primary": null,
+    "is_specific": false,
+    "hitl_required": true,
+    "hitl_question": "A286 needs: (1) CRES confirmed? (2) Strength class (KSI)? (3) Which AMS spec?",
+    "resolves_to": "A286 CRES",
+    "notes": "Generic A286. Almost always A286 CRES (UNS S66286). Need strength class for fasteners."
+  },
+  {
+    "designation": "302 CRES",
+    "family": "austenitic_stainless",
+    "uns": "S30200",
+    "spec_primary": "ASTM A313",
+    "spec_alternate": ["SAE AMS 5688"],
+    "common_forms": ["WIRE", "SPRING"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Austenitic stainless. Common for springs, Belleville washers."
+  },
+  {
+    "designation": "302 OR 304 CRES",
+    "family": "austenitic_stainless",
+    "uns": null,
+    "spec_primary": "MS21209",
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Per MS21209, helical coil inserts can be 302 or 304. Both acceptable."
+  },
+  {
+    "designation": "303 CRES",
+    "family": "austenitic_stainless",
+    "uns": "S30300",
+    "spec_primary": "ASTM A582",
+    "spec_alternate": ["SAE AMS 5640"],
+    "common_forms": ["BAR", "ROD"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Free-machining austenitic. Contains sulfur. Not for welding."
+  },
+  {
+    "designation": "304 CRES",
+    "family": "austenitic_stainless",
+    "uns": "S30400",
+    "spec_primary": "ASTM A240",
+    "spec_alternate": ["SAE AMS 5513", "ASTM A276"],
+    "common_forms": ["SHEET", "PLATE", "BAR"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Most common austenitic stainless. Good for cryogenic service."
+  },
+  {
+    "designation": "304L CRES",
+    "family": "austenitic_stainless",
+    "uns": "S30403",
+    "spec_primary": "ASTM A240",
+    "spec_alternate": ["SAE AMS 5511"],
+    "common_forms": ["SHEET", "PLATE", "WELD WIRE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Low carbon 304 for welding. Prevents sensitization."
+  },
+  {
+    "designation": "316 CRES",
+    "family": "austenitic_stainless",
+    "uns": "S31600",
+    "spec_primary": "ASTM A276",
+    "spec_alternate": ["SAE AMS 5648", "ASTM A580"],
+    "common_forms": ["BAR", "WIRE", "TUBE", "FITTING"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Mo-bearing austenitic. Better corrosion than 304. Common for fittings."
+  },
+  {
+    "designation": "316L CRES",
+    "family": "austenitic_stainless",
+    "uns": "S31603",
+    "spec_primary": "ASTM A240",
+    "spec_alternate": ["SAE AMS 5653"],
+    "common_forms": ["SHEET", "PLATE", "TUBE", "WELD WIRE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Low carbon 316 for welding. Excellent corrosion resistance."
+  },
+  {
+    "designation": "321 CRES",
+    "family": "austenitic_stainless",
+    "uns": "S32100",
+    "spec_primary": "SAE AMS 5645",
+    "spec_alternate": ["ASTM A240"],
+    "common_forms": ["SHEET", "PLATE", "TUBE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Ti-stabilized austenitic. For high-temp service. Resists sensitization."
+  },
+  {
+    "designation": "347 CRES",
+    "family": "austenitic_stainless",
+    "uns": "S34700",
+    "spec_primary": "SAE AMS 5646",
+    "spec_alternate": ["ASTM A240"],
+    "common_forms": ["SHEET", "PLATE", "TUBE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Nb-stabilized austenitic. For high-temp service. Better than 321 for welding."
+  },
+  {
+    "designation": "18-8 CRES",
+    "family": "austenitic_stainless",
+    "uns": null,
+    "spec_primary": "ASTM F879",
+    "is_specific": false,
+    "hitl_required": false,
+    "resolves_to": "304 CRES or 302 CRES",
+    "notes": "Generic 18-8 (18% Cr, 8% Ni). Usually 304 or 302. Per ASTM F879 for SBHCS."
+  },
+  {
+    "designation": "410 CRES",
+    "family": "martensitic_stainless",
+    "uns": "S41000",
+    "spec_primary": "ASTM A276",
+    "spec_alternate": ["SAE AMS 5613"],
+    "common_forms": ["BAR", "FORGING"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Martensitic stainless. Heat treatable. Magnetic."
+  },
+  {
+    "designation": "440C CRES",
+    "family": "martensitic_stainless",
+    "uns": "S44004",
+    "spec_primary": "SAE AMS 5630",
+    "spec_alternate": ["ASTM A276"],
+    "common_forms": ["BAR", "BEARING"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "High-carbon martensitic. For bearings, valve components. Very hard."
+  },
+  {
+    "designation": "17-4 PH CRES",
+    "family": "precipitation_hardening_stainless",
+    "uns": "S17400",
+    "spec_primary": "SAE AMS 5643",
+    "spec_alternate": ["ASTM A564", "SAE AMS 5604"],
+    "common_forms": ["BAR", "FORGING", "SHEET"],
+    "is_specific": true,
+    "hitl_required": false,
+    "conditions": {
+      "H900": {"hardness": "40-47 HRC", "tensile": "190 KSI min"},
+      "H1025": {"hardness": "32-40 HRC", "tensile": "155 KSI min"},
+      "H1075": {"hardness": "31-38 HRC", "tensile": "145 KSI min"},
+      "H1150": {"hardness": "28-37 HRC", "tensile": "135 KSI min"}
+    },
+    "notes": "Most common PH stainless. Excellent strength/corrosion combo. Magnetic."
+  },
+  {
+    "designation": "15-5 PH CRES",
+    "family": "precipitation_hardening_stainless",
+    "uns": "S15500",
+    "spec_primary": "SAE AMS 5659",
+    "spec_alternate": ["ASTM A564"],
+    "common_forms": ["BAR", "FORGING"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Similar to 17-4 PH but better transverse properties. Less delta ferrite."
+  },
+  {
+    "designation": "13-8Mo PH CRES",
+    "family": "precipitation_hardening_stainless",
+    "uns": "S13800",
+    "spec_primary": "SAE AMS 5629",
+    "spec_alternate": ["ASTM A564"],
+    "common_forms": ["BAR", "FORGING"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Highest strength PH stainless. Mo-bearing. Excellent toughness."
+  },
+  {
+    "designation": "CUSTOM 455 CRES",
+    "family": "precipitation_hardening_stainless",
+    "uns": "S45500",
+    "spec_primary": "SAE AMS 5617",
+    "common_forms": ["BAR", "WIRE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Martensitic PH. Age-hardenable. Good for springs and fasteners."
+  },
+  {
+    "designation": "CUSTOM 465 CRES",
+    "family": "precipitation_hardening_stainless",
+    "uns": "S46500",
+    "spec_primary": "SAE AMS 5936",
+    "common_forms": ["BAR", "FORGING"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Highest strength PH stainless (~270 KSI). Excellent SCC resistance."
+  },
+  {
+    "designation": "INCONEL 718",
+    "family": "nickel_superalloy",
+    "uns": "N07718",
+    "spec_primary": "SAE AMS 5663",
+    "spec_alternate": ["SAE AMS 5596", "SAE AMS 5662", "ASTM B637"],
+    "common_forms": ["BAR", "FORGING", "SHEET", "WIRE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Precipitation-hardened Ni-Cr-Fe-Mo-Nb. Primary aerospace superalloy."
+  },
+  {
+    "designation": "INCONEL 625",
+    "family": "nickel_superalloy",
+    "uns": "N06625",
+    "spec_primary": "SAE AMS 5666",
+    "spec_alternate": ["SAE AMS 5599", "ASTM B443"],
+    "common_forms": ["BAR", "SHEET", "WELD WIRE", "FORGING"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Solid-solution strengthened Ni-Cr-Mo-Nb. Excellent weldability."
+  },
+  {
+    "designation": "INCONEL X-750",
+    "family": "nickel_superalloy",
+    "uns": "N07750",
+    "spec_primary": "SAE AMS 5698",
+    "spec_alternate": ["SAE AMS 5542", "SAE AMS 5667"],
+    "common_forms": ["WIRE", "BAR", "SPRING"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Age-hardenable Ni-Cr. Standard for safety wire and springs."
+  },
+  {
+    "designation": "INCONEL 600",
+    "family": "nickel_superalloy",
+    "uns": "N06600",
+    "spec_primary": "SAE AMS 5665",
+    "spec_alternate": ["ASTM B166", "ASTM B168"],
+    "common_forms": ["BAR", "SHEET", "TUBE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "General-purpose Ni-Cr. Good oxidation resistance. Not age-hardenable."
+  },
+  {
+    "designation": "INCONEL",
+    "family": "nickel_superalloy",
+    "uns": null,
+    "spec_primary": null,
+    "is_specific": false,
+    "hitl_required": true,
+    "hitl_question": "Which Inconel? 625 (weld/corrosion), 718 (strength/springs), X-750 (springs/bolts), 600 (general)?",
+    "notes": "Generic Inconel. MUST be resolved to specific alloy."
+  },
+  {
+    "designation": "INCONEL ALLOY",
+    "family": "nickel_superalloy",
+    "uns": null,
+    "spec_primary": null,
+    "is_specific": false,
+    "hitl_required": true,
+    "hitl_question": "Same as INCONEL - which specific alloy? Check std part spec.",
+    "resolves_to": "INCONEL",
+    "notes": "Generic Inconel variant wording."
+  },
+  {
+    "designation": "NICKEL ALLOY",
+    "family": "nickel_superalloy",
+    "uns": null,
+    "spec_primary": null,
+    "is_specific": false,
+    "hitl_required": true,
+    "hitl_question": "Which nickel alloy? For safety wire (MS20995), it's Inconel X-750.",
+    "common_resolution": {
+      "MS20995": "INCONEL X-750",
+      "NASM20995": "INCONEL X-750"
+    },
+    "notes": "Generic nickel alloy. Context-dependent resolution."
+  },
+  {
+    "designation": "MONEL 400",
+    "family": "nickel_copper",
+    "uns": "N04400",
+    "spec_primary": "SAE AMS 4544",
+    "spec_alternate": ["ASTM B164", "ASTM B127"],
+    "common_forms": ["BAR", "SHEET", "TUBE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Ni-Cu alloy. Excellent seawater/acid corrosion resistance."
+  },
+  {
+    "designation": "MONEL K-500",
+    "family": "nickel_copper",
+    "uns": "N05500",
+    "spec_primary": "SAE AMS 4676",
+    "spec_alternate": ["ASTM B865"],
+    "common_forms": ["BAR", "FORGING"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Age-hardenable Ni-Cu. Higher strength than Monel 400. For marine/pump shafts."
+  },
+  {
+    "designation": "HASTELLOY C-276",
+    "family": "nickel_superalloy",
+    "uns": "N10276",
+    "spec_primary": "SAE AMS 5750",
+    "spec_alternate": ["ASTM B574", "ASTM B575"],
+    "common_forms": ["BAR", "SHEET", "PLATE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Ni-Mo-Cr. Outstanding corrosion resistance to oxidizing/reducing environments."
+  },
+  {
+    "designation": "HASTELLOY C-22",
+    "family": "nickel_superalloy",
+    "uns": "N06022",
+    "spec_primary": "ASTM B574",
+    "spec_alternate": ["SAE AMS 5743"],
+    "common_forms": ["BAR", "SHEET", "PLATE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Improved version of C-276. Better weld corrosion resistance."
+  },
+  {
+    "designation": "WASPALOY",
+    "family": "nickel_superalloy",
+    "uns": "N07001",
+    "spec_primary": "SAE AMS 5544",
+    "spec_alternate": ["SAE AMS 5706", "SAE AMS 5707"],
+    "common_forms": ["BAR", "FORGING", "SHEET"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Age-hardenable superalloy. For turbine discs and blades. High-temp strength."
+  },
+  {
+    "designation": "MP35N",
+    "family": "cobalt_nickel",
+    "uns": "R30035",
+    "spec_primary": "SAE AMS 5758",
+    "spec_alternate": ["SAE AMS 5844", "ASTM F562"],
+    "common_forms": ["BAR", "WIRE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Co-Ni-Cr-Mo. Ultra-high strength (~280 KSI). For springs, fasteners, medical."
+  },
+  {
+    "designation": "HAYNES 25 (L-605)",
+    "family": "cobalt_superalloy",
+    "uns": "R30605",
+    "spec_primary": "SAE AMS 5537",
+    "spec_alternate": ["SAE AMS 5759"],
+    "common_forms": ["SHEET", "BAR"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Co-Cr-W-Ni. For high-temp (up to 1800F). Turbine blades, combustors."
+  },
+  {
+    "designation": "STELLITE 6",
+    "family": "cobalt_superalloy",
+    "uns": "R30006",
+    "spec_primary": "SAE AMS 5387",
+    "common_forms": ["HARDFACING", "CASTING"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Co-Cr-W. Excellent wear/erosion resistance. Valve seats, hardfacing."
+  },
+  {
+    "designation": "ELGILOY",
+    "family": "cobalt_nickel",
+    "uns": "R30003",
+    "spec_primary": "SAE AMS 5833",
+    "spec_alternate": ["ASTM F1058"],
+    "common_forms": ["WIRE", "STRIP"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Co-Cr-Ni. For springs, diaphragms. Non-magnetic. Medical grade available."
+  },
+  {
+    "designation": "Ti-6Al-4V",
+    "family": "titanium_alpha_beta",
+    "uns": "R56400",
+    "spec_primary": "SAE AMS 4911",
+    "spec_alternate": ["SAE AMS 4928", "SAE AMS 4935", "ASTM B348"],
+    "common_forms": ["BAR", "FORGING", "SHEET", "PLATE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "grades": {
+      "STANDARD": {"spec": "SAE AMS 4911", "form": "Sheet/Plate"},
+      "ELI": {"spec": "SAE AMS 4930", "notes": "Extra Low Interstitial, for cryogenic"},
+      "FORGING": {"spec": "SAE AMS 4928"}
+    },
+    "notes": "Workhorse aerospace titanium. 6% Al, 4% V. Good to 600F."
+  },
+  {
+    "designation": "Ti-6Al-4V ELI",
+    "family": "titanium_alpha_beta",
+    "uns": "R56401",
+    "spec_primary": "SAE AMS 4930",
+    "spec_alternate": ["SAE AMS 4931", "ASTM F136"],
+    "common_forms": ["BAR", "FORGING", "SHEET"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Extra Low Interstitial grade. Better fracture toughness. Cryogenic and medical."
+  },
+  {
+    "designation": "Ti-6Al-2Sn-4Zr-2Mo",
+    "family": "titanium_near_alpha",
+    "uns": "R54620",
+    "spec_primary": "SAE AMS 4975",
+    "spec_alternate": ["SAE AMS 4976"],
+    "common_forms": ["FORGING", "BAR"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Near-alpha Ti. For high-temp (up to 1000F). Compressor discs, blades."
+  },
+  {
+    "designation": "CP TITANIUM GRADE 2",
+    "family": "titanium_cp",
+    "uns": "R50400",
+    "spec_primary": "ASTM B265",
+    "spec_alternate": ["SAE AMS 4902"],
+    "common_forms": ["SHEET", "PLATE", "TUBE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Commercially pure Ti. Good corrosion resistance, formability. 50 KSI tensile."
+  },
+  {
+    "designation": "CP TITANIUM GRADE 4",
+    "family": "titanium_cp",
+    "uns": "R50700",
+    "spec_primary": "ASTM B265",
+    "spec_alternate": ["SAE AMS 4901"],
+    "common_forms": ["SHEET", "PLATE", "BAR"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Higher strength CP Ti. 80 KSI tensile. Less ductile than Grade 2."
+  },
+  {
+    "designation": "TITANIUM",
+    "family": "titanium",
+    "uns": null,
+    "spec_primary": null,
+    "is_specific": false,
+    "hitl_required": true,
+    "hitl_question": "Which titanium alloy? Ti-6Al-4V (most common), CP Grade 2/4, or other?",
+    "notes": "Generic titanium. Must specify alloy or CP grade."
+  },
+  {
+    "designation": "BERYLLIUM COPPER",
+    "family": "copper",
+    "uns": "C17200",
+    "spec_primary": "SAE AMS 4650",
+    "spec_alternate": ["SAE AMS 4651", "ASTM B196"],
+    "common_forms": ["BAR", "STRIP", "WIRE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "conditions": {
+      "A": {"hardness": "HRB 45-80", "notes": "Solution annealed"},
+      "AT": {"hardness": "HRC 36-42", "notes": "Solution treated + age hardened"},
+      "HT": {"hardness": "HRC 38-44", "notes": "Cold worked + age hardened"}
+    },
+    "notes": "Age-hardenable Cu-Be. Non-sparking tools, springs, connectors."
+  },
+  {
+    "designation": "C17000 BERYLLIUM COPPER",
+    "family": "copper",
+    "uns": "C17000",
+    "spec_primary": "SAE AMS 4650",
+    "common_forms": ["STRIP", "WIRE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Lower Be content than C17200. Better formability, lower strength."
+  },
+  {
+    "designation": "OFHC COPPER",
+    "family": "copper",
+    "uns": "C10100",
+    "spec_primary": "ASTM B152",
+    "spec_alternate": ["SAE AMS 4501"],
+    "common_forms": ["BAR", "SHEET", "TUBE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Oxygen-free high conductivity. 99.99% Cu. For electrical and cryogenic."
+  },
+  {
+    "designation": "CuNi 70/30",
+    "family": "copper_nickel",
+    "uns": "C71500",
+    "spec_primary": "ASTM B122",
+    "spec_alternate": ["SAE AMS 4640"],
+    "common_forms": ["TUBE", "SHEET", "PLATE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Copper-nickel. Excellent seawater corrosion resistance. Heat exchangers."
+  },
+  {
+    "designation": "PCTFE",
+    "family": "fluoropolymer",
+    "uns": null,
+    "spec_primary": "ASTM D7194",
+    "spec_alternate": ["ASTM D1430"],
+    "common_forms": ["ROD", "SHEET", "MOLDED"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Polychlorotrifluoroethylene. Excellent for LOX/GOX service. NASA-approved."
+  },
+  {
+    "designation": "PTFE",
+    "family": "fluoropolymer",
+    "uns": null,
+    "spec_primary": "ASTM D4894",
+    "spec_alternate": ["ASTM D4895", "SAE AMS 3651"],
+    "common_forms": ["ROD", "SHEET", "TUBE", "TAPE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Polytetrafluoroethylene (Teflon). Wide temp range. Not oxygen-compatible."
+  },
+  {
+    "designation": "KEL-F 81",
+    "family": "fluoropolymer",
+    "uns": null,
+    "spec_primary": "ASTM D7194",
+    "common_forms": ["ROD", "SHEET", "MOLDED"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "PCTFE brand name (3M). Excellent for LOX/GOX seals."
+  },
+  {
+    "designation": "VESPEL SP-3",
+    "family": "polyimide",
+    "uns": null,
+    "spec_primary": "ASTM D6456",
+    "common_forms": ["BUSHING", "SEAL", "BEARING"],
+    "is_specific": true,
+    "hitl_required": false,
+    "subtypes": {
+      "TYPE III/M": "MoS2 filled (self-lubricating, vacuum)",
+      "TYPE III/P": "PTFE filled (low friction)"
+    },
+    "notes": "DuPont polyimide. SP-3 = filled grades. Cryogenic bushings."
+  },
+  {
+    "designation": "TORLON 4203",
+    "family": "polyamide_imide",
+    "uns": null,
+    "spec_primary": "ASTM D5204",
+    "common_forms": ["ROD", "MOLDED", "MACHINED"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Polyamide-imide. Unfilled grade. High strength, good wear."
+  },
+  {
+    "designation": "TORLON 4301",
+    "family": "polyamide_imide",
+    "uns": null,
+    "spec_primary": "ASTM D5204",
+    "common_forms": ["ROD", "MOLDED"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "PAI with PTFE/graphite fill. Self-lubricating. For bearings, seals."
+  },
+  {
+    "designation": "RULON LR",
+    "family": "fluoropolymer_filled",
+    "uns": null,
+    "spec_primary": null,
+    "common_forms": ["BEARING", "BUSHING", "SEAL"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Glass-reinforced PTFE. For bearings in cryogenic/aerospace."
+  },
+  {
+    "designation": "RULON J",
+    "family": "fluoropolymer_filled",
+    "uns": null,
+    "spec_primary": null,
+    "common_forms": ["BEARING", "BUSHING", "SEAL"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "PTFE with filler. For hydraulic seals, piston rings."
+  },
+  {
+    "designation": "KAPTON",
+    "family": "polyimide_film",
+    "uns": null,
+    "spec_primary": "SAE AMS 3700",
+    "common_forms": ["FILM", "TAPE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "types": {
+      "HN": "Standard film",
+      "FN": "FEP-coated (heat sealable)"
+    },
+    "notes": "DuPont polyimide film. -269C to +400C. Electrical insulation, flex circuits."
+  },
+  {
+    "designation": "VITON",
+    "family": "elastomer_fkm",
+    "uns": null,
+    "spec_primary": "SAE AMS 7276",
+    "spec_alternate": ["SAE AMS-R-83485"],
+    "common_forms": ["O-RING", "SEAL", "GASKET"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "FKM fluoroelastomer. Excellent fuel/oil resistance. -20F to +400F."
+  },
+  {
+    "designation": "BUNA-N",
+    "family": "elastomer_nbr",
+    "uns": null,
+    "spec_primary": "SAE AMS 7272",
+    "spec_alternate": ["SAE AMS-P-5315"],
+    "common_forms": ["O-RING", "SEAL", "GASKET"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Nitrile rubber (NBR). Good oil resistance. -40F to +250F. Not for LOX."
+  },
+  {
+    "designation": "SILICONE",
+    "family": "elastomer_vmq",
+    "uns": null,
+    "spec_primary": "SAE AMS 3304",
+    "spec_alternate": ["SAE AMS 3325"],
+    "common_forms": ["O-RING", "SEAL", "GASKET"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "VMQ silicone rubber. Wide temp range (-80F to +450F). Not for fuel."
+  },
+  {
+    "designation": "EPDM",
+    "family": "elastomer_epdm",
+    "uns": null,
+    "spec_primary": "SAE AMS 7280",
+    "common_forms": ["O-RING", "SEAL", "GASKET"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Ethylene propylene diene. Excellent ozone/weather resistance. Not for oil."
+  },
+  {
+    "designation": "KALREZ",
+    "family": "elastomer_ffkm",
+    "uns": null,
+    "spec_primary": null,
+    "common_forms": ["O-RING", "SEAL"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Perfluoroelastomer (FFKM). Best chemical resistance. Expensive. -20F to +600F."
+  },
+  {
+    "designation": "SI3N4",
+    "family": "ceramic",
+    "uns": null,
+    "spec_primary": null,
+    "common_forms": ["BEARING BALL", "BEARING ROLLER"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Silicon nitride. Hybrid ceramic bearings. Non-sparking in O2 service."
+  },
+  {
+    "designation": "INVAR 36",
+    "family": "nickel_iron",
+    "uns": "K93600",
+    "spec_primary": "SAE AMS 5540",
+    "spec_alternate": ["ASTM B753"],
+    "common_forms": ["BAR", "SHEET"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "36% Ni-Fe. Ultra-low thermal expansion. For optical, aerospace tooling."
+  },
+  {
+    "designation": "KOVAR",
+    "family": "nickel_iron_cobalt",
+    "uns": "K94610",
+    "spec_primary": "SAE AMS 5802",
+    "spec_alternate": ["ASTM F15"],
+    "common_forms": ["BAR", "SHEET", "WIRE"],
+    "is_specific": true,
+    "hitl_required": false,
+    "notes": "Fe-Ni-Co. Matched CTE with borosilicate glass. Glass-to-metal seals."
+  },
+  {
+    "designation": "MISC",
+    "family": "placeholder",
+    "uns": null,
+    "spec_primary": null,
+    "is_specific": false,
+    "hitl_required": true,
+    "hitl_question": "MISC = assembly with multiple materials. List primary material or mark as VARIOUS.",
+    "notes": "Placeholder for assemblies containing mixed materials."
+  }
+]

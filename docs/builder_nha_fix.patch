@@ -1,0 +1,124 @@
+# MIUL Builder NHA Fix for SecPayMIUL Compliance
+# 
+# Problem: builder.py currently puts full parent drawing numbers in NHA
+#          (e.g., "MER07543-001") but SecPayMIUL expects either:
+#          - The MIUL acronym (e.g., "MCP") for tree-visible parts, OR
+#          - Blank for subparts
+#
+# Solution: Add a Phase 3e that normalizes NHA after Parent is calculated
+#
+# The logic:
+#   - Parts with Parent=2 (direct children of MIUL root) → NHA = miul_acronym
+#   - Parts with Parent>2 (nested under assemblies) → NHA = "" (subparts)
+#   - Header rows (Index 1,2) → Keep as-is
+#
+# This preserves the hierarchy in the Parent column while making NHA
+# comply with the SecPayMIUL binary pattern (acronym or blank).
+
+# =============================================================================
+# CHANGE 1: In merge_dt_and_parts() - Add Phase 3e after Phase 3c
+# =============================================================================
+
+# After line 1853 (after "LOGGER.info(f"[Merge] Updated Parent column...")"):
+# Add this new phase:
+
+    # Phase 3e: Normalize NHA for SecPayMIUL compliance
+    # Per SecPayMIUL.pdf, NHA should be:
+    #   - MIUL acronym (e.g., "MCP") for tree-visible parts (Parent=2)
+    #   - Blank for subparts (Parent>2)
+    # The Parent column already carries the actual hierarchy.
+    miul_acronym = miul_number or project_name
+    nha_normalized = 0
+    for row in rows:
+        row_index = row["Index"]
+        # Skip header rows and EOF
+        if row_index <= 2 or row_index == -1:
+            continue
+        
+        parent = row.get("Parent", 0)
+        if parent == 2:
+            # Direct child of MIUL root - this is a tree part
+            row["NHA"] = miul_acronym
+            nha_normalized += 1
+        else:
+            # Nested under another assembly - this is a subpart
+            row["NHA"] = ""
+            nha_normalized += 1
+    
+    LOGGER.info(f"[Merge] Normalized NHA for {nha_normalized} rows (SecPayMIUL compliance)")
+
+
+# =============================================================================
+# CHANGE 2: In _process_assembly() - Same pattern for the class-based builder
+# =============================================================================
+
+# The MIULBuilderV3._process_assembly() method at line 1302-1313 sets:
+#     "NHA": drawing.drawing_number
+# 
+# This should instead be blank for subparts. The assembly row (parent_index)
+# should get the acronym, EPL children should get blank.
+
+# Replace lines 1252-1264 (assembly header row):
+        # Assembly header row - NHA = acronym (tree-visible)
+        # Note: self.miul_acronym should be set during extract_directory()
+        miul_acronym = getattr(self, 'miul_acronym', '') or self._detect_project_prefix()
+        rows.append({
+            "Index": parent_index,
+            "Parent": 0,
+            "Part Number": drawing.drawing_number,
+            "Part Description": drawing.title,
+            "Nomenclature": drawing.title,
+            "NHA": miul_acronym,  # Tree-visible: use acronym
+            "Change Letter": drawing.revision,
+            "Drawing Source": drawing.drawing_number,
+            "Designation": "",
+            "Material Specification": "",
+        })
+
+# Replace lines 1302-1313 (EPL child rows):
+            rows.append({
+                "Index": child_index,
+                "Parent": parent_index,
+                "Part Number": part_number,
+                "Part Description": part.get("description", ""),
+                "Nomenclature": part.get("description", ""),
+                "NHA": "",  # Subpart: blank NHA per SecPayMIUL
+                "Drawing Source": drawing.drawing_number,
+                "Designation": material,
+                "Material Specification": spec,
+                "Material Form": _infer_material_form(raw_spec, raw_material),
+            })
+
+
+# =============================================================================
+# CHANGE 3: Store miul_acronym during directory extraction
+# =============================================================================
+
+# In extract_directory() around line 460, after extracting DT:
+        if self.dt_tree and self.dt_tree.get("top_level"):
+            top_level = self.dt_tree["top_level"]
+            # Extract acronym (e.g., "MER" from "MER07540-001")
+            import re
+            match = re.match(r'^([A-Z]+\d*)', top_level.upper())
+            self.miul_acronym = match.group(1) if match else top_level
+            LOGGER.info(f"[MIULBuilder] MIUL acronym: {self.miul_acronym}")
+
+
+# =============================================================================
+# SUMMARY OF CHANGES
+# =============================================================================
+#
+# Before (current behavior):
+#   Index | Parent | Part Number    | NHA
+#   3     | 2      | MCP-CH-001     | MER07540
+#   4     | 3      | MCP-CH-001-1   | MCP-CH-001     ← Full drawing number
+#   5     | 3      | MS16995-001    | MCP-CH-001     ← Full drawing number
+#
+# After (SecPayMIUL compliant):
+#   Index | Parent | Part Number    | NHA
+#   3     | 2      | MCP-CH-001     | MCP            ← Acronym (tree-visible)
+#   4     | 3      | MCP-CH-001-1   |                ← Blank (subpart)
+#   5     | 3      | MS16995-001    |                ← Blank (subpart)
+#
+# The Parent column still carries the full hierarchy information.
+# MAPTIS uses Parent to build relationships, NHA to determine tree visibility.
