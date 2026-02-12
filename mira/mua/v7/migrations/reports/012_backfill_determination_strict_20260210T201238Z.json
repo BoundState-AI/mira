@@ -1,0 +1,1096 @@
+{
+  "mode": "APPLY",
+  "timestamp_utc": "2026-02-10T20:12:38.262634+00:00",
+  "unknown_before": 702,
+  "deterministic_candidates": 668,
+  "updates_prepared": 668,
+  "skipped_unmapped": 0,
+  "unknown_after": 34,
+  "mapping_counts": {
+    "APPROVED->APPROVED": 355,
+    "CONDITIONAL->APPROVED_WITH_LIMITS": 312,
+    "REJECTED->REJECTED": 1
+  },
+  "sample_updates": [
+    {
+      "row_id": 5036,
+      "mua_number": "1001-0093",
+      "source_file": "1001-0093.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5051,
+      "mua_number": "1001-2210",
+      "source_file": "1001-2210.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5055,
+      "mua_number": "1001-2223",
+      "source_file": "1001-2223.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5057,
+      "mua_number": "1001-2236",
+      "source_file": "1001-2236.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5060,
+      "mua_number": "1001-2247",
+      "source_file": "1001-2247.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5062,
+      "mua_number": "1001-2249",
+      "source_file": "1001-2249.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5063,
+      "mua_number": "1001-2250",
+      "source_file": "1001-2250.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5064,
+      "mua_number": "1001-2252",
+      "source_file": "1001-2252.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5074,
+      "mua_number": "1001-2275",
+      "source_file": "1001-2276.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5083,
+      "mua_number": "1001-2297",
+      "source_file": "1001-2297.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5086,
+      "mua_number": "1001-2302",
+      "source_file": "1001-2302.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5087,
+      "mua_number": "1001-2304",
+      "source_file": "1001-2304.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5090,
+      "mua_number": "1001-2307",
+      "source_file": "1001-2307.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5098,
+      "mua_number": "1001-2339",
+      "source_file": "1001-2339.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5101,
+      "mua_number": "1001-2344",
+      "source_file": "1001-2344.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5103,
+      "mua_number": "1001-2349",
+      "source_file": "1001-2349.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5105,
+      "mua_number": "1001-2351",
+      "source_file": "1001-2351.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5106,
+      "mua_number": "1001-2352",
+      "source_file": "1001-2352.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5107,
+      "mua_number": "1001-2353",
+      "source_file": "1001-2353.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5117,
+      "mua_number": "1001-2375",
+      "source_file": "1001-2375.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5122,
+      "mua_number": "1001-2383",
+      "source_file": "1001-2383.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5124,
+      "mua_number": "1001-2385",
+      "source_file": "1001-2385.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5130,
+      "mua_number": "1001-2393",
+      "source_file": "1001-2393.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5131,
+      "mua_number": "1001-2398",
+      "source_file": "1001-2398.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5134,
+      "mua_number": "1002-0059",
+      "source_file": "1002-0059.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5137,
+      "mua_number": "1002-0090",
+      "source_file": "1002-0090.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5156,
+      "mua_number": "1004-0025",
+      "source_file": "1004-0025.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5161,
+      "mua_number": "1004-0032",
+      "source_file": "1004-0032.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5162,
+      "mua_number": "1004-0033",
+      "source_file": "1004-0033.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5185,
+      "mua_number": "1009-0023",
+      "source_file": "1009-0023.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5195,
+      "mua_number": "1010-0009",
+      "source_file": "1010-0009.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5196,
+      "mua_number": "1010-0010",
+      "source_file": "1010-0010.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5207,
+      "mua_number": "1010-0102",
+      "source_file": "1010-0102.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5251,
+      "mua_number": "1019-0013",
+      "source_file": "1019-0013.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5255,
+      "mua_number": "1019-0022",
+      "source_file": "1019-0022.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5256,
+      "mua_number": "1019-0023",
+      "source_file": "1019-0023.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5277,
+      "mua_number": "C-1ES027A",
+      "source_file": "1es-027a.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5335,
+      "mua_number": "2220-0000CS/02",
+      "source_file": "2220-0000cs-002.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5336,
+      "mua_number": "AGE-2220-0000CS/03",
+      "source_file": "2220-0000cs-003.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5338,
+      "mua_number": "2220-0000CS/05",
+      "source_file": "2220-0000cs-005.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5342,
+      "mua_number": "2220-0000CS/011",
+      "source_file": "2220-0000cs-011.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5344,
+      "mua_number": "2220-0000D0/02",
+      "source_file": "2220-0000do-002.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5359,
+      "mua_number": "308309 - MUA01",
+      "source_file": "308309-MUA01_A.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5360,
+      "mua_number": "308309 - MUA02",
+      "source_file": "308309-mua02.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5361,
+      "mua_number": "308309",
+      "source_file": "308309-mua03_A.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5362,
+      "mua_number": "MUA-004",
+      "source_file": "308309-mua04.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5363,
+      "mua_number": "308309 - MUA05",
+      "source_file": "308309-mua05_A.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5364,
+      "mua_number": "308309",
+      "source_file": "308309-mua06.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5365,
+      "mua_number": "MUA-008",
+      "source_file": "308309-mua08.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5384,
+      "mua_number": "4 BMS-012",
+      "source_file": "4%20bms-012.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5392,
+      "mua_number": "4-R-006",
+      "source_file": "4-r-006.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5403,
+      "mua_number": "5-B-010",
+      "source_file": "5-b-010.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5410,
+      "mua_number": "5-E-012",
+      "source_file": "5-e-012.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5448,
+      "mua_number": "5103 MUA 219",
+      "source_file": "5103-019.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5462,
+      "mua_number": "5103 MUA 206",
+      "source_file": "5103-206.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5465,
+      "mua_number": "5103 MUA 209",
+      "source_file": "5103-209.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5488,
+      "mua_number": "5103 MUA 232",
+      "source_file": "5103-232.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5491,
+      "mua_number": "5103 MUA 235",
+      "source_file": "5103-235.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5494,
+      "mua_number": "5103 MUA 238",
+      "source_file": "5103-238.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5498,
+      "mua_number": "5103 MUA 242",
+      "source_file": "5103-242.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5501,
+      "mua_number": "5103 MUA 245",
+      "source_file": "5103-245.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5507,
+      "mua_number": "5103 MUA 251",
+      "source_file": "5103-251.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5509,
+      "mua_number": "5103 MUA 253",
+      "source_file": "5103-253.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5536,
+      "mua_number": "755-8957MUA2",
+      "source_file": "8957-002.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5615,
+      "mua_number": "AADSF-010",
+      "source_file": "aadsf-010.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5619,
+      "mua_number": "AAEU - 001",
+      "source_file": "aaeu-001.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5650,
+      "mua_number": "ACC-025",
+      "source_file": "acc-025.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5657,
+      "mua_number": "ACC-07",
+      "source_file": "acces-007.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5671,
+      "mua_number": "ACIS-016",
+      "source_file": "acis-016.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5681,
+      "mua_number": "ACIS-031",
+      "source_file": "acis-031.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5693,
+      "mua_number": "ACIS-044",
+      "source_file": "acis-044.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5700,
+      "mua_number": "ACR-004",
+      "source_file": "ACR-004.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5702,
+      "mua_number": "ACR-006",
+      "source_file": "acr-006_A.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5705,
+      "mua_number": "ACR-009",
+      "source_file": "ACR-009.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5706,
+      "mua_number": "ACR-011",
+      "source_file": "acr-011.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5708,
+      "mua_number": "ACR-013",
+      "source_file": "acr-013.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5709,
+      "mua_number": "ACS-07",
+      "source_file": "acs-007.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5713,
+      "mua_number": "TSS-AEC/2",
+      "source_file": "aec-002.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5721,
+      "mua_number": "TSS-AEC/15",
+      "source_file": "aec-015.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5722,
+      "mua_number": "TSS-ACE/16",
+      "source_file": "aec-016.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5723,
+      "mua_number": "TSS-AEC/17",
+      "source_file": "aec-017.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5724,
+      "mua_number": "TSS-AEC/18",
+      "source_file": "aec-018.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5725,
+      "mua_number": "TSS-AEC/19",
+      "source_file": "aec-019.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5726,
+      "mua_number": "TSS-AEC/20",
+      "source_file": "aec-020.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5731,
+      "mua_number": "TSS-AEC/27",
+      "source_file": "aec-027.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5732,
+      "mua_number": "TSS-AEC/28",
+      "source_file": "aec-028.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5733,
+      "mua_number": "TSS-AEC-030",
+      "source_file": "aec-030.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5735,
+      "mua_number": "TSS-AEC-033",
+      "source_file": "aec-033.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5751,
+      "mua_number": "AEPI-007",
+      "source_file": "AEPI-007.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5757,
+      "mua_number": "AFE-001",
+      "source_file": "afe-001.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5766,
+      "mua_number": "AFSMUA-003",
+      "source_file": "afsmua-003.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5770,
+      "mua_number": "AFTMUA-3",
+      "source_file": "aft-003.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5774,
+      "mua_number": "AFTMUA-7",
+      "source_file": "aft-007.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5788,
+      "mua_number": "TS-MU-A1-003",
+      "source_file": "ai-003.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5789,
+      "mua_number": "TS-MU-A1-004",
+      "source_file": "ai-004.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5790,
+      "mua_number": "TS-MU-AI-011",
+      "source_file": "ai-011.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5813,
+      "mua_number": "IMPT-ALF-CE-1",
+      "source_file": "alf-ce-01.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5820,
+      "mua_number": "APU-006 Rev A",
+      "source_file": "apu-006.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5840,
+      "mua_number": "APU-031",
+      "source_file": "apu-031.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5848,
+      "mua_number": "APU-040",
+      "source_file": "apu-040.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5851,
+      "mua_number": "APU 043",
+      "source_file": "apu-043.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5862,
+      "mua_number": "APU-055",
+      "source_file": "apu-055.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5867,
+      "mua_number": "APU-060",
+      "source_file": "apu-060.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5868,
+      "mua_number": "APU-061",
+      "source_file": "apu-061.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5923,
+      "mua_number": "APU-120",
+      "source_file": "apu-120.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5945,
+      "mua_number": "APU-143",
+      "source_file": "apu-143.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5964,
+      "mua_number": "ARC-2",
+      "source_file": "arc-002.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5976,
+      "mua_number": "ARC-SLJ-009",
+      "source_file": "arc-slj-009.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5977,
+      "mua_number": "ARC-SLJ-010",
+      "source_file": "arc-slj-010.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5978,
+      "mua_number": "ARC-SLJ-011",
+      "source_file": "arc-slj-011.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 5984,
+      "mua_number": "ARC-LSP-013 A",
+      "source_file": "arclsp-013.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 6005,
+      "mua_number": "arclsp-045",
+      "source_file": "arclsp-045.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 6011,
+      "mua_number": "ARCLSP062",
+      "source_file": "arclsp-062.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 6014,
+      "mua_number": "ARCLSP-065",
+      "source_file": "arclsp-065.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 6021,
+      "mua_number": "ARCLSP088A",
+      "source_file": "arclsp-088%20.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 6058,
+      "mua_number": "ASC3",
+      "source_file": "asc-003.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 6063,
+      "mua_number": "ASC-1-016",
+      "source_file": "asc-010.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 6086,
+      "mua_number": "AST-12",
+      "source_file": "ast-012.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 6119,
+      "mua_number": "030B",
+      "source_file": "atmos-030.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "APPROVED",
+      "new_determination": "APPROVED",
+      "method": "strict_filename_join_single_non_unknown"
+    },
+    {
+      "row_id": 6120,
+      "mua_number": "031",
+      "source_file": "atmos-031.pdf",
+      "old_determination": "UNKNOWN",
+      "bok_determination_raw": "CONDITIONAL",
+      "new_determination": "APPROVED_WITH_LIMITS",
+      "method": "strict_filename_join_single_non_unknown"
+    }
+  ]
+}

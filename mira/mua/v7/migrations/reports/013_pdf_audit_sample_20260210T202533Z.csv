@@ -1,0 +1,13 @@
+sample_id,pdf_filename,pdf_path,population_group,v7_id,v7_mua_number,source_file,source_hash,v7_material_designation,v7_material_family,v7_env_type,v7_determination,v7_category,v7_appendix_b_code,v7_closure_path,v7_temp_min_f,v7_temp_max_f,audit_done,audit_pass,finding_severity,error_fields,corrected_material_family,corrected_env_type,corrected_determination,corrected_category,corrected_appendix_b_code,corrected_closure_path,notes
+1,usbi-e-83-033.pdf,C:\MIRA backup full\maptis-nlp\mira\data\mua_pdfs\usbi-e-83-033.pdf,all,,,,,,,,,,,,,,,,,,,,,,,,
+2,e021-13.pdf,C:\MIRA backup full\maptis-nlp\mira\data\mua_pdfs\e021-13.pdf,all,,,,,,,,,,,,,,,,,,,,,,,,
+3,xfmua-130.pdf,C:\MIRA backup full\maptis-nlp\mira\data\mua_pdfs\xfmua-130.pdf,all,,,,,,,,,,,,,,,,,,,,,,,,
+4,fbms-088.pdf,C:\MIRA backup full\maptis-nlp\mira\data\mua_pdfs\fbms-088.pdf,all,,,,,,,,,,,,,,,,,,,,,,,,
+5,usbi-e-87-127.pdf,C:\MIRA backup full\maptis-nlp\mira\data\mua_pdfs\usbi-e-87-127.pdf,all,,,,,,,,,,,,,,,,,,,,,,,,
+6,ius-315.pdf,C:\MIRA backup full\maptis-nlp\mira\data\mua_pdfs\ius-315.pdf,all,,,,,,,,,,,,,,,,,,,,,,,,
+7,lmsc-n-320.pdf,C:\MIRA backup full\maptis-nlp\mira\data\mua_pdfs\lmsc-n-320.pdf,all,,,,,,,,,,,,,,,,,,,,,,,,
+8,bio-007.pdf,C:\MIRA backup full\maptis-nlp\mira\data\mua_pdfs\bio-007.pdf,all,,,,,,,,,,,,,,,,,,,,,,,,
+9,bcrs-022.pdf,C:\MIRA backup full\maptis-nlp\mira\data\mua_pdfs\bcrs-022.pdf,all,,,,,,,,,,,,,,,,,,,,,,,,
+10,vcds-008.pdf,C:\MIRA backup full\maptis-nlp\mira\data\mua_pdfs\vcds-008.pdf,all,,,,,,,,,,,,,,,,,,,,,,,,
+11,mua-0393.pdf,C:\MIRA backup full\maptis-nlp\mira\data\mua_pdfs\mua-0393.pdf,all,,,,,,,,,,,,,,,,,,,,,,,,
+12,TSS-043.pdf,C:\MIRA backup full\maptis-nlp\mira\data\mua_pdfs\TSS-043.pdf,all,,,,,,,,,,,,,,,,,,,,,,,,

@@ -1,0 +1,852 @@
+{
+  "mode": "DRY_RUN",
+  "timestamp_utc": "2026-02-10T19:59:06.190090+00:00",
+  "rows_scanned": 3869,
+  "updates_count": 3869,
+  "method_counts": {
+    "cat1_trigger": 824,
+    "default_cat2": 3045
+  },
+  "sample_updates": [
+    {
+      "row_id": 5004,
+      "mua_number": "1000-0012",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5005,
+      "mua_number": "1000-0013",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5007,
+      "mua_number": "1001-0002",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5010,
+      "mua_number": "1001-0005",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5011,
+      "mua_number": "1001-0006",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5012,
+      "mua_number": "1001-0007",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5013,
+      "mua_number": "1001-0008",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5015,
+      "mua_number": "1001-0010",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5016,
+      "mua_number": "1001-0029",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5017,
+      "mua_number": "1001-0030",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5018,
+      "mua_number": "1001-0032",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5019,
+      "mua_number": "1001-0034",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5020,
+      "mua_number": "1001-0035",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5021,
+      "mua_number": "1001-0036",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5022,
+      "mua_number": "1001-0037",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5023,
+      "mua_number": "1001-0038",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5024,
+      "mua_number": "1001-0042",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5025,
+      "mua_number": "1001-0043",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5026,
+      "mua_number": "1001-0044",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5027,
+      "mua_number": "1001-0045",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5028,
+      "mua_number": "1001-0047",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5029,
+      "mua_number": "1001-0048",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5030,
+      "mua_number": "1001-0049",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5032,
+      "mua_number": "1001-0069",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5033,
+      "mua_number": "1001-0073",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5036,
+      "mua_number": "1001-0093",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5037,
+      "mua_number": "1001-0094",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5039,
+      "mua_number": "1001-0109",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5040,
+      "mua_number": "1001-0111",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5041,
+      "mua_number": "1001-0128",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5042,
+      "mua_number": "1001-0131",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5043,
+      "mua_number": "1001-0141",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5044,
+      "mua_number": "1001-0150",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5045,
+      "mua_number": "1001-0151",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5047,
+      "mua_number": "1001-0158",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5049,
+      "mua_number": "1001-2203",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5051,
+      "mua_number": "1001-2210",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5052,
+      "mua_number": "1001-2212",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5054,
+      "mua_number": "1001-2217",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5056,
+      "mua_number": "1001-2226",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5058,
+      "mua_number": "1001-2237",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5064,
+      "mua_number": "1001-2252",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5067,
+      "mua_number": "1001-2256",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5068,
+      "mua_number": "1001-2257",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5080,
+      "mua_number": "1001-2291",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5083,
+      "mua_number": "1001-2297",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5084,
+      "mua_number": "1001-2300",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5091,
+      "mua_number": "1001-2311",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5093,
+      "mua_number": "1001-2323",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5102,
+      "mua_number": "1001-2345",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5112,
+      "mua_number": "1001-2370",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5115,
+      "mua_number": "1001-2373",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5119,
+      "mua_number": "1001-2378",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5122,
+      "mua_number": "1001-2383",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5123,
+      "mua_number": "1001-2384",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5125,
+      "mua_number": "1001-2386",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5126,
+      "mua_number": "1001-2387",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5128,
+      "mua_number": "1001-2390",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5132,
+      "mua_number": "1001-5001",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5138,
+      "mua_number": "1002-0113",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5139,
+      "mua_number": "1002-0124",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5140,
+      "mua_number": "1002-0127",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5141,
+      "mua_number": "1002-0145",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5142,
+      "mua_number": "ARDE # 02",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5143,
+      "mua_number": "1003-0003",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5144,
+      "mua_number": "1003-0101",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5145,
+      "mua_number": "1004-0001",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5148,
+      "mua_number": "1004-0004",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5150,
+      "mua_number": "1004-0006",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5151,
+      "mua_number": "1004-0007",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5153,
+      "mua_number": "1004-0012",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5154,
+      "mua_number": "1004-0015",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5156,
+      "mua_number": "1004-0025",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5161,
+      "mua_number": "1004-0032",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5162,
+      "mua_number": "1004-0033",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5164,
+      "mua_number": "1004-0035",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5165,
+      "mua_number": "1005-0003",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5166,
+      "mua_number": "1005-0010",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5167,
+      "mua_number": "CR0014-923-008",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5169,
+      "mua_number": "CR0014-923-011",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5171,
+      "mua_number": "CR0014-923-014",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5180,
+      "mua_number": "1069 S87-0001",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5182,
+      "mua_number": "J409-0003",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5183,
+      "mua_number": "1009-0006",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5184,
+      "mua_number": "/D09-0007",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5189,
+      "mua_number": "1010-0002",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5190,
+      "mua_number": "1010-0003",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5191,
+      "mua_number": "1010-0004",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5195,
+      "mua_number": "1010-0009",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5196,
+      "mua_number": "1010-0010",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5201,
+      "mua_number": "1010-0016",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5202,
+      "mua_number": "1010-0017",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5203,
+      "mua_number": "1010-0018",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5204,
+      "mua_number": "1010-0019",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5205,
+      "mua_number": "1010-0020",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5209,
+      "mua_number": "1010-0113",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5210,
+      "mua_number": "1010-0114",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5211,
+      "mua_number": "1011-0001",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5214,
+      "mua_number": "1011-0004",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5215,
+      "mua_number": "1011-0005",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5216,
+      "mua_number": "1011-0006",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5217,
+      "mua_number": "1011-0007",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5219,
+      "mua_number": "1011-0009",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5220,
+      "mua_number": "1011-0017",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5221,
+      "mua_number": "1011-0033",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5222,
+      "mua_number": "1011-0034",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5225,
+      "mua_number": "1013-0030",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5226,
+      "mua_number": "1014-0002 B/L",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5227,
+      "mua_number": "1014-0003",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5228,
+      "mua_number": "1014-0004",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5230,
+      "mua_number": "1014-0006",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5231,
+      "mua_number": "1014-0008",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5232,
+      "mua_number": "1014-0010",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5233,
+      "mua_number": "1014-0015",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5234,
+      "mua_number": "1014-0016",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5235,
+      "mua_number": "1014-0019",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5236,
+      "mua_number": "1014-0020",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5237,
+      "mua_number": "1014-0023",
+      "old_category": null,
+      "new_category": "I",
+      "method": "cat1_trigger"
+    },
+    {
+      "row_id": 5238,
+      "mua_number": "1014-0033",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    },
+    {
+      "row_id": 5239,
+      "mua_number": "1014-0035",
+      "old_category": null,
+      "new_category": "II",
+      "method": "default_cat2"
+    }
+  ]
+}

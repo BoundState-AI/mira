@@ -1,0 +1,18 @@
+MIUL Dedupe Review (by Drawing Source)
+
+{
+  "input_rows": 135,
+  "input_data_rows": 132,
+  "output_rows": 132,
+  "output_data_rows": 129,
+  "rows_removed": 3,
+  "source_part_number_duplicate_groups": 0,
+  "source_description_duplicate_groups": 1,
+  "actions_taken": 1
+}
+
+Description duplicate groups:
+- MER07576 | ACTUATOR INTERNAL WELD ASSEMBLY | count=4 | part_numbers=['MER07576-001', 'MER07576-003', 'MER07576-005', 'MER07576-007']
+
+Actions taken:
+- {"type": "collapse_suffix_variant_desc_duplicates", "drawing_source": "MER07576", "part_description": "ACTUATOR INTERNAL WELD ASSEMBLY", "base_part_number": "MER07576", "kept_part_number": "MER07576-001", "merged_part_numbers": ["MER07576-003", "MER07576-005", "MER07576-007"], "dropped_rows": [120, 121, 122]}

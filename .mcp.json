@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "mira-api": {
+      "type": "stdio",
+      "command": "C:/Users/jwilde2/.conda/envs/boundstate-intent/python.exe",
+      "args": [
+        "C:/BoundState/scripts/mcp_mira_server.py"
+      ],
+      "env": {}
+    }
+  }
+}

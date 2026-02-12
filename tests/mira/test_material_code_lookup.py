@@ -177,6 +177,24 @@ class TestLookupByUns:
         assert matches[0].material_code == "10018"
 
     @patch("psycopg2.connect")
+    def test_a286_hint_keeps_optional_dash_pattern(self, mock_connect):
+        """A286 hint should still use A-?286 regex to match A286/A-286 variants."""
+        mock_cursor = MagicMock()
+        mock_cursor.fetchall.return_value = []
+        mock_conn = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        mock_connect.return_value = mock_conn
+
+        service = MaterialCodeLookupService()
+        service._lookup_by_uns("S66286", base_alloy_hint="A286 CRES")
+
+        _, params = mock_cursor.execute.call_args[0]
+        assert any(
+            isinstance(p, str) and r"\yA-?286\y" in p
+            for p in params
+        )
+
+    @patch("psycopg2.connect")
     def test_returns_material_matches(self, mock_connect):
         """Should return MaterialMatch objects."""
         mock_cursor = MagicMock()

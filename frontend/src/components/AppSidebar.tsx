@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, DragEvent } from 'react';
-import { Droplet, FlaskConical, FileStack, FileCheck, MessageSquare, Brain, ShieldCheck, ClipboardList, FolderTree, GripVertical, RotateCcw, Zap, LucideIcon } from 'lucide-react';
+import { Droplet, FlaskConical, FileStack, FileCheck, Brain, ShieldCheck, ClipboardList, FolderTree, GripVertical, RotateCcw, Zap, LucideIcon } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { BoundStateLogo } from '@/components/BoundStateLogo';
 import {
@@ -29,13 +29,11 @@ interface NavItem {
 
 const DEFAULT_NAV_ITEMS: NavItem[] = [
   { id: 'mp-plan', title: 'M&P Plan', url: '/mp-plan', icon: ClipboardList },
-  { id: 'query', title: 'Query', url: '/query', icon: MessageSquare },
-  { id: 'v4-query', title: 'MIRA V4', url: '/v4-query', icon: Zap },
+  { id: 'v4-query', title: 'MIRA Query', url: '/v4-query', icon: Zap },
   { id: 'test-classes', title: 'Test Classes', url: '/test-classes', icon: FlaskConical },
   { id: 'miul', title: 'MIUL Builder', url: '/miul', icon: FileStack },
   { id: 'dt-editor', title: 'DT Editor', url: '/dt-editor', icon: FolderTree },
-  { id: 'miul-v4', title: 'MIUL V4', url: '/miul-v4', icon: Zap },
-  { id: 'mua', title: 'MUA Generator', url: '/mua', icon: FileCheck },
+  { id: 'mua-v7', title: 'MUA Generator', url: '/mua-v7', icon: FileCheck },
   { id: 'compliance', title: 'Compliance', url: '/compliance', icon: ShieldCheck },
   { id: 'gas-compatibility', title: 'Gas Compatibility', url: '/gas-compatibility', icon: Droplet },
   { id: 'knowledge-twins', title: 'Knowledge Twins', url: '/', icon: Brain },

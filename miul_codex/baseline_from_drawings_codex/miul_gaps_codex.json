@@ -1,0 +1,2779 @@
+{
+  "generated_at": "2026-02-09T20:50:10.145812+00:00",
+  "project": "DMLLV",
+  "gap_count": 98,
+  "gaps": [
+    {
+      "index": 3,
+      "part_number": "MER07543-001",
+      "drawing_source": "MER07540-001",
+      "nha": "MER07540-001",
+      "missing_fields": [
+        "Designation",
+        "Process Specification"
+      ],
+      "severity": "high",
+      "current_values": {
+        "designation": "",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ]
+    },
+    {
+      "index": 4,
+      "part_number": "MER07570-001",
+      "drawing_source": "MER07540-001",
+      "nha": "MER07540-001",
+      "missing_fields": [
+        "Designation",
+        "Process Specification"
+      ],
+      "severity": "high",
+      "current_values": {
+        "designation": "",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ]
+    },
+    {
+      "index": 5,
+      "part_number": "MER07550-001",
+      "drawing_source": "MER07540-001",
+      "nha": "MER07540-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286",
+          "A286 CRES"
+        ],
+        "material_spec": [
+          "SAE AMS 5737"
+        ],
+        "process_spec": [
+          "SURFACE TEXTURE PER ASME B46.1; PASSIVATE PER SAE AMS 2700, METHOD 1, TYPE 1,2,3,OR 8, OR METHOD 2"
+        ]
+      },
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ]
+    },
+    {
+      "index": 6,
+      "part_number": "MER07571-001",
+      "drawing_source": "MER07540-001",
+      "nha": "MER07540-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286",
+          "A286 CRES"
+        ],
+        "material_spec": [
+          "SAE AMS 5737"
+        ],
+        "process_spec": [
+          "SURFACE TEXTURE PER ASME B46.1; KOLSTERIZE PER MANUFACTURERS RECOMMENDATION SOURCE: BODYCOTE THERMAL PROCESSING, INC. 128 SPEEDWAY LANE MOORESVILLE, NC 28117 6879 WWW.BODYCOTE.COM CAGE CODE 8W6S8; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ]
+    },
+    {
+      "index": 7,
+      "part_number": "01-885-06K",
+      "drawing_source": "MER07540-001",
+      "nha": "MER07540-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "INCONEL 718",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "INCONEL 718"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ]
+    },
+    {
+      "index": 8,
+      "part_number": "11-885-06K",
+      "drawing_source": "MER07540-001",
+      "nha": "MER07540-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "INCONEL 718",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "INCONEL 718"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ]
+    },
+    {
+      "index": 9,
+      "part_number": "M81935/3-6C",
+      "drawing_source": "MER07540-001",
+      "nha": "MER07540-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ]
+    },
+    {
+      "index": 10,
+      "part_number": "MER07540-003",
+      "drawing_source": "MER07540-001",
+      "nha": "MER07540-001",
+      "missing_fields": [
+        "Designation",
+        "Process Specification"
+      ],
+      "severity": "high",
+      "current_values": {
+        "designation": "",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ]
+    },
+    {
+      "index": 11,
+      "part_number": "MS14198N6",
+      "drawing_source": "MER07540-001",
+      "nha": "MER07540-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "INCONEL ALLOY",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "INCONEL ALLOY"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ]
+    },
+    {
+      "index": 12,
+      "part_number": "MS20995N32",
+      "drawing_source": "MER07540-001",
+      "nha": "MER07540-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "NICKEL ALLOY",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "NICKEL ALLOY"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ]
+    },
+    {
+      "index": 13,
+      "part_number": "MS21043-6",
+      "drawing_source": "MER07540-001",
+      "nha": "MER07540-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ]
+    },
+    {
+      "index": 14,
+      "part_number": "MS9390-440",
+      "drawing_source": "MER07540-001",
+      "nha": "MER07540-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ]
+    },
+    {
+      "index": 15,
+      "part_number": "NAS1149E0432R",
+      "drawing_source": "MER07540-001",
+      "nha": "MER07540-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286 (160 KSI)",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286 (160 KSI)"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ]
+    },
+    {
+      "index": 16,
+      "part_number": "NAS1149E0516R",
+      "drawing_source": "MER07540-001",
+      "nha": "MER07540-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286 (160 KSI)",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286 (160 KSI)",
+          "A286"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ]
+    },
+    {
+      "index": 17,
+      "part_number": "NAS1351N4-20",
+      "drawing_source": "MER07540-001",
+      "nha": "MER07540-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286 (180 KSI)",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286 (180 KSI)"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ]
+    },
+    {
+      "index": 18,
+      "part_number": "NAS1352N5-12",
+      "drawing_source": "MER07540-001",
+      "nha": "MER07540-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286 (180 KSI)",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286 (180 KSI)"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ]
+    },
+    {
+      "index": 19,
+      "part_number": "NAS509-6C",
+      "drawing_source": "MER07540-001",
+      "nha": "MER07540-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286 (150 KSI)",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286 (150 KSI)"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ]
+    },
+    {
+      "index": 20,
+      "part_number": "NAS509L6C",
+      "drawing_source": "MER07540-001",
+      "nha": "MER07540-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286 (150 KSI)",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286 (150 KSI)"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ]
+    },
+    {
+      "index": 21,
+      "part_number": "NAS6706U13",
+      "drawing_source": "MER07540-001",
+      "nha": "MER07540-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286 (160 KSI)",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286 (160 KSI)",
+          "A286, 160 KSI"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ]
+    },
+    {
+      "index": 22,
+      "part_number": "WSM-137-C86",
+      "drawing_source": "MER07540-001",
+      "nha": "MER07540-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ]
+    },
+    {
+      "index": 23,
+      "part_number": "MER07560-001",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Designation",
+        "Process Specification"
+      ],
+      "severity": "high",
+      "current_values": {
+        "designation": "",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 24,
+      "part_number": "MER07565-001",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Designation",
+        "Process Specification"
+      ],
+      "severity": "high",
+      "current_values": {
+        "designation": "",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 25,
+      "part_number": "MER07584-001",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Designation",
+        "Process Specification"
+      ],
+      "severity": "high",
+      "current_values": {
+        "designation": "",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [],
+        "material_spec": [],
+        "process_spec": [
+          "CLEAN AND MAINTAIN TO IEST-STD-CC1246E, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 26,
+      "part_number": "MER07545-001",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "7075 AL",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "7075 AL",
+          "ALUMINUM ALLOY 7075-T651"
+        ],
+        "material_spec": [
+          "ASTM B211, SAE AMS-QQ-A-225/9"
+        ],
+        "process_spec": [
+          "SURFACE TEXTURE PER ASME B46.1; ANODIZE PER MIL-A-8625, TYPE II, CLASS 1, CLEAR; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 27,
+      "part_number": "MER07546-001",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286"
+        ],
+        "material_spec": [
+          "AMS 5737"
+        ],
+        "process_spec": [
+          "SURFACE TEXTURE PER ASME B46.1; KOLSTERIZE PER MANUFACTURERS RECOMMENDATION SOURCE: BODYCOTE THERMAL PROCESSING, INC. 128 SPEEDWAY LANE MOORESVILLE, NC 28117 6879 WWW.BODYCOTE.COM CAGE CODE 8W6S8; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 28,
+      "part_number": "MER07553-001",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286",
+          "A286 CRES"
+        ],
+        "material_spec": [
+          "SAE AMS 5737"
+        ],
+        "process_spec": [
+          "KOLSTERIZE PER MANUFACTURERS RECOMMENDATION. SOURCE: BODYCOTE THERMAL PROCESSING, INC. 128 SPEEDWAY LANE MOORESVILLE, NC 28117 6879 WWW.BODYCOTE.COM CAGE CODE 8W6S8"
+        ]
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 29,
+      "part_number": "MER07554-001",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286",
+          "A286 CRES"
+        ],
+        "material_spec": [
+          "SAE AMS 5737"
+        ],
+        "process_spec": [
+          "SURFACE TEXTURE PER ASME B46.1; KOLSTERIZE PER MANUFACTURERS RECOMMENDATION SOURCE: BODYCOTE THERMAL PROCESSING, INC. 128 SPEEDWAY LANE MOORESVILLE, NC 28117 6879 WWW.BODYCOTE.COM CAGE CODE 8W6S8; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 30,
+      "part_number": "MER07555-001",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "AL/BRONZE ALLOY",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "AL/BRONZE ALLOY",
+          "ALUMINUM BRONZE ALLOY"
+        ],
+        "material_spec": [
+          "ASTM B505"
+        ],
+        "process_spec": [
+          "SURFACE TEXTURE PER ASME B46.1; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 31,
+      "part_number": "MER07556-001",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286",
+          "A286 CRES"
+        ],
+        "material_spec": [
+          "SAE AMS 5737"
+        ],
+        "process_spec": [
+          "SURFACE TEXTURE PER ASME B46.1; KOLSTERIZE PER MANUFACTURERS RECOMMENDATION SOURCE: BODYCOTE THERMAL PROCESSING, INC. 128 SPEEDWAY LANE MOORESVILLE, NC 28117 6879 WWW.BODYCOTE.COM CAGE CODE 8W6S8; CLEAN AND MAINTAIN PER IEST-STD-CC1246E, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 32,
+      "part_number": "MER07557-001",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286",
+          "A286 CRES"
+        ],
+        "material_spec": [
+          "SAE AMS 5737"
+        ],
+        "process_spec": [
+          "SURFACE TEXTURE PER ASME B46.1; KOLSTERIZE PER MANUFACTURERS RECOMMENDATION SOURCE: BODYCOTE THERMAL PROCESSING, INC. 128 SPEEDWAY LANE MOORESVILLE, NC 28117 6879 WWW.BODYCOTE.COM; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 33,
+      "part_number": "MER07558-001",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286",
+          "A286 CRES"
+        ],
+        "material_spec": [
+          "SAE AMS 5737"
+        ],
+        "process_spec": [
+          "SURFACE TEXTURE PER ASME B46.1; KOLSTERIZE PER MANUFACTURERS RECOMMENDATION SOURCE: BODYCOTE THERMAL PROCESSING, INC. 128 SPEEDWAY LANE MOORESVILLE, NC 28117 6879 WWW.BODYCOTE.COM; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 34,
+      "part_number": "MER07559-001",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286",
+          "A286 SST"
+        ],
+        "material_spec": [
+          "SAE AMS 5737"
+        ],
+        "process_spec": [
+          "KOLSTERIZE PER MANUFACTURERS RECOMMENDATION, SOURCE: BODYCOTE THERMAL PROCESSING, INC.; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000; SURFACE TEXTURE PER ASME B46.1"
+        ]
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 35,
+      "part_number": "2949T32",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "316 SST",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "316 SST"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 36,
+      "part_number": "97022A388",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "316 SST",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "316 SST"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 37,
+      "part_number": "M12133/2-100",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "302 SST",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "302 SST"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 38,
+      "part_number": "M12133/2-255",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "302 SST",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "302 SST",
+          "302 CRES"
+        ],
+        "material_spec": [
+          "M12133/2-255"
+        ],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 39,
+      "part_number": "NAS1149E0432R",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286 (160 KSI)",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286 (160 KSI)"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 40,
+      "part_number": "NAS1351N4H16",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286 (180 KSI)",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286 (180 KSI)"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 41,
+      "part_number": "NAS1352N4-12",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286 (180 KSI)",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286 (180 KSI)"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 42,
+      "part_number": "NAS1352N4-14",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286 (180 KSI)",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286 (180 KSI)"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 43,
+      "part_number": "NAS509-4C",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286 (150 KSI)",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286 (150 KSI)"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 44,
+      "part_number": "NASM20995N32",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "NICKEL ALLOY",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "NICKEL ALLOY"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 45,
+      "part_number": "WHM-244-S86",
+      "drawing_source": "MER07543-001",
+      "nha": "MER07543-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 46,
+      "part_number": "MER07563-001",
+      "drawing_source": "MER07560-001",
+      "nha": "MER07560-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "MISC",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "MISC"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07560-001.DRW_-.12_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 47,
+      "part_number": "MER07561-001",
+      "drawing_source": "MER07560-001",
+      "nha": "MER07560-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "7075 AL",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "7075 AL",
+          "ALUMINUM ALLOY 7075-T651"
+        ],
+        "material_spec": [
+          "ASTM B211, SAE AMS-QQ-A-225/9"
+        ],
+        "process_spec": [
+          "ANODIZE PER MIL-A-8625, TYPE II, CLASS 1, CLEAR. ALL DIMENSIONS APPLY AFTER ANODIZING PART"
+        ]
+      },
+      "source_pages": [
+        "MER07560-001.DRW_-.12_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 48,
+      "part_number": "MER07562-001",
+      "drawing_source": "MER07560-001",
+      "nha": "MER07560-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "PCTFE",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "PCTFE"
+        ],
+        "material_spec": [
+          "ASTM D7194, TYPE III"
+        ],
+        "process_spec": [
+          "SURFACE TEXTURE PER ASME B46.1; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07560-001.DRW_-.12_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 49,
+      "part_number": "MER07569-001",
+      "drawing_source": "MER07560-001",
+      "nha": "MER07560-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "7075 AL",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "7075 AL",
+          "ALUMINUM ALLOY 7075-T651"
+        ],
+        "material_spec": [
+          "ASTM B211, SAE AMS-QQ-A-225/9"
+        ],
+        "process_spec": [
+          "SURFACE TEXTURE PER ASME B46.1; ANODIZE PER MIL-A-8625, TYPE II, CLASS1, CLEAR; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07560-001.DRW_-.12_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 50,
+      "part_number": "ASME B18.3, ASTM F879",
+      "drawing_source": "MER07560-001",
+      "nha": "MER07560-001",
+      "missing_fields": [
+        "Process Specification"
+      ],
+      "severity": "low",
+      "current_values": {
+        "designation": "18-8 CRES",
+        "material_spec": "ASTM F879",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "18-8 CRES"
+        ],
+        "material_spec": [
+          "ASTM F879"
+        ],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07560-001.DRW_-.12_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 51,
+      "part_number": "LUBRICANT",
+      "drawing_source": "MER07560-001",
+      "nha": "MER07560-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "KRYTOX 240AC / TRIBOLUBE 16 / CHRISTO-LUBE MCG 111",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "KRYTOX 240AC / TRIBOLUBE 16 / CHRISTO-LUBE MCG 111"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07560-001.DRW_-.12_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 52,
+      "part_number": "M12133/2-255",
+      "drawing_source": "MER07560-001",
+      "nha": "MER07560-001",
+      "missing_fields": [
+        "Process Specification"
+      ],
+      "severity": "low",
+      "current_values": {
+        "designation": "302 CRES",
+        "material_spec": "M12133/2-255",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "302 SST",
+          "302 CRES"
+        ],
+        "material_spec": [
+          "M12133/2-255"
+        ],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07560-001.DRW_-.12_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 53,
+      "part_number": "NAS1149E0516R",
+      "drawing_source": "MER07560-001",
+      "nha": "MER07560-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286 (160 KSI)",
+          "A286"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07560-001.DRW_-.12_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 54,
+      "part_number": "NAS1352N5-16",
+      "drawing_source": "MER07560-001",
+      "nha": "MER07560-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07560-001.DRW_-.12_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 55,
+      "part_number": "MER07564-001",
+      "drawing_source": "MER07563-001",
+      "nha": "MER07563-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "7075 AL",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "7075 AL",
+          "ALUMINUM ALLOY 7075-T651"
+        ],
+        "material_spec": [
+          "ASTM B211, SAE AMS-QQ-A-225/9"
+        ],
+        "process_spec": [
+          "SURFACE TEXTURE PER ASME B46.1; ANODIZE PER MIL-A-8625, TYPE II, CLASS 1, CLEAR; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07563-001.DRW_-.9_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 56,
+      "part_number": "MS21209C4-10",
+      "drawing_source": "MER07563-001",
+      "nha": "MER07563-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "302 OR 304 SST",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "302 OR 304 SST"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07563-001.DRW_-.9_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 57,
+      "part_number": "MS21209C4-15",
+      "drawing_source": "MER07563-001",
+      "nha": "MER07563-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "302 OR 304 SST",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "302 OR 304 SST"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07563-001.DRW_-.9_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 58,
+      "part_number": "MS21209C5-15",
+      "drawing_source": "MER07563-001",
+      "nha": "MER07563-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "302 OR 304 SST",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "302 OR 304 SST"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07563-001.DRW_-.9_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 59,
+      "part_number": "MS21209C6-20",
+      "drawing_source": "MER07563-001",
+      "nha": "MER07563-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "302 OR 304 SST",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "302 OR 304 SST"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07563-001.DRW_-.9_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 64,
+      "part_number": "MER07567-001",
+      "drawing_source": "MER07565-001",
+      "nha": "MER07565-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "MISC",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "MISC"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07565-001.DRW_-.12_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 65,
+      "part_number": "MER07566-001",
+      "drawing_source": "MER07565-001",
+      "nha": "MER07565-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286",
+          "A286 CRES"
+        ],
+        "material_spec": [
+          "SAE AMS 5737"
+        ],
+        "process_spec": [
+          "SURFACE TEXTURE PER ASME B46.1; KOLSTERIZE PER MANUFACTURERS RECOMMENDATION SOURCE: BODYCOTE THERMAL PROCESSING, INC. 128 SPEEDWAY LANE MOORESVILLE, NC 28117 6879 WWW.BODYCOTE.COM CAGE CODE 8W6S8; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07565-001.DRW_-.12_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 66,
+      "part_number": "LUBRICANT_LOX_COMPATIBLE",
+      "drawing_source": "MER07565-001",
+      "nha": "MER07565-001",
+      "missing_fields": [
+        "Material Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "KRYTOX 240AC / TRIBOLUBE 16 / CHRISTO-LUBE MCG 111",
+        "material_spec": "",
+        "process_spec": "APPLY TO THREADS OF F/N 4 PER NOTE 6"
+      },
+      "suggested_values": {
+        "designation": [
+          "KRYTOX 240AC / TRIBOLUBE 16 / CHRISTO-LUBE MCG 111"
+        ],
+        "material_spec": [],
+        "process_spec": [
+          "APPLY TO THREADS OF F/N 4 PER NOTE 6"
+        ]
+      },
+      "source_pages": [
+        "MER07565-001.DRW_-.12_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 67,
+      "part_number": "M12133/2-255",
+      "drawing_source": "MER07565-001",
+      "nha": "MER07565-001",
+      "missing_fields": [
+        "Process Specification"
+      ],
+      "severity": "low",
+      "current_values": {
+        "designation": "302 SST",
+        "material_spec": "M12133/2-255",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "302 SST",
+          "302 CRES"
+        ],
+        "material_spec": [
+          "M12133/2-255"
+        ],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07565-001.DRW_-.12_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 68,
+      "part_number": "NAS1352N4-10",
+      "drawing_source": "MER07565-001",
+      "nha": "MER07565-001",
+      "missing_fields": [
+        "Process Specification"
+      ],
+      "severity": "low",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "NAS1352",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286"
+        ],
+        "material_spec": [
+          "NAS1352"
+        ],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07565-001.DRW_-.12_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 69,
+      "part_number": "MER07568-001",
+      "drawing_source": "MER07567-001",
+      "nha": "MER07567-001",
+      "missing_fields": [
+        "Material Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "7075 AL",
+        "material_spec": "",
+        "process_spec": "CLEAN AND MAINTAIN PER IEST-STD-CC1246E, LEVEL VC-0.5-1000"
+      },
+      "suggested_values": {
+        "designation": [
+          "7075 AL",
+          "ALUMINUM ALLOY 7075-T651"
+        ],
+        "material_spec": [
+          "ASTM B211, SAE AMS-QQ-A-225/9"
+        ],
+        "process_spec": [
+          "CLEAN AND MAINTAIN PER IEST-STD-CC1246E, LEVEL VC-0.5-1000",
+          "ANODIZE PER MIL-A-8625, TYPE II, CLASS 1, CLEAR"
+        ]
+      },
+      "source_pages": [
+        "MER07567-001.DRW_-.11_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 70,
+      "part_number": "MS21209C1610",
+      "drawing_source": "MER07567-001",
+      "nha": "MER07567-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "302 OR 304 SST",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "302 OR 304 SST"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07567-001.DRW_-.11_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 71,
+      "part_number": "MS21209C4-10",
+      "drawing_source": "MER07567-001",
+      "nha": "MER07567-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "302 OR 304 SST",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "302 OR 304 SST"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07567-001.DRW_-.11_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 74,
+      "part_number": "MER07585-001",
+      "drawing_source": "MER07584-001",
+      "nha": "MER07584-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286",
+          "A286 CRES"
+        ],
+        "material_spec": [
+          "SAE AMS 5737"
+        ],
+        "process_spec": [
+          "KOLSTERIZE PER MANUFACTURERS RECOMMENDATION; SURFACE TEXTURE PER ASME B46.1"
+        ]
+      },
+      "source_pages": [
+        "MER07584-001.DRW_-.17_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 75,
+      "part_number": "MER07586-001",
+      "drawing_source": "MER07584-001",
+      "nha": "MER07584-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286",
+          "A286 CRES"
+        ],
+        "material_spec": [
+          "SAE AMS 5737"
+        ],
+        "process_spec": [
+          "SURFACE TEXTURE PER ASME B46.1; KOLSTERIZE PER MANUFACTURERS RECOMMENDATION SOURCE: BODYCOTE THERMAL PROCESSING, INC. 128 SPEEDWAY LANE MOORESVILLE, NC 28117 6879 WWW.BODYCOTE.COM CAGE CODE 8W6S8; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07584-001.DRW_-.17_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 76,
+      "part_number": "MER07587-001",
+      "drawing_source": "MER07584-001",
+      "nha": "MER07584-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286",
+          "A286 CRES"
+        ],
+        "material_spec": [
+          "SAE AMS 5737"
+        ],
+        "process_spec": [
+          "SURFACE TEXTURE PER ASME B46.1; KOLSTERIZE PER MANUFACTURERS RECOMMENDATION (BODYCOTE THERMAL PROCESSING, INC., 128 SPEEDWAY LANE, MOORESVILLE, NC 28117 #879, WWW.BODYCOTE.COM, CAGE CODE 8W6S8); CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07584-001.DRW_-.17_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 77,
+      "part_number": "MER07588-001",
+      "drawing_source": "MER07584-001",
+      "nha": "MER07584-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "INCONEL 718",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "INCONEL 718"
+        ],
+        "material_spec": [
+          "SAE AMS 5664"
+        ],
+        "process_spec": [
+          "HEAT TREATMENT: PRIOR TO ROUGH MACHINING, SOLUTION TREAT AT 1900\u00b0F (730\u00b0C) FOR 45 MINUTES IN VACUUM OR ARGON. FAN/GAS QUENCH TO BELOW 600\u00b0F. AFTER ROUGH MACHINING, AGE AT 1350\u00b0F FOR 8 HOURS. FURNACE COOL AT 50\u00b0/HOUR TO 1200\u00b0F (650\u00b0C), HOLD AT 1200\u00b0F (650\u00b0C) FOR 8 HOURS, THEN AIR COOL"
+        ]
+      },
+      "source_pages": [
+        "MER07584-001.DRW_-.17_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 78,
+      "part_number": "50854SCS",
+      "drawing_source": "MER07584-001",
+      "nha": "MER07584-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "316 SST",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "316 SST"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07584-001.DRW_-.17_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 79,
+      "part_number": "WHM-275-S86",
+      "drawing_source": "MER07584-001",
+      "nha": "MER07584-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07584-001.DRW_-.17_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 94,
+      "part_number": "MER07573-001",
+      "drawing_source": "MER07570-001",
+      "nha": "MER07570-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "INCONEL",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "INCONEL"
+        ],
+        "material_spec": [],
+        "process_spec": [
+          "CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000; WELD PER MSFC-SPEC-3679, CLASS B"
+        ]
+      },
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 95,
+      "part_number": "MER07548-001",
+      "drawing_source": "MER07570-001",
+      "nha": "MER07570-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "7075 AL",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "ALUMINUM ALLOY 7075-T651",
+          "7075 AL"
+        ],
+        "material_spec": [
+          "ASTM B211, SAE AMS-QQ-A-225/9"
+        ],
+        "process_spec": [
+          "ANODIZE PER MIL-A-8625, TYPE II, CLASS 1, CLEAR"
+        ]
+      },
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 96,
+      "part_number": "MER07572-001",
+      "drawing_source": "MER07570-001",
+      "nha": "MER07570-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286",
+          "A286 CRES"
+        ],
+        "material_spec": [
+          "SAE AMS 5737"
+        ],
+        "process_spec": [
+          "KOLSTERIZE PER MANUFACTURERS RECOMMENDATION, SOURCE: BODYCOTE THERMAL PROCESSING, INC.; SURFACE TEXTURE PER ASME B46.1; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 97,
+      "part_number": "AS4307K04",
+      "drawing_source": "MER07570-001",
+      "nha": "MER07570-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "316 CRES",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "316 CRES"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 98,
+      "part_number": "AS933K04",
+      "drawing_source": "MER07570-001",
+      "nha": "MER07570-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "need material for this",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "need material for this"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 99,
+      "part_number": "ASME B18.3, ASTM F879",
+      "drawing_source": "MER07570-001",
+      "nha": "MER07570-001",
+      "missing_fields": [
+        "Process Specification"
+      ],
+      "severity": "low",
+      "current_values": {
+        "designation": "18-8 CRES",
+        "material_spec": "ASTM F879",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "18-8 CRES"
+        ],
+        "material_spec": [
+          "ASTM F879"
+        ],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 100,
+      "part_number": "F-400521-04",
+      "drawing_source": "MER07570-001",
+      "nha": "MER07570-001",
+      "missing_fields": [
+        "Material Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "304 CRES",
+        "material_spec": "",
+        "process_spec": "GOLD PLATE"
+      },
+      "suggested_values": {
+        "designation": [
+          "304 CRES"
+        ],
+        "material_spec": [],
+        "process_spec": [
+          "GOLD PLATE"
+        ]
+      },
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 101,
+      "part_number": "LUBRICANT",
+      "drawing_source": "MER07570-001",
+      "nha": "MER07570-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "KRYTOX 240AC / TRIBOLUBE 16 / CHRISTO-LUBE MCG 111",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "KRYTOX 240AC / TRIBOLUBE 16 / CHRISTO-LUBE MCG 111"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 102,
+      "part_number": "M12133/2-255",
+      "drawing_source": "MER07570-001",
+      "nha": "MER07570-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "302 CRES",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "302 SST",
+          "302 CRES"
+        ],
+        "material_spec": [
+          "M12133/2-255"
+        ],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 103,
+      "part_number": "MS21043-6",
+      "drawing_source": "MER07570-001",
+      "nha": "MER07570-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 104,
+      "part_number": "NAS6706U13",
+      "drawing_source": "MER07570-001",
+      "nha": "MER07570-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286, 160 KSI",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286 (160 KSI)",
+          "A286, 160 KSI"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 105,
+      "part_number": "MER07580-001",
+      "drawing_source": "MER07573-001",
+      "nha": "MER07573-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "INCONEL 625",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "INCONEL 625"
+        ],
+        "material_spec": [
+          "SAE AMS 5666"
+        ],
+        "process_spec": [
+          "SURFACE TEXTURE PER ASME B46.1; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07573-001.DRW_-.12_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 106,
+      "part_number": "MER07574-001",
+      "drawing_source": "MER07573-001",
+      "nha": "MER07573-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "INCONEL 718",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "INCONEL 718",
+          "INCONEL 625"
+        ],
+        "material_spec": [
+          "SAE AMS 5666"
+        ],
+        "process_spec": [
+          "SURFACE TEXTURE PER ASME B46.1; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07573-001.DRW_-.12_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 107,
+      "part_number": "MER07578-001",
+      "drawing_source": "MER07573-001",
+      "nha": "MER07573-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "VESPEL SP-21",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "VESPEL SP-21",
+          "VESPEL SP-3, Type III/M OR Type III/P POLYIMIDE RESIN"
+        ],
+        "material_spec": [
+          "ASTM 6456-10"
+        ],
+        "process_spec": [
+          "SURFACE TEXTURE PER ASME B46.1; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07573-001.DRW_-.12_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 108,
+      "part_number": "MER07579-001",
+      "drawing_source": "MER07573-001",
+      "nha": "MER07573-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "VESPEL SP-21",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "VESPEL SP-21",
+          "VESPEL SP-3, TYPE III/M OR TYPE III/P, POLYIMIDE RESIN"
+        ],
+        "material_spec": [
+          "ASTM B456-10"
+        ],
+        "process_spec": [
+          "SURFACE TEXTURE PER ASME B46.1; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07573-001.DRW_-.12_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 109,
+      "part_number": "EH-22-C86",
+      "drawing_source": "MER07573-001",
+      "nha": "MER07573-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "A286",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "A286"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07573-001.DRW_-.12_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 110,
+      "part_number": "MER07576-001",
+      "drawing_source": "MER07573-001",
+      "nha": "MER07573-001",
+      "missing_fields": [
+        "Material Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "need material for this",
+        "material_spec": "",
+        "process_spec": "WELD PER MSFC-SPEC-3679, CLASS B"
+      },
+      "suggested_values": {
+        "designation": [
+          "need material for this"
+        ],
+        "material_spec": [],
+        "process_spec": [
+          "WELD PER MSFC-SPEC-3679, CLASS B"
+        ]
+      },
+      "source_pages": [
+        "MER07573-001.DRW_-.12_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 115,
+      "part_number": "MER07581-001",
+      "drawing_source": "MER07576",
+      "nha": "MER07576",
+      "missing_fields": [
+        "Material Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "INCONEL 625",
+        "material_spec": "",
+        "process_spec": "WELD PER MSFC-SPEC-3679, CLASS B"
+      },
+      "suggested_values": {
+        "designation": [
+          "INCONEL 625"
+        ],
+        "material_spec": [
+          "SAE AMS 5666"
+        ],
+        "process_spec": [
+          "WELD PER MSFC-SPEC-3679, CLASS B",
+          "CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07576.DRW_-.6_RELEASED.pdf p1",
+        "MER07576.DRW_-.6_RELEASED.pdf p2",
+        "MER07576.DRW_-.6_RELEASED.pdf p3",
+        "MER07576.DRW_-.6_RELEASED.pdf p4"
+      ]
+    },
+    {
+      "index": 116,
+      "part_number": "MER07582-001",
+      "drawing_source": "MER07576",
+      "nha": "MER07576",
+      "missing_fields": [
+        "Material Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "INCONEL 718",
+        "material_spec": "",
+        "process_spec": "WELD PER MSFC-SPEC-3679, CLASS B"
+      },
+      "suggested_values": {
+        "designation": [
+          "INCONEL 718"
+        ],
+        "material_spec": [
+          "UNS N07718, PER SAE AMS 5596"
+        ],
+        "process_spec": [
+          "WELD PER MSFC-SPEC-3679, CLASS B",
+          "SURFACE TEXTURE PER ASME B46.1; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000; WELD PER MSFC-SPEC-3679, CLASS B"
+        ]
+      },
+      "source_pages": [
+        "MER07576.DRW_-.6_RELEASED.pdf p1",
+        "MER07576.DRW_-.6_RELEASED.pdf p2",
+        "MER07576.DRW_-.6_RELEASED.pdf p3",
+        "MER07576.DRW_-.6_RELEASED.pdf p4"
+      ]
+    },
+    {
+      "index": 117,
+      "part_number": "MER07577-001",
+      "drawing_source": "MER07576",
+      "nha": "MER07576",
+      "missing_fields": [
+        "Material Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "INCONEL 625",
+        "material_spec": "",
+        "process_spec": "WELD PER MSFC-SPEC-3679, CLASS B"
+      },
+      "suggested_values": {
+        "designation": [
+          "INCONEL 625"
+        ],
+        "material_spec": [
+          "SAE AMS 5666"
+        ],
+        "process_spec": [
+          "WELD PER MSFC-SPEC-3679, CLASS B",
+          "CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07576.DRW_-.6_RELEASED.pdf p1",
+        "MER07576.DRW_-.6_RELEASED.pdf p2",
+        "MER07576.DRW_-.6_RELEASED.pdf p3",
+        "MER07576.DRW_-.6_RELEASED.pdf p4"
+      ]
+    },
+    {
+      "index": 118,
+      "part_number": "MER07583-001",
+      "drawing_source": "MER07576",
+      "nha": "MER07576",
+      "missing_fields": [
+        "Material Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "INCONEL 718",
+        "material_spec": "",
+        "process_spec": "WELD PER MSFC-SPEC-3679, CLASS B"
+      },
+      "suggested_values": {
+        "designation": [
+          "INCONEL 718"
+        ],
+        "material_spec": [
+          "UNS N07718, PER SAE AMS 5596"
+        ],
+        "process_spec": [
+          "WELD PER MSFC-SPEC-3679, CLASS B",
+          "SURFACE TEXTURE PER ASME B46.1; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000; WELD PER MSFC-SPEC-3679 CLASS B"
+        ]
+      },
+      "source_pages": [
+        "MER07576.DRW_-.6_RELEASED.pdf p1",
+        "MER07576.DRW_-.6_RELEASED.pdf p2",
+        "MER07576.DRW_-.6_RELEASED.pdf p3",
+        "MER07576.DRW_-.6_RELEASED.pdf p4"
+      ]
+    },
+    {
+      "index": 119,
+      "part_number": "MER07576-001",
+      "drawing_source": "MER07576",
+      "nha": "MER07576",
+      "missing_fields": [
+        "Designation"
+      ],
+      "severity": "high",
+      "current_values": {
+        "designation": "",
+        "material_spec": "",
+        "process_spec": "WELD PER MSFC-SPEC-3679, CLASS B"
+      },
+      "suggested_values": {
+        "designation": [
+          "need material for this"
+        ],
+        "material_spec": [],
+        "process_spec": [
+          "WELD PER MSFC-SPEC-3679, CLASS B"
+        ]
+      },
+      "source_pages": [
+        "MER07576.DRW_-.6_RELEASED.pdf p1"
+      ]
+    },
+    {
+      "index": 120,
+      "part_number": "MER07576-003",
+      "drawing_source": "MER07576",
+      "nha": "MER07576",
+      "missing_fields": [
+        "Material Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "need material for this",
+        "material_spec": "",
+        "process_spec": "WELD PER MSFC-SPEC-3679, CLASS B"
+      },
+      "suggested_values": {
+        "designation": [
+          "need material for this"
+        ],
+        "material_spec": [],
+        "process_spec": [
+          "WELD PER MSFC-SPEC-3679, CLASS B"
+        ]
+      },
+      "source_pages": [
+        "MER07576.DRW_-.6_RELEASED.pdf p1",
+        "MER07576.DRW_-.6_RELEASED.pdf p2",
+        "MER07576.DRW_-.6_RELEASED.pdf p3",
+        "MER07576.DRW_-.6_RELEASED.pdf p4"
+      ]
+    },
+    {
+      "index": 121,
+      "part_number": "MER07576-005",
+      "drawing_source": "MER07576",
+      "nha": "MER07576",
+      "missing_fields": [
+        "Material Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "need material for this",
+        "material_spec": "",
+        "process_spec": "WELD PER MSFC-SPEC-3679, CLASS B"
+      },
+      "suggested_values": {
+        "designation": [
+          "need material for this"
+        ],
+        "material_spec": [],
+        "process_spec": [
+          "WELD PER MSFC-SPEC-3679, CLASS B"
+        ]
+      },
+      "source_pages": [
+        "MER07576.DRW_-.6_RELEASED.pdf p1",
+        "MER07576.DRW_-.6_RELEASED.pdf p2",
+        "MER07576.DRW_-.6_RELEASED.pdf p3",
+        "MER07576.DRW_-.6_RELEASED.pdf p4"
+      ]
+    },
+    {
+      "index": 122,
+      "part_number": "MER07576-007",
+      "drawing_source": "MER07576",
+      "nha": "MER07576",
+      "missing_fields": [
+        "Material Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "need material for this",
+        "material_spec": "",
+        "process_spec": "WELD PER MSFC-SPEC-3679, CLASS B"
+      },
+      "suggested_values": {
+        "designation": [
+          "need material for this"
+        ],
+        "material_spec": [],
+        "process_spec": [
+          "WELD PER MSFC-SPEC-3679, CLASS B"
+        ]
+      },
+      "source_pages": [
+        "MER07576.DRW_-.6_RELEASED.pdf p1",
+        "MER07576.DRW_-.6_RELEASED.pdf p2",
+        "MER07576.DRW_-.6_RELEASED.pdf p3",
+        "MER07576.DRW_-.6_RELEASED.pdf p4"
+      ]
+    },
+    {
+      "index": 126,
+      "part_number": "MER07584-003",
+      "drawing_source": "MER07583-001",
+      "nha": "MER07583-001",
+      "missing_fields": [
+        "Material Specification",
+        "Process Specification"
+      ],
+      "severity": "medium",
+      "current_values": {
+        "designation": "INCONEL",
+        "material_spec": "",
+        "process_spec": ""
+      },
+      "suggested_values": {
+        "designation": [
+          "INCONEL"
+        ],
+        "material_spec": [],
+        "process_spec": []
+      },
+      "source_pages": [
+        "MER07583-001.DRW_-.9_RELEASED.pdf p1",
+        "MER07583-001.DRW_-.9_RELEASED.pdf p2"
+      ]
+    },
+    {
+      "index": 134,
+      "part_number": "MER07540-ICD",
+      "drawing_source": "MER07540-ICD",
+      "nha": "MER07540-ICD",
+      "missing_fields": [
+        "Designation"
+      ],
+      "severity": "high",
+      "current_values": {
+        "designation": "",
+        "material_spec": "",
+        "process_spec": "CLEAN AND MAINTAIN PER IEST-STD-CC1246L, LEVEL VC-0.5-1000"
+      },
+      "suggested_values": {
+        "designation": [],
+        "material_spec": [],
+        "process_spec": [
+          "CLEAN AND MAINTAIN PER IEST-STD-CC1246L, LEVEL VC-0.5-1000"
+        ]
+      },
+      "source_pages": [
+        "MER07540-ICD.DRW_-.5_REWORK.pdf p1"
+      ]
+    }
+  ]
+}

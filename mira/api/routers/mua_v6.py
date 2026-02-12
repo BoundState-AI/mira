@@ -302,6 +302,7 @@ async def generate_mua(
             query_temp_f=request.environment.temperature_f,
             precedent_o2_max=env.moc_o2_pct,
             precedent_pressure_max=env.pressure_psia,
+            precedent_temp_min=env.temperature_f,
             precedent_temp_max=env.temperature_f,
         )
         envelope_status = envelope_result.status

@@ -7,7 +7,7 @@ import { PageHelpContent } from "@/components/PageHelp";
 
 export const helpContent: Record<string, PageHelpContent> = {
   query: {
-    title: "Query & Search",
+    title: "MIRA Query",
     description: "Ask questions about materials, search the knowledge base, and get AI-powered answers with source citations.",
     whatItDoes: [
       "Search the MAPTIS knowledge base with natural language queries",
@@ -148,7 +148,7 @@ export const helpContent: Record<string, PageHelpContent> = {
     ],
     relatedPages: [
       { name: "Materials", path: "/materials" },
-      { name: "Query & Search", path: "/query" },
+      { name: "MIRA Query", path: "/v4-query" },
       { name: "Test Classes", path: "/test-classes" },
     ],
     apiEndpoint: "POST /api/v1/o2/search-bok, POST /api/v1/h2/search-bok, POST /api/query/hybrid",
@@ -188,7 +188,7 @@ export const helpContent: Record<string, PageHelpContent> = {
       "Check helicoil quantities - they're consolidated by thread size per parent drawing",
     ],
     relatedPages: [
-      { name: "MUA Generator", path: "/mua" },
+      { name: "MUA Generator", path: "/mua-v7" },
       { name: "Materials", path: "/materials" },
     ],
     apiEndpoint: "POST /api/miul/compliant-extract, POST /api/miul/enrich",
@@ -271,7 +271,7 @@ export const helpContent: Record<string, PageHelpContent> = {
     relatedPages: [
       { name: "Knowledge Twins", path: "/" },
       { name: "Compliance Analysis", path: "/compliance" },
-      { name: "MUA Generator", path: "/mua" },
+      { name: "MUA Generator", path: "/mua-v7" },
     ],
     apiEndpoint: "POST /api/o2/evaluate, POST /api/o2/search, GET /api/o2/families",
   },
@@ -314,7 +314,7 @@ export const helpContent: Record<string, PageHelpContent> = {
     ],
     relatedPages: [
       { name: "Gas Compatibility", path: "/gas-compatibility" },
-      { name: "MUA Generator", path: "/mua" },
+      { name: "MUA Generator", path: "/mua-v7" },
       { name: "Knowledge Twins", path: "/" },
     ],
     apiEndpoint: "POST /api/compliance/analyze",

@@ -1,0 +1,12 @@
+{
+  "timestamp_utc": "2026-02-10T20:25:34.576011+00:00",
+  "sample_manifest": "C:\\BoundState\\mira\\mua\\v7\\migrations\\reports\\013_pdf_audit_sample_20260210T202533Z.json",
+  "sample_csv": "C:\\BoundState\\mira\\mua\\v7\\migrations\\reports\\013_pdf_audit_sample_20260210T202533Z.csv",
+  "auto_csv": "C:\\BoundState\\mira\\mua\\v7\\migrations\\reports\\013_pdf_audit_sample_20260210T202533Z_auto.csv",
+  "manual_queue_csv": "C:\\BoundState\\mira\\mua\\v7\\migrations\\reports\\013_pdf_audit_sample_20260210T202533Z_auto_manual_queue.csv",
+  "confidence_report": "C:\\BoundState\\mira\\mua\\v7\\migrations\\reports\\014_audit_confidence_20260210T202534Z.json",
+  "population": "all",
+  "population_n": 10355,
+  "sample_n": 12,
+  "hash_policy": "warn"
+}

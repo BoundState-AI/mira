@@ -1,0 +1,21 @@
+{
+  "project": "MER07540",
+  "outputs": {
+    "extraction_json": "miul_codex\\materials_extracted_codex.json",
+    "review_json": "miul_codex\\review_items_codex.json",
+    "materials_by_drawing_json": "miul_codex\\materials_by_drawing_codex.json",
+    "miul_json": "miul_codex\\miul_rows_codex.json",
+    "miul_excel": "miul_codex\\MIUL_codex.xlsx",
+    "gaps_json": "miul_codex\\miul_gaps_codex.json",
+    "correction_queue_excel": "miul_codex\\miul_correction_queue_codex.xlsx"
+  },
+  "counts": {
+    "raw_extracted_materials": 206,
+    "pair_rows": 132,
+    "miul_rows": 135,
+    "gaps": 98
+  },
+  "enrichment": {
+    "enabled": false
+  }
+}

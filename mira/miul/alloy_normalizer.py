@@ -119,8 +119,9 @@ PATTERNS = {
     "stainless_300_400": re.compile(
         r"""
         (?:(?:SS|SST|STAINLESS|CRES|AISI)[\s\-]?)?  # Optional prefix
-        (?P<alloy>3\d{2}|4[0-5]\d)              # 300-series or 400-4xx
+        (?<!\d)(?P<alloy>3\d{2}|4[0-5]\d)       # Standalone 300/400 token only
         (?P<suffix>[LNH])?                      # L/N/H suffix
+        (?!\d)                                  # Prevent partial match in e.g. 9310
         (?:[\s\-]?(?P<condition>ANN|CW|CD|\d{1,2}%\s?CW))?  # Condition
         """,
         re.IGNORECASE | re.VERBOSE
@@ -156,12 +157,20 @@ PATTERNS = {
         re.IGNORECASE | re.VERBOSE
     ),
 
+    # A-286 / A286 variants, often with extra qualifiers like "(160 KSI)" or "SST"
+    "stainless_a286": re.compile(
+        r"""
+        \bA[\s\-]?286\b
+        """,
+        re.IGNORECASE | re.VERBOSE
+    ),
+
     # -------------------------------------------------------------------------
     # TITANIUM - CP grades and alloys
     # -------------------------------------------------------------------------
     "titanium_grade": re.compile(
         r"""
-        (?:TI(?:TANIUM)?[\s\-]?)?
+        (?:TI(?:TANIUM)?[\s\-]?)       # Require Ti/Titanium prefix to avoid false positives
         (?:GRADE[\s\-]?)?
         (?P<grade>[1-4]|5|23|6|7|9|12)
         (?![\d])  # Not followed by more digits
@@ -561,13 +570,13 @@ class AlloyNormalizer:
         # Fix common UNS typos
         for typo, correct in self.UNS_TYPO_CORRECTIONS.items():
             if typo in cleaned:
-                logger.warning(f"Correcting UNS typo: {typo} → {correct} in '{designation}'")
+                logger.warning(f"Correcting UNS typo: {typo} -> {correct} in '{designation}'")
                 cleaned = cleaned.replace(typo, correct)
 
         # Fix common designation typos
         for typo, correct in self.DESIGNATION_TYPO_CORRECTIONS.items():
             if typo in cleaned:
-                logger.warning(f"Correcting designation typo: {typo} → {correct} in '{designation}'")
+                logger.warning(f"Correcting designation typo: {typo} -> {correct} in '{designation}'")
                 cleaned = cleaned.replace(typo, correct)
 
         return cleaned.strip()
@@ -675,6 +684,20 @@ class AlloyNormalizer:
                     family=AlloyFamily.STAINLESS_STEEL,
                     base_alloy=lookup_key,
                     condition=condition,
+                    confidence=0.9,
+                    match_method=pattern_name,
+                )
+
+        # A286 variants (including A286 SST, A286 (160 KSI), etc.)
+        if pattern_name == "stainless_a286":
+            uns = UNS_STAINLESS.get("A286")
+            if uns:
+                return NormalizedAlloy(
+                    original_input=original,
+                    uns=uns,
+                    canonical_name="A286",
+                    family=AlloyFamily.STAINLESS_STEEL,
+                    base_alloy="A286",
                     confidence=0.9,
                     match_method=pattern_name,
                 )

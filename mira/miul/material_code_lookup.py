@@ -17,6 +17,7 @@ Safety Critical: True
 """
 
 import logging
+import math
 import re
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -174,6 +175,22 @@ class MaterialCodeLookupService:
         'TI': {'TITANIUM'},
         'INCONEL': {'INC', 'IN'},
         'NICKEL': {'NI'},
+        'PTFE': {'TEFLON'},
+        'TEFLON': {'PTFE'},
+    }
+
+    # Canonical token normalization for alias-heavy materials.
+    CANONICAL_ALIASES = {
+        'AL': 'ALUMINUM',
+        'ALUMINIUM': 'ALUMINUM',
+        'CRES': 'STAINLESS',
+        'SS': 'STAINLESS',
+        'SST': 'STAINLESS',
+        'TI': 'TITANIUM',
+        'NI': 'NICKEL',
+        'INC': 'INCONEL',
+        'IN': 'INCONEL',
+        'TEFLON': 'PTFE',
     }
 
     def __init__(self):
@@ -231,11 +248,51 @@ class MaterialCodeLookupService:
         form_upper = material_form.upper().strip()
         return FORM_KEYWORDS.get(form_upper, [form_upper] if form_upper else [])
 
+    def _normalize_designation_for_direct_map(self, designation: str) -> str:
+        """Normalize designation tokens using MATERIAL_ALIASES for direct map lookup."""
+        if not designation:
+            return ""
+        cleaned = designation.upper().strip()
+        cleaned = re.sub(r"[\s\\-_/]+", " ", cleaned)
+        tokens = cleaned.split()
+        normalized_tokens = []
+        for token in tokens:
+            if token in self.CANONICAL_ALIASES:
+                normalized_tokens.append(self.CANONICAL_ALIASES[token])
+                continue
+            if token in self.MATERIAL_ALIASES:
+                normalized_tokens.append(token)
+                continue
+            canonical = None
+            for key, aliases in self.MATERIAL_ALIASES.items():
+                if token in aliases:
+                    canonical = key
+                    break
+            normalized_tokens.append(canonical or token)
+        return " ".join(normalized_tokens)
+
+    def _prepare_lookup_query(self, designation: str) -> str:
+        """Normalize noisy designation text for exact/fuzzy lookup.
+
+        This strips parenthetical formulas/notes (e.g., "(Si3N4)") and
+        normalizes separators so token matching focuses on canonical material
+        terms in MAPTIS designations.
+        """
+        if not designation:
+            return ""
+        cleaned = designation.upper()
+        cleaned = re.sub(r"\([^)]*\)", " ", cleaned)
+        cleaned = re.sub(r"[\[\]{}]", " ", cleaned)
+        cleaned = re.sub(r"[^A-Z0-9+\-/\s]", " ", cleaned)
+        cleaned = re.sub(r"\s+", " ", cleaned).strip()
+        return cleaned
+
     def _lookup_by_uns(
         self,
         uns_code: str,
         temper: Optional[str] = None,
         material_form: Optional[str] = None,
+        base_alloy_hint: Optional[str] = None,
     ) -> List[MaterialMatch]:
         """
         Look up materials in MAPTIS by UNS code.
@@ -288,27 +345,84 @@ class MaterialCodeLookupService:
             # Nickel alloys: N07718 → 718, N06625 → 625
             base_alloy = uns_code[3:].lstrip('0') or uns_code[3:]
             material_family = 'NI'
+        elif uns_code.startswith('R') and len(uns_code) >= 5:
+            # Titanium alloys (prefer base_alloy_hint)
+            material_family = 'TI'
+
+        # If caller provided a more precise base alloy (e.g., "17-4"), prefer it.
+        if base_alloy_hint:
+            hint_token = base_alloy_hint.strip().upper().split()[0]
+            if (
+                material_family == 'SS'
+                and uns_code == 'S66286'
+                and re.fullmatch(r'A-?286', hint_token)
+            ):
+                # Keep optional dash matching for A286 variants ("A286", "A-286").
+                base_alloy = 'A-?286'
+            elif material_family == 'SS' and '-' in hint_token:
+                base_alloy = hint_token
+            elif material_family == 'SS' and hint_token.startswith('A') and len(hint_token) >= 4:
+                base_alloy = hint_token
+            elif material_family == 'TI':
+                if hint_token.startswith('TI-'):
+                    base_alloy = hint_token[3:]
+                elif hint_token.startswith('TI'):
+                    base_alloy = hint_token[2:]
+                else:
+                    base_alloy = hint_token
 
         try:
             # Build search query using boundary-safe regex (~*)
             # CRITICAL: Use \y word boundary to prevent "302" matching "3302"
 
             # Build base WHERE clause based on material family
-            if material_family in ('SS', 'AL', 'NI') and base_alloy:
-                alloy_pattern = rf'\y{base_alloy}\y'
-                family_key = {'SS': 'STAINLESS', 'AL': 'ALUMINUM', 'NI': 'NICKEL'}[material_family]
-                family_pattern = FAMILY_SQL_PATTERNS.get(family_key)
+            if material_family in ('SS', 'AL', 'NI', 'TI') and base_alloy:
+                if '-' in base_alloy and '?' not in base_alloy:
+                    # Allow suffixes like "17-4PH"
+                    alloy_pattern = rf'\y{base_alloy}[A-Z]*\y'
+                else:
+                    alloy_pattern = rf'\y{base_alloy}\y'
+                compact_alloy = "".join(ch for ch in base_alloy if ch.isalnum()) if "?" not in base_alloy else ""
 
-                base_where = """
-                    (
-                        designation ILIKE %s
-                        OR designation ILIKE %s
-                        OR (designation ~* %s AND designation ~* %s)
-                    )
-                    AND material_code IS NOT NULL
-                    AND material_code != 'UNKNOWN'
-                """
-                params = [f'%{uns_code}%', f'%UNS {uns_code}%', alloy_pattern, family_pattern]
+                # Special-case A286 (UNS S66286): MAPTIS designations can appear as
+                # "A-286", "A286 SST", or "INCONEL A-286" and may not include
+                # explicit "STAINLESS" family keywords.
+                if uns_code == 'S66286':
+                    base_where = """
+                        (
+                            designation ILIKE %s
+                            OR designation ILIKE %s
+                            OR designation ~* %s
+                        )
+                        AND material_code IS NOT NULL
+                        AND material_code != 'UNKNOWN'
+                    """
+                    params = [f'%{uns_code}%', f'%UNS {uns_code}%', alloy_pattern]
+                else:
+                    family_key = {'SS': 'STAINLESS', 'AL': 'ALUMINUM', 'NI': 'NICKEL', 'TI': 'TITANIUM'}[material_family]
+                    family_pattern = FAMILY_SQL_PATTERNS.get(family_key)
+
+                    base_where = """
+                        (
+                            designation ILIKE %s
+                            OR designation ILIKE %s
+                            OR (designation ~* %s AND designation ~* %s)
+                            OR (
+                                REPLACE(REPLACE(REPLACE(UPPER(designation), '-', ''), ' ', ''), '/', '') LIKE %s
+                                AND designation ~* %s
+                            )
+                        )
+                        AND material_code IS NOT NULL
+                        AND material_code != 'UNKNOWN'
+                    """
+                    params = [
+                        f'%{uns_code}%',
+                        f'%UNS {uns_code}%',
+                        alloy_pattern,
+                        family_pattern,
+                        f'%{compact_alloy}%' if compact_alloy else '%',
+                        family_pattern,
+                    ]
             else:
                 # Generic search - only search for UNS code directly
                 base_where = """
@@ -465,7 +579,7 @@ class MaterialCodeLookupService:
 
             scored_candidates.append((score, c))
             logger.debug(
-                f"Fallback scoring: {c.material_code} '{c.designation}' → score={score}"
+                f"Fallback scoring: {c.material_code} '{c.designation}' -> score={score}"
             )
 
         # Sort by score descending, then by material_code for stability
@@ -473,7 +587,7 @@ class MaterialCodeLookupService:
 
         best = scored_candidates[0][1]
         logger.info(
-            f"Deterministic fallback: '{designation}' → {best.material_code} "
+            f"Deterministic fallback: '{designation}' -> {best.material_code} "
             f"(temper={temper}, form={material_form}, score={scored_candidates[0][0]})"
         )
         return best
@@ -497,8 +611,8 @@ class MaterialCodeLookupService:
                     uns_matches = self._lookup_by_uns(normalized.uns)
                     if uns_matches:
                         logger.info(
-                            f"Normalized '{material_name}' → UNS {normalized.uns} "
-                            f"({normalized.canonical_name}) → {len(uns_matches)} MAPTIS materials"
+                            f"Normalized '{material_name}' -> UNS {normalized.uns} "
+                            f"({normalized.canonical_name}) -> {len(uns_matches)} MAPTIS materials"
                         )
                         return uns_matches
                     else:
@@ -526,9 +640,26 @@ class MaterialCodeLookupService:
 
         try:
             query_clean = material_name.upper().strip()
-            query_tokens = set(re.findall(r'\b([A-Z0-9][-A-Z0-9]*)\b', query_clean))
+            query_search = self._prepare_lookup_query(material_name) or query_clean
+            query_tokens = set(re.findall(r'\b([A-Z0-9][-A-Z0-9]*)\b', query_search))
             filler_words = {'ALLOY', 'TYPE', 'GRADE', 'CLASS', 'SPEC', 'PER', 'THE', 'AND', 'OR'}
             query_tokens = query_tokens - filler_words
+            # Normalize tokens using alias map (e.g., TEFLON -> PTFE)
+            normalized_tokens = set()
+            for token in query_tokens:
+                if token in self.CANONICAL_ALIASES:
+                    normalized_tokens.add(self.CANONICAL_ALIASES[token])
+                    continue
+                if token in self.MATERIAL_ALIASES:
+                    normalized_tokens.add(token)
+                    continue
+                canonical = None
+                for key, aliases in self.MATERIAL_ALIASES.items():
+                    if token in aliases:
+                        canonical = key
+                        break
+                normalized_tokens.add(canonical or token)
+            query_tokens = normalized_tokens
 
             # Separate numeric tokens (need word boundary) from text tokens
             numeric_tokens = {t for t in query_tokens if re.match(r'^\d+[A-Z]?$', t)}
@@ -540,20 +671,21 @@ class MaterialCodeLookupService:
 
             # Full query string match (ILIKE is OK for complete phrases)
             where_parts.append("designation ILIKE %s")
-            params.append(f'%{query_clean}%')
+            params.append(f'%{query_search}%')
 
-            # Text tokens can use ILIKE (less risk of substring collision)
+            # Text/alpha tokens use boundary regex to avoid false positives
+            # such as SILICON matching SILICONE.
             for token in text_tokens:
                 if len(token) >= 2:
-                    where_parts.append("designation ILIKE %s")
-                    params.append(f'%{token}%')
+                    where_parts.append("designation ~* %s")
+                    params.append(rf'\y{re.escape(token)}\y')
 
             # Numeric tokens MUST use word-boundary regex to prevent
             # "302" matching "3302" or "625" matching "182625D-01"
             for token in numeric_tokens:
                 if len(token) >= 2:
                     where_parts.append("designation ~* %s")
-                    params.append(rf'\y{token}\y')
+                    params.append(rf'\y{re.escape(token)}\y')
 
             where_clauses = " OR ".join(where_parts)
 
@@ -563,7 +695,7 @@ class MaterialCodeLookupService:
                 WHERE ({where_clauses})
                   AND material_code IS NOT NULL
                   AND material_code != 'UNKNOWN'
-                LIMIT 50
+                LIMIT 300
             """
 
             cursor.execute(query, params)
@@ -574,7 +706,7 @@ class MaterialCodeLookupService:
                 designation = row['designation'] or ''
                 desig_upper = designation.upper()
 
-                score = self._calculate_fuzzy_score(query_clean, desig_upper, query_tokens)
+                score = self._calculate_fuzzy_score(query_search, desig_upper, query_tokens)
 
                 if score >= 0.3:
                     confidence = 'high' if score >= 0.8 else 'medium' if score >= 0.5 else 'low'
@@ -617,7 +749,9 @@ class MaterialCodeLookupService:
             return 0.95
 
         if candidate in query:
-            return 0.9
+            # Only treat as high-confidence if candidate covers most of the query.
+            if len(candidate) >= max(6, int(len(query) * 0.6)):
+                return 0.9
 
         # ONLY use word-boundary number matching (no embedded matches!)
         # This prevents "302" from matching "AMS 3302" or "625" matching "182625D-01"
@@ -648,19 +782,40 @@ class MaterialCodeLookupService:
         if material_type_match:
             base_score += 0.15
 
-        if RAPIDFUZZ_AVAILABLE and base_score > 0:
+        if RAPIDFUZZ_AVAILABLE:
             token_set = fuzz.token_set_ratio(query, candidate) / 100.0
             partial = fuzz.partial_ratio(query, candidate) / 100.0
-            fuzzy_bonus = (token_set * 0.1 + partial * 0.05)
-            base_score = min(base_score + fuzzy_bonus, 1.0)
+            if base_score > 0:
+                fuzzy_bonus = (token_set * 0.1 + partial * 0.05)
+                base_score = min(base_score + fuzzy_bonus, 1.0)
+            else:
+                # Allow non-numeric matches (e.g., polymers) to score without UNS context.
+                base_score = max(base_score, token_set * 0.6, partial * 0.4)
         elif not RAPIDFUZZ_AVAILABLE:
             candidate_tokens = set(re.findall(r'\b([A-Z0-9][-A-Z0-9]*)\b', candidate))
             filler_words = {'ALLOY', 'TYPE', 'GRADE', 'CLASS', 'SPEC', 'PER', 'THE', 'AND', 'OR'}
             candidate_tokens = candidate_tokens - filler_words
             if query_tokens and candidate_tokens:
-                intersection = query_tokens & candidate_tokens
+                match_tokens = {t for t in query_tokens if len(t) >= 3}
+                if not match_tokens:
+                    return min(base_score, 1.0)
+                intersection = match_tokens & candidate_tokens
                 if intersection:
-                    base_score += 0.1
+                    base_score = max(base_score, 0.35 + 0.5 * (len(intersection) / len(match_tokens)))
+                else:
+                    # Allow prefix matches like RULON vs RULON641
+                    matched = set()
+                    for qt in match_tokens:
+                        for ct in candidate_tokens:
+                            if (
+                                qt == ct
+                                or (len(qt) >= 3 and qt in ct)
+                            ):
+                                matched.add(qt)
+                                break
+                    if matched:
+                        match_ratio = len(matched) / len(match_tokens)
+                        base_score = max(base_score, 0.35 + 0.5 * match_ratio)
 
         return min(base_score, 1.0)
 
@@ -813,12 +968,13 @@ class MaterialCodeLookupService:
         """
         designation_clean = designation.strip()
         designation_upper = designation_clean.upper()
+        designation_lookup = self._prepare_lookup_query(designation_clean)
 
         # Step 0: Check direct material code mappings (polymers, bronzes, generic SST)
         # First try exact match, then try prefix/contains match for extended designations
         if designation_upper in self.DIRECT_MATERIAL_CODES:
             material_code = self.DIRECT_MATERIAL_CODES[designation_upper]
-            logger.info(f"Direct lookup (exact): '{designation_clean}' → {material_code}")
+            logger.info(f"Direct lookup (exact): '{designation_clean}' -> {material_code}")
             return MaterialMatch(
                 material_code=material_code,
                 designation=designation_clean,
@@ -828,10 +984,48 @@ class MaterialCodeLookupService:
                 specs=[],
             )
 
+        if designation_lookup and designation_lookup in self.DIRECT_MATERIAL_CODES:
+            material_code = self.DIRECT_MATERIAL_CODES[designation_lookup]
+            logger.info(
+                f"Direct lookup (normalized): '{designation_clean}' -> {material_code} "
+                f"(normalized='{designation_lookup}')"
+            )
+            return MaterialMatch(
+                material_code=material_code,
+                designation=designation_clean,
+                confidence='high',
+                method='direct_lookup',
+                score=0.93,
+                specs=[],
+            )
+
+        normalized_direct_key = self._normalize_designation_for_direct_map(
+            designation_lookup or designation_upper
+        )
+        if normalized_direct_key in self.DIRECT_MATERIAL_CODES:
+            material_code = self.DIRECT_MATERIAL_CODES[normalized_direct_key]
+            logger.info(
+                f"Direct lookup (alias): '{designation_clean}' -> {material_code} "
+                f"(normalized='{normalized_direct_key}')"
+            )
+            return MaterialMatch(
+                material_code=material_code,
+                designation=designation_clean,
+                confidence='high',
+                method='direct_lookup',
+                score=0.92,
+                specs=[],
+            )
+
         # Try partial match for extended designations like "PCTFE PER ASTM D1710, TYPE II"
         for key, code in self.DIRECT_MATERIAL_CODES.items():
-            if designation_upper.startswith(key + ' ') or designation_upper.startswith(key + ','):
-                logger.info(f"Direct lookup (prefix): '{designation_clean}' → {code} (matched '{key}')")
+            if (
+                designation_upper.startswith(key + ' ')
+                or designation_upper.startswith(key + ',')
+                or (designation_lookup and designation_lookup.startswith(key + ' '))
+                or (designation_lookup and designation_lookup.startswith(key + ','))
+            ):
+                logger.info(f"Direct lookup (prefix): '{designation_clean}' -> {code} (matched '{key}')")
                 return MaterialMatch(
                     material_code=code,
                     designation=designation_clean,
@@ -854,6 +1048,7 @@ class MaterialCodeLookupService:
                         normalized.uns,
                         temper=temper,
                         material_form=material_form,
+                        base_alloy_hint=normalized.base_alloy,
                     )
 
                     # If no matches with filters, try without form filter
@@ -861,14 +1056,21 @@ class MaterialCodeLookupService:
                         logger.debug(
                             f"No matches with form filter '{material_form}', trying without"
                         )
-                        matches = self._lookup_by_uns(normalized.uns, temper=temper)
+                        matches = self._lookup_by_uns(
+                            normalized.uns,
+                            temper=temper,
+                            base_alloy_hint=normalized.base_alloy,
+                        )
 
                     # If still no matches, try without any filters
                     if not matches and temper:
                         logger.debug(
                             f"No matches with temper filter '{temper}', trying without"
                         )
-                        matches = self._lookup_by_uns(normalized.uns)
+                        matches = self._lookup_by_uns(
+                            normalized.uns,
+                            base_alloy_hint=normalized.base_alloy,
+                        )
 
                     if matches:
                         # Use AI to select best match when multiple candidates
@@ -887,8 +1089,8 @@ class MaterialCodeLookupService:
                             # Check if AI selection succeeded (not fallback methods)
                             if result and result.method == "ai_selection":
                                 logger.info(
-                                    f"UNS normalized + AI: '{designation_clean}' → {normalized.uns} "
-                                    f"→ {result.material_code} ({result.confidence}: {result.reasoning})"
+                                    f"UNS normalized + AI: '{designation_clean}' -> {normalized.uns} "
+                                    f"-> {result.material_code} ({result.confidence}: {result.reasoning})"
                                 )
                                 return MaterialMatch(
                                     material_code=result.material_code,
@@ -920,8 +1122,8 @@ class MaterialCodeLookupService:
                         # Single match - use it directly
                         best = matches[0]
                         logger.info(
-                            f"UNS normalized: '{designation_clean}' → {normalized.uns} "
-                            f"→ {best.material_code}"
+                            f"UNS normalized: '{designation_clean}' -> {normalized.uns} "
+                            f"-> {best.material_code}"
                         )
                         return MaterialMatch(
                             material_code=best.material_code,
@@ -936,8 +1138,10 @@ class MaterialCodeLookupService:
 
         # Step 2: Exact designation match
         exact = self._exact_designation_match(designation_clean)
+        if not exact and designation_lookup and designation_lookup != designation_upper:
+            exact = self._exact_designation_match(designation_lookup)
         if exact:
-            logger.info(f"Exact match: '{designation_clean}' → {exact.material_code}")
+            logger.info(f"Exact match: '{designation_clean}' -> {exact.material_code}")
             return exact
 
         # Step 3: Family-filtered partial match (boundary-safe)
@@ -947,7 +1151,7 @@ class MaterialCodeLookupService:
         if len(candidates) == 1:
             c = candidates[0]
             logger.info(
-                f"Family-filtered match: '{designation_clean}' → {c.material_code}"
+                f"Family-filtered match: '{designation_clean}' -> {c.material_code}"
             )
             return MaterialMatch(
                 material_code=c.material_code,
@@ -970,6 +1174,139 @@ class MaterialCodeLookupService:
                 score=0.3,
                 specs=[],
                 candidates=candidates,
+            )
+
+        # Step 4: Fuzzy lookup fallback (non-UNS materials like polymers)
+        fuzzy_query = designation_lookup or designation_clean
+        fuzzy_candidates = self.lookup_by_designation(fuzzy_query)
+        if not fuzzy_candidates and designation_lookup and designation_lookup != designation_upper:
+            fuzzy_candidates = self.lookup_by_designation(designation_clean)
+        if fuzzy_candidates:
+            fuzzy_candidates.sort(key=lambda m: m.score, reverse=True)
+            best = fuzzy_candidates[0]
+            second = fuzzy_candidates[1] if len(fuzzy_candidates) > 1 else None
+            score_gap = (best.score - second.score) if second else best.score
+            # Secondary heuristic: prefer candidates that cover query tokens with minimal extras.
+            filler_words = {'ALLOY', 'TYPE', 'GRADE', 'CLASS', 'SPEC', 'PER', 'THE', 'AND', 'OR'}
+
+            def _tokenize(text: str) -> set:
+                tokens = set(re.findall(r'\b([A-Z0-9][-A-Z0-9]*)\b', text.upper()))
+                tokens = tokens - filler_words
+                normalized = set()
+                for token in tokens:
+                    if token in self.CANONICAL_ALIASES:
+                        normalized.add(self.CANONICAL_ALIASES[token])
+                        continue
+                    if token in self.MATERIAL_ALIASES:
+                        normalized.add(token)
+                        continue
+                    canonical = None
+                    for key, aliases in self.MATERIAL_ALIASES.items():
+                        if token in aliases:
+                            canonical = key
+                            break
+                    normalized.add(canonical or token)
+                return {t for t in normalized if len(t) >= 3 or (len(t) == 2 and t.isalpha())}
+
+            query_tokens = _tokenize(designation_clean)
+            if query_tokens:
+                qualifier_tokens = {
+                    "FILLED", "UNFILLED", "VIRGIN", "TYPE", "GRADE", "CLASS",
+                    "COND", "CONDITION", "DUROMETER",
+                }
+                core_tokens = {
+                    t for t in query_tokens
+                    if t not in qualifier_tokens and not t.isdigit()
+                }
+                if not core_tokens:
+                    core_tokens = set(query_tokens)
+
+                # Fast path only when query is effectively a single core material token.
+                if len(core_tokens) == 1 and best.score >= 0.8 and score_gap >= 0.1:
+                    logger.info(
+                        f"Fuzzy match: '{designation_clean}' -> {best.material_code} "
+                        f"(score={best.score:.2f})"
+                    )
+                    return MaterialMatch(
+                        material_code=best.material_code,
+                        designation=best.designation,
+                        confidence='medium',
+                        method='fuzzy_designation',
+                        score=best.score,
+                        specs=best.specs,
+                    )
+
+                scored = []
+                for cand in fuzzy_candidates:
+                    cand_tokens = _tokenize(cand.designation or "")
+                    matched_query = set()
+                    matched_candidate = set()
+                    matched_core = set()
+                    for qt in query_tokens:
+                        for ct in cand_tokens:
+                            if (
+                                qt == ct
+                                or (len(qt) >= 3 and qt in ct)
+                                or (len(qt) == 2 and ct.endswith(qt))
+                            ):
+                                matched_query.add(qt)
+                                matched_candidate.add(ct)
+                                if qt in core_tokens:
+                                    matched_core.add(qt)
+                                break
+                    overlap = len(matched_query)
+                    core_overlap = len(matched_core)
+                    extra = len(cand_tokens) - len(matched_candidate)
+                    scored.append({
+                        "core_overlap": core_overlap,
+                        "overlap": overlap,
+                        "extra": extra,
+                        "length": len(cand.designation or ""),
+                        "code": str(cand.material_code or ""),
+                        "cand": cand,
+                    })
+
+                scored.sort(
+                    key=lambda x: (
+                        -x["core_overlap"],
+                        -x["overlap"],
+                        x["extra"],
+                        x["length"],
+                        x["code"],
+                    )
+                )
+                best = scored[0]
+                second = scored[1] if len(scored) > 1 else None
+                core_min_required = max(1, math.ceil(len(core_tokens) * 0.6))
+                if best["core_overlap"] >= core_min_required and (
+                    second is None
+                    or best["core_overlap"] > second["core_overlap"]
+                    or best["overlap"] > second["overlap"]
+                    or best["extra"] < second["extra"]
+                    or best["length"] < second["length"]
+                ):
+                    best_cand = best["cand"]
+                    logger.info(
+                        f"Token match: '{designation_clean}' -> {best_cand.material_code} "
+                        f"(core_overlap={best['core_overlap']}/{len(core_tokens)})"
+                    )
+                    return MaterialMatch(
+                        material_code=best_cand.material_code,
+                        designation=best_cand.designation,
+                        confidence='medium',
+                        method='fuzzy_designation',
+                        score=best_cand.score,
+                        specs=best_cand.specs,
+                    )
+
+            return MaterialMatch(
+                material_code=None,
+                designation=designation_clean,
+                confidence='low',
+                method='ambiguous',
+                score=best["cand"].score,
+                specs=[],
+                candidates=fuzzy_candidates[:5],
             )
 
         # No match - unresolved

@@ -61,6 +61,7 @@ export default function MiraV4Query() {
   const [showLineageDrawer, setShowLineageDrawer] = useState(false);
   const [showVetoModal, setShowVetoModal] = useState(false);
   const [overrideComplete, setOverrideComplete] = useState(false);
+  const [showFullMaterialPool, setShowFullMaterialPool] = useState(false);
 
   // Advanced environment fields
   const [temperatureC, setTemperatureC] = useState("");
@@ -91,6 +92,7 @@ export default function MiraV4Query() {
 
       const data = await v4Query(req);
       setResult(data);
+      setShowFullMaterialPool(false);
 
       // Check if heritage veto requires acknowledgment
       if (
@@ -131,6 +133,18 @@ export default function MiraV4Query() {
 
   // Should we block due to dirty data REFUSE tier?
   const dirtyRefuse = result?.dirty_data?.tier === "refuse";
+  const focusedMaterials = result?.materials ?? [];
+  const fullMaterials =
+    result?.all_materials && result.all_materials.length > 0
+      ? result.all_materials
+      : focusedMaterials;
+  const hasAdditionalPool =
+    (result?.materials_focus_applied ?? false) &&
+    fullMaterials.length > focusedMaterials.length;
+  const displayedMaterials = showFullMaterialPool
+    ? fullMaterials
+    : focusedMaterials;
+  const displayedMaterialCount = displayedMaterials.length;
 
   return (
     <div className="min-h-full bg-background">
@@ -139,7 +153,7 @@ export default function MiraV4Query() {
         <div className="max-w-4xl mx-auto px-6 py-12">
           <div className="mb-8">
             <h1 className="text-4xl font-serif font-bold mb-1 text-balance flex items-center gap-3">
-              MIRA V4
+              MIRA Query
               {helpContent.query && <PageHelp content={helpContent.query} />}
             </h1>
             <p className="text-lg text-muted-foreground mb-1">
@@ -344,7 +358,7 @@ export default function MiraV4Query() {
 
             <div className="flex items-center gap-3 text-xs text-muted-foreground">
               <span>
-                {result.materials.length} materials
+                {displayedMaterialCount} materials
                 {result.search_source && (
                   <span className="ml-1 opacity-60">
                     via {result.search_source}
@@ -362,6 +376,18 @@ export default function MiraV4Query() {
                   <Award className="h-3 w-3" />
                   {result.materials_with_mua} MUA
                 </span>
+              )}
+              {hasAdditionalPool && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 px-2 text-[11px]"
+                  onClick={() => setShowFullMaterialPool((prev) => !prev)}
+                >
+                  {showFullMaterialPool
+                    ? `Show answer evidence (${focusedMaterials.length})`
+                    : `Show full pool (${fullMaterials.length})`}
+                </Button>
               )}
             </div>
           </div>
@@ -427,7 +453,7 @@ export default function MiraV4Query() {
         )}
 
         {/* Materials list (only if not blocked by veto or dirty data REFUSE) */}
-        {showResults && !dirtyRefuse && result.materials.length > 0 && (
+        {showResults && !dirtyRefuse && displayedMaterials.length > 0 && (
           <div className="animate-subtle-fade-in">
             <Tabs
               value={activeTab}
@@ -446,7 +472,7 @@ export default function MiraV4Query() {
               </TabsList>
 
               <TabsContent value="cards" className="space-y-4 mt-0">
-                {result.materials.map((mat, idx) => {
+                {displayedMaterials.map((mat, idx) => {
                   const totalTests = (mat.total_tests as number) || 0;
                   const testCounts = (mat.test_counts as Record<string, number>) || {};
                   const hasMua = mat.has_mua_precedent as boolean;
@@ -584,7 +610,7 @@ export default function MiraV4Query() {
                       </tr>
                     </thead>
                     <tbody>
-                      {result.materials.map((mat, idx) => {
+                      {displayedMaterials.map((mat, idx) => {
                         const totalTests = (mat.total_tests as number) || 0;
                         return (
                           <tr
@@ -646,7 +672,7 @@ export default function MiraV4Query() {
         )}
 
         {/* Empty results */}
-        {showResults && !dirtyRefuse && result.materials.length === 0 && (
+        {showResults && !dirtyRefuse && displayedMaterials.length === 0 && (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-sm">
               No materials found for this query.

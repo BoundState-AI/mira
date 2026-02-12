@@ -178,6 +178,8 @@ class SemanticEvidenceRetriever:
                     content_text = result.content.get("text", "") or result.content.get("content", "")
 
                     # Apply safety boost (Phase 1)
+                    # TODO: Wire in query_material parameter to apply_safety_boost
+                    # to gate material+environment combo boosts by the queried material
                     safety_boosted = apply_safety_boost(
                         result.score,
                         content_text,

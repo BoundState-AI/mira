@@ -66,9 +66,11 @@ def create_app() -> FastAPI:
     app.include_router(routers.bom_router, prefix="/bom", tags=["bom"])
     app.include_router(routers.mua_router, prefix="/mua", tags=["mua"])
     app.include_router(routers.mua_v6_router, prefix="/mua/v6", tags=["mua-v6"])
+    app.include_router(routers.mua_v7_router, prefix="/mua/v7", tags=["mua-v7"])
 
-    # M&P Plan Generator V2
+    # M&P Plan Generator V1 + V2 (Codex)
     app.include_router(routers.mp_plan_router, prefix="/mp-plan", tags=["mp-plan"])
+    app.include_router(routers.mp_plan_v2_codex_router, prefix="/mp-plan/v2", tags=["mp-plan-v2-codex"])
 
     # MIRA v4 Decision Lineage pipeline
     app.include_router(routers.mira_v4_router, prefix="/mira/v4", tags=["mira-v4"])

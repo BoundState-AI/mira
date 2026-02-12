@@ -34,10 +34,11 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+import fitz
 
 # Reuse existing v3 infrastructure - no need to rebuild
-from .v3.extract import VisionClient, pdf_to_images
-from .v3.text_extract import extract_drawing as extract_ocr_text, has_text_layer
+from mira.miul.v3.extract import VisionClient, pdf_to_images
+from mira.miul.v3.text_extract import extract_drawing as extract_ocr_text, has_text_layer
 
 LOGGER = logging.getLogger(__name__)
 
@@ -60,6 +61,9 @@ MAX_PAGES_PER_PDF = 50
 
 # Max concurrent Sonnet API calls (Anthropic rate limit friendly)
 MAX_SONNET_WORKERS = 4
+
+_DRAWING_VARIANT_SUFFIX_RE = re.compile(r"^(?:[A-Z]|[A-Z]?\d+(?:/\d+)?)$")
+_DRAWING_TOKEN_RE = re.compile(r"[A-Z0-9]+(?:[-/][A-Z0-9]+)+")
 
 
 # =============================================================================
@@ -136,6 +140,7 @@ class ExtractionResult:
         default_factory=lambda: datetime.now(timezone.utc).isoformat()
     )
     materials: List[ExtractedMaterial] = field(default_factory=list)
+    drawing_packages: List[Dict[str, Any]] = field(default_factory=list)
     dt_context: Optional[Dict[str, Any]] = None
     summary: Dict[str, Any] = field(default_factory=dict)
     audit_trail: List[Dict[str, Any]] = field(default_factory=list)
@@ -148,6 +153,7 @@ class ExtractionResult:
             "total_materials": total,
             "needs_review": needs_review,
             "auto_approved": total - needs_review,
+            "drawing_packages": len(self.drawing_packages),
         }
         return self.summary
 
@@ -157,6 +163,7 @@ class ExtractionResult:
             "extraction_id": self.extraction_id,
             "timestamp": self.timestamp,
             "materials": [_material_to_dict(m) for m in self.materials],
+            "drawing_packages": self.drawing_packages,
             "dt_context": self.dt_context,
             "summary": self.summary,
             "audit_trail": self.audit_trail,
@@ -168,12 +175,19 @@ class ExtractionResult:
         result = cls(
             extraction_id=data["extraction_id"],
             timestamp=data["timestamp"],
+            drawing_packages=data.get("drawing_packages", []),
             dt_context=data.get("dt_context"),
             summary=data.get("summary", {}),
             audit_trail=data.get("audit_trail", []),
         )
         for m in data.get("materials", []):
             result.materials.append(_material_from_dict(m))
+        # Backward compatibility: old sessions only stored flat materials.
+        if not result.drawing_packages and result.materials:
+            result.drawing_packages = _build_drawing_packages_from_materials(
+                result.materials,
+                result.dt_context or {},
+            )
         return result
 
 
@@ -438,14 +452,16 @@ class MIULVisionExtractor:
                 LOGGER.info(f"[Phase1] Skipping DT PDF: {pdf_path.name}")
                 continue
 
-            drawing_number = _extract_drawing_number(pdf_path)
+            drawing_number = _extract_drawing_number(pdf_path, dt_json=dt_json)
             dt_context = _get_dt_context(dt_json, drawing_number)
 
             # --- OCR ---
             ocr_result: Dict[str, Any] = {}
+            page_texts: List[str] = []
             if has_text_layer(pdf_path):
                 try:
                     ocr_result = extract_ocr_text(pdf_path)
+                    page_texts = _extract_page_texts(pdf_path)
                     LOGGER.info(
                         f"[Phase1] OCR: {pdf_path.name} -> "
                         f"type={ocr_result.get('drawing_type', '?')}, "
@@ -454,8 +470,6 @@ class MIULVisionExtractor:
                     )
                 except Exception as e:
                     LOGGER.warning(f"[Phase1] OCR failed: {pdf_path.name}: {e}")
-
-            ocr_json = json.dumps(ocr_result, indent=2) if ocr_result else ""
 
             result.audit_trail.append({
                 "event": "phase1_ocr",
@@ -480,17 +494,26 @@ class MIULVisionExtractor:
 
             if len(page_images) > MAX_PAGES_PER_PDF:
                 page_images = page_images[:MAX_PAGES_PER_PDF]
+                if page_texts:
+                    page_texts = page_texts[:MAX_PAGES_PER_PDF]
 
             # --- Bank each page ---
             for page_num, img_b64 in enumerate(page_images, 1):
+                page_text = page_texts[page_num - 1] if page_num - 1 < len(page_texts) else ""
+                page_ocr = _build_page_ocr_payload(
+                    doc_ocr=ocr_result,
+                    page_text=page_text,
+                    page_number=page_num,
+                    total_pages=len(page_images),
+                )
                 bank.append(BankedPage(
                     pdf_name=pdf_path.name,
                     page_number=page_num,
                     drawing_number=drawing_number,
                     image_b64=img_b64,
-                    ocr_json=ocr_json,
+                    ocr_json=json.dumps(page_ocr, indent=2) if page_ocr else "",
                     dt_context=dt_context,
-                    ocr_result=ocr_result,
+                    ocr_result=page_ocr,
                 ))
 
         LOGGER.info(f"[Phase1] OCR Bank complete: {len(bank)} pages from {len(pdf_paths)} PDFs")
@@ -548,6 +571,23 @@ class MIULVisionExtractor:
                 idx, page = futures[future]
                 try:
                     _, materials = future.result()
+                    if not materials:
+                        fallback_materials = _fallback_epl_materials_from_page_text(
+                            page_text=str((page.ocr_result or {}).get("page_text", "") or ""),
+                            source_file=page.pdf_name,
+                            page_number=page.page_number,
+                        )
+                        if fallback_materials:
+                            materials = fallback_materials
+                            result.audit_trail.append(
+                                {
+                                    "event": "phase2_ocr_fallback",
+                                    "file": page.pdf_name,
+                                    "page": page.page_number,
+                                    "materials_found": len(materials),
+                                    "timestamp": _now(),
+                                }
+                            )
                     results_by_idx[idx] = materials
 
                     result.audit_trail.append({
@@ -606,15 +646,85 @@ class MIULVisionExtractor:
 
         Remaining gaps go to HITL review via identify_review_items().
         """
+        package_map: Dict[str, Dict[str, Any]] = {}
+        dt_lookup = {
+            _norm_token(node.get("drawing_number", "")): node
+            for node in (result.dt_context or {}).get("tree", [])
+            if node.get("drawing_number")
+        }
+
         for idx, page in enumerate(bank):
             materials = sonnet_results.get(idx, [])
+            drawing_number = _norm_token(page.drawing_number)
+            if not drawing_number:
+                drawing_number = _extract_drawing_number(
+                    Path(page.pdf_name),
+                    dt_json=result.dt_context or {},
+                )
+            dt_node = dt_lookup.get(drawing_number, {})
+
+            pkg = package_map.setdefault(
+                drawing_number,
+                {
+                    "drawing_number": drawing_number,
+                    "title": str((dt_node or {}).get("title") or (page.dt_context or {}).get("title") or "").strip(),
+                    "drawing_type": str((dt_node or {}).get("type") or (page.dt_context or {}).get("type") or "").upper(),
+                    "dt_parent": _norm_token((dt_node or {}).get("parent") or (page.dt_context or {}).get("parent") or ""),
+                    "expected_parts": list((page.dt_context or {}).get("expected_parts") or []),
+                    "source_files": set(),
+                    "pages_seen": set(),
+                    "materials": [],
+                },
+            )
+            if not pkg.get("title"):
+                pkg["title"] = str((dt_node or {}).get("title") or (page.dt_context or {}).get("title") or "").strip()
+            if not pkg.get("drawing_type"):
+                pkg["drawing_type"] = str((dt_node or {}).get("type") or (page.dt_context or {}).get("type") or "").upper()
+            if not pkg.get("dt_parent"):
+                pkg["dt_parent"] = _norm_token((dt_node or {}).get("parent") or (page.dt_context or {}).get("parent") or "")
+            if not pkg.get("expected_parts") and (page.dt_context or {}).get("expected_parts"):
+                pkg["expected_parts"] = list((page.dt_context or {}).get("expected_parts") or [])
+            pkg["source_files"].add(page.pdf_name)
+            pkg["pages_seen"].add(int(page.page_number))
 
             # Assign NHA from DT context if not already set
             for mat in materials:
                 if mat.nha is None and page.dt_context:
                     mat.nha = page.dt_context.get("parent")
+                if not mat.source_file:
+                    mat.source_file = page.pdf_name
+                if not mat.source_page:
+                    mat.source_page = int(page.page_number)
+                pkg["materials"].append(_material_to_dict(mat))
 
             result.materials.extend(materials)
+
+        normalized_packages: List[Dict[str, Any]] = []
+        for drawing_number in sorted(package_map.keys()):
+            pkg = package_map[drawing_number]
+            mats = pkg.get("materials", [])
+            part_numbers = sorted(
+                {
+                    _norm_token(m.get("part_number", ""))
+                    for m in mats
+                    if _norm_token(m.get("part_number", ""))
+                }
+            )
+            normalized_packages.append(
+                {
+                    "drawing_number": drawing_number,
+                    "title": pkg.get("title", ""),
+                    "drawing_type": pkg.get("drawing_type", ""),
+                    "dt_parent": pkg.get("dt_parent", ""),
+                    "expected_parts": pkg.get("expected_parts", []),
+                    "source_files": sorted(pkg.get("source_files", set())),
+                    "pages_seen": sorted(pkg.get("pages_seen", set())),
+                    "materials": mats,
+                    "part_numbers": part_numbers,
+                    "material_count": len(mats),
+                }
+            )
+        result.drawing_packages = normalized_packages
 
         result.compute_summary()
 
@@ -627,6 +737,7 @@ class MIULVisionExtractor:
         result.audit_trail.append({
             "event": "phase3_complete",
             "summary": result.summary,
+            "drawing_packages": len(result.drawing_packages),
             "timestamp": _now(),
         })
 
@@ -955,10 +1066,59 @@ def identify_review_items(result: ExtractionResult) -> Dict[str, Any]:
     into one review item with stacked evidence and best-of-breed field values.
     Uses smart thresholds: only required fields trigger HITL.
     """
-    # Phase 1: Group materials by part_number
+    # Build known drawing identifiers from DT + extracted drawing packages.
+    known_drawings: set[str] = set()
+    for node in (result.dt_context or {}).get("tree", []) if isinstance(result.dt_context, dict) else []:
+        drawing_number = _norm_token(node.get("drawing_number", ""))
+        if drawing_number:
+            known_drawings.add(drawing_number)
+    for pkg in result.drawing_packages or []:
+        drawing_number = _norm_token(pkg.get("drawing_number", ""))
+        if drawing_number:
+            known_drawings.add(drawing_number)
+
+    known_drawing_keys = {drawing: _drawing_match_keys(drawing) for drawing in sorted(known_drawings)}
+
+    def _leading_root_key(value: Any) -> str:
+        token = _norm_token(value)
+        if not token:
+            return ""
+        lead = re.split(r"[\s\-_\/]+", token)[0]
+        match = re.match(r"^([A-Z]+\d+)", lead)
+        return match.group(1) if match else ""
+
+    def _canonical_review_pn(part_number: str) -> str:
+        pn_norm = _norm_token(part_number)
+        if not pn_norm:
+            return pn_norm
+        if pn_norm in known_drawing_keys:
+            return pn_norm
+        pn_keys = _drawing_match_keys(pn_norm)
+        if not pn_keys:
+            return pn_norm
+        matches = [
+            drawing for drawing, drawing_keys in known_drawing_keys.items()
+            if pn_keys & drawing_keys
+        ]
+        if len(matches) == 1:
+            return matches[0]
+        # Conservative alias fallback for drawing-reference style part numbers
+        # (e.g. IMER07755-001, IMER07781-001 A).
+        if re.fullmatch(r"[A-Z]+\d+-001(?:\s+[A-Z])?", pn_norm):
+            pn_root = _leading_root_key(pn_norm)
+            if pn_root:
+                root_matches = [
+                    drawing for drawing in known_drawing_keys.keys()
+                    if _leading_root_key(drawing) == pn_root
+                ]
+                if len(root_matches) == 1:
+                    return root_matches[0]
+        return pn_norm
+
+    # Phase 1: Group materials by canonical part number (drawing-backed when unique).
     by_pn: Dict[str, List["ExtractedMaterial"]] = {}
     for mat in result.materials:
-        by_pn.setdefault(mat.part_number, []).append(mat)
+        by_pn.setdefault(_canonical_review_pn(mat.part_number), []).append(mat)
 
     review_items = []
     auto_approved_parts = []
@@ -967,6 +1127,12 @@ def identify_review_items(result: ExtractionResult) -> Dict[str, Any]:
         # Start with the highest-confidence sighting as the base
         mats_sorted = sorted(mats, key=lambda m: m.worst_confidence, reverse=True)
         primary = mats_sorted[0]
+        part_aliases = sorted({
+            _norm_token(m.part_number) for m in mats
+            if _norm_token(m.part_number)
+        })
+        is_drawing_backed = pn in known_drawing_keys
+        is_assembly_named = any("ASSEMBLY" in _norm_token(m.part_description) for m in mats)
 
         # Check if ANY sighting needs review
         any_needs_review = any(m.needs_review for m in mats)
@@ -981,6 +1147,8 @@ def identify_review_items(result: ExtractionResult) -> Dict[str, Any]:
             "part_number": pn,
             "part_description": primary.part_description,
             "nha": primary.nha,
+            "linked_drawing": pn if is_drawing_backed else "",
+            "part_aliases": part_aliases,
             "source_file": primary.source_file,
             "source_page": primary.source_page,
             "source_pages": [f"{primary.source_file} p{primary.source_page}"],
@@ -1047,6 +1215,18 @@ def identify_review_items(result: ExtractionResult) -> Dict[str, Any]:
                     still_needs = True
                     break
 
+        # In no-DT extraction sets, assembly references in EPLs often surface as
+        # "missing designation" even though the material is intentionally defined
+        # on lower-level component drawings. If this item maps cleanly to a known
+        # drawing package and is clearly an assembly callout, do not queue it.
+        designation_field = item["fields"].get("designation", {})
+        designation_missing = (
+            not str(designation_field.get("value") or "").strip()
+            and float(designation_field.get("confidence", 0.0) or 0.0) < REVIEW_THRESHOLD
+        )
+        if still_needs and is_drawing_backed and is_assembly_named and designation_missing:
+            still_needs = False
+
         if still_needs:
             review_items.append(item)
         else:
@@ -1073,20 +1253,83 @@ def identify_review_items(result: ExtractionResult) -> Dict[str, Any]:
 # DT Context Helpers
 # =============================================================================
 
-def _extract_drawing_number(pdf_path: Path) -> str:
-    """
-    Extract drawing number from filename.
+def _drawing_match_keys(value: Any) -> set[str]:
+    drawing = _norm_token(value)
+    if not drawing:
+        return set()
 
-    NASA convention: MER07545-001_DRW_-_12_RELEASED.pdf
-    Drawing number: MER07545-001
+    keys: set[str] = {drawing}
+    parts = drawing.split("-")
+    while len(parts) >= 3 and _DRAWING_VARIANT_SUFFIX_RE.fullmatch(parts[-1]):
+        parts = parts[:-1]
+        keys.add("-".join(parts))
+    return {k for k in keys if k}
+
+
+def _drawing_candidates_from_stem(stem: str) -> List[str]:
+    upper_stem = _norm_token(stem)
+    if not upper_stem:
+        return []
+
+    candidates: List[str] = []
+    for sep in (".DRW", "_DRW", "_DRW_", "_DRW-"):
+        if sep in upper_stem:
+            prefix = _norm_token(upper_stem.split(sep)[0])
+            if prefix:
+                candidates.append(prefix)
+
+    for token in _DRAWING_TOKEN_RE.findall(upper_stem):
+        norm = _norm_token(token)
+        if norm:
+            candidates.append(norm)
+
+    first_underscore = _norm_token(upper_stem.split("_")[0])
+    if first_underscore:
+        candidates.append(first_underscore)
+    candidates.append(upper_stem)
+
+    unique: List[str] = []
+    seen: set[str] = set()
+    for candidate in candidates:
+        if candidate and candidate not in seen:
+            seen.add(candidate)
+            unique.append(candidate)
+    return unique
+
+
+def _extract_drawing_number(pdf_path: Path, dt_json: Optional[Dict[str, Any]] = None) -> str:
     """
-    stem = pdf_path.stem
-    # Take everything before _DRW or _drw
-    for sep in ["_DRW", "_drw", "_Drw"]:
-        if sep in stem:
-            return stem.split(sep)[0]
-    # Fallback: take up to first underscore after dash pattern
-    return stem.split("_")[0] if "_" in stem else stem
+    Extract drawing number from filename using rule-based candidate matching.
+
+    Uses DT-aware matching when DT context exists, then falls back to filename
+    candidates in priority order.
+    """
+    candidates = _drawing_candidates_from_stem(pdf_path.stem)
+    if not candidates:
+        return ""
+
+    tree = (dt_json or {}).get("tree", []) if dt_json else []
+    dt_nodes = {
+        _norm_token(node.get("drawing_number", ""))
+        for node in tree
+        if _norm_token(node.get("drawing_number", ""))
+    }
+    if dt_nodes:
+        for candidate in candidates:
+            if candidate in dt_nodes:
+                return candidate
+
+        dt_nodes_sorted = sorted(dt_nodes)
+        dt_keys = {node: _drawing_match_keys(node) for node in dt_nodes_sorted}
+        for candidate in candidates:
+            candidate_keys = _drawing_match_keys(candidate)
+            if not candidate_keys:
+                continue
+            matches = [node for node in dt_nodes_sorted if candidate_keys & dt_keys[node]]
+            if len(matches) == 1:
+                return matches[0]
+
+    return candidates[0]
 
 
 def _get_dt_context(
@@ -1107,16 +1350,38 @@ def _get_dt_context(
     if not tree:
         return None
 
-    # Find node matching this drawing number
+    query_norm = _norm_token(drawing_number)
+    node_by_norm: Dict[str, Dict[str, Any]] = {}
     for node in tree:
-        if node.get("drawing_number", "").upper() == drawing_number.upper():
-            return {
-                "drawing_number": node.get("drawing_number"),
-                "title": node.get("title", ""),
-                "type": node.get("type", ""),
-                "parent": node.get("parent"),
-                "expected_parts": _get_child_parts(tree, drawing_number),
-            }
+        node_norm = _norm_token(node.get("drawing_number", ""))
+        if node_norm:
+            node_by_norm[node_norm] = node
+
+    chosen_norm = query_norm if query_norm in node_by_norm else ""
+    if not chosen_norm and query_norm:
+        query_keys = _drawing_match_keys(query_norm)
+        if query_keys:
+            scored: List[Tuple[int, str]] = []
+            for node_norm in node_by_norm:
+                overlap = len(query_keys & _drawing_match_keys(node_norm))
+                if overlap > 0:
+                    scored.append((overlap, node_norm))
+            if scored:
+                scored.sort(reverse=True)
+                best_overlap = scored[0][0]
+                best_nodes = sorted(node for overlap, node in scored if overlap == best_overlap)
+                if len(best_nodes) == 1:
+                    chosen_norm = best_nodes[0]
+
+    if chosen_norm:
+        node = node_by_norm[chosen_norm]
+        return {
+            "drawing_number": node.get("drawing_number"),
+            "title": node.get("title", ""),
+            "type": node.get("type", ""),
+            "parent": node.get("parent"),
+            "expected_parts": _get_child_parts(tree, str(node.get("drawing_number") or drawing_number)),
+        }
 
     return None
 
@@ -1124,8 +1389,20 @@ def _get_dt_context(
 def _get_child_parts(tree: List[Dict], parent_drawing: str) -> List[Dict]:
     """Get all parts that list this drawing as their parent."""
     children = []
+    parent_norm = _norm_token(parent_drawing)
+    parent_keys = _drawing_match_keys(parent_norm)
     for node in tree:
-        if node.get("parent", "").upper() == parent_drawing.upper():
+        node_parent = _norm_token(node.get("parent") or "")
+        if not node_parent:
+            continue
+        if node_parent == parent_norm:
+            children.append({
+                "drawing_number": node.get("drawing_number"),
+                "title": node.get("title", ""),
+                "type": node.get("type", ""),
+            })
+            continue
+        if parent_keys and (_drawing_match_keys(node_parent) & parent_keys):
             children.append({
                 "drawing_number": node.get("drawing_number"),
                 "title": node.get("title", ""),
@@ -1135,8 +1412,325 @@ def _get_child_parts(tree: List[Dict], parent_drawing: str) -> List[Dict]:
 
 
 # =============================================================================
+# Drawing Packages
+# =============================================================================
+
+def _build_drawing_packages_from_materials(
+    materials: List[ExtractedMaterial],
+    dt_json: Dict[str, Any],
+) -> List[Dict[str, Any]]:
+    """
+    Build per-drawing package payload from flat material sightings.
+
+    Used as a compatibility bridge for pre-refactor sessions that only stored
+    `materials[]` and no `drawing_packages[]`.
+    """
+    packages: Dict[str, Dict[str, Any]] = {}
+    dt_lookup = {
+        _norm_token(node.get("drawing_number", "")): node
+        for node in (dt_json or {}).get("tree", [])
+        if node.get("drawing_number")
+    }
+
+    for mat in materials:
+        source_file = str(getattr(mat, "source_file", "") or "")
+        drawing_number = (
+            _norm_token(_extract_drawing_number(Path(source_file), dt_json=dt_json))
+            if source_file
+            else ""
+        )
+        if not drawing_number:
+            drawing_number = _norm_token(getattr(mat, "part_number", ""))
+        node = dt_lookup.get(drawing_number, {})
+        pkg = packages.setdefault(
+            drawing_number,
+            {
+                "drawing_number": drawing_number,
+                "title": str((node or {}).get("title") or "").strip(),
+                "drawing_type": str((node or {}).get("type") or "").upper(),
+                "dt_parent": _norm_token((node or {}).get("parent") or ""),
+                "expected_parts": _get_child_parts((dt_json or {}).get("tree", []), drawing_number),
+                "source_files": set(),
+                "pages_seen": set(),
+                "materials": [],
+            },
+        )
+        if source_file:
+            pkg["source_files"].add(source_file)
+        page_num = int(getattr(mat, "source_page", 0) or 0)
+        if page_num > 0:
+            pkg["pages_seen"].add(page_num)
+        pkg["materials"].append(_material_to_dict(mat))
+
+    normalized: List[Dict[str, Any]] = []
+    for drawing_number in sorted(packages.keys()):
+        pkg = packages[drawing_number]
+        mats = pkg.get("materials", [])
+        part_numbers = sorted(
+            {
+                _norm_token(m.get("part_number", ""))
+                for m in mats
+                if _norm_token(m.get("part_number", ""))
+            }
+        )
+        normalized.append(
+            {
+                "drawing_number": drawing_number,
+                "title": pkg.get("title", ""),
+                "drawing_type": pkg.get("drawing_type", ""),
+                "dt_parent": pkg.get("dt_parent", ""),
+                "expected_parts": pkg.get("expected_parts", []),
+                "source_files": sorted(pkg.get("source_files", set())),
+                "pages_seen": sorted(pkg.get("pages_seen", set())),
+                "materials": mats,
+                "part_numbers": part_numbers,
+                "material_count": len(mats),
+            }
+        )
+    return normalized
+
+
+# =============================================================================
+# Page OCR / EPL Fallback Helpers
+# =============================================================================
+
+_EPL_HEADER_RE = re.compile(r"ENGINEERING\s+PARTS\s+LIST", re.IGNORECASE)
+_FALLBACK_PART_RE = re.compile(r"^[A-Z0-9][A-Z0-9/\- ]{2,}$")
+_MATERIAL_LINE_RE = re.compile(
+    r"\b(TITANIUM|AL(?:UMINUM)?(?:\s+ALLOY)?|STEEL|CRES|BRONZE|PTFE|TEFLON|INCONEL|A286|17-4|6061|7075)\b",
+    re.IGNORECASE,
+)
+_REV_MARKER_RE = re.compile(r"^(?:-|[A-Z])$")
+_QTY_MARKER_RE = re.compile(r"^(?:A/R|AR|AS REQ'?D|\d+)$")
+_EPL_IGNORED_LINES = {
+    "ENGINEERING PARTS LIST",
+    "QTY REQ'D",
+    "FIND",
+    "NO.",
+    "PART NUMBER",
+    "DWG",
+    "REV",
+    "DESCRIPTION",
+    "MATERIAL (REF)",
+    "-003",
+    "-001",
+}
+
+
+def _extract_page_texts(pdf_path: Path) -> List[str]:
+    """Extract text per page so each Vision call gets page-local OCR context."""
+    texts: List[str] = []
+    try:
+        doc = fitz.open(pdf_path)
+        for page in doc:
+            text = page.get_text("text") or ""
+            texts.append(text)
+        doc.close()
+    except Exception as e:
+        LOGGER.warning(f"[Phase1] Per-page OCR text failed: {pdf_path.name}: {e}")
+    return texts
+
+
+def _build_page_ocr_payload(
+    doc_ocr: Dict[str, Any],
+    page_text: str,
+    page_number: int,
+    total_pages: int,
+) -> Dict[str, Any]:
+    """Build compact OCR payload scoped to a single page."""
+    payload: Dict[str, Any] = {
+        "drawing_number": doc_ocr.get("drawing_number", ""),
+        "drawing_type": doc_ocr.get("drawing_type", "unknown"),
+        "page_number": page_number,
+        "pages": total_pages,
+        "has_epl": bool(_EPL_HEADER_RE.search(page_text or "")),
+        "page_text": str(page_text or "")[:12000],
+    }
+
+    # Keep doc-level context lightweight on non-title pages.
+    title_block = doc_ocr.get("title_block") if isinstance(doc_ocr, dict) else None
+    if isinstance(title_block, dict):
+        payload["title_block"] = {
+            "drawing_number": title_block.get("drawing_number"),
+            "nha": title_block.get("nha"),
+            "title": title_block.get("title"),
+        }
+
+    if page_number == 1:
+        if doc_ocr.get("epl"):
+            payload["epl"] = doc_ocr.get("epl")
+        notes = doc_ocr.get("notes") or []
+        if isinstance(notes, list) and notes:
+            payload["notes"] = notes[:20]
+
+    return payload
+
+
+def _is_part_token_candidate(token: str) -> bool:
+    token_norm = _norm_token(token)
+    if not token_norm:
+        return False
+    if token_norm in _EPL_IGNORED_LINES:
+        return False
+    if token_norm.startswith("MSFC_DWG_"):
+        return False
+    if not _FALLBACK_PART_RE.fullmatch(token_norm):
+        return False
+    if not any(ch.isalpha() for ch in token_norm):
+        return False
+    if not any(ch.isdigit() for ch in token_norm):
+        return False
+    # Space-delimited EPL part numbers are rare; keep only known standard style.
+    if " " in token_norm and not token_norm.startswith("SAE "):
+        return False
+    if _QTY_MARKER_RE.fullmatch(token_norm):
+        return False
+    if token_norm.count(" ") > 3 and not token_norm.startswith("SAE "):
+        return False
+    return True
+
+
+def _is_description_line(candidate: str) -> bool:
+    text = str(candidate or "").strip()
+    token = _norm_token(text)
+    if not token:
+        return False
+    if _REV_MARKER_RE.fullmatch(token):
+        return False
+    if _QTY_MARKER_RE.fullmatch(token):
+        return False
+    if token in _EPL_IGNORED_LINES:
+        return False
+    if _is_part_token_candidate(token):
+        return False
+    if len(token) < 2:
+        return False
+    return any(ch.isalpha() for ch in token)
+
+
+def _infer_material_line(lines: List[str], idx: int) -> str:
+    if idx >= len(lines):
+        return ""
+    candidate = str(lines[idx] or "").strip()
+    token = _norm_token(candidate)
+    if not token:
+        return ""
+    if _QTY_MARKER_RE.fullmatch(token):
+        return ""
+    if _REV_MARKER_RE.fullmatch(token):
+        return ""
+    if token in _EPL_IGNORED_LINES:
+        return ""
+    if _is_part_token_candidate(token):
+        return ""
+    if len(token) < 2:
+        return ""
+    # Material lines often contain these tokens; keep broad fallback to avoid
+    # dropping legitimate values like "TYPE I, II, III".
+    if _MATERIAL_LINE_RE.search(token):
+        return candidate
+    return candidate if any(ch.isalpha() for ch in token) else ""
+
+
+def _fallback_epl_materials_from_page_text(
+    page_text: str,
+    source_file: str,
+    page_number: int,
+) -> List[ExtractedMaterial]:
+    """
+    Build minimal material rows from EPL text when Vision returns no rows.
+
+    This is a conservative fallback used only on pages that clearly contain an
+    EPL header. It preserves part numbers and routes material fields to review.
+    """
+    text = str(page_text or "")
+    if not text or not _EPL_HEADER_RE.search(text):
+        return []
+
+    materials: List[ExtractedMaterial] = []
+    seen: set[str] = set()
+    lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
+    raw_norm = lambda s: re.sub(r"\s+", " ", str(s or "").strip().upper())
+
+    # EPL rows are usually:
+    # [part_number] [rev] [description] [material] [qty] [qty] [find]
+    for i in range(0, len(lines) - 2):
+        pn_candidate = _norm_token(lines[i])
+        if not _is_part_token_candidate(pn_candidate):
+            continue
+
+        rev = raw_norm(lines[i + 1]) if i + 1 < len(lines) else ""
+        if not _REV_MARKER_RE.fullmatch(rev):
+            continue
+
+        description = lines[i + 2].strip() if i + 2 < len(lines) else ""
+        if not _is_description_line(description):
+            continue
+
+        pn = pn_candidate
+        if pn in seen:
+            continue
+        seen.add(pn)
+
+        designation = _infer_material_line(lines, i + 3)
+        evidence_bits = [lines[i].strip(), description]
+        if designation:
+            evidence_bits.append(designation)
+        evidence_text = " | ".join(bit for bit in evidence_bits if bit)[:260]
+
+        materials.append(
+            ExtractedMaterial(
+                part_number=pn,
+                part_description=description,
+                designation=designation or None,
+                material_spec=None,
+                process_spec=None,
+                uns_code=None,
+                material_form=None,
+                quantity=1,
+                source_file=source_file,
+                source_page=page_number,
+                confidence={
+                    "part_number": 0.9,
+                    "designation": 0.65 if designation else 0.0,
+                    "material_spec": 0.0,
+                    "process_spec": 0.0,
+                    "uns_code": 0.0,
+                    "material_form": 0.0,
+                },
+                gaps=["designation"] if not designation else [],
+                gap_reasons=(
+                    ["Vision returned no row; extracted part number from EPL text fallback"]
+                    if not designation
+                    else []
+                ),
+                evidence=[
+                    ExtractionEvidence(
+                        source_page=page_number,
+                        source_location="ocr_epl_fallback",
+                        source_text=evidence_text,
+                        confidence=0.7 if designation else 0.65,
+                    )
+                ],
+            )
+        )
+
+    return materials
+
+
+# =============================================================================
 # Utilities
 # =============================================================================
+
+def _norm_token(value: Any) -> str:
+    token = str(value or "").strip().upper()
+    if not token:
+        return ""
+    # OCR often appends trailing separator dashes in EPL rows
+    # (e.g., "IMER07755-001 -"). Strip only trailing separators.
+    token = re.sub(r"\s*[-–—]+\s*$", "", token).strip()
+    return token
+
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()

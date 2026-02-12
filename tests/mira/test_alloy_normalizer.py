@@ -157,6 +157,18 @@ class TestAlloyNormalizerStainless:
             result = normalize_alloy(v)
             assert result.uns == "S66286", f"Failed for {v}: got {result.uns}"
 
+    def test_a286_with_strength_qualifier(self):
+        """A286 with KSI qualifier should still normalize to S66286."""
+        result = normalize_alloy("A286 (160 KSI)")
+        assert result.uns == "S66286"
+        assert result.match_method == "stainless_a286"
+
+    def test_a286_sst_variant(self):
+        """A286 with SST suffix should still normalize to S66286."""
+        result = normalize_alloy("A286 SST")
+        assert result.uns == "S66286"
+        assert result.match_method == "stainless_a286"
+
 
 class TestAlloyNormalizerAluminum:
     """Tests for aluminum normalization."""
@@ -207,6 +219,12 @@ class TestAlloyNormalizerTitanium:
         result = normalize_alloy("Ti Grade 2")
         assert result.uns == "R50400"
 
+    def test_silicon_nitride_not_misclassified_as_titanium(self):
+        """Non-titanium strings containing digits should not resolve as Ti grade."""
+        result = normalize_alloy("SILICON NITRIDE (Si3N4)")
+        assert result.uns is None
+        assert not result.is_resolved
+
 
 class TestAlloyNormalizerNickel:
     """Tests for nickel alloy normalization."""
@@ -224,6 +242,12 @@ class TestAlloyNormalizerNickel:
         """Should normalize Inconel 718."""
         result = normalize_alloy("Inconel 718")
         assert result.uns == "N07718"
+
+    def test_generic_inconel_alloy_unresolved(self):
+        """Generic Inconel without grade should remain unresolved."""
+        result = normalize_alloy("INCONEL ALLOY")
+        assert result.uns is None
+        assert not result.is_resolved
 
     def test_hastelloy_c276(self):
         """Should normalize Hastelloy C-276."""

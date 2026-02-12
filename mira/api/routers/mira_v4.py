@@ -168,6 +168,9 @@ class V4QueryResponse(BaseModel):
     intent_disagreement: Optional[V4IntentDisagreementResponse] = None
     answer: str = ""
     materials: List[Dict[str, Any]] = Field(default_factory=list)
+    all_materials: List[Dict[str, Any]] = Field(default_factory=list)
+    all_material_count: int = 0
+    materials_focus_applied: bool = False
     material_families: List[str] = Field(default_factory=list)
     search_source: str = ""
     parsed_query: Dict[str, Any] = Field(default_factory=dict)
@@ -241,6 +244,8 @@ Return ONLY valid JSON with these fields:
 {
   "intent": "<one of: compatibility_query, risk_query, materials_query, property_query, comparison, recommendation, general_search>",
   "safety_context": "<one of: oxygen, hydrogen, cryogenic, high_pressure, general>",
+  "domain_scope": "<one of: in_scope, out_of_scope, uncertain>",
+  "scope_reason": "<short reason for scope classification>",
   "material_key": "<specific material name/spec if user named one, or null>",
   "candidate_materials": [
     "<specific material designations that would work for this application>"
@@ -272,6 +277,12 @@ CRITICAL RULES:
 - Convert temperatures to Celsius, pressures to kPa.
 - safety_context: "oxygen" if O2/LOX/GOX, "hydrogen" if H2/LH2/GH2,
   "cryogenic" if T < -73C, "high_pressure" if P > 20684 kPa, else "general".
+- domain_scope:
+  * "in_scope" for NASA materials/process questions (compatibility, ratings,
+    test data, MUA/MIUL, standards, material selection).
+  * "out_of_scope" for unrelated prompts (jokes, trivia, personal advice,
+    coding tasks not about M&P, etc.).
+  * "uncertain" only if the query is ambiguous.
 - Use your aerospace/materials engineering knowledge. Think about:
   * Oxygen compatibility (ASTM G94, NASA-STD-6001)
   * Hydrogen embrittlement resistance
@@ -352,6 +363,8 @@ You may ONLY state facts that appear explicitly in the evidence below.
 - If a material has [MUA precedent: N records], say it has N MUA precedent records.
   MUA records indicate prior usage approval, NOT oxygen compatibility ratings.
 - If data is absent or marked "no test data", say so. Do not infer.
+- If a "Focus material" is provided, answer ONLY for that material using
+  matching designation evidence. Do not substitute other materials.
 
 ANSWER FORMAT:
 - Lead with a direct YES/NO/CONDITIONAL when the question is about compatibility.
@@ -377,6 +390,7 @@ async def _generate_answer(
     confidence_score: float,
     gate_action: str,
     safety_context: str,
+    focus_material_key: Optional[str] = None,
 ) -> str:
     """Generate a natural language answer using Sonnet + DB evidence.
 
@@ -418,6 +432,7 @@ async def _generate_answer(
 
 Confidence: {confidence_score:.0%} ({gate_action})
 Safety context: {safety_context}
+Focus material: {focus_material_key or "none"}
 Materials found: {len(materials)} ({len(top_materials)} shown)
 
 Evidence from MAPTIS database:
@@ -582,6 +597,8 @@ def _heuristic_parse(raw_query: str) -> Dict[str, Any]:
     return {
         "intent": "general_search",
         "safety_context": safety_context,
+        "domain_scope": "uncertain",
+        "scope_reason": "Heuristic fallback parser cannot reliably classify domain scope.",
         "material_key": material_key,
         "candidate_materials": candidate_materials,
         "material_families": material_families,
@@ -589,6 +606,105 @@ def _heuristic_parse(raw_query: str) -> Dict[str, Any]:
         "environment": {},
         "filters": {},
     }
+
+
+def _normalize_domain_scope(raw_scope: Any) -> str:
+    """Normalize Sonnet domain scope label into a strict tri-state."""
+    if raw_scope is None:
+        return "uncertain"
+
+    scope = str(raw_scope).strip().lower()
+    if scope in {"in_scope", "out_of_scope", "uncertain"}:
+        return scope
+    return "uncertain"
+
+
+def _is_out_of_scope(parsed: Dict[str, Any]) -> bool:
+    """Return True only when Sonnet explicitly classifies as out_of_scope."""
+    return _normalize_domain_scope(parsed.get("domain_scope")) == "out_of_scope"
+
+
+def _build_out_of_scope_answer(parsed: Dict[str, Any]) -> str:
+    """User-facing response for non-materials questions."""
+    reason = str(parsed.get("scope_reason") or "").strip()
+    if not reason:
+        reason = (
+            "This question is not about NASA materials or processes decisions."
+        )
+
+    return (
+        "# MIRA Response: Out of Scope\n"
+        "This question is outside the MIRA materials and processes domain.\n\n"
+        f"Reason: {reason}\n\n"
+        "Ask about material compatibility, MAPTIS ratings/test data, "
+        "or MUA/MIUL decisions."
+    )
+
+
+def _tokenize_material_text(value: str) -> set:
+    """Tokenize material strings for robust designation matching."""
+    return set(re.findall(r"[a-z0-9]+", str(value or "").lower()))
+
+
+def _select_answer_materials_for_focus(
+    materials: List[Dict[str, Any]],
+    focus_material_key: Optional[str],
+) -> List[Dict[str, Any]]:
+    """Select answer-evidence materials matching the user-requested material.
+
+    Returns the original list when no reliable focus match exists.
+    """
+    if not materials or not focus_material_key:
+        return materials
+
+    focus_norm = str(focus_material_key).strip().lower()
+    focus_tokens = _tokenize_material_text(focus_norm)
+    if not focus_tokens:
+        return materials
+
+    # Tier 1: strict direct-designation matches (preferred when available).
+    # Example: "Inconel 718" should prefer "INCONEL 718 BAR AGED" over
+    # multi-material records containing "INCONEL 718" in a join note.
+    direct_matches = []
+    for row in materials:
+        designation = str(row.get("designation", "") or "")
+        des_norm = designation.strip().lower()
+        if des_norm.startswith(focus_norm):
+            direct_matches.append(row)
+
+    if direct_matches:
+        return sorted(
+            direct_matches,
+            key=lambda r: (-r.get("total_tests", 0), str(r.get("designation", ""))),
+        )
+
+    numeric_focus_tokens = {t for t in focus_tokens if t.isdigit()}
+    matches: List[tuple] = []
+
+    for row in materials:
+        designation = str(row.get("designation", "") or "")
+        des_tokens = _tokenize_material_text(designation)
+        if not des_tokens:
+            continue
+
+        # If the requested material includes numeric identity (e.g., 718),
+        # require those numeric tokens to be present.
+        if numeric_focus_tokens and not numeric_focus_tokens.issubset(des_tokens):
+            continue
+
+        overlap = len(focus_tokens.intersection(des_tokens))
+        coverage = overlap / max(1, len(focus_tokens))
+        full_substring = focus_norm in designation.lower()
+
+        if full_substring or coverage >= 1.0:
+            score = (100 if full_substring else 0) + overlap
+            matches.append((score, row.get("total_tests", 0), designation, row))
+
+    if not matches:
+        return materials
+
+    matches.sort(key=lambda item: (-item[0], -item[1], item[2]))
+    return [item[3] for item in matches]
 
 
 # =============================================================================
@@ -625,6 +741,11 @@ def _build_parsed_query(
     # Intent
     sonnet_intent = sonnet_parsed.get("intent", "general_search")
     material_key = request.material_key or sonnet_parsed.get("material_key")
+    filters = dict(sonnet_parsed.get("filters", {}) or {})
+    filters["domain_scope"] = _normalize_domain_scope(sonnet_parsed.get("domain_scope"))
+    scope_reason = sonnet_parsed.get("scope_reason")
+    if scope_reason:
+        filters["scope_reason"] = str(scope_reason)
 
     return ParsedQuery(
         raw_query=raw_query,
@@ -632,7 +753,7 @@ def _build_parsed_query(
         safety_context=safety_context,
         environment=environment,
         material_key=material_key,
-        filters=sonnet_parsed.get("filters", {}),
+        filters=filters,
         sonnet_intent=sonnet_intent,
         heuristic_intent=None,  # filled by guardrail
         batch_mode=request.batch_mode,
@@ -656,6 +777,7 @@ def _classify_dirty_data(evidence_rows: list) -> tuple:
 def _serialize_lineage(
     lineage,
     materials: list,
+    all_materials: Optional[List[Dict[str, Any]]] = None,
     material_families: Optional[List[str]] = None,
     search_source: str = "",
     answer: str = "",
@@ -732,7 +854,12 @@ def _serialize_lineage(
             explanation=idis.explanation,
         )
 
-    # Compute aggregate stats from enriched material rows
+    full_materials = all_materials if all_materials is not None else materials
+    used_keys = [m.get("material_key") for m in materials]
+    full_keys = [m.get("material_key") for m in full_materials]
+    focus_applied = used_keys != full_keys
+
+    # Compute aggregate stats from answer-evidence material rows
     total_test_records = sum(m.get("total_tests", 0) for m in materials)
     materials_with_tests = sum(1 for m in materials if m.get("total_tests", 0) > 0)
     materials_with_mua = sum(1 for m in materials if m.get("has_mua_precedent", False))
@@ -749,6 +876,9 @@ def _serialize_lineage(
         intent_disagreement=intent_resp,
         answer=answer,
         materials=materials,
+        all_materials=full_materials,
+        all_material_count=len(full_materials),
+        materials_focus_applied=focus_applied,
         material_families=material_families or [],
         search_source=search_source,
         parsed_query=lineage.parsed_query.model_dump(),
@@ -802,6 +932,39 @@ async def query_v4(request: V4QueryRequest) -> V4QueryResponse:
             LOGGER.info("[MIRA_V4] Using heuristic fallback parser")
 
         parsed_query = _build_parsed_query(request.query, sonnet_parsed, request)
+
+        # --- Step 1b: Intelligent domain-scope bouncer (LLM-based) ---
+        if _is_out_of_scope(sonnet_parsed):
+            scope_reason = str(sonnet_parsed.get("scope_reason") or "").strip()
+            LOGGER.info(
+                "[MIRA_V4] Out-of-scope query blocked before retrieval. reason='%s'",
+                scope_reason or "n/a",
+            )
+
+            parsed_query = parsed_query.model_copy(update={
+                "intent": "out_of_scope",
+                "filters": {
+                    **parsed_query.filters,
+                    "domain_scope": "out_of_scope",
+                    "scope_reason": scope_reason,
+                },
+            })
+
+            builder = DecisionLineageBuilder()
+            lineage = builder.build(
+                parsed_query=parsed_query,
+                evidence_rows=[],
+                schema_version="1.0.0",
+            )
+
+            return _serialize_lineage(
+                lineage=lineage,
+                materials=[],
+                all_materials=[],
+                material_families=[],
+                search_source="out_of_scope",
+                answer=_build_out_of_scope_answer(sonnet_parsed),
+            )
 
         # --- Step 2: Intent guardrail ---
         intent_disagreement = None
@@ -951,7 +1114,7 @@ async def query_v4(request: V4QueryRequest) -> V4QueryResponse:
                             -- identifier from parenthetical, e.g. "CRES 347"
                             -- from "STAINLESS STEEL 347 (CRES 347) BAR ANNEALED",
                             -- or fall back to first two words if no parens)
-                            (SELECT COUNT(*) FROM mua_precedents mp
+                            (SELECT COUNT(*) FROM public.mua_precedents_v7 mp
                              WHERE LOWER(mp.material_designation) LIKE
                                    '%%' || LOWER(
                                        CASE
@@ -1105,7 +1268,7 @@ async def query_v4(request: V4QueryRequest) -> V4QueryResponse:
                                     UNION ALL SELECT MAX(date_tested) FROM fluid_compatibility_tests
                                         WHERE material_code = m.material_key
                                 ) sub) AS latest_test_date,
-                                (SELECT COUNT(*) FROM mua_precedents mp
+                                (SELECT COUNT(*) FROM public.mua_precedents_v7 mp
                                  WHERE LOWER(mp.material_designation) LIKE
                                        '%%' || LOWER(SPLIT_PART(m.designation, ' ', 1)) || '%%'
                                  AND LENGTH(SPLIT_PART(m.designation, ' ', 1)) >= 4
@@ -1377,19 +1540,34 @@ async def query_v4(request: V4QueryRequest) -> V4QueryResponse:
 
         # --- Step 7: Generate natural language answer ---
         answer = ""
+        answer_materials = _select_answer_materials_for_focus(
+            materials,
+            parsed_query.material_key,
+        )
+
+        if parsed_query.material_key and answer_materials is not materials:
+            LOGGER.info(
+                "[MIRA_V4] Answer/response scope anchored to '%s': %d of %d materials kept",
+                parsed_query.material_key,
+                len(answer_materials),
+                len(materials),
+            )
+
         try:
             answer = await _generate_answer(
                 raw_query=request.query,
-                materials=materials,
+                materials=answer_materials,
                 confidence_score=lineage.confidence.score,
                 gate_action=lineage.confidence.gate_action.value,
                 safety_context=parsed_query.safety_context.value,
+                focus_material_key=parsed_query.material_key,
             )
         except Exception as exc:
             LOGGER.warning("[MIRA_V4] Response engine error: %s", exc)
 
         return _serialize_lineage(
-            lineage, materials,
+            lineage, answer_materials,
+            all_materials=materials,
             material_families=material_families,
             search_source=search_source,
             answer=answer,
@@ -1497,7 +1675,7 @@ async def query_v4_laundered(request: V4QueryRequest) -> Dict[str, Any]:
                                     UNION ALL SELECT MAX(date_tested) FROM fluid_compatibility_tests
                                         WHERE material_code = m.material_key
                                 ) sub) AS latest_test_date,
-                                (SELECT COUNT(*) FROM mua_precedents mp
+                                (SELECT COUNT(*) FROM public.mua_precedents_v7 mp
                                  WHERE LOWER(mp.material_designation) LIKE
                                        '%%' || LOWER(SPLIT_PART(m.designation, ' ', 1)) || '%%'
                                  AND LENGTH(SPLIT_PART(m.designation, ' ', 1)) >= 4

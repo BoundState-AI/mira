@@ -1,0 +1,15 @@
+{
+  "timestamp_utc": "2026-02-10T20:14:14.908028+00:00",
+  "pdf_root": "C:\\MIRA backup full\\maptis-nlp\\mira\\data\\mua_pdfs",
+  "population": "v7",
+  "population_n": 5650,
+  "total_pdfs_under_root": 10355,
+  "v7_missing_paths": 0,
+  "v7_ambiguous_paths": 0,
+  "confidence": 0.95,
+  "margin": 0.05,
+  "p_estimate": 0.5,
+  "seed": 6016,
+  "sample_n": 360,
+  "csv_path": "C:\\BoundState\\mira\\mua\\v7\\migrations\\reports\\013_pdf_audit_sample_20260210T201414Z.csv"
+}

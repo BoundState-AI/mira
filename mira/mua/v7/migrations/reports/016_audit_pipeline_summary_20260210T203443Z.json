@@ -1,0 +1,15 @@
+{
+  "timestamp_utc": "2026-02-10T20:34:43.511755+00:00",
+  "sample_manifest": "",
+  "sample_csv": "c:\\BoundState\\mira\\mua\\v7\\migrations\\reports\\013_pdf_audit_sample_20260210T201543Z.csv",
+  "auto_csv": "c:\\BoundState\\mira\\mua\\v7\\migrations\\reports\\013_pdf_audit_sample_20260210T201543Z_auto.csv",
+  "manual_queue_csv": "c:\\BoundState\\mira\\mua\\v7\\migrations\\reports\\013_pdf_audit_sample_20260210T201543Z_auto_manual_queue.csv",
+  "confidence_report": "C:\\BoundState\\mira\\mua\\v7\\migrations\\reports\\014_audit_confidence_20260210T203443Z.json",
+  "auto_audit_summary_015": "C:\\BoundState\\mira\\mua\\v7\\migrations\\reports\\015_auto_audit_summary_20260210T203443Z.json",
+  "auto_audit_scope": "coverage_only",
+  "auto_audit_scope_note": "Coverage audit only: verifies sampled PDFs are present/readable; not a field-level PDF-vs-DB validation.",
+  "population": "all",
+  "population_n": 10355,
+  "sample_n": null,
+  "hash_policy": "warn"
+}

@@ -17,7 +17,7 @@ Safety Critical: True
 """
 
 from enum import Enum
-from typing import List, Dict
+from typing import List, Dict, Optional
 from dataclasses import dataclass
 import re
 
@@ -108,7 +108,7 @@ def has_prohibition(content: str) -> bool:
     return any(re.search(pattern, content, re.IGNORECASE) for pattern in prohibition_patterns)
 
 
-def apply_safety_boost(score: float, content: str, metadata: Dict = None) -> float:
+def apply_safety_boost(score: float, content: str, metadata: Dict = None, query_material: Optional[str] = None) -> float:
     """
     Apply safety-aware boosting to semantic search scores.
 
@@ -122,9 +122,12 @@ def apply_safety_boost(score: float, content: str, metadata: Dict = None) -> flo
         score: Base similarity score (0.0-1.0)
         content: Document content text
         metadata: Optional metadata dict
+        query_material: Optional material from the user query. When provided,
+            material+environment combo boosts only apply if the combo material
+            matches query_material (case-insensitive substring match).
 
     Returns:
-        Boosted score (capped at 1.0)
+        Boosted score (capped at 2.0)
     """
     boost_factor = 1.0
     content_lower = content.lower() if content else ""
@@ -169,6 +172,9 @@ def apply_safety_boost(score: float, content: str, metadata: Dict = None) -> flo
     ]
 
     for material, environment, critical_terms in material_env_combos:
+        # Only boost if query_material is not set OR matches the combo material
+        if query_material and material not in query_material.lower():
+            continue
         if (material in content_lower and
             environment in content_lower and
             any(term in content_lower for term in critical_terms)):
@@ -183,8 +189,10 @@ def apply_safety_boost(score: float, content: str, metadata: Dict = None) -> flo
         elif "NASA-STD-6001B" in spec_id:
             boost_factor *= 1.4
 
-    # Apply boost WITHOUT capping - let scores differentiate naturally
-    # This prevents traffic jams at 1.0 where critical docs get lost
+    # Cap boost_factor to prevent unbounded multiplicative stacking
+    boost_factor = min(boost_factor, 3.0)
+
+    # Apply boost with capped factor
     boosted_score = score * boost_factor
 
     # CRITICAL: Massive boost for definitive prohibitions (2.0x)
@@ -198,7 +206,7 @@ def apply_safety_boost(score: float, content: str, metadata: Dict = None) -> flo
     elif "shall not" in content_lower or "prohibited" in content_lower:
         boosted_score += 0.001
 
-    return boosted_score
+    return min(boosted_score, 2.0)
 
 
 def filter_by_relevance(

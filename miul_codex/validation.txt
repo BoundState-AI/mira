@@ -1,0 +1,9 @@
+MIUL v4 validation summary
+
+v3_reference: rows=97, cols=40, duplicate_pn=1, nha_nonempty=95
+v4_current: rows=206, cols=15, duplicate_pn=61, nha_nonempty=0
+v4_fixed: rows=92, cols=40, duplicate_pn=1, nha_nonempty=90
+
+part overlap old/fixed: 84
+part only in old: 11
+part only in fixed: 6

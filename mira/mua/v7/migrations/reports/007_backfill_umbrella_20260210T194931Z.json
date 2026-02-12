@@ -1,0 +1,712 @@
+{
+  "mode": "DRY_RUN",
+  "timestamp_utc": "2026-02-10T19:49:31.221672+00:00",
+  "rows_scanned": 5650,
+  "rows_flagged": 2229,
+  "reason_counts": {
+    "application_pattern": 1842,
+    "designation_pattern": 387
+  },
+  "sample_rows": [
+    {
+      "row_id": 5001,
+      "mua_number": "1000-0003",
+      "source_file": "1000-0003.pdf",
+      "material_designation": "Chem. Film on Al and Nickel plating",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5002,
+      "mua_number": "1000-00005",
+      "source_file": "1000-0005.pdf",
+      "material_designation": "17-7PH Cond. C",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5004,
+      "mua_number": "1000-0012",
+      "source_file": "1000-0012.pdf",
+      "material_designation": "Monel 400 or CRES",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5005,
+      "mua_number": "1000-0013",
+      "source_file": "1000-0013.pdf",
+      "material_designation": "See next page",
+      "reason": "designation_pattern"
+    },
+    {
+      "row_id": 5006,
+      "mua_number": "1000-0014",
+      "source_file": "1000-0014.pdf",
+      "material_designation": "See next page",
+      "reason": "designation_pattern"
+    },
+    {
+      "row_id": 5007,
+      "mua_number": "1001-0002",
+      "source_file": "1001-0002.pdf",
+      "material_designation": "Reflection Coating",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5008,
+      "mua_number": "1001-0003",
+      "source_file": "1001-0003.pdf",
+      "material_designation": "COATING POLYURETHANE P/TC",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5009,
+      "mua_number": "1001-0004",
+      "source_file": "1001-0004.pdf",
+      "material_designation": "WORNOINK M-O-N/CATA MARK/INK",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5013,
+      "mua_number": "1001-0008",
+      "source_file": "1001-0008.pdf",
+      "material_designation": "Thermostat Element",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5014,
+      "mua_number": "1001-0009",
+      "source_file": "1001-0009.pdf",
+      "material_designation": "FEP TEFLON SHEET",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5017,
+      "mua_number": "1001-0030",
+      "source_file": "1001-0030.pdf",
+      "material_designation": "Lube Dry NP1425 Polyimide",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5018,
+      "mua_number": "1001-0032",
+      "source_file": "1001-0032.pdf",
+      "material_designation": "Insert-Stainless, O-Ring-Teflon",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5019,
+      "mua_number": "1001-0034",
+      "source_file": "1001-0034.pdf",
+      "material_designation": "AS4/3501-6",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5020,
+      "mua_number": "1001-0035",
+      "source_file": "1001-0035.pdf",
+      "material_designation": "E-Glass/3501-6",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5021,
+      "mua_number": "1001-0036",
+      "source_file": "1001-0036.pdf",
+      "material_designation": "Dry Film Lubricants: (1) Tiolube 460 MS21063, (2) Drilube 6A, (3) Kalgard RA",
+      "reason": "designation_pattern"
+    },
+    {
+      "row_id": 5022,
+      "mua_number": "1001-0037",
+      "source_file": "1001-0037.pdf",
+      "material_designation": "AL 2219-T8X PLATE AND FORGING",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5023,
+      "mua_number": "1001-0038",
+      "source_file": "1001-0038.pdf",
+      "material_designation": "Vitro-lube 1220",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5025,
+      "mua_number": "1001-0043",
+      "source_file": "1001-0043.pdf",
+      "material_designation": "6061-T6",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5026,
+      "mua_number": "1001-0044",
+      "source_file": "1001-0044.pdf",
+      "material_designation": "CRES CUSTOM 455",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5027,
+      "mua_number": "1001-0045",
+      "source_file": "1001-0045.pdf",
+      "material_designation": "Lubricant Karon/Bearing Liner",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5028,
+      "mua_number": "1001-0047",
+      "source_file": "1001-0047.pdf",
+      "material_designation": "Composition 6, Type I, Class",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5031,
+      "mua_number": "1001-0056",
+      "source_file": "1001-0056.pdf",
+      "material_designation": "17-4PH CRES, 440C CRES, DUPONT ZYTEL 101 (NYLON 66), KAHR-LON X-1200s",
+      "reason": "designation_pattern"
+    },
+    {
+      "row_id": 5033,
+      "mua_number": "1001-0073",
+      "source_file": "1001-0073.pdf",
+      "material_designation": "AL ALLOY AA-1145 W/ACRYLIC ADHESIVE",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5035,
+      "mua_number": "1001-0089",
+      "source_file": "1001-0089.pdf",
+      "material_designation": "6AL-4V TITANIUM, 3AL-2.5V TITANIUM",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5037,
+      "mua_number": "1001-0094",
+      "source_file": "1001-0094.pdf",
+      "material_designation": "ETHYLENE PROPYLENE",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5038,
+      "mua_number": "1001-0108",
+      "source_file": "1001-0108.pdf",
+      "material_designation": "NOMEX WEBBING 9960 & ARAMID THREAD",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5039,
+      "mua_number": "1001-0109",
+      "source_file": "1001-0109.pdf",
+      "material_designation": "CHEMICAL CONVERSION",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5040,
+      "mua_number": "1001-0111",
+      "source_file": "1001-0111.pdf",
+      "material_designation": "AL 2219T87",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5041,
+      "mua_number": "1001-0128",
+      "source_file": "1001-0128.pdf",
+      "material_designation": "Copper alloy (1) UNS 26000 or (2) 26800 per ASTM B36; (3)Tin/Lead (3% lead minimum)",
+      "reason": "designation_pattern"
+    },
+    {
+      "row_id": 5042,
+      "mua_number": "1001-0131",
+      "source_file": "1001-0131.pdf",
+      "material_designation": "ASTM B172 wire (Rope-Lay-Stranded Copper Conductors Having Bunch Stranded Members, For Electrical Conductors) made from Copper Wire, Soft and Annealed per ASTM B3 (MC 10354) with Nickel Plate per ASTM B355 (MC 10308); Terminals: 683-25904, nickel-plated copper (MC 10346 and 10308)",
+      "reason": "designation_pattern"
+    },
+    {
+      "row_id": 5043,
+      "mua_number": "1001-0141",
+      "source_file": "1001-0141.pdf",
+      "material_designation": "ZYTEL 101",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5045,
+      "mua_number": "1001-0151",
+      "source_file": "1001-0151.pdf",
+      "material_designation": "Ti-10V-2Fe-3AL",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5046,
+      "mua_number": "1001-0152",
+      "source_file": "1001-0152.pdf",
+      "material_designation": "A286",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5051,
+      "mua_number": "1001-2210",
+      "source_file": "1001-2210.pdf",
+      "material_designation": "IM6/3501-6, AW193-PW, F161",
+      "reason": "designation_pattern"
+    },
+    {
+      "row_id": 5052,
+      "mua_number": "1001-2212",
+      "source_file": "1001-2212.pdf",
+      "material_designation": "See attachment #1",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5053,
+      "mua_number": "30233",
+      "source_file": "1001-2216.pdf",
+      "material_designation": "Molybdenum disulfide",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5055,
+      "mua_number": "1001-2223",
+      "source_file": "1001-2223.pdf",
+      "material_designation": "Polyolefin",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5056,
+      "mua_number": "1001-2226",
+      "source_file": "1001-2226.pdf",
+      "material_designation": "Polyurethane topcoat semigloss/flat",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5057,
+      "mua_number": "1001-2236",
+      "source_file": "1001-2236.pdf",
+      "material_designation": "powder epoxy coating",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5058,
+      "mua_number": "1001-2237",
+      "source_file": "1001-2237.pdf",
+      "material_designation": "CAT-L-INK 50-700R BLACK WITH CATALYST 9",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5059,
+      "mua_number": "1001-2240",
+      "source_file": "1001-2240.pdf",
+      "material_designation": "Kevlar 29, Style 710-DuPont; Nomex R79-430 thread -DuPont; Nextel 312, Style AF-62, Class 1, sized-3M",
+      "reason": "designation_pattern"
+    },
+    {
+      "row_id": 5060,
+      "mua_number": "1001-2247",
+      "source_file": "1001-2247.pdf",
+      "material_designation": "7075 aluminum",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5061,
+      "mua_number": "1001-2248A",
+      "source_file": "1001-2248.pdf",
+      "material_designation": "ALUMINUM 2219",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5062,
+      "mua_number": "1001-2249",
+      "source_file": "1001-2249.pdf",
+      "material_designation": "2219-T852 and 7075-T7351",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5064,
+      "mua_number": "1001-2252",
+      "source_file": "1001-2252.pdf",
+      "material_designation": "Cross-Linked Modified ETFE Insulation",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5065,
+      "mua_number": "1001-2253",
+      "source_file": "1001-2253.pdf",
+      "material_designation": "LAMINATED ALUMINUM SHIMS",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5069,
+      "mua_number": "1001-2258",
+      "source_file": "1001-2258.pdf",
+      "material_designation": "VARIOUS",
+      "reason": "designation_pattern"
+    },
+    {
+      "row_id": 5070,
+      "mua_number": "1001-2266",
+      "source_file": "1001-2266.pdf",
+      "material_designation": "TA6711 Silicone cushion material",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5076,
+      "mua_number": "1001-2278",
+      "source_file": "1001-2278.pdf",
+      "material_designation": "Silicone rubber, LT-40",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5079,
+      "mua_number": "1001-2290",
+      "source_file": "1001-2290.pdf",
+      "material_designation": "2219 Aluminum",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5080,
+      "mua_number": "1001-2291",
+      "source_file": "1001-2291.pdf",
+      "material_designation": "Al 6061, IN-625, IN-718, 17-4PH CRES",
+      "reason": "designation_pattern"
+    },
+    {
+      "row_id": 5081,
+      "mua_number": "1001-2293",
+      "source_file": "1001-2293.pdf",
+      "material_designation": "Chemlok 236 A",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5084,
+      "mua_number": "1001-2300",
+      "source_file": "1001-2300.pdf",
+      "material_designation": "titanium; stainless steel, electroless nickel plated aluminum or anodized aluminum",
+      "reason": "designation_pattern"
+    },
+    {
+      "row_id": 5085,
+      "mua_number": "1001-2301",
+      "source_file": "1001-2301.pdf",
+      "material_designation": "Acrylonitrile Butadiene Styrene (ABS), unfilled",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5086,
+      "mua_number": "1001-2302",
+      "source_file": "1001-2302.pdf",
+      "material_designation": "Assorted Velcro Hook & Loop",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5087,
+      "mua_number": "1001-2304",
+      "source_file": "1001-2304.pdf",
+      "material_designation": "wire rope, flexible",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5088,
+      "mua_number": "1001-2305",
+      "source_file": "1001-2305.pdf",
+      "material_designation": "various",
+      "reason": "designation_pattern"
+    },
+    {
+      "row_id": 5089,
+      "mua_number": "1001-2306",
+      "source_file": "1001-2306.pdf",
+      "material_designation": "FABRIC, WEBBING",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5090,
+      "mua_number": "1001-2307",
+      "source_file": "1001-2307.pdf",
+      "material_designation": "PVC Dust Cap and Polyethylene Tether",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5091,
+      "mua_number": "1001-2311",
+      "source_file": "1001-2311.pdf",
+      "material_designation": "Delrin",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5092,
+      "mua_number": "1001-2322",
+      "source_file": "1001-2322.pdf",
+      "material_designation": "7075-T7351",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5094,
+      "mua_number": "1001-2324",
+      "source_file": "1001-2324.pdf",
+      "material_designation": "Epo-Tek H31LV",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5095,
+      "mua_number": "1001-2327",
+      "source_file": "1001-2327.pdf",
+      "material_designation": "CRES and Aluminum",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5096,
+      "mua_number": "1001-2333",
+      "source_file": "1001-2333.pdf",
+      "material_designation": "CRES 15-5 PH, CRES 17-7 PH, CRES 321/302, Viton V747-75, Silicone S383-70, Braycote 601EF Perflorinated Polyether w/ PTFE Filler",
+      "reason": "designation_pattern"
+    },
+    {
+      "row_id": 5097,
+      "mua_number": "1001-2238",
+      "source_file": "1001-2338.pdf",
+      "material_designation": "Chromated epoxy primer",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5098,
+      "mua_number": "1001-2339",
+      "source_file": "1001-2339.pdf",
+      "material_designation": "Various",
+      "reason": "designation_pattern"
+    },
+    {
+      "row_id": 5100,
+      "mua_number": "1001-2343",
+      "source_file": "1001-2343.pdf",
+      "material_designation": "BMS 10-11 Type I, Class A, Grade A, Color Green",
+      "reason": "designation_pattern"
+    },
+    {
+      "row_id": 5101,
+      "mua_number": "1001-2344",
+      "source_file": "1001-2344.pdf",
+      "material_designation": "SJ-3560 and SJ-3441",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5104,
+      "mua_number": "1001-2350",
+      "source_file": "1001-2350.pdf",
+      "material_designation": "Corrosion Resistant Steel Alloys",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5106,
+      "mua_number": "1001-2352",
+      "source_file": "1001-2352.pdf",
+      "material_designation": "Flexible Hose",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5107,
+      "mua_number": "1001-2353",
+      "source_file": "1001-2353.pdf",
+      "material_designation": "Flexible Hose",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5108,
+      "mua_number": "1001-2355",
+      "source_file": "1001-2355.pdf",
+      "material_designation": "17-7PH CRES",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5109,
+      "mua_number": "1001-2356",
+      "source_file": "1001-2356.pdf",
+      "material_designation": "See Attachment",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5111,
+      "mua_number": "1001-2368",
+      "source_file": "1001-2368.pdf",
+      "material_designation": "Polyolefin",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5117,
+      "mua_number": "1001-2375",
+      "source_file": "1001-2375.pdf",
+      "material_designation": "VARIOUS, SEE ATTACHMENT 1",
+      "reason": "designation_pattern"
+    },
+    {
+      "row_id": 5119,
+      "mua_number": "1001-2378",
+      "source_file": "1001-2378.pdf",
+      "material_designation": "Xylan 1010",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5120,
+      "mua_number": "1001-2380",
+      "source_file": "1001-2380.pdf",
+      "material_designation": "B4A",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5123,
+      "mua_number": "1001-2384",
+      "source_file": "1001-2384.pdf",
+      "material_designation": "A286 Steel",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5124,
+      "mua_number": "1001-2385",
+      "source_file": "1001-2385.pdf",
+      "material_designation": "Minicel Foam L200",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5126,
+      "mua_number": "1001-2387",
+      "source_file": "1001-2387.pdf",
+      "material_designation": "15-5 Stainless Steel",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5127,
+      "mua_number": "1001-2388",
+      "source_file": "1001-2388.pdf",
+      "material_designation": "Wire",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5128,
+      "mua_number": "1001-2390",
+      "source_file": "1001-2390.pdf",
+      "material_designation": "Shim stock of Full hard 302 stainless steel sheet per ASTM A666",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5129,
+      "mua_number": "1001-2392",
+      "source_file": "1001-2392.pdf",
+      "material_designation": "Inconel 718",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5130,
+      "mua_number": "1001-2393",
+      "source_file": "1001-2393.pdf",
+      "material_designation": "30066 (CRES 430)",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5131,
+      "mua_number": "1001-2398",
+      "source_file": "1001-2398.pdf",
+      "material_designation": "CRES 440C, CRES 440B",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5132,
+      "mua_number": "1001-5001",
+      "source_file": "1001-5001.pdf",
+      "material_designation": "See Page 2 and attachments",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5134,
+      "mua_number": "1002-0059",
+      "source_file": "1002-0059.pdf",
+      "material_designation": "Tin Plating, MIL-T-10727, Type I",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5136,
+      "mua_number": "1002-0069",
+      "source_file": "1002-0069.pdf",
+      "material_designation": "Nickel and Nickel-Plated Ring Tongue Termini",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5138,
+      "mua_number": "1002-0113",
+      "source_file": "1002-0113.pdf",
+      "material_designation": "SEE ATTACHED",
+      "reason": "designation_pattern"
+    },
+    {
+      "row_id": 5139,
+      "mua_number": "1002-0124",
+      "source_file": "1002-0124.pdf",
+      "material_designation": "SEE ATTACHED",
+      "reason": "designation_pattern"
+    },
+    {
+      "row_id": 5140,
+      "mua_number": "1002-0127",
+      "source_file": "1002-0127.pdf",
+      "material_designation": "SEE ATTACHED",
+      "reason": "designation_pattern"
+    },
+    {
+      "row_id": 5143,
+      "mua_number": "1003-0003",
+      "source_file": "1003-0003.pdf",
+      "material_designation": "SEE SH 2",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5144,
+      "mua_number": "1003-0101",
+      "source_file": "1003-0101.pdf",
+      "material_designation": "CORR, FLAM, TOX",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5146,
+      "mua_number": "1004-D0032",
+      "source_file": "1004-0002.pdf",
+      "material_designation": "Polyester Adhesive, Dry Film Lubricant",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5150,
+      "mua_number": "1004-0006",
+      "source_file": "1004-0006.pdf",
+      "material_designation": "See Below",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5153,
+      "mua_number": "1004-0012",
+      "source_file": "1004-0012.pdf",
+      "material_designation": "CAT-L-INK 50-100R/Catalyst 28 (White Ink)",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5154,
+      "mua_number": "1004-0015",
+      "source_file": "1004-0015.pdf",
+      "material_designation": "Lube, Dry, Electrofilm 4306",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5155,
+      "mua_number": "1004-0017",
+      "source_file": "1004-0017.pdf",
+      "material_designation": "1) Nomex, HT-30 Loc B 2) Silicone Elastomer",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5156,
+      "mua_number": "1004-0025",
+      "source_file": "1004-0025.pdf",
+      "material_designation": "Hysol EA 9360",
+      "reason": "application_pattern"
+    },
+    {
+      "row_id": 5158,
+      "mua_number": "1004-0027",
+      "source_file": "1004-0027.pdf",
+      "material_designation": "Single Component Acetic Acid Liberating Silicone RTV (1) RTV 102 2) RTV 106",
+      "reason": "application_pattern"
+    }
+  ]
+}

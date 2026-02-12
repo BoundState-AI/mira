@@ -1,0 +1,30 @@
+{
+  "timestamp_utc": "2026-02-10T20:34:43.409492+00:00",
+  "input_csv": "c:\\BoundState\\mira\\mua\\v7\\migrations\\reports\\013_pdf_audit_sample_20260210T201543Z.csv",
+  "output_csv": "c:\\BoundState\\mira\\mua\\v7\\migrations\\reports\\013_pdf_audit_sample_20260210T201543Z_auto.csv",
+  "total_rows": 371,
+  "auto_scored_rows": 371,
+  "skipped_existing_rows": 0,
+  "auto_pass": 371,
+  "auto_fail": 0,
+  "population_counts": {
+    "all": 371
+  },
+  "audit_scope": "coverage_only",
+  "scope_statement": "Coverage audit only: verifies sampled PDFs are present/readable; not a field-level PDF-vs-DB validation.",
+  "supported_claims": [
+    "Sampled PDFs exist at the specified root unless explicitly flagged (pdf_missing).",
+    "Sampled PDFs were machine-readable where text extraction succeeded."
+  ],
+  "unsupported_claims": [
+    "Material, environment, category, and determination values are not validated against extracted PDF semantics in this mode.",
+    "This run does not prove row-level correctness of mua_precedents_v7 fields."
+  ],
+  "severity_counts": {
+    "medium": 371
+  },
+  "issue_counts": {
+    "coverage_only_sample": 371,
+    "pdf_text_unavailable": 3
+  }
+}

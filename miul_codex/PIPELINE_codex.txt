@@ -1,0 +1,26 @@
+﻿MIUL Codex Pipeline
+===================
+
+This folder contains a 4-step MIUL pipeline output aligned to your requested flow:
+1) extract materials/specs/process specs to JSON
+2) build MIUL using DT JSON NHA
+3) identify MIUL gaps
+4) emit correction package for user review
+
+Script:
+- scripts/miul_pipeline_codex.py
+
+Example run (using existing v4 session extraction):
+- py -3 scripts/miul_pipeline_codex.py --dt-json "C:\Users\jwilde2\Desktop\DMLLV\MER07540-001_corrected.json" --session-id b2e930a5-6cf1-4a8a-a059-f96edbb9c998 --output-dir miul_codex --project MER07540 --no-enrich
+
+Example run (fresh extraction from drawings, requires ANTHROPIC_API_KEY in env):
+- py -3 scripts/miul_pipeline_codex.py --dt-json "C:\Users\jwilde2\Desktop\DMLLV\MER07540-001_corrected.json" --drawings-dir "C:\Users\jwilde2\Desktop\DMLLV" --output-dir miul_codex --project MER07540
+
+Primary outputs:
+- materials_extracted_codex.json
+- materials_by_drawing_codex.json
+- MIUL_codex.xlsx
+- miul_rows_codex.json
+- miul_gaps_codex.json
+- miul_correction_queue_codex.xlsx
+- pipeline_summary_codex.json

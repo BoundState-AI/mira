@@ -1,3 +1,21 @@
+# Project Context
+
+This project is primarily Python with TypeScript frontend components. The main language is Python (~22k lines). Always assume Python conventions unless the file is clearly TypeScript/frontend.
+
+## Debugging Rules
+
+When debugging or investigating errors, ALWAYS diagnose the root cause first before proposing any redesign or refactoring. Start by reproducing the error, reading the traceback, and checking for missing dependencies/endpoints. Do NOT plan architectural changes unless explicitly asked.
+
+When asked to fix a bug or investigate a crash:
+1. Reproduce the error
+2. Read the actual error message/traceback
+3. Identify the minimal fix
+4. Apply and verify
+
+Do NOT skip to step 4 or propose large-scale changes.
+
+---
+
 # Windows Development Environment
 
 ## Python Execution

@@ -1,0 +1,25 @@
+{
+  "timestamp_utc": "2026-02-10T20:22:12.723521+00:00",
+  "input_csv": "C:\\BoundState\\mira\\mua\\v7\\migrations\\reports\\013_pdf_audit_sample_20260210T201414Z.csv",
+  "output_csv": "C:\\BoundState\\mira\\mua\\v7\\migrations\\reports\\013_pdf_audit_sample_20260210T201414Z_auto.csv",
+  "total_rows": 360,
+  "auto_scored_rows": 360,
+  "skipped_existing_rows": 0,
+  "auto_pass": 85,
+  "auto_fail": 275,
+  "severity_counts": {
+    "high": 275,
+    "medium": 46,
+    "low": 39
+  },
+  "issue_counts": {
+    "source_hash_mismatch": 211,
+    "material_family_missing": 120,
+    "determination_mismatch_bok": 115,
+    "env_type_unknown": 66,
+    "designation_not_seen_in_pdf_text": 31,
+    "pdf_text_unavailable": 7,
+    "cat3_missing_appendix": 4,
+    "determination_unknown": 2
+  }
+}

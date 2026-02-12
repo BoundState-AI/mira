@@ -1,0 +1,10 @@
+Human vs Codex MIUL snapshot
+
+Human: {'rows': 139, 'duplicate_part_numbers': 46, 'nha_nonempty': 136, 'designation_nonempty': 116, 'material_spec_nonempty': 56, 'process_spec_nonempty': 30}
+Codex: {'rows': 135, 'duplicate_part_numbers': 43, 'nha_nonempty': 133, 'designation_nonempty': 123, 'material_spec_nonempty': 37, 'process_spec_nonempty': 48}
+
+Part overlap: 81
+Part only in Human: 8
+Part only in Codex: 8
+Human-only sample: ['16007', '5.', '51109', '6824', '6915', 'MER07540-001', 'MER07576', 'WSM-137-C86 10.']
+Codex-only sample: ['AS933K04', 'LUBRICANT', 'LUBRICANT_LOX_COMPATIBLE', 'MER07540-ICD', 'MER07583-003', 'MER07584-003', 'MS21209C1610', 'WSM-137-C86']

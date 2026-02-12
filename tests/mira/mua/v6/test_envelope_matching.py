@@ -345,5 +345,61 @@ class TestComputeEnvelopeOverlap:
         assert "pressure_psia" in dims
 
 
+class TestTempMinBug:
+    """Regression tests for Bug A: precedent_temp_min dropped at call site.
+
+    MAPTIS flammability tests are conducted at a single temperature, so
+    temperature_f should serve as both the lower and upper bound. When
+    precedent_temp_min is omitted (defaults to None), the lower-bound check
+    is skipped entirely, allowing a query far below the tested temperature
+    to pass as WITHIN.
+    """
+
+    def test_missing_temp_min_incorrectly_returns_within(self):
+        """Demonstrate the bug: omitting precedent_temp_min lets a far-below
+        query temperature slip through as WITHIN."""
+        result = compute_envelope_overlap(
+            query_temp_f=-100.0,
+            precedent_temp_max=200.0,
+            # precedent_temp_min intentionally omitted — reproduces the bug
+        )
+        # Without temp_min, the lower-bound check is skipped and -100 F is
+        # treated as within the envelope.
+        assert result.status == OverlapStatus.WITHIN
+
+    def test_with_temp_min_correctly_rejects_below(self):
+        """With precedent_temp_min supplied, a query well below should NOT
+        be WITHIN."""
+        result = compute_envelope_overlap(
+            query_temp_f=-100.0,
+            precedent_temp_min=70.0,
+            precedent_temp_max=200.0,
+        )
+        assert result.status != OverlapStatus.WITHIN
+        assert len(result.extrapolation_warnings) > 0
+        assert any("below" in w.lower() for w in result.extrapolation_warnings)
+
+    def test_single_point_temp_within(self):
+        """When temp_min == temp_max (single test point), a query at that
+        exact temperature should be WITHIN."""
+        result = compute_envelope_overlap(
+            query_temp_f=70.0,
+            precedent_temp_min=70.0,
+            precedent_temp_max=70.0,
+        )
+        assert result.status == OverlapStatus.WITHIN
+
+    def test_single_point_temp_below(self):
+        """When temp_min == temp_max (single test point), a query below
+        should not be WITHIN."""
+        result = compute_envelope_overlap(
+            query_temp_f=-100.0,
+            precedent_temp_min=70.0,
+            precedent_temp_max=70.0,
+        )
+        assert result.status != OverlapStatus.WITHIN
+        assert any("below" in w.lower() for w in result.extrapolation_warnings)
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

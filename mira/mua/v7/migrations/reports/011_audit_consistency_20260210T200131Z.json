@@ -1,0 +1,68 @@
+{
+  "timestamp_utc": "2026-02-10T20:01:31.186667+00:00",
+  "cat3_without_appendix": 43,
+  "cat3_with_cat1_triggers": 5,
+  "appendix_with_cat1_triggers": 0,
+  "closure_without_appendix": 368,
+  "appendix_without_closure": 0,
+  "category_null": 0,
+  "traceability_missing_hash": 0,
+  "category_distribution": [
+    [
+      "II",
+      2820
+    ],
+    [
+      "I",
+      2241
+    ],
+    [
+      "III",
+      589
+    ]
+  ],
+  "appendix_distribution": [
+    [
+      "104",
+      400
+    ],
+    [
+      "105",
+      238
+    ],
+    [
+      "106",
+      68
+    ],
+    [
+      "107",
+      56
+    ],
+    [
+      "108",
+      40
+    ],
+    [
+      "103",
+      24
+    ]
+  ],
+  "closure_distribution": [
+    [
+      "HEAT_SINK",
+      649
+    ],
+    [
+      "MINOR_QUANTITY",
+      339
+    ],
+    [
+      "CONFIG_ANALYSIS",
+      155
+    ],
+    [
+      "SUBSTITUTION",
+      51
+    ]
+  ]
+}

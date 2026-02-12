@@ -1,0 +1,1922 @@
+{
+  "generated_at": "2026-02-09T20:27:16.546497+00:00",
+  "pair_row_count": 132,
+  "pair_rows": [
+    {
+      "part_number": "MER07571-001",
+      "source_drawing": "MER07540-001",
+      "part_description": "CONNECTING ROD, ACTUATOR, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "sighting_count": 3
+    },
+    {
+      "part_number": "01-885-06K",
+      "source_drawing": "MER07540-001",
+      "part_description": "ROD END, .375, .3750-24 RH THREAD",
+      "quantity": 1,
+      "designation": "INCONEL 718",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "sighting_count": 3
+    },
+    {
+      "part_number": "11-885-06K",
+      "source_drawing": "MER07540-001",
+      "part_description": "ROD END, .375, .3750-24 LH THREAD",
+      "quantity": 1,
+      "designation": "INCONEL 718",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "sighting_count": 3
+    },
+    {
+      "part_number": "M81935/3-6C",
+      "source_drawing": "MER07540-001",
+      "part_description": "LOCKING DEVICE FOR ROD END BEARINGS, .375",
+      "quantity": 2,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "sighting_count": 3
+    },
+    {
+      "part_number": "MS14198N6",
+      "source_drawing": "MER07540-001",
+      "part_description": "LOCK, ROD END, EXTRA STRENGTH, HIGH PROFILE LUG",
+      "quantity": 0,
+      "designation": "INCONEL ALLOY",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "sighting_count": 3
+    },
+    {
+      "part_number": "NAS509-6C",
+      "source_drawing": "MER07540-001",
+      "part_description": "NUT, JAM, DRILLED, .3750-24 RH THREAD",
+      "quantity": 1,
+      "designation": "A286 (150 KSI)",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "sighting_count": 3
+    },
+    {
+      "part_number": "NAS509L6C",
+      "source_drawing": "MER07540-001",
+      "part_description": "NUT, JAM, DRILLED, .3750-24 LH THREAD",
+      "quantity": 1,
+      "designation": "A286 (150 KSI)",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "sighting_count": 3
+    },
+    {
+      "part_number": "MER07543-001",
+      "source_drawing": "MER07540-001",
+      "part_description": "SHAFT SUB-ASSEMBLY, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "sighting_count": 3
+    },
+    {
+      "part_number": "MS9390-440",
+      "source_drawing": "MER07540-001",
+      "part_description": "PIN, STRAIGHT, HEADLESS, DOWEL, .250 OD, .75 LG",
+      "quantity": 2,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "sighting_count": 3
+    },
+    {
+      "part_number": "MER07570-001",
+      "source_drawing": "MER07540-001",
+      "part_description": "ACTUATOR ASSEMBLY, 10 INCH VALVE",
+      "quantity": 2,
+      "designation": "",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "sighting_count": 3
+    },
+    {
+      "part_number": "MER07550-001",
+      "source_drawing": "MER07540-001",
+      "part_description": "DRIVE LINK, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "sighting_count": 3
+    },
+    {
+      "part_number": "WSM-137-C86",
+      "source_drawing": "MER07540-001",
+      "part_description": "RETAINING RING, EXTERIOR",
+      "quantity": 1,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "WIRE",
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "sighting_count": 3
+    },
+    {
+      "part_number": "MER07540-003",
+      "source_drawing": "MER07540-001",
+      "part_description": "CONNECTING ROD ASSEMBLY",
+      "quantity": 2,
+      "designation": "",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "sighting_count": 3
+    },
+    {
+      "part_number": "NAS6706U13",
+      "source_drawing": "MER07540-001",
+      "part_description": "BOLT, TENSION, HEX HEAD, CLOSE TOL, .3750-24 UNJF THD, 1.4 LG",
+      "quantity": 4,
+      "designation": "A286 (160 KSI)",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "sighting_count": 3
+    },
+    {
+      "part_number": "MS21043-6",
+      "source_drawing": "MER07540-001",
+      "part_description": "NUT SELF-LOCKING, 800 F, REDUCED HEX, .3750-24 UNJF THD",
+      "quantity": 4,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "sighting_count": 3
+    },
+    {
+      "part_number": "NAS1351N4-20",
+      "source_drawing": "MER07540-001",
+      "part_description": "SHCS, .2500-28 UNRF-3A, 1.250 LG",
+      "quantity": 4,
+      "designation": "A286 (180 KSI)",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "sighting_count": 3
+    },
+    {
+      "part_number": "NAS1352N5-12",
+      "source_drawing": "MER07540-001",
+      "part_description": "SHCS, .3125-24 UNRF-3A, .750 LG",
+      "quantity": 8,
+      "designation": "A286 (180 KSI)",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "sighting_count": 3
+    },
+    {
+      "part_number": "NAS1149E0432R",
+      "source_drawing": "MER07540-001",
+      "part_description": "WASHER, FLAT, .265 ID, .032 THK",
+      "quantity": 4,
+      "designation": "A286 (160 KSI)",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "sighting_count": 3
+    },
+    {
+      "part_number": "NAS1149E0516R",
+      "source_drawing": "MER07540-001",
+      "part_description": "WASHER, FLAT, .328 ID, .016 THK",
+      "quantity": 2,
+      "designation": "A286 (160 KSI)",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "sighting_count": 3
+    },
+    {
+      "part_number": "MS20995N32",
+      "source_drawing": "MER07540-001",
+      "part_description": "WIRE, SAFETY OR LOCK, .032 DIA",
+      "quantity": 0,
+      "designation": "NICKEL ALLOY",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "WIRE",
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "sighting_count": 3
+    },
+    {
+      "part_number": "MER07540-ICD",
+      "source_drawing": "MER07540-ICD",
+      "part_description": "INTERFACE CONTROL DRAWING, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "",
+      "material_spec": "",
+      "process_spec": "CLEAN AND MAINTAIN PER IEST-STD-CC1246L, LEVEL VC-0.5-1000",
+      "material_form": "",
+      "source_pages": [
+        "MER07540-ICD.DRW_-.5_REWORK.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07560-001",
+      "source_drawing": "MER07543-001",
+      "part_description": "VALVE BODY SUB-ASSEMBLY, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07565-001",
+      "source_drawing": "MER07543-001",
+      "part_description": "SHAFT, OFFSET, SUB-ASSEMBLY, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07557-001",
+      "source_drawing": "MER07543-001",
+      "part_description": "SHAFT, CENTER, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07558-001",
+      "source_drawing": "MER07543-001",
+      "part_description": "OFFSET ROTARY SHAFT, LOWER, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07559-001",
+      "source_drawing": "MER07543-001",
+      "part_description": "OFFSET ROTARY SHAFT, UPPER, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07556-001",
+      "source_drawing": "MER07543-001",
+      "part_description": "RING, INTERMEDIATE, ROTATIONAL, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07554-001",
+      "source_drawing": "MER07543-001",
+      "part_description": "SLIDER, ROTARY TANG, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07555-001",
+      "source_drawing": "MER07543-001",
+      "part_description": "PIN, TRANSLATING, 10 INCH VALVE",
+      "quantity": 2,
+      "designation": "AL/BRONZE ALLOY",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "M12133/2-255",
+      "source_drawing": "MER07543-001",
+      "part_description": "WASHER, SPRING TENSION, BELLEVILLE SPRING, .25 ID",
+      "quantity": 11,
+      "designation": "302 SST",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07553-001",
+      "source_drawing": "MER07543-001",
+      "part_description": "COVER, BEARING, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "WHM-244-S86",
+      "source_drawing": "MER07543-001",
+      "part_description": "RETAINING RING, INTERNAL, 2-7/16 ID",
+      "quantity": 1,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07546-001",
+      "source_drawing": "MER07543-001",
+      "part_description": "PRELOAD DISC, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "M12133/2-100",
+      "source_drawing": "MER07543-001",
+      "part_description": "WASHER, SPRING TENSION, BELLEVILLE SPRING, 1.0 ID",
+      "quantity": 5,
+      "designation": "302 SST",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "97022A388",
+      "source_drawing": "MER07543-001",
+      "part_description": "RING SHIM, 1.5 OD, 1.0 ID, .010 THICK",
+      "quantity": "AR",
+      "designation": "316 SST",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07545-001",
+      "source_drawing": "MER07543-001",
+      "part_description": "LOWER CAM MOUNT, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "7075 AL",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "NAS1352N4-12",
+      "source_drawing": "MER07543-001",
+      "part_description": "SHCS, .2500-20 UNRC-3A, .750 LG",
+      "quantity": 11,
+      "designation": "A286 (180 KSI)",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "NAS1352N4-14",
+      "source_drawing": "MER07543-001",
+      "part_description": "SHCS, .2500-20 UNRC-3A, .875 LG",
+      "quantity": 16,
+      "designation": "A286 (180 KSI)",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "NAS1149E0432R",
+      "source_drawing": "MER07543-001",
+      "part_description": "WASHER, FLAT, .250 NOM",
+      "quantity": 27,
+      "designation": "A286 (160 KSI)",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07584-001",
+      "source_drawing": "MER07543-001",
+      "part_description": "POPPET SUB-ASSEMBLY, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "",
+      "material_spec": "",
+      "process_spec": "CLEAN AND MAINTAIN TO IEST-STD-CC1246E, LEVEL VC-0.5-1000",
+      "material_form": "",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "2949T32",
+      "source_drawing": "MER07543-001",
+      "part_description": "HOIST RING, LIFTING, .3750-16 THD, 500LB",
+      "quantity": 1,
+      "designation": "316 SST",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "NAS1351N4H16",
+      "source_drawing": "MER07543-001",
+      "part_description": "SHCS, DRILLED, .2500-28 UNRF-3A, 1.00 LG",
+      "quantity": 1,
+      "designation": "A286 (180 KSI)",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "NAS509-4C",
+      "source_drawing": "MER07543-001",
+      "part_description": "NUT, JAM, DRILLED, .2500-28 UNJF-3B",
+      "quantity": 1,
+      "designation": "A286 (150 KSI)",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "NASM20995N32",
+      "source_drawing": "MER07543-001",
+      "part_description": "WIRE, SAFETY OR LOCK",
+      "quantity": "AR",
+      "designation": "NICKEL ALLOY",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "WIRE",
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07545-001",
+      "source_drawing": "MER07545-001",
+      "part_description": "LOWER CAM MOUNT, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "ALUMINUM ALLOY 7075-T651",
+      "material_spec": "ASTM B211, SAE AMS-QQ-A-225/9",
+      "process_spec": "SURFACE TEXTURE PER ASME B46.1; ANODIZE PER MIL-A-8625, TYPE II, CLASS 1, CLEAR; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000",
+      "material_form": "BAR",
+      "source_pages": [
+        "MER07545-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07546-001",
+      "source_drawing": "MER07546-001",
+      "part_description": "PRELOAD DISC, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "A286",
+      "material_spec": "AMS 5737",
+      "process_spec": "SURFACE TEXTURE PER ASME B46.1; KOLSTERIZE PER MANUFACTURERS RECOMMENDATION SOURCE: BODYCOTE THERMAL PROCESSING, INC. 128 SPEEDWAY LANE MOORESVILLE, NC 28117 6879 WWW.BODYCOTE.COM CAGE CODE 8W6S8; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000",
+      "material_form": "",
+      "source_pages": [
+        "MER07546-001.DRW_-.9_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07548-001",
+      "source_drawing": "MER07548-001",
+      "part_description": "MOUNT BRACKET, ACTUATOR, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "ALUMINUM ALLOY 7075-T651",
+      "material_spec": "ASTM B211, SAE AMS-QQ-A-225/9",
+      "process_spec": "ANODIZE PER MIL-A-8625, TYPE II, CLASS 1, CLEAR",
+      "material_form": "BAR",
+      "source_pages": [
+        "MER07548-001.DRW_-.10_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07550-001",
+      "source_drawing": "MER07550-001",
+      "part_description": "DRIVE LINK, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "A286 CRES",
+      "material_spec": "SAE AMS 5737",
+      "process_spec": "SURFACE TEXTURE PER ASME B46.1; PASSIVATE PER SAE AMS 2700, METHOD 1, TYPE 1,2,3,OR 8, OR METHOD 2",
+      "material_form": "BAR",
+      "source_pages": [
+        "MER07550-001.DRW_-.10_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07553-001",
+      "source_drawing": "MER07553-001",
+      "part_description": "COVER, BEARING, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "A286 CRES",
+      "material_spec": "SAE AMS 5737",
+      "process_spec": "KOLSTERIZE PER MANUFACTURERS RECOMMENDATION. SOURCE: BODYCOTE THERMAL PROCESSING, INC. 128 SPEEDWAY LANE MOORESVILLE, NC 28117 6879 WWW.BODYCOTE.COM CAGE CODE 8W6S8",
+      "material_form": "",
+      "source_pages": [
+        "MER07553-001.DRW_-.15_RELEASED.pdf p1",
+        "MER07553-001.DRW_-.15_RELEASED.pdf p2"
+      ],
+      "sighting_count": 2
+    },
+    {
+      "part_number": "MER07554-001",
+      "source_drawing": "MER07554-001",
+      "part_description": "SLIDER, ROTARY VALVE 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "A286 CRES",
+      "material_spec": "SAE AMS 5737",
+      "process_spec": "SURFACE TEXTURE PER ASME B46.1; KOLSTERIZE PER MANUFACTURERS RECOMMENDATION SOURCE: BODYCOTE THERMAL PROCESSING, INC. 128 SPEEDWAY LANE MOORESVILLE, NC 28117 6879 WWW.BODYCOTE.COM CAGE CODE 8W6S8; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000",
+      "material_form": "",
+      "source_pages": [
+        "MER07554-001.DRW_-.11_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07555-001",
+      "source_drawing": "MER07555-001",
+      "part_description": "PIN, TRANSL, FITTING, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "ALUMINUM BRONZE ALLOY",
+      "material_spec": "ASTM B505",
+      "process_spec": "SURFACE TEXTURE PER ASME B46.1; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000",
+      "material_form": "",
+      "source_pages": [
+        "MER07555-001.DRW_-.8_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07556-001",
+      "source_drawing": "MER07556-001",
+      "part_description": "RING, INTERMEDIATE, ROTATIONAL, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "A286 CRES",
+      "material_spec": "SAE AMS 5737",
+      "process_spec": "SURFACE TEXTURE PER ASME B46.1; KOLSTERIZE PER MANUFACTURERS RECOMMENDATION SOURCE: BODYCOTE THERMAL PROCESSING, INC. 128 SPEEDWAY LANE MOORESVILLE, NC 28117 6879 WWW.BODYCOTE.COM CAGE CODE 8W6S8; CLEAN AND MAINTAIN PER IEST-STD-CC1246E, LEVEL VC-0.5-1000",
+      "material_form": "",
+      "source_pages": [
+        "MER07556-001.DRW_-.14_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07557-001",
+      "source_drawing": "MER07557-001",
+      "part_description": "SHAFT, CENTRAL, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "A286 CRES",
+      "material_spec": "SAE AMS 5737",
+      "process_spec": "SURFACE TEXTURE PER ASME B46.1; KOLSTERIZE PER MANUFACTURERS RECOMMENDATION SOURCE: BODYCOTE THERMAL PROCESSING, INC. 128 SPEEDWAY LANE MOORESVILLE, NC 28117 6879 WWW.BODYCOTE.COM; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000",
+      "material_form": "",
+      "source_pages": [
+        "MER07557-001.DRW_-.9_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07558-001",
+      "source_drawing": "MER07558-001",
+      "part_description": "OFFSET ROTARY SHAFT, LOWER, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "A286 CRES",
+      "material_spec": "SAE AMS 5737",
+      "process_spec": "SURFACE TEXTURE PER ASME B46.1; KOLSTERIZE PER MANUFACTURERS RECOMMENDATION SOURCE: BODYCOTE THERMAL PROCESSING, INC. 128 SPEEDWAY LANE MOORESVILLE, NC 28117 6879 WWW.BODYCOTE.COM; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000",
+      "material_form": "",
+      "source_pages": [
+        "MER07558-001.DRW_-.16_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07559-001",
+      "source_drawing": "MER07559-001",
+      "part_description": "OFFSET ROTARY SHAFT, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "A286 SST",
+      "material_spec": "SAE AMS 5737",
+      "process_spec": "KOLSTERIZE PER MANUFACTURERS RECOMMENDATION, SOURCE: BODYCOTE THERMAL PROCESSING, INC.; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000; SURFACE TEXTURE PER ASME B46.1",
+      "material_form": "BAR",
+      "source_pages": [
+        "MER07559-001.DRW_-.19_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07563-001",
+      "source_drawing": "MER07560-001",
+      "part_description": "BODY INSERT ASSEMBLY, VALVE",
+      "quantity": 1,
+      "designation": "MISC",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07560-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07562-001",
+      "source_drawing": "MER07560-001",
+      "part_description": "SEAT, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "PCTFE",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07560-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07561-001",
+      "source_drawing": "MER07560-001",
+      "part_description": "RING, RETAINING, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "7075 AL",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07560-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07569-001",
+      "source_drawing": "MER07560-001",
+      "part_description": "BRACE, REAR, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "7075 AL",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07560-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "ASME B18.3, ASTM F879",
+      "source_drawing": "MER07560-001",
+      "part_description": "SBHCS, .2500-20, 1.125 LG",
+      "quantity": 24,
+      "designation": "18-8 CRES",
+      "material_spec": "ASTM F879",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07560-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "M12133/2-255",
+      "source_drawing": "MER07560-001",
+      "part_description": "WASHER, SPRING TENSION, BELLEVILLE SPRING, .250 ID",
+      "quantity": 96,
+      "designation": "302 CRES",
+      "material_spec": "M12133/2-255",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07560-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "NAS1149E0516R",
+      "source_drawing": "MER07560-001",
+      "part_description": "FLAT WASHER, .328 ID NOM, .063 THK",
+      "quantity": 6,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07560-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "NAS1352N5-16",
+      "source_drawing": "MER07560-001",
+      "part_description": "SHCS, .3125-18 UNRC-3A, 1.000 LG",
+      "quantity": 6,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07560-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "LUBRICANT",
+      "source_drawing": "MER07560-001",
+      "part_description": "LUBRICANT, LOX COMPATABLE",
+      "quantity": null,
+      "designation": "KRYTOX 240AC / TRIBOLUBE 16 / CHRISTO-LUBE MCG 111",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07560-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07561-001",
+      "source_drawing": "MER07561-001",
+      "part_description": "RING, RETAINING, VALVE",
+      "quantity": 1,
+      "designation": "ALUMINUM ALLOY 7075-T651",
+      "material_spec": "ASTM B211, SAE AMS-QQ-A-225/9",
+      "process_spec": "ANODIZE PER MIL-A-8625, TYPE II, CLASS 1, CLEAR. ALL DIMENSIONS APPLY AFTER ANODIZING PART",
+      "material_form": "BAR",
+      "source_pages": [
+        "MER07561-001.DRW_-.10_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07562-001",
+      "source_drawing": "MER07562-001",
+      "part_description": "SEAT, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "PCTFE",
+      "material_spec": "ASTM D7194, TYPE III",
+      "process_spec": "SURFACE TEXTURE PER ASME B46.1; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000",
+      "material_form": "",
+      "source_pages": [
+        "MER07562-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07564-001",
+      "source_drawing": "MER07563-001",
+      "part_description": "BODY, VALVE, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "7075 AL",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07563-001.DRW_-.9_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MS21209C4-10",
+      "source_drawing": "MER07563-001",
+      "part_description": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .2500-20 THD, .250 LG",
+      "quantity": 24,
+      "designation": "302 OR 304 SST",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07563-001.DRW_-.9_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MS21209C4-15",
+      "source_drawing": "MER07563-001",
+      "part_description": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .2500-20 THD, .375 LG",
+      "quantity": 27,
+      "designation": "302 OR 304 SST",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07563-001.DRW_-.9_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MS21209C5-15",
+      "source_drawing": "MER07563-001",
+      "part_description": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .3125-18 THD, .469 LG",
+      "quantity": 14,
+      "designation": "302 OR 304 SST",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07563-001.DRW_-.9_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MS21209C6-20",
+      "source_drawing": "MER07563-001",
+      "part_description": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .3750-16 THD, .75 LG",
+      "quantity": 1,
+      "designation": "302 OR 304 SST",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07563-001.DRW_-.9_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07564-001",
+      "source_drawing": "MER07564-001",
+      "part_description": "BODY, VALVE, 10 INCH",
+      "quantity": 1,
+      "designation": "ALUMINUM ALLOY 7075-T651",
+      "material_spec": "ASTM B211, SAE AMS-QQ-A-225/9",
+      "process_spec": "SURFACE TEXTURE PER ASME B46.1; ANODIZE PER MIL-A-8625, TYPE II, CLASS 1, CLEAR; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000",
+      "material_form": "BAR",
+      "source_pages": [
+        "MER07564-001.DRW_-.13_RELEASED.pdf p1",
+        "MER07564-001.DRW_-.13_RELEASED.pdf p2",
+        "MER07564-001.DRW_-.13_RELEASED.pdf p3",
+        "MER07564-001.DRW_-.13_RELEASED.pdf p4"
+      ],
+      "sighting_count": 4
+    },
+    {
+      "part_number": "MER07567-001",
+      "source_drawing": "MER07565-001",
+      "part_description": "SHAFT, OFFSET, INSERT INSTALL, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "MISC",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07565-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "M12133/2-255",
+      "source_drawing": "MER07565-001",
+      "part_description": "WASHER, SPRING TENSION, BELLEVILLE DISC SPRING, .250 ID",
+      "quantity": 6,
+      "designation": "302 SST",
+      "material_spec": "M12133/2-255",
+      "process_spec": "",
+      "material_form": "SPRING",
+      "source_pages": [
+        "MER07565-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07566-001",
+      "source_drawing": "MER07565-001",
+      "part_description": "ROTARY TANG, OFFSET SHAFT, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07565-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "NAS1352N4-10",
+      "source_drawing": "MER07565-001",
+      "part_description": "SHCS, .2500-20 UNRC-3A, .625 LG",
+      "quantity": 6,
+      "designation": "A286",
+      "material_spec": "NAS1352",
+      "process_spec": "",
+      "material_form": "FASTENER",
+      "source_pages": [
+        "MER07565-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "LUBRICANT_LOX_COMPATIBLE",
+      "source_drawing": "MER07565-001",
+      "part_description": "LUBRICANT, LOX COMPATABLE",
+      "quantity": null,
+      "designation": "KRYTOX 240AC / TRIBOLUBE 16 / CHRISTO-LUBE MCG 111",
+      "material_spec": "",
+      "process_spec": "APPLY TO THREADS OF F/N 4 PER NOTE 6",
+      "material_form": "LUBRICANT",
+      "source_pages": [
+        "MER07565-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07566-001",
+      "source_drawing": "MER07566-001",
+      "part_description": "ROTARY TANG, OFFSET SHAFT, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "A286 CRES",
+      "material_spec": "SAE AMS 5737",
+      "process_spec": "SURFACE TEXTURE PER ASME B46.1; KOLSTERIZE PER MANUFACTURERS RECOMMENDATION SOURCE: BODYCOTE THERMAL PROCESSING, INC. 128 SPEEDWAY LANE MOORESVILLE, NC 28117 6879 WWW.BODYCOTE.COM CAGE CODE 8W6S8; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000",
+      "material_form": "",
+      "source_pages": [
+        "MER07566-001.DRW_-.13_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07568-001",
+      "source_drawing": "MER07567-001",
+      "part_description": "SHAFT, OFFSET, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "7075 AL",
+      "material_spec": "",
+      "process_spec": "CLEAN AND MAINTAIN PER IEST-STD-CC1246E, LEVEL VC-0.5-1000",
+      "material_form": "",
+      "source_pages": [
+        "MER07567-001.DRW_-.11_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MS21209C4-10",
+      "source_drawing": "MER07567-001",
+      "part_description": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .2500-20, .250 LG",
+      "quantity": 6,
+      "designation": "302 OR 304 SST",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "WIRE",
+      "source_pages": [
+        "MER07567-001.DRW_-.11_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MS21209C1610",
+      "source_drawing": "MER07567-001",
+      "part_description": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, 1.000-8, 1.000 LG",
+      "quantity": 1,
+      "designation": "302 OR 304 SST",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "WIRE",
+      "source_pages": [
+        "MER07567-001.DRW_-.11_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07568-001",
+      "source_drawing": "MER07568-001",
+      "part_description": "SHAFT, OFFSET, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "ALUMINUM ALLOY 7075-T651",
+      "material_spec": "ASTM B211, SAE AMS-QQ-A-225/9",
+      "process_spec": "ANODIZE PER MIL-A-8625, TYPE II, CLASS 1, CLEAR",
+      "material_form": "BAR",
+      "source_pages": [
+        "MER07568-001.DRW_-.17_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07569-001",
+      "source_drawing": "MER07569-001",
+      "part_description": "BRACE, BRACE",
+      "quantity": 1,
+      "designation": "ALUMINUM ALLOY 7075-T651",
+      "material_spec": "ASTM B211, SAE AMS-QQ-A-225/9",
+      "process_spec": "SURFACE TEXTURE PER ASME B46.1; ANODIZE PER MIL-A-8625, TYPE II, CLASS1, CLEAR; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000",
+      "material_form": "BAR",
+      "source_pages": [
+        "MER07569-001.DRW_-.10_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07573-001",
+      "source_drawing": "MER07570-001",
+      "part_description": "ACTUATOR WELD ASSEMBLY",
+      "quantity": 1,
+      "designation": "INCONEL",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07572-001",
+      "source_drawing": "MER07570-001",
+      "part_description": "BRACKET, ANGLE, ACTUATOR",
+      "quantity": 1,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07548-001",
+      "source_drawing": "MER07570-001",
+      "part_description": "MOUNT BRACKET, ACTUATOR, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "7075 AL",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "ASME B18.3, ASTM F879",
+      "source_drawing": "MER07570-001",
+      "part_description": "SBHCS, .2500-20 UNC-2A, .75 LG",
+      "quantity": 3,
+      "designation": "18-8 CRES",
+      "material_spec": "ASTM F879",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "M12133/2-255",
+      "source_drawing": "MER07570-001",
+      "part_description": "WASHER, SPRING TENSION, BELLEVILLE SPRING, CRES",
+      "quantity": 3,
+      "designation": "302 CRES",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "NAS6706U13",
+      "source_drawing": "MER07570-001",
+      "part_description": "BOLT, TENSION, HEX HEAD, CLOSE TOL, .3750-24 UNJF-3A, 1.390 LG",
+      "quantity": 2,
+      "designation": "A286, 160 KSI",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MS21043-6",
+      "source_drawing": "MER07570-001",
+      "part_description": "NUT SELF-LOCKING, 800 F, REDUCED HEXAGON, .3750-24 UNJF-3B",
+      "quantity": 2,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "AS933K04",
+      "source_drawing": "MER07570-001",
+      "part_description": "FITTING, ADAPTER, UNION, FLARED TO BOSS, .25 NOM DIA PORT",
+      "quantity": 0,
+      "designation": "need material for this",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "AS4307K04",
+      "source_drawing": "MER07570-001",
+      "part_description": "UNION FITTING, -04, (.250), .4375-20 UNJF 3A THD",
+      "quantity": 2,
+      "designation": "316 CRES",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "F-400521-04",
+      "source_drawing": "MER07570-001",
+      "part_description": "SEAL, K-PORT, GOLD PLATE, .25 NOM DIA PORT",
+      "quantity": 2,
+      "designation": "304 CRES",
+      "material_spec": "",
+      "process_spec": "GOLD PLATE",
+      "material_form": "",
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "LUBRICANT",
+      "source_drawing": "MER07570-001",
+      "part_description": "LUBRICANT, LOX COMPATABLE",
+      "quantity": 0,
+      "designation": "KRYTOX 240AC / TRIBOLUBE 16 / CHRISTO-LUBE MCG 111",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07571-001",
+      "source_drawing": "MER07571-001",
+      "part_description": "CONNECTING ROD, ACTUATOR, 10 INCH VALVE",
+      "quantity": 1,
+      "designation": "A286 CRES",
+      "material_spec": "SAE AMS 5737",
+      "process_spec": "SURFACE TEXTURE PER ASME B46.1; KOLSTERIZE PER MANUFACTURERS RECOMMENDATION SOURCE: BODYCOTE THERMAL PROCESSING, INC. 128 SPEEDWAY LANE MOORESVILLE, NC 28117 6879 WWW.BODYCOTE.COM CAGE CODE 8W6S8; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000",
+      "material_form": "",
+      "source_pages": [
+        "MER07571-001.DRW_-.13_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07572-001",
+      "source_drawing": "MER07572-001",
+      "part_description": "BRACKET, ANGLE, ACTUATOR",
+      "quantity": 1,
+      "designation": "A286 CRES",
+      "material_spec": "SAE AMS 5737",
+      "process_spec": "KOLSTERIZE PER MANUFACTURERS RECOMMENDATION, SOURCE: BODYCOTE THERMAL PROCESSING, INC.; SURFACE TEXTURE PER ASME B46.1; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000",
+      "material_form": "",
+      "source_pages": [
+        "MER07572-001.DRW_-.10_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07574-001",
+      "source_drawing": "MER07573-001",
+      "part_description": "HOUSING, ACTUATOR",
+      "quantity": 1,
+      "designation": "INCONEL 718",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07573-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07578-001",
+      "source_drawing": "MER07573-001",
+      "part_description": "BUSHING, SMALL, ACTUATOR",
+      "quantity": 1,
+      "designation": "VESPEL SP-21",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07573-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07579-001",
+      "source_drawing": "MER07573-001",
+      "part_description": "BUSHING, LARGE, ACTUATOR",
+      "quantity": 1,
+      "designation": "VESPEL SP-21",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07573-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07580-001",
+      "source_drawing": "MER07573-001",
+      "part_description": "CAP, ACTUATOR",
+      "quantity": 1,
+      "designation": "INCONEL 625",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07573-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07576-001",
+      "source_drawing": "MER07573-001",
+      "part_description": "ACTUATOR INTERNAL WELD ASSEMBLY",
+      "quantity": 1,
+      "designation": "need material for this",
+      "material_spec": "",
+      "process_spec": "WELD PER MSFC-SPEC-3679, CLASS B",
+      "material_form": "",
+      "source_pages": [
+        "MER07573-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "EH-22-C86",
+      "source_drawing": "MER07573-001",
+      "part_description": "RETAINING RING, INTERNAL, 22mm",
+      "quantity": 1,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07573-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07573-001",
+      "source_drawing": "MER07573-001",
+      "part_description": "ACTUATOR WELD ASSEMBLY",
+      "quantity": 1,
+      "designation": "",
+      "material_spec": "",
+      "process_spec": "CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000; WELD PER MSFC-SPEC-3679, CLASS B",
+      "material_form": "",
+      "source_pages": [
+        "MER07573-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07574-001",
+      "source_drawing": "MER07574-001",
+      "part_description": "HOUSING, ACTUATOR",
+      "quantity": 1,
+      "designation": "INCONEL 625",
+      "material_spec": "SAE AMS 5666",
+      "process_spec": "SURFACE TEXTURE PER ASME B46.1; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000",
+      "material_form": "",
+      "source_pages": [
+        "MER07574-001.DRW_-.9_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07581-001",
+      "source_drawing": "MER07576",
+      "part_description": "SHAFT, PISTON, ACTUATOR",
+      "quantity": 1,
+      "designation": "INCONEL 625",
+      "material_spec": "",
+      "process_spec": "WELD PER MSFC-SPEC-3679, CLASS B",
+      "material_form": "",
+      "source_pages": [
+        "MER07576.DRW_-.6_RELEASED.pdf p1",
+        "MER07576.DRW_-.6_RELEASED.pdf p2",
+        "MER07576.DRW_-.6_RELEASED.pdf p3",
+        "MER07576.DRW_-.6_RELEASED.pdf p4"
+      ],
+      "sighting_count": 4
+    },
+    {
+      "part_number": "MER07582-001",
+      "source_drawing": "MER07576",
+      "part_description": "BELLOWS, INTERNAL, ACTUATOR",
+      "quantity": 1,
+      "designation": "INCONEL 718",
+      "material_spec": "",
+      "process_spec": "WELD PER MSFC-SPEC-3679, CLASS B",
+      "material_form": "",
+      "source_pages": [
+        "MER07576.DRW_-.6_RELEASED.pdf p1",
+        "MER07576.DRW_-.6_RELEASED.pdf p2",
+        "MER07576.DRW_-.6_RELEASED.pdf p3",
+        "MER07576.DRW_-.6_RELEASED.pdf p4"
+      ],
+      "sighting_count": 4
+    },
+    {
+      "part_number": "MER07576-007",
+      "source_drawing": "MER07576",
+      "part_description": "ACTUATOR INTERNAL WELD ASSEMBLY",
+      "quantity": 1,
+      "designation": "need material for this",
+      "material_spec": "",
+      "process_spec": "WELD PER MSFC-SPEC-3679, CLASS B",
+      "material_form": "",
+      "source_pages": [
+        "MER07576.DRW_-.6_RELEASED.pdf p1",
+        "MER07576.DRW_-.6_RELEASED.pdf p2",
+        "MER07576.DRW_-.6_RELEASED.pdf p3",
+        "MER07576.DRW_-.6_RELEASED.pdf p4"
+      ],
+      "sighting_count": 4
+    },
+    {
+      "part_number": "MER07583-001",
+      "source_drawing": "MER07576",
+      "part_description": "BELLOWS, EXTERNAL, ACTUATOR",
+      "quantity": 1,
+      "designation": "INCONEL 718",
+      "material_spec": "",
+      "process_spec": "WELD PER MSFC-SPEC-3679, CLASS B",
+      "material_form": "",
+      "source_pages": [
+        "MER07576.DRW_-.6_RELEASED.pdf p1",
+        "MER07576.DRW_-.6_RELEASED.pdf p2",
+        "MER07576.DRW_-.6_RELEASED.pdf p3",
+        "MER07576.DRW_-.6_RELEASED.pdf p4"
+      ],
+      "sighting_count": 4
+    },
+    {
+      "part_number": "MER07576-005",
+      "source_drawing": "MER07576",
+      "part_description": "ACTUATOR INTERNAL WELD ASSEMBLY",
+      "quantity": 1,
+      "designation": "need material for this",
+      "material_spec": "",
+      "process_spec": "WELD PER MSFC-SPEC-3679, CLASS B",
+      "material_form": "",
+      "source_pages": [
+        "MER07576.DRW_-.6_RELEASED.pdf p1",
+        "MER07576.DRW_-.6_RELEASED.pdf p2",
+        "MER07576.DRW_-.6_RELEASED.pdf p3",
+        "MER07576.DRW_-.6_RELEASED.pdf p4"
+      ],
+      "sighting_count": 4
+    },
+    {
+      "part_number": "MER07577-001",
+      "source_drawing": "MER07576",
+      "part_description": "MOUNT CAP, ACTUATOR",
+      "quantity": 1,
+      "designation": "INCONEL 625",
+      "material_spec": "",
+      "process_spec": "WELD PER MSFC-SPEC-3679, CLASS B",
+      "material_form": "",
+      "source_pages": [
+        "MER07576.DRW_-.6_RELEASED.pdf p1",
+        "MER07576.DRW_-.6_RELEASED.pdf p2",
+        "MER07576.DRW_-.6_RELEASED.pdf p3",
+        "MER07576.DRW_-.6_RELEASED.pdf p4"
+      ],
+      "sighting_count": 4
+    },
+    {
+      "part_number": "MER07576-003",
+      "source_drawing": "MER07576",
+      "part_description": "ACTUATOR INTERNAL WELD ASSEMBLY",
+      "quantity": 1,
+      "designation": "need material for this",
+      "material_spec": "",
+      "process_spec": "WELD PER MSFC-SPEC-3679, CLASS B",
+      "material_form": "",
+      "source_pages": [
+        "MER07576.DRW_-.6_RELEASED.pdf p1",
+        "MER07576.DRW_-.6_RELEASED.pdf p2",
+        "MER07576.DRW_-.6_RELEASED.pdf p3",
+        "MER07576.DRW_-.6_RELEASED.pdf p4"
+      ],
+      "sighting_count": 4
+    },
+    {
+      "part_number": "MER07576-001",
+      "source_drawing": "MER07576",
+      "part_description": "ACTUATOR INTERNAL WELD ASSEMBLY",
+      "quantity": 1,
+      "designation": "need material for this",
+      "material_spec": "",
+      "process_spec": "WELD PER MSFC-SPEC-3679, CLASS B",
+      "material_form": "",
+      "source_pages": [
+        "MER07576.DRW_-.6_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07577-001",
+      "source_drawing": "MER07577-001",
+      "part_description": "MOUNT CAP, ACTUATOR",
+      "quantity": 1,
+      "designation": "INCONEL 625",
+      "material_spec": "SAE AMS 5666",
+      "process_spec": "CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000",
+      "material_form": "",
+      "source_pages": [
+        "MER07577-001.DRW_-.16_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07578-001",
+      "source_drawing": "MER07578-001",
+      "part_description": "BUSHING, ACTUATOR, SMALL",
+      "quantity": 1,
+      "designation": "VESPEL SP-3, Type III/M OR Type III/P POLYIMIDE RESIN",
+      "material_spec": "ASTM 6456-10",
+      "process_spec": "SURFACE TEXTURE PER ASME B46.1; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000",
+      "material_form": "",
+      "source_pages": [
+        "MER07578-001.DRW_-.8_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07579-001",
+      "source_drawing": "MER07579-001",
+      "part_description": "BUSHING, ACTUATOR, LARGE",
+      "quantity": 1,
+      "designation": "VESPEL SP-3, TYPE III/M OR TYPE III/P, POLYIMIDE RESIN",
+      "material_spec": "ASTM B456-10",
+      "process_spec": "SURFACE TEXTURE PER ASME B46.1; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000",
+      "material_form": "",
+      "source_pages": [
+        "MER07579-001.DRW_-.7_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07580-001",
+      "source_drawing": "MER07580-001",
+      "part_description": "CAP, ACTUATOR",
+      "quantity": 1,
+      "designation": "INCONEL 625",
+      "material_spec": "SAE AMS 5666",
+      "process_spec": "SURFACE TEXTURE PER ASME B46.1; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000",
+      "material_form": "",
+      "source_pages": [
+        "MER07580-001.DRW_-.9_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07581-001",
+      "source_drawing": "MER07581-001",
+      "part_description": "SHAFT, PISTON, ACTUATOR",
+      "quantity": 1,
+      "designation": "INCONEL 625",
+      "material_spec": "SAE AMS 5666",
+      "process_spec": "CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000",
+      "material_form": "BAR",
+      "source_pages": [
+        "MER07581-001.DRW_-.8_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07582-001",
+      "source_drawing": "MER07582-001",
+      "part_description": "BELLOWS, INTERNAL, ACTUATOR",
+      "quantity": 1,
+      "designation": "INCONEL 718",
+      "material_spec": "UNS N07718, PER SAE AMS 5596",
+      "process_spec": "SURFACE TEXTURE PER ASME B46.1; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000; WELD PER MSFC-SPEC-3679, CLASS B",
+      "material_form": "",
+      "source_pages": [
+        "MER07582-001.DRW_-.8_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07583-003",
+      "source_drawing": "MER07582-001",
+      "part_description": "BELLEVILLE WASHER, BELLOWS, INTERNAL, ACTUATOR",
+      "quantity": "AR",
+      "designation": "INCONEL",
+      "material_spec": "SAE AMS 5596",
+      "process_spec": "SURFACE TEXTURE PER ASME B46.1; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000; WELD PER MSFC-SPEC-3679, CLASS B",
+      "material_form": "",
+      "source_pages": [
+        "MER07582-001.DRW_-.8_RELEASED.pdf p1",
+        "MER07582-001.DRW_-.8_RELEASED.pdf p2"
+      ],
+      "sighting_count": 2
+    },
+    {
+      "part_number": "MER07583-001",
+      "source_drawing": "MER07583-001",
+      "part_description": "BELLOWS, EXTERNAL, ACTUATOR",
+      "quantity": 1,
+      "designation": "INCONEL 718",
+      "material_spec": "UNS N07718, PER SAE AMS 5596",
+      "process_spec": "SURFACE TEXTURE PER ASME B46.1; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000; WELD PER MSFC-SPEC-3679 CLASS B",
+      "material_form": "",
+      "source_pages": [
+        "MER07583-001.DRW_-.9_RELEASED.pdf p1",
+        "MER07583-001.DRW_-.9_RELEASED.pdf p2"
+      ],
+      "sighting_count": 2
+    },
+    {
+      "part_number": "MER07584-003",
+      "source_drawing": "MER07583-001",
+      "part_description": "BELLEVILLE WASHER, BELLOWS, EXTERNAL, ACTUATOR",
+      "quantity": null,
+      "designation": "INCONEL",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07583-001.DRW_-.9_RELEASED.pdf p1",
+        "MER07583-001.DRW_-.9_RELEASED.pdf p2"
+      ],
+      "sighting_count": 2
+    },
+    {
+      "part_number": "50854SCS",
+      "source_drawing": "MER07584-001",
+      "part_description": "SPRING, COMPRESSION, 1.575 LG",
+      "quantity": 1,
+      "designation": "316 SST",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07584-001.DRW_-.17_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "WHM-275-S86",
+      "source_drawing": "MER07584-001",
+      "part_description": "RETAINING RING, INTERNAL, 2 3/4",
+      "quantity": 1,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07584-001.DRW_-.17_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07585-001",
+      "source_drawing": "MER07584-001",
+      "part_description": "POPPET, VALVE, 10 INCH",
+      "quantity": 1,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07584-001.DRW_-.17_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07586-001",
+      "source_drawing": "MER07584-001",
+      "part_description": "COUPLING, POPPET",
+      "quantity": 1,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07584-001.DRW_-.17_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07588-001",
+      "source_drawing": "MER07584-001",
+      "part_description": "PUSHER, BALL, POPPET",
+      "quantity": 1,
+      "designation": "INCONEL 718",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07584-001.DRW_-.17_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07587-001",
+      "source_drawing": "MER07584-001",
+      "part_description": "INTERFACE RING, COUPLER TO POPPET",
+      "quantity": 1,
+      "designation": "A286",
+      "material_spec": "",
+      "process_spec": "",
+      "material_form": "",
+      "source_pages": [
+        "MER07584-001.DRW_-.17_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07584-001",
+      "source_drawing": "MER07584-001",
+      "part_description": "POPPET SUB-ASSEMBLY, 10 INCH",
+      "quantity": 1,
+      "designation": "",
+      "material_spec": "",
+      "process_spec": "CLEAN AND MAINTAIN TO IEST-STD-CC1246E, LEVEL VC-0.5-1000",
+      "material_form": "",
+      "source_pages": [
+        "MER07584-001.DRW_-.17_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07585-001",
+      "source_drawing": "MER07585-001",
+      "part_description": "POPPET, VALVE, 4 INCH",
+      "quantity": 1,
+      "designation": "A286 CRES",
+      "material_spec": "SAE AMS 5737",
+      "process_spec": "KOLSTERIZE PER MANUFACTURERS RECOMMENDATION; SURFACE TEXTURE PER ASME B46.1",
+      "material_form": "",
+      "source_pages": [
+        "MER07585-001.DRW_-.17_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07586-001",
+      "source_drawing": "MER07586-001",
+      "part_description": "COUPLING, POPPET",
+      "quantity": 1,
+      "designation": "A286 CRES",
+      "material_spec": "SAE AMS 5737",
+      "process_spec": "SURFACE TEXTURE PER ASME B46.1; KOLSTERIZE PER MANUFACTURERS RECOMMENDATION SOURCE: BODYCOTE THERMAL PROCESSING, INC. 128 SPEEDWAY LANE MOORESVILLE, NC 28117 6879 WWW.BODYCOTE.COM CAGE CODE 8W6S8; CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000",
+      "material_form": "",
+      "source_pages": [
+        "MER07586-001.DRW_-.18_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07587-001",
+      "source_drawing": "MER07587-001",
+      "part_description": "INTERFACE RING, COUPLET FOR EXPT",
+      "quantity": 1,
+      "designation": "A286 CRES",
+      "material_spec": "SAE AMS 5737",
+      "process_spec": "SURFACE TEXTURE PER ASME B46.1; KOLSTERIZE PER MANUFACTURERS RECOMMENDATION (BODYCOTE THERMAL PROCESSING, INC., 128 SPEEDWAY LANE, MOORESVILLE, NC 28117 #879, WWW.BODYCOTE.COM, CAGE CODE 8W6S8); CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000",
+      "material_form": "",
+      "source_pages": [
+        "MER07587-001.DRW_-.7_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    },
+    {
+      "part_number": "MER07588-001",
+      "source_drawing": "MER07588-001",
+      "part_description": "PUSHER, BALL POPPET",
+      "quantity": 1,
+      "designation": "INCONEL 718",
+      "material_spec": "SAE AMS 5664",
+      "process_spec": "HEAT TREATMENT: PRIOR TO ROUGH MACHINING, SOLUTION TREAT AT 1900\u00b0F (730\u00b0C) FOR 45 MINUTES IN VACUUM OR ARGON. FAN/GAS QUENCH TO BELOW 600\u00b0F. AFTER ROUGH MACHINING, AGE AT 1350\u00b0F FOR 8 HOURS. FURNACE COOL AT 50\u00b0/HOUR TO 1200\u00b0F (650\u00b0C), HOLD AT 1200\u00b0F (650\u00b0C) FOR 8 HOURS, THEN AIR COOL",
+      "material_form": "",
+      "source_pages": [
+        "MER07588-001.DRW_-.12_RELEASED.pdf p1"
+      ],
+      "sighting_count": 1
+    }
+  ]
+}

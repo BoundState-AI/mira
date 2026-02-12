@@ -683,11 +683,24 @@ export interface GeneratedMPArtifact {
   error?: string;
 }
 
+export interface MPPlanComputeResult {
+  status: string;
+  can_generate: boolean;
+  blockers: string[];
+  materials: number;
+  environments: number;
+  determinations: number;
+  deficiencies: number;
+  nonconformances: number;
+  hitl_required: number;
+  blocking_questions: MPPlanBlockingQuestion[];
+}
+
 /**
  * M&P Plan Generator health check.
  */
 export async function mpPlanPing(): Promise<{ status: string; domain: string; version: string }> {
-  const response = await fetch(`${API_BASE}/mp-plan/ping`);
+  const response = await fetch(`${API_BASE}/mp-plan/v2/ping`);
   if (!response.ok) {
     throw new Error(`M&P Plan ping failed: ${response.statusText}`);
   }
@@ -700,7 +713,7 @@ export async function mpPlanPing(): Promise<{ status: string; domain: string; ve
 export async function createMPPlanSession(
   req: CreateMPPlanSessionRequest
 ): Promise<MPPlanSessionSummary> {
-  const response = await fetch(`${API_BASE}/mp-plan/sessions`, {
+  const response = await fetch(`${API_BASE}/mp-plan/v2/sessions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(req),
@@ -718,7 +731,7 @@ export async function createMPPlanSession(
  * Get M&P Plan session by ID.
  */
 export async function getMPPlanSession(sessionId: string): Promise<Record<string, unknown>> {
-  const response = await fetch(`${API_BASE}/mp-plan/sessions/${sessionId}`);
+  const response = await fetch(`${API_BASE}/mp-plan/v2/sessions/${sessionId}`);
   if (!response.ok) {
     throw new Error(`Failed to get session: ${response.statusText}`);
   }
@@ -729,7 +742,7 @@ export async function getMPPlanSession(sessionId: string): Promise<Record<string
  * List all M&P Plan sessions.
  */
 export async function listMPPlanSessions(): Promise<{ sessions: MPPlanSessionSummary[]; count: number }> {
-  const response = await fetch(`${API_BASE}/mp-plan/sessions`);
+  const response = await fetch(`${API_BASE}/mp-plan/v2/sessions`);
   if (!response.ok) {
     throw new Error(`Failed to list sessions: ${response.statusText}`);
   }
@@ -740,7 +753,7 @@ export async function listMPPlanSessions(): Promise<{ sessions: MPPlanSessionSum
  * Delete M&P Plan session.
  */
 export async function deleteMPPlanSession(sessionId: string): Promise<{ status: string; session_id: string }> {
-  const response = await fetch(`${API_BASE}/mp-plan/sessions/${sessionId}`, {
+  const response = await fetch(`${API_BASE}/mp-plan/v2/sessions/${sessionId}`, {
     method: 'DELETE',
   });
   if (!response.ok) {
@@ -756,7 +769,7 @@ export async function addMPPlanEnvironment(
   sessionId: string,
   env: AddMPEnvironmentRequest
 ): Promise<MPPlanEnvironment> {
-  const response = await fetch(`${API_BASE}/mp-plan/sessions/${sessionId}/environment`, {
+  const response = await fetch(`${API_BASE}/mp-plan/v2/sessions/${sessionId}/environment`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(env),
@@ -777,7 +790,7 @@ export async function addMPPlanMaterials(
   sessionId: string,
   materials: AddMPMaterialRequest[]
 ): Promise<{ materials: MPPlanMaterial[]; count: number }> {
-  const response = await fetch(`${API_BASE}/mp-plan/sessions/${sessionId}/materials`, {
+  const response = await fetch(`${API_BASE}/mp-plan/v2/sessions/${sessionId}/materials`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ materials }),
@@ -797,7 +810,7 @@ export async function addMPPlanMaterials(
 export async function getMPPlanQuestions(
   sessionId: string
 ): Promise<{ questions: MPPlanBlockingQuestion[]; count: number }> {
-  const response = await fetch(`${API_BASE}/mp-plan/sessions/${sessionId}/questions`);
+  const response = await fetch(`${API_BASE}/mp-plan/v2/sessions/${sessionId}/questions`);
   if (!response.ok) {
     throw new Error(`Failed to get questions: ${response.statusText}`);
   }
@@ -810,8 +823,8 @@ export async function getMPPlanQuestions(
 export async function submitMPPlanAnswer(
   sessionId: string,
   req: SubmitMPAnswerRequest
-): Promise<{ status: string; can_generate: boolean; blockers: string[] }> {
-  const response = await fetch(`${API_BASE}/mp-plan/sessions/${sessionId}/answer`, {
+): Promise<{ status: string; can_generate: boolean; blockers: string[]; remaining_questions: number }> {
+  const response = await fetch(`${API_BASE}/mp-plan/v2/sessions/${sessionId}/answer`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(req),
@@ -828,15 +841,8 @@ export async function submitMPPlanAnswer(
 /**
  * Run compute loop on session.
  */
-export async function runMPPlanCompute(sessionId: string): Promise<{
-  status: string;
-  can_generate: boolean;
-  blockers: string[];
-  blocking_questions: MPPlanBlockingQuestion[];
-  nonconformances: number;
-  deficiencies: number;
-}> {
-  const response = await fetch(`${API_BASE}/mp-plan/sessions/${sessionId}/compute`, {
+export async function runMPPlanCompute(sessionId: string): Promise<MPPlanComputeResult> {
+  const response = await fetch(`${API_BASE}/mp-plan/v2/sessions/${sessionId}/compute`, {
     method: 'POST',
   });
 
@@ -855,7 +861,7 @@ export async function generateMPPlanArtifacts(
   sessionId: string,
   req: GenerateMPArtifactsRequest = {}
 ): Promise<{ status: string; artifacts: GeneratedMPArtifact[] }> {
-  const response = await fetch(`${API_BASE}/mp-plan/sessions/${sessionId}/generate`, {
+  const response = await fetch(`${API_BASE}/mp-plan/v2/sessions/${sessionId}/generate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(req),
@@ -870,12 +876,73 @@ export async function generateMPPlanArtifacts(
 }
 
 /**
- * Get review packet for session.
+ * Submit closure decision for a nonconformance.
  */
-export async function getMPPlanReviewPacket(sessionId: string): Promise<Record<string, unknown>> {
-  const response = await fetch(`${API_BASE}/mp-plan/sessions/${sessionId}/review-packet`);
+export async function submitMPPlanClosure(
+  sessionId: string,
+  req: { gap_id: string; selected_path: string; rationale: string; provided_inputs?: Record<string, unknown> }
+): Promise<{ status: string; gap_id: string; can_generate: boolean; blockers: string[] }> {
+  const response = await fetch(`${API_BASE}/mp-plan/v2/sessions/${sessionId}/closure`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+
   if (!response.ok) {
-    throw new Error(`Failed to get review packet: ${response.statusText}`);
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Failed to submit closure: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Accept an open gap (defer closure with owner + due date).
+ */
+export async function acceptMPPlanOpenGap(
+  sessionId: string,
+  req: { gap_id: string; rationale: string; owner: string; due_date?: string; risk_statement?: string }
+): Promise<{ status: string; gap_id: string; owner: string; due_date: string; can_generate: boolean; blockers: string[] }> {
+  const response = await fetch(`${API_BASE}/mp-plan/v2/sessions/${sessionId}/accept-open`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Failed to accept open gap: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Reopen a previously closed or accepted gap.
+ */
+export async function reopenMPPlanGap(
+  sessionId: string,
+  gapId: string
+): Promise<{ status: string; gap_id: string; closure_removed: number; acceptance_removed: number }> {
+  const response = await fetch(`${API_BASE}/mp-plan/v2/sessions/${sessionId}/reopen-gap/${gapId}`, {
+    method: 'POST',
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Failed to reopen gap: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Export M&P Plan as structured JSON.
+ */
+export async function exportMPPlanJson(sessionId: string): Promise<Record<string, unknown>> {
+  const response = await fetch(`${API_BASE}/mp-plan/v2/sessions/${sessionId}/export/mp-plan-json`);
+  if (!response.ok) {
+    throw new Error(`Failed to export JSON: ${response.statusText}`);
   }
   return response.json();
 }
@@ -895,7 +962,7 @@ export async function listMPPlanVehiclePresets(): Promise<{ presets: MPPlanVehic
  * Download artifact URL.
  */
 export function getMPPlanArtifactDownloadUrl(sessionId: string, artifactId: string): string {
-  return `${API_BASE}/mp-plan/sessions/${sessionId}/download/${artifactId}`;
+  return `${API_BASE}/mp-plan/v2/sessions/${sessionId}/download/${artifactId}`;
 }
 
 export interface MaptisSearchResult {
@@ -1150,6 +1217,9 @@ export interface V4QueryResponse {
   intent_disagreement: V4IntentDisagreementResponse | null;
   answer: string;
   materials: V4MaterialResult[];
+  all_materials: V4MaterialResult[];
+  all_material_count: number;
+  materials_focus_applied: boolean;
   material_families: string[];
   search_source: string;
   parsed_query: Record<string, unknown>;

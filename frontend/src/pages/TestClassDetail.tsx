@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { Fragment, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +34,7 @@ interface TestRecord {
   material_key: number;
   material_code?: string;
   material_designation?: string;
+  tested_fluid?: string | null;
   test_conditions?: Record<string, any>;
   test_results?: Record<string, any>;
   rating?: string;
@@ -100,6 +101,7 @@ export default function TestClassDetail() {
   const [viewMode, setViewMode] = useState<"report" | "json">("report");
 
   const testInfo = testType ? TEST_CLASS_INFO[testType] : null;
+  const isFluidCompatibility = testType === 'fluid-compatibility';
 
   // Fetch available ratings for this test type
   useEffect(() => {
@@ -349,6 +351,7 @@ export default function TestClassDetail() {
                 <TableHead>Material Code</TableHead>
                 <TableHead>Material Name</TableHead>
                 <TableHead>Rating</TableHead>
+                {isFluidCompatibility && <TableHead>Tested Fluid</TableHead>}
                 <TableHead>Details</TableHead>
               </TableRow>
             </TableHeader>
@@ -370,6 +373,15 @@ export default function TestClassDetail() {
                       <span className="text-muted-foreground">-</span>
                     )}
                   </TableCell>
+                  {isFluidCompatibility && (
+                    <TableCell>
+                      {record.tested_fluid ? (
+                        <span className="text-sm">{record.tested_fluid}</span>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
+                  )}
                   <TableCell>
                     <Button
                       variant="ghost"
@@ -447,7 +459,7 @@ export default function TestClassDetail() {
             <div className="space-y-6" id="test-report">
               {/* Material Info Header */}
               <div className="bg-primary/5 rounded-lg p-4 border-2 border-primary/20">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className={`grid grid-cols-2 ${isFluidCompatibility ? 'md:grid-cols-5' : 'md:grid-cols-4'} gap-4`}>
                   <div>
                     <p className="text-xs font-semibold text-muted-foreground uppercase">Material Code</p>
                     <p className="text-lg font-mono font-bold">{selectedRecord.material_code || `MAT-${selectedRecord.material_key}`}</p>
@@ -470,6 +482,12 @@ export default function TestClassDetail() {
                     <p className="text-xs font-semibold text-muted-foreground uppercase">Test Type</p>
                     <p className="text-sm font-medium">{testInfo?.name}</p>
                   </div>
+                  {isFluidCompatibility && (
+                    <div>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase">Tested Fluid</p>
+                      <p className="text-sm font-medium">{selectedRecord.tested_fluid || '-'}</p>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -487,7 +505,11 @@ export default function TestClassDetail() {
                 </TabsList>
 
                 <TabsContent value="report" className="mt-4">
-                  <FormattedReport record={selectedRecord} testType={testInfo?.name || ""} />
+                  <FormattedReport
+                    record={selectedRecord}
+                    testType={testInfo?.name || ""}
+                    isFluidCompatibility={isFluidCompatibility}
+                  />
                 </TabsContent>
 
                 <TabsContent value="json" className="mt-4">
@@ -553,6 +575,7 @@ const FIELD_LABELS: Record<string, string> = {
   'stress_rating': 'Rating',
   'fluid_rating': 'Rating',
   'fluc_rating': 'Rating',
+  'tested_fluid': 'Tested Fluid',
   'odor_rating': 'Rating',
   'fla_rating': 'Rating',
   'pneu_rating': 'Rating',
@@ -714,8 +737,19 @@ function getFieldLabel(fieldName: string): string {
 }
 
 // Formatted Report Component - DYNAMIC based on populated fields
-function FormattedReport({ record, testType }: { record: TestRecord; testType: string }) {
-  const data = record.test_results || {};
+function FormattedReport({
+  record,
+  testType,
+  isFluidCompatibility = false,
+}: {
+  record: TestRecord;
+  testType: string;
+  isFluidCompatibility?: boolean;
+}) {
+  const data = {
+    ...(record.test_results || {}),
+    ...(record.tested_fluid ? { tested_fluid: record.tested_fluid } : {}),
+  };
 
   // Blacklist of internal/technical fields that should never display
   const BLACKLIST_FIELDS = [
@@ -785,6 +819,9 @@ function FormattedReport({ record, testType }: { record: TestRecord; testType: s
         <div className="pl-4 space-y-1 text-sm">
           <div><span className="font-semibold">Material Code:</span> {record.material_code || `MAT-${record.material_key}`}</div>
           <div><span className="font-semibold">Designation:</span> {record.material_designation || 'N/A'}</div>
+          {isFluidCompatibility && record.tested_fluid && (
+            <div><span className="font-semibold">Tested Fluid:</span> {record.tested_fluid}</div>
+          )}
           {data.composition && <div><span className="font-semibold">Composition:</span> {data.composition}</div>}
           {data.usetype && <div><span className="font-semibold">Use Type:</span> {data.usetype}</div>}
           {data.temperatureminimum !== undefined && data.temperatureminimum !== null && (
@@ -805,14 +842,14 @@ function FormattedReport({ record, testType }: { record: TestRecord; testType: s
             {rows.map((row, rowIdx) => (
               <tr key={rowIdx}>
                 {row.map(([fieldName, value], colIdx) => (
-                  <>
-                    <td className="border border-black px-3 py-2 font-semibold bg-gray-50 print:bg-gray-50 w-[25%]" key={`label-${colIdx}`}>
+                  <Fragment key={`${rowIdx}-${fieldName}-${colIdx}`}>
+                    <td className="border border-black px-3 py-2 font-semibold bg-gray-50 print:bg-gray-50 w-[25%]">
                       {getFieldLabel(fieldName)}
                     </td>
-                    <td className="border border-black px-3 py-2 w-[25%]" key={`value-${colIdx}`}>
+                    <td className="border border-black px-3 py-2 w-[25%]">
                       {formatValue(value)}
                     </td>
-                  </>
+                  </Fragment>
                 ))}
                 {/* Fill empty columns if row has only 1 field */}
                 {row.length === 1 && (

@@ -111,6 +111,20 @@ RATING_COLUMNS = ["FLAM", "SCC", "CORR", "TVS", "TOX", "FS"]
 # Ratings that indicate a gap (need rationale)
 GAP_VALUES = {"", None, "U", "I", "X", "N"}
 
+# Material code placeholders that should be treated as missing values.
+# Normalization removes whitespace and uppercases before comparison.
+MATERIAL_CODE_PLACEHOLDERS = {
+    "N/A",
+    "NA",
+    "NONE",
+    "NONEASSIGNED",
+    "NULL",
+    "NAN",
+    "<NA>",
+    "UNASSIGNED",
+    "UNKNOWN",
+}
+
 
 class MIULWorkflow:
     """Orchestrates the complete MIUL generation pipeline.
@@ -139,6 +153,32 @@ class MIULWorkflow:
         self._extractor = extractor_service or get_extractor_service()
         self._enrichment = enrichment_service or get_enrichment_service()
         self._tree_builder = tree_builder or MIULTreeBuilder()
+
+    @staticmethod
+    def _normalize_material_code(value: Any) -> str:
+        """Normalize a Material Code cell value to a comparable string."""
+        if value is None:
+            return ""
+        if pd.isna(value):
+            return ""
+        return str(value).strip()
+
+    @classmethod
+    def is_usable_material_code(cls, value: Any) -> bool:
+        """True when value is a meaningful material code (not blank/placeholder)."""
+        code = cls._normalize_material_code(value)
+        if not code:
+            return False
+
+        normalized = code.upper().replace(" ", "")
+        if normalized in MATERIAL_CODE_PLACEHOLDERS:
+            return False
+
+        # Common spreadsheet placeholders like "-", "--", "-----", "____".
+        if normalized and all(ch in "-_.~" for ch in normalized):
+            return False
+
+        return True
 
     async def extract_from_pdfs(self, pdf_paths: List[Path]) -> pd.DataFrame:
         """Step 1: Extract parts from PDFs and transform to MIUL format.
@@ -340,9 +380,14 @@ class MIULWorkflow:
             try:
                 for idx, row in miul_df.iterrows():
                     material_code = row.get("Material Code")
+                    normalized_existing = self._normalize_material_code(material_code)
+                    if normalized_existing and not self.is_usable_material_code(material_code):
+                        # Normalize placeholders like "-----" to truly blank values.
+                        miul_df.at[idx, "Material Code"] = None
+                        material_code = None
 
                     # Skip if already has a material code
-                    if pd.notna(material_code) and str(material_code).strip():
+                    if self.is_usable_material_code(material_code):
                         continue
 
                     # Try to look up from designation
@@ -420,9 +465,14 @@ class MIULWorkflow:
             LOGGER.warning("[Workflow] MaterialCodeLookupService not available, using fallback")
             for idx, row in miul_df.iterrows():
                 material_code = row.get("Material Code")
+                normalized_existing = self._normalize_material_code(material_code)
+                if normalized_existing and not self.is_usable_material_code(material_code):
+                    # Normalize placeholders like "-----" to truly blank values.
+                    miul_df.at[idx, "Material Code"] = None
+                    material_code = None
 
                 # Skip if already has a material code
-                if pd.notna(material_code) and str(material_code).strip():
+                if self.is_usable_material_code(material_code):
                     continue
 
                 # Try to look up from designation
@@ -489,8 +539,8 @@ class MIULWorkflow:
 
         for idx, row in miul_df.iterrows():
             material_code = row.get("Material Code")
-            if pd.notna(material_code) and str(material_code).strip():
-                code = str(material_code).strip()
+            if self.is_usable_material_code(material_code):
+                code = self._normalize_material_code(material_code)
                 codes_to_lookup.append(code)
                 if code not in code_to_indices:
                     code_to_indices[code] = []

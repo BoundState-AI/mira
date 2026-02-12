@@ -1,11 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { PageHeader } from '@/components/PageHeader';
-import { StatusBadge } from '@/components/StatusBadge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import {
   Select,
@@ -25,27 +23,31 @@ import {
   RefreshCw,
   ChevronRight,
   Search,
+  Thermometer,
+  Shield,
 } from 'lucide-react';
 import {
   createMPPlanSession,
-  listMPPlanVehiclePresets,
+  addMPPlanEnvironment,
   addMPPlanMaterials,
   getMPPlanQuestions,
   submitMPPlanAnswer,
   runMPPlanCompute,
   generateMPPlanArtifacts,
   getMPPlanArtifactDownloadUrl,
-  getMPPlanReviewPacket,
+  exportMPPlanJson,
   searchMaptisCode,
   type MPPlanSessionSummary,
-  type MPPlanVehiclePreset,
   type MPPlanBlockingQuestion,
   type AddMPMaterialRequest,
+  type AddMPEnvironmentRequest,
+  type MPPlanEnvironment,
   type GeneratedMPArtifact,
   type MaptisSearchResult,
+  type MPPlanComputeResult,
 } from '@/lib/api';
 
-type Step = 'setup' | 'materials' | 'questions' | 'generate';
+type Step = 'setup' | 'environment' | 'materials' | 'analysis' | 'generate';
 
 interface MaterialRow {
   id: string;
@@ -55,17 +57,59 @@ interface MaterialRow {
   maptis_code: string;
 }
 
+interface EnvironmentPreset {
+  label: string;
+  name: string;
+  o2_pct: number;
+  pressure_psia: number;
+  temp_min_c: number;
+  temp_max_c: number;
+  habitable: boolean;
+  vacuum_exposure: boolean;
+  lunar_dust: boolean;
+}
+
+const ENV_PRESETS: EnvironmentPreset[] = [
+  { label: 'ISS Habitable', name: 'ISS Habitable Volume', o2_pct: 23.5, pressure_psia: 14.7, temp_min_c: 18, temp_max_c: 27, habitable: true, vacuum_exposure: false, lunar_dust: false },
+  { label: 'SLS Launch', name: 'SLS Launch Environment', o2_pct: 21.0, pressure_psia: 14.7, temp_min_c: -20, temp_max_c: 60, habitable: false, vacuum_exposure: false, lunar_dust: false },
+  { label: 'Lunar Surface', name: 'Lunar Surface EVA', o2_pct: 100, pressure_psia: 4.3, temp_min_c: -170, temp_max_c: 120, habitable: false, vacuum_exposure: true, lunar_dust: true },
+  { label: 'O₂ Service', name: 'Oxygen Service', o2_pct: 100, pressure_psia: 14.7, temp_min_c: -183, temp_max_c: 60, habitable: false, vacuum_exposure: false, lunar_dust: false },
+];
+
+const PROGRAM_PHASES = ['PDR', 'CDR', 'Flight', 'Ground Ops', 'Prototype', 'Qual Test'];
+
+const QUESTION_TYPE_LABELS: Record<string, { label: string; color: string }> = {
+  material_ambiguous: { label: 'Material', color: 'bg-blue-100 text-blue-700' },
+  environment_missing: { label: 'Environment', color: 'bg-purple-100 text-purple-700' },
+  tailoring_approval: { label: 'Tailoring', color: 'bg-amber-100 text-amber-700' },
+  closure_selection: { label: 'Closure', color: 'bg-red-100 text-red-700' },
+  grouping_confirmation: { label: 'Grouping', color: 'bg-slate-100 text-slate-700' },
+  quantity_missing: { label: 'Quantity', color: 'bg-teal-100 text-teal-700' },
+  cots_criticality: { label: 'COTS', color: 'bg-orange-100 text-orange-700' },
+  precedent_validation: { label: 'Precedent', color: 'bg-indigo-100 text-indigo-700' },
+};
+
 export default function MPPlanGenerator() {
-  // State
+  // Step state
   const [step, setStep] = useState<Step>('setup');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Session state
   const [programName, setProgramName] = useState('');
-  const [vehiclePreset, setVehiclePreset] = useState('');
-  const [presets, setPresets] = useState<MPPlanVehiclePreset[]>([]);
+  const [programPhase, setProgramPhase] = useState('');
   const [session, setSession] = useState<MPPlanSessionSummary | null>(null);
+
+  // Environment state
+  const [envName, setEnvName] = useState('');
+  const [envO2, setEnvO2] = useState('21.0');
+  const [envPressure, setEnvPressure] = useState('14.7');
+  const [envTempMin, setEnvTempMin] = useState('-20');
+  const [envTempMax, setEnvTempMax] = useState('60');
+  const [envHabitable, setEnvHabitable] = useState(false);
+  const [envVacuum, setEnvVacuum] = useState(false);
+  const [envLunarDust, setEnvLunarDust] = useState(false);
+  const [addedEnvironments, setAddedEnvironments] = useState<MPPlanEnvironment[]>([]);
 
   // Materials state
   const [materials, setMaterials] = useState<MaterialRow[]>([
@@ -75,41 +119,29 @@ export default function MPPlanGenerator() {
   const [searchingMaptis, setSearchingMaptis] = useState<Record<string, boolean>>({});
   const searchTimeouts = useRef<Record<string, NodeJS.Timeout>>({});
 
-  // Questions state
+  // Analysis state
+  const [computeResult, setComputeResult] = useState<MPPlanComputeResult | null>(null);
   const [questions, setQuestions] = useState<MPPlanBlockingQuestion[]>([]);
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
   // Generate state
   const [artifacts, setArtifacts] = useState<GeneratedMPArtifact[]>([]);
-  const [reviewPacket, setReviewPacket] = useState<Record<string, unknown> | null>(null);
 
-  // Load vehicle presets on mount
-  useEffect(() => {
-    loadPresets();
-  }, []);
-
-  const loadPresets = async () => {
-    try {
-      const response = await listMPPlanVehiclePresets();
-      setPresets(response.presets);
-    } catch (err) {
-      console.error('Failed to load presets:', err);
-    }
-  };
-
+  // --------------------------------------------------------------------------
+  // Setup handlers
+  // --------------------------------------------------------------------------
   const handleCreateSession = async () => {
     if (!programName) return;
-
     setLoading(true);
     setError(null);
 
     try {
       const response = await createMPPlanSession({
         program_name: programName,
-        vehicle_preset: vehiclePreset || undefined,
+        program_phase: programPhase || undefined,
       });
       setSession(response);
-      setStep('materials');
+      setStep('environment');
     } catch (err) {
       console.error('Failed to create session:', err);
       setError(err instanceof Error ? err.message : 'Failed to create session');
@@ -118,6 +150,58 @@ export default function MPPlanGenerator() {
     }
   };
 
+  // --------------------------------------------------------------------------
+  // Environment handlers
+  // --------------------------------------------------------------------------
+  const applyEnvPreset = (preset: EnvironmentPreset) => {
+    setEnvName(preset.name);
+    setEnvO2(String(preset.o2_pct));
+    setEnvPressure(String(preset.pressure_psia));
+    setEnvTempMin(String(preset.temp_min_c));
+    setEnvTempMax(String(preset.temp_max_c));
+    setEnvHabitable(preset.habitable);
+    setEnvVacuum(preset.vacuum_exposure);
+    setEnvLunarDust(preset.lunar_dust);
+  };
+
+  const handleAddEnvironment = async () => {
+    if (!session || !envName) return;
+    setLoading(true);
+    setError(null);
+
+    try {
+      const env: AddMPEnvironmentRequest = {
+        name: envName,
+        o2_pct: parseFloat(envO2) || 21.0,
+        pressure_psia: parseFloat(envPressure) || 14.7,
+        temp_min_c: parseFloat(envTempMin) || -20,
+        temp_max_c: parseFloat(envTempMax) || 60,
+        habitable: envHabitable,
+        vacuum_exposure: envVacuum,
+        lunar_dust: envLunarDust,
+      };
+      const result = await addMPPlanEnvironment(session.session_id, env);
+      setAddedEnvironments((prev) => [...prev, result]);
+      // Clear form for next
+      setEnvName('');
+      setEnvO2('21.0');
+      setEnvPressure('14.7');
+      setEnvTempMin('-20');
+      setEnvTempMax('60');
+      setEnvHabitable(false);
+      setEnvVacuum(false);
+      setEnvLunarDust(false);
+    } catch (err) {
+      console.error('Failed to add environment:', err);
+      setError(err instanceof Error ? err.message : 'Failed to add environment');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // --------------------------------------------------------------------------
+  // Material handlers
+  // --------------------------------------------------------------------------
   const addMaterialRow = () => {
     setMaterials([
       ...materials,
@@ -136,13 +220,10 @@ export default function MPPlanGenerator() {
       materials.map((m) => (m.id === id ? { ...m, [field]: value } : m))
     );
 
-    // Trigger MAPTIS search when material name changes
     if (field === 'name' && typeof value === 'string' && value.length >= 2) {
-      // Clear previous timeout for this material
       if (searchTimeouts.current[id]) {
         clearTimeout(searchTimeouts.current[id]);
       }
-      // Debounce the search
       searchTimeouts.current[id] = setTimeout(() => {
         searchMaptisForMaterial(id, value);
       }, 500);
@@ -151,7 +232,6 @@ export default function MPPlanGenerator() {
 
   const searchMaptisForMaterial = async (materialId: string, materialName: string) => {
     if (materialName.length < 2) return;
-
     setSearchingMaptis((prev) => ({ ...prev, [materialId]: true }));
 
     try {
@@ -169,7 +249,6 @@ export default function MPPlanGenerator() {
     setMaterials(
       materials.map((m) => (m.id === materialId ? { ...m, maptis_code: code } : m))
     );
-    // Clear suggestions after selection
     setMaptisSearchResults((prev) => ({ ...prev, [materialId]: [] }));
   };
 
@@ -195,23 +274,24 @@ export default function MPPlanGenerator() {
 
       await addMPPlanMaterials(session.session_id, materialsToAdd);
 
-      // Run compute and get questions
-      const computeResult = await runMPPlanCompute(session.session_id);
-      setQuestions(computeResult.blocking_questions);
+      // Run compute
+      const result = await runMPPlanCompute(session.session_id);
+      setComputeResult(result);
+      setQuestions(result.blocking_questions);
 
-      // Update session state
+      // Update session
       setSession({
         ...session,
         material_count: session.material_count + validMaterials.length,
-        can_generate: computeResult.can_generate,
-        blockers: computeResult.blockers,
-        blocking_question_count: computeResult.blocking_questions.length,
-        nonconformance_count: computeResult.nonconformances,
+        can_generate: result.can_generate,
+        blockers: result.blockers,
+        blocking_question_count: result.blocking_questions.length,
+        nonconformance_count: result.nonconformances,
       });
 
-      if (computeResult.blocking_questions.length > 0) {
-        setStep('questions');
-      } else if (computeResult.can_generate) {
+      if (result.blocking_questions.length > 0 || !result.can_generate) {
+        setStep('analysis');
+      } else {
         setStep('generate');
       }
     } catch (err) {
@@ -222,9 +302,11 @@ export default function MPPlanGenerator() {
     }
   };
 
+  // --------------------------------------------------------------------------
+  // Analysis handlers
+  // --------------------------------------------------------------------------
   const handleSubmitAnswer = async (questionId: string) => {
     if (!session || !answers[questionId]) return;
-
     setLoading(true);
     setError(null);
 
@@ -258,21 +340,19 @@ export default function MPPlanGenerator() {
     }
   };
 
+  // --------------------------------------------------------------------------
+  // Generate handlers
+  // --------------------------------------------------------------------------
   const handleGenerate = async () => {
     if (!session) return;
-
     setLoading(true);
     setError(null);
 
     try {
       const result = await generateMPPlanArtifacts(session.session_id, {
-        artifacts: ['mp_plan_docx', 'miul_xlsx', 'review_packet'],
+        artifacts: ['mp_plan_docx', 'mp_plan_json'],
       });
       setArtifacts(result.artifacts);
-
-      // Also load review packet
-      const packet = await getMPPlanReviewPacket(session.session_id);
-      setReviewPacket(packet);
     } catch (err) {
       console.error('Failed to generate:', err);
       setError(err instanceof Error ? err.message : 'Failed to generate artifacts');
@@ -286,6 +366,41 @@ export default function MPPlanGenerator() {
     window.open(getMPPlanArtifactDownloadUrl(session.session_id, artifact.artifact_id), '_blank');
   };
 
+  const handleExportJson = async () => {
+    if (!session) return;
+    try {
+      const data = await exportMPPlanJson(session.session_id);
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `mp_plan_${session.session_id.slice(0, 8)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Failed to export JSON:', err);
+      setError(err instanceof Error ? err.message : 'Failed to export JSON');
+    }
+  };
+
+  const resetSession = () => {
+    setStep('setup');
+    setSession(null);
+    setProgramName('');
+    setProgramPhase('');
+    setAddedEnvironments([]);
+    setMaterials([{ id: '1', name: '', application: '', quantity: 1, maptis_code: '' }]);
+    setMaptisSearchResults({});
+    setComputeResult(null);
+    setQuestions([]);
+    setAnswers({});
+    setArtifacts([]);
+    setError(null);
+  };
+
+  // --------------------------------------------------------------------------
+  // Render
+  // --------------------------------------------------------------------------
   return (
     <div>
       <PageHeader
@@ -298,11 +413,13 @@ export default function MPPlanGenerator() {
         <div className="flex items-center gap-2 text-sm">
           <StepIndicator step="setup" currentStep={step} label="1. Setup" />
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          <StepIndicator step="materials" currentStep={step} label="2. Materials" />
+          <StepIndicator step="environment" currentStep={step} label="2. Environment" />
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          <StepIndicator step="questions" currentStep={step} label="3. Questions" />
+          <StepIndicator step="materials" currentStep={step} label="3. Materials" />
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          <StepIndicator step="generate" currentStep={step} label="4. Generate" />
+          <StepIndicator step="analysis" currentStep={step} label="4. Analysis" />
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          <StepIndicator step="generate" currentStep={step} label="5. Generate" />
         </div>
       </div>
 
@@ -312,13 +429,15 @@ export default function MPPlanGenerator() {
         </div>
       )}
 
+      {/* ================================================================ */}
       {/* Step 1: Setup */}
+      {/* ================================================================ */}
       {step === 'setup' && (
         <Card>
           <CardHeader>
             <CardTitle>Create New M&P Plan Session</CardTitle>
             <CardDescription>
-              Enter program details and select a vehicle preset to get started
+              Enter program details to start a NASA-STD-6016C compliance session
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -333,22 +452,19 @@ export default function MPPlanGenerator() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="vehiclePreset">Vehicle Preset</Label>
-                <Select value={vehiclePreset} onValueChange={setVehiclePreset}>
+                <Label htmlFor="programPhase">Program Phase</Label>
+                <Select value={programPhase} onValueChange={setProgramPhase}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a vehicle..." />
+                    <SelectValue placeholder="Select phase..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {presets.map((preset) => (
-                      <SelectItem key={preset.preset_id} value={preset.preset_id}>
-                        {preset.name} ({preset.o2_pct}% O₂, {preset.pressure_psia} psia)
+                    {PROGRAM_PHASES.map((phase) => (
+                      <SelectItem key={phase} value={phase}>
+                        {phase}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-muted-foreground">
-                  Presets auto-configure environment parameters
-                </p>
               </div>
             </div>
 
@@ -360,13 +476,163 @@ export default function MPPlanGenerator() {
         </Card>
       )}
 
-      {/* Step 2: Materials */}
+      {/* ================================================================ */}
+      {/* Step 2: Environment */}
+      {/* ================================================================ */}
+      {step === 'environment' && session && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Thermometer className="h-5 w-5" />
+              Define Service Environment
+            </CardTitle>
+            <CardDescription>
+              Define one or more environments where materials will be used
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            {/* Quick-fill presets */}
+            <div>
+              <Label className="text-sm font-medium mb-2 block">Quick Fill</Label>
+              <div className="flex flex-wrap gap-2">
+                {ENV_PRESETS.map((preset) => (
+                  <Button
+                    key={preset.label}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => applyEnvPreset(preset)}
+                    className="text-xs"
+                  >
+                    {preset.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Environment form */}
+            <div className="space-y-3">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="space-y-1">
+                  <Label className="text-xs">Environment Name *</Label>
+                  <Input
+                    placeholder="e.g., ISS Habitable Volume"
+                    value={envName}
+                    onChange={(e) => setEnvName(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">O₂ Concentration (%)</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={envO2}
+                    onChange={(e) => setEnvO2(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div className="space-y-1">
+                  <Label className="text-xs">Pressure (psia)</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={envPressure}
+                    onChange={(e) => setEnvPressure(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Temp Min (°C)</Label>
+                  <Input
+                    type="number"
+                    value={envTempMin}
+                    onChange={(e) => setEnvTempMin(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Temp Max (°C)</Label>
+                  <Input
+                    type="number"
+                    value={envTempMax}
+                    onChange={(e) => setEnvTempMax(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="flex gap-6">
+                <label className="flex items-center gap-2 cursor-pointer text-sm">
+                  <input
+                    type="checkbox"
+                    checked={envHabitable}
+                    onChange={(e) => setEnvHabitable(e.target.checked)}
+                    className="rounded"
+                  />
+                  Habitable
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer text-sm">
+                  <input
+                    type="checkbox"
+                    checked={envVacuum}
+                    onChange={(e) => setEnvVacuum(e.target.checked)}
+                    className="rounded"
+                  />
+                  Vacuum Exposure
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer text-sm">
+                  <input
+                    type="checkbox"
+                    checked={envLunarDust}
+                    onChange={(e) => setEnvLunarDust(e.target.checked)}
+                    className="rounded"
+                  />
+                  Lunar Dust
+                </label>
+              </div>
+            </div>
+
+            <Button onClick={handleAddEnvironment} disabled={loading || !envName} variant="outline">
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <Plus className="mr-2 h-4 w-4" />
+              Add Environment
+            </Button>
+
+            {/* Added environments */}
+            {addedEnvironments.length > 0 && (
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Added Environments</Label>
+                <div className="flex flex-wrap gap-2">
+                  {addedEnvironments.map((env) => (
+                    <Badge key={env.environment_id} variant="secondary" className="py-1 px-3 text-xs">
+                      {env.name} — {env.o2_pct}% O₂, {env.pressure_psia} psia
+                      {env.habitable && ', Habitable'}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-4 border-t">
+              <Button
+                onClick={() => setStep('materials')}
+                disabled={addedEnvironments.length === 0}
+              >
+                Continue to Materials
+              </Button>
+              <Button variant="ghost" onClick={() => setStep('setup')}>
+                Back
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* ================================================================ */}
+      {/* Step 3: Materials */}
+      {/* ================================================================ */}
       {step === 'materials' && session && (
         <Card>
           <CardHeader>
             <CardTitle>Add Materials</CardTitle>
             <CardDescription>
-              Enter material names - MAPTIS codes will be automatically looked up.
+              Enter material names — MAPTIS codes will be automatically looked up
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -408,14 +674,12 @@ export default function MPPlanGenerator() {
                     </div>
                     <div className="space-y-1">
                       {index === 0 && <Label className="text-xs">MAPTIS Code</Label>}
-                      <div className="flex gap-1">
-                        <Input
-                          placeholder="Auto-lookup"
-                          value={material.maptis_code}
-                          onChange={(e) => updateMaterial(material.id, 'maptis_code', e.target.value)}
-                          className={material.maptis_code ? 'bg-green-50 border-green-300' : ''}
-                        />
-                      </div>
+                      <Input
+                        placeholder="Auto-lookup"
+                        value={material.maptis_code}
+                        onChange={(e) => updateMaterial(material.id, 'maptis_code', e.target.value)}
+                        className={material.maptis_code ? 'bg-green-50 border-green-300' : ''}
+                      />
                     </div>
                     <div>
                       <Button
@@ -431,7 +695,7 @@ export default function MPPlanGenerator() {
 
                   {/* MAPTIS Suggestions */}
                   {maptisSearchResults[material.id]?.length > 0 && !material.maptis_code && (
-                    <div className="ml-0 sm:ml-0 p-2 bg-blue-50 border border-blue-200 rounded-md">
+                    <div className="ml-0 p-2 bg-blue-50 border border-blue-200 rounded-md">
                       <p className="text-xs text-blue-700 mb-1 flex items-center gap-1">
                         <Search className="h-3 w-3" />
                         Found {maptisSearchResults[material.id].length} MAPTIS match(es):
@@ -466,9 +730,9 @@ export default function MPPlanGenerator() {
             <div className="flex gap-3 pt-4 border-t">
               <Button onClick={handleAddMaterials} disabled={loading}>
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Continue to Analysis
+                Compute Compliance
               </Button>
-              <Button variant="ghost" onClick={() => setStep('setup')}>
+              <Button variant="ghost" onClick={() => setStep('environment')}>
                 Back
               </Button>
             </div>
@@ -476,91 +740,157 @@ export default function MPPlanGenerator() {
         </Card>
       )}
 
-      {/* Step 3: Questions */}
-      {step === 'questions' && session && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Answer Blocking Questions</CardTitle>
-            <CardDescription>
-              The following questions must be answered before generation
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {questions.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <CheckCircle className="h-12 w-12 mx-auto mb-3 text-green-500" />
-                <p>All questions answered!</p>
-                <Button onClick={() => setStep('generate')} className="mt-4">
-                  Continue to Generate
-                </Button>
-              </div>
-            ) : (
-              questions.map((question) => (
-                <Card key={question.question_id} className="border-l-4 border-l-yellow-400">
-                  <CardContent className="pt-4">
-                    <div className="space-y-3">
-                      <div>
-                        <Badge variant="outline" className="mb-2">
-                          {question.question_type}
-                        </Badge>
-                        <p className="font-medium">{question.question_text}</p>
-                        {question.context && (
-                          <p className="text-sm text-muted-foreground mt-1">{question.context}</p>
-                        )}
-                      </div>
+      {/* ================================================================ */}
+      {/* Step 4: Analysis */}
+      {/* ================================================================ */}
+      {step === 'analysis' && session && (
+        <div className="space-y-6">
+          {/* Compute Summary */}
+          {computeResult && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Compliance Analysis
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-3 sm:grid-cols-5">
+                  <div className="text-center p-3 bg-muted rounded-lg">
+                    <div className="text-xl font-bold">{computeResult.materials}</div>
+                    <div className="text-xs text-muted-foreground">Materials</div>
+                  </div>
+                  <div className="text-center p-3 bg-muted rounded-lg">
+                    <div className="text-xl font-bold">{computeResult.environments}</div>
+                    <div className="text-xs text-muted-foreground">Environments</div>
+                  </div>
+                  <div className="text-center p-3 bg-muted rounded-lg">
+                    <div className="text-xl font-bold">{computeResult.determinations}</div>
+                    <div className="text-xs text-muted-foreground">Determinations</div>
+                  </div>
+                  <div className="text-center p-3 bg-muted rounded-lg">
+                    <div className="text-xl font-bold text-red-600">{computeResult.nonconformances}</div>
+                    <div className="text-xs text-muted-foreground">Nonconformances</div>
+                  </div>
+                  <div className="text-center p-3 bg-muted rounded-lg">
+                    <div className="text-xl font-bold text-amber-600">{computeResult.hitl_required}</div>
+                    <div className="text-xs text-muted-foreground">HITL Required</div>
+                  </div>
+                </div>
 
-                      {question.options && question.options.length > 0 ? (
-                        <Select
-                          value={answers[question.question_id] || ''}
-                          onValueChange={(value) =>
-                            setAnswers({ ...answers, [question.question_id]: value })
-                          }
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select an option..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {question.options.map((option) => (
-                              <SelectItem key={option} value={option}>
-                                {option}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        <Input
-                          placeholder="Enter your answer (e.g., MAPTIS code)..."
-                          value={answers[question.question_id] || ''}
-                          onChange={(e) =>
-                            setAnswers({ ...answers, [question.question_id]: e.target.value })
-                          }
-                        />
-                      )}
+                {session.blockers.length > 0 && (
+                  <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p className="text-sm font-medium text-yellow-800">Blockers:</p>
+                    <ul className="text-sm text-yellow-700 list-disc list-inside">
+                      {session.blockers.map((blocker, i) => (
+                        <li key={i}>{blocker}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
-                      <Button
-                        onClick={() => handleSubmitAnswer(question.question_id)}
-                        disabled={loading || !answers[question.question_id]}
-                        size="sm"
-                      >
-                        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Submit Answer
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
+          {/* Blocking Questions */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Blocking Questions</CardTitle>
+              <CardDescription>
+                Answer these questions to resolve compliance gaps and proceed to generation
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {questions.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <CheckCircle className="h-12 w-12 mx-auto mb-3 text-green-500" />
+                  <p className="font-medium">All questions resolved!</p>
+                  {session.can_generate ? (
+                    <Button onClick={() => setStep('generate')} className="mt-4">
+                      Proceed to Generate
+                    </Button>
+                  ) : (
+                    <p className="text-sm mt-2">
+                      Generation is still blocked. Check blockers above.
+                    </p>
+                  )}
+                </div>
+              ) : (
+                questions.map((question) => {
+                  const typeInfo = QUESTION_TYPE_LABELS[question.question_type] || {
+                    label: question.question_type,
+                    color: 'bg-slate-100 text-slate-700',
+                  };
+                  return (
+                    <Card key={question.question_id} className="border-l-4 border-l-yellow-400">
+                      <CardContent className="pt-4">
+                        <div className="space-y-3">
+                          <div>
+                            <Badge className={`mb-2 ${typeInfo.color} border-0`}>
+                              {typeInfo.label}
+                            </Badge>
+                            <p className="font-medium">{question.question_text}</p>
+                            {question.context && (
+                              <p className="text-sm text-muted-foreground mt-1">{question.context}</p>
+                            )}
+                          </div>
 
-            <div className="flex gap-3 pt-4 border-t">
-              <Button variant="ghost" onClick={() => setStep('materials')}>
-                Back to Materials
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+                          {question.options && question.options.length > 0 ? (
+                            <Select
+                              value={answers[question.question_id] || ''}
+                              onValueChange={(value) =>
+                                setAnswers({ ...answers, [question.question_id]: value })
+                              }
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select an option..." />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {question.options.map((option) => (
+                                  <SelectItem key={option} value={option}>
+                                    {option}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : (
+                            <Input
+                              placeholder="Enter your answer..."
+                              value={answers[question.question_id] || ''}
+                              onChange={(e) =>
+                                setAnswers({ ...answers, [question.question_id]: e.target.value })
+                              }
+                            />
+                          )}
+
+                          <Button
+                            onClick={() => handleSubmitAnswer(question.question_id)}
+                            disabled={loading || !answers[question.question_id]}
+                            size="sm"
+                          >
+                            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Submit Answer
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })
+              )}
+            </CardContent>
+          </Card>
+
+          <div className="flex gap-3">
+            <Button variant="ghost" onClick={() => setStep('materials')}>
+              Back to Materials
+            </Button>
+          </div>
+        </div>
       )}
 
-      {/* Step 4: Generate */}
+      {/* ================================================================ */}
+      {/* Step 5: Generate */}
+      {/* ================================================================ */}
       {step === 'generate' && session && (
         <div className="space-y-6">
           {/* Session Summary */}
@@ -575,7 +905,7 @@ export default function MPPlanGenerator() {
                   <div className="text-sm text-muted-foreground">Materials</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-bold">{session.environment_count}</div>
+                  <div className="text-2xl font-bold">{session.environment_count || addedEnvironments.length}</div>
                   <div className="text-sm text-muted-foreground">Environments</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
@@ -618,7 +948,7 @@ export default function MPPlanGenerator() {
                   <FileText className="h-12 w-12 mx-auto mb-3 text-muted-foreground" />
                   <h3 className="font-medium mb-2">Ready to Generate</h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Generate your M&P Plan, MIUL, and Review Packet
+                    Generate your M&P Plan (DOCX) and structured JSON export
                   </p>
                   <Button onClick={handleGenerate} disabled={loading}>
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -668,44 +998,12 @@ export default function MPPlanGenerator() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
-          )}
 
-          {/* Review Packet Preview */}
-          {reviewPacket && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Review Packet Preview</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {reviewPacket.key_findings && (
-                    <div>
-                      <h4 className="font-medium mb-2">Key Findings</h4>
-                      <ul className="text-sm space-y-1">
-                        {(reviewPacket.key_findings as string[]).map((finding, i) => (
-                          <li key={i} className="flex items-start gap-2">
-                            <span className="text-muted-foreground">•</span>
-                            {finding}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {reviewPacket.predicted_questions && (
-                    <div>
-                      <h4 className="font-medium mb-2">Predicted Review Questions</h4>
-                      <ul className="text-sm space-y-2">
-                        {(reviewPacket.predicted_questions as Array<{question: string; answer: string; confidence: string}>).map((q, i) => (
-                          <li key={i} className="border-l-2 border-blue-200 pl-3">
-                            <p className="font-medium">{q.question}</p>
-                            <p className="text-muted-foreground text-xs mt-1">{q.answer}</p>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                <div className="mt-4">
+                  <Button variant="outline" size="sm" onClick={handleExportJson}>
+                    <Download className="mr-2 h-4 w-4" />
+                    Export Full JSON
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -713,19 +1011,7 @@ export default function MPPlanGenerator() {
 
           {/* Start Over */}
           <div className="flex gap-3">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setStep('setup');
-                setSession(null);
-                setMaterials([{ id: '1', name: '', application: '', quantity: 1, maptis_code: '' }]);
-                setQuestions([]);
-                setAnswers({});
-                setArtifacts([]);
-                setReviewPacket(null);
-                setError(null);
-              }}
-            >
+            <Button variant="outline" onClick={resetSession}>
               <RefreshCw className="mr-2 h-4 w-4" />
               Start New Session
             </Button>
@@ -746,7 +1032,7 @@ function StepIndicator({
   currentStep: Step;
   label: string;
 }) {
-  const steps: Step[] = ['setup', 'materials', 'questions', 'generate'];
+  const steps: Step[] = ['setup', 'environment', 'materials', 'analysis', 'generate'];
   const currentIndex = steps.indexOf(currentStep);
   const stepIndex = steps.indexOf(step);
 

@@ -268,23 +268,52 @@ async def get_test_records(
         offset = (page - 1) * per_page
 
         # Fetch records - JOIN via material_code (materialkey stores material_code, not material_key)
-        query = f"""
-            SELECT DISTINCT ON (s.normalized_payload->>%s)
-                s.row_uid as id,
-                s.contract_id,
-                s.normalized_payload->>'materialkey' as material_code,
-                s.normalized_payload,
-                COALESCE(
-                    m.designation,
-                    CONCAT('Material ', s.normalized_payload->>'materialkey')
-                ) as material_designation
-            FROM silver_report_rows s
-            LEFT JOIN materials m ON m.material_code = s.normalized_payload->>'materialkey'
-            WHERE {where_clause}
-            ORDER BY s.normalized_payload->>%s, s.row_uid DESC
-            LIMIT %s OFFSET %s
-        """
-        cursor.execute(query, [test_key_field, *params, test_key_field, per_page, offset])
+        # FC class enrichment: include tested fluid from curated FC table when available.
+        if contract_id == 'fluid_compatibility_report':
+            query = f"""
+                SELECT DISTINCT ON (s.normalized_payload->>%s)
+                    s.row_uid as id,
+                    s.contract_id,
+                    s.normalized_payload->>'materialkey' as material_code,
+                    s.normalized_payload,
+                    COALESCE(
+                        m.designation,
+                        CONCAT('Material ', s.normalized_payload->>'materialkey')
+                    ) as material_designation,
+                    fc_lookup.tested_fluid
+                FROM silver_report_rows s
+                LEFT JOIN materials m ON m.material_code = s.normalized_payload->>'materialkey'
+                LEFT JOIN LATERAL (
+                    SELECT string_agg(DISTINCT fc.media, '; ' ORDER BY fc.media) AS tested_fluid
+                    FROM maptis.fluid_compatibility_tests fc
+                    WHERE (s.normalized_payload->>'materialkey') ~ '^[0-9]+$'
+                      AND fc.material_code = (s.normalized_payload->>'materialkey')::integer
+                      AND NULLIF(BTRIM(s.normalized_payload->>'testreportnumber'), '') IS NOT NULL
+                      AND UPPER(BTRIM(fc.test_report_no)) = UPPER(BTRIM(s.normalized_payload->>'testreportnumber'))
+                ) fc_lookup ON TRUE
+                WHERE {where_clause}
+                ORDER BY s.normalized_payload->>%s, s.row_uid DESC
+                LIMIT %s OFFSET %s
+            """
+            cursor.execute(query, [test_key_field, *params, test_key_field, per_page, offset])
+        else:
+            query = f"""
+                SELECT DISTINCT ON (s.normalized_payload->>%s)
+                    s.row_uid as id,
+                    s.contract_id,
+                    s.normalized_payload->>'materialkey' as material_code,
+                    s.normalized_payload,
+                    COALESCE(
+                        m.designation,
+                        CONCAT('Material ', s.normalized_payload->>'materialkey')
+                    ) as material_designation
+                FROM silver_report_rows s
+                LEFT JOIN materials m ON m.material_code = s.normalized_payload->>'materialkey'
+                WHERE {where_clause}
+                ORDER BY s.normalized_payload->>%s, s.row_uid DESC
+                LIMIT %s OFFSET %s
+            """
+            cursor.execute(query, [test_key_field, *params, test_key_field, per_page, offset])
         rows = cursor.fetchall()
 
         records = []
@@ -297,6 +326,7 @@ async def get_test_records(
                 'test_results': payload,
                 'rating': extract_rating(payload),
                 'contract_id': row['contract_id'],
+                'tested_fluid': row.get('tested_fluid'),
             })
 
         cursor.close()

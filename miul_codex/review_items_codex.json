@@ -1,0 +1,1044 @@
+{
+  "version": "1.1",
+  "extraction_id": "b2e930a5-6cf1-4a8a-a059-f96edbb9c998",
+  "summary": {
+    "total_materials": 95,
+    "total_extractions": 206,
+    "needs_review": 14,
+    "auto_approved": 81
+  },
+  "review_items": [
+    {
+      "item_id": "MER07543-001",
+      "part_number": "MER07543-001",
+      "part_description": "SHAFT SUB-ASSEMBLY, 10 INCH VALVE",
+      "nha": null,
+      "source_file": "MER07540-001.DRW_-.20_RELEASED.pdf",
+      "source_page": 1,
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "fields": {
+        "designation": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "material_spec": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "process_spec": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "uns_code": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "material_form": {
+          "value": null,
+          "confidence": 0.0
+        }
+      },
+      "gaps": [
+        "designation"
+      ],
+      "gap_reasons": [
+        "Sub-assembly - material not specified at assembly level, check detail drawing MER07543-001"
+      ],
+      "evidence": [
+        {
+          "source_location": "MER07540-001.DRW_-.20_RELEASED.pdf p1: EPL_row_find_7",
+          "source_text": "SHAFT SUB-ASSEMBLY, 10 INCH VALVE | (no material shown)",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07540-001.DRW_-.20_RELEASED.pdf p2: EPL",
+          "source_text": "FIND 7: MER07543-001, MATERIAL: (blank)",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07540-001.DRW_-.20_RELEASED.pdf p3: EPL",
+          "source_text": "FIND 7: MER07543-001, MATERIAL: (blank)",
+          "confidence": 1.0
+        }
+      ],
+      "worst_confidence": 0.0,
+      "status": "accepted",
+      "accepted_at": "2026-02-09T19:42:40.930301+00:00",
+      "accepted_by": "engineer",
+      "accept_reason": ""
+    },
+    {
+      "item_id": "MER07570-001",
+      "part_number": "MER07570-001",
+      "part_description": "ACTUATOR ASSEMBLY, 10 INCH VALVE",
+      "nha": null,
+      "source_file": "MER07540-001.DRW_-.20_RELEASED.pdf",
+      "source_page": 1,
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "fields": {
+        "designation": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "material_spec": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "process_spec": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "uns_code": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "material_form": {
+          "value": null,
+          "confidence": 0.0
+        }
+      },
+      "gaps": [
+        "designation"
+      ],
+      "gap_reasons": [
+        "Assembly - material not specified at assembly level, check detail drawing MER07570-001"
+      ],
+      "evidence": [
+        {
+          "source_location": "MER07540-001.DRW_-.20_RELEASED.pdf p1: EPL_row_find_9",
+          "source_text": "ACTUATOR ASSEMBLY, 10 INCH VALVE | (no material shown)",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07540-001.DRW_-.20_RELEASED.pdf p2: EPL",
+          "source_text": "FIND 9: MER07570-001, MATERIAL: (blank)",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07540-001.DRW_-.20_RELEASED.pdf p3: EPL",
+          "source_text": "FIND 9: MER07570-001, MATERIAL: (blank)",
+          "confidence": 1.0
+        }
+      ],
+      "worst_confidence": 0.0,
+      "status": "accepted",
+      "accepted_at": "2026-02-09T19:42:42.695970+00:00",
+      "accepted_by": "engineer",
+      "accept_reason": ""
+    },
+    {
+      "item_id": "MER07540-003",
+      "part_number": "MER07540-003",
+      "part_description": "CONNECTING ROD ASSEMBLY",
+      "nha": null,
+      "source_file": "MER07540-001.DRW_-.20_RELEASED.pdf",
+      "source_page": 1,
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p1",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p2",
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "fields": {
+        "designation": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "material_spec": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "process_spec": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "uns_code": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "material_form": {
+          "value": null,
+          "confidence": 0.0
+        }
+      },
+      "gaps": [
+        "designation"
+      ],
+      "gap_reasons": [
+        "Assembly - material not specified at assembly level, check detail drawing MER07540-003"
+      ],
+      "evidence": [
+        {
+          "source_location": "MER07540-001.DRW_-.20_RELEASED.pdf p1: EPL_row_find_12",
+          "source_text": "CONNECTING ROD ASSEMBLY | (no material shown)",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07540-001.DRW_-.20_RELEASED.pdf p2: EPL",
+          "source_text": "FIND 12: MER07540-003, MATERIAL: (blank)",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07540-001.DRW_-.20_RELEASED.pdf p3: EPL",
+          "source_text": "FIND 12: MER07540-003, MATERIAL: (blank)",
+          "confidence": 1.0
+        }
+      ],
+      "worst_confidence": 0.0,
+      "status": "accepted",
+      "accepted_at": "2026-02-09T19:42:44.200592+00:00",
+      "accepted_by": "engineer",
+      "accept_reason": ""
+    },
+    {
+      "item_id": "5.",
+      "part_number": "5.",
+      "part_description": "LUBRICANT, LOX COMPATABLE",
+      "nha": null,
+      "source_file": "MER07540-001.DRW_-.20_RELEASED.pdf",
+      "source_page": 3,
+      "source_pages": [
+        "MER07540-001.DRW_-.20_RELEASED.pdf p3"
+      ],
+      "fields": {
+        "designation": {
+          "value": "Lubricant lox compatable",
+          "confidence": 1.0,
+          "corrected_by": "engineer"
+        },
+        "material_spec": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "process_spec": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "uns_code": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "material_form": {
+          "value": null,
+          "confidence": 0.0
+        }
+      },
+      "gaps": [
+        "designation",
+        "material_spec",
+        "process_spec",
+        "material_form"
+      ],
+      "gap_reasons": [
+        "Consumable lubricant - material spec not provided in EPL, likely specified in assembly notes"
+      ],
+      "evidence": [
+        {
+          "source_location": "MER07540-001.DRW_-.20_RELEASED.pdf p3: EPL",
+          "source_text": "FIND 19: 5., MATERIAL: (blank), QTY: AR",
+          "confidence": 0.8
+        }
+      ],
+      "worst_confidence": 0.0,
+      "status": "corrected",
+      "corrected_at": "2026-02-09T19:43:05.886245+00:00",
+      "corrected_by": "engineer"
+    },
+    {
+      "item_id": "MER07540-ICD",
+      "part_number": "MER07540-ICD",
+      "part_description": "INTERFACE CONTROL DRAWING, 10 INCH VALVE",
+      "nha": null,
+      "source_file": "MER07540-ICD.DRW_-.5_REWORK.pdf",
+      "source_page": 1,
+      "source_pages": [
+        "MER07540-ICD.DRW_-.5_REWORK.pdf p1"
+      ],
+      "fields": {
+        "designation": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "material_spec": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "process_spec": {
+          "value": "CLEAN AND MAINTAIN PER IEST-STD-CC1246L, LEVEL VC-0.5-1000",
+          "confidence": 1.0
+        },
+        "uns_code": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "material_form": {
+          "value": null,
+          "confidence": 0.0
+        }
+      },
+      "gaps": [
+        "designation",
+        "material_spec",
+        "material_form"
+      ],
+      "gap_reasons": [
+        "No material designation found - this is an interface control drawing (ICD) which typically does not specify materials as it defines interfaces between components",
+        "No material specification found - ICD documents interface requirements, not material requirements",
+        "No material form found - ICD does not specify material form"
+      ],
+      "evidence": [
+        {
+          "source_location": "MER07540-ICD.DRW_-.5_REWORK.pdf p1: title_block",
+          "source_text": "DRAWING NUMBER: MER07540-ICD, TITLE: INTERFACE CONTROL DRAWING, 10 INCH VALVE",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07540-ICD.DRW_-.5_REWORK.pdf p1: notes",
+          "source_text": "3. CLEAN AND MAINTAIN PER IEST-STD-CC1246L, LEVEL VC-0.5-1000.",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07540-ICD.DRW_-.5_REWORK.pdf p1: title_block_process_spec",
+          "source_text": "CLEAN AND MAINTAIN PER IEST-STD-CC1246, LEVEL VC-0.5-1000; AS568-450 HEAT TREATMENT",
+          "confidence": 1.0
+        }
+      ],
+      "worst_confidence": 0.0,
+      "status": "accepted",
+      "accepted_at": "2026-02-09T19:43:15.512665+00:00",
+      "accepted_by": "engineer",
+      "accept_reason": ""
+    },
+    {
+      "item_id": "MER07560-001",
+      "part_number": "MER07560-001",
+      "part_description": "VALVE BODY SUB-ASSEMBLY, 10 INCH VALVE",
+      "nha": null,
+      "source_file": "MER07543-001.DRW_-.23_RELEASED.pdf",
+      "source_page": 2,
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "fields": {
+        "designation": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "material_spec": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "process_spec": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "uns_code": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "material_form": {
+          "value": null,
+          "confidence": 0.0
+        }
+      },
+      "gaps": [
+        "designation",
+        "material_spec",
+        "process_spec",
+        "material_form"
+      ],
+      "gap_reasons": [
+        "Sub-assembly - material data on component drawing MER07560-001"
+      ],
+      "evidence": [
+        {
+          "source_location": "MER07543-001.DRW_-.23_RELEASED.pdf p2: EPL",
+          "source_text": "FIND 1: MER07560-001, VALVE BODY SUB-ASSEMBLY, 10 INCH VALVE",
+          "confidence": 1.0
+        }
+      ],
+      "worst_confidence": 0.0,
+      "status": "accepted",
+      "accepted_at": "2026-02-09T19:43:20.161744+00:00",
+      "accepted_by": "engineer",
+      "accept_reason": ""
+    },
+    {
+      "item_id": "MER07565-001",
+      "part_number": "MER07565-001",
+      "part_description": "SHAFT, OFFSET, SUB-ASSEMBLY, 10 INCH VALVE",
+      "nha": null,
+      "source_file": "MER07543-001.DRW_-.23_RELEASED.pdf",
+      "source_page": 2,
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "fields": {
+        "designation": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "material_spec": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "process_spec": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "uns_code": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "material_form": {
+          "value": null,
+          "confidence": 0.0
+        }
+      },
+      "gaps": [
+        "designation",
+        "material_spec",
+        "process_spec",
+        "material_form"
+      ],
+      "gap_reasons": [
+        "Sub-assembly - material data on component drawing MER07565-001"
+      ],
+      "evidence": [
+        {
+          "source_location": "MER07543-001.DRW_-.23_RELEASED.pdf p2: EPL",
+          "source_text": "FIND 2: MER07565-001, SHAFT, OFFSET, SUB-ASSEMBLY, 10 INCH VALVE",
+          "confidence": 1.0
+        }
+      ],
+      "worst_confidence": 0.0,
+      "status": "accepted",
+      "accepted_at": "2026-02-09T19:43:22.162508+00:00",
+      "accepted_by": "engineer",
+      "accept_reason": ""
+    },
+    {
+      "item_id": "MER07584-001",
+      "part_number": "MER07584-001",
+      "part_description": "POPPET SUB-ASSEMBLY, 10 INCH VALVE",
+      "nha": null,
+      "source_file": "MER07543-001.DRW_-.23_RELEASED.pdf",
+      "source_page": 2,
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2",
+        "MER07584-001.DRW_-.17_RELEASED.pdf p1"
+      ],
+      "fields": {
+        "designation": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "material_spec": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "process_spec": {
+          "value": "CLEAN AND MAINTAIN TO IEST-STD-CC1246E, LEVEL VC-0.5-1000",
+          "confidence": 1.0
+        },
+        "uns_code": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "material_form": {
+          "value": null,
+          "confidence": 0.0
+        }
+      },
+      "gaps": [
+        "designation"
+      ],
+      "gap_reasons": [
+        "Sub-assembly - material data on component drawing MER07584-001"
+      ],
+      "evidence": [
+        {
+          "source_location": "MER07543-001.DRW_-.23_RELEASED.pdf p2: EPL",
+          "source_text": "FIND 24: MER07584-001, POPPET SUB-ASSEMBLY, 10 INCH VALVE",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07584-001.DRW_-.17_RELEASED.pdf p1: title_block",
+          "source_text": "MER07584-001, POPPET SUB-ASSEMBLY, 10 INCH",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07584-001.DRW_-.17_RELEASED.pdf p1: note_3",
+          "source_text": "3. CLEAN AND MAINTAIN TO IEST-STD-CC1246E, LEVEL VC-0.5-1000.",
+          "confidence": 1.0
+        }
+      ],
+      "worst_confidence": 0.0,
+      "status": "accepted",
+      "accepted_at": "2026-02-09T19:43:23.704694+00:00",
+      "accepted_by": "engineer",
+      "accept_reason": ""
+    },
+    {
+      "item_id": "6.",
+      "part_number": "6.",
+      "part_description": "LUBRICANT, LOX COMPATABLE",
+      "nha": null,
+      "source_file": "MER07543-001.DRW_-.23_RELEASED.pdf",
+      "source_page": 2,
+      "source_pages": [
+        "MER07543-001.DRW_-.23_RELEASED.pdf p2"
+      ],
+      "fields": {
+        "designation": {
+          "value": "LUBRICANT, LOX COMPATABLE",
+          "confidence": 1.0,
+          "corrected_by": "engineer"
+        },
+        "material_spec": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "process_spec": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "uns_code": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "material_form": {
+          "value": null,
+          "confidence": 0.0
+        }
+      },
+      "gaps": [
+        "designation",
+        "material_spec",
+        "process_spec",
+        "material_form"
+      ],
+      "gap_reasons": [
+        "Consumable lubricant - specification likely in notes or separate document"
+      ],
+      "evidence": [
+        {
+          "source_location": "MER07543-001.DRW_-.23_RELEASED.pdf p2: EPL",
+          "source_text": "FIND 26: 6., LUBRICANT, LOX COMPATABLE, QTY: AR",
+          "confidence": 1.0
+        }
+      ],
+      "worst_confidence": 0.0,
+      "status": "corrected",
+      "corrected_at": "2026-02-09T19:43:36.505536+00:00",
+      "corrected_by": "engineer"
+    },
+    {
+      "item_id": "AS933K04",
+      "part_number": "AS933K04",
+      "part_description": "FITTING, ADAPTER, UNION, FLARED TO BOSS, .25 NOM DIA PORT",
+      "nha": null,
+      "source_file": "MER07570-001.DRW_-.17_RELEASED.pdf",
+      "source_page": 1,
+      "source_pages": [
+        "MER07570-001.DRW_-.17_RELEASED.pdf p1"
+      ],
+      "fields": {
+        "designation": {
+          "value": "need material for this",
+          "confidence": 1.0,
+          "corrected_by": "engineer"
+        },
+        "material_spec": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "process_spec": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "uns_code": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "material_form": {
+          "value": null,
+          "confidence": 0.0
+        }
+      },
+      "gaps": [
+        "designation",
+        "material_spec",
+        "process_spec",
+        "material_form"
+      ],
+      "gap_reasons": [
+        "Alternate part - material not specified in EPL, covered by AS standard"
+      ],
+      "evidence": [
+        {
+          "source_location": "MER07570-001.DRW_-.17_RELEASED.pdf p1: EPL",
+          "source_text": "ALT 8 AS933K04 FITTING, ADAPTER, UNION, FLARED TO BOSS, .25 NOM DIA PORT",
+          "confidence": 1.0
+        }
+      ],
+      "worst_confidence": 0.0,
+      "status": "corrected",
+      "corrected_at": "2026-02-09T19:44:08.100973+00:00",
+      "corrected_by": "engineer"
+    },
+    {
+      "item_id": "MER07576-001",
+      "part_number": "MER07576-001",
+      "part_description": "ACTUATOR INTERNAL WELD ASSEMBLY",
+      "nha": null,
+      "source_file": "MER07573-001.DRW_-.12_RELEASED.pdf",
+      "source_page": 1,
+      "source_pages": [
+        "MER07573-001.DRW_-.12_RELEASED.pdf p1",
+        "MER07576.DRW_-.6_RELEASED.pdf p1"
+      ],
+      "fields": {
+        "designation": {
+          "value": "need material for this",
+          "confidence": 1.0,
+          "corrected_by": "engineer"
+        },
+        "material_spec": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "process_spec": {
+          "value": "WELD PER MSFC-SPEC-3679, CLASS B",
+          "confidence": 1.0
+        },
+        "uns_code": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "material_form": {
+          "value": null,
+          "confidence": 0.0
+        }
+      },
+      "gaps": [
+        "designation",
+        "material_spec",
+        "material_form"
+      ],
+      "gap_reasons": [
+        "Assembly part - material designation not applicable (composed of multiple materials)",
+        "Assembly part - material specification not applicable",
+        "Assembly part - material form not applicable"
+      ],
+      "evidence": [
+        {
+          "source_location": "MER07573-001.DRW_-.12_RELEASED.pdf p1: EPL_table",
+          "source_text": "FIND 5: MER07576-001, 339B2, ACTUATOR INTERNAL WELD ASSEMBLY",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07573-001.DRW_-.12_RELEASED.pdf p1: notes",
+          "source_text": "5. WELD PER MSFC-SPEC-3679, CLASS B.",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p1: TITLE_BLOCK",
+          "source_text": "MER07576-001, HEAT TREATMENT STRESS Kelsay Neely 2026-01-13",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p1: NOTE 5",
+          "source_text": "WELD PER MSFC-SPEC-3679, CLASS B",
+          "confidence": 1.0
+        }
+      ],
+      "worst_confidence": 0.0,
+      "status": "corrected",
+      "corrected_at": "2026-02-09T19:44:37.182837+00:00",
+      "corrected_by": "engineer"
+    },
+    {
+      "item_id": "MER07576-007",
+      "part_number": "MER07576-007",
+      "part_description": "ACTUATOR INTERNAL WELD ASSEMBLY",
+      "nha": null,
+      "source_file": "MER07576.DRW_-.6_RELEASED.pdf",
+      "source_page": 1,
+      "source_pages": [
+        "MER07576.DRW_-.6_RELEASED.pdf p1",
+        "MER07576.DRW_-.6_RELEASED.pdf p2",
+        "MER07576.DRW_-.6_RELEASED.pdf p3",
+        "MER07576.DRW_-.6_RELEASED.pdf p4"
+      ],
+      "fields": {
+        "designation": {
+          "value": "need material for this",
+          "confidence": 1.0,
+          "corrected_by": "engineer"
+        },
+        "material_spec": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "process_spec": {
+          "value": "WELD PER MSFC-SPEC-3679, CLASS B",
+          "confidence": 1.0
+        },
+        "uns_code": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "material_form": {
+          "value": null,
+          "confidence": 0.0
+        }
+      },
+      "gaps": [
+        "designation",
+        "material_spec",
+        "material_form"
+      ],
+      "gap_reasons": [
+        "Assembly - material designation not applicable",
+        "Assembly - material spec not applicable",
+        "Assembly - material form not applicable"
+      ],
+      "evidence": [
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p1: EPL",
+          "source_text": "FIND 3: MER07576-007, 339B2, ACTUATOR INTERNAL WELD ASSEMBLY",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p1: NOTE 5",
+          "source_text": "WELD PER MSFC-SPEC-3679, CLASS B",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p2: EPL_table",
+          "source_text": "3 MER07576-007 339B2 ACTUATOR INTERNAL WELD ASSEMBLY",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p2: title_block_process_spec",
+          "source_text": "WELD PER MSFC-SPEC-3679, CLASS B",
+          "confidence": 0.8
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p3: EPL_table",
+          "source_text": "3 MER07576-007 339B2 ACTUATOR INTERNAL WELD ASSEMBLY",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p3: title_block_notes",
+          "source_text": "WELD PER MSFC-SPEC-3679, CLASS B",
+          "confidence": 0.8
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p4: EPL table",
+          "source_text": "3 MER07576-007 339B2 ACTUATOR INTERNAL WELD ASSEMBLY",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p4: Title block process spec field",
+          "source_text": "WELD PER MSFC-SPEC-3679, CLASS B",
+          "confidence": 1.0
+        }
+      ],
+      "worst_confidence": 0.0,
+      "status": "corrected",
+      "corrected_at": "2026-02-09T19:44:46.107545+00:00",
+      "corrected_by": "engineer"
+    },
+    {
+      "item_id": "MER07576-005",
+      "part_number": "MER07576-005",
+      "part_description": "ACTUATOR INTERNAL WELD ASSEMBLY",
+      "nha": null,
+      "source_file": "MER07576.DRW_-.6_RELEASED.pdf",
+      "source_page": 1,
+      "source_pages": [
+        "MER07576.DRW_-.6_RELEASED.pdf p1",
+        "MER07576.DRW_-.6_RELEASED.pdf p2",
+        "MER07576.DRW_-.6_RELEASED.pdf p3",
+        "MER07576.DRW_-.6_RELEASED.pdf p4"
+      ],
+      "fields": {
+        "designation": {
+          "value": "need material for this",
+          "confidence": 1.0,
+          "corrected_by": "engineer"
+        },
+        "material_spec": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "process_spec": {
+          "value": "WELD PER MSFC-SPEC-3679, CLASS B",
+          "confidence": 1.0
+        },
+        "uns_code": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "material_form": {
+          "value": null,
+          "confidence": 0.0
+        }
+      },
+      "gaps": [
+        "designation",
+        "material_spec",
+        "material_form"
+      ],
+      "gap_reasons": [
+        "Assembly - material designation not applicable",
+        "Assembly - material spec not applicable",
+        "Assembly - material form not applicable"
+      ],
+      "evidence": [
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p1: EPL",
+          "source_text": "FIND 5: MER07576-005, 339B2, ACTUATOR INTERNAL WELD ASSEMBLY",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p1: NOTE 5",
+          "source_text": "WELD PER MSFC-SPEC-3679, CLASS B",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p2: EPL_table",
+          "source_text": "5 MER07576-005 339B2 ACTUATOR INTERNAL WELD ASSEMBLY",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p2: title_block_process_spec",
+          "source_text": "WELD PER MSFC-SPEC-3679, CLASS B",
+          "confidence": 0.8
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p3: EPL_table",
+          "source_text": "5 MER07576-005 339B2 ACTUATOR INTERNAL WELD ASSEMBLY",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p3: drawing_number",
+          "source_text": "MER07576-005",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p3: title_block_notes",
+          "source_text": "WELD PER MSFC-SPEC-3679, CLASS B",
+          "confidence": 0.8
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p4: EPL table",
+          "source_text": "5 MER07576-005 339B2 ACTUATOR INTERNAL WELD ASSEMBLY",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p4: Title block process spec field",
+          "source_text": "WELD PER MSFC-SPEC-3679, CLASS B",
+          "confidence": 1.0
+        }
+      ],
+      "worst_confidence": 0.0,
+      "status": "corrected",
+      "corrected_at": "2026-02-09T19:44:57.133214+00:00",
+      "corrected_by": "engineer"
+    },
+    {
+      "item_id": "MER07576-003",
+      "part_number": "MER07576-003",
+      "part_description": "ACTUATOR INTERNAL WELD ASSEMBLY",
+      "nha": null,
+      "source_file": "MER07576.DRW_-.6_RELEASED.pdf",
+      "source_page": 1,
+      "source_pages": [
+        "MER07576.DRW_-.6_RELEASED.pdf p1",
+        "MER07576.DRW_-.6_RELEASED.pdf p2",
+        "MER07576.DRW_-.6_RELEASED.pdf p3",
+        "MER07576.DRW_-.6_RELEASED.pdf p4"
+      ],
+      "fields": {
+        "designation": {
+          "value": "need material for this",
+          "confidence": 1.0,
+          "corrected_by": "engineer"
+        },
+        "material_spec": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "process_spec": {
+          "value": "WELD PER MSFC-SPEC-3679, CLASS B",
+          "confidence": 1.0
+        },
+        "uns_code": {
+          "value": null,
+          "confidence": 0.0
+        },
+        "material_form": {
+          "value": null,
+          "confidence": 0.0
+        }
+      },
+      "gaps": [
+        "designation",
+        "material_spec",
+        "material_form"
+      ],
+      "gap_reasons": [
+        "Assembly - material designation not applicable",
+        "Assembly - material spec not applicable",
+        "Assembly - material form not applicable"
+      ],
+      "evidence": [
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p1: EPL",
+          "source_text": "FIND 7: MER07576-003, 339B2, ACTUATOR INTERNAL WELD ASSEMBLY",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p1: NOTE 5",
+          "source_text": "WELD PER MSFC-SPEC-3679, CLASS B",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p2: EPL_table",
+          "source_text": "7 MER07576-003 339B2 ACTUATOR INTERNAL WELD ASSEMBLY",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p2: title_block_process_spec",
+          "source_text": "WELD PER MSFC-SPEC-3679, CLASS B",
+          "confidence": 0.8
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p2: drawing_view",
+          "source_text": "MER07576-003 shown in main assembly view",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p3: EPL_table",
+          "source_text": "7 MER07576-003 339B2 ACTUATOR INTERNAL WELD ASSEMBLY",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p3: title_block_notes",
+          "source_text": "WELD PER MSFC-SPEC-3679, CLASS B",
+          "confidence": 0.8
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p4: EPL table",
+          "source_text": "7 MER07576-003 339B2 ACTUATOR INTERNAL WELD ASSEMBLY",
+          "confidence": 1.0
+        },
+        {
+          "source_location": "MER07576.DRW_-.6_RELEASED.pdf p4: Title block process spec field",
+          "source_text": "WELD PER MSFC-SPEC-3679, CLASS B",
+          "confidence": 1.0
+        }
+      ],
+      "worst_confidence": 0.0,
+      "status": "corrected",
+      "corrected_at": "2026-02-09T19:45:08.135281+00:00",
+      "corrected_by": "engineer"
+    }
+  ],
+  "auto_approved_parts": [
+    "MER07571-001",
+    "01-885-06K",
+    "11-885-06K",
+    "M81935/3-6C",
+    "MS14198N6",
+    "NAS509-6C",
+    "NAS509L6C",
+    "MS9390-440",
+    "MER07550-001",
+    "WSM-137-C86",
+    "NAS6706U13",
+    "MS21043-6",
+    "NAS1351N4-20",
+    "NAS1352N5-12",
+    "NAS1149E0432R",
+    "NAS1149E0516R",
+    "MS20995N32",
+    "WSM-137-C86 10.",
+    "51109",
+    "MER07557-001",
+    "6915",
+    "6824",
+    "MER07558-001",
+    "MER07559-001",
+    "MER07556-001",
+    "MER07554-001",
+    "MER07555-001",
+    "M12133/2-255",
+    "MER07553-001",
+    "16007",
+    "WHM-244-S86 10.",
+    "MER07546-001",
+    "M12133/2-100",
+    "97022A388",
+    "MER07545-001",
+    "NAS1352N4-12",
+    "NAS1352N4-14",
+    "2949T32",
+    "NAS1351N4H16",
+    "NAS509-4C",
+    "NASM20995N32",
+    "MER07548-001",
+    "MER07563-001",
+    "MER07562-001",
+    "MER07561-001",
+    "MER07569-001",
+    "ASME B18.3, ASTM F879",
+    "NAS1352N5-16",
+    "LUBRICANT",
+    "MER07564-001",
+    "MS21209C4-10",
+    "MS21209C4-15",
+    "MS21209C5-15",
+    "MS21209C6-20",
+    "MER07567-001",
+    "MER07566-001",
+    "NAS1352N4-10",
+    "LUBRICANT_LOX_COMPATIBLE",
+    "MER07568-001",
+    "MS21209C1610",
+    "MER07573-001",
+    "MER07572-001",
+    "AS4307K04",
+    "F-400521-04",
+    "MER07574-001",
+    "MER07578-001",
+    "MER07579-001",
+    "MER07580-001",
+    "EH-22-C86",
+    "MER07581-001",
+    "MER07582-001",
+    "MER07583-001",
+    "MER07577-001",
+    "MER07583-003",
+    "MER07584-003",
+    "50854SCS",
+    "WHM-275-S86",
+    "MER07585-001",
+    "MER07586-001",
+    "MER07588-001",
+    "MER07587-001"
+  ],
+  "status": "approved",
+  "approved_at": "2026-02-09T19:45:11.014979+00:00",
+  "approved_by": "engineer"
+}

@@ -30,8 +30,10 @@ from .ui_endpoints import router as ui_router
 from .test_classes import router as test_classes_router
 from .compliance import router as compliance_router
 from .mp_plan import router as mp_plan_router
+from .mp_plan_v2_codex import router as mp_plan_v2_codex_router
 from .o2 import router as o2_router
 from .mira_v4 import router as mira_v4_router
+from .mua_v7 import router as mua_v7_router
 import uuid
 
 __all__ = [
@@ -47,8 +49,10 @@ __all__ = [
     "test_classes_router",
     "compliance_router",
     "mp_plan_router",
+    "mp_plan_v2_codex_router",
     "o2_router",
     "mira_v4_router",
+    "mua_v7_router",
 ]
 
 

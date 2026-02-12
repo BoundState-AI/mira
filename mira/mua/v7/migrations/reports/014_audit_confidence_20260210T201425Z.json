@@ -1,0 +1,18 @@
+{
+  "timestamp_utc": "2026-02-10T20:14:25.653474+00:00",
+  "audit_csv": "C:\\BoundState\\mira\\mua\\v7\\migrations\\reports\\013_pdf_audit_sample_20260210T201414Z.csv",
+  "population_size": 5650,
+  "confidence": 0.95,
+  "target_max_defect": 0.05,
+  "target_margin": 0.05,
+  "rows_in_csv": 360,
+  "rows_scored": 0,
+  "passes": 0,
+  "fails": 0,
+  "observed_defect_rate": 0.0,
+  "wilson_lower": 0.0,
+  "wilson_upper": 1.0,
+  "meets_target": false,
+  "recommended_required_n": 360,
+  "recommended_additional_n": 360
+}

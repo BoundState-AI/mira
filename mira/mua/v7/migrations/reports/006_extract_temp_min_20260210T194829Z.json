@@ -1,0 +1,612 @@
+{
+  "mode": "DRY_RUN",
+  "timestamp_utc": "2026-02-10T19:48:29.378128+00:00",
+  "rows_scanned": 5650,
+  "updates_count": 5072,
+  "method_counts": {
+    "join_bok_normalized": 4923,
+    "regex_text_parse": 149
+  },
+  "sample_updates": [
+    {
+      "row_id": 5001,
+      "source_file": "1000-0003.pdf",
+      "temp_min_f": -60.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5002,
+      "source_file": "1000-0005.pdf",
+      "temp_min_f": -60.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5003,
+      "source_file": "1000-0006.pdf",
+      "temp_min_f": -58.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5004,
+      "source_file": "1000-0012.pdf",
+      "temp_min_f": 3.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5005,
+      "source_file": "1000-0013.pdf",
+      "temp_min_f": 3.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5006,
+      "source_file": "1000-0014.pdf",
+      "temp_min_f": 3.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5007,
+      "source_file": "1001-0002.pdf",
+      "temp_min_f": -150.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5008,
+      "source_file": "1001-0003.pdf",
+      "temp_min_f": 65.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5009,
+      "source_file": "1001-0004.pdf",
+      "temp_min_f": 70.0,
+      "method": "regex_text_parse"
+    },
+    {
+      "row_id": 5010,
+      "source_file": "1001-0005.pdf",
+      "temp_min_f": -150.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5011,
+      "source_file": "1001-0006.pdf",
+      "temp_min_f": -150.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5012,
+      "source_file": "1001-0007.pdf",
+      "temp_min_f": -150.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5013,
+      "source_file": "1001-0008.pdf",
+      "temp_min_f": -150.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5015,
+      "source_file": "1001-0010.pdf",
+      "temp_min_f": -150.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5016,
+      "source_file": "1001-0029.pdf",
+      "temp_min_f": -60.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5017,
+      "source_file": "1001-0030.pdf",
+      "temp_min_f": -60.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5018,
+      "source_file": "1001-0032.pdf",
+      "temp_min_f": -180.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5019,
+      "source_file": "1001-0034.pdf",
+      "temp_min_f": -150.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5020,
+      "source_file": "1001-0035.pdf",
+      "temp_min_f": -150.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5021,
+      "source_file": "1001-0036.pdf",
+      "temp_min_f": 0.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5022,
+      "source_file": "1001-0037.pdf",
+      "temp_min_f": -10.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5023,
+      "source_file": "1001-0038.pdf",
+      "temp_min_f": -60.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5024,
+      "source_file": "1001-0042.pdf",
+      "temp_min_f": -150.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5025,
+      "source_file": "1001-0043.pdf",
+      "temp_min_f": -180.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5026,
+      "source_file": "1001-0044.pdf",
+      "temp_min_f": -100.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5027,
+      "source_file": "1001-0045.pdf",
+      "temp_min_f": -100.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5028,
+      "source_file": "1001-0047.pdf",
+      "temp_min_f": -150.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5029,
+      "source_file": "1001-0048.pdf",
+      "temp_min_f": -67.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5030,
+      "source_file": "1001-0049.pdf",
+      "temp_min_f": 65.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5031,
+      "source_file": "1001-0056.pdf",
+      "temp_min_f": -60.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5032,
+      "source_file": "1001-0069.pdf",
+      "temp_min_f": -50.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5033,
+      "source_file": "1001-0073.pdf",
+      "temp_min_f": -200.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5034,
+      "source_file": "1001-0084.pdf",
+      "temp_min_f": -6.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5035,
+      "source_file": "1001-0089.pdf",
+      "temp_min_f": -67.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5036,
+      "source_file": "1001-0093.pdf",
+      "temp_min_f": -60.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5037,
+      "source_file": "1001-0094.pdf",
+      "temp_min_f": -40.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5038,
+      "source_file": "1001-0108.pdf",
+      "temp_min_f": 5.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5039,
+      "source_file": "1001-0109.pdf",
+      "temp_min_f": -60.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5040,
+      "source_file": "1001-0111.pdf",
+      "temp_min_f": -60.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5041,
+      "source_file": "1001-0128.pdf",
+      "temp_min_f": -150.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5042,
+      "source_file": "1001-0131.pdf",
+      "temp_min_f": -60.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5043,
+      "source_file": "1001-0141.pdf",
+      "temp_min_f": -60.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5044,
+      "source_file": "1001-0150.pdf",
+      "temp_min_f": 40.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5045,
+      "source_file": "1001-0151.pdf",
+      "temp_min_f": -180.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5046,
+      "source_file": "1001-0152.pdf",
+      "temp_min_f": 1.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5047,
+      "source_file": "1001-0158.pdf",
+      "temp_min_f": -60.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5048,
+      "source_file": "1001-0163.pdf",
+      "temp_min_f": -250.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5049,
+      "source_file": "1001-2203.pdf",
+      "temp_min_f": -60.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5050,
+      "source_file": "1001-2206.pdf",
+      "temp_min_f": -60.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5051,
+      "source_file": "1001-2210.pdf",
+      "temp_min_f": -6.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5052,
+      "source_file": "1001-2212.pdf",
+      "temp_min_f": -60.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5053,
+      "source_file": "1001-2216.pdf",
+      "temp_min_f": -300.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5054,
+      "source_file": "1001-2217.pdf",
+      "temp_min_f": -65.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5055,
+      "source_file": "1001-2223.pdf",
+      "temp_min_f": -360.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5056,
+      "source_file": "1001-2226.pdf",
+      "temp_min_f": 40.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5057,
+      "source_file": "1001-2236.pdf",
+      "temp_min_f": 40.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5058,
+      "source_file": "1001-2237.pdf",
+      "temp_min_f": -60.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5059,
+      "source_file": "1001-2240.pdf",
+      "temp_min_f": 40.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5060,
+      "source_file": "1001-2247.pdf",
+      "temp_min_f": -45.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5061,
+      "source_file": "1001-2248.pdf",
+      "temp_min_f": -180.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5062,
+      "source_file": "1001-2249.pdf",
+      "temp_min_f": 10.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5063,
+      "source_file": "1001-2250.pdf",
+      "temp_min_f": 10.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5064,
+      "source_file": "1001-2252.pdf",
+      "temp_min_f": -65.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5065,
+      "source_file": "1001-2253.pdf",
+      "temp_min_f": 65.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5066,
+      "source_file": "1001-2254.pdf",
+      "temp_min_f": -180.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5067,
+      "source_file": "1001-2256.pdf",
+      "temp_min_f": -25.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5068,
+      "source_file": "1001-2257.pdf",
+      "temp_min_f": -60.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5069,
+      "source_file": "1001-2258.pdf",
+      "temp_min_f": -250.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5070,
+      "source_file": "1001-2266.pdf",
+      "temp_min_f": 0.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5071,
+      "source_file": "1001-2268.pdf",
+      "temp_min_f": 65.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5072,
+      "source_file": "1001-2269.pdf",
+      "temp_min_f": 65.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5073,
+      "source_file": "1001-2272.pdf",
+      "temp_min_f": 65.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5074,
+      "source_file": "1001-2276.pdf",
+      "temp_min_f": 1.0,
+      "method": "regex_text_parse"
+    },
+    {
+      "row_id": 5075,
+      "source_file": "1001-2277.pdf",
+      "temp_min_f": -67.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5076,
+      "source_file": "1001-2278.pdf",
+      "temp_min_f": -67.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5077,
+      "source_file": "1001-2286.pdf",
+      "temp_min_f": 150.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5078,
+      "source_file": "1001-2287.pdf",
+      "temp_min_f": 10.0,
+      "method": "regex_text_parse"
+    },
+    {
+      "row_id": 5079,
+      "source_file": "1001-2290.pdf",
+      "temp_min_f": -40.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5080,
+      "source_file": "1001-2291.pdf",
+      "temp_min_f": -60.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5081,
+      "source_file": "1001-2293.pdf",
+      "temp_min_f": 0.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5082,
+      "source_file": "1001-2296.pdf",
+      "temp_min_f": -67.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5083,
+      "source_file": "1001-2297.pdf",
+      "temp_min_f": 55.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5084,
+      "source_file": "1001-2300.pdf",
+      "temp_min_f": 65.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5085,
+      "source_file": "1001-2301.pdf",
+      "temp_min_f": -60.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5087,
+      "source_file": "1001-2304.pdf",
+      "temp_min_f": -423.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5088,
+      "source_file": "1001-2305.pdf",
+      "temp_min_f": -60.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5089,
+      "source_file": "1001-2306.pdf",
+      "temp_min_f": 0.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5090,
+      "source_file": "1001-2307.pdf",
+      "temp_min_f": 40.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5091,
+      "source_file": "1001-2311.pdf",
+      "temp_min_f": -60.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5092,
+      "source_file": "1001-2322.pdf",
+      "temp_min_f": -250.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5093,
+      "source_file": "1001-2323.pdf",
+      "temp_min_f": -50.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5094,
+      "source_file": "1001-2324.pdf",
+      "temp_min_f": 40.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5095,
+      "source_file": "1001-2327.pdf",
+      "temp_min_f": 40.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5096,
+      "source_file": "1001-2333.pdf",
+      "temp_min_f": -67.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5097,
+      "source_file": "1001-2338.pdf",
+      "temp_min_f": 40.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5098,
+      "source_file": "1001-2339.pdf",
+      "temp_min_f": -30.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5099,
+      "source_file": "1001-2342.pdf",
+      "temp_min_f": -60.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5100,
+      "source_file": "1001-2343.pdf",
+      "temp_min_f": -65.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5101,
+      "source_file": "1001-2344.pdf",
+      "temp_min_f": -200.0,
+      "method": "join_bok_normalized"
+    },
+    {
+      "row_id": 5102,
+      "source_file": "1001-2345.pdf",
+      "temp_min_f": 5.0,
+      "method": "join_bok_normalized"
+    }
+  ]
+}

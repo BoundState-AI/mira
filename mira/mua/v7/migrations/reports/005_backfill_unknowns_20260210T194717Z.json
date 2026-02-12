@@ -1,0 +1,1037 @@
+{
+  "mode": "DRY_RUN",
+  "timestamp_utc": "2026-02-10T19:47:17.086309+00:00",
+  "rows_scanned": 3755,
+  "family_updates": 481,
+  "env_updates": 1531,
+  "rows_touched": 1915,
+  "family_method_counts": {
+    "keyword_composite": 19,
+    "keyword_adhesive": 25,
+    "keyword_polymer": 199,
+    "keyword_stainless": 73,
+    "keyword_carbon_steel": 97,
+    "keyword_elastomer": 7,
+    "keyword_ceramic": 22,
+    "keyword_sealant": 3,
+    "keyword_coating": 3,
+    "keyword_nickel": 26,
+    "keyword_lubricant": 6,
+    "keyword_aluminum": 1
+  },
+  "env_method_counts": {
+    "keyword_enriched_o2": 78,
+    "keyword_airlike": 170,
+    "keyword_vacuum": 325,
+    "o2_percent_enriched": 690,
+    "keyword_cryogenic": 5,
+    "keyword_nitrogen_proxy": 141,
+    "temperature_cryogenic": 16,
+    "keyword_lox_gox": 15,
+    "keyword_propellant": 23,
+    "keyword_water": 29,
+    "keyword_hydrogen": 39
+  },
+  "sample_updates": [
+    {
+      "row_id": 5004,
+      "mua_number": "1000-0012",
+      "old_family": "STAINLESS_STEEL",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "keyword_enriched_o2"
+    },
+    {
+      "row_id": 5005,
+      "mua_number": "1000-0013",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "placeholder_designation",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "keyword_enriched_o2"
+    },
+    {
+      "row_id": 5006,
+      "mua_number": "1000-0014",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "placeholder_designation",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "keyword_enriched_o2"
+    },
+    {
+      "row_id": 5019,
+      "mua_number": "1001-0034",
+      "old_family": null,
+      "new_family": "COMPOSITE",
+      "family_method": "keyword_composite",
+      "old_env_type": "ENRICHED_O2",
+      "new_env_type": null,
+      "env_method": "not_needed"
+    },
+    {
+      "row_id": 5025,
+      "mua_number": "1001-0043",
+      "old_family": "ALUMINUM",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "CABIN_AIR",
+      "env_method": "keyword_airlike"
+    },
+    {
+      "row_id": 5030,
+      "mua_number": "1001-0049",
+      "old_family": null,
+      "new_family": "ADHESIVE",
+      "family_method": "keyword_adhesive",
+      "old_env_type": "CABIN_AIR",
+      "new_env_type": null,
+      "env_method": "not_needed"
+    },
+    {
+      "row_id": 5037,
+      "mua_number": "1001-0094",
+      "old_family": null,
+      "new_family": "POLYMER",
+      "family_method": "keyword_polymer",
+      "old_env_type": "ENRICHED_O2",
+      "new_env_type": null,
+      "env_method": "not_needed"
+    },
+    {
+      "row_id": 5038,
+      "mua_number": "1001-0108",
+      "old_family": null,
+      "new_family": "POLYMER",
+      "family_method": "keyword_polymer",
+      "old_env_type": "ENRICHED_O2",
+      "new_env_type": null,
+      "env_method": "not_needed"
+    },
+    {
+      "row_id": 5039,
+      "mua_number": "1001-0109",
+      "old_family": "COATING",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "VACUUM",
+      "env_method": "keyword_vacuum"
+    },
+    {
+      "row_id": 5043,
+      "mua_number": "1001-0141",
+      "old_family": null,
+      "new_family": "POLYMER",
+      "family_method": "keyword_polymer",
+      "old_env_type": "VACUUM",
+      "new_env_type": null,
+      "env_method": "not_needed"
+    },
+    {
+      "row_id": 5046,
+      "mua_number": "1001-0152",
+      "old_family": null,
+      "new_family": "STAINLESS_STEEL",
+      "family_method": "keyword_stainless",
+      "old_env_type": "ENRICHED_O2",
+      "new_env_type": null,
+      "env_method": "not_needed"
+    },
+    {
+      "row_id": 5049,
+      "mua_number": "1001-2203",
+      "old_family": null,
+      "new_family": "POLYMER",
+      "family_method": "keyword_polymer",
+      "old_env_type": "VACUUM",
+      "new_env_type": null,
+      "env_method": "not_needed"
+    },
+    {
+      "row_id": 5051,
+      "mua_number": "1001-2210",
+      "old_family": null,
+      "new_family": "COMPOSITE",
+      "family_method": "keyword_composite",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5052,
+      "mua_number": "1001-2212",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "placeholder_designation",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5055,
+      "mua_number": "1001-2223",
+      "old_family": null,
+      "new_family": "POLYMER",
+      "family_method": "keyword_polymer",
+      "old_env_type": "CABIN_AIR",
+      "new_env_type": null,
+      "env_method": "not_needed"
+    },
+    {
+      "row_id": 5056,
+      "mua_number": "1001-2226",
+      "old_family": null,
+      "new_family": "POLYMER",
+      "family_method": "keyword_polymer",
+      "old_env_type": "CABIN_AIR",
+      "new_env_type": null,
+      "env_method": "not_needed"
+    },
+    {
+      "row_id": 5057,
+      "mua_number": "1001-2236",
+      "old_family": "COATING",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5059,
+      "mua_number": "1001-2240",
+      "old_family": null,
+      "new_family": "COMPOSITE",
+      "family_method": "keyword_composite",
+      "old_env_type": "VACUUM",
+      "new_env_type": null,
+      "env_method": "not_needed"
+    },
+    {
+      "row_id": 5061,
+      "mua_number": "1001-2248A",
+      "old_family": "ALUMINUM",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "VACUUM",
+      "env_method": "keyword_vacuum"
+    },
+    {
+      "row_id": 5065,
+      "mua_number": "1001-2253",
+      "old_family": "ALUMINUM",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5070,
+      "mua_number": "1001-2266",
+      "old_family": "ELASTOMER",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5071,
+      "mua_number": "1001-2268",
+      "old_family": "POLYMER",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5072,
+      "mua_number": "1001-2269",
+      "old_family": "ADHESIVE",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5073,
+      "mua_number": "1001-2272",
+      "old_family": "ELASTOMER",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5074,
+      "mua_number": "1001-2275",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "VACUUM",
+      "env_method": "keyword_vacuum"
+    },
+    {
+      "row_id": 5081,
+      "mua_number": "1001-2293",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "keyword_enriched_o2"
+    },
+    {
+      "row_id": 5085,
+      "mua_number": "1001-2301",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5088,
+      "mua_number": "1001-2305",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "placeholder_designation",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5090,
+      "mua_number": "1001-2307",
+      "old_family": "POLYMER",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5094,
+      "mua_number": "1001-2324",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5095,
+      "mua_number": "1001-2327",
+      "old_family": "STAINLESS_STEEL",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5098,
+      "mua_number": "1001-2339",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "placeholder_designation",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5099,
+      "mua_number": "1001-2342",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5103,
+      "mua_number": "1001-2349",
+      "old_family": null,
+      "new_family": "POLYMER",
+      "family_method": "keyword_polymer",
+      "old_env_type": "CABIN_AIR",
+      "new_env_type": null,
+      "env_method": "not_needed"
+    },
+    {
+      "row_id": 5104,
+      "mua_number": "1001-2350",
+      "old_family": null,
+      "new_family": "CARBON_STEEL",
+      "family_method": "keyword_carbon_steel",
+      "old_env_type": "ENRICHED_O2",
+      "new_env_type": null,
+      "env_method": "not_needed"
+    },
+    {
+      "row_id": 5111,
+      "mua_number": "1001-2368",
+      "old_family": null,
+      "new_family": "POLYMER",
+      "family_method": "keyword_polymer",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5112,
+      "mua_number": "1001-2370",
+      "old_family": "STAINLESS_STEEL",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "keyword_enriched_o2"
+    },
+    {
+      "row_id": 5114,
+      "mua_number": "1001-2372",
+      "old_family": "STAINLESS_STEEL",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "keyword_enriched_o2"
+    },
+    {
+      "row_id": 5116,
+      "mua_number": "1001-2374",
+      "old_family": null,
+      "new_family": "COMPOSITE",
+      "family_method": "keyword_composite",
+      "old_env_type": "VACUUM",
+      "new_env_type": null,
+      "env_method": "not_needed"
+    },
+    {
+      "row_id": 5117,
+      "mua_number": "1001-2375",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "placeholder_designation",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5118,
+      "mua_number": "1001-2377",
+      "old_family": "ALUMINUM",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5119,
+      "mua_number": "1001-2378",
+      "old_family": null,
+      "new_family": "CARBON_STEEL",
+      "family_method": "keyword_carbon_steel",
+      "old_env_type": "VACUUM",
+      "new_env_type": null,
+      "env_method": "not_needed"
+    },
+    {
+      "row_id": 5122,
+      "mua_number": "1001-2383",
+      "old_family": "ALUMINUM",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "VACUUM",
+      "env_method": "keyword_vacuum"
+    },
+    {
+      "row_id": 5123,
+      "mua_number": "1001-2384",
+      "old_family": null,
+      "new_family": "STAINLESS_STEEL",
+      "family_method": "keyword_stainless",
+      "old_env_type": "VACUUM",
+      "new_env_type": null,
+      "env_method": "not_needed"
+    },
+    {
+      "row_id": 5124,
+      "mua_number": "1001-2385",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5134,
+      "mua_number": "1002-0059",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5152,
+      "mua_number": "1004-0008",
+      "old_family": "ADHESIVE",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "VACUUM",
+      "env_method": "keyword_vacuum"
+    },
+    {
+      "row_id": 5163,
+      "mua_number": "1004-0034",
+      "old_family": "STAINLESS_STEEL",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5164,
+      "mua_number": "1004-0035",
+      "old_family": "ALUMINUM",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5168,
+      "mua_number": "CRO014-923-010",
+      "old_family": "ALUMINUM",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "CRYOGENIC",
+      "env_method": "keyword_cryogenic"
+    },
+    {
+      "row_id": 5180,
+      "mua_number": "1069 S87-0001",
+      "old_family": "POLYMER",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5181,
+      "mua_number": "1809-0002",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5184,
+      "mua_number": "/D09-0007",
+      "old_family": null,
+      "new_family": "CARBON_STEEL",
+      "family_method": "keyword_carbon_steel",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": null,
+      "env_method": "no_rule_hit"
+    },
+    {
+      "row_id": 5185,
+      "mua_number": "1009-0023",
+      "old_family": "ELASTOMER",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5186,
+      "mua_number": "1009-0024",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5187,
+      "mua_number": "1009-0025",
+      "old_family": null,
+      "new_family": "POLYMER",
+      "family_method": "keyword_polymer",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5209,
+      "mua_number": "1010-0113",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "placeholder_designation",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5210,
+      "mua_number": "1010-0114",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "placeholder_designation",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5213,
+      "mua_number": "1011-0003",
+      "old_family": null,
+      "new_family": "STAINLESS_STEEL",
+      "family_method": "keyword_stainless",
+      "old_env_type": "CABIN_AIR",
+      "new_env_type": null,
+      "env_method": "not_needed"
+    },
+    {
+      "row_id": 5229,
+      "mua_number": "1014-0005",
+      "old_family": null,
+      "new_family": "ADHESIVE",
+      "family_method": "keyword_adhesive",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5234,
+      "mua_number": "1014-0016",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5236,
+      "mua_number": "1014-0020",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5238,
+      "mua_number": "1014-0033",
+      "old_family": null,
+      "new_family": "ELASTOMER",
+      "family_method": "keyword_elastomer",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "CABIN_AIR",
+      "env_method": "keyword_nitrogen_proxy"
+    },
+    {
+      "row_id": 5241,
+      "mua_number": "1015-0081",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "placeholder_designation",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5242,
+      "mua_number": "1015-0104",
+      "old_family": "ADHESIVE",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5243,
+      "mua_number": "1016-0106",
+      "old_family": "ALUMINUM",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5244,
+      "mua_number": "1015-0106",
+      "old_family": "ALUMINUM",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5245,
+      "mua_number": "1016-0119",
+      "old_family": "COATING",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5246,
+      "mua_number": "1615-0127",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "placeholder_designation",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5247,
+      "mua_number": "1015-0129",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "placeholder_designation",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5257,
+      "mua_number": "1888 MUA5",
+      "old_family": "ADHESIVE",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5258,
+      "mua_number": "1888 MUAG",
+      "old_family": null,
+      "new_family": "POLYMER",
+      "family_method": "keyword_polymer",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5259,
+      "mua_number": "1888 MUA8",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5260,
+      "mua_number": "1888 MUA9",
+      "old_family": "ADHESIVE",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5262,
+      "mua_number": "1888 MUA11",
+      "old_family": null,
+      "new_family": "POLYMER",
+      "family_method": "keyword_polymer",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5263,
+      "mua_number": "1889 MUA12",
+      "old_family": "ELASTOMER",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5264,
+      "mua_number": "1888 MUA13",
+      "old_family": "POLYMER",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5265,
+      "mua_number": "1888 MUA16",
+      "old_family": "ADHESIVE",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5266,
+      "mua_number": "1988 MUA17",
+      "old_family": null,
+      "new_family": "POLYMER",
+      "family_method": "keyword_polymer",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5267,
+      "mua_number": "1888 MUA18",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5268,
+      "mua_number": "1888 MUA19",
+      "old_family": "ELASTOMER",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5269,
+      "mua_number": "1888 MUA21",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5271,
+      "mua_number": "1888 MUA14",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5272,
+      "mua_number": "1888 MUA15",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5274,
+      "mua_number": "EOM 1/2 - ES021-001",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "VACUUM",
+      "env_method": "keyword_vacuum"
+    },
+    {
+      "row_id": 5279,
+      "mua_number": "C-1ES029",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "VACUUM",
+      "env_method": "keyword_vacuum"
+    },
+    {
+      "row_id": 5282,
+      "mua_number": "IES 300 GEN",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5300,
+      "mua_number": "IES 321",
+      "old_family": "ELASTOMER",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "VACUUM",
+      "env_method": "keyword_vacuum"
+    },
+    {
+      "row_id": 5301,
+      "mua_number": "IES 324",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "VACUUM",
+      "env_method": "keyword_vacuum"
+    },
+    {
+      "row_id": 5316,
+      "mua_number": "2-11-9",
+      "old_family": null,
+      "new_family": "POLYMER",
+      "family_method": "keyword_polymer",
+      "old_env_type": "CABIN_AIR",
+      "new_env_type": null,
+      "env_method": "not_needed"
+    },
+    {
+      "row_id": 5320,
+      "mua_number": "2-11-12",
+      "old_family": null,
+      "new_family": "CARBON_STEEL",
+      "family_method": "keyword_carbon_steel",
+      "old_env_type": "CABIN_AIR",
+      "new_env_type": null,
+      "env_method": "not_needed"
+    },
+    {
+      "row_id": 5322,
+      "mua_number": "2-13-3",
+      "old_family": "POLYMER",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "VACUUM",
+      "env_method": "keyword_vacuum"
+    },
+    {
+      "row_id": 5324,
+      "mua_number": "2-13-5",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "VACUUM",
+      "env_method": "keyword_vacuum"
+    },
+    {
+      "row_id": 5325,
+      "mua_number": "2-13-6",
+      "old_family": null,
+      "new_family": "POLYMER",
+      "family_method": "keyword_polymer",
+      "old_env_type": "VACUUM",
+      "new_env_type": null,
+      "env_method": "not_needed"
+    },
+    {
+      "row_id": 5328,
+      "mua_number": "1239-2030 90/00",
+      "old_family": null,
+      "new_family": "POLYMER",
+      "family_method": "keyword_polymer",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5330,
+      "mua_number": "2439-200-00-03",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5331,
+      "mua_number": "MUA-2 13A-2000-00-04",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5332,
+      "mua_number": "484-2439-2000-00-05",
+      "old_family": null,
+      "new_family": null,
+      "family_method": "no_rule_hit",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "ENRICHED_O2",
+      "env_method": "o2_percent_enriched"
+    },
+    {
+      "row_id": 5334,
+      "mua_number": "PL2220-0000CS/01",
+      "old_family": "CERAMIC",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "CRYOGENIC",
+      "env_method": "temperature_cryogenic"
+    },
+    {
+      "row_id": 5335,
+      "mua_number": "2220-0000CS/02",
+      "old_family": "POLYMER",
+      "new_family": null,
+      "family_method": "not_needed",
+      "old_env_type": "UNKNOWN",
+      "new_env_type": "CABIN_AIR",
+      "env_method": "keyword_airlike"
+    }
+  ]
+}

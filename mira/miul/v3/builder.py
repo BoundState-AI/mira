@@ -33,9 +33,9 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
-from openpyxl import Workbook
+from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
-from openpyxl.utils import get_column_letter
+from openpyxl.utils import get_column_letter, column_index_from_string
 
 from .extract import (
     extract_drawing_page,
@@ -1489,10 +1489,9 @@ class MIULBuilderV3:
     ) -> None:
         """Export MIUL DataFrame to Excel with MAPTIS-compliant formatting.
 
-        Uses identical formatting to V1 DTMIULBuilder:
+        Uses MAPTIS-style formatting:
         - Dark blue headers with white bold font
-        - Assembly rows in light blue
-        - EPL subpart rows in light orange
+        - Neutral (unshaded) data rows
         - Freeze panes on header row
         - Summary statistics sheet
         """
@@ -1558,14 +1557,6 @@ class MIULBuilderV3:
 
         # Write data rows
         for row_idx, (_, row) in enumerate(df.iterrows(), start=2):
-            # Determine row type for highlighting
-            part_num = str(row.get("Part Number", ""))
-            designation = str(row.get("Designation", ""))
-            has_parts = part_num in self.drawings and self.drawings[part_num].drawing_type == "ASSEMBLY"
-            is_assembly = has_parts or (not designation or designation == "nan")
-            parent_val = row.get("Parent", 0)
-            is_subpart = parent_val and parent_val != 0
-
             for col_idx, (header, _, _) in enumerate(MAPTIS_COLUMNS, start=1):
                 # Get value from DataFrame row using display name
                 if header in row.index:
@@ -1581,12 +1572,6 @@ class MIULBuilderV3:
 
                 cell = ws.cell(row=row_idx, column=col_idx, value=value)
                 cell.border = self.THIN_BORDER
-
-                # Row highlighting (matching V1)
-                if is_assembly and not is_subpart:
-                    cell.fill = self.ASSEMBLY_FILL
-                elif is_subpart:
-                    cell.fill = self.SUBPART_FILL
 
         # Freeze header row
         ws.freeze_panes = "A2"
@@ -2282,7 +2267,14 @@ def build_miul_2phase(
 
     # Export Excel if path provided
     if output_excel:
-        _export_miul_excel(df, output_excel, project_name, dt_json, parts_json)
+        _export_miul_excel(
+            df,
+            output_excel,
+            project_name,
+            dt_json,
+            parts_json,
+            environment=environment,
+        )
 
     # Stats
     metadata = parts_json.get("metadata", {})
@@ -2306,15 +2298,455 @@ def _export_miul_excel(
     project_name: str,
     dt_json: Dict[str, Any],
     parts_json: Dict[str, Any],
+    environment: Optional[Any] = None,
 ) -> None:
-    """Export MIUL DataFrame to Excel with formatting."""
+    """Export MIUL DataFrame to Excel.
+
+    Standard output uses the OPIV macro-enabled template format.
+    Falls back to the legacy generated workbook if template export fails.
+    """
     from mira.miul.v1_archive.dt_miul_builder import MAPTIS_COLUMNS
 
-    # Styling constants
+    def _as_cell(value: Any) -> Any:
+        if value is None:
+            return None
+        if pd.isna(value):
+            return None
+        if isinstance(value, str):
+            text = value.strip()
+            return text if text else None
+        if isinstance(value, float) and value.is_integer():
+            return int(value)
+        return value
+
+    def _safe_int(value: Any) -> Any:
+        v = _as_cell(value)
+        if v is None:
+            return None
+        try:
+            return int(float(v))
+        except (TypeError, ValueError):
+            return v
+
+    def _filter_sentinel_rows(frame: pd.DataFrame) -> pd.DataFrame:
+        if "Index" not in frame.columns:
+            return frame
+
+        def _is_not_sentinel(idx_val: Any) -> bool:
+            try:
+                return int(float(idx_val)) != -1
+            except (TypeError, ValueError):
+                return str(idx_val).strip() != "-1"
+
+        return frame[frame["Index"].map(_is_not_sentinel)]
+
+    def _data_rows_only(frame: pd.DataFrame) -> pd.DataFrame:
+        if "Index" not in frame.columns:
+            return frame
+        idx_series = pd.to_numeric(frame["Index"], errors="coerce")
+        return frame[idx_series >= 3]
+
+    def _as_text(value: Any) -> str:
+        cell = _as_cell(value)
+        if cell is None:
+            return ""
+        return str(cell).strip()
+
+    def _ordered_rows(frame: pd.DataFrame) -> pd.DataFrame:
+        if "Index" not in frame.columns:
+            return frame
+        work = frame.copy()
+        work["__sort_idx"] = pd.to_numeric(work["Index"], errors="coerce")
+        work = work.sort_values("__sort_idx", na_position="last")
+        return work.drop(columns=["__sort_idx"])
+
+    # Defaults reused for MIUL cells and Notes tab.
+    env_defaults = {
+        "o2_percent": getattr(environment, "o2_percent", None),
+        "max_pressure": getattr(environment, "max_pressure", None),
+        "min_pressure": getattr(environment, "min_pressure", None),
+        "max_temp": getattr(environment, "max_temp", None),
+        "min_temp": getattr(environment, "min_temp", None),
+        "fluid_type": getattr(environment, "fluid_type", None),
+    }
+
+    def _build_parent_rows(frame: pd.DataFrame) -> List[Tuple[int, str, str]]:
+        data_rows = _ordered_rows(_data_rows_only(frame))
+        parent_rows: List[Tuple[int, str, str]] = []
+        seen: set[str] = set()
+
+        pn_to_nha: Dict[str, str] = {}
+        if "Part Number" in data_rows.columns and "NHA" in data_rows.columns:
+            for _, row in data_rows.iterrows():
+                pn = _as_text(row.get("Part Number", ""))
+                if pn and pn not in pn_to_nha:
+                    pn_to_nha[pn] = _as_text(row.get("NHA", ""))
+
+        tree_entries = dt_json.get("tree", []) if isinstance(dt_json, dict) else []
+        if tree_entries:
+            for entry in tree_entries:
+                drawing = _as_text(entry.get("drawing_number", ""))
+                if not drawing or drawing in seen:
+                    continue
+                nha_val = _as_text(entry.get("parent", "")) or pn_to_nha.get(drawing, "")
+                parent_rows.append((len(parent_rows) + 1, drawing, nha_val))
+                seen.add(drawing)
+
+        if not parent_rows:
+            for _, row in data_rows.iterrows():
+                drawing = _as_text(row.get("Drawing Source", "")) or _as_text(row.get("Part Number", ""))
+                if not drawing or drawing in seen:
+                    continue
+                nha_val = _as_text(row.get("NHA", "")) or pn_to_nha.get(drawing, "")
+                parent_rows.append((len(parent_rows) + 1, drawing, nha_val))
+                seen.add(drawing)
+
+        return parent_rows
+
+    def _extract_rationale_codes(frame: pd.DataFrame) -> Dict[str, int]:
+        code_counts: Dict[str, int] = {}
+        if "MUA Rationale" not in frame.columns:
+            return code_counts
+
+        data_rows = _data_rows_only(frame)
+        for raw in data_rows["MUA Rationale"].tolist():
+            text = _as_text(raw)
+            if not text:
+                continue
+            for token in re.split(r"[,\n;/|]+", text):
+                code = token.strip()
+                if not code:
+                    continue
+                code_counts[code] = code_counts.get(code, 0) + 1
+        return code_counts
+
+    def _populate_parents_sheet(ws: Any, parent_rows: List[Tuple[int, str, str]]) -> None:
+        ws["A1"] = "Count"
+        ws["B1"] = "Drawing"
+        ws["C1"] = "NHA"
+
+        max_clear_row = max(ws.max_row, len(parent_rows) + 20)
+        for row_idx in range(2, max_clear_row + 1):
+            for col_idx in range(1, 7):
+                try:
+                    ws.cell(row=row_idx, column=col_idx).value = None
+                except AttributeError:
+                    continue
+
+        for out_row_idx, (count, drawing, nha_val) in enumerate(parent_rows, start=2):
+            ws.cell(row=out_row_idx, column=1, value=count)
+            ws.cell(row=out_row_idx, column=2, value=drawing)
+            ws.cell(row=out_row_idx, column=3, value=nha_val)
+
+    def _populate_codes_sheet(ws: Any, frame: pd.DataFrame) -> None:
+        code_sections: List[Tuple[str, List[Tuple[str, str]]]] = [
+            (
+                "FLAMMABILITY RATIONALE CODES",
+                [
+                    ("101", "Approved materials usage agreement (MUA) Category I."),
+                    ("102", "Approved materials usage agreement (MUA) Category II."),
+                    ("103", "Materials passed requirements when tested in configuration."),
+                    ("104", "Unexposed, over coated or sandwiched between non-flammable material and no ignition source or propagation path."),
+                    ("105", "Minor usage (less than 0.1 LB. and 2 SQ-IN surface area); no propagation path or ignition source."),
+                    ("106", "Material is used in hermetically sealed container."),
+                    ("107", "Passes test No. 8 of NHB 8060.1, Flammability test for materials in vented containers, by test or analysis."),
+                    ("108", "Of the shelf equipment having material acceptable in configuration; no ignition source or propagation path."),
+                    ("109", "Material not exposed; totally immersed in fluid; evaluated for fluid compatibility only."),
+                    ("110", "Material is acceptable when used on a metal substrate that provides a good heat sink. Material considered noncombustible in this configuration by test or analysis."),
+                    ("111", "Material not A-rated for Flam is sandwiched between non-flammable materials with edges only exposed and is more than 2 IN. from an ignition source or more than 12 IN. from other materials not A-rated."),
+                    ("112", "Material not A-rated for Flam is unexposed or is over coated with a non-flammable material."),
+                    ("113", "Material (not more than 0.010 IN. thickness) no A-rated for Flam is sprayed or bonded to a metallic surface > 0.062 IN. thick."),
+                    ("114", "Material not A-rated for Flam is used in 'small amounts' and is more than 2 IN. from an ignition source or more than 12 IN. from other materials not A-rated for Flam. 'Small amounts' for Flam may be quantified as follows: Total weight < 0.1 LB. and < 2.0 SQ. IN. surface area."),
+                ],
+            ),
+            (
+                "TOXICITY (OFFGASSING) RATIONALE CODES",
+                [
+                    ("201", "Approved materials usage agreement (MUA) Category I."),
+                    ("202", "Approved materials usage agreement (MUA) Category II."),
+                    ("203", "T value for material/component in usage weight is less than 0.5 in each 118 cubic meter volume."),
+                    ("204", "Materials usage in hermetically sealed container."),
+                ],
+            ),
+            (
+                "FLUID SYSTEM COMPATIBILITY RATIONALE CODES",
+                [
+                    ("301", "Approved materials usage agreement (MUA) Category I."),
+                    ("302", "Passes requirements in configuration."),
+                    ("303", "'B' rated material passed in batch lot test."),
+                    ("304", "Approved materials usage agreement (MUA) Category II."),
+                ],
+            ),
+            (
+                "THERMAL VACUUM STABILITY (TVS) RATIONALE CODES",
+                [
+                    ("401", "Approved materials usage agreement (MUA) Category I."),
+                    ("402", "Approved materials usage agreement (MUA) Category II."),
+                    ("403", "'C' rated material; exposed area is not more than 2 SQ. IN. and not near a critical surface."),
+                    ("404", "'X' rated material; exposed area less than 1/4 SQ. IN."),
+                    ("405", "Unexposed, over coated or encapsulated with approved material."),
+                    ("406", "'B' rated material cured to meet the requirements of an 'A' rated material."),
+                    ("407", "Meets TVS requirements in configuration."),
+                    ("408", "Materials usage in hermetically sealed container."),
+                    ("409", "Material not A-rated for TVS in enclosed in a sealed container (i.e., designed with a leakage rate of <0.0001 standard CC/SEC. with atmosphere pressure differential - ref. MSFC-PROC-1301, Section 1.3)."),
+                ],
+            ),
+            (
+                "STRESS CORROSION CRACKING (SCC) RATIONALE CODES",
+                [
+                    ("501", "Approved materials usage agreement (MUA) Category I."),
+                    ("502", "Approved materials usage agreement (MUA) Category II."),
+                    ("503", "Maximum tensile stress less than 50% of yield strength for part on electrical/electronic assemblies."),
+                    ("504", "Martensitic or PH stainless steels used in ball bearing, race or similar applications where the primary loading is compressive."),
+                    ("505", "Metal not A-rated for SCC is not exposed to a corrosive environment after final assembly through end item use."),
+                    ("506", "Carbon & low alloy high strength steels in greater than 180 KSI used in ball bearings, springs, or similar applications where primary loading is compressive, low tensile stresses, or history of satisfactory performance."),
+                ],
+            ),
+            (
+                "CORROSION (Corr) RATIONALE CODES",
+                [
+                    ("601", "Approved materials usage agreement (MUA) Category I."),
+                    ("602", "Approved materials usage agreement (MUA) Category II."),
+                    ("603", "Adequately finished for corrosion protection."),
+                    ("604", "Acceptable for use environment."),
+                    ("606", "Electrical grounding required, cladding plus conversion coating adequate."),
+                    ("607", "Thermal conductance and electrical bonding requirements preclude painting. Conversion coating is adequate (for aluminum only)."),
+                    ("608", "Finished on a higher assembly."),
+                    ("609", "Laminated shim - minimum exposure of corrosion resistant material."),
+                    ("610", "Surface of a metal not A-rated for Corr is treated or coated in a manner which meets or exceeds the requirements of MSFC-SPEC-250A. Actual surface treatment shall be listed."),
+                    ("611", "Metal not A-rated for Corr is not exposed to a corrosive environment after final assembly and through end item use."),
+                    ("612", "Welding of titanium alloy-to-alloy or CP-to-alloy using CP filler metal in mixed alloy welds where hydrogen embrittlement is not predicted in service."),
+                ],
+            ),
+            (
+                "GENERAL CODES",
+                [
+                    ("701", "Material ratings in MAPTIS (Material and Processes Technical Information System) are used for acceptance in place of MSFC-HDBK-527/JSC 09604. (Date of MAPTIS rating usage to be documented.)"),
+                    ("702", "Generic materials controlled by MIL-SPEC or industry specification using MAPTIS averages for ratings or test results. Material codes for generic material shall be used."),
+                    ("703", "MIL-SPEC or industry spec allowing several material options where all options have acceptable ratings."),
+                    ("704", "Materials controlled by SSQ specification."),
+                ],
+            ),
+        ]
+
+        code_counts = _extract_rationale_codes(frame)
+
+        max_clear_row = max(ws.max_row, 320)
+        for row_idx in range(1, max_clear_row + 1):
+            for col_idx in range(1, 8):
+                try:
+                    ws.cell(row=row_idx, column=col_idx).value = None
+                except AttributeError:
+                    continue
+
+        ws["A1"] = "MUA III Codes"
+        out_row_idx = 3
+        known_codes = {code for _, entries in code_sections for code, _ in entries}
+
+        for section_title, entries in code_sections:
+            ws.cell(row=out_row_idx, column=1, value=section_title)
+            out_row_idx += 1
+            ws.cell(row=out_row_idx, column=1, value="Code")
+            ws.cell(row=out_row_idx, column=2, value="Rationale")
+            ws.cell(row=out_row_idx, column=3, value="Count")
+            out_row_idx += 1
+
+            for code, rationale in entries:
+                ws.cell(row=out_row_idx, column=1, value=code)
+                ws.cell(row=out_row_idx, column=2, value=rationale)
+                ws.cell(row=out_row_idx, column=3, value=code_counts.get(code, 0))
+                out_row_idx += 1
+
+            out_row_idx += 2
+
+        extra_codes = [
+            code for code in code_counts.keys()
+            if code not in known_codes
+        ]
+        if extra_codes:
+            def _code_sort(code: str) -> Tuple[int, Any]:
+                if re.fullmatch(r"\d+", code):
+                    return (0, int(code))
+                return (1, code)
+
+            ws.cell(row=out_row_idx, column=1, value="ADDITIONAL CODES FOUND")
+            out_row_idx += 1
+            ws.cell(row=out_row_idx, column=1, value="Code")
+            ws.cell(row=out_row_idx, column=2, value="Rationale")
+            ws.cell(row=out_row_idx, column=3, value="Count")
+            out_row_idx += 1
+
+            for code in sorted(extra_codes, key=_code_sort):
+                ws.cell(row=out_row_idx, column=1, value=code)
+                ws.cell(row=out_row_idx, column=2, value="(Not in standard MUA III reference list)")
+                ws.cell(row=out_row_idx, column=3, value=code_counts.get(code, 0))
+                out_row_idx += 1
+
+    def _populate_notes_sheet(ws: Any, frame: pd.DataFrame, parent_rows: List[Tuple[int, str, str]]) -> None:
+        max_clear_row = max(ws.max_row, 40)
+        for row_idx in range(1, max_clear_row + 1):
+            for col_idx in range(1, 15):
+                try:
+                    ws.cell(row=row_idx, column=col_idx).value = None
+                except AttributeError:
+                    continue
+
+        top_level = _as_text((dt_json or {}).get("top_level", ""))
+        data_rows = _data_rows_only(frame)
+
+        notes = [
+            "Assembly Notes",
+            "",
+            f"1. Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}",
+            f"2. Project: {project_name or top_level or 'N/A'}",
+            f"3. Top-Level Drawing: {top_level or 'N/A'}",
+            f"4. Drawing Count: {len(parent_rows)}",
+            f"5. Material Rows: {len(data_rows)}",
+            (
+                "6. Environment: "
+                f"{_as_text(env_defaults['fluid_type']) or 'N/A'}, "
+                f"O2 {_as_text(env_defaults['o2_percent']) or 'N/A'}%, "
+                f"P {_as_text(env_defaults['min_pressure']) or 'N/A'}-"
+                f"{_as_text(env_defaults['max_pressure']) or 'N/A'} psia, "
+                f"T {_as_text(env_defaults['min_temp']) or 'N/A'}-"
+                f"{_as_text(env_defaults['max_temp']) or 'N/A'} F"
+            ),
+            "7. Add assembly-specific engineering notes below as needed.",
+        ]
+
+        for row_idx, note in enumerate(notes, start=1):
+            ws.cell(row=row_idx, column=1, value=note)
+
+    def _ensure_required_tabs(wb: Workbook, miul_ws: Any) -> Tuple[Any, Any, Any]:
+        if miul_ws.title != "MIUL":
+            miul_ws.title = "MIUL"
+
+        required = {"MIUL", "Parents", "Codes", "Notes"}
+        for sheet_name in list(wb.sheetnames):
+            if sheet_name not in required:
+                try:
+                    del wb[sheet_name]
+                except Exception:
+                    LOGGER.debug("[2Phase] Could not remove extra sheet '%s'", sheet_name, exc_info=True)
+
+        parents_ws = wb["Parents"] if "Parents" in wb.sheetnames else wb.create_sheet("Parents")
+        codes_ws = wb["Codes"] if "Codes" in wb.sheetnames else wb.create_sheet("Codes")
+        notes_ws = wb["Notes"] if "Notes" in wb.sheetnames else wb.create_sheet("Notes")
+        return parents_ws, codes_ws, notes_ws
+
+    template_path = Path(__file__).resolve().parents[3] / "docs" / "OPIV_MIUL_Updated.xlsm"
+    if template_path.exists():
+        try:
+            # Load template without preserving VBA so output workbook is macro-free.
+            wb = load_workbook(template_path, keep_vba=False)
+            ws = wb["MIUL"] if "MIUL" in wb.sheetnames else (wb["Sheet1"] if "Sheet1" in wb.sheetnames else wb.active)
+
+            data_df = _filter_sentinel_rows(df)
+            parents_rows = _build_parent_rows(data_df)
+
+            # Managed columns for data population. Leave formula helper columns
+            # (AN/AO/AP) untouched so template logic remains available.
+            managed_cols = [
+                "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
+                "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+                "AA", "AB", "AC", "AD", "AE", "AF", "AG", "AH", "AI", "AJ", "AK", "AL",
+            ]
+            managed_idx = [column_index_from_string(col) for col in managed_cols]
+            data_no_fill = PatternFill(fill_type=None)
+
+            # Clear previous sample data in managed columns.
+            for row_idx in range(2, ws.max_row + 1):
+                for col_idx in managed_idx:
+                    cell = ws.cell(row=row_idx, column=col_idx)
+                    cell.value = None
+                    cell.fill = data_no_fill
+
+            # New builds should not carry template conditional color shading.
+            try:
+                ws.conditional_formatting._cf_rules.clear()
+            except Exception:
+                LOGGER.debug("[2Phase] Could not clear conditional formatting on MIUL sheet", exc_info=True)
+
+            # Populate template rows.
+            last_dwg_number: str = ""
+            for out_row_idx, (_, row) in enumerate(data_df.iterrows(), start=2):
+                part_number = _as_cell(row.get("Part Number", ""))
+                nomenclature = _as_cell(row.get("Nomenclature", "")) or _as_cell(row.get("Part Description", ""))
+                source_dwg = _as_cell(row.get("Drawing Source", ""))
+                nha_val = _as_cell(row.get("NHA", ""))
+
+                # Dwg Number should be the source drawing when available.
+                # Fall back to part number when source drawing is blank.
+                dwg_number = source_dwg or part_number
+                dwg_display = dwg_number if dwg_number and dwg_number != last_dwg_number else None
+                if dwg_number:
+                    last_dwg_number = str(dwg_number)
+
+                material_code = _as_cell(row.get("Material Code", ""))
+
+                qty_value = _as_cell(row.get("Qty", None))
+
+                opiv_cells = {
+                    "A": _safe_int(row.get("Index", None)),  # Index
+                    "B": _safe_int(row.get("Parent", None)),  # Parent
+                    "C": dwg_display,  # Dwg Number (only at first row for each drawing group)
+                    "D": nha_val,  # NHAssy
+                    "E": _as_cell(row.get("Line Number", None)),  # Find No.
+                    "F": part_number,  # Part Number
+                    "G": nomenclature,  # Nomenclature
+                    "H": material_code,  # Material Code
+                    "I": _as_cell(row.get("Designation", "")),  # Designation
+                    "J": source_dwg,  # Dwg Source
+                    "K": _as_cell(row.get("Material Specification", "")),  # Material Spec.
+                    "L": _as_cell(row.get("Process Specification", "")),  # Process Spec.
+                    "P": qty_value,  # Qty
+                    "Q": _as_cell(row.get("Cure Codes", "")),  # Cure No.
+                    "R": _as_cell(row.get("FLAM", "")),  # FLAMM Rating
+                    "S": _as_cell(row.get("SCC", "")),  # SCC Rating
+                    "T": _as_cell(row.get("CORR", "")),  # CORR Rating
+                    "U": _as_cell(row.get("TVS", "")),  # TVS Rating
+                    "V": _as_cell(row.get("TOX", "")),  # TOX Rating
+                    "W": _as_cell(row.get("FS", "")),  # FS Rating
+                    "X": _as_cell(row.get("Overall Evaluation", "")),  # MUA
+                    "Y": _as_cell(row.get("MUA Rationale", "")),  # Rationale Code
+                    "Z": _as_cell(row.get("Remarks", "")),  # Remarks
+                    "AA": _as_cell(row.get("Change Letter", "")),  # Dwg Rev
+                    "AB": _as_cell(row.get("Document Title", "")) or _as_cell(row.get("Part Description", "")),  # Dwg Description
+                    "AC": _as_cell(row.get("Part Description", "")),  # Part Description
+                    "AD": _as_cell(row.get("System", "")),  # System
+                    "AE": _as_cell(row.get("Subsystem", "")),  # Subsystem
+                    "AF": _as_cell(row.get("O2 %", None)) if "O2 %" in row.index else _as_cell(env_defaults["o2_percent"]),  # O2 %
+                    "AG": _as_cell(row.get("Max Pressure", None)) or _as_cell(env_defaults["max_pressure"]),  # Max Pressure
+                    "AH": _as_cell(row.get("Min Pressure", None)) or _as_cell(env_defaults["min_pressure"]),  # Min Pressure
+                    "AI": _as_cell(row.get("Max Temperature", None)) or _as_cell(env_defaults["max_temp"]),  # Max Temp
+                    "AJ": _as_cell(row.get("Min Temperature", None)) or _as_cell(env_defaults["min_temp"]),  # Min Temp
+                    "AK": _as_cell(row.get("Fluid Type", "")) or _as_cell(env_defaults["fluid_type"]),  # Media
+                    "AL": _as_cell(row.get("Criticality", "")),  # Criticality
+                }
+
+                for col_letter, value in opiv_cells.items():
+                    target = ws[f"{col_letter}{out_row_idx}"]
+                    target.value = value
+                    target.fill = data_no_fill
+
+            parents_ws, codes_ws, notes_ws = _ensure_required_tabs(wb, ws)
+            _populate_parents_sheet(parents_ws, parents_rows)
+            _populate_codes_sheet(codes_ws, data_df)
+            _populate_notes_sheet(notes_ws, data_df, parents_rows)
+
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            wb.save(str(output_path))
+            LOGGER.info(f"[2Phase] Exported MIUL using OPIV template: {output_path}")
+            return
+        except Exception as exc:
+            LOGGER.exception(
+                "[2Phase] OPIV template export failed; falling back to legacy exporter: %s",
+                exc,
+            )
+
+    # Legacy fallback export (non-template)
     HEADER_FILL = PatternFill(start_color="1F4E79", end_color="1F4E79", fill_type="solid")
     HEADER_FONT = Font(bold=True, color="FFFFFF", size=10)
-    ASSEMBLY_FILL = PatternFill(start_color="D6EAF8", end_color="D6EAF8", fill_type="solid")
-    SUBPART_FILL = PatternFill(start_color="FFF3E0", end_color="FFF3E0", fill_type="solid")
     THIN_BORDER = Border(
         left=Side(style="thin"), right=Side(style="thin"),
         top=Side(style="thin"), bottom=Side(style="thin"),
@@ -2323,19 +2755,9 @@ def _export_miul_excel(
     wb = Workbook()
     ws = wb.active
     ws.title = "MIUL"
+    data_df = _filter_sentinel_rows(df)
+    parents_rows = _build_parent_rows(data_df)
 
-    # Build set of assemblies from DT
-    assemblies = {
-        e.get("drawing_number", "")
-        for e in dt_json.get("tree", [])
-        if e.get("type", "").upper() == "ASSEMBLY"
-    }
-    # Also check drawings info from parts_json
-    for dwg_num, dwg_info in parts_json.get("drawings", {}).items():
-        if dwg_info.get("drawing_type", "").upper() == "ASSEMBLY":
-            assemblies.add(dwg_num)
-
-    # Write headers
     for col_idx, (header, _, width) in enumerate(MAPTIS_COLUMNS, start=1):
         cell = ws.cell(row=1, column=col_idx, value=header)
         cell.fill = HEADER_FILL
@@ -2344,14 +2766,7 @@ def _export_miul_excel(
         cell.alignment = Alignment(horizontal="center", wrap_text=True)
         ws.column_dimensions[get_column_letter(col_idx)].width = width
 
-    # Write data rows
     for row_idx, (_, row) in enumerate(df.iterrows(), start=2):
-        part_num = str(row.get("Part Number", ""))
-        is_assembly = part_num in assemblies
-        designation = str(row.get("Designation", ""))
-        parent_val = row.get("Parent", 0)
-        is_subpart = parent_val and parent_val != 0
-
         for col_idx, (header, _, _) in enumerate(MAPTIS_COLUMNS, start=1):
             if header in row.index:
                 value = row[header]
@@ -2366,45 +2781,12 @@ def _export_miul_excel(
             cell = ws.cell(row=row_idx, column=col_idx, value=value)
             cell.border = THIN_BORDER
 
-            if is_assembly and not is_subpart:
-                cell.fill = ASSEMBLY_FILL
-            elif is_subpart:
-                cell.fill = SUBPART_FILL
-
-    # Freeze header
     ws.freeze_panes = "A2"
 
-    # Summary sheet
-    ws_summary = wb.create_sheet("Summary")
-    ws_summary.column_dimensions["A"].width = 35
-    ws_summary.column_dimensions["B"].width = 25
-
-    summary = [
-        ("MIUL 2-Phase Pipeline Summary", ""),
-        ("", ""),
-        ("Project", project_name),
-        ("Generated", datetime.now().strftime("%Y-%m-%d %H:%M")),
-        ("Architecture", "2-Phase Pipeline (DT JSON + Parts JSON)"),
-        ("", ""),
-        ("Phase 1: DT Extraction", ""),
-        ("DT Entries", len(dt_json.get("tree", []))),
-        ("Top Level", dt_json.get("top_level", "(none)")),
-        ("", ""),
-        ("Phase 2: Parts Extraction", ""),
-        ("Drawings Processed", len(parts_json.get("drawings", {}))),
-        ("Parts Found", len(parts_json.get("parts", {}))),
-        ("", ""),
-        ("Phase 3: Merged MIUL", ""),
-        ("Total Rows", len(df)),
-        ("Materials Found", (df["Designation"].notna() & (df["Designation"] != "")).sum()),
-        ("Assemblies", len(assemblies)),
-    ]
-
-    for row_idx, (label, value) in enumerate(summary, start=1):
-        ws_summary.cell(row=row_idx, column=1, value=label)
-        ws_summary.cell(row=row_idx, column=2, value=value)
-        if "Summary" in str(label) or "Phase" in str(label):
-            ws_summary.cell(row=row_idx, column=1).font = Font(bold=True)
+    parents_ws, codes_ws, notes_ws = _ensure_required_tabs(wb, ws)
+    _populate_parents_sheet(parents_ws, parents_rows)
+    _populate_codes_sheet(codes_ws, data_df)
+    _populate_notes_sheet(notes_ws, data_df, parents_rows)
 
     wb.save(str(output_path))
-    LOGGER.info(f"[2Phase] Exported MIUL to {output_path}")
+    LOGGER.info(f"[2Phase] Exported MIUL (legacy fallback) to {output_path}")

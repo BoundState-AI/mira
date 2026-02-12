@@ -217,7 +217,7 @@ class MaterialCodeSelector:
 
             if result:
                 logger.info(
-                    f"AI selected: '{designation}' + '{part_description}' → "
+                    f"AI selected: '{designation}' + '{part_description}' -> "
                     f"{result.material_code} ({result.confidence}: {result.reasoning})"
                 )
                 # Cache the result

@@ -1,0 +1,15 @@
+{
+  "mode": "APPLY",
+  "timestamp_utc": "2026-02-10T19:45:18.498452+00:00",
+  "rows_considered": 2424,
+  "pdf_index_unique": 10547,
+  "pdf_index_duplicates": 44,
+  "updates_count": 2424,
+  "verified_match": 0,
+  "verified_mismatch": 0,
+  "missing_pdf": 0,
+  "ambiguous_pdf": 0,
+  "missing_samples": [],
+  "ambiguous_samples": [],
+  "mismatch_samples": []
+}

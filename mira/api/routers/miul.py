@@ -21,10 +21,12 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import os
+import re
 import shutil
 import tempfile
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 from fastapi import APIRouter, Body, Depends, File, Form, HTTPException, UploadFile
@@ -37,6 +39,9 @@ get_miul_workflow = None
 LOGGER = logging.getLogger(__name__)
 
 router = APIRouter()
+
+XLSX_MEDIA_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+XLSM_MEDIA_TYPE = "application/vnd.ms-excel.sheet.macroEnabled.12"
 
 
 def _get_workflow():
@@ -138,63 +143,151 @@ async def enrich_miul(
     from io import BytesIO
     from openpyxl import load_workbook
 
-    if not file.filename.lower().endswith((".xlsx", ".xls")):
-        raise HTTPException(status_code=400, detail="File must be Excel format")
+    input_name = file.filename or "MIUL.xlsx"
+    input_suffix = Path(input_name).suffix.lower()
+    if input_suffix not in (".xlsx", ".xlsm"):
+        raise HTTPException(status_code=400, detail="File must be .xlsx or .xlsm format")
 
-    LOGGER.info(f"[MIUL] Enriching MIUL from {file.filename}")
+    LOGGER.info(f"[MIUL] Enriching MIUL from {input_name}")
 
     tmp_path = None
     try:
         # Save uploaded file
-        with tempfile.NamedTemporaryFile(suffix=".xlsx", delete=False) as tmp:
+        tmp_suffix = ".xlsm" if input_suffix == ".xlsm" else ".xlsx"
+        with tempfile.NamedTemporaryFile(suffix=tmp_suffix, delete=False) as tmp:
             content = await file.read()
             tmp.write(content)
             tmp_path = Path(tmp.name)
 
-        # Read MIUL sheet into DataFrame for processing
-        miul_df = pd.read_excel(tmp_path, sheet_name="MIUL", engine="openpyxl")
-        original_columns = list(miul_df.columns)
+        # Always strip VBA projects/macros from returned enrichment files.
+        wb = load_workbook(tmp_path, keep_vba=False)
+        sheet_name = "MIUL" if "MIUL" in wb.sheetnames else ("Sheet1" if "Sheet1" in wb.sheetnames else wb.sheetnames[0])
+        ws = wb[sheet_name]
+
+        # Read worksheet into DataFrame for enrichment logic.
+        source_df = pd.read_excel(tmp_path, sheet_name=sheet_name, engine="openpyxl")
+        original_columns = list(source_df.columns)
+
+        miul_required = {"Designation", "Material Code", "FLAM", "SCC", "CORR", "TVS", "TOX", "FS"}
+        opiv_required = {"Designation", "Material Code", "FLAMM Rating", "SCC Rating", "CORR Rating", "TVS Rating", "TOX Rating", "FS Rating"}
+
+        schema = None
+        if miul_required.issubset(set(original_columns)):
+            schema = "miul"
+            working_df = source_df.copy()
+        elif opiv_required.issubset(set(original_columns)):
+            schema = "opiv"
+            working_df = pd.DataFrame(index=source_df.index)
+            working_df["Designation"] = source_df["Designation"]
+            working_df["Material Code"] = source_df["Material Code"]
+            working_df["FLAM"] = source_df["FLAMM Rating"]
+            working_df["SCC"] = source_df["SCC Rating"]
+            working_df["CORR"] = source_df["CORR Rating"]
+            working_df["TVS"] = source_df["TVS Rating"]
+            working_df["TOX"] = source_df["TOX Rating"]
+            working_df["FS"] = source_df["FS Rating"]
+            if "Material Spec." in source_df.columns:
+                working_df["Material Specification"] = source_df["Material Spec."]
+            if "Process Spec." in source_df.columns:
+                working_df["Process Specification"] = source_df["Process Spec."]
+        else:
+            raise HTTPException(
+                status_code=422,
+                detail=(
+                    f"Sheet '{sheet_name}' does not match supported MIUL formats. "
+                    "Expected either standard MIUL columns (FLAM/SCC/CORR/TVS/TOX/FS) "
+                    "or OPIV template columns (FLAMM Rating/SCC Rating/CORR Rating/TVS Rating/TOX Rating/FS Rating)."
+                ),
+            )
 
         # Build column name -> index mapping (1-based for openpyxl)
         col_name_to_idx = {col: i + 1 for i, col in enumerate(original_columns)}
 
-        # Run enrichment steps (2-4) on DataFrame
-        miul_df, codes_found, quarantine = workflow.lookup_material_codes(miul_df)
-        miul_df, stats = workflow.fetch_ratings(miul_df)
+        # Run enrichment on normalized working dataframe.
+        working_df, codes_found, quarantine = workflow.lookup_material_codes(working_df)
+        working_df, stats = workflow.fetch_ratings(working_df)
 
         LOGGER.info(
             f"[MIUL] Enrichment: {stats.get('enriched_count', 0)}/{stats.get('total_materials', 0)} "
             f"({stats.get('coverage_pct', 0):.1f}%), {len(quarantine)} quarantined"
         )
 
-        # NOW: Modify original file in-place to preserve ALL formatting
-        wb = load_workbook(tmp_path)
-        ws = wb["MIUL"]
+        # Write updates back into original worksheet to preserve formatting.
+        if schema == "opiv":
+            update_map = {
+                "Material Code": "Material Code",
+                "FLAM": "FLAMM Rating",
+                "SCC": "SCC Rating",
+                "CORR": "CORR Rating",
+                "TVS": "TVS Rating",
+                "TOX": "TOX Rating",
+                "FS": "FS Rating",
+            }
+        else:
+            update_map = {
+                "Material Code": "Material Code",
+                "FLAM": "FLAM",
+                "SCC": "SCC",
+                "CORR": "CORR",
+                "TVS": "TVS",
+                "TOX": "TOX",
+                "FS": "FS",
+            }
 
-        # Update cells that changed (Material Code and rating columns)
-        # Only update columns that exist in original file
-        update_cols = ["Material Code", "FLAM", "SCC", "CORR", "TVS", "TOX", "FS"]
+        filled_counts: Dict[str, int] = {}
 
-        for col_name in update_cols:
-            if col_name not in col_name_to_idx:
+        for source_col, target_col in update_map.items():
+            if target_col not in col_name_to_idx or source_col not in working_df.columns:
                 continue
-            col_idx = col_name_to_idx[col_name]
+            col_idx = col_name_to_idx[target_col]
+            filled_count = 0
 
-            for row_idx, value in enumerate(miul_df[col_name], start=2):  # Row 2+ (1 is header)
-                if pd.notna(value) and str(value).strip():
-                    ws.cell(row=row_idx, column=col_idx, value=str(value))
+            for row_idx, value in enumerate(working_df[source_col], start=2):  # Row 2+ (1 is header)
+                output_value = None
+                if source_col == "Material Code":
+                    if workflow.is_usable_material_code(value):
+                        output_value = workflow._normalize_material_code(value)
+                else:
+                    if pd.notna(value):
+                        text = str(value).strip()
+                        if text:
+                            output_value = text
+
+                ws.cell(row=row_idx, column=col_idx, value=output_value)
+                if output_value is not None:
+                    filled_count += 1
+            filled_counts[target_col] = filled_count
+
+        if codes_found == 0 and int(stats.get("enriched_count", 0) or 0) == 0:
+            LOGGER.warning(
+                "[MIUL] Enrichment produced no new material codes or MAPTIS rows. "
+                "Check Designation values and material code mappings."
+            )
 
         # Save modified workbook to BytesIO
         output = BytesIO()
         wb.save(output)
         output.seek(0)
 
+        out_name = f"{Path(input_name).stem}_enriched.xlsx"
+        headers = {
+            "Content-Disposition": f"attachment; filename={out_name}",
+            "X-Codes-Found": str(codes_found),
+            "X-Quarantine-Count": str(len(quarantine)),
+            "X-Materials-With-Codes": str(filled_counts.get("Material Code", 0)),
+            "X-Ratings-Enriched": str(int(stats.get("enriched_count", 0) or 0)),
+            "X-Ratings-Added": str(int(stats.get("total_ratings_added", 0) or 0)),
+            "X-Rating-Coverage-Pct": f"{float(stats.get('coverage_pct', 0.0) or 0.0):.1f}",
+        }
+
         return StreamingResponse(
             iter([output.getvalue()]),
-            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers={"Content-Disposition": "attachment; filename=MIUL_enriched.xlsx"},
+            media_type=XLSX_MEDIA_TYPE,
+            headers=headers,
         )
 
+    except HTTPException:
+        raise
     except Exception as e:
         LOGGER.error(f"[MIUL] Enrichment failed: {e}")
         raise HTTPException(status_code=500, detail=f"Enrichment failed: {e}")
@@ -218,17 +311,44 @@ async def get_rating_gaps(
     Returns:
         List of parts needing rationale
     """
-    if not file.filename.lower().endswith((".xlsx", ".xls")):
-        raise HTTPException(status_code=400, detail="File must be Excel format")
+    input_name = file.filename or "MIUL.xlsx"
+    input_suffix = Path(input_name).suffix.lower()
+    if input_suffix not in (".xlsx", ".xlsm"):
+        raise HTTPException(status_code=400, detail="File must be .xlsx or .xlsm format")
 
     tmp_path = None
     try:
-        with tempfile.NamedTemporaryFile(suffix=".xlsx", delete=False) as tmp:
+        tmp_suffix = ".xlsm" if input_suffix == ".xlsm" else ".xlsx"
+        with tempfile.NamedTemporaryFile(suffix=tmp_suffix, delete=False) as tmp:
             content = await file.read()
             tmp.write(content)
             tmp_path = Path(tmp.name)
 
-        miul_df = pd.read_excel(tmp_path, sheet_name="MIUL", engine="openpyxl")
+        wb = load_workbook(tmp_path, keep_vba=(input_suffix == ".xlsm"))
+        sheet_name = "MIUL" if "MIUL" in wb.sheetnames else ("Sheet1" if "Sheet1" in wb.sheetnames else wb.sheetnames[0])
+
+        source_df = pd.read_excel(tmp_path, sheet_name=sheet_name, engine="openpyxl")
+        cols = set(source_df.columns)
+        if {"FLAMM Rating", "SCC Rating", "CORR Rating", "TVS Rating", "TOX Rating", "FS Rating"}.issubset(cols):
+            miul_df = pd.DataFrame(index=source_df.index)
+            miul_df["FLAM"] = source_df["FLAMM Rating"]
+            miul_df["SCC"] = source_df["SCC Rating"]
+            miul_df["CORR"] = source_df["CORR Rating"]
+            miul_df["TVS"] = source_df["TVS Rating"]
+            miul_df["TOX"] = source_df["TOX Rating"]
+            miul_df["FS"] = source_df["FS Rating"]
+            miul_df["Line Number"] = source_df["Index"] if "Index" in source_df.columns else source_df.index + 1
+            miul_df["Detail Drawing"] = source_df["Dwg Source"] if "Dwg Source" in source_df.columns else ""
+            miul_df["Designation"] = source_df["Designation"] if "Designation" in source_df.columns else ""
+            miul_df["Material Code"] = source_df["Material Code"] if "Material Code" in source_df.columns else ""
+        else:
+            miul_df = source_df
+
+        # Ignore blank template rows to avoid false gap reports.
+        if "Part Number" in source_df.columns:
+            part_mask = source_df["Part Number"].fillna("").astype(str).str.strip() != ""
+            miul_df = miul_df[part_mask]
+
         gaps = workflow.identify_rating_gaps(miul_df)
 
         return {
@@ -429,7 +549,12 @@ async def extract_miul_v3(
         Excel file with MIUL data (MAPTIS-compliant formatting).
     """
     from io import BytesIO
-    from mira.miul.v3.builder import MIULBuilderV3, build_miul_2phase, EnvironmentConfig
+    from mira.miul.v3.builder import (
+        MIULBuilderV3,
+        build_miul_2phase,
+        EnvironmentConfig,
+        _export_miul_excel,
+    )
 
     # Build environment config from form parameters
     env_config = EnvironmentConfig(
@@ -552,7 +677,14 @@ async def extract_miul_v3(
             builder = MIULBuilderV3()
             builder.extract_directory(temp_dir, nha_override_path=nha_override_path)
             df = builder.build_miul()
-            builder.export_to_excel(df, output_excel, project=project)
+            _export_miul_excel(
+                df,
+                output_excel,
+                project,
+                builder.dt_tree if isinstance(builder.dt_tree, dict) else {},
+                {"parts": {}, "drawings": {}},
+                environment=env_config,
+            )
 
             # Export inventory JSON for debugging
             inventory_path = temp_dir / f"{project}_inventory_v3.json"
@@ -597,7 +729,7 @@ async def extract_miul_v3(
         # This fixes proxy issues with binary file downloads
         return Response(
             content=content,
-            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            media_type=XLSX_MEDIA_TYPE,
             headers=response_headers,
         )
 
@@ -624,7 +756,7 @@ def _get_v4_extractor():
     """Lazy-load v4 vision extractor."""
     global _V4Extractor
     if _V4Extractor is None:
-        from mira.miul.vision_extractor import MIULVisionExtractor
+        from mira.miul.production.extractor import MIULVisionExtractor
         _V4Extractor = MIULVisionExtractor
     return _V4Extractor()
 
@@ -633,9 +765,197 @@ def _get_v4_session(extraction_id: str):
     """Lazy-load v4 session manager."""
     global _V4Session
     if _V4Session is None:
-        from mira.miul.v4_session import V4Session
+        from mira.miul.production.session import V4Session
         _V4Session = V4Session
     return _V4Session(extraction_id)
+
+
+def _is_blank_value(value: Any) -> bool:
+    """Return True for None/empty/nan-like values."""
+    if value is None:
+        return True
+    text = str(value).strip()
+    return text == "" or text.lower() == "nan"
+
+
+def _env_flag(name: str, default: bool) -> bool:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    return str(raw).strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _normalize_v4_part_number(part_number: Any) -> str:
+    """Normalize OCR part numbers for dedupe and matching."""
+    pn = str(part_number or "").strip().upper()
+    pn = re.sub(r"\s+", " ", pn)
+    # Common OCR artifact: append Find number to PN ("EH-22-C86 6.")
+    pn = re.sub(r"\s+\d+\.$", "", pn)
+    return pn
+
+
+def _extract_drawing_number_from_source(source_file: str) -> str:
+    """Extract drawing number from source filename."""
+    if not source_file:
+        return ""
+    stem = Path(source_file).stem
+    for sep in (".DRW", "_DRW", "_drw", "_Drw"):
+        if sep in stem:
+            return stem.split(sep)[0].upper()
+    return (stem.split("_")[0] if "_" in stem else stem).upper()
+
+
+def _material_worst_confidence(material: Any) -> float:
+    """Compute lowest confidence for a material sighting."""
+    confidence = getattr(material, "confidence", None) or {}
+    if not confidence:
+        return 0.0
+    try:
+        return min(float(v or 0.0) for v in confidence.values())
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def _select_best_field_value(
+    materials: List[Any],
+    field_name: str,
+) -> Tuple[str, float]:
+    """Pick highest-confidence non-empty value for a field across sightings."""
+    best_value = ""
+    best_conf = -1.0
+    for material in materials:
+        raw_value = getattr(material, field_name, None)
+        if _is_blank_value(raw_value):
+            continue
+        confidence = getattr(material, "confidence", None) or {}
+        try:
+            score = float(confidence.get(field_name, 0.0) or 0.0)
+        except (TypeError, ValueError):
+            score = 0.0
+        if score > best_conf:
+            best_conf = score
+            best_value = str(raw_value).strip()
+    return best_value, (best_conf if best_conf >= 0.0 else 0.0)
+
+
+def _is_noise_v4_material(part_number: str, description: str, quantity: Any) -> bool:
+    """Filter obvious non-parts from extraction stream."""
+    pn = _normalize_v4_part_number(part_number)
+    desc = str(description or "").upper()
+    qty = str(quantity or "").strip().upper()
+
+    if not pn:
+        return True
+    if pn.startswith("NOTE") or re.fullmatch(r"NOTE-?\d+", pn):
+        return True
+    if re.fullmatch(r"\d+\.?", pn):
+        return True
+    # ICD docs are references, not MIUL parts.
+    if pn.endswith("-ICD"):
+        return True
+    if qty == "AR" and any(token in desc for token in ("LUBRICANT", "GREASE", "OIL")):
+        return True
+    return False
+
+
+def _default_project_from_dt(dt_json: Dict[str, Any], extraction_id: str) -> str:
+    """Infer a stable project identifier from DT top-level drawing number."""
+    top_level = str((dt_json or {}).get("top_level") or "").strip().upper()
+    if not top_level:
+        return f"MIUL_V4_{extraction_id[:8]}"
+
+    # MER07540-001 -> MER07540
+    match = re.match(r"^([A-Z]+\d+)", top_level)
+    if match:
+        return match.group(1)
+
+    # GPE-A000-1 -> GPE-A000
+    match = re.match(r"^([A-Z0-9-]+?)(?:-\d+)?$", top_level)
+    if match:
+        return match.group(1)
+
+    return top_level
+
+
+def _build_parts_json_from_v4_extraction(
+    extraction_result: Any,
+    review_data: Optional[Dict[str, Any]],
+) -> Dict[str, Any]:
+    """Convert reviewed v4 extraction into v3 merge-compatible parts_json."""
+    grouped: Dict[str, List[Any]] = {}
+    for material in extraction_result.materials:
+        pn = _normalize_v4_part_number(getattr(material, "part_number", ""))
+        desc = str(getattr(material, "part_description", "") or "")
+        qty = getattr(material, "quantity", "")
+        if _is_noise_v4_material(pn, desc, qty):
+            continue
+        grouped.setdefault(pn, []).append(material)
+
+    dt_tree = (extraction_result.dt_context or {}).get("tree", [])
+    dt_lookup = {
+        _normalize_v4_part_number(node.get("drawing_number", "")): node
+        for node in dt_tree
+        if node.get("drawing_number")
+    }
+
+    review_overrides: Dict[str, Dict[str, Any]] = {}
+    if review_data:
+        for item in review_data.get("review_items", []):
+            pn = _normalize_v4_part_number(item.get("part_number", ""))
+            if pn:
+                review_overrides[pn] = item
+
+    parts: Dict[str, Dict[str, Any]] = {}
+    drawings: Dict[str, Dict[str, Any]] = {}
+
+    for pn, sightings in grouped.items():
+        sightings_sorted = sorted(sightings, key=_material_worst_confidence, reverse=True)
+        primary = sightings_sorted[0]
+
+        chosen_fields: Dict[str, str] = {}
+        for field_name in ("designation", "material_spec", "process_spec", "uns_code", "material_form"):
+            chosen_fields[field_name], _ = _select_best_field_value(sightings_sorted, field_name)
+
+        # Human-reviewed values are authoritative for corrected/accepted items.
+        review_item = review_overrides.get(pn)
+        if review_item:
+            review_fields = review_item.get("fields", {})
+            for field_name in ("designation", "material_spec", "process_spec", "uns_code", "material_form"):
+                reviewed_value = (review_fields.get(field_name) or {}).get("value")
+                if not _is_blank_value(reviewed_value):
+                    chosen_fields[field_name] = str(reviewed_value).strip()
+
+        description = str(getattr(primary, "part_description", "") or "").strip()
+        source_file = str(getattr(primary, "source_file", "") or "")
+        source_drawing = _extract_drawing_number_from_source(source_file)
+        if not source_drawing and pn in dt_lookup:
+            source_drawing = pn
+
+        parts[pn] = {
+            "description": description,
+            "material": chosen_fields.get("designation", ""),
+            "material_spec": chosen_fields.get("material_spec", ""),
+            "process_spec": chosen_fields.get("process_spec", ""),
+            "uns": chosen_fields.get("uns_code", ""),
+            "source_drawing": source_drawing,
+        }
+
+        dt_node = dt_lookup.get(pn)
+        if dt_node:
+            drawings[pn] = {
+                "title": str(dt_node.get("title") or description or "").strip(),
+                "revision": "",
+                "material": chosen_fields.get("designation", ""),
+                "material_spec": chosen_fields.get("material_spec", ""),
+                "process_spec": chosen_fields.get("process_spec", ""),
+                "uns": chosen_fields.get("uns_code", ""),
+                "drawing_type": str(dt_node.get("type") or "DETAIL").upper(),
+            }
+
+    return {
+        "parts": parts,
+        "drawings": drawings,
+    }
 
 
 def _run_extraction_background(
@@ -649,7 +969,7 @@ def _run_extraction_background(
     This runs in a separate thread via asyncio.to_thread so the HTTP response
     returns immediately and the frontend polls /v4/extract/{id}/status.
     """
-    from mira.miul.v4_session import V4Session
+    from mira.miul.production.session import V4Session
     session = V4Session(extraction_id)
 
     try:
@@ -694,7 +1014,7 @@ def _run_extraction_background(
 @router.get("/v4/sessions")
 async def list_v4_sessions(limit: int = 20) -> dict:
     """List recent v4 extraction sessions for session resume UI."""
-    from mira.miul.v4_session import list_sessions
+    from mira.miul.production.session import list_sessions
     sessions = list_sessions(limit=limit)
     return {"sessions": sessions}
 
@@ -706,7 +1026,7 @@ async def delete_v4_session(extraction_id: str) -> dict:
     Removes all session files (extraction, review, audit, status).
     Used when the user toggled 'sensitive build' to prevent data persistence.
     """
-    from mira.miul.v4_session import get_session_root
+    from mira.miul.production.session import get_session_root
 
     session_dir = get_session_root() / extraction_id
     if not session_dir.exists():
@@ -725,7 +1045,7 @@ async def delete_v4_session(extraction_id: str) -> dict:
 @router.post("/v4/extract")
 async def extract_miul_v4(
     drawings: List[UploadFile] = File(...),
-    drawing_tree_json: UploadFile = File(...),
+    drawing_tree_json: UploadFile = File(None),
     project: str = Form(""),
 ) -> dict:
     """V4 MIUL Extraction -- Sonnet Vision with 2-pass gap-filling.
@@ -740,15 +1060,9 @@ async def extract_miul_v4(
     if not drawings:
         raise HTTPException(status_code=400, detail="No PDF files provided")
 
-    if not drawing_tree_json or not drawing_tree_json.filename:
-        raise HTTPException(
-            status_code=400,
-            detail="Drawing Tree JSON is required. Use the DT Editor to extract it first."
-        )
-
     LOGGER.info(
         f"[MIUL-V4] Starting extraction: {len(drawings)} PDFs, "
-        f"DT={drawing_tree_json.filename}"
+        f"DT={(drawing_tree_json.filename if drawing_tree_json and drawing_tree_json.filename else 'none')}"
     )
 
     # Generate extraction ID upfront so we can return it immediately
@@ -756,7 +1070,7 @@ async def extract_miul_v4(
     extraction_id = str(uuid.uuid4())
 
     # Create session directory and set initial status
-    from mira.miul.v4_session import V4Session
+    from mira.miul.production.session import V4Session
     session = V4Session(extraction_id)
     session.set_status("uploading", "Receiving files...", progress=1)
 
@@ -764,12 +1078,22 @@ async def extract_miul_v4(
     temp_dir = Path(tempfile.mkdtemp())
 
     try:
-        # Load DT JSON
-        dt_content = await drawing_tree_json.read()
-        try:
-            dt_json = json.loads(dt_content)
-        except json.JSONDecodeError:
-            raise HTTPException(status_code=400, detail="Invalid DT JSON file")
+        # Load DT JSON if provided; allow no-DT mode for degraded hierarchy builds.
+        dt_json: Dict[str, Any] = {}
+        if drawing_tree_json and drawing_tree_json.filename:
+            dt_content = await drawing_tree_json.read()
+            try:
+                parsed = json.loads(dt_content)
+            except json.JSONDecodeError:
+                raise HTTPException(status_code=400, detail="Invalid DT JSON file")
+
+            if not isinstance(parsed, dict):
+                raise HTTPException(status_code=400, detail="DT JSON must be a JSON object")
+            dt_json = parsed
+        else:
+            LOGGER.warning(
+                "[MIUL-V4] No DT JSON provided; extraction will continue in degraded hierarchy mode."
+            )
 
         # Save drawing PDFs to temp directory
         pdf_paths = []
@@ -799,6 +1123,7 @@ async def extract_miul_v4(
             "extraction_id": extraction_id,
             "project": project,
             "status": "extracting",
+            "dt_mode": "with_tree" if dt_json.get("tree") else "no_tree",
         }
 
     except HTTPException:
@@ -966,6 +1291,89 @@ async def get_v4_material_list(extraction_id: str) -> dict:
     }
 
 
+@router.get("/v4/extract/{extraction_id}/drawings")
+async def get_v4_drawing_list(extraction_id: str) -> dict:
+    """Get extracted drawing packages for the review-stage remove flow."""
+    session = _get_v4_session(extraction_id)
+    if not session.exists:
+        raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
+
+    drawings = session.list_drawings()
+    return {
+        "extraction_id": extraction_id,
+        "count": len(drawings),
+        "drawings": drawings,
+    }
+
+
+@router.delete("/v4/extract/{extraction_id}/drawings/{drawing_id}")
+async def remove_v4_drawing(
+    extraction_id: str,
+    drawing_id: str,
+    reviewer: str = "",
+    reason: str = "",
+) -> dict:
+    """Remove a drawing from an extracted session and regenerate review data."""
+    session = _get_v4_session(extraction_id)
+    if not session.exists:
+        raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
+
+    result = session.remove_drawing(drawing_id=drawing_id, reviewer=reviewer, reason=reason)
+    if not result.get("removed"):
+        detail = result.get("error") or f"Drawing {drawing_id} not found"
+        raise HTTPException(status_code=404, detail=detail)
+
+    review = session.load_review() or {}
+    review_summary = review.get("summary", {})
+    if "total_rows" in review_summary and "total_materials" not in review_summary:
+        review_summary["total_materials"] = review_summary.pop("total_rows")
+
+    drawings = session.list_drawings()
+    return {
+        "extraction_id": extraction_id,
+        "drawing_id": drawing_id,
+        "removed": True,
+        "summary": review_summary,
+        "review_status": review.get("status", "unknown"),
+        "drawings": drawings,
+        **{k: v for k, v in result.items() if k != "removed"},
+    }
+
+
+@router.delete("/v4/extract/{extraction_id}/parts/{part_number:path}")
+async def remove_v4_part(
+    extraction_id: str,
+    part_number: str,
+    reviewer: str = "",
+    reason: str = "",
+) -> dict:
+    """Remove a part from an extracted session and regenerate review data."""
+    session = _get_v4_session(extraction_id)
+    if not session.exists:
+        raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
+
+    result = session.remove_part(part_number=part_number, reviewer=reviewer, reason=reason)
+    if not result.get("removed"):
+        detail = result.get("error") or f"Part {part_number} not found"
+        raise HTTPException(status_code=404, detail=detail)
+
+    review = session.load_review() or {}
+    review_summary = review.get("summary", {})
+    if "total_rows" in review_summary and "total_materials" not in review_summary:
+        review_summary["total_materials"] = review_summary.pop("total_rows")
+
+    drawings = session.list_drawings()
+    return {
+        "extraction_id": extraction_id,
+        "part_number": part_number,
+        "removed": True,
+        "summary": review_summary,
+        "review_status": review.get("status", "unknown"),
+        "drawings": drawings,
+        **{k: v for k, v in result.items() if k != "removed"},
+    }
+
+
 @router.post("/v4/extract/{extraction_id}/review/{part_number}")
 async def submit_v4_correction(
     extraction_id: str,
@@ -997,7 +1405,7 @@ async def submit_v4_correction(
     return {"status": "corrected", "part_number": part_number, "item": item}
 
 
-@router.post("/v4/extract/{extraction_id}/review/{part_number}/accept")
+@router.post("/v4/extract/{extraction_id}/review/{part_number:path}/accept")
 async def accept_v4_item(
     extraction_id: str,
     part_number: str,
@@ -1062,21 +1470,35 @@ async def approve_v4_build(
 async def build_miul_v4(
     extraction_id: str = Form(...),
     project: str = Form(""),
+    max_temp: float = Form(120.0),
+    min_temp: float = Form(0.0),
+    max_pressure: float = Form(14.7),
+    min_pressure: float = Form(0.0),
+    fluid_type: str = Form("Air"),
+    environment: str = Form("Air, VAC"),
+    o2_percent: float = Form(20.9),
 ) -> Response:
-    """Build final MIUL from an approved v4 extraction.
+    """Build base MIUL from an approved v4 extraction (no enrichment).
 
-    Phase 3 of the v4 pipeline. Takes approved extraction data and runs it
-    through the existing enrichment pipeline: material code lookup -> MAPTIS
-    ratings -> MIULTree construction -> Excel export.
+    Produces a 40-column MAPTIS-compliant Excel with environment parameters.
+    When DT context is present, tree/NHA/parent structure is DT-driven.
+    When DT is missing, build runs in degraded hierarchy mode.
 
     ONLY works after extraction is approved via /v4/extract/{id}/approve.
 
     Args:
         extraction_id: Extraction UUID (must be approved)
         project: Project name for Excel output
+        max_temp: Max operating temperature (deg F)
+        min_temp: Min operating temperature (deg F)
+        max_pressure: Max operating pressure (psia)
+        min_pressure: Min operating pressure (psia)
+        fluid_type: Service media (Air, O2, H2, etc.)
+        environment: Environment description (e.g. "Air, VAC")
+        o2_percent: Oxygen concentration (%)
 
     Returns:
-        MAPTIS-compliant Excel file.
+        MAPTIS-compliant Excel file (base MIUL, no enrichment).
     """
     session = _get_v4_session(extraction_id)
     if not session.exists:
@@ -1091,55 +1513,131 @@ async def build_miul_v4(
     LOGGER.info(f"[MIUL-V4] Building MIUL from approved extraction: {extraction_id}")
 
     try:
+        from mira.miul.v3.builder import _export_miul_excel, EnvironmentConfig
+        from mira.miul.production.pair_builder import (
+            build_miul_from_pair_rows,
+            build_pair_rows_from_v4_extraction,
+            build_parts_json_for_summary,
+            validate_miul_tree_against_dt,
+        )
+
         result = session.load_extraction()
         if not result:
             raise HTTPException(status_code=500, detail="Could not load extraction data")
 
-        # Build MIUL using existing workflow pipeline
-        workflow = _get_workflow()
+        dt_json = result.dt_context if isinstance(result.dt_context, dict) else {}
+        has_dt_tree = bool(dt_json.get("tree"))
+        if not has_dt_tree:
+            LOGGER.warning(
+                "[MIUL-V4] No DT tree context for extraction %s; building in degraded hierarchy mode.",
+                extraction_id,
+            )
 
-        # Convert extraction materials to DataFrame for existing pipeline
-        rows = []
-        for mat in result.materials:
-            rows.append({
-                "Part Number": mat.part_number,
-                "Description": mat.part_description,
-                "Designation": mat.designation or "",
-                "Material Specification": mat.material_spec or "",
-                "Process Specification": mat.process_spec or "",
-                "Material Form": mat.material_form or "",
-                "NHA": mat.nha or "",
-                "Quantity": mat.quantity,
-            })
-
-        miul_df = pd.DataFrame(rows)
+        review = session.load_review() or {}
+        pair_rows = build_pair_rows_from_v4_extraction(result, review, dt_json=dt_json)
 
         if not project:
-            project = f"MIUL_V4_{extraction_id[:8]}"
+            project = _default_project_from_dt(dt_json, extraction_id)
 
-        # Run enrichment pipeline (reuse existing workflow)
-        miul_df, codes_found, quarantine = workflow.lookup_material_codes(miul_df)
-        miul_df, stats = workflow.fetch_ratings(miul_df)
-
-        LOGGER.info(
-            f"[MIUL-V4] Enrichment: {stats.get('enriched_count', 0)}/{stats.get('total_materials', 0)} "
-            f"({stats.get('coverage_pct', 0):.1f}%)"
+        # Build environment config from form params
+        env_config = EnvironmentConfig(
+            max_temp=max_temp,
+            min_temp=min_temp,
+            max_pressure=max_pressure,
+            min_pressure=min_pressure,
+            fluid_type=fluid_type,
+            environment=environment,
+            o2_percent=o2_percent,
         )
 
-        # Export to Excel (returns BytesIO buffer)
-        excel_buffer = workflow.export_to_excel(miul_df)
+        # Build MIUL at (Part Number, Drawing Source) granularity.
+        # DT remains authoritative for NHA relationships.
+        miul_df = build_miul_from_pair_rows(
+            pair_rows,
+            dt_json,
+            project,
+            environment=env_config,
+        )
+        parts_json_for_summary = build_parts_json_for_summary(pair_rows, dt_json)
 
-        LOGGER.info(f"[MIUL-V4] Build complete: {len(miul_df)} rows exported")
+        validation = (
+            validate_miul_tree_against_dt(miul_df, dt_json)
+            if has_dt_tree
+            else {
+                "valid": True,
+                "skipped": True,
+                "reason": "No DT tree context provided",
+            }
+        )
+        enforce_tree_validation = _env_flag("MIUL_V4_ENFORCE_TREE_VALIDATION", True)
+        if has_dt_tree and enforce_tree_validation and not validation.get("valid", False):
+            LOGGER.error(
+                "[MIUL-V4] Tree validation failed for extraction %s: missing=%d extra=%d "
+                "parent_mismatches=%d tree_nha_mismatches=%d subpart_nha_mismatches=%d",
+                extraction_id,
+                len(validation.get("missing_nodes", [])),
+                len(validation.get("extra_tree_nodes", [])),
+                len(validation.get("parent_mismatches", [])),
+                len(validation.get("tree_nha_mismatches", [])),
+                len(validation.get("subpart_nha_mismatches", [])),
+            )
+            raise HTTPException(
+                status_code=422,
+                detail={
+                    "message": "Built MIUL tree does not match DT structure.",
+                    "validation": validation,
+                    "rollback_hint": (
+                        "Set MIUL_V4_ENFORCE_TREE_VALIDATION=0 to bypass temporarily, "
+                        "or MIUL_V4_STRUCTURAL_TREE_MODE=legacy for rollback mode."
+                    ),
+                },
+            )
+
+        LOGGER.info(
+            f"[MIUL-V4] Pair build: {len(pair_rows)} pair rows -> "
+            f"{len(miul_df)} MIUL rows (env: {fluid_type}, {min_temp}-{max_temp}F, "
+            f"{min_pressure}-{max_pressure} psia)"
+        )
+
+        # Export with v3 MAPTIS formatting and summary sheet (NO enrichment).
+        # Use /enrich endpoint separately to add material codes + ratings.
+        export_dir = Path(tempfile.mkdtemp())
+        export_path = export_dir / f"MIUL_{project}_v4.xlsx"
+        try:
+            _export_miul_excel(
+                miul_df,
+                export_path,
+                project,
+                dt_json,
+                parts_json_for_summary,
+                environment=env_config,
+            )
+            excel_bytes = export_path.read_bytes()
+        finally:
+            shutil.rmtree(export_dir, ignore_errors=True)
+
+        # Also save to persistent location for manual retrieval
+        persistent_path = Path("C:/BoundState/temp") / f"MIUL_{project}_v4.xlsx"
+        persistent_path.parent.mkdir(parents=True, exist_ok=True)
+        persistent_path.write_bytes(excel_bytes)
+        LOGGER.info(f"[MIUL-V4] Build complete: {len(miul_df)} rows -> {persistent_path}")
 
         return Response(
-            content=excel_buffer.getvalue(),
-            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            content=excel_bytes,
+            media_type=XLSX_MEDIA_TYPE,
             headers={
                 "Content-Disposition": f"attachment; filename=MIUL_{project}_v4.xlsx",
-                "X-Pipeline-Version": "v4",
+                "X-Pipeline-Version": "v4-hybrid",
                 "X-Project": project,
                 "X-MIUL-Count": str(len(miul_df)),
                 "X-Extraction-ID": extraction_id,
+                "X-V4-Tree-Mode": str(os.getenv("MIUL_V4_STRUCTURAL_TREE_MODE", "deterministic")),
+                "X-V4-Package-Mode": "on" if _env_flag("MIUL_V4_USE_DRAWING_PACKAGES", True) else "off",
+                "X-V4-DT-Context": "provided" if has_dt_tree else "missing",
+                "X-V4-Tree-Validation-Enforced": "on" if (has_dt_tree and enforce_tree_validation) else "off",
+                "X-V4-Tree-Validation-Pass": (
+                    "yes" if validation.get("valid", False) else ("n/a" if not has_dt_tree else "no")
+                ),
             },
         )
 

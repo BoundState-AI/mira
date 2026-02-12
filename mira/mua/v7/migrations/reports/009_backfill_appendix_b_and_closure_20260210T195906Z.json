@@ -1,0 +1,1225 @@
+{
+  "mode": "DRY_RUN",
+  "timestamp_utc": "2026-02-10T19:59:06.690892+00:00",
+  "rows_scanned": 5650,
+  "appendix_updates": 826,
+  "closure_updates": 1194,
+  "rows_touched": 1194,
+  "appendix_method_counts": {
+    "pattern_code_106": 68,
+    "pattern_code_105": 238,
+    "pattern_code_104": 400,
+    "pattern_code_108": 40,
+    "pattern_code_103": 24,
+    "pattern_code_107": 56
+  },
+  "closure_method_counts": {
+    "from_appendix_code": 826,
+    "pattern_heat_sink": 193,
+    "pattern_substitution": 51,
+    "pattern_config_analysis": 23,
+    "pattern_minor_quantity": 101
+  },
+  "sample_updates": [
+    {
+      "row_id": 5002,
+      "mua_number": "1000-00005",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "106",
+      "appendix_method": "pattern_code_106",
+      "old_closure_path": null,
+      "new_closure_path": "CONFIG_ANALYSIS",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5003,
+      "mua_number": "1000-0006",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5014,
+      "mua_number": "1001-0009",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5017,
+      "mua_number": "1001-0030",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5021,
+      "mua_number": "1001-0036",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5023,
+      "mua_number": "1001-0038",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5027,
+      "mua_number": "1001-0045",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5029,
+      "mua_number": "1001-0048",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5030,
+      "mua_number": "1001-0049",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5031,
+      "mua_number": "1001-0056",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "108",
+      "appendix_method": "pattern_code_108",
+      "old_closure_path": null,
+      "new_closure_path": "CONFIG_ANALYSIS",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5034,
+      "mua_number": "1001-0086",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5043,
+      "mua_number": "1001-0141",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5048,
+      "mua_number": "1001-0163",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5053,
+      "mua_number": "30233",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5069,
+      "mua_number": "1001-2258",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5077,
+      "mua_number": "1001-2286",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5078,
+      "mua_number": "1001-2287",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5079,
+      "mua_number": "1001-2290",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "no_rule_hit",
+      "old_closure_path": null,
+      "new_closure_path": "SUBSTITUTION",
+      "closure_method": "pattern_substitution"
+    },
+    {
+      "row_id": 5086,
+      "mua_number": "1001-2302",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "determination_not_approved",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5090,
+      "mua_number": "1001-2307",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "determination_not_approved",
+      "old_closure_path": null,
+      "new_closure_path": "CONFIG_ANALYSIS",
+      "closure_method": "pattern_config_analysis"
+    },
+    {
+      "row_id": 5101,
+      "mua_number": "1001-2344",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "determination_not_approved",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5103,
+      "mua_number": "1001-2349",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "determination_not_approved",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "pattern_minor_quantity"
+    },
+    {
+      "row_id": 5120,
+      "mua_number": "1001-2380",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5124,
+      "mua_number": "1001-2385",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "determination_not_approved",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5128,
+      "mua_number": "1001-2390",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5132,
+      "mua_number": "1001-5001",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "determination_not_approved",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "pattern_minor_quantity"
+    },
+    {
+      "row_id": 5134,
+      "mua_number": "1002-0059",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "determination_not_approved",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5144,
+      "mua_number": "1003-0101",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5146,
+      "mua_number": "1004-D0032",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5148,
+      "mua_number": "1004-0004",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5149,
+      "mua_number": "1004-0005",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5152,
+      "mua_number": "1004-0008",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5153,
+      "mua_number": "1004-0012",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5167,
+      "mua_number": "CR0014-923-008",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "CONFIG_ANALYSIS",
+      "closure_method": "pattern_config_analysis"
+    },
+    {
+      "row_id": 5177,
+      "mua_number": "1008-0207",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5178,
+      "mua_number": "1008-0221",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5179,
+      "mua_number": "1008-0222",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5181,
+      "mua_number": "1809-0002",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5183,
+      "mua_number": "1009-0006",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5185,
+      "mua_number": "1009-0023",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "determination_not_approved",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5193,
+      "mua_number": "1010-0007",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5195,
+      "mua_number": "1010-0009",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "determination_not_approved",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5201,
+      "mua_number": "1010-0016",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5203,
+      "mua_number": "1010-0018",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5204,
+      "mua_number": "1010-0019",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5205,
+      "mua_number": "1010-0020",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "106",
+      "appendix_method": "pattern_code_106",
+      "old_closure_path": null,
+      "new_closure_path": "CONFIG_ANALYSIS",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5206,
+      "mua_number": "1010-0028",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5211,
+      "mua_number": "1011-0001",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5216,
+      "mua_number": "1011-0006",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5217,
+      "mua_number": "1011-0007",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5227,
+      "mua_number": "1014-0003",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5228,
+      "mua_number": "1014-0004",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5229,
+      "mua_number": "1014-0005",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5230,
+      "mua_number": "1014-0006",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5232,
+      "mua_number": "1014-0010",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5233,
+      "mua_number": "1014-0015",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5234,
+      "mua_number": "1014-0016",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "pattern_minor_quantity"
+    },
+    {
+      "row_id": 5235,
+      "mua_number": "1014-0019",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5236,
+      "mua_number": "1014-0020",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5237,
+      "mua_number": "1014-0023",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5238,
+      "mua_number": "1014-0033",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5242,
+      "mua_number": "1015-0104",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5244,
+      "mua_number": "1015-0106",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5245,
+      "mua_number": "1016-0119",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5257,
+      "mua_number": "1888 MUA5",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "pattern_minor_quantity"
+    },
+    {
+      "row_id": 5259,
+      "mua_number": "1888 MUA8",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "pattern_minor_quantity"
+    },
+    {
+      "row_id": 5260,
+      "mua_number": "1888 MUA9",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "determination_not_approved",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5262,
+      "mua_number": "1888 MUA11",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "pattern_minor_quantity"
+    },
+    {
+      "row_id": 5265,
+      "mua_number": "1888 MUA16",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "pattern_minor_quantity"
+    },
+    {
+      "row_id": 5266,
+      "mua_number": "1988 MUA17",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "pattern_minor_quantity"
+    },
+    {
+      "row_id": 5267,
+      "mua_number": "1888 MUA18",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "pattern_minor_quantity"
+    },
+    {
+      "row_id": 5268,
+      "mua_number": "1888 MUA19",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "pattern_minor_quantity"
+    },
+    {
+      "row_id": 5269,
+      "mua_number": "1888 MUA21",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "pattern_minor_quantity"
+    },
+    {
+      "row_id": 5272,
+      "mua_number": "1888 MUA15",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5278,
+      "mua_number": "IES028",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "103",
+      "appendix_method": "pattern_code_103",
+      "old_closure_path": null,
+      "new_closure_path": "CONFIG_ANALYSIS",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5283,
+      "mua_number": "IES 300--Stowage Container",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "107",
+      "appendix_method": "pattern_code_107",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5312,
+      "mua_number": "2-11-5",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5313,
+      "mua_number": "2-11-6",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5322,
+      "mua_number": "2-13-3",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5323,
+      "mua_number": "2-13-4",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5337,
+      "mua_number": "2220-0000CS/04",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "106",
+      "appendix_method": "pattern_code_106",
+      "old_closure_path": null,
+      "new_closure_path": "CONFIG_ANALYSIS",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5339,
+      "mua_number": "2220-000 CS/06",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "106",
+      "appendix_method": "pattern_code_106",
+      "old_closure_path": null,
+      "new_closure_path": "CONFIG_ANALYSIS",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5340,
+      "mua_number": "R02220-0000CS/07",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "106",
+      "appendix_method": "pattern_code_106",
+      "old_closure_path": null,
+      "new_closure_path": "CONFIG_ANALYSIS",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5341,
+      "mua_number": "2220-0000CS/09",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "106",
+      "appendix_method": "pattern_code_106",
+      "old_closure_path": null,
+      "new_closure_path": "CONFIG_ANALYSIS",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5346,
+      "mua_number": "2220-0000D0/04",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "106",
+      "appendix_method": "pattern_code_106",
+      "old_closure_path": null,
+      "new_closure_path": "CONFIG_ANALYSIS",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5347,
+      "mua_number": "497 2220-0001-002",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "cat1_disqualifier",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5350,
+      "mua_number": "2220CA0003",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "106",
+      "appendix_method": "pattern_code_106",
+      "old_closure_path": null,
+      "new_closure_path": "CONFIG_ANALYSIS",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5353,
+      "mua_number": "2220CA0010",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "106",
+      "appendix_method": "pattern_code_106",
+      "old_closure_path": null,
+      "new_closure_path": "CONFIG_ANALYSIS",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5354,
+      "mua_number": "2220CAU012",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "106",
+      "appendix_method": "pattern_code_106",
+      "old_closure_path": null,
+      "new_closure_path": "CONFIG_ANALYSIS",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5363,
+      "mua_number": "308309 - MUA05",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "determination_not_approved",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5366,
+      "mua_number": "3997-001",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5373,
+      "mua_number": "3197-008",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5377,
+      "mua_number": "3997-012",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5387,
+      "mua_number": "4 BMS-015",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "108",
+      "appendix_method": "pattern_code_108",
+      "old_closure_path": null,
+      "new_closure_path": "CONFIG_ANALYSIS",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5388,
+      "mua_number": "6 BMS-017",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "108",
+      "appendix_method": "pattern_code_108",
+      "old_closure_path": null,
+      "new_closure_path": "CONFIG_ANALYSIS",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5389,
+      "mua_number": "4 8MS-018",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "108",
+      "appendix_method": "pattern_code_108",
+      "old_closure_path": null,
+      "new_closure_path": "CONFIG_ANALYSIS",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5390,
+      "mua_number": "4-BNS-019",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "108",
+      "appendix_method": "pattern_code_108",
+      "old_closure_path": null,
+      "new_closure_path": "CONFIG_ANALYSIS",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5398,
+      "mua_number": "4-R-020",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "108",
+      "appendix_method": "pattern_code_108",
+      "old_closure_path": null,
+      "new_closure_path": "CONFIG_ANALYSIS",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5406,
+      "mua_number": "S-C-114",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "108",
+      "appendix_method": "pattern_code_108",
+      "old_closure_path": null,
+      "new_closure_path": "CONFIG_ANALYSIS",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5422,
+      "mua_number": "50000-8012",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "107",
+      "appendix_method": "pattern_code_107",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5425,
+      "mua_number": "50000-8015",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5430,
+      "mua_number": "5103 MUA 001",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5432,
+      "mua_number": "5103 MUA 003",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5433,
+      "mua_number": "5103 MUA 004",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5434,
+      "mua_number": "5103 MUA 005",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5442,
+      "mua_number": "5103 MUA 013",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5447,
+      "mua_number": "5103 MUA 018",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5463,
+      "mua_number": "5103 MUA 207",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "106",
+      "appendix_method": "pattern_code_106",
+      "old_closure_path": null,
+      "new_closure_path": "CONFIG_ANALYSIS",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5468,
+      "mua_number": "5103 MUA 212",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "107",
+      "appendix_method": "pattern_code_107",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5472,
+      "mua_number": "5103 MUA 216",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "107",
+      "appendix_method": "pattern_code_107",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5473,
+      "mua_number": "5103 MUA 217",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5489,
+      "mua_number": "5103 MUA 233",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "105",
+      "appendix_method": "pattern_code_105",
+      "old_closure_path": null,
+      "new_closure_path": "MINOR_QUANTITY",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5490,
+      "mua_number": "5103 MUA 234",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5492,
+      "mua_number": "5103 MUA 236",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5493,
+      "mua_number": "5103 MUA 237",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5497,
+      "mua_number": "5103 MUA 241",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5498,
+      "mua_number": "5103 MUA 242",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "determination_not_approved",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    },
+    {
+      "row_id": 5499,
+      "mua_number": "5103 MUA 243",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5500,
+      "mua_number": "5103 MUA 244",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": "104",
+      "appendix_method": "pattern_code_104",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "from_appendix_code"
+    },
+    {
+      "row_id": 5501,
+      "mua_number": "5103 MUA 245",
+      "old_appendix_b_code": null,
+      "new_appendix_b_code": null,
+      "appendix_method": "determination_not_approved",
+      "old_closure_path": null,
+      "new_closure_path": "HEAT_SINK",
+      "closure_method": "pattern_heat_sink"
+    }
+  ]
+}

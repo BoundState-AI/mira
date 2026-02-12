@@ -85,6 +85,15 @@ interface ExtractionSummary {
   auto_approved: number;
 }
 
+interface SourceDrawing {
+  drawing_id: string;
+  drawing_number: string;
+  drawing_type: string;
+  title: string;
+  source_files: string[];
+  materials_count: number;
+}
+
 // ============================================================================
 // Pipeline Configuration
 // ============================================================================
@@ -113,6 +122,46 @@ function formatTimeAgo(date: Date): string {
   return date.toLocaleDateString();
 }
 
+function extractDrawingNumberFromSourceFile(sourceFile: string): string {
+  if (!sourceFile) return "";
+  const leaf = sourceFile.split(/[\\/]/).pop() || sourceFile;
+  const stem = leaf.replace(/\.pdf$/i, "");
+  for (const sep of [".DRW", "_DRW", "_drw", "_Drw"]) {
+    if (stem.includes(sep)) return stem.split(sep)[0].toUpperCase();
+  }
+  return (stem.includes("_") ? stem.split("_")[0] : stem).toUpperCase();
+}
+
+function getSummaryCounts(summary: ExtractionSummary | null | undefined): {
+  extractedSightings: number;
+  uniqueParts: number;
+  hasUniqueParts: boolean;
+} {
+  if (!summary) {
+    return { extractedSightings: 0, uniqueParts: 0, hasUniqueParts: false };
+  }
+  const hasUniqueParts = typeof summary.total_extractions === "number";
+  return {
+    extractedSightings: hasUniqueParts
+      ? (summary.total_extractions || 0)
+      : (summary.total_materials || 0),
+    uniqueParts: summary.total_materials || 0,
+    hasUniqueParts,
+  };
+}
+
+function parseFilenameFromContentDisposition(headerValue: string | null): string | null {
+  if (!headerValue) return null;
+  const match = headerValue.match(/filename\*?=(?:UTF-8''|\"?)([^\";]+)/i);
+  if (!match || !match[1]) return null;
+  const raw = match[1].replace(/\"/g, "").trim();
+  try {
+    return decodeURIComponent(raw);
+  } catch {
+    return raw;
+  }
+}
+
 function getStageStatuses(
   current: PipelineStageId,
   allComplete: boolean,
@@ -138,10 +187,10 @@ const EXTRACT_SUBSTAGES = [
 ];
 
 const BUILD_SUBSTAGES = [
-  "Looking up material codes...",
-  "Fetching MAPTIS compatibility ratings...",
-  "Constructing MIUL tree structure...",
-  "Generating Excel spreadsheet...",
+  "Converting extraction to V3 format...",
+  "Merging with Drawing Tree hierarchy...",
+  "Applying environment parameters...",
+  "Generating formatted Excel spreadsheet...",
 ];
 
 // ============================================================================
@@ -310,11 +359,55 @@ interface ReviewItemCardProps {
   item: ReviewItem;
   onAccept: (itemKey: string) => void;
   onCorrect: (itemKey: string, corrections: Record<string, string>) => void;
+  onRemovePart: (itemKey: string, partNumber: string) => void;
+  removingPartKey: string | null;
   isSubmitting: boolean;
   groceryList: MaterialGroceryList;
 }
 
-function ReviewItemCard({ item, onAccept, onCorrect, isSubmitting, groceryList }: ReviewItemCardProps) {
+interface DrawingRemovalPanelProps {
+  drawings: SourceDrawing[];
+  removingDrawingId: string | null;
+  disabled: boolean;
+  onRemove: (drawingId: string) => void;
+  description?: string;
+}
+
+const ASSEMBLY_LEVEL_FIELDS = new Set([
+  "designation",
+  "material_spec",
+  "process_spec",
+  "material_form",
+  "uns_code",
+]);
+
+function isAssemblyLevelExpectedMissing(item: ReviewItem): boolean {
+  const desc = (item.part_description || "").toUpperCase();
+  const reasons = (item.gap_reasons || []).join(" ").toUpperCase();
+  const hasAssemblySignal =
+    desc.includes("ASSEMBLY") ||
+    reasons.includes("MATERIAL NOT SPECIFIED AT ASSEMBLY LEVEL");
+
+  if (!hasAssemblySignal) {
+    return false;
+  }
+
+  const reqFields = ["designation", "material_spec", "process_spec", "material_form"];
+  return reqFields.every((fieldName) => {
+    const field = item.fields[fieldName];
+    return !field?.value;
+  });
+}
+
+function ReviewItemCard({
+  item,
+  onAccept,
+  onCorrect,
+  onRemovePart,
+  removingPartKey,
+  isSubmitting,
+  groceryList,
+}: ReviewItemCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [showEvidence, setShowEvidence] = useState(false);
   const [corrections, setCorrections] = useState<Record<string, string>>({});
@@ -336,6 +429,13 @@ function ReviewItemCard({ item, onAccept, onCorrect, isSubmitting, groceryList }
   };
 
   const isResolved = item.status === "corrected" || item.status === "accepted";
+  const isRemovingThisItem = removingPartKey === itemKey;
+  const sourceDrawing = extractDrawingNumberFromSourceFile(item.source_file);
+  const assemblyExpectedMissing = isAssemblyLevelExpectedMissing(item);
+  const acceptLabel = assemblyExpectedMissing ? "Accept (Expected for Assembly)" : "Accept As-Is";
+  const humanGuidance = assemblyExpectedMissing
+    ? "Recommended action: Accept As-Is. Assembly/sub-assembly drawings often do not define direct material at this level."
+    : "Recommended action: Check evidence. Edit values if the drawing clearly specifies material/process; otherwise Accept As-Is.";
 
   return (
     <Card
@@ -379,6 +479,24 @@ function ReviewItemCard({ item, onAccept, onCorrect, isSubmitting, groceryList }
           </div>
         </div>
 
+        <div className="text-xs text-slate-600 mb-3">
+          This item is part <span className="font-mono font-semibold">{item.part_number}</span> from drawing{" "}
+          <span className="font-mono font-semibold">{sourceDrawing || "UNKNOWN"}</span> (source page {item.source_page}).
+        </div>
+
+        {!isResolved && (
+          <div
+            className={cn(
+              "text-xs rounded-lg p-2.5 mb-3 border",
+              assemblyExpectedMissing
+                ? "text-emerald-800 bg-emerald-50 border-emerald-200"
+                : "text-blue-800 bg-blue-50 border-blue-200",
+            )}
+          >
+            {humanGuidance}
+          </div>
+        )}
+
         {/* Fields */}
         {isEditing ? (
           <div className="space-y-2 mb-3">
@@ -415,17 +533,31 @@ function ReviewItemCard({ item, onAccept, onCorrect, isSubmitting, groceryList }
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-x-4 gap-y-1 mb-3 text-sm">
-            {Object.entries(item.fields).map(([fieldName, field]) => (
-              <div key={fieldName} className="flex items-center gap-2">
-                <span className="text-muted-foreground capitalize text-xs w-28">
-                  {fieldName.replace(/_/g, " ")}:
-                </span>
-                <span className={field.value ? "" : "text-red-500 italic"}>
-                  {field.value || "missing"}
-                </span>
-                <ConfidenceBadge confidence={field.confidence} />
-              </div>
-            ))}
+            {Object.entries(item.fields).map(([fieldName, field]) => {
+              const expectedBlank =
+                assemblyExpectedMissing &&
+                ASSEMBLY_LEVEL_FIELDS.has(fieldName) &&
+                !field.value;
+              return (
+                <div key={fieldName} className="flex items-center gap-2">
+                  <span className="text-muted-foreground capitalize text-xs w-28">
+                    {fieldName.replace(/_/g, " ")}:
+                  </span>
+                  <span
+                    className={
+                      field.value
+                        ? ""
+                        : expectedBlank
+                          ? "text-slate-500 italic"
+                          : "text-red-500 italic"
+                    }
+                  >
+                    {field.value || (expectedBlank ? "expected at assembly level" : "missing")}
+                  </span>
+                  <ConfidenceBadge confidence={field.confidence} />
+                </div>
+              );
+            })}
           </div>
         )}
 
@@ -487,12 +619,17 @@ function ReviewItemCard({ item, onAccept, onCorrect, isSubmitting, groceryList }
                   size="sm"
                   variant="outline"
                   onClick={() => onAccept(itemKey)}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !!removingPartKey}
                 >
                   <Check className="h-3 w-3 mr-1" />
-                  Accept As-Is
+                  {acceptLabel}
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => setIsEditing(true)}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setIsEditing(true)}
+                  disabled={isSubmitting || !!removingPartKey}
+                >
                   <Edit3 className="h-3 w-3 mr-1" />
                   Edit
                 </Button>
@@ -500,9 +637,24 @@ function ReviewItemCard({ item, onAccept, onCorrect, isSubmitting, groceryList }
                   size="sm"
                   variant="ghost"
                   onClick={() => setShowEvidence(!showEvidence)}
+                  disabled={isSubmitting || !!removingPartKey}
                 >
                   <Eye className="h-3 w-3 mr-1" />
                   Evidence
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-red-200 text-red-700 hover:bg-red-50"
+                  onClick={() => onRemovePart(itemKey, item.part_number)}
+                  disabled={isSubmitting || !!removingPartKey}
+                >
+                  {isRemovingThisItem ? (
+                    <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-3 w-3 mr-1" />
+                  )}
+                  Remove Part
                 </Button>
               </>
             )}
@@ -510,6 +662,67 @@ function ReviewItemCard({ item, onAccept, onCorrect, isSubmitting, groceryList }
         )}
       </CardContent>
     </Card>
+  );
+}
+
+function DrawingRemovalPanel({
+  drawings,
+  removingDrawingId,
+  disabled,
+  onRemove,
+  description,
+}: DrawingRemovalPanelProps) {
+  return (
+    <div className="border rounded-xl p-3 space-y-2">
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium text-slate-900">Drawings in this extraction</p>
+        <Badge variant="outline">{drawings.length}</Badge>
+      </div>
+      {drawings.length > 0 ? (
+        <div className="max-h-56 overflow-y-auto space-y-2 pr-1">
+          {drawings.map((drawing) => {
+            const label = drawing.drawing_number || drawing.drawing_id;
+            const sourcePreview = drawing.source_files[0] || "";
+            const materialLabel = `${drawing.materials_count} material sighting${
+              drawing.materials_count === 1 ? "" : "s"
+            }`;
+            return (
+              <div
+                key={drawing.drawing_id}
+                className="rounded-md border px-3 py-2 flex items-center justify-between gap-2"
+              >
+                <div className="min-w-0">
+                  <p className="text-sm font-medium truncate">{label}</p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {materialLabel}
+                    {sourcePreview ? ` - ${sourcePreview}` : ""}
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-red-200 text-red-700 hover:bg-red-50"
+                  disabled={disabled || removingDrawingId === drawing.drawing_id}
+                  onClick={() => onRemove(drawing.drawing_id)}
+                >
+                  {removingDrawingId === drawing.drawing_id ? (
+                    <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-3.5 w-3.5 mr-1" />
+                  )}
+                  Remove
+                </Button>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="text-xs text-muted-foreground">No drawing packages found.</p>
+      )}
+      <p className="text-xs text-muted-foreground">
+        {description || "Removing a drawing updates extraction results and rebuilds the review queue."}
+      </p>
+    </div>
   );
 }
 
@@ -525,6 +738,15 @@ export default function MIULBuilderV4() {
   const [drawingFiles, setDrawingFiles] = useState<FileList | null>(null);
   const [project, setProject] = useState("");
 
+  // ---- Environment config state ----
+  const [maxTemp, setMaxTemp] = useState("120");
+  const [minTemp, setMinTemp] = useState("0");
+  const [maxPressure, setMaxPressure] = useState("14.7");
+  const [minPressure, setMinPressure] = useState("0");
+  const [fluidType, setFluidType] = useState("Air");
+  const [envMedia, setEnvMedia] = useState("Air, VAC");
+  const [o2Percent, setO2Percent] = useState("20.9");
+
   // ---- Extraction state ----
   const [isExtracting, setIsExtracting] = useState(false);
   const [extractionId, setExtractionId] = useState<string | null>(null);
@@ -534,6 +756,9 @@ export default function MIULBuilderV4() {
   // ---- Review state ----
   const [reviewItems, setReviewItems] = useState<ReviewItem[]>([]);
   const [groceryList, setGroceryList] = useState<MaterialGroceryList>({});
+  const [sourceDrawings, setSourceDrawings] = useState<SourceDrawing[]>([]);
+  const [removingDrawingId, setRemovingDrawingId] = useState<string | null>(null);
+  const [removingPartKey, setRemovingPartKey] = useState<string | null>(null);
   const [isLoadingReview, setIsLoadingReview] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [reviewFilter, setReviewFilter] = useState<"all" | "open" | "resolved">("all");
@@ -543,6 +768,12 @@ export default function MIULBuilderV4() {
   const [isApproved, setIsApproved] = useState(false);
   const [buildComplete, setBuildComplete] = useState(false);
   const [buildSubStage, setBuildSubStage] = useState(0);
+  const [buildBlob, setBuildBlob] = useState<Blob | null>(null);
+  const [buildFileName, setBuildFileName] = useState<string | null>(null);
+  const [builtRowCount, setBuiltRowCount] = useState<number | null>(null);
+  const [isEnriching, setIsEnriching] = useState(false);
+  const [enrichComplete, setEnrichComplete] = useState(false);
+  const [standaloneEnrichFile, setStandaloneEnrichFile] = useState<File | null>(null);
 
   // ---- Session resume state ----
   const [recentSessions, setRecentSessions] = useState<SessionInfo[]>([]);
@@ -552,6 +783,7 @@ export default function MIULBuilderV4() {
   // ---- Derived state ----
   const openCount = reviewItems.filter((i) => i.status === "open").length;
   const resolvedCount = reviewItems.filter((i) => i.status !== "open").length;
+  const summaryCounts = getSummaryCounts(summary);
 
   const filteredItems =
     reviewFilter === "all"
@@ -577,7 +809,7 @@ export default function MIULBuilderV4() {
   const stageDetail = useMemo(() => {
     switch (currentStage) {
       case "upload":
-        return "Upload drawing PDFs and Drawing Tree JSON to begin";
+        return "Upload drawing PDFs to begin. Drawing Tree JSON is optional (recommended for accurate hierarchy).";
       case "extract":
         return EXTRACT_SUBSTAGES[extractSubStage];
       case "review":
@@ -644,17 +876,24 @@ export default function MIULBuilderV4() {
     return () => clearInterval(interval);
   }, [isBuilding]);
 
-  // ---- Load recent sessions on mount ----
-  const loadRecentSessions = useCallback(async () => {
+  // ---- Load recent sessions on mount (with retry for server restarts) ----
+  const loadRecentSessions = useCallback(async (retries = 2) => {
     setIsLoadingSessions(true);
     try {
       const res = await fetch("/api/miul/v4/sessions?limit=10");
       if (res.ok) {
         const data = await res.json();
         setRecentSessions(data.sessions || []);
+      } else if (res.status === 502 && retries > 0) {
+        // Server may be restarting (hot-reload) -- retry after short delay
+        await new Promise((r) => setTimeout(r, 2000));
+        return loadRecentSessions(retries - 1);
       }
     } catch {
-      // Non-critical -- just don't show sessions
+      if (retries > 0) {
+        await new Promise((r) => setTimeout(r, 2000));
+        return loadRecentSessions(retries - 1);
+      }
     } finally {
       setIsLoadingSessions(false);
     }
@@ -669,6 +908,13 @@ export default function MIULBuilderV4() {
     async (session: SessionInfo) => {
       setExtractionId(session.extraction_id);
       if (session.project) setProject(session.project);
+      setBuiltRowCount(null);
+      setBuildComplete(false);
+      setBuildBlob(null);
+      setBuildFileName(null);
+      setEnrichComplete(false);
+      setRemovingDrawingId(null);
+      setRemovingPartKey(null);
 
       // Determine where to resume based on session status
       if (session.status === "approved") {
@@ -685,9 +931,10 @@ export default function MIULBuilderV4() {
 
       // Always try to load review items -- the stage computation will handle the rest
       try {
-        const [reviewRes, groceryRes] = await Promise.all([
+        const [reviewRes, groceryRes, drawingsRes] = await Promise.all([
           fetch(`/api/miul/v4/extract/${session.extraction_id}/review`),
           fetch(`/api/miul/v4/extract/${session.extraction_id}/materials`),
+          fetch(`/api/miul/v4/extract/${session.extraction_id}/drawings`),
         ]);
         if (reviewRes.ok) {
           const data = await reviewRes.json();
@@ -698,8 +945,15 @@ export default function MIULBuilderV4() {
           const gData = await groceryRes.json();
           setGroceryList(gData.materials || {});
         }
+        if (drawingsRes.ok) {
+          const dData = await drawingsRes.json();
+          setSourceDrawings(dData.drawings || []);
+        } else {
+          setSourceDrawings([]);
+        }
       } catch {
         // If loading fails, we still have the extraction_id set
+        setSourceDrawings([]);
       }
 
       toast({
@@ -733,10 +987,11 @@ export default function MIULBuilderV4() {
   const loadReviewItems = useCallback(async (extId: string) => {
     setIsLoadingReview(true);
     try {
-      // Fetch review items and grocery list in parallel
-      const [reviewRes, groceryRes] = await Promise.all([
+      // Fetch review items, grocery list, and source drawings in parallel
+      const [reviewRes, groceryRes, drawingsRes] = await Promise.all([
         fetch(`/api/miul/v4/extract/${extId}/review`),
         fetch(`/api/miul/v4/extract/${extId}/materials`),
+        fetch(`/api/miul/v4/extract/${extId}/drawings`),
       ]);
 
       if (!reviewRes.ok) throw new Error("Failed to load review items");
@@ -749,7 +1004,14 @@ export default function MIULBuilderV4() {
         const gData = await groceryRes.json();
         setGroceryList(gData.materials || {});
       }
+      if (drawingsRes.ok) {
+        const dData = await drawingsRes.json();
+        setSourceDrawings(dData.drawings || []);
+      } else {
+        setSourceDrawings([]);
+      }
     } catch (e: any) {
+      setSourceDrawings([]);
       toast({ title: "Error", description: e.message, variant: "destructive" });
     } finally {
       setIsLoadingReview(false);
@@ -769,7 +1031,7 @@ export default function MIULBuilderV4() {
             setSummary(status.summary || null);
             toast({
               title: "Extraction complete",
-              description: `${status.summary?.total_materials ?? "?"} materials found. ${status.summary?.needs_review ?? "?"} need review.`,
+              description: `${status.summary?.total_materials ?? "?"} extracted sightings found. Building unique-part review queue...`,
             });
             await loadReviewItems(extId);
             setIsExtracting(false);
@@ -799,21 +1061,28 @@ export default function MIULBuilderV4() {
   );
 
   const handleExtract = useCallback(async () => {
-    if (!dtJsonFile || !drawingFiles || drawingFiles.length === 0) {
+    if (!drawingFiles || drawingFiles.length === 0) {
       toast({
         title: "Missing files",
-        description: "Upload DT JSON and drawing PDFs.",
+        description: "Upload drawing PDFs.",
         variant: "destructive",
       });
       return;
     }
 
     setIsExtracting(true);
+    setBuiltRowCount(null);
+    setBuildFileName(null);
     setExtractSubStage(0);
+    setSourceDrawings([]);
+    setRemovingDrawingId(null);
+    setRemovingPartKey(null);
 
     try {
       const formData = new FormData();
-      formData.append("drawing_tree_json", dtJsonFile);
+      if (dtJsonFile) {
+        formData.append("drawing_tree_json", dtJsonFile);
+      }
       for (let i = 0; i < drawingFiles.length; i++) {
         formData.append("drawings", drawingFiles[i]);
       }
@@ -899,6 +1168,90 @@ export default function MIULBuilderV4() {
     }
   };
 
+  const handleRemoveDrawing = useCallback(
+    async (drawingId: string) => {
+      if (!extractionId || !drawingId) return;
+
+      const confirmed = window.confirm(
+        `Remove drawing '${drawingId}' from extraction ${extractionId.slice(0, 8)}...? This regenerates the review queue.`,
+      );
+      if (!confirmed) return;
+
+      setRemovingDrawingId(drawingId);
+      try {
+        const response = await fetch(
+          `/api/miul/v4/extract/${extractionId}/drawings/${encodeURIComponent(drawingId)}?reviewer=engineer`,
+          { method: "DELETE" },
+        );
+
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({ detail: "Failed to remove drawing" }));
+          throw new Error(err.detail || "Failed to remove drawing");
+        }
+
+        setIsApproved(false);
+        setBuildComplete(false);
+        setBuildBlob(null);
+        setBuildFileName(null);
+        setBuiltRowCount(null);
+        setEnrichComplete(false);
+
+        await loadReviewItems(extractionId);
+        toast({
+          title: "Drawing removed",
+          description: `${drawingId} removed from this extraction session.`,
+        });
+      } catch (e: any) {
+        toast({ title: "Remove failed", description: e.message, variant: "destructive" });
+      } finally {
+        setRemovingDrawingId(null);
+      }
+    },
+    [extractionId, loadReviewItems, toast],
+  );
+
+  const handleRemovePart = useCallback(
+    async (itemKey: string, partNumber: string) => {
+      if (!extractionId || !itemKey) return;
+
+      const confirmed = window.confirm(
+        `Remove part '${partNumber}' from extraction ${extractionId.slice(0, 8)}...? This regenerates the review queue.`,
+      );
+      if (!confirmed) return;
+
+      setRemovingPartKey(itemKey);
+      try {
+        const response = await fetch(
+          `/api/miul/v4/extract/${extractionId}/parts/${encodeURIComponent(itemKey)}?reviewer=engineer`,
+          { method: "DELETE" },
+        );
+
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({ detail: "Failed to remove part" }));
+          throw new Error(err.detail || "Failed to remove part");
+        }
+
+        setIsApproved(false);
+        setBuildComplete(false);
+        setBuildBlob(null);
+        setBuildFileName(null);
+        setBuiltRowCount(null);
+        setEnrichComplete(false);
+
+        await loadReviewItems(extractionId);
+        toast({
+          title: "Part removed",
+          description: `${partNumber} removed from this extraction session.`,
+        });
+      } catch (e: any) {
+        toast({ title: "Remove failed", description: e.message, variant: "destructive" });
+      } finally {
+        setRemovingPartKey(null);
+      }
+    },
+    [extractionId, loadReviewItems, toast],
+  );
+
   const handleApprove = async () => {
     if (!extractionId) return;
     setIsSubmitting(true);
@@ -936,11 +1289,19 @@ export default function MIULBuilderV4() {
   const handleBuild = async () => {
     if (!extractionId) return;
     setIsBuilding(true);
+    setBuiltRowCount(null);
     setBuildSubStage(0);
     try {
       const formData = new FormData();
       formData.append("extraction_id", extractionId);
       formData.append("project", project || "MIUL_V4");
+      formData.append("max_temp", maxTemp);
+      formData.append("min_temp", minTemp);
+      formData.append("max_pressure", maxPressure);
+      formData.append("min_pressure", minPressure);
+      formData.append("fluid_type", fluidType);
+      formData.append("environment", envMedia);
+      formData.append("o2_percent", o2Percent);
 
       const response = await fetch("/api/miul/v4/build", {
         method: "POST",
@@ -952,18 +1313,36 @@ export default function MIULBuilderV4() {
         throw new Error(err.detail || "Build failed");
       }
 
+      const miulCountHeader = response.headers.get("X-MIUL-Count");
+      if (miulCountHeader) {
+        const parsed = Number.parseInt(miulCountHeader, 10);
+        setBuiltRowCount(Number.isFinite(parsed) ? parsed : null);
+      }
+      const downloadedName =
+        parseFilenameFromContentDisposition(response.headers.get("Content-Disposition")) ||
+        `MIUL_${project || "V4"}_v4.xlsx`;
+      setBuildFileName(downloadedName);
+
       const blob = await response.blob();
+      setBuildBlob(blob);
+
+      // Auto-download base MIUL
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `MIUL_${project || "V4"}_v4.xlsx`;
+      a.download = downloadedName;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
       setBuildComplete(true);
-      toast({ title: "MIUL Built", description: "Excel file downloaded successfully." });
+      toast({
+        title: "Base MIUL Built",
+        description: `${
+          miulCountHeader ? `${miulCountHeader} MIUL rows exported.` : "MIUL workbook exported."
+        } Use 'Enrich' to add MAPTIS ratings.`,
+      });
 
       // Sensitive build: auto-purge session data after successful download
       if (sensitiveBuild && extractionId) {
@@ -984,6 +1363,80 @@ export default function MIULBuilderV4() {
     }
   };
 
+  const runEnrich = async (
+    sourceBlob: Blob,
+    sourceName: string,
+    downloadName: string,
+    markBuildEnriched: boolean,
+  ) => {
+    setIsEnriching(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", sourceBlob, sourceName);
+
+      const response = await fetch("/api/miul/enrich", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({ detail: "Enrichment failed" }));
+        throw new Error(err.detail || "Enrichment failed");
+      }
+
+      const enrichedBlob = await response.blob();
+      const url = URL.createObjectURL(enrichedBlob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = downloadName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      const codesFound = Number.parseInt(response.headers.get("X-Codes-Found") || "0", 10);
+      const ratingsEnriched = Number.parseInt(response.headers.get("X-Ratings-Enriched") || "0", 10);
+      const ratingsAdded = Number.parseInt(response.headers.get("X-Ratings-Added") || "0", 10);
+      const coveragePct = response.headers.get("X-Rating-Coverage-Pct") || "0.0";
+
+      if (markBuildEnriched) {
+        setEnrichComplete(true);
+      }
+      toast({
+        title: "MIUL Enriched",
+        description: `Codes found: ${Number.isFinite(codesFound) ? codesFound : 0} · Materials enriched: ${
+          Number.isFinite(ratingsEnriched) ? ratingsEnriched : 0
+        } · Ratings added: ${Number.isFinite(ratingsAdded) ? ratingsAdded : 0} · Coverage: ${coveragePct}%`,
+      });
+    } catch (e: any) {
+      toast({ title: "Enrichment failed", description: e.message, variant: "destructive" });
+    } finally {
+      setIsEnriching(false);
+    }
+  };
+
+  const handleEnrichFromBuild = async () => {
+    if (!buildBlob) return;
+    const sourceName = buildFileName || `MIUL_${project || "V4"}_v4.xlsx`;
+    const baseName = sourceName.replace(/\.(xlsx|xlsm)$/i, "");
+    const outExt = ".xlsx";
+    await runEnrich(
+      buildBlob,
+      sourceName,
+      `${baseName}_enriched${outExt}`,
+      true,
+    );
+  };
+
+  const handleStandaloneEnrich = async () => {
+    if (!standaloneEnrichFile) return;
+    const sourceName = standaloneEnrichFile.name;
+    const baseName = sourceName.replace(/\.(xlsx|xlsm)$/i, "");
+    const outExt = ".xlsx";
+    const downloadName = `${baseName}_enriched${outExt}`;
+    await runEnrich(standaloneEnrichFile, sourceName, downloadName, false);
+  };
+
   // ---- Render ----
   const stageStatuses = getStageStatuses(currentStage, buildComplete);
 
@@ -992,7 +1445,7 @@ export default function MIULBuilderV4() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">MIUL Builder V4</h1>
+          <h1 className="text-2xl font-bold">MIUL Builder</h1>
           <p className="text-muted-foreground">
             Vision extraction with human-in-the-loop review
           </p>
@@ -1009,7 +1462,7 @@ export default function MIULBuilderV4() {
         reviewProgress={
           currentStage === "review" && reviewItems.length > 0
             ? { done: resolvedCount, total: reviewItems.length }
-            : undefined
+          : undefined
         }
       />
 
@@ -1023,7 +1476,11 @@ export default function MIULBuilderV4() {
       {stageStatuses.extract === "complete" && summary && (
         <CompletedMilestone
           icon={Sparkles}
-          text={`${summary.total_materials} materials extracted \u00b7 ${summary.auto_approved} auto-approved \u00b7 ${summary.needs_review} flagged for review`}
+          text={
+            summaryCounts.hasUniqueParts
+              ? `${summaryCounts.extractedSightings} sightings extracted \u00b7 ${summaryCounts.uniqueParts} unique parts \u00b7 ${summary.auto_approved} auto-approved \u00b7 ${summary.needs_review} flagged for review`
+              : `${summaryCounts.extractedSightings} sightings extracted \u00b7 preparing unique-part review queue`
+          }
         />
       )}
       {stageStatuses.review === "complete" && (
@@ -1050,8 +1507,10 @@ export default function MIULBuilderV4() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-sm font-medium">Drawing Tree JSON</Label>
-                <p className="text-xs text-muted-foreground mb-1">From DT Editor</p>
+                <Label className="text-sm font-medium">Drawing Tree JSON (Optional)</Label>
+                <p className="text-xs text-muted-foreground mb-1">
+                  From DT Editor. Include for accurate NHA/Parent hierarchy.
+                </p>
                 <Input
                   type="file"
                   accept=".json"
@@ -1063,6 +1522,11 @@ export default function MIULBuilderV4() {
                     {dtJsonFile.name}
                   </p>
                 )}
+                {!dtJsonFile && (
+                  <p className="text-xs text-amber-600 mt-1">
+                    No DT JSON selected: build will run in degraded hierarchy mode.
+                  </p>
+                )}
               </div>
               <div>
                 <Label className="text-sm font-medium">Project Name</Label>
@@ -1072,6 +1536,59 @@ export default function MIULBuilderV4() {
                   value={project}
                   onChange={(e) => setProject(e.target.value)}
                 />
+              </div>
+            </div>
+
+            {/* Environment Configuration */}
+            <div className="border rounded-lg p-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-medium">Use Environment</Label>
+                <div className="flex gap-1">
+                  <Button variant="outline" size="sm" className="h-6 text-xs"
+                    onClick={() => { setMaxTemp("120"); setMinTemp("0"); setMaxPressure("14.7"); setMinPressure("0"); setFluidType("Air"); setEnvMedia("Air, VAC"); setO2Percent("20.9"); }}>
+                    SLS Default
+                  </Button>
+                  <Button variant="outline" size="sm" className="h-6 text-xs"
+                    onClick={() => { setMaxTemp("200"); setMinTemp("-423"); setMaxPressure("6000"); setMinPressure("0"); setFluidType("H2"); setEnvMedia("GH2, LH2"); setO2Percent("0"); }}>
+                    H2 Service
+                  </Button>
+                  <Button variant="outline" size="sm" className="h-6 text-xs"
+                    onClick={() => { setMaxTemp("120"); setMinTemp("-297"); setMaxPressure("3000"); setMinPressure("0"); setFluidType("O2"); setEnvMedia("GOX, LOX"); setO2Percent("100"); }}>
+                    O2 Service
+                  </Button>
+                </div>
+              </div>
+              <div className="grid grid-cols-4 gap-2">
+                <div>
+                  <Label className="text-xs text-muted-foreground">Pressure Min (psia)</Label>
+                  <Input value={minPressure} onChange={(e) => setMinPressure(e.target.value)} className="h-8 text-sm" />
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Pressure Max (psia)</Label>
+                  <Input value={maxPressure} onChange={(e) => setMaxPressure(e.target.value)} className="h-8 text-sm" />
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Temp Min (F)</Label>
+                  <Input value={minTemp} onChange={(e) => setMinTemp(e.target.value)} className="h-8 text-sm" />
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Temp Max (F)</Label>
+                  <Input value={maxTemp} onChange={(e) => setMaxTemp(e.target.value)} className="h-8 text-sm" />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <Label className="text-xs text-muted-foreground">O2 Concentration (%)</Label>
+                  <Input value={o2Percent} onChange={(e) => setO2Percent(e.target.value)} className="h-8 text-sm" />
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Service Media</Label>
+                  <Input value={fluidType} onChange={(e) => setFluidType(e.target.value)} className="h-8 text-sm" />
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Environment</Label>
+                  <Input value={envMedia} onChange={(e) => setEnvMedia(e.target.value)} className="h-8 text-sm" />
+                </div>
               </div>
             </div>
 
@@ -1096,7 +1613,7 @@ export default function MIULBuilderV4() {
             <div className="flex items-center gap-4">
               <Button
                 onClick={handleExtract}
-                disabled={!dtJsonFile || !drawingFiles}
+                disabled={!drawingFiles || drawingFiles.length === 0}
                 className="flex-1 h-11 text-base"
               >
                 <Sparkles className="h-4 w-4 mr-2" />
@@ -1140,6 +1657,49 @@ export default function MIULBuilderV4() {
         </Card>
       )}
 
+      {/* Standalone MIUL Enrich (below upload) */}
+      <Card className="border-slate-200 shadow-sm">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Sparkles className="h-4 w-4 text-blue-600" />
+            Standalone MIUL Enrich
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Upload a non-enriched MIUL Excel file and run MAPTIS enrichment without re-running extraction.
+          </p>
+          <div className="flex items-end gap-3">
+            <div className="flex-1">
+              <Label className="text-sm font-medium">Base MIUL (.xlsx/.xlsm)</Label>
+              <Input
+                type="file"
+                accept=".xlsx,.xlsm"
+                onChange={(e) => setStandaloneEnrichFile(e.target.files?.[0] || null)}
+              />
+              {standaloneEnrichFile && (
+                <p className="text-xs text-emerald-600 mt-1 flex items-center gap-1">
+                  <FileSpreadsheet className="h-3 w-3" />
+                  {standaloneEnrichFile.name}
+                </p>
+              )}
+            </div>
+            <Button
+              onClick={handleStandaloneEnrich}
+              disabled={!standaloneEnrichFile || isEnriching}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {isEnriching ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4 mr-2" />
+              )}
+              {isEnriching ? "Enriching..." : "Enrich Uploaded MIUL"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Recent Sessions (shown on upload stage) */}
       {currentStage === "upload" && recentSessions.length > 0 && (
         <Card className="border-slate-200 shadow-sm">
@@ -1153,7 +1713,9 @@ export default function MIULBuilderV4() {
             <div className="space-y-1">
               {recentSessions.slice(0, 5).map((session) => {
                 const s = session.summary as ExtractionSummary | Record<string, never>;
-                const totalMaterials = "total_materials" in s ? s.total_materials : 0;
+                const uniqueParts = "total_materials" in s ? s.total_materials : 0;
+                const hasSightings = "total_extractions" in s && typeof s.total_extractions === "number";
+                const extractedSightings = hasSightings ? (s.total_extractions as number) : uniqueParts;
                 const statusLabel =
                   session.status === "approved"
                     ? "Approved"
@@ -1185,8 +1747,11 @@ export default function MIULBuilderV4() {
                           {session.project || session.extraction_id.slice(0, 8) + "..."}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {totalMaterials > 0 && `${totalMaterials} materials`}
-                          {totalMaterials > 0 && timeAgo && " -- "}
+                          {extractedSightings > 0 &&
+                            (hasSightings
+                              ? `${extractedSightings} sightings \u00b7 ${uniqueParts} parts`
+                              : `${extractedSightings} sightings`)}
+                          {extractedSightings > 0 && timeAgo && " -- "}
                           {timeAgo}
                         </p>
                       </div>
@@ -1282,18 +1847,26 @@ export default function MIULBuilderV4() {
             {/* Summary banner */}
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
               <p className="text-sm font-medium text-blue-900">
-                MIRA extracted <strong>{summary.total_materials}</strong> materials.{" "}
+                {summaryCounts.hasUniqueParts ? (
+                  <>
+                    MIRA extracted <strong>{summaryCounts.extractedSightings}</strong> sightings and grouped
+                    them into <strong>{summaryCounts.uniqueParts}</strong> unique parts.{" "}
+                  </>
+                ) : (
+                  <>
+                    MIRA extracted <strong>{summaryCounts.extractedSightings}</strong> sightings.{" "}
+                  </>
+                )}
                 <span className="text-emerald-700">
-                  {summary.auto_approved} look good.
+                  {summary.auto_approved} auto-approved.
                 </span>{" "}
                 {summary.needs_review > 0 && (
                   <span className="text-amber-700">
-                    {summary.needs_review} could use your expertise.
+                    {summary.needs_review} queued for your review.
                   </span>
                 )}
               </p>
             </div>
-
             {/* Review progress bar */}
             {reviewItems.length > 0 && (
               <div className="space-y-1.5">
@@ -1331,6 +1904,15 @@ export default function MIULBuilderV4() {
               ))}
             </div>
 
+            <DrawingRemovalPanel
+              drawings={sourceDrawings}
+              removingDrawingId={removingDrawingId}
+              disabled={isSubmitting || !!removingPartKey}
+              onRemove={(drawingId) => {
+                void handleRemoveDrawing(drawingId);
+              }}
+            />
+
             {/* Review items list */}
             {isLoadingReview ? (
               <div className="flex items-center justify-center py-8">
@@ -1344,6 +1926,8 @@ export default function MIULBuilderV4() {
                     item={item}
                     onAccept={handleAccept}
                     onCorrect={handleCorrect}
+                    onRemovePart={handleRemovePart}
+                    removingPartKey={removingPartKey}
                     isSubmitting={isSubmitting}
                     groceryList={groceryList}
                   />
@@ -1401,7 +1985,8 @@ export default function MIULBuilderV4() {
             </div>
             <h2 className="text-lg font-semibold mb-1">Build MIUL</h2>
             <p className="text-sm text-muted-foreground mb-6">
-              Extraction approved. Build the final MIUL with MAPTIS enrichment and export to Excel.
+              Extraction approved. Build the base MIUL with tree structure and environment parameters.
+              Enrich with MAPTIS ratings separately.
             </p>
             <Button onClick={handleBuild} className="h-11 px-8 text-base">
               <Download className="h-4 w-4 mr-2" />
@@ -1459,14 +2044,29 @@ export default function MIULBuilderV4() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 mb-4">
               <CheckCircle2 className="h-8 w-8 text-emerald-600" />
             </div>
-            <h2 className="text-xl font-bold text-emerald-900 mb-1">MIUL Complete</h2>
+            <h2 className="text-xl font-bold text-emerald-900 mb-1">
+              {enrichComplete ? "MIUL Enriched" : "Base MIUL Built"}
+            </h2>
             <p className="text-sm text-slate-600 mt-1 mb-6">
-              {summary?.total_materials} materials processed and exported to Excel
+              {enrichComplete
+                ? `${builtRowCount ?? "All"} MIUL rows with MAPTIS ratings exported`
+                : `${builtRowCount ?? "All"} MIUL rows exported. Enrich to add material codes and ratings.`
+              }
             </p>
             <div className="flex items-center justify-center gap-3">
+              {!enrichComplete && buildBlob && (
+                <Button onClick={handleEnrichFromBuild} disabled={isEnriching} className="bg-blue-600 hover:bg-blue-700">
+                  {isEnriching ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-4 w-4 mr-2" />
+                  )}
+                  {isEnriching ? "Enriching..." : "Enrich with MAPTIS Ratings"}
+                </Button>
+              )}
               <Button variant="outline" onClick={handleBuild}>
                 <Download className="h-4 w-4 mr-2" />
-                Download Again
+                Download Base MIUL
               </Button>
               <Button
                 variant="ghost"
@@ -1474,11 +2074,22 @@ export default function MIULBuilderV4() {
                   setExtractionId(null);
                   setSummary(null);
                   setReviewItems([]);
+                  setSourceDrawings([]);
+                  setRemovingDrawingId(null);
                   setIsApproved(false);
                   setBuildComplete(false);
+                  setBuildBlob(null);
+                  setBuildFileName(null);
+                  setBuiltRowCount(null);
+                  setEnrichComplete(false);
+                  setStandaloneEnrichFile(null);
                   setDtJsonFile(null);
                   setDrawingFiles(null);
                   setProject("");
+                  setMaxTemp("120"); setMinTemp("0");
+                  setMaxPressure("14.7"); setMinPressure("0");
+                  setFluidType("Air"); setEnvMedia("Air, VAC");
+                  setO2Percent("20.9");
                 }}
               >
                 Start New Extraction
@@ -1490,3 +2101,4 @@ export default function MIULBuilderV4() {
     </div>
   );
 }
+
