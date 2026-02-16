@@ -1342,3 +1342,122 @@ export async function v4SchemaValidate(): Promise<V4SchemaValidationResponse> {
   }
   return response.json();
 }
+
+// ============================================================================
+// BSMH (Temp) API
+// ============================================================================
+
+export interface BSMHStructuredQuery {
+  material: string | null;
+  materials: string[];
+  environment: string | null;
+  pressure_psi: number | null;
+  temperature_f: number | null;
+  o2_pct: number | null;
+  intent: string;
+  original_query: string;
+}
+
+export interface BSMHBouncerResult {
+  status: 'accepted' | 'rejected';
+  rejection_reason: string | null;
+  structured_query: BSMHStructuredQuery | null;
+  source: 'local_llm' | 'heuristic' | 'haiku';
+}
+
+export interface BSMHRuleEvidenceItem {
+  property: string;
+  value: string;
+  requirement: string;
+  passed: boolean;
+  source: string | null;
+}
+
+export interface BSMHMaterialRuleResult {
+  material_name: string;
+  material_key: unknown;
+  oxygen_rating: string | null;
+  hydrogen_signal_present: boolean | null;
+  verdict: 'COMPATIBLE' | 'INCOMPATIBLE' | 'CONDITIONAL' | 'INSUFFICIENT_DATA';
+  score: number;
+  warnings: string[];
+  limitations: string[];
+  evidence_chain: BSMHRuleEvidenceItem[];
+}
+
+export interface BSMHRuleDecisionPacket {
+  verdict: 'COMPATIBLE' | 'INCOMPATIBLE' | 'CONDITIONAL' | 'INSUFFICIENT_DATA';
+  confidence: number;
+  materials: BSMHMaterialRuleResult[];
+  aggregation_scope: 'primary_only' | 'all_materials';
+  primary_material_count: number;
+  associated_material_count: number;
+  bok_context_used: boolean;
+  bok_evidence_count: number;
+  bok_sources: string[];
+  requested_materials: string[];
+  missing_requested_materials: string[];
+  determination_material_keys: unknown[];
+  determination_material_names: string[];
+  rules_applied: string[];
+  standards_category: string | null;
+  evidence_gaps: string[];
+}
+
+export interface BSMHQueryResponse {
+  status: 'ok' | 'rejected' | 'error';
+  pipeline: string;
+  answer: string;
+  answer_sonnet: string | null;
+  answer_mode: 'sonnet';
+  sonnet_calls_used: number;
+  bouncer: BSMHBouncerResult;
+  rules: BSMHRuleDecisionPacket | null;
+  materials: V4MaterialResult[];
+  sonnet_metadata: Record<string, unknown>;
+  raw_v4_answer: string | null;
+  v4_lineage_id: string | null;
+  v4_gate_action: string | null;
+  v4_confidence_score: number | null;
+  error: string | null;
+}
+
+/**
+ * Execute temporary BSMH pipeline.
+ */
+export interface BSMHQueryRequest extends V4QueryRequest {
+  answer_mode?: 'sonnet';
+}
+
+export type QueryRequest = BSMHQueryRequest;
+export type QueryResponse = BSMHQueryResponse;
+
+export async function miraQuery(req: QueryRequest): Promise<QueryResponse> {
+  const response = await fetch(`${API_BASE}/mira/query`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `MIRA query failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function bsmhQuery(req: BSMHQueryRequest): Promise<BSMHQueryResponse> {
+  const response = await fetch(`${API_BASE}/mira/bsmh/query`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `BSMH query failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}

@@ -60,6 +60,7 @@ def create_app_codex() -> FastAPI:
 
     app.include_router(routers.search_router, prefix="/search", tags=["search"])
     app.include_router(routers.mira_router, prefix="/mira", tags=["mira"])
+    app.include_router(routers.query_router, prefix="/mira", tags=["query"])
     app.include_router(routers.aegis_router, prefix="/aegis", tags=["aegis"])
     app.include_router(routers.compliance_router, prefix="/compliance", tags=["compliance"])
     app.include_router(routers.o2_router, prefix="/o2", tags=["o2"])
@@ -72,6 +73,7 @@ def create_app_codex() -> FastAPI:
     app.include_router(routers.mp_plan_router, prefix="/mp-plan", tags=["mp-plan"])
     app.include_router(mp_plan_v2_codex_router, prefix="/mp-plan/v2", tags=["mp-plan-v2-codex"])
     app.include_router(routers.mira_v4_router, prefix="/mira/v4", tags=["mira-v4"])
+    app.include_router(routers.bsmh_router, prefix="/mira/bsmh", tags=["bsmh-temp"])
     app.include_router(routers.ui_router, tags=["ui"])
     app.include_router(routers.test_classes_router, tags=["test-classes"])
 

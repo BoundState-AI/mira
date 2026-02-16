@@ -34,6 +34,8 @@ from .mp_plan_v2_codex import router as mp_plan_v2_codex_router
 from .o2 import router as o2_router
 from .mira_v4 import router as mira_v4_router
 from .mua_v7 import router as mua_v7_router
+from .bsmh import router as bsmh_router
+from .query import router as query_router
 import uuid
 
 __all__ = [
@@ -53,6 +55,8 @@ __all__ = [
     "o2_router",
     "mira_v4_router",
     "mua_v7_router",
+    "bsmh_router",
+    "query_router",
 ]
 
 

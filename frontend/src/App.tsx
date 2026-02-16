@@ -7,13 +7,12 @@ import { AppLayout } from "@/components/AppLayout";
 import KnowledgeTwins from "./pages/KnowledgeTwins";
 import TestClasses from "./pages/TestClasses";
 import TestClassDetail from "./pages/TestClassDetail";
-import GasCompatibility from "./pages/GasCompatibility";
 // import MIULBuilder from "./pages/MIULBuilder";  // Deprecated: replaced by V4 production builder
-import ComplianceAnalysis from "./pages/ComplianceAnalysis";
 import MPPlanGenerator from "./pages/MPPlanGenerator";
 import DTTreeEditor from "./pages/DTTreeEditor";
 import MIULBuilderV4 from "./pages/MIULBuilderV4";
 import MiraV4Query from "./pages/MiraV4Query";
+import BSMHQuery from "./pages/BSMHQuery";
 import MUAWizardV7 from "./pages/MUAWizardV7";
 import NotFound from "./pages/NotFound";
 
@@ -28,16 +27,29 @@ const App = () => (
         <AppLayout>
           <Routes>
             <Route path="/" element={<KnowledgeTwins />} />
-            <Route path="/query" element={<Navigate to="/v4-query" replace />} />
-            <Route path="/gas-compatibility" element={<GasCompatibility />} />
+            <Route
+              path="/query"
+              element={
+                <BSMHQuery
+                  endpoint="query"
+                  title="MIRA Query"
+                  runLabel="Run Query"
+                  subtitle="Decision Lineage Pipeline"
+                  description="Evidence-first queries with transparent confidence scoring and NASA-compliant audit trails"
+                  showPipelineBlurb
+                />
+              }
+            />
+            <Route path="/gas-compatibility" element={<Navigate to="/query" replace />} />
             <Route path="/test-classes" element={<TestClasses />} />
             <Route path="/test-classes/:testType" element={<TestClassDetail />} />
             <Route path="/miul" element={<MIULBuilderV4 />} />
             <Route path="/mua" element={<Navigate to="/mua-v7" replace />} />
-            <Route path="/compliance" element={<ComplianceAnalysis />} />
+            <Route path="/compliance" element={<Navigate to="/query" replace />} />
             <Route path="/mp-plan" element={<MPPlanGenerator />} />
             <Route path="/dt-editor" element={<DTTreeEditor />} />
             <Route path="/v4-query" element={<MiraV4Query />} />
+            <Route path="/bsmh" element={<Navigate to="/query" replace />} />
             <Route path="/mua-v7" element={<MUAWizardV7 />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

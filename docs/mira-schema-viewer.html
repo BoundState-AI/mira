@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIRA Schema Viewer</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #030712; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; padding: 20px; }
+  code, .mono { font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; }
+
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  h1 {
+    font-size: 26px; font-weight: 800; letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #fbbf24, #2dd4bf);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .subtitle { color: #475569; font-size: 13px; margin-top: 4px; }
+
+  /* Stats */
+  .stats { display: flex; gap: 12px; margin: 14px 0; flex-wrap: wrap; }
+  .stat { background: #0c1017; border: 1px solid #1e293b; border-radius: 6px; padding: 6px 14px; }
+  .stat-label { color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-val { font-size: 18px; font-weight: 700; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+  .tab {
+    padding: 5px 14px; border-radius: 5px; cursor: pointer; font-size: 12px;
+    border: 1px solid #1e293b; background: #0c1017; color: #64748b;
+  }
+  .tab.active { border-color: #2dd4bf; background: #0d3d38; color: #2dd4bf; font-weight: 700; }
+  .tab-sep { color: #1e293b; margin: 0 4px; }
+  .layer { padding: 5px 14px; border-radius: 5px; cursor: pointer; font-size: 12px; border: 1px solid #1e293b; background: #0c1017; color: #64748b; }
+  .layer.active { border-color: #fbbf24; background: #1c1208; color: #fbbf24; font-weight: 700; }
+
+  /* Panels */
+  .panel { background: #060a10; border: 1px solid #1e293b; border-radius: 8px; overflow: auto; max-height: 74vh; }
+  .panel-padded { padding: 18px; }
+
+  /* ERD tables */
+  .erd-table { position: absolute; width: 440px; border: 1px solid #1e293b; border-radius: 5px; background: #0c1017; cursor: pointer; transition: border-color 0.15s; }
+  .erd-table:hover { border-color: #475569; }
+  .erd-table.selected-raw { border-color: #fbbf24; border-width: 2px; background: #1c1208; }
+  .erd-table.selected-gold { border-color: #2dd4bf; border-width: 2px; background: #061f1c; }
+  .erd-header { padding: 8px 12px; border-radius: 5px 5px 0 0; }
+  .erd-header-raw { background: #92400e; }
+  .erd-header-gold { background: #0f766e; }
+  .erd-title { color: #fff; font-size: 13px; font-weight: bold; }
+  .erd-desc { color: rgba(255,255,255,0.6); font-size: 10px; margin-top: 2px; }
+  .erd-cols { padding: 6px 0; }
+  .erd-col { display: flex; align-items: baseline; padding: 2px 10px; font-size: 11.5px; gap: 4px; }
+  .col-icon { width: 16px; text-align: center; flex-shrink: 0; }
+  .col-name { flex: 1; min-width: 0; }
+  .col-pk { color: #fbbf24; font-weight: bold; }
+  .col-pk-gold { color: #2dd4bf; font-weight: bold; }
+  .col-fk { color: #64748b; }
+  .col-normal { color: #cbd5e1; }
+  .col-type { color: #475569; font-size: 10.5px; width: 110px; flex-shrink: 0; text-align: right; }
+  .col-note { color: #374151; font-size: 9px; font-style: italic; max-width: 160px; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Quality panel */
+  .quality-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
+  .quality-card { background: #0c1017; border: 1px solid #1e293b; border-radius: 8px; padding: 16px; }
+  .quality-card.full { grid-column: 1 / -1; }
+  .quality-title { font-size: 13px; margin-bottom: 12px; }
+  .null-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .null-label { width: 120px; font-size: 10px; color: #9ca3af; text-align: right; }
+  .null-bar { flex: 1; background: #1e293b; border-radius: 2px; height: 10px; }
+  .null-fill { border-radius: 2px; height: 10px; }
+  .null-pct { width: 35px; font-size: 9px; color: #64748b; }
+  .rating-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .rating-badge { width: 24px; height: 24px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; }
+  .rating-bar { flex: 1; background: #1e293b; border-radius: 2px; height: 14px; }
+  .rating-fill { border-radius: 2px; height: 14px; }
+  .rating-info { width: 100px; font-size: 10px; color: #9ca3af; }
+  .env-row { display: flex; justify-content: space-between; font-size: 10px; color: #9ca3af; margin-bottom: 3px; }
+  .test-row { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+  .test-label { width: 140px; font-size: 10px; color: #9ca3af; text-align: right; }
+  .test-bar { height: 14px; border-radius: 2px; background: #7c3aed; opacity: 0.8; }
+  .test-count { font-size: 9px; color: #64748b; margin-left: 4px; }
+
+  /* SQL */
+  pre { color: #cbd5e1; font-size: 12px; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; }
+  .kw { color: #c084fc; } .typ { color: #2dd4bf; } .cmt { color: #475569; } .str { color: #fbbf24; } .num { color: #fb923c; }
+
+  .footer { margin-top: 12px; color: #334155; font-size: 11px; }
+
+  @media (max-width: 700px) {
+    .quality-grid { grid-template-columns: 1fr; }
+    .stats { gap: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container" id="app"></div>
+
+<script>
+// ── Schema data ──
+const SCHEMA = {
+  maptis_raw: {
+    label: "MAPTIS Raw Ingest (Bronze)",
+    desc: "Direct mirror of how MAPTIS actually exports data",
+    tier: "raw",
+    tables: [
+      { name: "maptis_materials", desc: "~37,765 materials from MAPTIS UI. Keyed by their integer MaterialKey.", x: 20, y: 0,
+        columns: [
+          { name: "material_key", type: "INT", pk: true, note: "MAPTIS native PK" },
+          { name: "designation", type: "VARCHAR(300)", note: "Material name/alloy" },
+          { name: "category_code", type: "VARCHAR(20)" },
+          { name: "spec_reference", type: "VARCHAR(200)", note: "MIL-STD, ASTM, AMS" },
+          { name: "manufacturer", type: "VARCHAR(300)" },
+          { name: "trade_name", type: "VARCHAR(300)" },
+          { name: "form", type: "VARCHAR(100)", note: "bar, sheet, wire, tube" },
+          { name: "condition_temper", type: "VARCHAR(100)", note: "T6, annealed, CW" },
+          { name: "raw_metadata", type: "JSONB" },
+          { name: "ingested_at", type: "TIMESTAMPTZ" },
+        ]},
+      { name: "maptis_test_reports", desc: "~90K reports. Common header across all 24 test types.", x: 20, y: 340,
+        columns: [
+          { name: "test_report_key", type: "INT", pk: true, note: "MAPTIS native PK" },
+          { name: "material_key", type: "INT", fk: true, note: "FK → maptis_materials" },
+          { name: "test_type_key", type: "INT", fk: true, note: "FK → test_types" },
+          { name: "test_report_number", type: "VARCHAR(200)", note: "65% NULL" },
+          { name: "request_date", type: "VARCHAR(100)", note: "93% NULL" },
+          { name: "temperature_min_f", type: "DECIMAL", note: "-425 to 75°F" },
+          { name: "temperature_max_f", type: "DECIMAL", note: "-425 to 1600°F" },
+          { name: "data_quality_flag", type: "VARCHAR(20)" },
+          { name: "ingested_at", type: "TIMESTAMPTZ" },
+        ]},
+      { name: "maptis_test_details", desc: "Type-specific fields. Prefixed STRESS_, FLAMM_, IMPACT_, etc.", x: 20, y: 640,
+        columns: [
+          { name: "id", type: "SERIAL", pk: true },
+          { name: "test_report_key", type: "INT", fk: true },
+          { name: "detail_key", type: "INT", note: "STRESS_Key, FLAMM_Key" },
+          { name: "data_source", type: "VARCHAR(100)" },
+          { name: "environment", type: "TEXT" },
+          { name: "rating", type: "VARCHAR(10)", note: "A/B/C/N/U" },
+          { name: "resistance_level", type: "VARCHAR(20)", note: "HIGH/MOD/LOW" },
+          { name: "sample_count", type: "INT", note: "94% populated (SCC)" },
+          { name: "raw_fields", type: "JSONB", note: "Remaining columns" },
+          { name: "column_shift_detected", type: "BOOLEAN", note: "~7% shifted" },
+        ]},
+      { name: "maptis_test_types", desc: "The 24 test categories with report counts.", x: 500, y: 0,
+        columns: [
+          { name: "test_type_key", type: "INT", pk: true, note: "1–24" },
+          { name: "caption", type: "VARCHAR(50)", note: "Stress Corr, Flamm…" },
+          { name: "column_prefix", type: "VARCHAR(20)", note: "STRESS_, FLAMM_…" },
+          { name: "report_count", type: "INT" },
+          { name: "expected_columns", type: "JSONB" },
+        ]},
+      { name: "maptis_data_quality_log", desc: "Tracks every data quality issue found during ingest.", x: 500, y: 200,
+        columns: [
+          { name: "id", type: "SERIAL", pk: true },
+          { name: "test_report_key", type: "INT", fk: true },
+          { name: "issue_type", type: "VARCHAR(30)", note: "column_shift, null…" },
+          { name: "column_name", type: "VARCHAR(50)" },
+          { name: "raw_value", type: "TEXT" },
+          { name: "severity", type: "VARCHAR(10)", note: "error/warning/info" },
+          { name: "detected_at", type: "TIMESTAMPTZ" },
+        ]},
+    ]
+  },
+  mira_gold: {
+    label: "MIRA Gold (Cleaned + Enriched)",
+    desc: "Cleaned, normalized, evidence-linked data ready for the translation layer",
+    tier: "gold",
+    tables: [
+      { name: "materials", desc: "Canonical material records with normalized families.", x: 20, y: 0,
+        columns: [
+          { name: "id", type: "UUID", pk: true },
+          { name: "maptis_material_key", type: "INT", fk: true, note: "Link to raw" },
+          { name: "designation", type: "VARCHAR(300)" },
+          { name: "material_family", type: "VARCHAR(80)", note: "austenitic_ss, ni_alloy" },
+          { name: "category", type: "VARCHAR(80)", note: "metal, polymer, ceramic" },
+          { name: "alloy_system", type: "VARCHAR(80)" },
+          { name: "spec_reference", type: "VARCHAR(200)" },
+          { name: "form", type: "VARCHAR(100)" },
+          { name: "condition_temper", type: "VARCHAR(100)" },
+          { name: "status", type: "VARCHAR(20)", note: "active/legacy/restricted" },
+        ]},
+      { name: "scc_results", desc: "6,430 cleaned SCC records with column-shift corrections.", x: 20, y: 340,
+        columns: [
+          { name: "id", type: "UUID", pk: true },
+          { name: "material_id", type: "UUID", fk: true },
+          { name: "scc_rating", type: "CHAR(1)", note: "A/B/C" },
+          { name: "scc_resistance", type: "VARCHAR(20)", note: "HIGH/MOD/LOW" },
+          { name: "environment", type: "TEXT" },
+          { name: "env_normalized", type: "VARCHAR(50)" },
+          { name: "temp_min_f", type: "DECIMAL" },
+          { name: "temp_max_f", type: "DECIMAL" },
+          { name: "threshold_ksi", type: "DECIMAL" },
+          { name: "quality_score", type: "DECIMAL(3,2)", note: "0–1" },
+        ]},
+      { name: "flammability_results", desc: "17,838 flammability test records (largest category).", x: 500, y: 0,
+        columns: [
+          { name: "id", type: "UUID", pk: true },
+          { name: "material_id", type: "UUID", fk: true },
+          { name: "test_method", type: "VARCHAR(50)" },
+          { name: "o2_concentration_pct", type: "DECIMAL" },
+          { name: "pressure_psia", type: "DECIMAL" },
+          { name: "result", type: "VARCHAR(20)", note: "pass/fail/self_ext" },
+          { name: "burn_length_in", type: "DECIMAL" },
+          { name: "sample_config", type: "VARCHAR(30)", note: "rod/sheet/mesh" },
+          { name: "quality_score", type: "DECIMAL(3,2)" },
+        ]},
+      { name: "mech_impact_results", desc: "13,789 mechanical impact test records.", x: 500, y: 310,
+        columns: [
+          { name: "id", type: "UUID", pk: true },
+          { name: "material_id", type: "UUID", fk: true },
+          { name: "test_method", type: "VARCHAR(50)" },
+          { name: "o2_concentration_pct", type: "DECIMAL" },
+          { name: "pressure_psia", type: "DECIMAL" },
+          { name: "result", type: "VARCHAR(20)", note: "reaction/no_reaction" },
+          { name: "reactions_of_20", type: "INT" },
+          { name: "energy_ft_lbs", type: "DECIMAL" },
+          { name: "quality_score", type: "DECIMAL(3,2)" },
+        ]},
+      { name: "compatibility_ratings", desc: "Computed O2/H2 ratings with evidence chains.", x: 20, y: 640,
+        columns: [
+          { name: "id", type: "UUID", pk: true },
+          { name: "material_id", type: "UUID", fk: true },
+          { name: "fluid_type", type: "VARCHAR(10)", note: "LOX/GOX/LH2/GH2" },
+          { name: "rating", type: "VARCHAR(20)", note: "preferred → prohibited" },
+          { name: "pressure_psia", type: "DECIMAL" },
+          { name: "severity_modifier", type: "DECIMAL", note: "conc-dependent" },
+          { name: "confidence", type: "DECIMAL(3,2)" },
+          { name: "evidence_chain", type: "JSONB" },
+          { name: "computation_trace", type: "JSONB" },
+        ]},
+      { name: "mua_records", desc: "Material Usage Agreements per NASA-STD-6016C.", x: 500, y: 600,
+        columns: [
+          { name: "id", type: "UUID", pk: true },
+          { name: "material_id", type: "UUID", fk: true },
+          { name: "mua_number", type: "VARCHAR(50)" },
+          { name: "category", type: "CHAR(1)", note: "A/B/C/D per 6016C" },
+          { name: "envelope", type: "JSONB" },
+          { name: "rationale", type: "TEXT" },
+          { name: "status", type: "VARCHAR(20)" },
+          { name: "program", type: "VARCHAR(100)" },
+        ]},
+    ]
+  }
+};
+
+const DATA_QUALITY = {
+  total_rows: 6430, unique_materials: 5903, column_shift_pct: 7,
+  null_heavy_fields: [
+    { field: "DisregardFlag", null_pct: 100 }, { field: "MaxTemp50mil", null_pct: 99 },
+    { field: "TEMP2", null_pct: 99 }, { field: "Pressure", null_pct: 98 },
+    { field: "CureSequence", null_pct: 93 }, { field: "RequestDate", null_pct: 93 },
+    { field: "ThresholdLevel", null_pct: 92 }, { field: "DataSource", null_pct: 76 },
+    { field: "TestReportNumber", null_pct: 65 }, { field: "TempMin", null_pct: 72 },
+    { field: "TempMax", null_pct: 61 }, { field: "Environment", null_pct: 60 },
+    { field: "SCCResistance", null_pct: 61 },
+  ],
+  rating_distribution: [
+    { val: "A", count: 3231, desc: "High resistance", bg: "#166534", fg: "#4ade80", bar: "#22c55e" },
+    { val: "B", count: 669, desc: "Moderate", bg: "#854d0e", fg: "#fbbf24", bar: "#eab308" },
+    { val: "C", count: 811, desc: "Low resistance", bg: "#991b1b", fg: "#fca5a5", bar: "#ef4444" },
+    { val: "U", count: 679, desc: "Unknown", bg: "#1e293b", fg: "#64748b", bar: "#475569" },
+    { val: "N", count: 612, desc: "Not applicable", bg: "#1e293b", fg: "#64748b", bar: "#475569" },
+  ],
+  top_environments: [
+    { val: "Sodium Chloride (NaCl)", count: 1733 }, { val: "SCC (generic)", count: 419 },
+    { val: "3.5% NaCl alt. immersion", count: 182 }, { val: "Seacoast at KSC", count: 39 },
+    { val: "5% salt spray", count: 30 },
+  ],
+  test_type_counts: [
+    { type: "Flammability", count: 17838 }, { type: "TVS Outgassing", count: 16178 },
+    { type: "Mech Impact", count: 13789 }, { type: "Toxicity", count: 13099 },
+    { type: "Stress Corr (SCC)", count: 6427 }, { type: "Corrosion", count: 5777 },
+    { type: "Fluid Compat", count: 3987 }, { type: "Odor", count: 3319 },
+    { type: "Flash Fire", count: 2256 }, { type: "Tensile Strength", count: 2053 },
+    { type: "Pneumatic Impact", count: 1252 }, { type: "Promoted Combustion", count: 956 },
+    { type: "Particle Impact", count: 559 }, { type: "Elec Overload", count: 405 },
+    { type: "VCM Optical", count: 353 }, { type: "Elec Wire Insulation", count: 283 },
+    { type: "Low Cycle Fatigue", count: 161 }, { type: "Fungus", count: 102 },
+    { type: "Flammability/MOC", count: 59 }, { type: "Fracture Mechanics", count: 44 },
+    { type: "Creep Rupture", count: 42 }, { type: "High Cycle Fatigue", count: 29 },
+    { type: "Crack Growth", count: 24 }, { type: "Friction Heat", count: 24 },
+  ],
+};
+
+// ── State ──
+let currentTab = "erd";
+let currentLayer = "both";
+let selectedTable = null;
+
+// ── Render helpers ──
+function h(tag, attrs, ...children) {
+  const el = document.createElement(tag);
+  if (attrs) Object.entries(attrs).forEach(([k, v]) => {
+    if (k === "style" && typeof v === "object") Object.assign(el.style, v);
+    else if (k.startsWith("on")) el.addEventListener(k.slice(2).toLowerCase(), v);
+    else if (k === "className") el.className = v;
+    else el.setAttribute(k, v);
+  });
+  children.flat(Infinity).forEach(c => {
+    if (c == null) return;
+    el.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+  });
+  return el;
+}
+
+function renderTable(table, tier, offsetY) {
+  const isRaw = tier === "raw";
+  const selClass = selectedTable === `${tier}.${table.name}` ? (isRaw ? " selected-raw" : " selected-gold") : "";
+  const div = h("div", {
+    className: "erd-table" + selClass,
+    style: { left: table.x + "px", top: (table.y + offsetY) + "px" },
+    onClick: () => { selectedTable = `${tier}.${table.name}`; render(); }
+  },
+    h("div", { className: "erd-header " + (isRaw ? "erd-header-raw" : "erd-header-gold") },
+      h("div", { className: "erd-title mono" }, table.name),
+      h("div", { className: "erd-desc" }, (table.desc || "").slice(0, 70))
+    ),
+    h("div", { className: "erd-cols" },
+      ...table.columns.map(col => {
+        const cls = col.pk ? (isRaw ? "col-pk" : "col-pk-gold") : col.fk ? "col-fk" : "col-normal";
+        const icon = col.pk ? "\u26b7" : col.fk ? "\u2197" : "";
+        return h("div", { className: "erd-col mono" },
+          h("span", { className: "col-icon " + cls }, icon),
+          h("span", { className: "col-name " + cls }, col.name),
+          h("span", { className: "col-type" }, col.type),
+          col.note ? h("span", { className: "col-note" }, col.note) : null
+        );
+      })
+    )
+  );
+  return div;
+}
+
+function renderERD() {
+  const showRaw = currentLayer === "both" || currentLayer === "raw";
+  const showGold = currentLayer === "both" || currentLayer === "gold";
+  const goldOffset = currentLayer === "both" ? 1020 : 0;
+
+  const wrapper = h("div", { className: "panel", style: { position: "relative", minHeight: (currentLayer === "both" ? "2060px" : "1020px") } });
+
+  if (showRaw) {
+    const tierLabel = h("div", {
+      className: "mono",
+      style: { position: "absolute", left: "14px", top: "8px", color: "#fbbf24", fontSize: "13px", fontWeight: "bold" }
+    }, "\u25aa MAPTIS Raw Ingest (Bronze)");
+    wrapper.appendChild(tierLabel);
+    SCHEMA.maptis_raw.tables.forEach(t => wrapper.appendChild(renderTable(t, "raw", 34)));
+  }
+  if (showGold) {
+    const tierLabel = h("div", {
+      className: "mono",
+      style: { position: "absolute", left: "14px", top: (goldOffset + 8) + "px", color: "#2dd4bf", fontSize: "13px", fontWeight: "bold" }
+    }, "\u25aa MIRA Gold (Cleaned + Enriched)");
+    wrapper.appendChild(tierLabel);
+    SCHEMA.mira_gold.tables.forEach(t => wrapper.appendChild(renderTable(t, "gold", goldOffset + 34)));
+  }
+
+  return wrapper;
+}
+
+function renderQuality() {
+  const maxCount = DATA_QUALITY.test_type_counts[0].count;
+
+  return h("div", { className: "quality-grid" },
+    // NULL density
+    h("div", { className: "quality-card" },
+      h("h3", { className: "quality-title mono", style: { color: "#fbbf24" } },
+        "\u26a0 NULL Density (SCC Export)"),
+      h("div", { style: { fontSize: "11px", color: "#64748b", marginBottom: "8px" } },
+        `${DATA_QUALITY.total_rows.toLocaleString()} rows \u2022 ${DATA_QUALITY.unique_materials.toLocaleString()} unique materials \u2022 ${DATA_QUALITY.column_shift_pct}% column-shifted`),
+      ...DATA_QUALITY.null_heavy_fields.map(f =>
+        h("div", { className: "null-row" },
+          h("span", { className: "null-label mono" }, f.field),
+          h("div", { className: "null-bar" },
+            h("div", { className: "null-fill", style: {
+              width: f.null_pct + "%",
+              background: f.null_pct > 90 ? "#ef4444" : f.null_pct > 70 ? "#f59e0b" : "#3b82f6"
+            }})
+          ),
+          h("span", { className: "null-pct mono" }, f.null_pct + "%")
+        )
+      )
+    ),
+    // Rating distribution
+    h("div", { className: "quality-card" },
+      h("h3", { className: "quality-title mono", style: { color: "#2dd4bf" } }, "SCC Rating Distribution"),
+      ...DATA_QUALITY.rating_distribution.map(r =>
+        h("div", { className: "rating-row" },
+          h("span", { className: "rating-badge mono", style: { background: r.bg, color: r.fg } }, r.val),
+          h("div", { className: "rating-bar" },
+            h("div", { className: "rating-fill", style: { width: (r.count / 6430 * 100) + "%", background: r.bar } })
+          ),
+          h("span", { className: "rating-info mono" }, `${r.count.toLocaleString()} \u2014 ${r.desc}`)
+        )
+      ),
+      h("h3", { className: "quality-title mono", style: { color: "#2dd4bf", marginTop: "20px" } }, "Top Environments"),
+      ...DATA_QUALITY.top_environments.map(e =>
+        h("div", { className: "env-row mono" }, h("span", null, e.val), h("span", null, e.count.toLocaleString()))
+      )
+    ),
+    // Test type counts
+    h("div", { className: "quality-card full" },
+      h("h3", { className: "quality-title mono", style: { color: "#a78bfa" } },
+        "All 24 MAPTIS Test Types (~89,778 total reports)"),
+      ...DATA_QUALITY.test_type_counts.map(t =>
+        h("div", { className: "test-row" },
+          h("span", { className: "test-label mono" }, t.type),
+          h("div", { className: "test-bar", style: { width: Math.max(2, (t.count / maxCount) * 400) + "px" } }),
+          h("span", { className: "test-count mono" }, t.count.toLocaleString())
+        )
+      )
+    )
+  );
+}
+
+function renderSQL() {
+  // Minimal syntax highlighting
+  const sql = `-- ================================================================
+-- MIRA SCHEMA \u2014 Grounded in Real MAPTIS Data
+-- Derived from actual SCC export: 6,430 rows, 26 columns
+-- Two-tier: Raw ingest (bronze) \u2192 Cleaned gold
+-- PostgreSQL 16+ with pgvector
+-- ================================================================
+
+CREATE TABLE mira.maptis_materials (
+    material_key        INT PRIMARY KEY,
+    designation         VARCHAR(300) NOT NULL,
+    category_code       VARCHAR(20),
+    spec_reference      VARCHAR(200),
+    manufacturer        VARCHAR(300),
+    form                VARCHAR(100),
+    condition_temper    VARCHAR(100),
+    raw_metadata        JSONB DEFAULT '{}',
+    ingested_at         TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE mira.maptis_test_reports (
+    test_report_key     INT PRIMARY KEY,
+    material_key        INT NOT NULL REFERENCES mira.maptis_materials(material_key),
+    test_type_key       INT NOT NULL,
+    test_report_number  VARCHAR(200),
+    temperature_min_f   DECIMAL(10,4),
+    temperature_max_f   DECIMAL(10,4),
+    data_quality_flag   VARCHAR(20) DEFAULT 'pending',
+    ingested_at         TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE mira.materials (
+    id                  UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    maptis_material_key INT UNIQUE REFERENCES mira.maptis_materials(material_key),
+    designation         VARCHAR(300) NOT NULL,
+    material_family     VARCHAR(80),
+    category            VARCHAR(80),
+    status              VARCHAR(20) DEFAULT 'active'
+);
+
+CREATE TABLE mira.scc_results (
+    id                  UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    material_id         UUID NOT NULL REFERENCES mira.materials(id),
+    scc_rating          CHAR(1) NOT NULL,
+    scc_resistance      VARCHAR(20),
+    environment         TEXT,
+    quality_score       DECIMAL(3,2) DEFAULT 0.50
+);
+
+CREATE TABLE mira.compatibility_ratings (
+    id                  UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    material_id         UUID NOT NULL REFERENCES mira.materials(id),
+    fluid_type          VARCHAR(10) NOT NULL,
+    rating              VARCHAR(20) NOT NULL,
+    confidence          DECIMAL(3,2) DEFAULT 0.50,
+    evidence_chain      JSONB DEFAULT '[]',
+    assessed_at         TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- See full DDL in docs/mira-real-schema.jsx`;
+
+  return h("div", { className: "panel panel-padded" }, h("pre", { className: "mono" }, sql));
+}
+
+// ── Main render ──
+function render() {
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+
+  // Header
+  app.appendChild(h("div", { style: { marginBottom: "16px" } },
+    h("h1", null, "MIRA Schema \u2014 Grounded in Real MAPTIS Data"),
+    h("p", { className: "subtitle" }, "Derived from actual SCC export \u2022 6,430 rows \u2022 26 columns \u2022 Two-tier: Raw Ingest \u2192 Gold")
+  ));
+
+  // Stats
+  const stats = [
+    { label: "Materials", val: "37,765", color: "#fbbf24" },
+    { label: "Test Reports", val: "89,778", color: "#2dd4bf" },
+    { label: "Test Types", val: "24", color: "#a78bfa" },
+    { label: "SCC Records", val: "6,430", color: "#fb923c" },
+    { label: "Column Shift", val: "~7%", color: "#ef4444" },
+  ];
+  app.appendChild(h("div", { className: "stats" },
+    ...stats.map(s => h("div", { className: "stat" },
+      h("div", { className: "stat-label" }, s.label),
+      h("div", { className: "stat-val mono", style: { color: s.color } }, s.val)
+    ))
+  ));
+
+  // Tabs
+  const tabBar = h("div", { className: "tabs" });
+  ["erd", "quality", "sql"].forEach(id => {
+    const label = id === "erd" ? "ERD" : id === "quality" ? "Data Quality" : "SQL DDL";
+    tabBar.appendChild(h("button", {
+      className: "tab" + (currentTab === id ? " active" : ""),
+      onClick: () => { currentTab = id; render(); }
+    }, label));
+  });
+  if (currentTab === "erd") {
+    tabBar.appendChild(h("span", { className: "tab-sep" }, "\u2502"));
+    [["both", "Both Tiers"], ["raw", "Raw (Bronze)"], ["gold", "Gold (Cleaned)"]].forEach(([id, label]) => {
+      tabBar.appendChild(h("button", {
+        className: "layer" + (currentLayer === id ? " active" : ""),
+        onClick: () => { currentLayer = id; render(); }
+      }, label));
+    });
+  }
+  app.appendChild(tabBar);
+
+  // Content
+  if (currentTab === "erd") app.appendChild(renderERD());
+  else if (currentTab === "quality") app.appendChild(renderQuality());
+  else app.appendChild(renderSQL());
+
+  // Footer
+  app.appendChild(h("div", { className: "footer" },
+    "Click tables to highlight \u2022 Toggle Raw/Gold tiers \u2022 Data Quality tab shows actual MAPTIS field sparsity"
+  ));
+}
+
+render();
+</script>
+</body>
+</html>

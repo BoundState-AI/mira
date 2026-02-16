@@ -148,7 +148,7 @@ export const helpContent: Record<string, PageHelpContent> = {
     ],
     relatedPages: [
       { name: "Materials", path: "/materials" },
-      { name: "MIRA Query", path: "/v4-query" },
+      { name: "MIRA Query", path: "/query" },
       { name: "Test Classes", path: "/test-classes" },
     ],
     apiEndpoint: "POST /api/v1/o2/search-bok, POST /api/v1/h2/search-bok, POST /api/query/hybrid",
@@ -270,7 +270,7 @@ export const helpContent: Record<string, PageHelpContent> = {
     ],
     relatedPages: [
       { name: "Knowledge Twins", path: "/" },
-      { name: "Compliance Analysis", path: "/compliance" },
+      { name: "MIRA Query", path: "/query" },
       { name: "MUA Generator", path: "/mua-v7" },
     ],
     apiEndpoint: "POST /api/o2/evaluate, POST /api/o2/search, GET /api/o2/families",
@@ -313,7 +313,7 @@ export const helpContent: Record<string, PageHelpContent> = {
       "Use MAPTIS code when available for most accurate material lookup",
     ],
     relatedPages: [
-      { name: "Gas Compatibility", path: "/gas-compatibility" },
+      { name: "MIRA Query", path: "/query" },
       { name: "MUA Generator", path: "/mua-v7" },
       { name: "Knowledge Twins", path: "/" },
     ],

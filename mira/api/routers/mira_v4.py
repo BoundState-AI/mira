@@ -314,7 +314,10 @@ async def _parse_query_with_sonnet(raw_query: str) -> Dict[str, Any]:
                 model = model_bedrock
             else:
                 from anthropic import Anthropic
-                client = Anthropic()
+                api_key = (os.environ.get("ANTHROPIC_API_KEY") or "").strip()
+                if not api_key:
+                    raise RuntimeError("ANTHROPIC_API_KEY is missing or empty.")
+                client = Anthropic(api_key=api_key)
                 model = model_direct
 
             message = client.messages.create(
@@ -450,7 +453,10 @@ Evidence from MAPTIS database:
                 model = "anthropic.claude-sonnet-4-5-20250929-v1:0"
             else:
                 from anthropic import Anthropic
-                client = Anthropic()
+                api_key = (os.environ.get("ANTHROPIC_API_KEY") or "").strip()
+                if not api_key:
+                    raise RuntimeError("ANTHROPIC_API_KEY is missing or empty.")
+                client = Anthropic(api_key=api_key)
                 model = "claude-sonnet-4-5-20250929"
 
             message = client.messages.create(
@@ -901,9 +907,12 @@ async def ping() -> Dict[str, str]:
     return {"status": "ok", "domain": "mira-v4", "version": "4.0.0"}
 
 
-@router.post("/query", response_model=V4QueryResponse)
+@router.post("/query", response_model=V4QueryResponse, deprecated=True)
 async def query_v4(request: V4QueryRequest) -> V4QueryResponse:
     """Execute the full MIRA v4 decision lineage pipeline.
+
+    Deprecated:
+    Use `POST /mira/query` for the canonical B-S-M-S query path.
 
     Steps:
     1. Parse NL query with Sonnet (Bedrock)

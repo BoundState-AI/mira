@@ -51,6 +51,7 @@ def create_app() -> FastAPI:
     # Core routers (MIRA domain, AEGIS, etc.)
     app.include_router(routers.search_router, prefix="/search", tags=["search"])
     app.include_router(routers.mira_router, prefix="/mira", tags=["mira"])
+    app.include_router(routers.query_router, prefix="/mira", tags=["query"])
     app.include_router(routers.aegis_router, prefix="/aegis", tags=["aegis"])
     app.include_router(routers.compliance_router, prefix="/compliance", tags=["compliance"])
 
@@ -74,6 +75,7 @@ def create_app() -> FastAPI:
 
     # MIRA v4 Decision Lineage pipeline
     app.include_router(routers.mira_v4_router, prefix="/mira/v4", tags=["mira-v4"])
+    app.include_router(routers.bsmh_router, prefix="/mira/bsmh", tags=["bsmh-temp"])
 
     # UI endpoints (semantic search, BOK search)
     # Note: ui_router has its own /api prefix on routes
