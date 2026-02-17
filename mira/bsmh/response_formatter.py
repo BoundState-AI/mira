@@ -550,3 +550,139 @@ async def format_decision(
         requested_materials=requested_materials,
         missing_requested_materials=missing_requested_materials,
     )
+
+
+# =============================================================================
+# Fracture Control Response Formatter
+# =============================================================================
+
+_FC_FORMATTER_SYSTEM_PROMPT = """You are a senior NASA structural engineer writing fracture control assessments.
+Given a deterministic fracture classification result, write a concise engineering response.
+
+STRUCTURE:
+1. First line MUST be exactly: FC_VERDICT: <decision.verdict>
+2. One-sentence classification: state the part classification and what it means.
+3. Applicable FCRs: list fracture control requirements that apply.
+4. NDE requirements: what inspection is required (or exempted and why).
+5. Required documentation: what deliverables are needed (see DOCUMENTATION below).
+6. If NEEDS_CLARIFICATION: list exactly what information is needed and why.
+
+DOCUMENTATION GUIDANCE (per 5019A Section 5):
+Based on the part classification, specify which deliverables are required:
+- Fracture-Critical parts: Fracture Control Plan (FCP), Fracture Control Summary Report (FCSR),
+  detailed damage tolerance or safe-life analysis, and flight rationale for any deviations.
+- Non-Fracture-Critical parts: Classification rationale documenting why the part does not meet
+  fracture-critical criteria. If exempt per 5019A Section 4.2, state the exemption basis.
+- Low-Risk Fracture parts: Limited analysis package per FCR requirements; FCSR entry required
+  but full damage tolerance analysis is not.
+- Legacy/Heritage parts: Legacy Part Analysis if the part predates current 5019A revision.
+  Reference prior FCSR documentation.
+
+MANDATORY RULES:
+- ONLY cite sections/figures that appear in the classification packet's citations list.
+  If no citations are provided in the packet, reference "NASA-STD-5019A Figure 2" as the
+  classification basis and do not fabricate specific section numbers.
+- If center-specific overrides applied, note which center and what changed.
+- Never override the deterministic classification — it is authoritative.
+- Write as a structural engineer, not as software reporting its internals.
+- If verdict is NEEDS_CLARIFICATION, be specific about what fields are missing
+  and explain why each is needed for fracture classification.
+- Response length: 100-300 words for CLASSIFIED verdicts, 50-100 for NEEDS_CLARIFICATION.
+  Complex cases (center overrides + multiple FCRs + NDE requirements) may need the full 300.
+
+PROHIBITED:
+- "safety context" (say "fracture control" directly)
+- Raw internal field names (translate to engineering language)
+- Mentioning rule codes or priority orders
+- Speculating about classification when data is missing
+- Fabricating 5019A section/figure references not present in the packet
+"""
+
+
+def _fc_template_response(decision) -> str:
+    """Template fallback when Sonnet is unavailable for fracture formatting."""
+    from .models import FractureDecisionPacket
+
+    if not isinstance(decision, FractureDecisionPacket):
+        return "FC_VERDICT: ERROR\n\nUnable to process fracture classification."
+
+    if decision.verdict == "NEEDS_CLARIFICATION":
+        fields = decision.classification.clarify_fields if decision.classification else []
+        field_list = ", ".join(fields) if fields else "unknown"
+        return (
+            f"FC_VERDICT: NEEDS_CLARIFICATION\n\n"
+            f"Cannot classify this part without additional information.\n"
+            f"Required fields: {field_list}\n\n"
+            f"Please provide these details for fracture control classification "
+            f"per NASA-STD-5019A Section 6."
+        )
+
+    if decision.verdict == "CLASSIFIED" and decision.classification:
+        cls = decision.classification
+        fcrs = ", ".join(cls.fcr_set) if cls.fcr_set else "None"
+        nde = ", ".join(cls.nde_methods) if cls.nde_methods else "None required"
+        return (
+            f"FC_VERDICT: CLASSIFIED\n\n"
+            f"Part classified as: {cls.part_class} per NASA-STD-5019A Figure 2.\n\n"
+            f"Applicable FCRs: {fcrs}\n"
+            f"NDE required: {'Yes' if cls.nde_required else 'No'}\n"
+            f"NDE methods: {nde}\n\n"
+            f"Classification confidence: {cls.classification_confidence:.0%}"
+        )
+
+    return f"FC_VERDICT: {decision.verdict}\n\nUnable to classify part. Review required."
+
+
+async def format_fracture_decision_sonnet(
+    *,
+    query: str,
+    decision,
+) -> str:
+    """Format fracture classification using Sonnet, with template fallback."""
+    from .models import FractureDecisionPacket
+
+    if not isinstance(decision, FractureDecisionPacket):
+        return _fc_template_response(decision)
+
+    payload = {
+        "original_query": query,
+        "verdict": decision.verdict,
+        "classification": decision.classification.model_dump(mode="json") if decision.classification else None,
+        "context_provided": decision.context_provided.model_dump(mode="json"),
+        "citations": [c.model_dump(mode="json") for c in decision.citations],
+        "derived_values": decision.derived_values,
+        "warnings": decision.warnings,
+        "evidence_gaps": decision.evidence_gaps,
+        "rules_applied": decision.rules_applied,
+    }
+    user_message = json.dumps(payload, indent=2)
+
+    model = os.environ.get("BSMH_SONNET_DIRECT_MODEL", "claude-sonnet-4-5-20250929")
+    max_tokens = int(os.environ.get("BSMH_SONNET_MAX_TOKENS", "1200"))
+
+    def _call_sonnet() -> str:
+        from anthropic import Anthropic
+
+        api_key = (os.environ.get("ANTHROPIC_API_KEY") or "").strip()
+        if not api_key:
+            raise RuntimeError("ANTHROPIC_API_KEY missing")
+
+        client = Anthropic(api_key=api_key)
+        message = client.messages.create(
+            model=model,
+            max_tokens=max_tokens,
+            temperature=0.0,
+            system=_FC_FORMATTER_SYSTEM_PROMPT,
+            messages=[{"role": "user", "content": user_message}],
+        )
+        return (message.content[0].text or "").strip()
+
+    loop = asyncio.get_event_loop()
+    try:
+        text = await loop.run_in_executor(None, _call_sonnet)
+        if text:
+            return text
+    except Exception as exc:
+        LOGGER.warning("[FC] Sonnet formatter failed; using template: %s", exc)
+
+    return _fc_template_response(decision)
