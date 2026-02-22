@@ -31,7 +31,11 @@ bok_ultimate_output/
 discovery_index/
 test_discovery_index/
 athena_files/
-data_laundering/
+# data_laundering/ — now a real package, not generated output
+
+# --- SCRATCH / TEMP DIRS ---
+tmp/
+tmp_*/
 
 # --- FRONTEND BUILD ARTIFACTS ---
 frontend/node_modules/
