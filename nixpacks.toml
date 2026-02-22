@@ -1,0 +1,2 @@
+# Force Python provider for Railway
+providers = ["python"]
