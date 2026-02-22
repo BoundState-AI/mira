@@ -1,0 +1,247 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MUA Matchmaker Rule Pack",
+  "type": "object",
+  "required": [
+    "rule_pack_id",
+    "version",
+    "effective_date",
+    "citation",
+    "domains"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "rule_pack_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Unique identifier, lowercase with hyphens"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version"
+    },
+    "effective_date": {
+      "type": "string",
+      "format": "date",
+      "description": "ISO 8601 date"
+    },
+    "retired_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "citation": {
+      "type": "string",
+      "description": "Source document reference"
+    },
+    "domains": {
+      "type": "object",
+      "patternProperties": {
+        "^[A-Z0-9_]+$": {
+          "$ref": "#/definitions/domain"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "definitions": {
+    "domain": {
+      "type": "object",
+      "required": [
+        "applicable_codes",
+        "questions"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "applicable_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "All Cat III codes possible for this domain"
+        },
+        "stowage_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Supplemental stowage codes (FLAM only)"
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/question"
+          }
+        }
+      }
+    },
+    "question": {
+      "type": "object",
+      "required": [
+        "id",
+        "text",
+        "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^Q[0-9a-z]+$",
+          "description": "Question ID, unique within domain"
+        },
+        "text": {
+          "type": "string",
+          "description": "Question text shown to engineer"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "yes_no",
+            "select",
+            "numeric",
+            "numeric_pair",
+            "numeric_range",
+            "free_text"
+          ],
+          "description": "Input widget type"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "For select type only"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Named fields for numeric_pair/range types"
+        },
+        "condition": {
+          "$ref": "#/definitions/condition",
+          "description": "When to show this question"
+        },
+        "terminates": {
+          "type": "object",
+          "patternProperties": {
+            ".*": {
+              "$ref": "#/definitions/outcome"
+            }
+          },
+          "description": "Answer values that terminate the tree"
+        },
+        "collects": {
+          "type": "object",
+          "patternProperties": {
+            ".*": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "description": "Additional fields to collect for given answers"
+        },
+        "required_for": {
+          "type": "string",
+          "enum": [
+            "CAT_I_II"
+          ],
+          "description": "Required if no Cat III code resolved"
+        },
+        "shall_address": {
+          "type": "string",
+          "description": "Regulatory requirement this question satisfies"
+        }
+      }
+    },
+    "condition": {
+      "type": "object",
+      "description": "Conditions evaluated against current answers",
+      "additionalProperties": true,
+      "patternProperties": {
+        "^Q[0-9a-z.]+$": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/operator"
+            }
+          ]
+        },
+        "^_": {
+          "type": "boolean",
+          "description": "Internal flags like _no_cat3"
+        }
+      }
+    },
+    "operator": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "eq": {
+          "description": "Equal"
+        },
+        "not_in": {
+          "type": "array",
+          "description": "Not in list"
+        },
+        "in": {
+          "type": "array",
+          "description": "In list"
+        },
+        "lt": {
+          "type": "number",
+          "description": "Less than"
+        },
+        "lte": {
+          "type": "number",
+          "description": "Less than or equal"
+        },
+        "gt": {
+          "type": "number",
+          "description": "Greater than"
+        },
+        "gte": {
+          "type": "number",
+          "description": "Greater than or equal"
+        },
+        "default": {
+          "type": "boolean",
+          "description": "Show if prior question not matched"
+        }
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "required": [
+        "outcome"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "PASS",
+            "CAT_III",
+            "CAT_I_II"
+          ]
+        },
+        "code": {
+          "type": "string",
+          "description": "Appendix E code for CAT_III"
+        },
+        "note": {
+          "type": "string",
+          "description": "Supplemental note (e.g., batch/lot)"
+        }
+      }
+    }
+  }
+}

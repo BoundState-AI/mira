@@ -1,0 +1,118 @@
+{
+  "pageTitle": "MIRA",
+  "pageSubtitle": "材料インテリジェンスとリスク分析",
+  "pageDescription": "MAPTISに自然言語で質問できます",
+  "placeholder": "M&Pに関する質問を入力...",
+  "searching": "解析中...",
+  "search": "検索",
+  "exampleQueries": [
+    "極低温サービス用の酸素適合金属を表示",
+    "低透過性の3000 psi GOX対応材料",
+    "インコネル718とハステロイC-276の機械的特性を比較",
+    "ヒドラジンに曝露されたポリマーの試験結果"
+  ],
+  "examples": [
+    "MAPTISで304Lと316Lの腐食試験カバレッジを比較してください。",
+    "Inconel 625の棒材と鋳造材で、MAPTISの試験証拠はどう違いますか？",
+    "Inconel 718は時効材と鋳造材で評価が異なりますか？",
+    "MAPTISでCRES 304Lの流体適合性試験データはありますか？",
+    "高強度ハードウェア向けに、MUA前例と試験カバレッジが最も強い材料はどれですか？"
+  ],
+  "pipelineLabel": "パイプライン:",
+  "pipelineFlow": "Bouncer → Sonnet → MIRAルール → Sonnet",
+  "advancedEnvironment": "詳細環境設定",
+  "searchedFor": "検索対象:",
+  "buttons": {
+    "showAnswerEvidence": "回答証拠を表示 ({{count}})",
+    "showFullPool": "候補全体を表示 ({{count}})"
+  },
+  "sections": {
+    "sonnetAnswer": "Sonnet回答",
+    "deterministicRules": "決定論ルール (M)",
+    "sonnetDbLayer": "Sonnet + DB層 (S)"
+  },
+  "labels": {
+    "pipelineStatus": "パイプライン状態",
+    "bouncer": "Bouncer",
+    "confidence": "信頼度",
+    "scope": "スコープ",
+    "primary": "主要",
+    "associated": "関連",
+    "h2Bok": "H2 BoK",
+    "category": "カテゴリ",
+    "score": "スコア",
+    "materials": "材料",
+    "sonnetCalls": "Sonnet呼び出し回数",
+    "searchSource": "検索ソース",
+    "v4Gate": "v4ゲート",
+    "v4Confidence": "v4信頼度"
+  },
+  "environment": {
+    "temperature": "温度 (C)",
+    "pressure": "圧力 (kPa)",
+    "o2": "O2 %",
+    "fluid": "流体媒体",
+    "duration": "期間 (時間)",
+    "cycles": "サイクル"
+  },
+  "messages": {
+    "noDirectTestData": "MAPTISに直接の試験データがありません"
+  },
+  "hybridSearch": {
+    "title": "ハイブリッド検索が有効",
+    "description": "クエリは意図、制約、エンティティを解析してからセマンティック検索を実行します。",
+    "yourQuery": "あなたのクエリ:",
+    "intentActive": "意図分類 + 制約抽出が有効",
+    "parsedConstraints": "抽出された制約:"
+  },
+  "noSearch": {
+    "title": "まだ検索していません",
+    "hint": "上記のクエリ例を試してください"
+  },
+  "results": {
+    "found": "{{count}}件の材料が見つかりました",
+    "noResults": "結果が見つかりません",
+    "exportCsv": "CSVエクスポート",
+    "cards": "カード",
+    "table": "テーブル",
+    "score": "スコア",
+    "code": "コード",
+    "viewDetails": "詳細を表示",
+    "temp": "温度"
+  },
+  "table": {
+    "materialName": "材料名",
+    "type": "種別",
+    "tests": "試験",
+    "mua": "MUA",
+    "latest": "最新",
+    "o2Compatible": "O₂適合",
+    "o2": "O2",
+    "flammability": "可燃性",
+    "corrosion": "腐食",
+    "stressCorr": "応力腐食",
+    "outgassing": "アウトガス",
+    "matchScore": "一致スコア"
+  },
+  "dialog": {
+    "title": "材料詳細",
+    "basicInfo": "基本情報",
+    "materialCode": "材料コード",
+    "materialKey": "材料キー",
+    "materialType": "材料タイプ",
+    "matchScore": "一致スコア",
+    "unknown": "不明",
+    "maptisRatings": "MAPTIS評価",
+    "flammability": "可燃性",
+    "corrosion": "腐食",
+    "scc": "SCC",
+    "tvs": "TVS",
+    "toxicity": "毒性",
+    "fluidSystems": "流体系",
+    "o2Compatibility": "O2適合性",
+    "mechanicalImpact": "機械的衝撃",
+    "mechanicalProperties": "機械特性",
+    "yieldStrength": "降伏強度",
+    "close": "閉じる"
+  }
+}

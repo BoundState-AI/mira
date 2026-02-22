@@ -1,0 +1,48 @@
+{
+  "title": "MUAウィザード v7",
+  "description": "材料使用合意書ジェネレーター",
+  "session": "セッション",
+  "loadingSession": "セッションを読み込み中...",
+  "steps": {
+    "define": {
+      "label": "定義",
+      "description": "材料と環境"
+    },
+    "investigate": {
+      "label": "調査",
+      "description": "証拠検索"
+    },
+    "review": {
+      "label": "レビュー",
+      "description": "エンジニア判断"
+    },
+    "draft": {
+      "label": "草案",
+      "description": "MUA文書"
+    },
+    "finalize": {
+      "label": "確定",
+      "description": "監査と出力"
+    }
+  },
+  "status": {
+    "finalized": "MUAを確定しました",
+    "stepOf": "ステップ {{step}} / {{total}}: {{description}}"
+  },
+  "buttons": {
+    "resume": "再開",
+    "backTo": "{{step}}に戻る"
+  },
+  "recentSessions": {
+    "title": "最近のセッション"
+  },
+  "toasts": {
+    "sessionDeleted": "セッションを削除しました",
+    "sessionDataRemoved": "セッションデータを削除しました。",
+    "error": "エラー",
+    "failedDelete": "セッションを削除できませんでした。",
+    "sessionResumed": "セッションを再開しました",
+    "loadedSession": "セッション {{session}} を読み込みました",
+    "failedResume": "セッションを再開できませんでした。"
+  }
+}

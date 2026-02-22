@@ -1,0 +1,269 @@
+[
+  {
+    "index": 1,
+    "query": "Is Monel 400 compatible with LOX at 1000 psi?",
+    "status": 200,
+    "answer": "# YES \u2014 Monel 400 is compatible with LOX at 1000 psi\n\n**Oxygen Compatibility Rating:**\n- Multiple Monel 400 designations are **[O\u2082 COMPATIBLE - NASA-STD-6001 A/B rated]** in MAPTIS\n- This rating covers LOX (liquid oxygen) service at typical pressures including 1000 psi\n\n**Supporting Test Data:**\n- **MONEL 400 PLATE ANNEALED**: 30 tests (29 impact, 1 corrosion) \u2014 most robust dataset\n- **MONEL 400 BAR ANNEALED**: 4 tests including 3 fluid compatibility tests\n- **MONEL 400 ROD** and **SOLID RIVETS**: Additional corrosion test data\n\n**Usage History:**\n- **15 MUA precedent records** across all designations, with latest approval in 2025\n- Demonstrates extensive flight heritage in oxygen systems\n\n**Recommendation:**\nMonel 400 (particularly annealed plate or bar forms) is approved for LOX service at 1000 psi per NASA-STD-6001 Test 13 (A/B rating). Ensure material form matches your application \u2014 annealed conditions have the most comprehensive test validation. Verify cleaning and handling procedures per MSFC-SPEC-164 or equivalent oxygen service requirements.",
+    "gate_action": "CLARIFY",
+    "search_source": "sonnet_candidates",
+    "materials_count": 5,
+    "all_material_count": 25,
+    "materials_focus_applied": true,
+    "top_materials": [
+      "MONEL 400 PLATE ANNEALED",
+      "MONEL 400 BAR ANNEALED",
+      "MONEL 400 ROD COLD DRAWN STRESS RELIEVED",
+      "MONEL 400 SOLID RIVETS",
+      "MONEL 400 BAR COLD WORKED"
+    ],
+    "confidence_score": 0.83
+  },
+  {
+    "index": 2,
+    "query": "What's the oxygen compatibility rating for 316 Stainless Steel in GOX environments?",
+    "status": 200,
+    "answer": "# Answer: **CONDITIONAL** \u2014 Depends on Material Condition\n\n## Oxygen Compatibility Rating\n\n**316 Stainless Steel** has **varying oxygen compatibility** based on material condition:\n\n### \u2705 **NASA-STD-6001 A/B Rated** (O\u2082 Compatible):\n- **Annealed condition** \u2014 1 corrosion test\n- **Bar Condition A** \u2014 1 corrosion test\n\n### \u26a0\ufe0f **No O\u2082 Rating in MAPTIS**:\n- **Bar Condition B** \u2014 1 corrosion test, but no rating assigned\n- **Bolting Material** \u2014 1 corrosion test, but no rating assigned  \n- **Casting** \u2014 1 corrosion test, but no rating assigned\n\n## Additional Context\n- **MUA Precedent**: 114 prior usage approval records across all 316 SS variants\n- **Test Data**: Limited to 1 corrosion test per designation (no mechanical impact, ignition, or particle impact data visible)\n\n## Recommendation\n**For GOX service**: Use **annealed** or **Bar Condition A** 316 SS, which carry NASA-STD-6001 A/B ratings. Avoid Bar Condition B, bolting material, or castings unless you obtain supplemental oxygen compatibility testing \u2014 the database lacks ratings for these forms despite MUA precedent.",
+    "gate_action": "CLARIFY",
+    "search_source": "sonnet_candidates",
+    "materials_count": 5,
+    "all_material_count": 28,
+    "materials_focus_applied": true,
+    "top_materials": [
+      "STAINLESS STEEL 316 (CRES 316) ANNEALED (SEE ALSO 50059)",
+      "STAINLESS STEEL 316 (CRES 316) BAR CONDITION A (SEE ALSO 52735)",
+      "STAINLESS STEEL 316 (CRES 316) BAR CONDITION B",
+      "STAINLESS STEEL 316 (CRES 316) BOLTING MATERIAL",
+      "STAINLESS STEEL 316 (CRES 316) CASTING"
+    ],
+    "confidence_score": 0.671071
+  },
+  {
+    "index": 3,
+    "query": "Does Aluminum 6061 have MAPTIS records for cryogenic LOX service, including temperature ranges?",
+    "status": 200,
+    "answer": "# CONDITIONAL \u2014 Limited Data for Al 6061 in Cryogenic LOX\n\n**Direct Answer:** MAPTIS contains **limited records** for Aluminum 6061 in cryogenic service, but **NO oxygen compatibility rating** exists for the base material.\n\n## Evidence Found:\n\n**Al 6061 Composite Materials (NOT base 6061):**\n- **AL 6061-T6 BRAZED WITH INCONEL 718 FILLER**: 5 tests (2 impact, 1 corrosion, 2 fluid compatibility)\n  - Temperature range: **-195\u00b0C to 200\u00b0C** (covers LOX cryogenic range)\n  - [NO O\u2082 RATING IN MAPTIS]\n  \n- **AL 6061-T6/STAINLESS STEEL 304L BIMETAL**: 4 tests (2 impact, 1 corrosion, 1 fluid compatibility)\n  - Temperature range: **-195\u00b0C to 426.67\u00b0C**\n  - [NO O\u2082 RATING IN MAPTIS]\n\n## Critical Gaps:\n- **No base Al 6061-T6 records** appear in the top 10 results shown\n- **No NASA-STD-6001 A/B oxygen compatibility rating** for any Al 6061 variant\n- Test data exists for **composite/joined configurations only**, not monolithic 6061\n\n## Recommendation:\n**Do not assume oxygen compatibility.** While temperature test data exists for Al 6061 composites at cryogenic ranges, the absence of an O\u2082 rating means you must obtain separate approval for LOX service. Request full MAPTIS query for base Al 6061-T6 records or consult materials engineering for MUA precedent review.",
+    "gate_action": "CLARIFY",
+    "search_source": "sonnet_candidates",
+    "materials_count": 20,
+    "all_material_count": 20,
+    "materials_focus_applied": false,
+    "top_materials": [
+      "MONEL 400 PLATE ANNEALED",
+      "INCONEL 718 BAR AGED",
+      "AL 6061-T6 BRAZED WITH INCONEL 718 FILLER",
+      "AL 6061-T6/STAINLESS STEEL 304L (CRES 304L) BIMETAL",
+      "MONEL 400 BAR ANNEALED"
+    ],
+    "confidence_score": 0.7475
+  },
+  {
+    "index": 4,
+    "query": "Is PTFE (Teflon) NASA-STD-6001 A/B rated for dynamic seals in oxygen systems?",
+    "status": 200,
+    "answer": "# NO \u2014 PTFE Not Found in Database Results\n\n**The evidence provided does NOT contain data for PTFE (Teflon).** The search returned only three Vespel materials (SP-21, SP-211, SP-22), which are polyimide-based, not PTFE.\n\n## What the Evidence Shows:\n- **0 PTFE records** in the retrieved data\n- **3 Vespel materials** (different polymer family) with NASA-STD-6001 A/B ratings\n- No test data, MUA records, or oxygen compatibility ratings for PTFE itself\n\n## Why This Matters:\nPTFE and Vespel are **chemically distinct materials** with different oxygen compatibility profiles. Vespel's A/B rating does **not** transfer to PTFE. The 45% confidence score correctly reflects missing data for the focus material.\n\n## Critical Gap:\nWithout PTFE-specific evidence from MAPTIS, I cannot confirm:\n- Whether PTFE has NASA-STD-6001 test data\n- Its A/B rating status for oxygen service\n- Dynamic seal application precedent\n\n---\n\n**Recommendation:** Query MAPTIS specifically for \"PTFE\" or \"Teflon\" designations (e.g., TFE, FEP variants) to retrieve relevant oxygen compatibility data. Do not substitute Vespel data for PTFE applications.",
+    "gate_action": "REFUSE",
+    "search_source": "sonnet_candidates",
+    "materials_count": 3,
+    "all_material_count": 3,
+    "materials_focus_applied": false,
+    "top_materials": [
+      "DUPONT VESPEL SP-21",
+      "DUPONT VESPEL SP-211",
+      "DUPONT VESPEL SP-22"
+    ],
+    "confidence_score": 0.45
+  },
+  {
+    "index": 5,
+    "query": "What are the test records for Brass in LOX, including any MUA precedents?",
+    "status": 200,
+    "answer": "# Brass LOX Test Records\n\n**CONDITIONAL** \u2014 Test data exists, but **no oxygen compatibility rating** is present in MAPTIS for any Brass designation.\n\n## Test Records Found:\n- **BRASS BAR NOC**: 3 tests\n  - 2 impact tests\n  - 1 corrosion test\n- **BRASS C21000 variants** (sheet/strip): 4 additional corrosion tests across different product forms\n\n**Total: 7 tests** in the database, primarily corrosion and impact evaluations.\n\n## MUA Precedent:\nAll Brass designations show **114 MUA precedent records**, with the latest dated **2025**. This indicates extensive prior usage approval history.\n\n## Critical Gap:\n\u26a0\ufe0f **No NASA-STD-6001 oxygen compatibility rating** (Test 1 or Test 13) is documented in MAPTIS for Brass. The existing tests (impact/corrosion) do not constitute formal LOX compatibility certification.\n\n---\n\n**Recommendation**: MUA precedent suggests historical acceptance, but **formal oxygen compatibility testing is not documented**. For new LOX applications, request clarification on which specific MUA records cover your use case, or consider initiating NASA-STD-6001 Test 1/13 if required for your pressure/temperature regime.",
+    "gate_action": "CLARIFY",
+    "search_source": "sonnet_candidates",
+    "materials_count": 5,
+    "all_material_count": 30,
+    "materials_focus_applied": true,
+    "top_materials": [
+      "BRASS BAR NOC",
+      "BRASS C21000 (OLD: CDA210) SHEET",
+      "BRASS C21000 (OLD: CDA210) STRIP",
+      "BRASS C21000 STRIP",
+      "BRASS C21000 STRIP"
+    ],
+    "confidence_score": 0.693333
+  },
+  {
+    "index": 6,
+    "query": "Is Titanium 6Al-4V compatible with GOX at elevated temperatures up to 200?C?",
+    "status": 200,
+    "answer": "# NO \u2014 Ti-6Al-4V is NOT rated for GOX service in MAPTIS\n\n**Critical Finding:**  \nThe MAPTIS database contains **NO oxygen compatibility rating** for Ti-6Al-4V (Titanium 6Al-4V) as a standalone material. The evidence shows only **bimetallic couples** involving Ti-6Al-4V, none of which carry an O\u2082 compatibility designation.\n\n**What the Evidence Shows:**\n- **AL 6061-T6/TI-6AL-4V BIMETAL**: 4 tests including fluid compatibility, temperature range **-195\u00b0C to 200\u00b0C** \u2014 but **[NO O\u2082 RATING IN MAPTIS]**\n- **AL 2014-T6/TI-6AL-4V COUPLE**: 9 tests (6 impact, 2 fluid compatibility) \u2014 **[NO O\u2082 RATING IN MAPTIS]**\n- **CRES 347/TI-6AL-4V BIMETAL**: 4 tests, **114 MUA precedent records** \u2014 but **[NO O\u2082 RATING IN MAPTIS]**\n\n**Why This Matters:**  \nTitanium alloys are **notoriously reactive** with gaseous oxygen at elevated temperatures. The presence of test data and MUA records does NOT constitute an oxygen compatibility rating. Without an explicit NASA-STD-6001 Test 13 (autogenous ignition) rating, Ti-6Al-4V cannot be approved for GOX service at 200\u00b0C.\n\n**Recommendation:**  \n**Do not use Ti-6Al-4V in GOX at 200\u00b0C without additional flammability testing per NASA-STD-6001.** Consult materials engineering for alternative alloys with documented O\u2082 ratings.",
+    "gate_action": "CLARIFY",
+    "search_source": "sonnet_candidates",
+    "materials_count": 3,
+    "all_material_count": 33,
+    "materials_focus_applied": true,
+    "top_materials": [
+      "AL 2014-T6/TI-6AL-4V COUPLE",
+      "AL 6061-T6/TI-6AL-4V BIMETAL",
+      "STAINLESS STEEL 347 (CRES 347)/TI-6AL-4V BIMETAL"
+    ],
+    "confidence_score": 0.752424
+  },
+  {
+    "index": 7,
+    "query": "Does Kel-F (PCTFE) show fluid compatibility testing in MAPTIS for LOX applications?",
+    "status": 200,
+    "answer": "**YES** \u2014 Kel-F 81 has fluid compatibility testing for LOX applications in MAPTIS.\n\n## Evidence Summary:\n- **Kel-F 81**: **8 fluid compatibility tests** recorded (part of 140 total tests)\n- **Oxygen rating**: [O\u2082 COMPATIBLE - NASA-STD-6001 A/B rated]\n- **Temperature range**: -240\u00b0C to 204.44\u00b0C (covers LOX service temperatures)\n- **MUA precedent**: 2 prior usage approval records\n- **Latest test**: 1993\n\nThe material also has extensive flammability (7) and impact (122) testing, which are critical for oxygen service qualification.\n\n## Important Notes:\n- **Kel-F 81 is OBSOLETE** \u2014 replaced by Neoflon M300 and M400\n- The related \"Kel-F 81 PV 506 Gasket\" variant has NO oxygen rating and only 1 impact test\n\n**Recommendation**: While Kel-F 81 shows documented fluid compatibility testing and NASA-STD-6001 A/B oxygen compatibility rating, **use the modern Neoflon M300/M400 replacements** for current LOX applications. Verify the replacement materials carry equivalent test data and ratings before substitution.",
+    "gate_action": "CLARIFY",
+    "search_source": "sonnet_candidates",
+    "materials_count": 2,
+    "all_material_count": 5,
+    "materials_focus_applied": true,
+    "top_materials": [
+      "KEL-F 81 (OBSOLETE REPLACED BY NEOFLONM300 AND M400)",
+      "KEL-F 81 PV 506 GASKET (OBSOLETE REPLACED BY NEOFLONM300 AND M400)"
+    ],
+    "confidence_score": 0.61
+  },
+  {
+    "index": 8,
+    "query": "What's the flammability rating for Vespel SP-1 in oxygen-enriched atmospheres?",
+    "status": 200,
+    "answer": "## Answer: YES \u2014 Vespel SP-1 is oxygen compatible with a NASA-STD-6001 A/B rating\n\n**Flammability Rating:** DuPont Vespel SP-1 has a **NASA-STD-6001 Test A/B rating**, indicating it meets NASA's flammability standards for oxygen-enriched atmospheres.\n\n**Supporting Evidence:**\n- **6 flammability tests** documented in MAPTIS\n- **120 total tests** across multiple categories (including 97 impact, 16 outgassing, 1 toxicity)\n- **3 MUA precedent records** showing prior usage approval\n- **Latest test data: 2020**\n\n**Key Point:** The [O\u2082 COMPATIBLE] tag and explicit NASA-STD-6001 A/B rating confirm this material has been evaluated and approved for oxygen service. The Test A rating addresses upward flame propagation, while Test B covers ignition and flame propagation characteristics.\n\n**Recommendation:** Vespel SP-1 is approved for oxygen-enriched environments per NASA standards. However, always verify the specific application conditions (pressure, temperature, flow velocity) match the test parameters, as oxygen compatibility is configuration-dependent.",
+    "gate_action": "REFUSE",
+    "search_source": "sonnet_candidates",
+    "materials_count": 1,
+    "all_material_count": 6,
+    "materials_focus_applied": true,
+    "top_materials": [
+      "DUPONT VESPEL SP-1"
+    ],
+    "confidence_score": 0.48
+  },
+  {
+    "index": 9,
+    "query": "Are there any caveats for using Buna-N in static seals for LOX systems per MAPTIS?",
+    "status": 200,
+    "answer": "# CONDITIONAL \u2014 Significant Caveats Exist\n\n**MAPTIS does NOT contain an oxygen compatibility rating for Buna-N.** This is a critical gap for LOX system applications.\n\n## Evidence Summary:\n- **Test data exists**: 13 tests total (5 flammability, 7 impact, 1 outgassing), latest from **1986**\n- **No NASA-STD-6001 rating**: Database explicitly shows [NO O\u2082 RATING IN MAPTIS]\n- **MUA precedent**: 5 prior usage approval records (indicates historical use, NOT oxygen compatibility certification)\n- **Temperature range**: -53.89\u00b0C to 121.11\u00b0C (from general Buna-N data)\n\n## Key Caveats:\n1. **No formal O\u2082 compatibility rating** \u2014 cannot confirm it meets NASA oxygen service standards\n2. **Test data is 38+ years old** \u2014 material formulations and standards have evolved\n3. **Static seal-specific data absent** \u2014 the 5 O-ring tests show no O\u2082 rating either\n4. **Elastomer risk in LOX** \u2014 nitrile rubbers are generally considered higher-risk in oxygen-enriched environments\n\n**Recommendation**: Do not specify Buna-N for LOX static seals without current NASA-STD-6001 Test 13 data or explicit engineering approval. Consider oxygen-rated alternatives (PTFE, Viton A, Kalrez) with documented MAPTIS ratings.",
+    "gate_action": "CLARIFY",
+    "search_source": "sonnet_candidates",
+    "materials_count": 3,
+    "all_material_count": 11,
+    "materials_focus_applied": true,
+    "top_materials": [
+      "BUNA-N",
+      "BUNA-N O-RING",
+      "BUNA-N 5-565"
+    ],
+    "confidence_score": 0.537273
+  },
+  {
+    "index": 10,
+    "query": "Is Carbon Fiber/Epoxy composite oxygen compatible, and what impact tests support it?",
+    "status": 200,
+    "answer": "# CONDITIONAL \u2014 Insufficient Evidence for Carbon Fiber/Epoxy Composite\n\nThe MAPTIS database **does not contain a direct oxygen compatibility rating** for \"Carbon Fiber/Epoxy Composite\" as a standalone material. The evidence shows only **composite assemblies** (graphite epoxy bonded to honeycomb cores with adhesives), not the base carbon fiber/epoxy material itself.\n\n## What the Evidence Shows:\n- **2 of 4 assemblies** are tagged [O\u2082 COMPATIBLE - NASA-STD-6001 A/B rated]\n- **2 of 4 assemblies** have [NO O\u2082 RATING IN MAPTIS]\n- All materials are **multi-layer sandwich structures** with adhesives (FM300, HA211) and protective layers (Tedlar, E-glass)\n- **Total test data**: 13 tests across assemblies (10 flammability, 3 toxicity)\n- **MUA precedent**: 19 total records (18 for one assembly, 1 for another)\n\n## Impact Test Support:\n**None explicitly documented.** The evidence lists \"flammability\" and \"toxicity\" tests only. No mechanical impact, autogenous ignition, or promoted ignition test data is provided for any material.\n\n## Recommendation:\n**Cannot confirm oxygen compatibility for bare carbon fiber/epoxy composite** based on this evidence. The rated assemblies include protective layers and adhesives that may contribute to compatibility. Request specific test data for the exact layup and resin system you're evaluating.",
+    "gate_action": "REFUSE",
+    "search_source": "postgresql_families",
+    "materials_count": 4,
+    "all_material_count": 4,
+    "materials_focus_applied": false,
+    "top_materials": [
+      "GRAPHITE EPOXY (2 PLY) BONDED ON BOTH SIDES OF ALUMINUM HONEYCOMB CORE PANCEL WITH FM300 ADHESIVE AND WRAPPED WITH TEDLARON BOTH SIDE EDGES",
+      "TEDLARLAYER OVER GRAPHITE EPOXY BONDED ON BOTH SIDES OF ALUMINUM HONEYCOMB CORE WITH FM300 ADHESIVE WITH STYLE 120 E-GLASS CLOTH LAYER AND TEDLARLAYER",
+      "HEXCELGRAPHITE EPOXY (2 PLY) BONDED ON BOTH SIDES OF ALUMINUM HONEYCOMB CORE WITH FM300 ADHESIVE AND 1 LAYER AERFILMLHR WITH HA211 ADHESIVE HONEYCOMB CORE EDGE POTTED WITH 87005-AC/B-61 ADHESIVE",
+      "HONEYCOMB PAMG-1.0-3/8-.007-P-5056 WITH GRAPHITE EPOXY P/N L-929-100 AND FILM ADHESIVE P/N L-302XL"
+    ],
+    "confidence_score": 0.49
+  },
+  {
+    "index": 11,
+    "query": "What's the latest test data for Copper in GOX, including pressure-specific validations?",
+    "status": 200,
+    "answer": "# MAPTIS Query Result: Copper in GOX\n\n**ANSWER: CONDITIONAL** \u2014 The database contains recent test data for beryllium copper alloys (copper-based), but **NO oxygen compatibility ratings** are present for pure copper or these alloys in MAPTIS.\n\n## Latest Test Data (2025):\n- **Beryllium Copper C17200/C17300**: 8 tests total\n  - 5 impact tests\n  - 2 fluid compatibility tests\n  - 1 corrosion test\n  - Latest tests: **2025**\n  \n- **Beryllium Copper C17000**: Multiple corrosion tests (latest 2025)\n\n## Key Limitations:\n- **No O\u2082 compatibility ratings** documented in MAPTIS for any copper materials shown\n- **No pressure-specific validations** found in the evidence\n- **MUA precedent exists**: 13 records for C17000 and C17200/C17300 alloys (indicates prior usage approval, NOT oxygen ratings)\n- Temperature range documented: **-17\u00b0C to 113\u00b0C** for some alloys\n\n## What's Missing:\n- Pure copper (non-alloyed) test data\n- NASA-STD-6001 Test 13 (pneumatic impact) results\n- Pressure-specific GOX validation data\n- Formal oxygen compatibility ratings\n\n**RECOMMENDATION**: The 2025 test activity suggests active evaluation, but **you cannot claim oxygen compatibility without formal ratings**. Contact MAPTIS administrators for Test 13 results or NASA-STD-6001 ratings if considering copper for GOX service.",
+    "gate_action": "CLARIFY",
+    "search_source": "postgresql",
+    "materials_count": 25,
+    "all_material_count": 25,
+    "materials_focus_applied": false,
+    "top_materials": [
+      "BERYLLIUM COPPER C17200 (BERYLCO 25)/C17300 FLAT PRODUCTS ROD AND WIRE",
+      "BERYLLIUM COPPER C17200 (BERYLCO 25)/C17300 FLAT PRODUCTS TD01 1/4H",
+      "BERYLLIUM COPPER C17200/C17300 FLAT PRODUCTS (BAR",
+      "BERYLLIUM COPPER C17000 (OLD: CDA170) FLAT PRODUCTS ROD TB00 A",
+      "BERYLLIUM COPPER C17000 FLAT PRODUCTS"
+    ],
+    "confidence_score": 0.62
+  },
+  {
+    "index": 12,
+    "query": "Does Mylar have offgassing records in MAPTIS for vacuum/oxygen environments?",
+    "status": 200,
+    "answer": "# NO \u2014 No Mylar-specific offgassing records found\n\nThe MAPTIS query returned **zero materials matching \"Mylar\"** as a standalone designation. The single result is a **multi-layer insulation (MLI) composite** containing multiple films (FEP, polyimide, fiberglass), not pure Mylar.\n\n## What the evidence shows:\n- **MLI composite**: 1 outgassing test (1981), but this is a **complex assembly**, not Mylar film alone\n- **No dedicated Mylar records**: The database search did not retrieve any materials designated as \"Mylar\" or \"polyester film\" by itself\n- **Confidence: 40%** indicates the search may have missed relevant records due to naming variations (Mylar = polyethylene terephthalate = PET film)\n\n## Key limitation:\n**[NO O\u2082 RATING IN MAPTIS]** for standalone Mylar. The MLI composite is O\u2082-rated, but you cannot extrapolate that rating to the Mylar component in isolation.\n\n---\n\n**Recommendation**: Request a MAPTIS search using alternate designations: \"polyester film,\" \"PET film,\" or \"polyethylene terephthalate.\" The 40% confidence suggests the query may need refinement to capture Mylar under its chemical name or common trade variants.",
+    "gate_action": "REFUSE",
+    "search_source": "sonnet_candidates",
+    "materials_count": 1,
+    "all_material_count": 1,
+    "materials_focus_applied": false,
+    "top_materials": [
+      "MLI-ALUMINIZED FIBERGLASS PS/FEP FILM PS/SILVER/INCONEL/METALLIZED FEP FILM/ALUMINIZED POLYIMIDE FILM CRINKLED/WOVEN POLYESTER MESH/FEP"
+    ],
+    "confidence_score": 0.4
+  },
+  {
+    "index": 13,
+    "query": "Is 304 Stainless Steel rated for LOX at 500 psi, with evidence from fatigue tests?",
+    "status": 200,
+    "answer": "# NO \u2014 Evidence Does Not Support This Claim\n\n**304 Stainless Steel is NOT present in the retrieved evidence.** The database search returned 10 materials (Monel 400, Inconel 718, AL 6061-T6, etc.), but **none match the focus material \"304 Stainless Steel.\"**\n\n## What's Missing:\n- **No 304 SS records** in the evidence provided\n- **No fatigue test data** for 304 SS at any pressure\n- **No oxygen compatibility rating** for 304 SS in this dataset\n- **No LOX service data** at 500 psi for 304 SS\n\n## Why the Search Failed:\nThe query returned materials with oxygen ratings (Monel 400, Inconel 718) and some fatigue tests (Inconel 718 has 4 fatigue tests), but **none for the requested alloy**. The confidence score of 82% likely reflects uncertainty in material identification, not data quality.\n\n## Recommendation:\n**Request a targeted MAPTIS search specifically for \"304 Stainless Steel\" or \"CRES 304\"** with filters for:\n- LOX compatibility tests\n- Pressure \u2265500 psi\n- Fatigue test data\n\nWithout 304 SS-specific evidence, **no compatibility determination can be made** for LOX service at 500 psi.",
+    "gate_action": "CLARIFY",
+    "search_source": "sonnet_candidates",
+    "materials_count": 11,
+    "all_material_count": 11,
+    "materials_focus_applied": false,
+    "top_materials": [
+      "MONEL 400 PLATE ANNEALED",
+      "INCONEL 718 BAR AGED",
+      "AL 6061-T6 BRAZED WITH INCONEL 718 FILLER",
+      "MONEL 400 BAR ANNEALED",
+      "BRAZE NIORO INCONEL 718 ON INCONEL 718"
+    ],
+    "confidence_score": 0.817273
+  },
+  {
+    "index": 14,
+    "query": "What are the prohibitions or risks for using Chloroprene in oxygen systems?",
+    "status": 200,
+    "answer": "# NO DATA AVAILABLE \u2014 Cannot Answer\n\n**The MAPTIS database contains NO records for Chloroprene.** The evidence retrieved shows 5 materials (KEL-F 81, Fluorosilicone variants, and PTFE-coated Fluorosilicone), but **none match the focus material \"Chloroprene.\"**\n\n## What This Means:\n- **No oxygen compatibility rating** exists in MAPTIS for Chloroprene\n- **No test data** (flammability, impact, or otherwise) is available\n- **No MUA precedent records** are documented\n- **No prohibitions or risks** can be cited from this database\n\n## Why Confidence is 48%:\nThe system likely flagged this as a **REFUSE** case because:\n- Chloroprene (also known as Neoprene or polychloroprene) is a **chlorinated elastomer**\n- Chlorinated polymers are generally **high-risk in oxygen systems** due to potential ignition and toxic combustion products\n- However, **without MAPTIS evidence, I cannot state specific NASA prohibitions**\n\n---\n\n**Recommendation:** Consult NASA-STD-6001B Test 1 (autogenous ignition temperature) data or contact the NASA White Sands Test Facility for Chloroprene oxygen compatibility testing. Do not use in oxygen service without explicit approval and testing.",
+    "gate_action": "REFUSE",
+    "search_source": "sonnet_candidates",
+    "materials_count": 5,
+    "all_material_count": 5,
+    "materials_focus_applied": false,
+    "top_materials": [
+      "KEL-F 81 (OBSOLETE REPLACED BY NEOFLONM300 AND M400)",
+      "FLUOROSILICONE NOC",
+      "FLUOROSILICONE 9891",
+      "KEL-F 81 PV 506 GASKET (OBSOLETE REPLACED BY NEOFLONM300 AND M400)",
+      "POLYTETRAFLUOROETHYLENE (PTFE) COATED FLUOROSILICONE NOC"
+    ],
+    "confidence_score": 0.48
+  },
+  {
+    "index": 15,
+    "query": "Does Bronze have NASA-approved usage in high-pressure LOX valves, per MUA records?",
+    "status": 200,
+    "answer": "# NO \u2014 Bronze Not Found in MAPTIS Evidence\n\nThe MAPTIS database search **did not return any Bronze materials** in the evidence provided. The 10 materials shown are:\n- **Monel 400** (various forms) \u2014 4 entries\n- **Inconel 718** (various forms) \u2014 3 entries\n- **Aluminum 6061-T6** (brazed)\n- **Incoloy 88** (welded)\n- **Stainless Steel 316L**\n\n**Key Findings:**\n- **Zero Bronze records** appear in the evidence\n- **Zero MUA precedent records** for Bronze in high-pressure LOX valves\n- **Zero test data** for Bronze materials\n\n**Why the 74% confidence score is misleading:**\nThe system found 15 materials total (10 shown), but **none match \"Bronze\"** as the focus material. The confidence score likely reflects the quality of the *search process*, not the presence of Bronze data.\n\n**Recommendation:**\nBronze is **not documented** in this MAPTIS evidence set for LOX valve applications. If Bronze is being considered for high-pressure oxygen service, you must:\n1. Request a targeted MAPTIS search specifically for Bronze alloys (C-series designations)\n2. Verify oxygen compatibility through NASA-STD-6001 testing\n3. Consult materials engineers before use \u2014 Bronze alloys vary widely in oxygen compatibility",
+    "gate_action": "CLARIFY",
+    "search_source": "sonnet_candidates",
+    "materials_count": 15,
+    "all_material_count": 15,
+    "materials_focus_applied": false,
+    "top_materials": [
+      "MONEL 400 PLATE ANNEALED",
+      "INCONEL 718 BAR AGED",
+      "AL 6061-T6 BRAZED WITH INCONEL 718 FILLER",
+      "MONEL 400 BAR ANNEALED",
+      "BRAZE NIORO INCONEL 718 ON INCONEL 718"
+    ],
+    "confidence_score": 0.743333
+  }
+]

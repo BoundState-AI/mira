@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import {
   type MaterialIntelCandidate,
+  type MaterialIdentity,
   type MaterialResolution,
   type MaterialIntelResponse,
   type MIULImportResponse,
@@ -41,7 +42,6 @@ import {
   type IssueCode,
   type IssueCodeInfo,
   importMIULWorkbook,
-  getMaterialIntel,
   resolveMaterial,
   investigate,
   previewIssues,
@@ -273,7 +273,12 @@ function buildCandidateWhy(
 export default function MUADefineStep({ wizard, patchWizard, onNext }: Props) {
   // Material resolution
   const [materialInput, setMaterialInput] = useState(wizard.material ?? '');
+  const [materialForm, setMaterialForm] = useState<string>((wizard.materialIdentity?.form ?? '').toLowerCase());
+  const [materialCondition, setMaterialCondition] = useState<string>(wizard.materialIdentity?.condition ?? '');
   const [resolution, setResolution] = useState<MaterialResolution | null>(null);
+  const [materialIdentity, setMaterialIdentity] = useState<MaterialIdentity | null>(
+    wizard.materialIdentity ?? null,
+  );
   const [selectedMaterialCode, setSelectedMaterialCode] = useState<string | null>(null);
   const [selectedMaterialKey, setSelectedMaterialKey] = useState<number | null>(null);
   const [selectedMaterialName, setSelectedMaterialName] = useState<string | null>(null);
@@ -341,25 +346,32 @@ export default function MUADefineStep({ wizard, patchWizard, onNext }: Props) {
   const doResolve = useCallback(async (query: string) => {
     if (query.trim().length < 2) {
       setResolution(null);
+      setMaterialIdentity(null);
       return;
     }
     const reqId = ++resolveRequestIdRef.current;
     setResolving(true);
     try {
-      const { resolution: r } = await resolveMaterial(query.trim());
+      const { resolution: r, identity } = await resolveMaterial(
+        query.trim(),
+        materialForm || null,
+        materialCondition || null,
+      );
       if (reqId === resolveRequestIdRef.current) {
         setResolution(r);
+        setMaterialIdentity(identity ?? null);
       }
     } catch {
       if (reqId === resolveRequestIdRef.current) {
         setResolution(null);
+        setMaterialIdentity(null);
       }
     } finally {
       if (reqId === resolveRequestIdRef.current) {
         setResolving(false);
       }
     }
-  }, []);
+  }, [materialCondition, materialForm]);
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -371,35 +383,8 @@ export default function MUADefineStep({ wizard, patchWizard, onNext }: Props) {
 
   useEffect(() => {
     if (intelDebounceRef.current) clearTimeout(intelDebounceRef.current);
-    const query = materialInput.trim();
-    if (query.length < 2) {
-      setMaterialIntel(null);
-      setIntelLoading(false);
-      return;
-    }
-
-    intelDebounceRef.current = setTimeout(async () => {
-      const reqId = ++intelRequestIdRef.current;
-      setIntelLoading(true);
-      try {
-        const intel = await getMaterialIntel(query, selectedMaterialCode ?? null, 20, materialFilters);
-        if (reqId === intelRequestIdRef.current) {
-          setMaterialIntel(intel);
-        }
-      } catch {
-        if (reqId === intelRequestIdRef.current) {
-          setMaterialIntel(null);
-        }
-      } finally {
-        if (reqId === intelRequestIdRef.current) {
-          setIntelLoading(false);
-        }
-      }
-    }, 700);
-
-    return () => {
-      if (intelDebounceRef.current) clearTimeout(intelDebounceRef.current);
-    };
+    setMaterialIntel(null);
+    setIntelLoading(false);
   }, [materialInput, selectedMaterialCode, materialFilters]);
 
   const materialCandidates: MaterialCandidate[] = (resolution?.suggestions ?? [])
@@ -645,7 +630,26 @@ export default function MUADefineStep({ wizard, patchWizard, onNext }: Props) {
     }
 
     if (bucket.suggested_environment) {
-      setEnv(bucket.suggested_environment);
+      setEnv((prev) => ({
+        ...prev,
+        ...bucket.suggested_environment,
+        o2_percent:
+          typeof bucket.suggested_environment.o2_percent === "number"
+            ? bucket.suggested_environment.o2_percent
+            : prev.o2_percent,
+        pressure_psia:
+          typeof bucket.suggested_environment.pressure_psia === "number"
+            ? bucket.suggested_environment.pressure_psia
+            : prev.pressure_psia,
+        temp_min_f:
+          typeof bucket.suggested_environment.temp_min_f === "number"
+            ? bucket.suggested_environment.temp_min_f
+            : prev.temp_min_f,
+        temp_max_f:
+          typeof bucket.suggested_environment.temp_max_f === "number"
+            ? bucket.suggested_environment.temp_max_f
+            : prev.temp_max_f,
+      }));
     }
     if (bucket.issue_codes?.length) {
       setSelectedIssues(new Set(bucket.issue_codes));
@@ -655,12 +659,13 @@ export default function MUADefineStep({ wizard, patchWizard, onNext }: Props) {
       setAppDesc(bucket.sample_part_descriptions[0]);
     }
 
-    if (bucket.likely_category === "I_or_II" || bucket.likely_category === "I") {
+    const likelyCategory = String(bucket.likely_category ?? "");
+    if (likelyCategory === "I_or_II" || likelyCategory === "I") {
       setMissionCritical("yes");
     } else {
       setMissionCritical("unknown");
     }
-    if (bucket.likely_category.includes("III")) {
+    if (likelyCategory.includes("III")) {
       setCat3PathKnown("yes");
     } else {
       setCat3PathKnown("unknown");
@@ -729,12 +734,12 @@ export default function MUADefineStep({ wizard, patchWizard, onNext }: Props) {
         title: "Likely Category III Candidate",
         tone: "info",
         summary:
-          "A Category III path is indicated by your plan input. If Appendix B applicability and evidence checks pass, this should route as Category III.",
+          "A Category III path is indicated by your plan input. If Appendix E applicability and evidence checks pass, this should route as Category III.",
         reasons: [
           cat3PathKnown === 'yes'
             ? "You indicated your plan has an approved Category III rationale path for this usage."
             : `Approved Category III code(s) entered: ${approvedCat3Codes.join(", ")}.`,
-          "Final routing still validates Appendix B fit, ratings, and open gaps.",
+          "Final routing still validates Appendix E fit, ratings, and open gaps.",
         ],
       } as const;
     }
@@ -764,17 +769,23 @@ export default function MUADefineStep({ wizard, patchWizard, onNext }: Props) {
   const envFieldsFromLocationGapClass = "mt-8";
   // UI tuning: adjust this one class to change label-to-input spacing for O2/Pressure/Temp fields.
   const envFieldLabelGapClass = "space-y-2";
+  const showLegacyMaterialSelection = false;
 
   // Validation
-  const requiresCandidateSelection =
-    resolution?.status === 'fuzzy' && materialCandidates.length > 0;
   const hasExplicitMaterialSelection =
     hasUserSelectedMaterial && Boolean(selectedMaterialCode) && materialInput.trim().length > 0;
   const materialResolvedByResolver =
-    (resolution?.status === 'resolved' || resolution?.status === 'fuzzy') &&
-    (!requiresCandidateSelection || (hasUserSelectedMaterial && Boolean(selectedMaterialCode)));
+    resolution?.status === 'resolved' || resolution?.status === 'fuzzy';
   const materialOk = hasExplicitMaterialSelection || materialResolvedByResolver;
-  const envOk = env.o2_percent > 0 && env.pressure_psia > 0 && env.temp_max_f > env.temp_min_f;
+  const envOk =
+    Number.isFinite(env.o2_percent) &&
+    env.o2_percent >= 0 &&
+    env.o2_percent <= 100 &&
+    Number.isFinite(env.pressure_psia) &&
+    env.pressure_psia > 0 &&
+    Number.isFinite(env.temp_min_f) &&
+    Number.isFinite(env.temp_max_f) &&
+    env.temp_max_f > env.temp_min_f;
   const canSubmit = materialOk && envOk && !submitting;
 
   // Submit
@@ -783,14 +794,15 @@ export default function MUADefineStep({ wizard, patchWizard, onNext }: Props) {
     setError(null);
     try {
       const effectiveMaterialName = materialInput.trim();
-      const explicitOverride = hasUserSelectedMaterial && Boolean(selectedMaterialCode);
 
       const buildReq = (sid: string | null): InvestigateRequest => ({
         session_id: sid,
         material: effectiveMaterialName,
-        material_code: explicitOverride ? selectedMaterialCode : null,
-        material_key: explicitOverride ? selectedMaterialKey : null,
-        resolved_name: explicitOverride ? (selectedMaterialName ?? effectiveMaterialName) : null,
+        material_code: null,
+        material_key: null,
+        resolved_name: null,
+        form: materialForm || null,
+        condition: materialCondition || null,
         environment: { ...env, application: appDesc || env.application },
         process_params: showProcess ? process : undefined,
         issue_codes: selectedIssues.size > 0 ? Array.from(selectedIssues) : undefined,
@@ -820,6 +832,7 @@ export default function MUADefineStep({ wizard, patchWizard, onNext }: Props) {
       patchWizard({
         sessionId: result.session_id,
         material: effectiveMaterialName,
+        materialIdentity,
         environment: env,
         processParams: showProcess ? process : null,
         applicationDescription: appDesc || null,
@@ -889,20 +902,29 @@ export default function MUADefineStep({ wizard, patchWizard, onNext }: Props) {
                 {miulImport.bucket_count} buckets.
               </div>
               <div className="space-y-2 max-h-72 overflow-auto pr-1">
-                {miulImport.buckets.slice(0, 30).map((bucket) => (
+                {miulImport.buckets.slice(0, 30).map((bucket) => {
+                  const isSelected = selectedMIULBucketId === bucket.bucket_id;
+                  return (
                   <div
                     key={bucket.bucket_id}
-                    className={`rounded border p-3 space-y-2 ${
-                      selectedMIULBucketId === bucket.bucket_id ? "border-primary bg-primary/5" : ""
+                    className={`rounded border p-3 space-y-2 transition-colors ${
+                      isSelected ? "border-primary bg-primary/5" : ""
                     }`}
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="text-sm font-medium">
                         {bucket.suggested_material} ({bucket.material_code})
                       </div>
-                      <Badge variant="outline">
-                        {bucket.part_count} part{bucket.part_count === 1 ? "" : "s"}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        {isSelected && (
+                          <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 border-emerald-200">
+                            Applied
+                          </Badge>
+                        )}
+                        <Badge variant="outline">
+                          {bucket.part_count} part{bucket.part_count === 1 ? "" : "s"}
+                        </Badge>
+                      </div>
                     </div>
                     <div className="text-xs text-muted-foreground">
                       Trigger: {bucket.trigger_signature} | Env: {bucket.environment_raw || bucket.suggested_environment.medium} | Fluid: {(bucket.fluid_types && bucket.fluid_types.length > 0) ? bucket.fluid_types.join(", ") : "unknown"} | Hint: {bucket.likely_category}
@@ -915,15 +937,16 @@ export default function MUADefineStep({ wizard, patchWizard, onNext }: Props) {
                     <div className="flex justify-end">
                       <Button
                         type="button"
-                        variant="secondary"
+                        variant={isSelected ? "default" : "secondary"}
                         size="sm"
+                        className="cursor-pointer"
                         onClick={() => applyMIULBucket(bucket)}
                       >
-                        Use This Bucket
+                        {isSelected ? "Bucket Applied" : "Use This Bucket"}
                       </Button>
                     </div>
                   </div>
-                ))}
+                )})}
               </div>
             </div>
           )}
@@ -1040,20 +1063,55 @@ export default function MUADefineStep({ wizard, patchWizard, onNext }: Props) {
                 {!resolving && resolutionIcon}
               </div>
             </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="material-form">Form (optional)</Label>
+                <Select
+                  value={materialForm || "__none"}
+                  onValueChange={(v) => setMaterialForm(v === "__none" ? "" : v)}
+                >
+                  <SelectTrigger id="material-form">
+                    <SelectValue placeholder="Select form" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none">Unspecified</SelectItem>
+                    <SelectItem value="bar">Bar</SelectItem>
+                    <SelectItem value="sheet">Sheet</SelectItem>
+                    <SelectItem value="plate">Plate</SelectItem>
+                    <SelectItem value="tube">Tube</SelectItem>
+                    <SelectItem value="pipe">Pipe</SelectItem>
+                    <SelectItem value="foil">Foil</SelectItem>
+                    <SelectItem value="wire">Wire</SelectItem>
+                    <SelectItem value="forging">Forging</SelectItem>
+                    <SelectItem value="casting">Casting</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="material-condition">Temper/Condition (optional)</Label>
+                <Input
+                  id="material-condition"
+                  placeholder="e.g. T6, annealed, O, as-received"
+                  value={materialCondition}
+                  onChange={(e) => setMaterialCondition(e.target.value)}
+                />
+              </div>
+            </div>
             {resolution && (
               <div className="text-sm">
                 {resolution.status === 'resolved' && (
                   <div className="space-y-1">
                     <span className="text-green-700">
-                      Resolved: {effectiveMaterialName ?? resolution.resolved_name}
-                      {effectiveMaterialCode &&
-                        ` (${effectiveMaterialCode})`}
+                      Resolved: {materialIdentity?.canonical_name ?? effectiveMaterialName ?? resolution.resolved_name}
                     </span>
-                    {(effectiveMaterialCode || effectiveMaterialKey) && (
+                    {materialIdentity?.family && (
                       <p className="text-xs text-muted-foreground">
-                        Using MAPTIS record
-                        {effectiveMaterialCode ? ` ${effectiveMaterialCode}` : ''}
-                        {effectiveMaterialKey ? ` (key ${effectiveMaterialKey})` : ''}.
+                        Family: {materialIdentity.family}
+                      </p>
+                    )}
+                    {materialIdentity && (
+                      <p className="text-xs text-muted-foreground">
+                        Matching MAPTIS records found: {materialIdentity.all_maptis_codes.length}
                       </p>
                     )}
                   </div>
@@ -1061,11 +1119,9 @@ export default function MUADefineStep({ wizard, patchWizard, onNext }: Props) {
                 {resolution.status === 'fuzzy' && (
                   <div className="space-y-1">
                     <span className="text-yellow-700">
-                      {resolution.selection_method === "multi_material_detected"
-                        ? "Multiple materials detected in one callout. Pick the exact subject material for this MUA."
-                        : "Review required: select the best MAPTIS record for this callout."}
+                      Material identity captured. Detailed MAPTIS code confirmation happens in Step 3 after evidence review.
                     </span>
-                    {materialCandidates.length > 0 && (
+                    {showLegacyMaterialSelection && materialCandidates.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-1">
                         {materialCandidates.slice(0, 8).map((c) => (
                           <Badge
@@ -1085,6 +1141,11 @@ export default function MUADefineStep({ wizard, patchWizard, onNext }: Props) {
                         {selectedMaterialCode ? ` (${selectedMaterialCode})` : ''}
                       </p>
                     )}
+                    {materialIdentity && (
+                      <p className="text-xs text-muted-foreground">
+                        Candidate MAPTIS records: {materialIdentity.all_maptis_codes.length}
+                      </p>
+                    )}
                   </div>
                 )}
                 {resolution.status === 'unresolved' && (
@@ -1095,7 +1156,7 @@ export default function MUADefineStep({ wizard, patchWizard, onNext }: Props) {
               </div>
             )}
 
-            {(intelLoading || materialIntel) && (
+            {showLegacyMaterialSelection && (intelLoading || materialIntel) && (
               <div className="mt-3 rounded-md border bg-muted/20 p-3 space-y-2">
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -1265,12 +1326,13 @@ export default function MUADefineStep({ wizard, patchWizard, onNext }: Props) {
         </CardContent>
       </Card>
 
-      <Sheet
-        open={Boolean(whyCandidate)}
-        onOpenChange={(open) => {
-          if (!open) setWhyCandidateCode(null);
-        }}
-      >
+      {showLegacyMaterialSelection && (
+        <Sheet
+          open={Boolean(whyCandidate)}
+          onOpenChange={(open) => {
+            if (!open) setWhyCandidateCode(null);
+          }}
+        >
         <SheetContent className="sm:max-w-xl overflow-y-auto">
           <SheetHeader className="mb-4">
             <SheetTitle>Why this candidate?</SheetTitle>
@@ -1411,7 +1473,8 @@ export default function MUADefineStep({ wizard, patchWizard, onNext }: Props) {
             </div>
           )}
         </SheetContent>
-      </Sheet>
+        </Sheet>
+      )}
 
       {/* Environment */}
       <Card>

@@ -1,0 +1,70 @@
+{
+  "title": "コンプライアンス分析",
+  "description": "NASA-STD-6016C要件に対する材料コンプライアンスを分析",
+  "form": {
+    "materialInputs": "材料入力",
+    "materialKey": "材料キー",
+    "materialKeyRequired": "材料キー *",
+    "materialKeyPlaceholder": "例：SS316、Ti-6Al-4V",
+    "maptisCode": "MAPTISコード（任意）",
+    "maptisCodePlaceholder": "例：12345",
+    "pressure": "圧力 (PSIA)",
+    "pressurePlaceholder": "14.7",
+    "temperature": "温度 (°F)",
+    "temperaturePlaceholder": "70",
+    "environmentOptions": "環境オプション",
+    "o2Concentration": "O₂濃度 (%)",
+    "o2Placeholder": "21",
+    "hydrogenService": "水素サービス (H₂)",
+    "habitableEnvironment": "居住可能環境",
+    "analyzeCompliance": "コンプライアンスを分析"
+  },
+  "results": {
+    "overallStatus": "全体コンプライアンスステータス",
+    "environmentDescription": "環境：{{description}}",
+    "summaryStats": {
+      "mprsCompliant": "MPR準拠",
+      "withConstraints": "制約付き",
+      "nonCompliant": "非準拠",
+      "gaps": "ギャップ（{{critical}}件クリティカル）"
+    },
+    "mprDeterminations": "MPR判定 ({{count}})",
+    "mprTitle": "MPR-{{number}}: {{title}}",
+    "section": "セクション {{section}}",
+    "requiredAction": "必要なアクション：{{action}}",
+    "gapsCount": "{{count}}件のギャップ",
+    "constraintsCount": "{{count}}件の制約",
+    "gapSignals": "ギャップシグナル ({{count}})",
+    "operationalConstraints": "運用制約 ({{count}})",
+    "constraintTable": {
+      "parameter": "パラメーター",
+      "limit": "制限",
+      "description": "説明"
+    },
+    "warnings": "警告",
+    "requestId": "リクエストID：{{id}}",
+    "analysisTime": "分析時間：{{ms}}ms"
+  },
+  "status": {
+    "compliant": "準拠",
+    "compliantWithConstraints": "制約付き準拠",
+    "noncompliant": "非準拠",
+    "unknown": "不明"
+  },
+  "severity": {
+    "critical": "クリティカル",
+    "high": "高",
+    "medium": "中",
+    "low": "低"
+  },
+  "gaps": {
+    "gapType": "ギャップタイプ",
+    "trigger": "トリガー：{{trigger}}",
+    "evidence": "{{count}}件のエビデンス"
+  },
+  "error": {
+    "title": "エラー",
+    "analysisFailed": "コンプライアンス分析に失敗しました"
+  },
+  "loading": "分析中..."
+}

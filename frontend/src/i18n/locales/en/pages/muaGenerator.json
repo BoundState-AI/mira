@@ -1,0 +1,303 @@
+{
+  "title": "MUA Generator",
+  "description": "Generate NASA-STD-6016 compliant Material Usage Agreements with LLM-powered synthesis",
+  "badge": "MUA BOK V3",
+  "tabs": {
+    "corpus": "Corpus Draft",
+    "v6": "V6 Pipeline",
+    "synthesis": "AI Synthesis",
+    "precedent": "Precedent Engine",
+    "interactive": "Interactive",
+    "batch": "Batch"
+  },
+  "corpus": {
+    "title": "Corpus-Based MUA Draft Generator",
+    "description": "Generate MUA drafts from <strong>5,650+ parsed historic MUAs</strong>. The system finds relevant precedents using semantic search, analyzes coverage, and synthesizes rationale with full provenance tracking.",
+    "form": {
+      "materialEnvironment": "Material & Environment",
+      "materialDesignation": "Material Designation",
+      "materialPlaceholder": "e.g., 6061-T6 Aluminum, Inconel 718, Viton",
+      "environmentDescription": "Environment Description",
+      "environmentPlaceholder": "e.g., Enriched oxygen, cabin air, vacuum",
+      "applicationContext": "Application Context",
+      "applicationPlaceholder": "Describe the intended use...",
+      "o2Percent": "O2 %",
+      "pressurePsia": "Pressure (PSIA)",
+      "tempF": "Temp (°F)",
+      "habitableLocation": "Habitable Location",
+      "issuesToAddress": "Issues to Address"
+    },
+    "issues": {
+      "flammability": "flammability",
+      "corrosion": "corrosion",
+      "scc": "scc",
+      "toxicity": "toxicity",
+      "offgassing": "offgassing",
+      "o2Compat": "o2_compat"
+    },
+    "actions": {
+      "searchPrecedents": "Search Precedents",
+      "searching": "Searching...",
+      "generateDraft": "Generate Draft",
+      "generating": "Generating...",
+      "reset": "Reset"
+    },
+    "results": {
+      "searchResults": "Precedent Search Results",
+      "found": "{{count}} found",
+      "generatedDraft": "Generated Draft",
+      "confidence": "{{percent}}% confidence",
+      "coverage": "Coverage",
+      "issuesAddressed": "Issues Addressed",
+      "gapsIdentified": "Gaps Identified",
+      "warnings": "Warnings",
+      "precedentsCited": "Precedents Cited ({{count}})",
+      "synthesizedRationale": "Synthesized Rationale"
+    },
+    "determinations": {
+      "approved": "APPROVED",
+      "conditional": "CONDITIONAL",
+      "requiresReview": "REQUIRES REVIEW"
+    },
+    "emptyState": "Enter material and environment details, then click \"Generate Draft\" to create an MUA based on historic precedents."
+  },
+  "v6": {
+    "title": "MUA V6 Evidence Pipeline",
+    "description": "Six-stage evidence-first pipeline: Material Resolution → Precedent Search → MAPTIS Test Data → Envelope Matching → Decision Engine → Logic Validation. Returns structured decisions with confidence scores and citations.",
+    "form": {
+      "queryParameters": "Query Parameters",
+      "materialDesignation": "Material Designation",
+      "materialPlaceholder": "e.g., INCONEL 625, 304 SS, Nylon 6/6",
+      "environmentDescription": "Environment Description",
+      "environmentPlaceholder": "e.g., Gaseous oxygen service at elevated pressure",
+      "o2Percent": "O2 %",
+      "pressurePsia": "Pressure (PSIA)",
+      "tempF": "Temp (°F)",
+      "habitableLocation": "Habitable Location",
+      "resultsK": "Results (k)",
+      "generationMode": "Generation Mode",
+      "evaluateOnly": "Evaluate Only (returns decision)",
+      "auto": "Auto (generate draft if PROCEED)"
+    },
+    "actions": {
+      "searchPrecedents": "Search Precedents",
+      "searching": "Searching...",
+      "evaluateGenerate": "Evaluate/Generate",
+      "evaluating": "Evaluating...",
+      "reset": "Reset"
+    },
+    "results": {
+      "searchResults": "Precedent Search Results",
+      "requestId": "ID: {{id}}",
+      "evaluationResult": "Evaluation Result",
+      "decision": "Decision",
+      "confidence": "Confidence",
+      "envelopeStatus": "Envelope Status",
+      "supporting": "Supporting",
+      "conflicting": "Conflicting",
+      "precedents": "Precedents",
+      "reasoning": "Reasoning",
+      "draftText": "Draft Text"
+    },
+    "decisions": {
+      "proceed": "PROCEED",
+      "warn": "WARN",
+      "review": "REVIEW",
+      "blocked": "BLOCKED"
+    },
+    "envelope": {
+      "within": "Within Envelope",
+      "partialOverlap": "Partial Overlap",
+      "extrapolation": "Extrapolation",
+      "insufficientData": "Insufficient Data"
+    }
+  },
+  "synthesis": {
+    "title": "AI Synthesis Mode",
+    "description": "Generate MUA rationale using AI-powered synthesis from precedent analysis",
+    "form": {
+      "material": "Material",
+      "materialPlaceholder": "e.g., Ti-6Al-4V, Inconel 718",
+      "issue": "Issue Type",
+      "application": "Application",
+      "applicationPlaceholder": "Describe the application/use case",
+      "environment": "Environment",
+      "environmentPlaceholder": "Operating environment details",
+      "location": "Location",
+      "massQuantity": "Mass/Quantity",
+      "program": "Program"
+    },
+    "issues": {
+      "flam": "FLAM - Flammability",
+      "scc": "SCC - Stress Corrosion Cracking",
+      "corr": "CORR - Corrosion",
+      "tvs": "TVS - Total Volatile Content",
+      "tox": "TOX - Toxicity",
+      "fs": "FS - Fluid Systems"
+    },
+    "locations": {
+      "habitable": "Habitable",
+      "nonHabitable": "Non-habitable"
+    },
+    "actions": {
+      "synthesize": "Synthesize MUA",
+      "synthesizing": "Synthesizing...",
+      "copyRationale": "Copy Rationale",
+      "copied": "Copied!",
+      "reset": "Reset"
+    },
+    "results": {
+      "category": "Category",
+      "confidence": "Confidence",
+      "precedentsUsed": "Precedents Used ({{count}})",
+      "applicabilityAnalysis": "Applicability Analysis",
+      "synthesizedRationale": "Synthesized Rationale",
+      "warnings": "Warnings"
+    },
+    "applicability": {
+      "yes": "Applicable",
+      "partial": "Partial",
+      "no": "Not Applicable"
+    }
+  },
+  "precedent": {
+    "title": "V4 Precedent Engine",
+    "description": "Evaluate precedent adequacy with tiered matching",
+    "form": {
+      "material": "Material",
+      "media": "Media/Fluid",
+      "o2Percent": "O2 %",
+      "tempMax": "Max Temp (°F)",
+      "pressureMax": "Max Pressure (PSIA)",
+      "deviations": "Deviation Types",
+      "location": "Location Class"
+    },
+    "deviationTypes": {
+      "flam": "FLAM",
+      "scc": "SCC",
+      "corr": "CORR",
+      "tvs": "TVS",
+      "tox": "TOX",
+      "fs": "FS"
+    },
+    "actions": {
+      "evaluate": "Evaluate Precedents",
+      "evaluating": "Evaluating...",
+      "reset": "Reset"
+    },
+    "results": {
+      "adequacy": "Adequacy",
+      "totalCandidates": "Total Candidates",
+      "tier1Matches": "Tier 1 Matches",
+      "tier2Matches": "Tier 2 Matches",
+      "tier3Matches": "Tier 3 Matches",
+      "recommendedBase": "Recommended Base",
+      "reasoning": "Selection Reasoning",
+      "statistics": "Statistics",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "approvalRate": "Approval Rate"
+    }
+  },
+  "interactive": {
+    "title": "Interactive Mode",
+    "description": "Search precedents, select matches, and generate MUA with your input",
+    "steps": {
+      "search": "1. Search",
+      "select": "2. Select",
+      "generate": "3. Generate"
+    },
+    "form": {
+      "material": "Material",
+      "materialPlaceholder": "Search for material...",
+      "issues": "Issue Types",
+      "environment": "Environment",
+      "application": "Application"
+    },
+    "actions": {
+      "search": "Search Precedents",
+      "searching": "Searching...",
+      "generate": "Generate from Selection",
+      "generating": "Generating...",
+      "reset": "Start Over"
+    },
+    "results": {
+      "precedentsFound": "{{count}} precedents found",
+      "selected": "{{count}} selected",
+      "selectPrecedents": "Select applicable precedents to use for MUA generation",
+      "generatedDraft": "Generated MUA Draft"
+    }
+  },
+  "batch": {
+    "title": "Batch Mode",
+    "description": "Generate MUAs for multiple materials from an enriched MIUL",
+    "form": {
+      "uploadMiul": "Upload Enriched MIUL",
+      "dragDrop": "Drag and drop your enriched MIUL Excel file",
+      "programName": "Program Name",
+      "hardwareName": "Hardware Name"
+    },
+    "actions": {
+      "generate": "Generate MUAs",
+      "generating": "Generating...",
+      "downloadExcel": "Download Excel with MUAs",
+      "downloadJson": "Download JSON"
+    },
+    "results": {
+      "processed": "{{count}} materials processed",
+      "generated": "{{count}} MUAs generated",
+      "viewResults": "View Results"
+    },
+    "progress": "Generating MUAs... {{percent}}%"
+  },
+  "toast": {
+    "searchComplete": "Search Complete",
+    "foundPrecedents": "Found {{count}} precedents",
+    "synthesisComplete": "MUA Synthesized",
+    "synthesisFromPrecedents": "Generated rationale from {{count}} applicable precedents",
+    "evaluationComplete": "Evaluation Complete",
+    "draftGenerated": "Draft Generated",
+    "copied": "Copied",
+    "rationalecopied": "Rationale copied to clipboard",
+    "muaDraftCopied": "MUA draft copied to clipboard",
+    "downloadComplete": "Download Complete",
+    "excelDownloaded": "Excel file with MUAs has been downloaded",
+    "batchComplete": "MUAs Generated",
+    "batchSuccess": "Successfully generated {{count}} MUA documents",
+    "error": {
+      "missingMaterial": "Missing Material",
+      "enterMaterial": "Please enter a material designation",
+      "missingApplication": "Missing Application",
+      "enterApplication": "Please describe the application/use case",
+      "missingFields": "Missing Fields",
+      "materialEnvRequired": "Material and environment description are required",
+      "noFile": "No File",
+      "uploadMiul": "Please upload an enriched MIUL file first",
+      "invalidFile": "Invalid File",
+      "excelRequired": "Please upload an Excel file (.xlsx or .xls)",
+      "noPrecedents": "No Precedents Selected",
+      "selectPrecedent": "Please select at least one precedent to use",
+      "searchFailed": "Search Failed",
+      "synthesisFailed": "Synthesis Failed",
+      "synthesisIssue": "Synthesis Issue",
+      "couldNotGenerate": "Could not generate MUA",
+      "evaluationFailed": "Evaluation Failed",
+      "generationFailed": "Generation Failed",
+      "copyFailed": "Copy Failed",
+      "couldNotCopy": "Could not copy to clipboard",
+      "downloadFailed": "Download Failed"
+    }
+  },
+  "common": {
+    "required": "Required",
+    "optional": "Optional",
+    "loading": "Loading...",
+    "noResults": "No results found",
+    "score": "Score",
+    "category": "Category",
+    "material": "Material",
+    "environment": "Environment",
+    "determination": "Determination",
+    "rationale": "Rationale"
+  }
+}

@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, Fragment } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ import {
   type SessionDetail,
   type SessionSummary,
   type InvestigationResult,
+  type MaterialIdentity,
   type ReviewDecisions,
   type MUADraft,
   type FinalizedMUA,
@@ -61,6 +63,7 @@ const STEP_META: Record<StepName, { label: string; description: string; icon: Lu
 export interface WizardClientState {
   sessionId: string | null;
   material: string | null;
+  materialIdentity: MaterialIdentity | null;
   environment: EnvironmentSpec | null;
   processParams: ProcessParams | null;
   applicationDescription: string | null;
@@ -78,6 +81,7 @@ export interface WizardClientState {
 const EMPTY_STATE: WizardClientState = {
   sessionId: null,
   material: null,
+  materialIdentity: null,
   environment: null,
   processParams: null,
   applicationDescription: null,
@@ -145,6 +149,7 @@ function PipelineTracker({
   allComplete: boolean;
   isInvestigating: boolean;
 }) {
+  const { t } = useTranslation("muaWizardV7");
   const statuses = getStageStatuses(currentStep, allComplete);
   const stepIndex = STEPS.indexOf(currentStep);
   const progressPct = allComplete ? 100 : ((stepIndex + 0.5) / STEPS.length) * 100;
@@ -191,7 +196,7 @@ function PipelineTracker({
                     status === 'pending' && 'text-slate-400',
                   )}
                 >
-                  {meta.label}
+                  {t(`steps.${step}.label`, { defaultValue: meta.label })}
                 </span>
               </div>
 
@@ -232,8 +237,15 @@ function PipelineTracker({
           )}
         >
           {allComplete
-            ? 'MUA finalized'
-            : `Step ${stepIndex + 1} of ${STEPS.length}: ${STEP_META[currentStep].description}`}
+            ? t("status.finalized", { defaultValue: "MUA finalized" })
+            : t("status.stepOf", {
+                step: stepIndex + 1,
+                total: STEPS.length,
+                description: t(`steps.${currentStep}.description`, {
+                  defaultValue: STEP_META[currentStep].description,
+                }),
+                defaultValue: `Step ${stepIndex + 1} of ${STEPS.length}: ${STEP_META[currentStep].description}`,
+              })}
         </span>
       </div>
     </div>
@@ -249,6 +261,7 @@ function SessionResumeBar({
 }: {
   onResume: (session: SessionSummary) => void;
 }) {
+  const { t } = useTranslation("muaWizardV7");
   const { toast } = useToast();
   const [sessions, setSessions] = useState<SessionSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -270,12 +283,19 @@ function SessionResumeBar({
       try {
         await deleteSession(sessionId);
         setSessions((prev) => prev.filter((s) => s.session_id !== sessionId));
-        toast({ title: 'Session deleted', description: 'Session data removed.' });
+        toast({
+          title: t("toasts.sessionDeleted", { defaultValue: "Session deleted" }),
+          description: t("toasts.sessionDataRemoved", { defaultValue: "Session data removed." }),
+        });
       } catch {
-        toast({ title: 'Error', description: 'Failed to delete session.', variant: 'destructive' });
+        toast({
+          title: t("toasts.error", { defaultValue: "Error" }),
+          description: t("toasts.failedDelete", { defaultValue: "Failed to delete session." }),
+          variant: 'destructive',
+        });
       }
     },
-    [toast],
+    [toast, t],
   );
 
   if (isLoading || sessions.length === 0) return null;
@@ -285,7 +305,7 @@ function SessionResumeBar({
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
           <History className="h-4 w-4" />
-          Recent Sessions
+          {t("recentSessions.title", { defaultValue: "Recent Sessions" })}
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0">
@@ -330,7 +350,7 @@ function SessionResumeBar({
                     onClick={() => onResume(session)}
                   >
                     <RotateCcw className="h-3 w-3 mr-1" />
-                    Resume
+                    {t("buttons.resume", { defaultValue: "Resume" })}
                   </Button>
                   <Button
                     variant="ghost"
@@ -355,6 +375,7 @@ function SessionResumeBar({
 // ---------------------------------------------------------------------------
 
 export default function MUAWizardV7() {
+  const { t } = useTranslation("muaWizardV7");
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -383,6 +404,10 @@ export default function MUAWizardV7() {
               ...prev,
               sessionId: s.session_id,
               material: s.material_input,
+              materialIdentity:
+                effectiveInvestigation?.material_identity
+                ?? s.material_identity
+                ?? (sameSession ? prev.materialIdentity : null),
               environment: effectiveInvestigation?.environment ?? null,
               processParams: effectiveInvestigation?.process_params ?? null,
               applicationDescription: effectiveInvestigation?.environment?.application ?? null,
@@ -433,6 +458,7 @@ export default function MUAWizardV7() {
           ...EMPTY_STATE,
           sessionId: s.session_id,
           material: s.material_input,
+          materialIdentity: s.investigation?.material_identity ?? s.material_identity ?? null,
           environment: s.investigation?.environment ?? null,
           processParams: s.investigation?.process_params ?? null,
           applicationDescription: s.investigation?.environment?.application ?? null,
@@ -444,16 +470,23 @@ export default function MUAWizardV7() {
         });
         goToStep(s.current_step, s.session_id);
         toast({
-          title: 'Session resumed',
-          description: `Loaded session ${s.session_id.slice(0, 8)}...`,
+          title: t("toasts.sessionResumed", { defaultValue: "Session resumed" }),
+          description: t("toasts.loadedSession", {
+            session: `${s.session_id.slice(0, 8)}...`,
+            defaultValue: `Loaded session ${s.session_id.slice(0, 8)}...`,
+          }),
         });
       } catch {
-        toast({ title: 'Error', description: 'Failed to resume session.', variant: 'destructive' });
+        toast({
+          title: t("toasts.error", { defaultValue: "Error" }),
+          description: t("toasts.failedResume", { defaultValue: "Failed to resume session." }),
+          variant: 'destructive',
+        });
       } finally {
         setLoading(false);
       }
     },
-    [goToStep, toast],
+    [goToStep, toast, t],
   );
 
   // ---- Patch wizard state helper ------------------------------------------
@@ -477,15 +510,17 @@ export default function MUAWizardV7() {
         <div className="flex items-center gap-3">
           <FileText className="h-6 w-6 text-primary" />
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">MUA Wizard v7</h1>
+            <h1 className="text-2xl font-bold tracking-tight">
+              {t("title", { defaultValue: "MUA Wizard v7" })}
+            </h1>
             <p className="text-sm text-muted-foreground">
-              Materials Usage Agreement Generator
+              {t("description", { defaultValue: "Materials Usage Agreement Generator" })}
             </p>
           </div>
         </div>
         {wizard.sessionId && (
           <Badge variant="outline" className="font-mono text-xs">
-            Session: {wizard.sessionId.slice(0, 8)}
+            {t("session", { defaultValue: "Session" })}: {wizard.sessionId.slice(0, 8)}
           </Badge>
         )}
       </div>
@@ -501,7 +536,12 @@ export default function MUAWizardV7() {
       {stepIndex > 0 && (
         <Button variant="ghost" size="sm" onClick={goBack} className="gap-1">
           <ChevronLeft className="h-4 w-4" />
-          Back to {STEP_META[STEPS[stepIndex - 1]].label}
+          {t("buttons.backTo", {
+            step: t(`steps.${STEPS[stepIndex - 1]}.label`, {
+              defaultValue: STEP_META[STEPS[stepIndex - 1]].label,
+            }),
+            defaultValue: `Back to ${STEP_META[STEPS[stepIndex - 1]].label}`,
+          })}
         </Button>
       )}
 
@@ -516,7 +556,7 @@ export default function MUAWizardV7() {
       {loading ? (
         <Card>
           <CardContent className="py-16 text-center text-muted-foreground">
-            Loading session...
+            {t("loadingSession", { defaultValue: "Loading session..." })}
           </CardContent>
         </Card>
       ) : (

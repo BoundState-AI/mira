@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Module:   Init  
+Module:   Init
 Purpose: API routers exposed by the BoundState service.
 
 BoundState AI 2025
@@ -18,25 +18,25 @@ Safety Critical: True
 
 from __future__ import annotations
 
-from .search import router as search_router
-from .mira import router as mira_router
 from .aegis import router as aegis_router
-from .miul import router as miul_router
 from .bom import router as bom_router
-from .mua import router as mua_router
-from .mua_v6 import router as mua_v6_router
-from .hybrid_query import router as hybrid_query_router
-from .ui_endpoints import router as ui_router
-from .test_classes import router as test_classes_router
+from .bsmh import router as bsmh_router
 from .compliance import router as compliance_router
+from .hybrid_query import router as hybrid_query_router
+from .matchmaker import router as matchmaker_router
+from .mira import router as mira_router
+from .mira_v4 import router as mira_v4_router
+from .miul import router as miul_router
 from .mp_plan import router as mp_plan_router
 from .mp_plan_v2_codex import router as mp_plan_v2_codex_router
-from .o2 import router as o2_router
-from .mira_v4 import router as mira_v4_router
+from .mua import router as mua_router
+from .mua_v6 import router as mua_v6_router
 from .mua_v7 import router as mua_v7_router
-from .bsmh import router as bsmh_router
+from .o2 import router as o2_router
 from .query import router as query_router
-import uuid
+from .search import router as search_router
+from .test_classes import router as test_classes_router
+from .ui_endpoints import router as ui_router
 
 __all__ = [
     "search_router",
@@ -55,6 +55,7 @@ __all__ = [
     "o2_router",
     "mira_v4_router",
     "mua_v7_router",
+    "matchmaker_router",
     "bsmh_router",
     "query_router",
 ]

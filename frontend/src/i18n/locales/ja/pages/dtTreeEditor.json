@@ -1,0 +1,66 @@
+{
+  "title": "図面ツリーエディター",
+  "description": "ドラッグ＆ドロップで階層関係を修正",
+  "toolbar": {
+    "extractPdf": "PDFから抽出",
+    "loadJson": "JSONを読み込む",
+    "export": "エクスポート",
+    "expandAll": "すべて展開",
+    "collapseAll": "すべて折りたたむ",
+    "undo": "元に戻す"
+  },
+  "upload": {
+    "drawings": "図面PDF",
+    "title": "図面ツリーが読み込まれていません",
+    "description": "PDFから抽出するかJSONを読み込む",
+    "extractFromPdf": "PDFから抽出",
+    "loadFromJson": "JSONを読み込む",
+    "claudeVision": "PDF抽出ではClaude Visionを使用して図面ツリー構造を解析します。",
+    "reviewHint": "抽出後、階層の誤りを確認・修正してからエクスポートしてください。"
+  },
+  "tree": {
+    "assembly": "ASM",
+    "detail": "DTL",
+    "dragTip": "グリップアイコンを押してドラッグしてノードを移動。タッチスクリーンでも動作します！"
+  },
+  "extraction": {
+    "extracting": "抽出中...",
+    "uploading": "PDFを抽出サービスにアップロード中...",
+    "analyzing": "Claude Visionで図面ツリーを解析中...",
+    "processing": "抽出結果を処理中...",
+    "progress": "図面ツリーを解析中... ({{seconds}}秒)",
+    "durationHint": "PDFの複雑さに応じて30〜60秒かかる場合があります"
+  },
+  "history": {
+    "title": "編集履歴",
+    "loadedFromFile": "ファイルから読み込み",
+    "extractedFromPdf": "PDFから抽出",
+    "moved": "{{node}}を{{from}}から{{to}}へ移動"
+  },
+  "toast": {
+    "treeLoaded": "ツリーを読み込みました",
+    "nodesLoaded": "{{filename}}から{{count}}ノードを読み込みました",
+    "extractionComplete": "抽出完了",
+    "nodesExtracted": "{{count}}ノードを抽出しました。必要に応じて確認・修正してください。",
+    "exported": "エクスポートしました",
+    "savedAs": "{{filename}}として保存しました",
+    "nodeMoved": "ノードを移動しました",
+    "nodeMovedDesc": "{{node}}は{{parent}}の下に移動しました",
+    "undone": "元に戻しました",
+    "error": {
+      "loadingFile": "ファイル読み込みエラー",
+      "extractionFailed": "抽出に失敗しました",
+      "invalidMove": "無効な移動",
+      "cannotMoveToDescendant": "ノードを自身の子孫の下に移動できません",
+      "unrecognizedFormat": "認識できないJSON形式です",
+      "extractionTimeout": "2分後に抽出がタイムアウトしました",
+      "emptyTree": "抽出結果が空のツリーです"
+    }
+  },
+  "nodeTypes": {
+    "assembly": "アセンブリ",
+    "detail": "詳細"
+  },
+  "tipLabel": "ヒント:",
+  "total": "合計"
+}

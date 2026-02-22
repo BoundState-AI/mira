@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, DragEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -234,6 +235,7 @@ function TreeNodeItem({
 // ============================================================================
 
 export default function DTTreeEditor() {
+  const { t } = useTranslation("dtTreeEditor");
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pdfInputRef = useRef<HTMLInputElement>(null);
@@ -293,16 +295,25 @@ export default function DTTreeEditor() {
           setExpandedNodes(new Set(assemblies));
 
           // Initialize history
-          setHistory([{ tree: flatTree.tree, description: "Loaded from file" }]);
+          setHistory([
+            {
+              tree: flatTree.tree,
+              description: t("history.loadedFromFile", { defaultValue: "Loaded from file" }),
+            },
+          ]);
           setHistoryIndex(0);
 
           toast({
-            title: "Tree Loaded",
-            description: `${flatTree.tree.length} nodes loaded from ${file.name}`,
+            title: t("toast.treeLoaded", { defaultValue: "Tree Loaded" }),
+            description: t("toast.nodesLoaded", {
+              count: flatTree.tree.length,
+              filename: file.name,
+              defaultValue: `${flatTree.tree.length} nodes loaded from ${file.name}`,
+            }),
           });
         } catch (err) {
           toast({
-            title: "Error Loading File",
+            title: t("toast.error.loadingFile", { defaultValue: "Error Loading File" }),
             description: String(err),
             variant: "destructive",
           });
@@ -310,7 +321,7 @@ export default function DTTreeEditor() {
       };
       reader.readAsText(file);
     },
-    [toast]
+    [toast, t]
   );
 
   const convertNestedToFlat = (nested: { root: NestedNode }): TreeData => {
@@ -358,14 +369,22 @@ export default function DTTreeEditor() {
       event.target.value = "";
 
       setIsExtracting(true);
-      setExtractionProgress("Uploading PDF to extraction service...");
+      setExtractionProgress(
+        t("extraction.uploading", {
+          defaultValue: "Uploading PDF to extraction service...",
+        })
+      );
 
       try {
         const formData = new FormData();
         formData.append("dt_file", file);
         formData.append("max_iterations", "3");
 
-        setExtractionProgress("Analyzing drawing tree with Claude Vision...");
+        setExtractionProgress(
+          t("extraction.analyzing", {
+            defaultValue: "Analyzing drawing tree with Claude Vision...",
+          })
+        );
 
         const response = await fetch("/api/miul/extract-dt", {
           method: "POST",
@@ -377,7 +396,11 @@ export default function DTTreeEditor() {
           throw new Error(`Extraction failed: ${errorText}`);
         }
 
-        setExtractionProgress("Processing extraction results...");
+        setExtractionProgress(
+          t("extraction.processing", {
+            defaultValue: "Processing extraction results...",
+          })
+        );
         const result = await response.json();
 
         if (!result.tree || result.tree.length === 0) {
@@ -399,16 +422,25 @@ export default function DTTreeEditor() {
         setExpandedNodes(new Set(assemblies));
 
         // Initialize history
-        setHistory([{ tree: flatTree.tree, description: "Extracted from PDF" }]);
+        setHistory([
+          {
+            tree: flatTree.tree,
+            description: t("history.extractedFromPdf", { defaultValue: "Extracted from PDF" }),
+          },
+        ]);
         setHistoryIndex(0);
 
         toast({
-          title: "Extraction Complete",
-          description: `${flatTree.tree.length} nodes extracted from ${file.name}. Review and correct if needed.`,
+          title: t("toast.extractionComplete", { defaultValue: "Extraction Complete" }),
+          description: t("toast.nodesExtracted", {
+            count: flatTree.tree.length,
+            filename: file.name,
+            defaultValue: `${flatTree.tree.length} nodes extracted from ${file.name}. Review and correct if needed.`,
+          }),
         });
       } catch (err) {
         toast({
-          title: "Extraction Failed",
+          title: t("toast.error.extractionFailed", { defaultValue: "Extraction Failed" }),
           description: String(err),
           variant: "destructive",
         });
@@ -417,7 +449,7 @@ export default function DTTreeEditor() {
         setExtractionProgress("");
       }
     },
-    [toast]
+    [toast, t]
   );
 
   const handleExport = useCallback(() => {
@@ -433,8 +465,11 @@ export default function DTTreeEditor() {
     URL.revokeObjectURL(url);
 
     toast({
-      title: "Exported",
-      description: `Saved as ${treeData.top_level}_corrected.json`,
+      title: t("toast.exported", { defaultValue: "Exported" }),
+      description: t("toast.savedAs", {
+        filename: `${treeData.top_level}_corrected.json`,
+        defaultValue: `Saved as ${treeData.top_level}_corrected.json`,
+      }),
     });
   }, [treeData, toast]);
 
@@ -466,8 +501,10 @@ export default function DTTreeEditor() {
       // Can't drop onto descendants (would create cycle)
       if (isDescendant(draggedNode, targetId, treeData.tree)) {
         toast({
-          title: "Invalid Move",
-          description: "Cannot move a node under its own descendant",
+          title: t("toast.error.invalidMove", { defaultValue: "Invalid Move" }),
+          description: t("toast.error.cannotMoveToDescendant", {
+            defaultValue: "Cannot move a node under its own descendant",
+          }),
           variant: "destructive",
         });
         setDraggedNode(null);
@@ -526,11 +563,15 @@ export default function DTTreeEditor() {
       setDraggedNode(null);
 
       toast({
-        title: "Node Moved",
-        description: `${draggedNode} is now under ${targetId}`,
+        title: t("toast.nodeMoved", { defaultValue: "Node Moved" }),
+        description: t("toast.nodeMovedDesc", {
+          node: draggedNode,
+          parent: targetId,
+          defaultValue: `${draggedNode} is now under ${targetId}`,
+        }),
       });
     },
-    [treeData, draggedNode, history, historyIndex, toast]
+    [treeData, draggedNode, history, historyIndex, toast, t]
   );
 
   // ============================================================================
@@ -543,11 +584,11 @@ export default function DTTreeEditor() {
       setHistoryIndex(prevIndex);
       setTreeData({ ...treeData, tree: history[prevIndex].tree });
       toast({
-        title: "Undone",
+        title: t("toast.undone", { defaultValue: "Undone" }),
         description: history[historyIndex].description,
       });
     }
-  }, [historyIndex, history, treeData, toast]);
+  }, [historyIndex, history, treeData, toast, t]);
 
   // ============================================================================
   // Tree Expand/Collapse
@@ -591,9 +632,11 @@ export default function DTTreeEditor() {
         <div className="flex items-center gap-3">
           <FolderTree className="h-8 w-8 text-primary" />
           <div>
-            <h1 className="text-2xl font-bold">Drawing Tree Editor</h1>
+            <h1 className="text-2xl font-bold">
+              {t("title", { defaultValue: "Drawing Tree Editor" })}
+            </h1>
             <p className="text-muted-foreground">
-              Drag and drop to correct hierarchy relationships
+              {t("description", { defaultValue: "Drag and drop to correct hierarchy relationships" })}
             </p>
           </div>
         </div>
@@ -622,7 +665,9 @@ export default function DTTreeEditor() {
               ) : (
                 <FileImage className="h-4 w-4 mr-2" />
               )}
-              {isExtracting ? "Extracting..." : "Extract from PDF"}
+              {isExtracting
+                ? t("extraction.extracting", { defaultValue: "Extracting..." })
+                : t("upload.extractFromPdf", { defaultValue: "Extract from PDF" })}
             </Button>
 
             {/* JSON File Upload */}
@@ -639,7 +684,7 @@ export default function DTTreeEditor() {
               disabled={isExtracting}
             >
               <Upload className="h-4 w-4 mr-2" />
-              Load JSON
+              {t("toolbar.loadJson", { defaultValue: "Load JSON" })}
             </Button>
 
             {/* Export */}
@@ -649,17 +694,17 @@ export default function DTTreeEditor() {
               disabled={!treeData || isExtracting}
             >
               <Download className="h-4 w-4 mr-2" />
-              Export
+              {t("toolbar.export", { defaultValue: "Export" })}
             </Button>
 
             <div className="h-6 w-px bg-border" />
 
             {/* Expand/Collapse */}
             <Button variant="ghost" size="sm" onClick={expandAll} disabled={!treeData}>
-              Expand All
+              {t("toolbar.expandAll", { defaultValue: "Expand All" })}
             </Button>
             <Button variant="ghost" size="sm" onClick={collapseAll} disabled={!treeData}>
-              Collapse All
+              {t("toolbar.collapseAll", { defaultValue: "Collapse All" })}
             </Button>
 
             <div className="h-6 w-px bg-border" />
@@ -672,7 +717,7 @@ export default function DTTreeEditor() {
               disabled={historyIndex <= 0}
             >
               <Undo2 className="h-4 w-4 mr-2" />
-              Undo
+              {t("toolbar.undo", { defaultValue: "Undo" })}
             </Button>
 
             {/* Stats */}
@@ -680,13 +725,13 @@ export default function DTTreeEditor() {
               <div className="flex items-center gap-4 ml-auto text-sm text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <Package className="h-4 w-4 text-blue-600" />
-                  {assemblyCount} Assemblies
+                  {assemblyCount} {t("nodeTypes.assembly", { defaultValue: "Assemblies" })}
                 </span>
                 <span className="flex items-center gap-1">
                   <File className="h-4 w-4 text-gray-500" />
-                  {detailCount} Details
+                  {detailCount} {t("nodeTypes.detail", { defaultValue: "Details" })}
                 </span>
-                <span>Total: {treeData.tree.length}</span>
+                <span>{t("total", { defaultValue: "Total" })}: {treeData.tree.length}</span>
               </div>
             )}
           </div>
@@ -700,10 +745,14 @@ export default function DTTreeEditor() {
             <div className="flex items-center gap-4">
               <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
               <div>
-                <h3 className="font-semibold">Extracting Drawing Tree...</h3>
+                <h3 className="font-semibold">
+                  {t("extraction.extracting", { defaultValue: "Extracting Drawing Tree..." })}
+                </h3>
                 <p className="text-sm text-muted-foreground">{extractionProgress}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  This may take 30-60 seconds depending on PDF complexity
+                  {t("extraction.durationHint", {
+                    defaultValue: "This may take 30-60 seconds depending on PDF complexity",
+                  })}
                 </p>
               </div>
             </div>
@@ -716,24 +765,33 @@ export default function DTTreeEditor() {
         <Card className="border-dashed">
           <CardContent className="p-12 text-center">
             <FolderTree className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No Drawing Tree Loaded</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              {t("upload.title", { defaultValue: "No Drawing Tree Loaded" })}
+            </h3>
             <p className="text-muted-foreground mb-6">
-              Extract from a Drawing Tree PDF or load an existing JSON file
+              {t("upload.description", {
+                defaultValue: "Extract from a Drawing Tree PDF or load an existing JSON file",
+              })}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" onClick={() => pdfInputRef.current?.click()}>
                 <FileImage className="h-5 w-5 mr-2" />
-                Extract from PDF
+                {t("upload.extractFromPdf", { defaultValue: "Extract from PDF" })}
               </Button>
               <Button variant="outline" size="lg" onClick={() => fileInputRef.current?.click()}>
                 <FileJson className="h-5 w-5 mr-2" />
-                Load JSON File
+                {t("upload.loadFromJson", { defaultValue: "Load JSON File" })}
               </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-6">
-              PDF extraction uses Claude Vision to analyze the drawing tree structure.
+              {t("upload.claudeVision", {
+                defaultValue: "PDF extraction uses Claude Vision to analyze the drawing tree structure.",
+              })}
               <br />
-              After extraction, review and correct any hierarchy errors before exporting.
+              {t("upload.reviewHint", {
+                defaultValue:
+                  "After extraction, review and correct any hierarchy errors before exporting.",
+              })}
             </p>
           </CardContent>
         </Card>
@@ -747,8 +805,11 @@ export default function DTTreeEditor() {
           </CardHeader>
           <CardContent className="p-4">
             <div className="text-sm text-muted-foreground mb-4 bg-muted/50 p-3 rounded-lg">
-              <strong>Tip:</strong> Drag any node and drop it onto another node
-              to change its parent. The drop target will highlight in blue.
+              <strong>{t("tipLabel", { defaultValue: "Tip:" })}</strong>{" "}
+              {t("tree.dragTip", {
+                defaultValue:
+                  "Drag any node and drop it onto another node to change its parent. The drop target will highlight in blue.",
+              })}
             </div>
             <div className="space-y-1">
               {rootNodes.map((node) => (
@@ -777,7 +838,9 @@ export default function DTTreeEditor() {
       {history.length > 1 && (
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm">Edit History</CardTitle>
+            <CardTitle className="text-sm">
+              {t("history.title", { defaultValue: "Edit History" })}
+            </CardTitle>
           </CardHeader>
           <CardContent className="p-4">
             <div className="space-y-1 text-sm">

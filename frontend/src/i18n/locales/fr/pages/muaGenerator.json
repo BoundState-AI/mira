@@ -1,0 +1,303 @@
+{
+  "title": "Générateur MUA",
+  "description": "Générer des Accords d'Utilisation des Matériaux conformes NASA-STD-6016 avec synthèse LLM",
+  "badge": "MUA BOK V3",
+  "tabs": {
+    "corpus": "Brouillon Corpus",
+    "v6": "Pipeline V6",
+    "synthesis": "Synthèse IA",
+    "precedent": "Moteur Précédents",
+    "interactive": "Interactif",
+    "batch": "Lot"
+  },
+  "corpus": {
+    "title": "Générateur de Brouillon MUA Basé sur Corpus",
+    "description": "Générer des brouillons MUA à partir de <strong>5 650+ MUAs historiques analysés</strong>. Le système trouve des précédents pertinents par recherche sémantique, analyse la couverture et synthétise la justification avec suivi complet de provenance.",
+    "form": {
+      "materialEnvironment": "Matériau et Environnement",
+      "materialDesignation": "Désignation du Matériau",
+      "materialPlaceholder": "ex: Aluminium 6061-T6, Inconel 718, Viton",
+      "environmentDescription": "Description de l'Environnement",
+      "environmentPlaceholder": "ex: Oxygène enrichi, air cabine, vide",
+      "applicationContext": "Contexte d'Application",
+      "applicationPlaceholder": "Décrire l'utilisation prévue...",
+      "o2Percent": "O2 %",
+      "pressurePsia": "Pression (PSIA)",
+      "tempF": "Temp (°F)",
+      "habitableLocation": "Zone Habitable",
+      "issuesToAddress": "Problèmes à Traiter"
+    },
+    "issues": {
+      "flammability": "inflammabilité",
+      "corrosion": "corrosion",
+      "scc": "csc",
+      "toxicity": "toxicité",
+      "offgassing": "dégazage",
+      "o2Compat": "compat_o2"
+    },
+    "actions": {
+      "searchPrecedents": "Rechercher Précédents",
+      "searching": "Recherche...",
+      "generateDraft": "Générer Brouillon",
+      "generating": "Génération...",
+      "reset": "Réinitialiser"
+    },
+    "results": {
+      "searchResults": "Résultats de Recherche de Précédents",
+      "found": "{{count}} trouvés",
+      "generatedDraft": "Brouillon Généré",
+      "confidence": "{{percent}}% confiance",
+      "coverage": "Couverture",
+      "issuesAddressed": "Problèmes Traités",
+      "gapsIdentified": "Lacunes Identifiées",
+      "warnings": "Avertissements",
+      "precedentsCited": "Précédents Cités ({{count}})",
+      "synthesizedRationale": "Justification Synthétisée"
+    },
+    "determinations": {
+      "approved": "APPROUVÉ",
+      "conditional": "CONDITIONNEL",
+      "requiresReview": "RÉVISION REQUISE"
+    },
+    "emptyState": "Entrez les détails du matériau et de l'environnement, puis cliquez sur \"Générer Brouillon\" pour créer un MUA basé sur les précédents historiques."
+  },
+  "v6": {
+    "title": "Pipeline d'Évidence MUA V6",
+    "description": "Pipeline à six étapes basé sur les preuves : Résolution Matériau → Recherche Précédents → Données Test MAPTIS → Correspondance Enveloppe → Moteur de Décision → Validation Logique. Retourne des décisions structurées avec scores de confiance et citations.",
+    "form": {
+      "queryParameters": "Paramètres de Requête",
+      "materialDesignation": "Désignation du Matériau",
+      "materialPlaceholder": "ex: INCONEL 625, 304 SS, Nylon 6/6",
+      "environmentDescription": "Description de l'Environnement",
+      "environmentPlaceholder": "ex: Service oxygène gazeux à pression élevée",
+      "o2Percent": "O2 %",
+      "pressurePsia": "Pression (PSIA)",
+      "tempF": "Temp (°F)",
+      "habitableLocation": "Zone Habitable",
+      "resultsK": "Résultats (k)",
+      "generationMode": "Mode de Génération",
+      "evaluateOnly": "Évaluation Seule (retourne décision)",
+      "auto": "Auto (générer brouillon si PROCÉDER)"
+    },
+    "actions": {
+      "searchPrecedents": "Rechercher Précédents",
+      "searching": "Recherche...",
+      "evaluateGenerate": "Évaluer/Générer",
+      "evaluating": "Évaluation...",
+      "reset": "Réinitialiser"
+    },
+    "results": {
+      "searchResults": "Résultats de Recherche de Précédents",
+      "requestId": "ID: {{id}}",
+      "evaluationResult": "Résultat d'Évaluation",
+      "decision": "Décision",
+      "confidence": "Confiance",
+      "envelopeStatus": "Statut Enveloppe",
+      "supporting": "Support",
+      "conflicting": "Conflit",
+      "precedents": "Précédents",
+      "reasoning": "Raisonnement",
+      "draftText": "Texte du Brouillon"
+    },
+    "decisions": {
+      "proceed": "PROCÉDER",
+      "warn": "AVERTIR",
+      "review": "RÉVISER",
+      "blocked": "BLOQUÉ"
+    },
+    "envelope": {
+      "within": "Dans l'Enveloppe",
+      "partialOverlap": "Chevauchement Partiel",
+      "extrapolation": "Extrapolation",
+      "insufficientData": "Données Insuffisantes"
+    }
+  },
+  "synthesis": {
+    "title": "Mode Synthèse IA",
+    "description": "Générer une justification MUA avec synthèse IA à partir de l'analyse des précédents",
+    "form": {
+      "material": "Matériau",
+      "materialPlaceholder": "ex: Ti-6Al-4V, Inconel 718",
+      "issue": "Type de Problème",
+      "application": "Application",
+      "applicationPlaceholder": "Décrire l'application/cas d'utilisation",
+      "environment": "Environnement",
+      "environmentPlaceholder": "Détails de l'environnement opérationnel",
+      "location": "Emplacement",
+      "massQuantity": "Masse/Quantité",
+      "program": "Programme"
+    },
+    "issues": {
+      "flam": "INFLAM - Inflammabilité",
+      "scc": "CSC - Corrosion Sous Contrainte",
+      "corr": "CORR - Corrosion",
+      "tvs": "TVS - Contenu Volatil Total",
+      "tox": "TOX - Toxicité",
+      "fs": "SF - Systèmes Fluides"
+    },
+    "locations": {
+      "habitable": "Habitable",
+      "nonHabitable": "Non-habitable"
+    },
+    "actions": {
+      "synthesize": "Synthétiser MUA",
+      "synthesizing": "Synthèse...",
+      "copyRationale": "Copier Justification",
+      "copied": "Copié !",
+      "reset": "Réinitialiser"
+    },
+    "results": {
+      "category": "Catégorie",
+      "confidence": "Confiance",
+      "precedentsUsed": "Précédents Utilisés ({{count}})",
+      "applicabilityAnalysis": "Analyse d'Applicabilité",
+      "synthesizedRationale": "Justification Synthétisée",
+      "warnings": "Avertissements"
+    },
+    "applicability": {
+      "yes": "Applicable",
+      "partial": "Partiel",
+      "no": "Non Applicable"
+    }
+  },
+  "precedent": {
+    "title": "Moteur de Précédents V4",
+    "description": "Évaluer l'adéquation des précédents avec correspondance par niveaux",
+    "form": {
+      "material": "Matériau",
+      "media": "Média/Fluide",
+      "o2Percent": "O2 %",
+      "tempMax": "Temp Max (°F)",
+      "pressureMax": "Pression Max (PSIA)",
+      "deviations": "Types de Déviation",
+      "location": "Classe d'Emplacement"
+    },
+    "deviationTypes": {
+      "flam": "INFLAM",
+      "scc": "CSC",
+      "corr": "CORR",
+      "tvs": "TVS",
+      "tox": "TOX",
+      "fs": "SF"
+    },
+    "actions": {
+      "evaluate": "Évaluer Précédents",
+      "evaluating": "Évaluation...",
+      "reset": "Réinitialiser"
+    },
+    "results": {
+      "adequacy": "Adéquation",
+      "totalCandidates": "Total Candidats",
+      "tier1Matches": "Correspondances Niveau 1",
+      "tier2Matches": "Correspondances Niveau 2",
+      "tier3Matches": "Correspondances Niveau 3",
+      "recommendedBase": "Base Recommandée",
+      "reasoning": "Raisonnement de Sélection",
+      "statistics": "Statistiques",
+      "approved": "Approuvés",
+      "rejected": "Rejetés",
+      "approvalRate": "Taux d'Approbation"
+    }
+  },
+  "interactive": {
+    "title": "Mode Interactif",
+    "description": "Rechercher des précédents, sélectionner des correspondances et générer MUA avec vos entrées",
+    "steps": {
+      "search": "1. Rechercher",
+      "select": "2. Sélectionner",
+      "generate": "3. Générer"
+    },
+    "form": {
+      "material": "Matériau",
+      "materialPlaceholder": "Rechercher un matériau...",
+      "issues": "Types de Problèmes",
+      "environment": "Environnement",
+      "application": "Application"
+    },
+    "actions": {
+      "search": "Rechercher Précédents",
+      "searching": "Recherche...",
+      "generate": "Générer depuis Sélection",
+      "generating": "Génération...",
+      "reset": "Recommencer"
+    },
+    "results": {
+      "precedentsFound": "{{count}} précédents trouvés",
+      "selected": "{{count}} sélectionnés",
+      "selectPrecedents": "Sélectionner les précédents applicables pour la génération MUA",
+      "generatedDraft": "Brouillon MUA Généré"
+    }
+  },
+  "batch": {
+    "title": "Mode Lot",
+    "description": "Générer des MUAs pour plusieurs matériaux depuis un MIUL enrichi",
+    "form": {
+      "uploadMiul": "Télécharger MIUL Enrichi",
+      "dragDrop": "Glissez-déposez votre fichier Excel MIUL enrichi",
+      "programName": "Nom du Programme",
+      "hardwareName": "Nom du Matériel"
+    },
+    "actions": {
+      "generate": "Générer MUAs",
+      "generating": "Génération...",
+      "downloadExcel": "Télécharger Excel avec MUAs",
+      "downloadJson": "Télécharger JSON"
+    },
+    "results": {
+      "processed": "{{count}} matériaux traités",
+      "generated": "{{count}} MUAs générés",
+      "viewResults": "Voir Résultats"
+    },
+    "progress": "Génération des MUAs... {{percent}}%"
+  },
+  "toast": {
+    "searchComplete": "Recherche Terminée",
+    "foundPrecedents": "{{count}} précédents trouvés",
+    "synthesisComplete": "MUA Synthétisé",
+    "synthesisFromPrecedents": "Justification générée à partir de {{count}} précédents applicables",
+    "evaluationComplete": "Évaluation Terminée",
+    "draftGenerated": "Brouillon Généré",
+    "copied": "Copié",
+    "rationalecopied": "Justification copiée dans le presse-papiers",
+    "muaDraftCopied": "Brouillon MUA copié dans le presse-papiers",
+    "downloadComplete": "Téléchargement Terminé",
+    "excelDownloaded": "Fichier Excel avec MUAs téléchargé",
+    "batchComplete": "MUAs Générés",
+    "batchSuccess": "{{count}} documents MUA générés avec succès",
+    "error": {
+      "missingMaterial": "Matériau Manquant",
+      "enterMaterial": "Veuillez entrer une désignation de matériau",
+      "missingApplication": "Application Manquante",
+      "enterApplication": "Veuillez décrire l'application/cas d'utilisation",
+      "missingFields": "Champs Manquants",
+      "materialEnvRequired": "Matériau et description de l'environnement sont requis",
+      "noFile": "Pas de Fichier",
+      "uploadMiul": "Veuillez d'abord télécharger un fichier MIUL enrichi",
+      "invalidFile": "Fichier Invalide",
+      "excelRequired": "Veuillez télécharger un fichier Excel (.xlsx ou .xls)",
+      "noPrecedents": "Aucun Précédent Sélectionné",
+      "selectPrecedent": "Veuillez sélectionner au moins un précédent à utiliser",
+      "searchFailed": "Échec de la Recherche",
+      "synthesisFailed": "Échec de la Synthèse",
+      "synthesisIssue": "Problème de Synthèse",
+      "couldNotGenerate": "Impossible de générer le MUA",
+      "evaluationFailed": "Échec de l'Évaluation",
+      "generationFailed": "Échec de la Génération",
+      "copyFailed": "Échec de la Copie",
+      "couldNotCopy": "Impossible de copier dans le presse-papiers",
+      "downloadFailed": "Échec du Téléchargement"
+    }
+  },
+  "common": {
+    "required": "Requis",
+    "optional": "Optionnel",
+    "loading": "Chargement...",
+    "noResults": "Aucun résultat trouvé",
+    "score": "Score",
+    "category": "Catégorie",
+    "material": "Matériau",
+    "environment": "Environnement",
+    "determination": "Détermination",
+    "rationale": "Justification"
+  }
+}

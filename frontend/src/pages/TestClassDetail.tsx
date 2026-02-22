@@ -1,4 +1,5 @@
 import { Fragment, useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -50,8 +51,7 @@ interface PaginationInfo {
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-// Map slugs back to display names and descriptions
-const TEST_CLASS_INFO: Record<string, { name: string; description: string }> = {
+const TEST_CLASS_FALLBACK: Record<string, { name: string; description: string }> = {
   'tvs-outgassing': { name: 'TVS Outgassing', description: 'Total Mass Loss, Collected Volatile Condensable Material' },
   'flammability': { name: 'Flammability', description: 'Upward and downward flame propagation ratings' },
   'mechanical-impact': { name: 'Mechanical Impact', description: 'Impact resistance and energy absorption' },
@@ -79,6 +79,7 @@ const TEST_CLASS_INFO: Record<string, { name: string; description: string }> = {
 };
 
 export default function TestClassDetail() {
+  const { t } = useTranslation(["testClasses", "common"]);
   const { testType } = useParams<{ testType: string }>();
   const navigate = useNavigate();
 
@@ -100,7 +101,19 @@ export default function TestClassDetail() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"report" | "json">("report");
 
-  const testInfo = testType ? TEST_CLASS_INFO[testType] : null;
+  const translatedName = testType
+    ? t(`classes.${testType}.name`, { ns: "testClasses", defaultValue: "" })
+    : "";
+  const translatedDescription = testType
+    ? t(`classes.${testType}.description`, { ns: "testClasses", defaultValue: "" })
+    : "";
+  const testInfo = testType
+    ? {
+        name: translatedName || TEST_CLASS_FALLBACK[testType]?.name || testType,
+        description: translatedDescription || TEST_CLASS_FALLBACK[testType]?.description || "",
+      }
+    : null;
+  const isKnownTestType = !!(testType && (translatedName || TEST_CLASS_FALLBACK[testType]));
   const isFluidCompatibility = testType === 'fluid-compatibility';
 
   // Fetch available ratings for this test type
@@ -119,14 +132,14 @@ export default function TestClassDetail() {
   }, [testType]);
 
   useEffect(() => {
-    if (!testType || !testInfo) {
-      setError("Unknown test type");
+    if (!testType || !isKnownTestType) {
+      setError(t("detail.unknownTestType", { ns: "testClasses", defaultValue: "Unknown test type" }));
       setIsLoading(false);
       return;
     }
 
     fetchRecords(pagination.page, pagination.per_page);
-  }, [testType, pagination.page, ratingFilter, ratingType, stdTestFlag]);
+  }, [testType, isKnownTestType, pagination.page, ratingFilter, ratingType, stdTestFlag, t]);
 
   const fetchRecords = async (page: number, perPage: number) => {
     setIsLoading(true);
@@ -210,11 +223,18 @@ export default function TestClassDetail() {
     return (
       <div className="min-h-full p-6">
         <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-2">Test Type Not Found</h2>
-          <p className="text-muted-foreground mb-4">The requested test type could not be found.</p>
+          <h2 className="text-xl font-semibold mb-2">
+            {t("detail.notFoundTitle", { ns: "testClasses", defaultValue: "Test Type Not Found" })}
+          </h2>
+          <p className="text-muted-foreground mb-4">
+            {t("detail.notFoundDescription", {
+              ns: "testClasses",
+              defaultValue: "The requested test type could not be found.",
+            })}
+          </p>
           <Button onClick={() => navigate('/test-classes')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Test Classes
+            {t("detail.backToClasses", { ns: "testClasses", defaultValue: "Back to Test Classes" })}
           </Button>
         </Card>
       </div>
@@ -231,13 +251,17 @@ export default function TestClassDetail() {
           className="mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Test Classes
+          {t("detail.backToClasses", { ns: "testClasses", defaultValue: "Back to Test Classes" })}
         </Button>
 
         <h1 className="text-2xl font-serif font-bold mb-1">{testInfo.name}</h1>
         <p className="text-sm text-muted-foreground">{testInfo.description}</p>
         <p className="text-sm text-muted-foreground mt-1">
-          {(pagination.total_records || 0).toLocaleString()} total records
+          {t("detail.totalRecords", {
+            ns: "testClasses",
+            count: (pagination.total_records || 0).toLocaleString(),
+            defaultValue: `${(pagination.total_records || 0).toLocaleString()} total records`,
+          })}
         </p>
       </div>
 
@@ -247,7 +271,10 @@ export default function TestClassDetail() {
           <div className="flex-1">
             <div className="flex gap-2">
               <Input
-                placeholder="Search materials..."
+                placeholder={t("detail.searchPlaceholder", {
+                  ns: "testClasses",
+                  defaultValue: "Search materials...",
+                })}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -255,7 +282,7 @@ export default function TestClassDetail() {
               />
               <Button onClick={handleSearch}>
                 <Search className="h-4 w-4 mr-2" />
-                Search
+                {t("buttons.search", { ns: "common", defaultValue: "Search" })}
               </Button>
             </div>
           </div>
@@ -321,7 +348,7 @@ export default function TestClassDetail() {
 
           <Button variant="outline" onClick={handleExport}>
             <Download className="h-4 w-4 mr-2" />
-            Export CSV
+            {t("buttons.exportCsv", { ns: "common", defaultValue: "Export CSV" })}
           </Button>
         </div>
       </Card>
@@ -335,12 +362,17 @@ export default function TestClassDetail() {
 
       {isLoading ? (
         <Card className="p-12">
-          <div className="text-center text-muted-foreground">Loading records...</div>
+          <div className="text-center text-muted-foreground">
+            {t("detail.loadingRecords", { ns: "testClasses", defaultValue: "Loading records..." })}
+          </div>
         </Card>
       ) : records.length === 0 ? (
         <Card className="p-12">
           <div className="text-center text-muted-foreground">
-            No records found. Try adjusting your filters.
+            {t("detail.noRecords", {
+              ns: "testClasses",
+              defaultValue: "No records found. Try adjusting your filters.",
+            })}
           </div>
         </Card>
       ) : (
@@ -348,11 +380,11 @@ export default function TestClassDetail() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Material Code</TableHead>
-                <TableHead>Material Name</TableHead>
-                <TableHead>Rating</TableHead>
-                {isFluidCompatibility && <TableHead>Tested Fluid</TableHead>}
-                <TableHead>Details</TableHead>
+                <TableHead>{t("table.materialCode", { ns: "testClasses", defaultValue: "Material Code" })}</TableHead>
+                <TableHead>{t("table.materialName", { ns: "testClasses", defaultValue: "Material Name" })}</TableHead>
+                <TableHead>{t("table.rating", { ns: "testClasses", defaultValue: "Rating" })}</TableHead>
+                {isFluidCompatibility && <TableHead>{t("table.testedFluid", { ns: "testClasses", defaultValue: "Tested Fluid" })}</TableHead>}
+                <TableHead>{t("labels.details", { ns: "common", defaultValue: "Details" })}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -391,7 +423,7 @@ export default function TestClassDetail() {
                         setDialogOpen(true);
                       }}
                     >
-                      View
+                      {t("buttons.view", { ns: "common", defaultValue: "View" })}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -402,9 +434,14 @@ export default function TestClassDetail() {
           {/* Pagination */}
           <div className="flex items-center justify-between px-6 py-4 border-t">
             <div className="text-sm text-muted-foreground">
-              Showing {((pagination.page - 1) * pagination.per_page) + 1} to{" "}
-              {Math.min(pagination.page * pagination.per_page, pagination.total_records)} of{" "}
-              {pagination.total_records} records
+              {t("detail.paginationSummary", {
+                ns: "testClasses",
+                start: ((pagination.page - 1) * pagination.per_page) + 1,
+                end: Math.min(pagination.page * pagination.per_page, pagination.total_records),
+                total: pagination.total_records,
+                defaultValue:
+                  `Showing ${((pagination.page - 1) * pagination.per_page) + 1} to ${Math.min(pagination.page * pagination.per_page, pagination.total_records)} of ${pagination.total_records} records`,
+              })}
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -414,10 +451,15 @@ export default function TestClassDetail() {
                 disabled={pagination.page === 1}
               >
                 <ChevronLeft className="h-4 w-4" />
-                Previous
+                {t("detail.previous", { ns: "testClasses", defaultValue: "Previous" })}
               </Button>
               <div className="text-sm">
-                Page {pagination.page} of {pagination.total_pages}
+                {t("detail.pageOf", {
+                  ns: "testClasses",
+                  page: pagination.page,
+                  total: pagination.total_pages,
+                  defaultValue: `Page ${pagination.page} of ${pagination.total_pages}`,
+                })}
               </div>
               <Button
                 variant="outline"
@@ -425,7 +467,7 @@ export default function TestClassDetail() {
                 onClick={() => handlePageChange(pagination.page + 1)}
                 disabled={pagination.page === pagination.total_pages}
               >
-                Next
+                {t("detail.next", { ns: "testClasses", defaultValue: "Next" })}
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
@@ -438,7 +480,7 @@ export default function TestClassDetail() {
         <DialogContent className="max-w-5xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
-              <span>Test Record Report</span>
+              <span>{t("detail.reportTitle", { ns: "testClasses", defaultValue: "Test Record Report" })}</span>
               <div className="flex gap-2">
                 <Button
                   variant="outline"

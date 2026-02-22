@@ -24,7 +24,14 @@ import logging
 from typing import Optional, Any
 from difflib import SequenceMatcher
 
-from .models import MaterialResolution, MaterialClass, ResolutionStatus
+from .models import (
+    MaterialCodeCandidate,
+    MaterialIdentity,
+    MaterialResolution,
+    MaterialClass,
+    RelationshipType,
+    ResolutionStatus,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -1360,6 +1367,118 @@ def _is_process_sensitive_designation(text: str) -> bool:
     return any(keyword in upper for keyword in _PROCESS_SENSITIVE_KEYWORDS)
 
 
+_FORM_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
+    ("bar", re.compile(r"\b(BAR|ROD)\b", re.IGNORECASE)),
+    ("plate", re.compile(r"\bPLATE\b", re.IGNORECASE)),
+    ("sheet", re.compile(r"\b(SHEET|STRIP|FOIL)\b", re.IGNORECASE)),
+    ("tube", re.compile(r"\b(TUBE|TUBING|PIPE)\b", re.IGNORECASE)),
+    ("wire", re.compile(r"\bWIRE\b", re.IGNORECASE)),
+    ("forging", re.compile(r"\b(FORGING|FORGED)\b", re.IGNORECASE)),
+    ("casting", re.compile(r"\b(CAST|CASTING)\b", re.IGNORECASE)),
+)
+
+
+_CONDITION_PATTERNS: tuple[re.Pattern[str], ...] = (
+    re.compile(r"\b(T\d{1,4})\b", re.IGNORECASE),
+    re.compile(r"\b(H\d{1,3})\b", re.IGNORECASE),
+    re.compile(r"\b(ANNEALED|AS[-\s]?CAST|AS[-\s]?RECEIVED|HOT ROLLED|COLD ROLLED)\b", re.IGNORECASE),
+    re.compile(r"\b(O|F)\b", re.IGNORECASE),
+)
+
+
+def _infer_form(designation: str) -> Optional[str]:
+    text = designation or ""
+    for name, pattern in _FORM_PATTERNS:
+        if pattern.search(text):
+            return name
+    return None
+
+
+def _infer_condition(designation: str) -> Optional[str]:
+    text = designation or ""
+    for pattern in _CONDITION_PATTERNS:
+        match = pattern.search(text)
+        if match:
+            return match.group(1).upper().replace("  ", " ").strip()
+    return None
+
+
+def _extract_canonical_name(input_text: str, designation_hint: Optional[str] = None) -> str:
+    """Extract a canonical material name from user input with a designation fallback."""
+    source = (input_text or "").strip()
+    if not source:
+        source = (designation_hint or "").strip()
+    upper = source.upper()
+
+    patterns: tuple[tuple[re.Pattern[str], str], ...] = (
+        (re.compile(r"\b(INCONEL)\s*([A-Z]?-?\d{2,4})\b", re.IGNORECASE), "{0} {1}"),
+        (re.compile(r"\b(HASTELLOY)\s*([A-Z]?-?\d{1,4})\b", re.IGNORECASE), "{0} {1}"),
+        (re.compile(r"\b(MONEL)\s*([A-Z]?-?\d{1,4})\b", re.IGNORECASE), "{0} {1}"),
+        (re.compile(r"\b(CRES|SS|SST|STAINLESS)\s*(\d{3,4}L?)\b", re.IGNORECASE), "{1}"),
+        (re.compile(r"\b(TI-?6AL-?4V(?:\s*ELI)?)\b", re.IGNORECASE), "{0}"),
+        (re.compile(r"\b(\d{3,4}L?)\b", re.IGNORECASE), "{0}"),
+    )
+    for pattern, template in patterns:
+        match = pattern.search(source)
+        if not match:
+            continue
+        groups = [g.strip().upper() for g in match.groups() if g is not None]
+        if not groups:
+            continue
+        if template == "{0}" and groups:
+            return groups[0]
+        if template == "{1}" and len(groups) > 1:
+            return groups[1]
+        if template == "{0} {1}" and len(groups) > 1:
+            return f"{groups[0].title()} {groups[1]}".strip()
+
+    anchor = _derive_anchor_token(input_text)
+    if anchor:
+        return anchor.upper()
+    if designation_hint:
+        return designation_hint.strip()
+    return upper or input_text.strip()
+
+
+def _classify_relationship(
+    *,
+    canonical_name: str,
+    candidate_designation: str,
+    query_form: Optional[str],
+    query_condition: Optional[str],
+) -> RelationshipType:
+    """Classify candidate relation to requested material identity."""
+    canonical_norm = _normalize_designation(canonical_name or "")
+    designation_norm = _normalize_designation(candidate_designation or "")
+    same_alloy = bool(canonical_norm and canonical_norm in designation_norm)
+
+    candidate_form = _infer_form(candidate_designation or "")
+    candidate_condition = _infer_condition(candidate_designation or "")
+
+    query_form_norm = (query_form or "").strip().lower() or None
+    query_condition_norm = (query_condition or "").strip().upper() or None
+    candidate_form_norm = (candidate_form or "").strip().lower() or None
+    candidate_condition_norm = (candidate_condition or "").strip().upper() or None
+
+    if same_alloy:
+        if query_condition_norm and candidate_condition_norm and query_condition_norm != candidate_condition_norm:
+            return RelationshipType.SAME_ALLOY_DIFFERENT_TEMPER
+        if query_form_norm and candidate_form_norm and query_form_norm != candidate_form_norm:
+            return RelationshipType.SAME_ALLOY_DIFFERENT_FORM
+        return RelationshipType.EXACT_MATCH
+    return RelationshipType.FAMILY_MATCH
+
+
+def _relationship_rank(value: RelationshipType) -> int:
+    if value == RelationshipType.EXACT_MATCH:
+        return 0
+    if value == RelationshipType.SAME_ALLOY_DIFFERENT_FORM:
+        return 1
+    if value == RelationshipType.SAME_ALLOY_DIFFERENT_TEMPER:
+        return 2
+    return 3
+
+
 def _derive_anchor_token(text: str) -> Optional[str]:
     """Pick a high-signal token for boundary-safe material candidate search."""
     upper = _normalize_designation(text or "")
@@ -1427,6 +1546,7 @@ def _load_material_candidates(
 
     rows_by_code: dict[str, dict[str, Any]] = {}
     anchor = _derive_anchor_token(query_text)
+    search_limit = max(40, min(max_rows * 4, 500))
 
     try:
         conn = psycopg2.connect(**get_db_connection_params())
@@ -1461,9 +1581,9 @@ def _load_material_candidates(
                   AND material_code != 'UNKNOWN'
                   AND designation ~* %s
                 ORDER BY designation
-                LIMIT 80
+                LIMIT %s
                 """,
-                (rf"\y{re.escape(anchor)}\y",),
+                (rf"\y{re.escape(anchor)}\y", search_limit),
             )
             for row in cursor.fetchall():
                 d = dict(row)
@@ -1478,9 +1598,9 @@ def _load_material_candidates(
                   AND material_code != 'UNKNOWN'
                   AND LOWER(designation) LIKE %s
                 ORDER BY designation
-                LIMIT 40
+                LIMIT %s
                 """,
-                (f"%{preferred_name.lower()}%",),
+                (f"%{preferred_name.lower()}%", search_limit),
             )
             for row in cursor.fetchall():
                 d = dict(row)
@@ -1495,9 +1615,9 @@ def _load_material_candidates(
                   AND material_code != 'UNKNOWN'
                   AND LOWER(designation) LIKE %s
                 ORDER BY designation
-                LIMIT 40
+                LIMIT %s
                 """,
-                (f"%{query_text.lower()}%",),
+                (f"%{query_text.lower()}%", search_limit),
             )
             for row in cursor.fetchall():
                 d = dict(row)
@@ -1744,8 +1864,121 @@ def _resolve_with_live_maptis_lookup(
 
 
 # ---------------------------------------------------------------------------
-# Main resolution function
+# Material identity (Step 1) and main resolution function
 # ---------------------------------------------------------------------------
+
+
+def identify_material(
+    input_text: str,
+    *,
+    form: Optional[str] = None,
+    condition: Optional[str] = None,
+    resolution: Optional[MaterialResolution] = None,
+    max_codes: int = 200,
+) -> MaterialIdentity:
+    """Resolve canonical material identity and all matching MAPTIS codes."""
+    raw = (input_text or "").strip()
+    max_codes = max(1, min(max_codes, 200))
+
+    if not raw or _is_non_material(raw):
+        canonical = _extract_canonical_name(raw or "")
+        return MaterialIdentity(
+            input_text=raw,
+            canonical_name=canonical or raw,
+            family=None,
+            material_class=MaterialClass.OTHER,
+            is_process_sensitive=False,
+            form=(form or None),
+            condition=(condition or None),
+            all_maptis_codes=[],
+            truncated=False,
+            truncation_note=None,
+        )
+
+    resolution = resolution or resolve_material(raw)
+    canonical_name = _extract_canonical_name(raw, resolution.resolved_name)
+
+    candidate_rows = _load_material_candidates(
+        raw,
+        preferred_code=resolution.material_code,
+        preferred_name=resolution.resolved_name,
+        max_rows=max_codes + 1,
+    )
+
+    scored_candidates: list[tuple[RelationshipType, float, dict[str, Any]]] = []
+    seen_codes: set[str] = set()
+    anchor = _derive_anchor_token(canonical_name or raw)
+    for row in candidate_rows:
+        code = str(row.get("material_code") or "").strip()
+        if not code or code in seen_codes:
+            continue
+        seen_codes.add(code)
+        designation = str(row.get("designation") or "").strip()
+        relationship = _classify_relationship(
+            canonical_name=canonical_name,
+            candidate_designation=designation,
+            query_form=form,
+            query_condition=condition,
+        )
+        score = _score_candidate_row(
+            query_text=canonical_name or raw,
+            row=row,
+            preferred_code=resolution.material_code,
+            preferred_name=resolution.resolved_name,
+            anchor=anchor,
+        )
+        scored_candidates.append((relationship, score, row))
+
+    scored_candidates.sort(
+        key=lambda item: (
+            _relationship_rank(item[0]),
+            -item[1],
+            str(item[2].get("designation") or ""),
+        )
+    )
+
+    truncated = len(scored_candidates) > max_codes
+    if truncated:
+        scored_candidates = scored_candidates[:max_codes]
+
+    candidates: list[MaterialCodeCandidate] = []
+    for idx, (relationship, score, row) in enumerate(scored_candidates, start=1):
+        designation = str(row.get("designation") or "").strip()
+        candidates.append(
+            MaterialCodeCandidate(
+                material_code=str(row.get("material_code") or "").strip(),
+                material_key=int(row["material_key"]) if row.get("material_key") is not None else None,
+                designation=designation,
+                form=_infer_form(designation),
+                condition=_infer_condition(designation),
+                relationship=relationship,
+                match_score=score,
+                rank=idx,
+            )
+        )
+
+    family = resolution.family
+    if not family and candidates:
+        family = _detect_family_from_text(candidates[0].designation)
+    material_class = resolution.material_class or _class_from_family(family)
+
+    return MaterialIdentity(
+        input_text=raw,
+        canonical_name=canonical_name or raw,
+        family=family,
+        material_class=material_class,
+        is_process_sensitive=resolution.is_process_sensitive,
+        form=(form or None),
+        condition=(condition or None),
+        all_maptis_codes=candidates,
+        truncated=truncated,
+        truncation_note=(
+            f"Candidate list truncated to {max_codes} MAPTIS records."
+            if truncated
+            else None
+        ),
+    )
+
 
 def resolve_material(
     input_text: str,

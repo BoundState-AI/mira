@@ -1,0 +1,150 @@
+{
+  "title": "テストクラス",
+  "description": "テストタイプ別に整理された材料テストデータを閲覧",
+  "loading": "読み込み中...",
+  "summary": "{{count}}件のテスト種別 | 合計{{total}}件のテスト記録",
+  "recordsCount": "{{count}}件の記録",
+  "search": "テストクラスを検索...",
+  "noResults": "テストクラスが見つかりません",
+  "viewTests": "テストを表示",
+  "testCount": "{{count}}件のテスト",
+  "classes": {
+    "tvs-outgassing": {
+      "name": "TVSアウトガス",
+      "description": "総質量損失と凝縮性揮発成分を測定"
+    },
+    "flammability": {
+      "name": "可燃性",
+      "description": "上向きおよび下向き火炎伝播の評価"
+    },
+    "mechanical-impact": {
+      "name": "機械的衝撃",
+      "description": "衝撃エネルギー吸収と破壊特性"
+    },
+    "toxicity": {
+      "name": "毒性",
+      "description": "ガス放出時の毒性測定"
+    },
+    "stress-corrosion-cracking": {
+      "name": "応力腐食割れ",
+      "description": "材料の応力腐食感受性"
+    },
+    "corrosion": {
+      "name": "腐食",
+      "description": "一般的な耐食性試験"
+    },
+    "fluid-compatibility": {
+      "name": "流体適合性",
+      "description": "各種流体に対する材料適合性"
+    },
+    "odor": {
+      "name": "臭気",
+      "description": "臭気強度の評価"
+    },
+    "flash-fire": {
+      "name": "フラッシュファイア",
+      "description": "フラッシュ火炎の伝播特性"
+    },
+    "tensile-strength": {
+      "name": "引張強度",
+      "description": "引張強度と伸び特性"
+    },
+    "pneumatic-impact": {
+      "name": "空気圧衝撃",
+      "description": "空気圧衝撃耐性試験"
+    },
+    "promoted-combustion": {
+      "name": "促進燃焼",
+      "description": "燃焼促進特性"
+    },
+    "particle-impact": {
+      "name": "粒子衝撃",
+      "description": "粒子衝撃耐性"
+    },
+    "electrical-overload": {
+      "name": "電気過負荷",
+      "description": "電気過負荷特性"
+    },
+    "vcm-optical": {
+      "name": "VCM光学",
+      "description": "凝縮性揮発成分と光学特性"
+    },
+    "electric-wire-insulation": {
+      "name": "電線絶縁",
+      "description": "ワイヤ絶縁の電気特性"
+    },
+    "low-cycle-fatigue": {
+      "name": "低サイクル疲労",
+      "description": "低サイクル疲労耐性"
+    },
+    "fungus": {
+      "name": "菌類",
+      "description": "防カビ性能試験"
+    },
+    "fracture-mechanics": {
+      "name": "破壊力学",
+      "description": "破壊靭性特性"
+    },
+    "creep-rupture": {
+      "name": "クリープ破断",
+      "description": "クリープと破断挙動"
+    },
+    "high-cycle-fatigue": {
+      "name": "高サイクル疲労",
+      "description": "高サイクル疲労耐性"
+    },
+    "friction-heat": {
+      "name": "摩擦熱",
+      "description": "摩擦および発熱特性"
+    },
+    "crack-growth": {
+      "name": "き裂進展",
+      "description": "き裂進展速度"
+    },
+    "arc-tracking": {
+      "name": "アークトラッキング",
+      "description": "電気アークトラッキング耐性"
+    }
+  },
+  "filters": {
+    "all": "すべてのクラス",
+    "mechanical": "機械的",
+    "environmental": "環境的",
+    "compatibility": "適合性",
+    "physical": "物理的"
+  },
+  "table": {
+    "materialCode": "材料コード",
+    "materialName": "材料名",
+    "rating": "評価",
+    "testedFluid": "試験流体",
+    "testId": "テストID",
+    "material": "材料",
+    "date": "日付",
+    "facility": "施設",
+    "result": "結果",
+    "status": "ステータス"
+  },
+  "comingSoon": {
+    "title": "近日公開",
+    "unitAwareFilters": "単位対応フィルター（圧力、温度、濃度）",
+    "statisticalSummaries": "統計サマリーと分布",
+    "interactivePlots": "インタラクティブプロット作成",
+    "exportDatasets": "テストデータセットをCSV/JSONで出力"
+  },
+  "detail": {
+    "unknownTestType": "不明なテスト種別",
+    "notFoundTitle": "テスト種別が見つかりません",
+    "notFoundDescription": "要求されたテスト種別は見つかりませんでした。",
+    "backToClasses": "テストクラスへ戻る",
+    "totalRecords": "合計{{count}}件の記録",
+    "searchPlaceholder": "材料を検索...",
+    "loadingRecords": "記録を読み込み中...",
+    "noRecords": "記録が見つかりません。フィルターを調整してください。",
+    "paginationSummary": "{{total}}件中 {{start}}〜{{end}} を表示",
+    "previous": "前へ",
+    "next": "次へ",
+    "pageOf": "{{total}}ページ中 {{page}}ページ",
+    "reportTitle": "試験記録レポート"
+  }
+}

@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback, DragEvent } from 'react';
-import { FlaskConical, FileStack, FileCheck, Brain, ClipboardList, FolderTree, GripVertical, RotateCcw, Zap, LucideIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { FlaskConical, FileStack, FileCheck, Brain, ClipboardList, FolderTree, GripVertical, RotateCcw, Zap, Sparkles, LucideIcon } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { BoundStateLogo } from '@/components/BoundStateLogo';
+import { LanguageSelector } from '@/components/LanguageSelector';
 import {
   Sidebar,
   SidebarContent,
@@ -23,18 +25,21 @@ import {
 interface NavItem {
   id: string;
   title: string;
+  navKey: string;
   url: string;
   icon: LucideIcon;
 }
 
 const DEFAULT_NAV_ITEMS: NavItem[] = [
-  { id: 'mp-plan', title: 'M&P Plan', url: '/mp-plan', icon: ClipboardList },
-  { id: 'query', title: 'MIRA Query', url: '/query', icon: Zap },
-  { id: 'test-classes', title: 'Test Classes', url: '/test-classes', icon: FlaskConical },
-  { id: 'miul', title: 'MIUL Builder', url: '/miul', icon: FileStack },
-  { id: 'dt-editor', title: 'DT Editor', url: '/dt-editor', icon: FolderTree },
-  { id: 'mua-v7', title: 'MUA Generator', url: '/mua-v7', icon: FileCheck },
-  { id: 'knowledge-twins', title: 'Knowledge Twins', url: '/', icon: Brain },
+  { id: 'mp-plan', title: 'M&P Plan', navKey: 'mpPlan', url: '/mp-plan', icon: ClipboardList },
+  { id: 'query', title: 'MIRA Query', navKey: 'query', url: '/query', icon: Zap },
+  { id: 'gas-compatibility', title: 'Gas Compatibility', navKey: 'gasCompatibility', url: '/gas-compatibility', icon: FlaskConical },
+  { id: 'test-classes', title: 'Test Classes', navKey: 'testClasses', url: '/test-classes', icon: FlaskConical },
+  { id: 'miul', title: 'MIUL Builder', navKey: 'miulBuilder', url: '/miul', icon: FileStack },
+  { id: 'dt-editor', title: 'DT Editor', navKey: 'dtEditor', url: '/dt-editor', icon: FolderTree },
+  { id: 'mua-v8', title: 'MUA V8', navKey: 'muaV8', url: '/mua-v8', icon: Sparkles },
+  { id: 'mua-v7', title: 'MUA Generator', navKey: 'muaGenerator', url: '/mua-v7', icon: FileCheck },
+  { id: 'knowledge-twins', title: 'Knowledge Twins', navKey: 'knowledgeTwins', url: '/', icon: Brain },
 ];
 
 const STORAGE_KEY = 'mira-sidebar-order';
@@ -73,6 +78,7 @@ function saveOrder(items: NavItem[]) {
 }
 
 export function AppSidebar() {
+  const { t } = useTranslation(['common', 'navigation']);
   const [items, setItems] = useState<NavItem[]>(DEFAULT_NAV_ITEMS);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dropTargetIndex, setDropTargetIndex] = useState<number | null>(null);
@@ -135,9 +141,10 @@ export function AppSidebar() {
       <SidebarHeader className="p-6 border-b border-sidebar-border">
         <div className="flex items-center justify-between">
           <span className="text-sidebar-primary font-medium tracking-widest uppercase text-[10px]">
-            MIRA V3
+            {t('appName', { ns: 'common', defaultValue: 'MIRA V3' })}
           </span>
           <div className="flex items-center gap-1">
+            <LanguageSelector />
             {isCustomOrder && (
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -150,7 +157,9 @@ export function AppSidebar() {
                     <RotateCcw className="h-3 w-3" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="right">Reset menu order</TooltipContent>
+                <TooltipContent side="right">
+                  {t('tooltips.resetOrder', { ns: 'common', defaultValue: 'Reset menu order' })}
+                </TooltipContent>
               </Tooltip>
             )}
             <Tooltip>
@@ -169,7 +178,9 @@ export function AppSidebar() {
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="right">
-                {isReorderMode ? 'Done reordering' : 'Reorder menu items'}
+                {isReorderMode
+                  ? t('tooltips.doneReordering', { ns: 'common', defaultValue: 'Done reordering' })
+                  : t('tooltips.reorderMenu', { ns: 'common', defaultValue: 'Reorder menu items' })}
               </TooltipContent>
             </Tooltip>
           </div>
@@ -215,7 +226,9 @@ export function AppSidebar() {
                         <GripVertical className="h-4 w-4 text-sidebar-foreground/40 flex-shrink-0 -ml-1" />
                       )}
                       <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
+                      <span>
+                        {t(item.navKey, { ns: 'navigation', defaultValue: item.title })}
+                      </span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

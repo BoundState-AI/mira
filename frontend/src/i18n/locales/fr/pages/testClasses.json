@@ -1,0 +1,150 @@
+{
+  "title": "Classes de Tests",
+  "description": "Parcourir les données de tests matériaux organisées par type de test",
+  "loading": "Chargement...",
+  "summary": "{{count}} types de tests | {{total}} enregistrements au total",
+  "recordsCount": "{{count}} enregistrements",
+  "search": "Rechercher classes de tests...",
+  "noResults": "Aucune classe de test trouvée",
+  "viewTests": "Voir les Tests",
+  "testCount": "{{count}} tests",
+  "classes": {
+    "tvs-outgassing": {
+      "name": "Dégazage TVS",
+      "description": "Mesure de perte de masse totale et des condensables volatils"
+    },
+    "flammability": {
+      "name": "Inflammabilité",
+      "description": "Évaluations de propagation de flamme ascendante et descendante"
+    },
+    "mechanical-impact": {
+      "name": "Impact mécanique",
+      "description": "Absorption d'énergie d'impact et caractéristiques de rupture"
+    },
+    "toxicity": {
+      "name": "Toxicité",
+      "description": "Mesures de toxicité des dégagements gazeux"
+    },
+    "stress-corrosion-cracking": {
+      "name": "Fissuration par corrosion sous contrainte",
+      "description": "Susceptibilité du matériau à la corrosion sous contrainte"
+    },
+    "corrosion": {
+      "name": "Corrosion",
+      "description": "Essais généraux de résistance à la corrosion"
+    },
+    "fluid-compatibility": {
+      "name": "Compatibilité des fluides",
+      "description": "Compatibilité des matériaux avec différents fluides"
+    },
+    "odor": {
+      "name": "Odeur",
+      "description": "Évaluations de l'intensité des odeurs"
+    },
+    "flash-fire": {
+      "name": "Feu éclair",
+      "description": "Caractéristiques de propagation du feu éclair"
+    },
+    "tensile-strength": {
+      "name": "Résistance à la traction",
+      "description": "Propriétés de résistance à la traction et d'allongement"
+    },
+    "pneumatic-impact": {
+      "name": "Impact pneumatique",
+      "description": "Essais de résistance aux impacts pneumatiques"
+    },
+    "promoted-combustion": {
+      "name": "Combustion stimulée",
+      "description": "Caractéristiques de promotion de combustion"
+    },
+    "particle-impact": {
+      "name": "Impact particulaire",
+      "description": "Résistance à l'impact de particules"
+    },
+    "electrical-overload": {
+      "name": "Surcharge électrique",
+      "description": "Caractéristiques en surcharge électrique"
+    },
+    "vcm-optical": {
+      "name": "VCM optique",
+      "description": "Propriétés optiques des matières volatiles condensables"
+    },
+    "electric-wire-insulation": {
+      "name": "Isolation de fils électriques",
+      "description": "Propriétés électriques de l'isolation des câbles"
+    },
+    "low-cycle-fatigue": {
+      "name": "Fatigue à faible cycle",
+      "description": "Résistance à la fatigue à faible cycle"
+    },
+    "fungus": {
+      "name": "Résistance fongique",
+      "description": "Essais de résistance aux champignons"
+    },
+    "fracture-mechanics": {
+      "name": "Mécanique de la rupture",
+      "description": "Caractéristiques de ténacité à la rupture"
+    },
+    "creep-rupture": {
+      "name": "Rupture par fluage",
+      "description": "Comportement de fluage et rupture"
+    },
+    "high-cycle-fatigue": {
+      "name": "Fatigue à haut cycle",
+      "description": "Résistance à la fatigue à haut cycle"
+    },
+    "friction-heat": {
+      "name": "Chaleur de friction",
+      "description": "Caractéristiques de friction et génération thermique"
+    },
+    "crack-growth": {
+      "name": "Propagation de fissure",
+      "description": "Vitesse de propagation des fissures"
+    },
+    "arc-tracking": {
+      "name": "Suivi d'arc",
+      "description": "Résistance au suivi d'arc électrique"
+    }
+  },
+  "filters": {
+    "all": "Toutes les Classes",
+    "mechanical": "Mécanique",
+    "environmental": "Environnemental",
+    "compatibility": "Compatibilité",
+    "physical": "Physique"
+  },
+  "table": {
+    "materialCode": "Code matériau",
+    "materialName": "Nom du matériau",
+    "rating": "Évaluation",
+    "testedFluid": "Fluide testé",
+    "testId": "ID Test",
+    "material": "Matériau",
+    "date": "Date",
+    "facility": "Installation",
+    "result": "Résultat",
+    "status": "Statut"
+  },
+  "comingSoon": {
+    "title": "Bientôt disponible",
+    "unitAwareFilters": "Filtres avec unités (pression, température, concentration)",
+    "statisticalSummaries": "Résumés statistiques et distributions",
+    "interactivePlots": "Constructeurs de graphiques interactifs",
+    "exportDatasets": "Exporter les jeux de données de test en CSV/JSON"
+  },
+  "detail": {
+    "unknownTestType": "Type de test inconnu",
+    "notFoundTitle": "Type de test introuvable",
+    "notFoundDescription": "Le type de test demandé est introuvable.",
+    "backToClasses": "Retour aux classes de tests",
+    "totalRecords": "{{count}} enregistrements au total",
+    "searchPlaceholder": "Rechercher des matériaux...",
+    "loadingRecords": "Chargement des enregistrements...",
+    "noRecords": "Aucun enregistrement trouvé. Essayez d'ajuster les filtres.",
+    "paginationSummary": "Affichage de {{start}} à {{end}} sur {{total}} enregistrements",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "pageOf": "Page {{page}} sur {{total}}",
+    "reportTitle": "Rapport d'enregistrement de test"
+  }
+}

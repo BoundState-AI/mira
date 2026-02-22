@@ -1,0 +1,48 @@
+{
+  "title": "Assistant MUA v7",
+  "description": "Générateur d'accord d'utilisation des matériaux",
+  "session": "Session",
+  "loadingSession": "Chargement de la session...",
+  "steps": {
+    "define": {
+      "label": "Définir",
+      "description": "Matériau et environnement"
+    },
+    "investigate": {
+      "label": "Enquêter",
+      "description": "Recherche de preuves"
+    },
+    "review": {
+      "label": "Revue",
+      "description": "Décisions ingénieur"
+    },
+    "draft": {
+      "label": "Brouillon",
+      "description": "Document MUA"
+    },
+    "finalize": {
+      "label": "Finaliser",
+      "description": "Audit et export"
+    }
+  },
+  "status": {
+    "finalized": "MUA finalisé",
+    "stepOf": "Étape {{step}} sur {{total}} : {{description}}"
+  },
+  "buttons": {
+    "resume": "Reprendre",
+    "backTo": "Retour à {{step}}"
+  },
+  "recentSessions": {
+    "title": "Sessions récentes"
+  },
+  "toasts": {
+    "sessionDeleted": "Session supprimée",
+    "sessionDataRemoved": "Données de session supprimées.",
+    "error": "Erreur",
+    "failedDelete": "Impossible de supprimer la session.",
+    "sessionResumed": "Session reprise",
+    "loadedSession": "Session chargée {{session}}",
+    "failedResume": "Impossible de reprendre la session."
+  }
+}

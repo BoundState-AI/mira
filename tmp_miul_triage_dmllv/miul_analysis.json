@@ -1,0 +1,3310 @@
+{
+  "workbook": "C:\\Users\\jwilde2\\Desktop\\DMLLV\\MIUL_DMLLV_Codes.xlsx",
+  "sheet": "MIUL",
+  "total_parts": 136,
+  "non_a_parts": 95,
+  "rating_distributions": {
+    "FLAM": {
+      "(blank)": 114,
+      "A": 13,
+      "C": 5,
+      "I": 4
+    },
+    "SCC": {
+      "(blank)": 40,
+      "A": 79,
+      "C": 10,
+      "N": 7
+    },
+    "CORR": {
+      "(blank)": 45,
+      "A": 79,
+      "B": 12
+    },
+    "TVS": {
+      "(blank)": 123,
+      "A": 6,
+      "C": 7
+    },
+    "TOX": {
+      "(blank)": 133,
+      "K": 3
+    },
+    "FS": {
+      "(blank)": 67,
+      "U": 69
+    }
+  },
+  "part_triggers": [
+    {
+      "row": 8,
+      "material_code": "54223",
+      "designation": "7075 AL",
+      "material_specification": null,
+      "part_number": "MER07564-001",
+      "part_description": "BODY, VALVE, 10 INCH VALVE",
+      "nomenclature": "BODY, VALVE, 10 INCH VALVE",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "SCC",
+          "rating": "C"
+        },
+        {
+          "issue": "CORR",
+          "rating": "B"
+        }
+      ]
+    },
+    {
+      "row": 9,
+      "material_code": "50181",
+      "designation": "7075 AL",
+      "material_specification": null,
+      "part_number": "MER07561-001",
+      "part_description": "RING, RETAINING, 10 INCH VALVE",
+      "nomenclature": "RING, RETAINING, 10 INCH VALVE",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "SCC",
+          "rating": "N"
+        },
+        {
+          "issue": "CORR",
+          "rating": "B"
+        },
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 11,
+      "material_code": "54223",
+      "designation": "7075 AL",
+      "material_specification": null,
+      "part_number": "MER07569-001",
+      "part_description": "BRACE, REAR, 10 INCH VALVE",
+      "nomenclature": "BRACE, REAR, 10 INCH VALVE",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "SCC",
+          "rating": "C"
+        },
+        {
+          "issue": "CORR",
+          "rating": "B"
+        }
+      ]
+    },
+    {
+      "row": 14,
+      "material_code": "50181",
+      "designation": "7075 AL",
+      "material_specification": null,
+      "part_number": "MER07568-001",
+      "part_description": "SHAFT, OFFSET, 10 INCH VALVE",
+      "nomenclature": "SHAFT, OFFSET, 10 INCH VALVE",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "SCC",
+          "rating": "N"
+        },
+        {
+          "issue": "CORR",
+          "rating": "B"
+        },
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 15,
+      "material_code": "10392",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "MER07566-001",
+      "part_description": "ROTARY TANG, OFFSET SHAFT, 10 INCH VALVE",
+      "nomenclature": "ROTARY TANG, OFFSET SHAFT, 10 INCH VALVE",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 17,
+      "material_code": "10392",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "MER07585-001",
+      "part_description": "POPPET, VALVE, 10 INCH",
+      "nomenclature": "POPPET, VALVE, 10 INCH",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 18,
+      "material_code": "10392",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "MER07586-001",
+      "part_description": "COUPLING, POPPET",
+      "nomenclature": "COUPLING, POPPET",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 19,
+      "material_code": "10392",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "MER07587-001",
+      "part_description": "INTERFACE RING, COUPLER TO POPPET",
+      "nomenclature": "INTERFACE RING, COUPLER TO POPPET",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 20,
+      "material_code": "55750",
+      "designation": "INCONEL 718",
+      "material_specification": null,
+      "part_number": "MER07588-001",
+      "part_description": "PUSHER, BALL, POPPET",
+      "nomenclature": "PUSHER, BALL, POPPET",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "TVS",
+          "rating": "C"
+        }
+      ]
+    },
+    {
+      "row": 21,
+      "material_code": "54223",
+      "designation": "7075 AL",
+      "material_specification": null,
+      "part_number": "MER07545-001",
+      "part_description": "LOWER CAM MOUNT, 10 INCH VALVE",
+      "nomenclature": "LOWER CAM MOUNT, 10 INCH VALVE",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "SCC",
+          "rating": "C"
+        },
+        {
+          "issue": "CORR",
+          "rating": "B"
+        }
+      ]
+    },
+    {
+      "row": 22,
+      "material_code": "10392",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "MER07546-001",
+      "part_description": "PRELOAD DISC, 10 INCH VALVE",
+      "nomenclature": "PRELOAD DISC, 10 INCH VALVE",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 23,
+      "material_code": "10392",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "MER07553-001",
+      "part_description": "COVER, BEARING, 10 INCH VALVE",
+      "nomenclature": "COVER, BEARING, 10 INCH VALVE",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 24,
+      "material_code": "10392",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "MER07554-001",
+      "part_description": "SLIDER, ROTARY TANG, 10 INCH VALVE",
+      "nomenclature": "SLIDER, ROTARY TANG, 10 INCH VALVE",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 25,
+      "material_code": "50678",
+      "designation": "AL/BRONZE ALLOY",
+      "material_specification": null,
+      "part_number": "MER07555-001",
+      "part_description": "PIN, TRANSLATING, 10 INCH VALVE",
+      "nomenclature": "PIN, TRANSLATING, 10 INCH VALVE",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FLAM",
+          "rating": "C"
+        }
+      ]
+    },
+    {
+      "row": 26,
+      "material_code": "10392",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "MER07556-001",
+      "part_description": "RING, INTERMEDIATE, ROTATIONAL, 10 INCH VALVE",
+      "nomenclature": "RING, INTERMEDIATE, ROTATIONAL, 10 INCH VALVE",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 27,
+      "material_code": "10392",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "MER07557-001",
+      "part_description": "SHAFT, CENTER, 10 INCH VALVE",
+      "nomenclature": "SHAFT, CENTER, 10 INCH VALVE",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 28,
+      "material_code": "10392",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "MER07558-001",
+      "part_description": "OFFSET ROTARY SHAFT, LOWER, 10 INCH VALVE",
+      "nomenclature": "OFFSET ROTARY SHAFT, LOWER, 10 INCH VALVE",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 29,
+      "material_code": "10392",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "MER07559-001",
+      "part_description": "OFFSET ROTARY SHAFT, UPPER, 10 INCH VALVE",
+      "nomenclature": "OFFSET ROTARY SHAFT, UPPER, 10 INCH VALVE",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 32,
+      "material_code": "55461",
+      "designation": "INCONEL 625",
+      "material_specification": null,
+      "part_number": "MER07580-001",
+      "part_description": "CAP, ACTUATOR",
+      "nomenclature": "CAP, ACTUATOR",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "SCC",
+          "rating": "N"
+        }
+      ]
+    },
+    {
+      "row": 33,
+      "material_code": "55750",
+      "designation": "INCONEL 718",
+      "material_specification": null,
+      "part_number": "MER07574-001",
+      "part_description": "HOUSING, ACTUATOR",
+      "nomenclature": "HOUSING, ACTUATOR",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "TVS",
+          "rating": "C"
+        }
+      ]
+    },
+    {
+      "row": 34,
+      "material_code": "10727",
+      "designation": "INCONEL 625",
+      "material_specification": null,
+      "part_number": "MER07581-001",
+      "part_description": "SHAFT, PISTON, ACTUATOR",
+      "nomenclature": "SHAFT, PISTON, ACTUATOR",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FLAM",
+          "rating": "C"
+        },
+        {
+          "issue": "TVS",
+          "rating": "C"
+        },
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 37,
+      "material_code": "55461",
+      "designation": "INCONEL 625",
+      "material_specification": null,
+      "part_number": "MER07577-001",
+      "part_description": "MOUNT CAP, ACTUATOR",
+      "nomenclature": "MOUNT CAP, ACTUATOR",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "SCC",
+          "rating": "N"
+        }
+      ]
+    },
+    {
+      "row": 38,
+      "material_code": "55962",
+      "designation": "INCONEL 718",
+      "material_specification": null,
+      "part_number": "MER07583-001",
+      "part_description": "BELLOWS, EXTERNAL, ACTUATOR",
+      "nomenclature": "BELLOWS, EXTERNAL, ACTUATOR",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FLAM",
+          "rating": "I"
+        }
+      ]
+    },
+    {
+      "row": 41,
+      "material_code": "51403",
+      "designation": "ALUMINUM ALLOY 7075-T651",
+      "material_specification": "ASTM B211, SAE AMS-QQ-A-225/9",
+      "part_number": "MER07548-001",
+      "part_description": "MOUNT BRACKET, ACTUATOR, 10 INCH VALVE",
+      "nomenclature": "MOUNT BRACKET, ACTUATOR, 10 INCH VALVE",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "SCC",
+          "rating": "C"
+        },
+        {
+          "issue": "CORR",
+          "rating": "B"
+        }
+      ]
+    },
+    {
+      "row": 42,
+      "material_code": "10392",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "MER07572-001",
+      "part_description": "BRACKET, ANGLE, ACTUATOR",
+      "nomenclature": "BRACKET, ANGLE, ACTUATOR",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 43,
+      "material_code": "10392",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "MER07550-001",
+      "part_description": "DRIVE LINK, 10 INCH VALVE",
+      "nomenclature": "DRIVE LINK, 10 INCH VALVE",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 44,
+      "material_code": "10392",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "MER07571-001",
+      "part_description": "CONNECTING ROD, ACTUATOR, 10 INCH VALVE",
+      "nomenclature": "CONNECTING ROD, ACTUATOR, 10 INCH VALVE",
+      "nha": "MER07540",
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 45,
+      "material_code": "10011",
+      "designation": "A286 CRES",
+      "material_specification": "SAE AMS 5737",
+      "part_number": "MER07550-001",
+      "part_description": "DRIVE LINK, 10 INCH VALVE",
+      "nomenclature": "DRIVE LINK, 10 INCH VALVE",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 46,
+      "material_code": "10392",
+      "designation": "A286 CRES",
+      "material_specification": "SAE AMS 5737",
+      "part_number": "MER07571-001",
+      "part_description": "CONNECTING ROD, ACTUATOR, 10 INCH VALVE",
+      "nomenclature": "CONNECTING ROD, ACTUATOR, 10 INCH VALVE",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 47,
+      "material_code": "51429",
+      "designation": "ALUMINUM ALLOY 7075-T651",
+      "material_specification": "ASTM B211, SAE AMS-QQ-A-225/9",
+      "part_number": "MER07545-001",
+      "part_description": "LOWER CAM MOUNT, 10 INCH VALVE",
+      "nomenclature": "LOWER CAM MOUNT, 10 INCH VALVE",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "SCC",
+          "rating": "C"
+        },
+        {
+          "issue": "CORR",
+          "rating": "B"
+        }
+      ]
+    },
+    {
+      "row": 48,
+      "material_code": "10392",
+      "designation": "A286",
+      "material_specification": "AMS 5737",
+      "part_number": "MER07546-001",
+      "part_description": "PRELOAD DISC, 10 INCH VALVE",
+      "nomenclature": "PRELOAD DISC, 10 INCH VALVE",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 49,
+      "material_code": "10392",
+      "designation": "A286 CRES",
+      "material_specification": "SAE AMS 5737",
+      "part_number": "MER07553-001",
+      "part_description": "COVER, BEARING, 10 INCH VALVE",
+      "nomenclature": "COVER, BEARING, 10 INCH VALVE",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 50,
+      "material_code": "10392",
+      "designation": "A286 CRES",
+      "material_specification": "SAE AMS 5737",
+      "part_number": "MER07554-001",
+      "part_description": "SLIDER, ROTARY VALVE 10 INCH VALVE",
+      "nomenclature": "SLIDER, ROTARY VALVE 10 INCH VALVE",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 51,
+      "material_code": "50678",
+      "designation": "ALUMINUM BRONZE ALLOY",
+      "material_specification": "ASTM B505",
+      "part_number": "MER07555-001",
+      "part_description": "PIN, TRANSL, FITTING, 10 INCH VALVE",
+      "nomenclature": "PIN, TRANSL, FITTING, 10 INCH VALVE",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FLAM",
+          "rating": "C"
+        }
+      ]
+    },
+    {
+      "row": 53,
+      "material_code": "10392",
+      "designation": "A286 CRES",
+      "material_specification": "SAE AMS 5737",
+      "part_number": "MER07557-001",
+      "part_description": "SHAFT, CENTRAL, 10 INCH VALVE",
+      "nomenclature": "SHAFT, CENTRAL, 10 INCH VALVE",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 54,
+      "material_code": "10392",
+      "designation": "A286 CRES",
+      "material_specification": "SAE AMS 5737",
+      "part_number": "MER07558-001",
+      "part_description": "OFFSET ROTARY SHAFT, LOWER, 10 INCH VALVE",
+      "nomenclature": "OFFSET ROTARY SHAFT, LOWER, 10 INCH VALVE",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 56,
+      "material_code": "51429",
+      "designation": "ALUMINUM ALLOY 7075-T651",
+      "material_specification": "ASTM B211, SAE AMS-QQ-A-225/9",
+      "part_number": "MER07561-001",
+      "part_description": "RING, RETAINING, VALVE",
+      "nomenclature": "RING, RETAINING, VALVE",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "SCC",
+          "rating": "C"
+        },
+        {
+          "issue": "CORR",
+          "rating": "B"
+        }
+      ]
+    },
+    {
+      "row": 58,
+      "material_code": "51429",
+      "designation": "ALUMINUM ALLOY 7075-T651",
+      "material_specification": "ASTM B211, SAE AMS-QQ-A-225/9",
+      "part_number": "MER07569-001",
+      "part_description": "BRACE, BRACE",
+      "nomenclature": "BRACE, BRACE",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "SCC",
+          "rating": "C"
+        },
+        {
+          "issue": "CORR",
+          "rating": "B"
+        }
+      ]
+    },
+    {
+      "row": 59,
+      "material_code": "51403",
+      "designation": "ALUMINUM ALLOY 7075-T651",
+      "material_specification": "ASTM B211, SAE AMS-QQ-A-225/9",
+      "part_number": "MER07564-001",
+      "part_description": "BODY, VALVE, 10 INCH",
+      "nomenclature": "BODY, VALVE, 10 INCH",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "SCC",
+          "rating": "C"
+        },
+        {
+          "issue": "CORR",
+          "rating": "B"
+        }
+      ]
+    },
+    {
+      "row": 60,
+      "material_code": "10392",
+      "designation": "A286 CRES",
+      "material_specification": "SAE AMS 5737",
+      "part_number": "MER07566-001",
+      "part_description": "ROTARY TANG, OFFSET SHAFT, 10 INCH VALVE",
+      "nomenclature": "ROTARY TANG, OFFSET SHAFT, 10 INCH VALVE",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 61,
+      "material_code": "51429",
+      "designation": "ALUMINUM ALLOY 7075-T651",
+      "material_specification": "ASTM B211, SAE AMS-QQ-A-225/9",
+      "part_number": "MER07568-001",
+      "part_description": "SHAFT, OFFSET, 10 INCH VALVE",
+      "nomenclature": "SHAFT, OFFSET, 10 INCH VALVE",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "SCC",
+          "rating": "C"
+        },
+        {
+          "issue": "CORR",
+          "rating": "B"
+        }
+      ]
+    },
+    {
+      "row": 62,
+      "material_code": "10392",
+      "designation": "A286 CRES",
+      "material_specification": "SAE AMS 5737",
+      "part_number": "MER07585-001",
+      "part_description": "POPPET, VALVE, 4 INCH",
+      "nomenclature": "POPPET, VALVE, 4 INCH",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 63,
+      "material_code": "10392",
+      "designation": "A286 CRES",
+      "material_specification": "SAE AMS 5737",
+      "part_number": "MER07586-001",
+      "part_description": "COUPLING, POPPET",
+      "nomenclature": "COUPLING, POPPET",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 64,
+      "material_code": "10392",
+      "designation": "A286 CRES",
+      "material_specification": "SAE AMS 5737",
+      "part_number": "MER07587-001",
+      "part_description": "INTERFACE RING, COUPLET SP-EXPT",
+      "nomenclature": "INTERFACE RING, COUPLET SP-EXPT",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 65,
+      "material_code": "55750",
+      "designation": "INCONEL 718",
+      "material_specification": "SAE AMS 5664",
+      "part_number": "MER07588-001",
+      "part_description": "PUSHER, BALL POPPET",
+      "nomenclature": "PUSHER, BALL POPPET",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "TVS",
+          "rating": "C"
+        }
+      ]
+    },
+    {
+      "row": 66,
+      "material_code": "54223",
+      "designation": "7075 AL",
+      "material_specification": null,
+      "part_number": "MER07548-001",
+      "part_description": "MOUNT BRACKET, ACTUATOR, 10 INCH VALVE",
+      "nomenclature": "MOUNT BRACKET, ACTUATOR, 10 INCH VALVE",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "SCC",
+          "rating": "C"
+        },
+        {
+          "issue": "CORR",
+          "rating": "B"
+        }
+      ]
+    },
+    {
+      "row": 67,
+      "material_code": "10392",
+      "designation": "A286 CRES",
+      "material_specification": "SAE AMS 5737",
+      "part_number": "MER07572-001",
+      "part_description": "BRACKET, ANGLE, ACTUATOR",
+      "nomenclature": "BRACKET, ANGLE, ACTUATOR",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 69,
+      "material_code": "55461",
+      "designation": "INCONEL 625",
+      "material_specification": "SAE AMS 5666",
+      "part_number": "MER07574-001",
+      "part_description": "HOUSING, ACTUATOR",
+      "nomenclature": "HOUSING, ACTUATOR",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "SCC",
+          "rating": "N"
+        }
+      ]
+    },
+    {
+      "row": 70,
+      "material_code": "55461",
+      "designation": "INCONEL 625",
+      "material_specification": "SAE AMS 5666",
+      "part_number": "MER07577-001",
+      "part_description": "MOUNT CAP, ACTUATOR",
+      "nomenclature": "MOUNT CAP, ACTUATOR",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "SCC",
+          "rating": "N"
+        }
+      ]
+    },
+    {
+      "row": 71,
+      "material_code": "05057",
+      "designation": "VESPEL SP-3, Type III/M OR Type III/P POLYIMIDE RESIN",
+      "material_specification": "ASTM 6456-10",
+      "part_number": "MER07578-001",
+      "part_description": "BUSHING, ACTUATOR, SMALL",
+      "nomenclature": "BUSHING, ACTUATOR, SMALL",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "TOX",
+          "rating": "K"
+        }
+      ]
+    },
+    {
+      "row": 72,
+      "material_code": "05057",
+      "designation": "VESPEL SP-3, TYPE III/M OR TYPE III/P, POLYIMIDE RESIN",
+      "material_specification": "ASTM B456-10",
+      "part_number": "MER07579-001",
+      "part_description": "BUSHING, ACTUATOR, LARGE",
+      "nomenclature": "BUSHING, ACTUATOR, LARGE",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "TOX",
+          "rating": "K"
+        }
+      ]
+    },
+    {
+      "row": 73,
+      "material_code": "55461",
+      "designation": "INCONEL 625",
+      "material_specification": "SAE AMS 5666",
+      "part_number": "MER07580-001",
+      "part_description": "CAP, ACTUATOR",
+      "nomenclature": "CAP, ACTUATOR",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "SCC",
+          "rating": "N"
+        }
+      ]
+    },
+    {
+      "row": 74,
+      "material_code": "10727",
+      "designation": "INCONEL 625",
+      "material_specification": "SAE AMS 5666",
+      "part_number": "MER07581-001",
+      "part_description": "SHAFT, PISTON, ACTUATOR",
+      "nomenclature": "SHAFT, PISTON, ACTUATOR",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FLAM",
+          "rating": "C"
+        },
+        {
+          "issue": "TVS",
+          "rating": "C"
+        },
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 76,
+      "material_code": "55962",
+      "designation": "INCONEL 718",
+      "material_specification": "UNS N07718, PER SAE AMS 5596",
+      "part_number": "MER07583-001",
+      "part_description": "BELLOWS, EXTERNAL, ACTUATOR",
+      "nomenclature": "BELLOWS, EXTERNAL, ACTUATOR",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FLAM",
+          "rating": "I"
+        }
+      ]
+    },
+    {
+      "row": 77,
+      "material_code": "55962",
+      "designation": "INCONEL 718",
+      "material_specification": null,
+      "part_number": "01-885-06K",
+      "part_description": "ROD END, .375, .3750-24 RH THREAD",
+      "nomenclature": "ROD END, .375, .3750-24 RH THREAD",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FLAM",
+          "rating": "I"
+        }
+      ]
+    },
+    {
+      "row": 78,
+      "material_code": "55962",
+      "designation": "INCONEL 718",
+      "material_specification": null,
+      "part_number": "11-885-06K",
+      "part_description": "ROD END, .375, .3750-24 LH THREAD",
+      "nomenclature": "ROD END, .375, .3750-24 LH THREAD",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FLAM",
+          "rating": "I"
+        }
+      ]
+    },
+    {
+      "row": 79,
+      "material_code": "52741",
+      "designation": "316 SST",
+      "material_specification": null,
+      "part_number": "2949T32",
+      "part_description": "HOIST RING, LIFTING, .3750-16 THD, 500LB",
+      "nomenclature": "HOIST RING, LIFTING, .3750-16 THD, 500LB",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FLAM",
+          "rating": "C"
+        },
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 80,
+      "material_code": "52739",
+      "designation": "316 SST",
+      "material_specification": null,
+      "part_number": "50854SCS",
+      "part_description": "SPRING, COMPRESSION, 1.575 LG",
+      "nomenclature": "SPRING, COMPRESSION, 1.575 LG",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 81,
+      "material_code": "10474",
+      "designation": "316 SST",
+      "material_specification": null,
+      "part_number": "97022A388",
+      "part_description": "RING SHIM, 1.5 OD, 1.0 ID, .010 THICK",
+      "nomenclature": "RING SHIM, 1.5 OD, 1.0 ID, .010 THICK",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "TVS",
+          "rating": "C"
+        },
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 82,
+      "material_code": "10474",
+      "designation": "316 CRES",
+      "material_specification": null,
+      "part_number": "AS4307K04",
+      "part_description": "UNION FITTING, -04, (.250), .4375-20 UNJF 3A THD",
+      "nomenclature": "UNION FITTING, -04, (.250), .4375-20 UNJF 3A THD",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "TVS",
+          "rating": "C"
+        },
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 86,
+      "material_code": "10392",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "EH-22-C86",
+      "part_description": "RETAINING RING, INTERNAL, 22mm",
+      "nomenclature": "RETAINING RING, INTERNAL, 22mm",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 87,
+      "material_code": "50784",
+      "designation": "304 CRES",
+      "material_specification": null,
+      "part_number": "F-400521-04",
+      "part_description": "SEAL, K-PORT, GOLD PLATE, .25 NOM DIA PORT",
+      "nomenclature": "SEAL, K-PORT, GOLD PLATE, .25 NOM DIA PORT",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 92,
+      "material_code": "50768",
+      "designation": "302 SST",
+      "material_specification": null,
+      "part_number": "M12133/2-100",
+      "part_description": "WASHER, SPRING TENSION, BELLEVILLE SPRING, 1.0 ID",
+      "nomenclature": "WASHER, SPRING TENSION, BELLEVILLE SPRING, 1.0 ID",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 93,
+      "material_code": "50768",
+      "designation": "302 SST",
+      "material_specification": null,
+      "part_number": "M12133/2-255",
+      "part_description": "WASHER, SPRING TENSION, BELLEVILLE SPRING, .25 ID",
+      "nomenclature": "WASHER, SPRING TENSION, BELLEVILLE SPRING, .25 ID",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 94,
+      "material_code": "50769",
+      "designation": "302 CRES",
+      "material_specification": "M12133/2-255",
+      "part_number": "M12133/2-255",
+      "part_description": "WASHER, SPRING TENSION, BELLEVILLE SPRING, .250 ID",
+      "nomenclature": "WASHER, SPRING TENSION, BELLEVILLE SPRING, .250 ID",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 96,
+      "material_code": "50769",
+      "designation": "302 CRES",
+      "material_specification": null,
+      "part_number": "M12133/2-255",
+      "part_description": "WASHER, SPRING TENSION, BELLEVILLE SPRING, CRES",
+      "nomenclature": "WASHER, SPRING TENSION, BELLEVILLE SPRING, CRES",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 97,
+      "material_code": "10392",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "M81935/3-6C",
+      "part_description": "LOCKING DEVICE FOR ROD END BEARINGS, .375",
+      "nomenclature": "LOCKING DEVICE FOR ROD END BEARINGS, .375",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 108,
+      "material_code": "10267",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "MS21043-6",
+      "part_description": "NUT SELF-LOCKING, 800 F, REDUCED HEX, .3750-24 UNJF THD",
+      "nomenclature": "NUT SELF-LOCKING, 800 F, REDUCED HEX, .3750-24 UNJF THD",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 109,
+      "material_code": "10267",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "MS21043-6",
+      "part_description": "NUT SELF-LOCKING, 800 F, REDUCED HEXAGON, .3750-24 UNJF-3B",
+      "nomenclature": "NUT SELF-LOCKING, 800 F, REDUCED HEXAGON, .3750-24 UNJF-3B",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 110,
+      "material_code": "10520",
+      "designation": "302 OR 304 SST",
+      "material_specification": null,
+      "part_number": "MS21209C1610",
+      "part_description": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, 1.000-8, 1.000 LG",
+      "nomenclature": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, 1.000-8, 1.000 LG",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 111,
+      "material_code": "50769",
+      "designation": "302 OR 304 SST",
+      "material_specification": null,
+      "part_number": "MS21209C4-10",
+      "part_description": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .2500-20 THD, .250 LG",
+      "nomenclature": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .2500-20 THD, .250 LG",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 112,
+      "material_code": "10520",
+      "designation": "302 OR 304 SST",
+      "material_specification": null,
+      "part_number": "MS21209C4-10",
+      "part_description": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .2500-20, .250 LG",
+      "nomenclature": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .2500-20, .250 LG",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 113,
+      "material_code": "50769",
+      "designation": "302 OR 304 SST",
+      "material_specification": null,
+      "part_number": "MS21209C4-15",
+      "part_description": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .2500-20 THD, .375 LG",
+      "nomenclature": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .2500-20 THD, .375 LG",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 114,
+      "material_code": "50769",
+      "designation": "302 OR 304 SST",
+      "material_specification": null,
+      "part_number": "MS21209C5-15",
+      "part_description": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .3125-18 THD, .469 LG",
+      "nomenclature": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .3125-18 THD, .469 LG",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 115,
+      "material_code": "50769",
+      "designation": "302 OR 304 SST",
+      "material_specification": null,
+      "part_number": "MS21209C6-20",
+      "part_description": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .3750-16 THD, .75 LG",
+      "nomenclature": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .3750-16 THD, .75 LG",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 116,
+      "material_code": "10267",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "MS9390-440",
+      "part_description": "PIN, STRAIGHT, HEADLESS, DOWEL, .250 OD, .75 LG",
+      "nomenclature": "PIN, STRAIGHT, HEADLESS, DOWEL, .250 OD, .75 LG",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 117,
+      "material_code": "10392",
+      "designation": "A286 (160 KSI)",
+      "material_specification": null,
+      "part_number": "NAS1149E0432R",
+      "part_description": "WASHER, FLAT, .265 ID, .032 THK",
+      "nomenclature": "WASHER, FLAT, .265 ID, .032 THK",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 118,
+      "material_code": "10392",
+      "designation": "A286 (160 KSI)",
+      "material_specification": null,
+      "part_number": "NAS1149E0432R",
+      "part_description": "WASHER, FLAT, .250 NOM",
+      "nomenclature": "WASHER, FLAT, .250 NOM",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 119,
+      "material_code": "10392",
+      "designation": "A286 (160 KSI)",
+      "material_specification": null,
+      "part_number": "NAS1149E0516R",
+      "part_description": "WASHER, FLAT, .328 ID, .016 THK",
+      "nomenclature": "WASHER, FLAT, .328 ID, .016 THK",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 120,
+      "material_code": "10392",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "NAS1149E0516R",
+      "part_description": "FLAT WASHER, .328 ID NOM, .063 THK",
+      "nomenclature": "FLAT WASHER, .328 ID NOM, .063 THK",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 121,
+      "material_code": "10267",
+      "designation": "A286 (180 KSI)",
+      "material_specification": null,
+      "part_number": "NAS1351N4-20",
+      "part_description": "SHCS, .2500-28 UNRF-3A, 1.250 LG",
+      "nomenclature": "SHCS, .2500-28 UNRF-3A, 1.250 LG",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 122,
+      "material_code": "10267",
+      "designation": "A286 (180 KSI)",
+      "material_specification": null,
+      "part_number": "NAS1351N4H16",
+      "part_description": "SHCS, DRILLED, .2500-28 UNRF-3A, 1.00 LG",
+      "nomenclature": "SHCS, DRILLED, .2500-28 UNRF-3A, 1.00 LG",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 123,
+      "material_code": "10267",
+      "designation": "A286",
+      "material_specification": "NAS1352",
+      "part_number": "NAS1352N4-10",
+      "part_description": "SHCS, .2500-20 UNRC-3A, .625 LG",
+      "nomenclature": "SHCS, .2500-20 UNRC-3A, .625 LG",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 124,
+      "material_code": "10267",
+      "designation": "A286 (180 KSI)",
+      "material_specification": null,
+      "part_number": "NAS1352N4-12",
+      "part_description": "SHCS, .2500-20 UNRC-3A, .750 LG",
+      "nomenclature": "SHCS, .2500-20 UNRC-3A, .750 LG",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 125,
+      "material_code": "10267",
+      "designation": "A286 (180 KSI)",
+      "material_specification": null,
+      "part_number": "NAS1352N4-14",
+      "part_description": "SHCS, .2500-20 UNRC-3A, .875 LG",
+      "nomenclature": "SHCS, .2500-20 UNRC-3A, .875 LG",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 126,
+      "material_code": "10267",
+      "designation": "A286 (180 KSI)",
+      "material_specification": null,
+      "part_number": "NAS1352N5-12",
+      "part_description": "SHCS, .3125-24 UNRF-3A, .750 LG",
+      "nomenclature": "SHCS, .3125-24 UNRF-3A, .750 LG",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 127,
+      "material_code": "10267",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "NAS1352N5-16",
+      "part_description": "SHCS, .3125-18 UNRC-3A, 1.000 LG",
+      "nomenclature": "SHCS, .3125-18 UNRC-3A, 1.000 LG",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 128,
+      "material_code": "10267",
+      "designation": "A286 (150 KSI)",
+      "material_specification": null,
+      "part_number": "NAS509-4C",
+      "part_description": "NUT, JAM, DRILLED, .2500-28 UNJF-3B",
+      "nomenclature": "NUT, JAM, DRILLED, .2500-28 UNJF-3B",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 129,
+      "material_code": "10267",
+      "designation": "A286 (150 KSI)",
+      "material_specification": null,
+      "part_number": "NAS509-6C",
+      "part_description": "NUT, JAM, DRILLED, .3750-24 RH THREAD",
+      "nomenclature": "NUT, JAM, DRILLED, .3750-24 RH THREAD",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 130,
+      "material_code": "10267",
+      "designation": "A286 (150 KSI)",
+      "material_specification": null,
+      "part_number": "NAS509L6C",
+      "part_description": "NUT, JAM, DRILLED, .3750-24 LH THREAD",
+      "nomenclature": "NUT, JAM, DRILLED, .3750-24 LH THREAD",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 131,
+      "material_code": "10267",
+      "designation": "A286 (160 KSI)",
+      "material_specification": null,
+      "part_number": "NAS6706U13",
+      "part_description": "BOLT, TENSION, HEX HEAD, CLOSE TOL, .3750-24 UNJF THD, 1.4 LG",
+      "nomenclature": "BOLT, TENSION, HEX HEAD, CLOSE TOL, .3750-24 UNJF THD, 1.4 LG",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 132,
+      "material_code": "10267",
+      "designation": "A286, 160 KSI",
+      "material_specification": null,
+      "part_number": "NAS6706U13",
+      "part_description": "BOLT, TENSION, HEX HEAD, CLOSE TOL, .3750-24 UNJF-3A, 1.390 LG",
+      "nomenclature": "BOLT, TENSION, HEX HEAD, CLOSE TOL, .3750-24 UNJF-3A, 1.390 LG",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 134,
+      "material_code": "10392",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "WHM-244-S86",
+      "part_description": "RETAINING RING, INTERNAL, 2-7/16 ID",
+      "nomenclature": "RETAINING RING, INTERNAL, 2-7/16 ID",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 135,
+      "material_code": "53430",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "WHM-275-S86",
+      "part_description": "RETAINING RING, INTERNAL, 2 3/4",
+      "nomenclature": "RETAINING RING, INTERNAL, 2 3/4",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "TOX",
+          "rating": "K"
+        },
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    },
+    {
+      "row": 136,
+      "material_code": "10392",
+      "designation": "A286",
+      "material_specification": null,
+      "part_number": "WSM-137-C86",
+      "part_description": "RETAINING RING, EXTERIOR",
+      "nomenclature": "RETAINING RING, EXTERIOR",
+      "nha": null,
+      "environment": "GH2, LH2",
+      "max_temperature": 200,
+      "min_temperature": -423,
+      "max_pressure": 6000,
+      "min_pressure": 0,
+      "fluid_type": "H2",
+      "system": null,
+      "subsystem": null,
+      "criticality": null,
+      "overall_evaluation": null,
+      "mua_rationale": null,
+      "remarks": null,
+      "triggers": [
+        {
+          "issue": "FS",
+          "rating": "U"
+        }
+      ]
+    }
+  ],
+  "material_code_groups": [
+    {
+      "material_code": "10392",
+      "part_count": 33,
+      "issue_counts": {
+        "FS": 33
+      },
+      "rating_counts": {
+        "FS:U": 33
+      },
+      "part_numbers": [
+        "EH-22-C86",
+        "M81935/3-6C",
+        "MER07546-001",
+        "MER07550-001",
+        "MER07553-001",
+        "MER07554-001",
+        "MER07556-001",
+        "MER07557-001",
+        "MER07558-001",
+        "MER07559-001",
+        "MER07566-001",
+        "MER07571-001",
+        "MER07572-001",
+        "MER07585-001",
+        "MER07586-001",
+        "MER07587-001",
+        "NAS1149E0432R",
+        "NAS1149E0516R",
+        "WHM-244-S86",
+        "WSM-137-C86"
+      ],
+      "environments": {
+        "GH2, LH2": 33
+      },
+      "nhas": {
+        "MER07540": 14
+      },
+      "designations": {
+        "A286": 20,
+        "A286 CRES": 10,
+        "A286 (160 KSI)": 3
+      }
+    },
+    {
+      "material_code": "10267",
+      "part_count": 15,
+      "issue_counts": {
+        "FS": 15
+      },
+      "rating_counts": {
+        "FS:U": 15
+      },
+      "part_numbers": [
+        "MS21043-6",
+        "MS9390-440",
+        "NAS1351N4-20",
+        "NAS1351N4H16",
+        "NAS1352N4-10",
+        "NAS1352N4-12",
+        "NAS1352N4-14",
+        "NAS1352N5-12",
+        "NAS1352N5-16",
+        "NAS509-4C",
+        "NAS509-6C",
+        "NAS509L6C",
+        "NAS6706U13"
+      ],
+      "environments": {
+        "GH2, LH2": 15
+      },
+      "nhas": {},
+      "designations": {
+        "A286": 5,
+        "A286 (180 KSI)": 5,
+        "A286 (150 KSI)": 3,
+        "A286 (160 KSI)": 1,
+        "A286, 160 KSI": 1
+      }
+    },
+    {
+      "material_code": "50769",
+      "part_count": 6,
+      "issue_counts": {
+        "FS": 6
+      },
+      "rating_counts": {
+        "FS:U": 6
+      },
+      "part_numbers": [
+        "M12133/2-255",
+        "MS21209C4-10",
+        "MS21209C4-15",
+        "MS21209C5-15",
+        "MS21209C6-20"
+      ],
+      "environments": {
+        "GH2, LH2": 6
+      },
+      "nhas": {},
+      "designations": {
+        "302 OR 304 SST": 4,
+        "302 CRES": 2
+      }
+    },
+    {
+      "material_code": "55461",
+      "part_count": 5,
+      "issue_counts": {
+        "SCC": 5
+      },
+      "rating_counts": {
+        "SCC:N": 5
+      },
+      "part_numbers": [
+        "MER07574-001",
+        "MER07577-001",
+        "MER07580-001"
+      ],
+      "environments": {
+        "GH2, LH2": 5
+      },
+      "nhas": {
+        "MER07540": 2
+      },
+      "designations": {
+        "INCONEL 625": 5
+      }
+    },
+    {
+      "material_code": "51429",
+      "part_count": 4,
+      "issue_counts": {
+        "CORR": 4,
+        "SCC": 4
+      },
+      "rating_counts": {
+        "CORR:B": 4,
+        "SCC:C": 4
+      },
+      "part_numbers": [
+        "MER07545-001",
+        "MER07561-001",
+        "MER07568-001",
+        "MER07569-001"
+      ],
+      "environments": {
+        "GH2, LH2": 4
+      },
+      "nhas": {},
+      "designations": {
+        "ALUMINUM ALLOY 7075-T651": 4
+      }
+    },
+    {
+      "material_code": "54223",
+      "part_count": 4,
+      "issue_counts": {
+        "CORR": 4,
+        "SCC": 4
+      },
+      "rating_counts": {
+        "CORR:B": 4,
+        "SCC:C": 4
+      },
+      "part_numbers": [
+        "MER07545-001",
+        "MER07548-001",
+        "MER07564-001",
+        "MER07569-001"
+      ],
+      "environments": {
+        "GH2, LH2": 4
+      },
+      "nhas": {
+        "MER07540": 3
+      },
+      "designations": {
+        "7075 AL": 4
+      }
+    },
+    {
+      "material_code": "55962",
+      "part_count": 4,
+      "issue_counts": {
+        "FLAM": 4
+      },
+      "rating_counts": {
+        "FLAM:I": 4
+      },
+      "part_numbers": [
+        "01-885-06K",
+        "11-885-06K",
+        "MER07583-001"
+      ],
+      "environments": {
+        "GH2, LH2": 4
+      },
+      "nhas": {
+        "MER07540": 1
+      },
+      "designations": {
+        "INCONEL 718": 4
+      }
+    },
+    {
+      "material_code": "55750",
+      "part_count": 3,
+      "issue_counts": {
+        "TVS": 3
+      },
+      "rating_counts": {
+        "TVS:C": 3
+      },
+      "part_numbers": [
+        "MER07574-001",
+        "MER07588-001"
+      ],
+      "environments": {
+        "GH2, LH2": 3
+      },
+      "nhas": {
+        "MER07540": 2
+      },
+      "designations": {
+        "INCONEL 718": 3
+      }
+    },
+    {
+      "material_code": "05057",
+      "part_count": 2,
+      "issue_counts": {
+        "TOX": 2
+      },
+      "rating_counts": {
+        "TOX:K": 2
+      },
+      "part_numbers": [
+        "MER07578-001",
+        "MER07579-001"
+      ],
+      "environments": {
+        "GH2, LH2": 2
+      },
+      "nhas": {},
+      "designations": {
+        "VESPEL SP-3, TYPE III/M OR TYPE III/P, POLYIMIDE RESIN": 1,
+        "VESPEL SP-3, Type III/M OR Type III/P POLYIMIDE RESIN": 1
+      }
+    },
+    {
+      "material_code": "10474",
+      "part_count": 2,
+      "issue_counts": {
+        "FS": 2,
+        "TVS": 2
+      },
+      "rating_counts": {
+        "FS:U": 2,
+        "TVS:C": 2
+      },
+      "part_numbers": [
+        "97022A388",
+        "AS4307K04"
+      ],
+      "environments": {
+        "GH2, LH2": 2
+      },
+      "nhas": {},
+      "designations": {
+        "316 CRES": 1,
+        "316 SST": 1
+      }
+    },
+    {
+      "material_code": "10520",
+      "part_count": 2,
+      "issue_counts": {
+        "FS": 2
+      },
+      "rating_counts": {
+        "FS:U": 2
+      },
+      "part_numbers": [
+        "MS21209C1610",
+        "MS21209C4-10"
+      ],
+      "environments": {
+        "GH2, LH2": 2
+      },
+      "nhas": {},
+      "designations": {
+        "302 OR 304 SST": 2
+      }
+    },
+    {
+      "material_code": "10727",
+      "part_count": 2,
+      "issue_counts": {
+        "FLAM": 2,
+        "FS": 2,
+        "TVS": 2
+      },
+      "rating_counts": {
+        "FLAM:C": 2,
+        "FS:U": 2,
+        "TVS:C": 2
+      },
+      "part_numbers": [
+        "MER07581-001"
+      ],
+      "environments": {
+        "GH2, LH2": 2
+      },
+      "nhas": {
+        "MER07540": 1
+      },
+      "designations": {
+        "INCONEL 625": 2
+      }
+    },
+    {
+      "material_code": "50181",
+      "part_count": 2,
+      "issue_counts": {
+        "CORR": 2,
+        "FS": 2,
+        "SCC": 2
+      },
+      "rating_counts": {
+        "CORR:B": 2,
+        "FS:U": 2,
+        "SCC:N": 2
+      },
+      "part_numbers": [
+        "MER07561-001",
+        "MER07568-001"
+      ],
+      "environments": {
+        "GH2, LH2": 2
+      },
+      "nhas": {
+        "MER07540": 2
+      },
+      "designations": {
+        "7075 AL": 2
+      }
+    },
+    {
+      "material_code": "50678",
+      "part_count": 2,
+      "issue_counts": {
+        "FLAM": 2
+      },
+      "rating_counts": {
+        "FLAM:C": 2
+      },
+      "part_numbers": [
+        "MER07555-001"
+      ],
+      "environments": {
+        "GH2, LH2": 2
+      },
+      "nhas": {
+        "MER07540": 1
+      },
+      "designations": {
+        "AL/BRONZE ALLOY": 1,
+        "ALUMINUM BRONZE ALLOY": 1
+      }
+    },
+    {
+      "material_code": "50768",
+      "part_count": 2,
+      "issue_counts": {
+        "FS": 2
+      },
+      "rating_counts": {
+        "FS:U": 2
+      },
+      "part_numbers": [
+        "M12133/2-100",
+        "M12133/2-255"
+      ],
+      "environments": {
+        "GH2, LH2": 2
+      },
+      "nhas": {},
+      "designations": {
+        "302 SST": 2
+      }
+    },
+    {
+      "material_code": "51403",
+      "part_count": 2,
+      "issue_counts": {
+        "CORR": 2,
+        "SCC": 2
+      },
+      "rating_counts": {
+        "CORR:B": 2,
+        "SCC:C": 2
+      },
+      "part_numbers": [
+        "MER07548-001",
+        "MER07564-001"
+      ],
+      "environments": {
+        "GH2, LH2": 2
+      },
+      "nhas": {
+        "MER07540": 1
+      },
+      "designations": {
+        "ALUMINUM ALLOY 7075-T651": 2
+      }
+    },
+    {
+      "material_code": "10011",
+      "part_count": 1,
+      "issue_counts": {
+        "FS": 1
+      },
+      "rating_counts": {
+        "FS:U": 1
+      },
+      "part_numbers": [
+        "MER07550-001"
+      ],
+      "environments": {
+        "GH2, LH2": 1
+      },
+      "nhas": {},
+      "designations": {
+        "A286 CRES": 1
+      }
+    },
+    {
+      "material_code": "50784",
+      "part_count": 1,
+      "issue_counts": {
+        "FS": 1
+      },
+      "rating_counts": {
+        "FS:U": 1
+      },
+      "part_numbers": [
+        "F-400521-04"
+      ],
+      "environments": {
+        "GH2, LH2": 1
+      },
+      "nhas": {},
+      "designations": {
+        "304 CRES": 1
+      }
+    },
+    {
+      "material_code": "52739",
+      "part_count": 1,
+      "issue_counts": {
+        "FS": 1
+      },
+      "rating_counts": {
+        "FS:U": 1
+      },
+      "part_numbers": [
+        "50854SCS"
+      ],
+      "environments": {
+        "GH2, LH2": 1
+      },
+      "nhas": {},
+      "designations": {
+        "316 SST": 1
+      }
+    },
+    {
+      "material_code": "52741",
+      "part_count": 1,
+      "issue_counts": {
+        "FLAM": 1,
+        "FS": 1
+      },
+      "rating_counts": {
+        "FLAM:C": 1,
+        "FS:U": 1
+      },
+      "part_numbers": [
+        "2949T32"
+      ],
+      "environments": {
+        "GH2, LH2": 1
+      },
+      "nhas": {},
+      "designations": {
+        "316 SST": 1
+      }
+    },
+    {
+      "material_code": "53430",
+      "part_count": 1,
+      "issue_counts": {
+        "FS": 1,
+        "TOX": 1
+      },
+      "rating_counts": {
+        "FS:U": 1,
+        "TOX:K": 1
+      },
+      "part_numbers": [
+        "WHM-275-S86"
+      ],
+      "environments": {
+        "GH2, LH2": 1
+      },
+      "nhas": {},
+      "designations": {
+        "A286": 1
+      }
+    }
+  ]
+}

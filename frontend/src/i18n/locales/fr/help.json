@@ -1,0 +1,309 @@
+{
+  "query": {
+    "title": "Requête & Recherche",
+    "description": "Posez des questions sur les matériaux, recherchez la base de connaissances et obtenez des réponses alimentées par IA avec citations sources.",
+    "whatItDoes": [
+      "Rechercher la base de connaissances MAPTIS avec des requêtes en langage naturel",
+      "Valider les conditions opérationnelles vs les évaluations des matériaux",
+      "Identifier les matériaux à haut risque pour service oxygène selon les données de test",
+      "Générer des rapports de violation avec recommandations",
+      "Signaler la contamination PFAS et les matériaux restreints"
+    ],
+    "howToUse": [
+      "Tapez votre question en langage naturel (ex: 'Quels matériaux sont sûrs pour l'oxygène liquide?')",
+      "Examinez la réponse générée par IA avec citations sources",
+      "Cliquez sur les sources pour voir les extraits originaux du document",
+      "Posez des questions de suivi pour approfondir",
+      "Utilisez les filtres pour affiner les résultats par classe de matériau ou norme"
+    ],
+    "useCases": [
+      "Quelle est la cote de compatibilité oxygène du Ti-6Al-4V ?",
+      "Quels matériaux nécessitent un nettoyage ASTM G93 pour service LOX ?",
+      "Afficher tous les matériaux avec cote d'inflammabilité 1 ou 2",
+      "Quelles sont les limites de pression pour Inconel 625 en service hydrogène ?"
+    ],
+    "tips": [
+      "Soyez spécifique : 'Ti-6Al-4V compatibilité oxygène à 3000 PSI' est mieux que 'titane oxygène'",
+      "Utilisez des questions de suivi pour affiner sans retaper le contexte",
+      "Vérifiez le score de confiance des réponses - confiance faible signifie vérifier les sources",
+      "Exportez les résultats avant de lancer une nouvelle recherche"
+    ]
+  },
+  "knowledgeTwins": {
+    "title": "Jumeaux de Connaissances O₂/H₂",
+    "description": "Évaluation de compatibilité des matériaux basée sur les preuves pour service oxygène et hydrogène utilisant le corpus NASA.",
+    "whatItDoes": [
+      "Rechercher des matériaux par compatibilité oxygène (O₂) ou hydrogène (H₂)",
+      "Interroger les normes NASA et la documentation de sécurité",
+      "Afficher les matériaux groupés par cote de compatibilité (A=Meilleur → X=Échec)",
+      "Montrer les évaluations complètes : inflammabilité, corrosion, CSC, HEE",
+      "Fournir des résumés IA des normes BOK avec points clés",
+      "Vérification déterministe des limites NASA-STD-6016C",
+      "Évaluation de l'indice de Fragilisation Environnementale par Hydrogène (HEE)"
+    ],
+    "howToUse": [
+      "Sélectionner le type de fluide : Oxygène (O₂) ou Hydrogène (H₂)",
+      "Mode Navigation : Voir les matériaux groupés par cote de compatibilité",
+      "Mode Question : Entrer une requête en langage naturel (ex: 'acier inoxydable à 3000 PSI')",
+      "Examiner les 'Matériaux Recommandés' groupés par cote (A à X)",
+      "Vérifier le 'Guide des Normes' pour la documentation BOK avec résumés IA",
+      "Cliquer sur les matériaux pour voir toutes les cotes (INFLAM, CORR, CSC, HEE)"
+    ],
+    "useCases": [
+      "Quels matériaux ont la cote 'A' pour oxygène liquide à 3000 PSI ?",
+      "Que dit le BOK H₂ de NASA sur les alliages de titane ?",
+      "Trouver tous les matériaux avec excellente compatibilité hydrogène (A/B)",
+      "Quel est l'indice HEE pour Inconel 718 à 69 MPa ?",
+      "Quelles sont les considérations de sécurité pour l'aluminium en GOX ?"
+    ],
+    "tips": [
+      "Cote A = meilleur (haut héritage), Cote X = non approuvé - éviter",
+      "Les résultats BOK incluent des résumés IA avec points de sécurité clés",
+      "La recherche retourne les cotes de matériaux ET la documentation des normes",
+      "Pour H₂ : Indice HEE < 0.50 = Susceptibilité extrême, utiliser avec grande prudence",
+      "Pour O₂ : Vérifier les limites de pression - service dynamique a des limites plus basses",
+      "Utilisez des requêtes spécifiques : 'Ti-6Al-4V oxygène 3000 PSI' mieux que 'titane'"
+    ]
+  },
+  "testClasses": {
+    "title": "Classes & Méthodes de Test",
+    "description": "Explorer les données de test organisées par type (traction, compression, inflammabilité, etc.).",
+    "whatItDoes": [
+      "Grouper les données de test par type/méthode",
+      "Voir les statistiques de test (taille échantillon, moyenne, écart-type)",
+      "Voir quels matériaux ont été testés avec chaque méthode",
+      "Identifier les lacunes de données - matériaux manquant de tests spécifiques",
+      "Comparer les résultats de test entre matériaux"
+    ],
+    "howToUse": [
+      "Sélectionner une classe de test (ex: 'Traction', 'Compression')",
+      "Voir tous les tests de ce type avec statistiques sommaires",
+      "Cliquer sur un test spécifique pour voir les détails complets",
+      "Utiliser les filtres pour trouver des tests par date, installation ou plage de résultats",
+      "Exporter les données de test pour analyse statistique"
+    ],
+    "useCases": [
+      "Afficher tous les tests de traction pour alliages aérospatiaux",
+      "Quels matériaux ont des données de test d'inflammabilité ?",
+      "Comparer la résistance à la compression entre grades d'acier",
+      "Trouver les tests effectués ces 6 derniers mois"
+    ],
+    "tips": [
+      "Utiliser l'onglet 'Analyse des Lacunes' pour trouver les tests manquants",
+      "Trier par taille d'échantillon pour prioriser les matériaux bien caractérisés",
+      "Vérifier les dates de test - les données anciennes peuvent nécessiter revalidation"
+    ]
+  },
+  "miulBuilder": {
+    "title": "MIUL Builder",
+    "description": "Générer des Listes d'Identification d'Utilisation des Matériaux (MIUL) à partir de dessins d'ingénierie avec enrichissement MAPTIS automatisé.",
+    "whatItDoes": [
+      "Extraire les matériaux des dessins PDF avec vision IA",
+      "Auto-détecter les arborescences pour hiérarchie parent/enfant",
+      "Identifier hélicoils, finitions et quincaillerie intégrée (extraction 3 passes)",
+      "Rechercher les codes matériaux MAPTIS depuis les désignations",
+      "Remplir les colonnes d'évaluation NASA (INFLAM, CORR, CSC, TVS, TOX, SF)",
+      "Générer une sortie Excel conforme SSP 30234 / JSC 27301F"
+    ],
+    "howToUse": [
+      "Sélectionner la méthode de téléchargement : Dessins PDF, Fichier BOM ou MIUL Conforme",
+      "Pour MIUL Conforme : Télécharger tous les PDF incluant l'arborescence (auto-détectée)",
+      "Entrer le nom du programme pour identifier votre MIUL",
+      "Configurer l'environnement d'utilisation (pression, température, média) ou utiliser les défauts SLS",
+      "Cliquer 'Générer MIUL de Base' pour extraire les matériaux",
+      "Cliquer 'Enrichir avec Évaluations MAPTIS' pour remplir les colonnes",
+      "Cliquer 'Générer MUAs' pour les matériaux avec lacunes"
+    ],
+    "useCases": [
+      "Générer MIUL depuis dessins d'assemblage valve DMLLV",
+      "Construire une liste de matériaux conforme pour nouveau matériel de vol",
+      "Identifier tous les hélicoils et finitions dans un assemblage",
+      "Auto-remplir les évaluations MAPTIS pour 50+ matériaux en minutes"
+    ],
+    "tips": [
+      "Nommer votre PDF d'arborescence avec 'Drawing Tree' pour auto-détection",
+      "Utiliser l'onglet 'MIUL Conforme' pour meilleurs résultats - extraction 3 passes anti-hallucination",
+      "Le système extrait matériaux, hélicoils, finitions et quincaillerie en passes séparées",
+      "Code Matériau vide après enrichissement = pas de correspondance MAPTIS - recherche manuelle requise",
+      "Vérifier les quantités d'hélicoils - consolidés par taille de filetage par dessin parent"
+    ]
+  },
+  "muaGenerator": {
+    "title": "Générateur MUA",
+    "description": "Générer des Accords d'Utilisation des Matériaux pour matériaux avec lacunes selon NASA-STD-6016C.",
+    "whatItDoes": [
+      "Identifier les matériaux nécessitant des MUAs basés sur les lacunes",
+      "Router les matériaux vers les catégories MUA appropriées (Cat I, II, III, IV)",
+      "Rechercher le corpus MUA historique pour précédents applicables",
+      "Auto-générer la justification utilisant les correspondances de précédents",
+      "Formater les MUAs selon les modèles NASA-STD-6016C",
+      "Exporter les documents MUA pour révision et soumission"
+    ],
+    "howToUse": [
+      "Commencer avec un MIUL enrichi (depuis MIUL Builder avec évaluations)",
+      "Examiner les matériaux signalés pour exigence MUA",
+      "Sélectionner la catégorie de justification pour chaque matériau",
+      "Examiner la justification suggérée par IA basée sur les précédents",
+      "Éditer et approuver le contenu MUA",
+      "Exporter les documents MUA finaux"
+    ],
+    "useCases": [
+      "Générer des MUAs pour nouveaux matériaux de matériel de vol",
+      "Trouver des justifications de précédent du corpus MUA historique",
+      "Générer en lot les MUAs pour MIUL entier",
+      "Exporter le résumé MUA avec tous les matériaux et justifications"
+    ],
+    "tips": [
+      "Catégorie I = données testées disponibles, Catégorie IV = analyse/similarité requise",
+      "La recherche de précédent trouve des matériaux similaires avec MUAs approuvés existants",
+      "Les matériaux à haut héritage (nombreux tests) routent typiquement vers Catégorie I",
+      "Les matériaux nouveaux sans héritage nécessiteront analyse ingénierie (Cat III/IV)",
+      "Examiner soigneusement la justification générée par IA - c'est un point de départ, pas final"
+    ]
+  },
+  "gasCompatibility": {
+    "title": "Compatibilité Gaz",
+    "description": "Évaluer la compatibilité des matériaux pour environnements O₂/H₂, rechercher les normes NASA et voir les règles des familles de matériaux.",
+    "whatItDoes": [
+      "Évaluer les matériaux contre les environnements gaz O₂ et H₂",
+      "Valider les conditions opérationnelles (pression, température, phase) contre les limites",
+      "Rechercher le corpus O2 (NASA-STD-6016, NASA-STD-6001B, JSC-27301F)",
+      "Voir les classifications de familles de matériaux (approuvé, restreint, interdit)",
+      "Vérifier les seuils d'ignition pour service oxygène (GOX vs LOX)",
+      "Évaluer la susceptibilité à la fragilisation par hydrogène",
+      "Générer des rapports de compatibilité avec citations de preuves"
+    ],
+    "howToUse": [
+      "Vérification Compatibilité : Sélectionner O₂ ou H₂, entrer matériau, pression, température",
+      "Pour O₂ : Choisir la phase (GOX = gazeux, LOX = liquide/cryogénique)",
+      "Recherche Normes O2 : Interroger le corpus pour guide des normes",
+      "Familles de Matériaux : Voir les règles d'approbation NASA-STD-6016",
+      "Examiner la classification (OK, ATTENTION, INTERDIT) avec justification",
+      "Vérifier les preuves de support depuis données de test et normes"
+    ],
+    "useCases": [
+      "INCONEL 718 est-il approuvé pour LOX à 3000 PSI ?",
+      "Rechercher : 'température d'ignition aluminium oxygène'",
+      "Quelles familles de matériaux sont interdites pour service O₂ ?",
+      "Quels matériaux peuvent être utilisés pour GH2 à -423°F ?",
+      "Trouver le guide NASA sur les tests de combustion promue"
+    ],
+    "tips": [
+      "Pour O₂ : LOX a des limites plus strictes que GOX - toujours spécifier la phase",
+      "La classification est basée sur la famille de matériaux MAPTIS, pas la correspondance de chaînes",
+      "La recherche BOK O2 trouve des extraits des normes NASA avec scores de pertinence",
+      "Familles approuvées (acier austénitique, alliages nickel, cuivre) sont généralement sûres",
+      "Pour H₂ : Vérifier l'indice HEE - valeurs < 0.50 indiquent susceptibilité extrême",
+      "Les limites de pression sont souvent le facteur limitant pour compatibilité O₂"
+    ]
+  },
+  "complianceAnalysis": {
+    "title": "Analyse de Conformité NASA-STD-6016C",
+    "description": "Analyse de conformité complète contre les Exigences Matériaux et Processus (MPR) NASA-STD-6016C.",
+    "whatItDoes": [
+      "Évaluer les matériaux contre tous les MPR NASA-STD-6016C applicables",
+      "Identifier les lacunes de conformité nécessitant génération MUA ou révision ingénierie",
+      "Détecter la susceptibilité HEE (Fragilisation Environnementale par Hydrogène) pour service H₂",
+      "Vérifier la compatibilité oxygène et les exigences d'inflammabilité",
+      "Générer des contraintes opérationnelles pour conformité conditionnelle",
+      "Router les matériaux vers les catégories MUA appropriées basé sur l'analyse des lacunes"
+    ],
+    "howToUse": [
+      "Entrer la clé matériau (ex: 'SS316', 'Ti-6Al-4V', 'Inconel 718')",
+      "Optionnellement fournir le code MAPTIS pour recherche précise",
+      "Définir les conditions opérationnelles : pression (PSIA) et température (°F)",
+      "Spécifier la concentration O₂ si pertinent (défaut 21% ambiant)",
+      "Cocher 'Service Hydrogène' pour analyse environnement H₂",
+      "Cocher 'Environnement Habitable' pour exigences sécurité équipage",
+      "Cliquer 'Analyser Conformité' pour lancer l'évaluation"
+    ],
+    "useCases": [
+      "Certification matériau pré-vol pour nouveau matériel",
+      "Évaluer Ti-6Al-4V pour service GOX à 3000 PSIA",
+      "Vérifier la conformité acier inoxydable pour lignes propergol LH₂",
+      "Identifier les exigences MUA pour matériaux avec lacunes",
+      "Vérifier la conformité avant soumission des matériaux au MIUL"
+    ],
+    "tips": [
+      "Vert (Conforme) = le matériau satisfait tous les MPR avec données de test",
+      "Jaune (Contraintes) = conforme mais avec limites opérationnelles - examiner les contraintes",
+      "Rouge (Non-Conforme) = nécessite MUA ou substitution de matériau",
+      "Les lacunes critiques nécessitent attention immédiate - peuvent bloquer la certification",
+      "Bandes HEE : Extrême/Sévère = sévérité CRITIQUE, Haute = sévérité HAUTE",
+      "Pour service H₂, indice HEE < 0.50 indique susceptibilité extrême",
+      "Utiliser le code MAPTIS quand disponible pour recherche matériau la plus précise"
+    ]
+  },
+  "dtTreeEditor": {
+    "title": "Éditeur d'Arborescence des Dessins",
+    "description": "Éditeur visuel glisser-déposer pour corriger les relations hiérarchiques de l'arborescence des dessins.",
+    "whatItDoes": [
+      "Visualiser la hiérarchie de l'arborescence comme boîtes interactives",
+      "Glisser-déposer les nœuds pour changer les relations parent",
+      "Mettre à jour automatiquement les types de nœuds (ASSEMBLAGE vs DÉTAIL)",
+      "Suivre l'historique des modifications avec capacité d'annulation",
+      "Importer/exporter JSON en format plat avec pointeurs parent",
+      "Supporter les fichiers JSON format v3 plat et format imbriqué"
+    ],
+    "howToUse": [
+      "Cliquer 'Charger JSON' pour importer un résultat d'extraction d'arborescence",
+      "L'arborescence affiche toutes les pièces avec leur hiérarchie actuelle",
+      "Glisser n'importe quel nœud sur un autre pour le rendre enfant",
+      "La cible de dépôt se surligne en bleu au survol",
+      "Utiliser 'Annuler' pour revenir sur les changements un par un",
+      "Cliquer 'Exporter' pour sauvegarder la hiérarchie corrigée"
+    ],
+    "useCases": [
+      "Corriger les erreurs dans les hiérarchies d'arborescence extraites par IA",
+      "Corriger les assignations parent quand des pièces sont placées sous le mauvais assemblage",
+      "Déplacer les siblings incorrectement imbriqués sous les autres",
+      "Préparer le JSON corrigé pour entrée MIUL Builder"
+    ],
+    "tips": [
+      "Charger d'abord le JSON d'extraction v3 depuis l'extraction DT automatisée",
+      "Comparer avec le PDF pour identifier les nœuds mal placés",
+      "Les pièces avec enfants sont marquées ASSEMBLAGE, les feuilles sont DÉTAIL",
+      "Les types se mettent à jour automatiquement quand vous déplacez les nœuds",
+      "Utiliser Tout Développer pour voir l'arborescence complète avant corrections",
+      "Exporter le JSON corrigé et utiliser comme entrée 'drawing_tree' dans MIUL Builder"
+    ]
+  },
+  "mpPlan": {
+    "title": "Plan M&P",
+    "description": "Construire un plan Matériaux & Procédés traçable à partir des preuves MIUL, des contraintes d'environnement et des règles de conformité.",
+    "whatItDoes": [
+      "Crée une session de planification M&P structurée pour un programme et un matériel donnés",
+      "Capture les environnements d'utilisation (pression, température, O2%, drapeaux habitable/vide)",
+      "Relie les matériaux sélectionnés aux codes MAPTIS pour un traitement déterministe",
+      "Exécute l'analyse de conformité et bloque les écarts critiques non résolus",
+      "Génère des artefacts de plan pour revue et publication"
+    ],
+    "howToUse": [
+      "Démarrer une nouvelle session et définir le périmètre programme/matériel",
+      "Ajouter au moins un profil environnemental correspondant aux conditions attendues",
+      "Ajouter les matériaux, puis résoudre les codes MAPTIS pour chaque matériau",
+      "Lancer l'analyse et répondre aux questions bloquantes",
+      "Générer et télécharger les artefacts finaux du plan"
+    ],
+    "useCases": [
+      "Préparer un dossier de plan M&P pour un comité de revue",
+      "Évaluer si un ensemble de matériaux est acceptable en environnements oxygène/hydrogène",
+      "Documenter les risques de conformité avant les jalons PDR/CDR",
+      "Produire une traçabilité propre du MIUL jusqu'à la décision finale"
+    ],
+    "tips": [
+      "Considérez la définition d'environnement comme une donnée critique; les mauvaises sorties viennent souvent d'entrées incomplètes",
+      "Privilégiez les correspondances exactes de code MAPTIS avant finalisation",
+      "Résolvez les questions bloquantes avant de générer les artefacts",
+      "Utilisez l'artefact JSON exporté pour la traçabilité d'audit et les relances"
+    ]
+  },
+  "common": {
+    "whatItDoes": "Fonctionnalités",
+    "howToUse": "Mode d'Emploi",
+    "useCases": "Exemples d'Utilisation",
+    "tips": "Conseils et Bonnes Pratiques",
+    "relatedPages": "Pages Connexes",
+    "apiEndpoint": "Point d'Accès API"
+  }
+}

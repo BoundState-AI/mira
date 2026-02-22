@@ -1,0 +1,150 @@
+{
+  "title": "Test Classes",
+  "description": "Browse material test data organized by test type",
+  "loading": "Loading...",
+  "summary": "{{count}} test types | {{total}} total test records",
+  "recordsCount": "{{count}} records",
+  "search": "Search test classes...",
+  "noResults": "No test classes found",
+  "viewTests": "View Tests",
+  "testCount": "{{count}} tests",
+  "classes": {
+    "tvs-outgassing": {
+      "name": "TVS Outgassing",
+      "description": "Total mass loss and condensable volatile measurement"
+    },
+    "flammability": {
+      "name": "Flammability",
+      "description": "Upward and downward flame propagation ratings"
+    },
+    "mechanical-impact": {
+      "name": "Mechanical Impact",
+      "description": "Impact energy absorption and failure characteristics"
+    },
+    "toxicity": {
+      "name": "Toxicity",
+      "description": "Off-gassing toxicity measurements"
+    },
+    "stress-corrosion-cracking": {
+      "name": "Stress Corrosion Cracking",
+      "description": "Material susceptibility to stress corrosion"
+    },
+    "corrosion": {
+      "name": "Corrosion",
+      "description": "General corrosion resistance testing"
+    },
+    "fluid-compatibility": {
+      "name": "Fluid Compatibility",
+      "description": "Material compatibility with various fluids"
+    },
+    "odor": {
+      "name": "Odor",
+      "description": "Odor intensity ratings"
+    },
+    "flash-fire": {
+      "name": "Flash Fire",
+      "description": "Flash fire propagation characteristics"
+    },
+    "tensile-strength": {
+      "name": "Tensile Strength",
+      "description": "Tensile strength and elongation properties"
+    },
+    "pneumatic-impact": {
+      "name": "Pneumatic Impact",
+      "description": "Pneumatic impact resistance testing"
+    },
+    "promoted-combustion": {
+      "name": "Promoted Combustion",
+      "description": "Combustion promotion characteristics"
+    },
+    "particle-impact": {
+      "name": "Particle Impact",
+      "description": "Particle impact resistance"
+    },
+    "electrical-overload": {
+      "name": "Electrical Overload",
+      "description": "Electrical overload characteristics"
+    },
+    "vcm-optical": {
+      "name": "VCM Optical",
+      "description": "Volatile condensable material and optical properties"
+    },
+    "electric-wire-insulation": {
+      "name": "Electric Wire Insulation",
+      "description": "Wire insulation electrical properties"
+    },
+    "low-cycle-fatigue": {
+      "name": "Low Cycle Fatigue",
+      "description": "Low cycle fatigue resistance"
+    },
+    "fungus": {
+      "name": "Fungus",
+      "description": "Fungal resistance testing"
+    },
+    "fracture-mechanics": {
+      "name": "Fracture Mechanics",
+      "description": "Fracture toughness characteristics"
+    },
+    "creep-rupture": {
+      "name": "Creep Rupture",
+      "description": "Creep and rupture behavior"
+    },
+    "high-cycle-fatigue": {
+      "name": "High Cycle Fatigue",
+      "description": "High cycle fatigue resistance"
+    },
+    "friction-heat": {
+      "name": "Friction Heat",
+      "description": "Friction and heat generation characteristics"
+    },
+    "crack-growth": {
+      "name": "Crack Growth",
+      "description": "Crack propagation rates"
+    },
+    "arc-tracking": {
+      "name": "Arc Tracking",
+      "description": "Electrical arc tracking resistance"
+    }
+  },
+  "filters": {
+    "all": "All Classes",
+    "mechanical": "Mechanical",
+    "environmental": "Environmental",
+    "compatibility": "Compatibility",
+    "physical": "Physical"
+  },
+  "table": {
+    "materialCode": "Material Code",
+    "materialName": "Material Name",
+    "rating": "Rating",
+    "testedFluid": "Tested Fluid",
+    "testId": "Test ID",
+    "material": "Material",
+    "date": "Date",
+    "facility": "Facility",
+    "result": "Result",
+    "status": "Status"
+  },
+  "comingSoon": {
+    "title": "Coming Soon",
+    "unitAwareFilters": "Unit-aware filters (pressure, temperature, concentration)",
+    "statisticalSummaries": "Statistical summaries and distributions",
+    "interactivePlots": "Interactive plot builders",
+    "exportDatasets": "Export test datasets to CSV/JSON"
+  },
+  "detail": {
+    "unknownTestType": "Unknown test type",
+    "notFoundTitle": "Test Type Not Found",
+    "notFoundDescription": "The requested test type could not be found.",
+    "backToClasses": "Back to Test Classes",
+    "totalRecords": "{{count}} total records",
+    "searchPlaceholder": "Search materials...",
+    "loadingRecords": "Loading records...",
+    "noRecords": "No records found. Try adjusting your filters.",
+    "paginationSummary": "Showing {{start}} to {{end}} of {{total}} records",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {{page}} of {{total}}",
+    "reportTitle": "Test Record Report"
+  }
+}

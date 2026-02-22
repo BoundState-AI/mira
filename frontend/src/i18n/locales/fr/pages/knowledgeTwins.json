@@ -1,0 +1,74 @@
+{
+  "title": "Jumeaux de connaissances",
+  "description": "Évaluation de la compatibilité des matériaux O2/H2 basée sur les données NASA",
+  "fluidTypes": {
+    "oxygen": "Oxygène (O2)",
+    "hydrogen": "Hydrogène (H2)"
+  },
+  "modes": {
+    "browse": "Parcourir les matériaux",
+    "ask": "Poser une question"
+  },
+  "llm": {
+    "label": "LLM :",
+    "ollama": "Local (Ollama)",
+    "haiku": "Claude Haiku"
+  },
+  "search": {
+    "placeholderBrowse": "Rechercher la compatibilité {{fluid}} (ex: \"matériaux compatibles avec {{fluid}} à 20psi\")",
+    "placeholderAsk": "Poser une question sur la compatibilité {{fluid}} (ex: \"Puis-je utiliser l'aluminium en service {{fluid}} ?\")",
+    "buttonSearch": "Rechercher",
+    "buttonAsk": "Demander",
+    "searching": "Recherche...",
+    "thinking": "Réflexion..."
+  },
+  "errors": {
+    "searchError": "Erreur de recherche",
+    "questionError": "Erreur de question"
+  },
+  "results": {
+    "recommendedMaterials": "Matériaux recommandés",
+    "materialsDescription": "Matériaux avec évaluations de compatibilité {{fluid}} de la base MAPTIS",
+    "standardsGuidance": "Conseils normatifs",
+    "standardsDescription": "Documentation de support de la base de connaissances NASA {{fluid}}",
+    "noContent": "Aucun contenu disponible",
+    "noResults": "Aucun résultat trouvé",
+    "noResultsHint": "Essayez d'ajuster votre requête ou de changer de fluide"
+  },
+  "labels": {
+    "material": "matériau",
+    "materials": "matériaux"
+  },
+  "ratings": {
+    "A": { "label": "Excellent", "description": "Approuvé, héritage élevé" },
+    "B": { "label": "Bon", "description": "Approuvé, héritage modéré" },
+    "C": { "label": "Passable", "description": "Approuvé, héritage limité" },
+    "D": { "label": "Médiocre", "description": "Approuvé sous conditions" },
+    "X": { "label": "Échec", "description": "Non approuvé" },
+    "U": { "label": "Inconnu", "description": "Évaluation non disponible" }
+  },
+  "ratingLabels": {
+    "FLAMM": "FLAMM",
+    "CORR": "CORR",
+    "SCC": "SCC",
+    "TVS": "TVS"
+  },
+  "hybridResults": {
+    "decision": "Décision",
+    "miraAnalysis": "Analyse MIRA",
+    "extractedConstraints": "Contraintes extraites :",
+    "evidenceSummary": "Résumé des preuves",
+    "muaPrecedents": "Précédents MUA",
+    "testResults": "Résultats des tests",
+    "requirements": "Exigences",
+    "semanticResults": "Résultats sémantiques",
+    "highConfidence": "Haute confiance",
+    "insufficientData": "Données insuffisantes",
+    "materialDecisions": "Décisions de compatibilité des matériaux",
+    "confidence": "confiance",
+    "citations": "Citations :",
+    "semanticSearchResults": "Résultats de recherche sémantique",
+    "match": "correspondance"
+  },
+  "score": "Score"
+}

@@ -1,0 +1,156 @@
+{
+  "title": "MIULビルダー",
+  "description": "エンジニアリング図面から材料識別使用リストを生成",
+  "badge": "3パスAI抽出",
+  "tabs": {
+    "compliant": "コンプライアントMIUL",
+    "bom": "BOMアップロード",
+    "pdf": "PDF図面"
+  },
+  "environment": {
+    "title": "使用環境設定",
+    "description": "材料評価のための運用環境を設定",
+    "useDefaults": "SLSデフォルトを使用",
+    "h2Service": "H2サービス",
+    "o2Service": "O2サービス",
+    "pressure": "圧力 (PSIA)",
+    "pressurePlaceholder": "例：3000",
+    "temperature": "温度 (°F)",
+    "temperaturePlaceholder": "例：70",
+    "media": "媒体/流体",
+    "mediaPlaceholder": "例：GOX、LOX、GH2",
+    "o2Concentration": "O2濃度 (%)",
+    "habitableLocation": "居住可能区域",
+    "phase": "相",
+    "phases": {
+      "gas": "気体",
+      "liquid": "液体",
+      "cryogenic": "極低温"
+    }
+  },
+  "upload": {
+    "title": "ファイルアップロード",
+    "drawingTreeHint": "DTエディターから取得。正確なNHA/親子階層のために含めてください。",
+    "noDrawingTreeWarning": "DT JSONが未選択です。生成は階層精度が低下したモードで実行されます。",
+    "dragDrop": "ファイルをここにドラッグ＆ドロップ、またはクリックして参照",
+    "supportedFormats": "PDF図面とExcel BOMをサポート",
+    "drawingTree": "図面ツリー（自動検出）",
+    "drawings": "エンジニアリング図面",
+    "bom": "部品表",
+    "clear": "すべてクリア",
+    "filesSelected": "{{count}}ファイル選択済み"
+  },
+  "program": {
+    "title": "プログラム情報",
+    "name": "プログラム名",
+    "forExcel": "Excel出力用",
+    "namePlaceholder": "例：ORION、SLS、Gateway",
+    "hardware": "ハードウェア名",
+    "hardwarePlaceholder": "例：デュアルモーションバルブアセンブリ"
+  },
+  "steps": {
+    "upload": "アップロード",
+    "generate": "生成",
+    "enrich": "エンリッチ",
+    "muas": "MUA"
+  },
+  "stages": {
+    "uploadDetail": "開始するには図面PDFをアップロードしてください。図面ツリーJSONは任意ですが、正確な階層には推奨されます。",
+    "loadingReviewItems": "レビュー項目を読み込み中...",
+    "reviewDetail": "{{total}}件中{{open}}件に専門判断が必要です",
+    "approvedReady": "承認済み — MIUL生成の準備完了",
+    "builtSuccess": "MIULの生成とエクスポートが完了しました",
+    "reviewedReady": "すべての項目がレビュー済み — エンジニア承認待ち",
+    "exportReady": "承認済み — [Build] をクリックしてMIUL Excelを生成してください"
+  },
+  "generate": {
+    "title": "ベースMIULを生成",
+    "description": "AIビジョンを使用してアップロードされた図面から材料を抽出",
+    "button": "ベースMIULを生成",
+    "generating": "材料を抽出中...",
+    "progress": "{{percent}}% 完了",
+    "passInfo": {
+      "pass1": "パス1：図面から材料を抽出",
+      "pass2": "パス2：ヘリコイルとファスナーを識別",
+      "pass3": "パス3：仕上げとコーティングを検出"
+    }
+  },
+  "enrich": {
+    "title": "MAPTISレーティングでエンリッチ",
+    "description": "MAPTISコードを検索してレーティング列を入力",
+    "button": "MAPTISでエンリッチ",
+    "uploaded": "アップロード済みMIULをエンリッチ",
+    "enriching": "レーティングを検索中...",
+    "materialsFound": "{{count}}件の材料が見つかりました",
+    "ratingsPopulated": "{{count}}件のレーティングを入力",
+    "gapsIdentified": "{{count}}件のギャップを識別"
+  },
+  "muas": {
+    "title": "MUAを生成",
+    "description": "ギャップのある材料に対してMUAを生成",
+    "button": "MUAを生成",
+    "generating": "MUAを生成中...",
+    "required": "{{count}}件のMUAが必要",
+    "generated": "{{count}}件のMUAを生成"
+  },
+  "results": {
+    "title": "抽出結果",
+    "materials": "材料",
+    "helicoils": "ヘリコイル",
+    "finishes": "仕上げ",
+    "hardware": "ハードウェア",
+    "total": "合計アイテム",
+    "exportExcel": "Excelエクスポート",
+    "exportCsv": "CSVエクスポート",
+    "viewDetails": "詳細を表示"
+  },
+  "table": {
+    "partNumber": "部品番号",
+    "material": "材料",
+    "maptisCode": "MAPTISコード",
+    "quantity": "数量",
+    "parent": "親",
+    "flammability": "可燃性",
+    "corrosion": "腐食",
+    "scc": "SCC",
+    "tvs": "TVS",
+    "toxicity": "毒性",
+    "fluidSystems": "FS",
+    "o2Compat": "O2",
+    "status": "ステータス"
+  },
+  "status": {
+    "complete": "完了",
+    "partial": "部分的",
+    "needsEnrichment": "エンリッチが必要",
+    "needsMua": "MUAが必要",
+    "noMatch": "一致なし"
+  },
+  "toast": {
+    "filesUploaded": "{{count}}ファイルをアップロードしました",
+    "extractionComplete": "抽出完了：{{count}}件の材料が見つかりました",
+    "enrichmentComplete": "エンリッチ完了：{{count}}件のレーティングを入力",
+    "muasGenerated": "{{count}}件のMUAを生成しました",
+    "exportStarted": "エクスポートを開始しました",
+    "error": {
+      "noFiles": "最初にファイルをアップロードしてください",
+      "extractionFailed": "材料抽出に失敗しました",
+      "enrichmentFailed": "MAPTISエンリッチに失敗しました",
+      "muaFailed": "MUA生成に失敗しました",
+      "invalidFormat": "無効なファイル形式です"
+    }
+  },
+  "labels": {
+    "sensitive": "機密"
+  },
+  "messages": {
+    "autoPurge": "生成完了後、セッションデータはサーバーから自動削除されます"
+  },
+  "session": {
+    "recentSessions": "最近のセッション"
+  },
+  "info": {
+    "compliantMiul": "コンプライアントMIULは3パスAI抽出を使用して、材料、ヘリコイル、仕上げ、ハードウェアを識別し、アンチハルシネーション検証を行います。",
+    "drawingTreeTip": "ヒント：図面ツリーPDFのファイル名に「Drawing Tree」を含めると自動検出されます。"
+  }
+}

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Search,
   Sparkles,
@@ -49,6 +50,11 @@ const exampleQueries = [
 ];
 
 export default function MiraV4Query() {
+  const { t } = useTranslation("query");
+  const localizedExampleQueries = t("exampleQueries", {
+    returnObjects: true,
+    defaultValue: exampleQueries,
+  }) as string[];
   // Search state
   const [query, setQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -153,15 +159,17 @@ export default function MiraV4Query() {
         <div className="max-w-4xl mx-auto px-6 py-12">
           <div className="mb-8">
             <h1 className="text-4xl font-serif font-bold mb-1 text-balance flex items-center gap-3">
-              MIRA Query
+              {t("pageTitle", { defaultValue: "MIRA Query" })}
               {helpContent.query && <PageHelp content={helpContent.query} />}
             </h1>
             <p className="text-lg text-muted-foreground mb-1">
-              Decision Lineage Pipeline
+              {t("pageSubtitle", { defaultValue: "Decision Lineage Pipeline" })}
             </p>
             <p className="text-sm text-muted-foreground">
-              Evidence-first queries with transparent confidence scoring and
-              NASA-compliant audit trails
+              {t("pageDescription", {
+                defaultValue:
+                  "Evidence-first queries with transparent confidence scoring and NASA-compliant audit trails",
+              })}
             </p>
           </div>
 
@@ -173,7 +181,9 @@ export default function MiraV4Query() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                placeholder="Ask about material compatibility, properties, or safety..."
+                placeholder={t("placeholder", {
+                  defaultValue: "Ask about material compatibility, properties, or safety...",
+                })}
                 className="pl-10 h-12 text-base"
               />
             </div>
@@ -182,7 +192,9 @@ export default function MiraV4Query() {
               disabled={isSearching || !query.trim()}
               className="h-12 px-6"
             >
-              {isSearching ? "Analyzing..." : "Search"}
+              {isSearching
+                ? t("searching", { defaultValue: "Analyzing..." })
+                : t("search", { defaultValue: "Search" })}
             </Button>
           </div>
 
@@ -191,7 +203,7 @@ export default function MiraV4Query() {
             <CollapsibleTrigger asChild>
               <Button variant="ghost" size="sm" className="mb-3 text-xs gap-1">
                 <Sparkles className="h-3.5 w-3.5" />
-                Advanced Environment
+                {t("advancedEnvironment", { defaultValue: "Advanced Environment" })}
                 {showAdvanced ? (
                   <ChevronUp className="h-3 w-3" />
                 ) : (
@@ -203,7 +215,9 @@ export default function MiraV4Query() {
               <Card className="p-4 mb-3">
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <Label className="text-xs">Temperature (C)</Label>
+                    <Label className="text-xs">
+                      {t("environment.temperature", { defaultValue: "Temperature (C)" })}
+                    </Label>
                     <Input
                       type="number"
                       value={temperatureC}
@@ -213,7 +227,9 @@ export default function MiraV4Query() {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs">Pressure (kPa)</Label>
+                    <Label className="text-xs">
+                      {t("environment.pressure", { defaultValue: "Pressure (kPa)" })}
+                    </Label>
                     <Input
                       type="number"
                       value={pressureKpa}
@@ -223,7 +239,9 @@ export default function MiraV4Query() {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs">O2 %</Label>
+                    <Label className="text-xs">
+                      {t("environment.o2", { defaultValue: "O2 %" })}
+                    </Label>
                     <Input
                       type="number"
                       value={o2Pct}
@@ -233,7 +251,9 @@ export default function MiraV4Query() {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs">Fluid Medium</Label>
+                    <Label className="text-xs">
+                      {t("environment.fluid", { defaultValue: "Fluid Medium" })}
+                    </Label>
                     <Input
                       value={fluidMedium}
                       onChange={(e) => setFluidMedium(e.target.value)}
@@ -242,7 +262,9 @@ export default function MiraV4Query() {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs">Duration (hrs)</Label>
+                    <Label className="text-xs">
+                      {t("environment.duration", { defaultValue: "Duration (hrs)" })}
+                    </Label>
                     <Input
                       type="number"
                       value={durationHr}
@@ -252,7 +274,9 @@ export default function MiraV4Query() {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs">Cycles</Label>
+                    <Label className="text-xs">
+                      {t("environment.cycles", { defaultValue: "Cycles" })}
+                    </Label>
                     <Input
                       type="number"
                       value={cycles}
@@ -268,7 +292,7 @@ export default function MiraV4Query() {
 
           {/* Example queries */}
           <div className="flex flex-wrap gap-2">
-            {exampleQueries.map((example, i) => (
+            {localizedExampleQueries.map((example, i) => (
               <Button
                 key={i}
                 variant="ghost"
@@ -312,9 +336,13 @@ export default function MiraV4Query() {
         {!result && !isSearching && !error && (
           <div className="text-center py-16">
             <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-medium mb-2">No search yet</h3>
+            <h3 className="text-lg font-medium mb-2">
+              {t("noSearch.title", { defaultValue: "No search yet" })}
+            </h3>
             <p className="text-muted-foreground text-sm">
-              Try one of the example queries above to get started
+              {t("noSearch.hint", {
+                defaultValue: "Try one of the example queries above to get started",
+              })}
             </p>
           </div>
         )}
@@ -385,8 +413,14 @@ export default function MiraV4Query() {
                   onClick={() => setShowFullMaterialPool((prev) => !prev)}
                 >
                   {showFullMaterialPool
-                    ? `Show answer evidence (${focusedMaterials.length})`
-                    : `Show full pool (${fullMaterials.length})`}
+                    ? t("buttons.showAnswerEvidence", {
+                        count: focusedMaterials.length,
+                        defaultValue: `Show answer evidence (${focusedMaterials.length})`,
+                      })
+                    : t("buttons.showFullPool", {
+                        count: fullMaterials.length,
+                        defaultValue: `Show full pool (${fullMaterials.length})`,
+                      })}
                 </Button>
               )}
             </div>
@@ -399,7 +433,7 @@ export default function MiraV4Query() {
           result.material_families.length > 0 && (
             <div className="flex items-center gap-2 mb-3 text-sm text-muted-foreground">
               <Sparkles className="h-3.5 w-3.5 shrink-0" />
-              <span>Searched for:</span>
+              <span>{t("searchedFor", { defaultValue: "Searched for:" })}</span>
               {result.material_families.map((family, i) => (
                 <Badge
                   key={i}
@@ -463,11 +497,11 @@ export default function MiraV4Query() {
               <TabsList className="mb-4">
                 <TabsTrigger value="cards" className="gap-2">
                   <List className="h-4 w-4" />
-                  Cards
+                  {t("results.cards", { defaultValue: "Cards" })}
                 </TabsTrigger>
                 <TabsTrigger value="table" className="gap-2">
                   <TableIcon className="h-4 w-4" />
-                  Table
+                  {t("results.table", { defaultValue: "Table" })}
                 </TabsTrigger>
               </TabsList>
 
@@ -512,13 +546,13 @@ export default function MiraV4Query() {
                           {o2Compat && (
                             <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 text-xs gap-1">
                               <ShieldCheck className="h-3 w-3" />
-                              O₂ Compatible
+                              {t("table.o2Compatible", { defaultValue: "O₂ Compatible" })}
                             </Badge>
                           )}
                           {hasMua && (
                             <Badge className="bg-blue-100 text-blue-800 border-blue-200 text-xs gap-1">
                               <Award className="h-3 w-3" />
-                              MUA
+                              {t("table.mua", { defaultValue: "MUA" })}
                             </Badge>
                           )}
                           {totalTests > 0 && (
@@ -553,7 +587,7 @@ export default function MiraV4Query() {
                       {/* Temperature range - show both F and C */}
                       {(mat.use_temp_min_f != null || mat.use_temp_max_f != null) && (
                         <p className="text-sm text-muted-foreground mb-3">
-                          Temp: {mat.use_temp_min_c ?? "—"}°C to {mat.use_temp_max_c ?? "—"}°C
+                          {t("results.temp", { defaultValue: "Temp" })}: {mat.use_temp_min_c ?? "—"}°C to {mat.use_temp_max_c ?? "—"}°C
                           <span className="ml-2 text-xs opacity-60">
                             ({mat.use_temp_min_f ?? "—"}°F to {mat.use_temp_max_f ?? "—"}°F)
                           </span>
@@ -563,14 +597,16 @@ export default function MiraV4Query() {
                       {totalTests === 0 && (
                         <p className="text-xs text-amber-600 mb-3 flex items-center gap-1">
                           <Shield className="h-3 w-3" />
-                          No direct test data in MAPTIS
+                          {t("messages.noDirectTestData", {
+                            defaultValue: "No direct test data in MAPTIS",
+                          })}
                         </p>
                       )}
 
                       <div className="flex items-center gap-4 text-sm">
                         <Button variant="link" className="h-auto p-0 gap-1">
                           <Eye className="h-3.5 w-3.5" />
-                          View details
+                          {t("results.viewDetails", { defaultValue: "View details" })}
                         </Button>
                       </div>
                     </Card>
@@ -584,25 +620,25 @@ export default function MiraV4Query() {
                     <thead>
                       <tr className="border-b bg-muted/50">
                         <th className="text-left px-4 py-2 font-medium">
-                          Material
+                          {t("table.materialName", { defaultValue: "Material" })}
                         </th>
                         <th className="text-left px-4 py-2 font-medium">
-                          Code
+                          {t("results.code", { defaultValue: "Code" })}
                         </th>
                         <th className="text-left px-4 py-2 font-medium">
-                          Type
+                          {t("table.type", { defaultValue: "Type" })}
                         </th>
                         <th className="text-right px-4 py-2 font-medium">
-                          Tests
+                          {t("table.tests", { defaultValue: "Tests" })}
                         </th>
                         <th className="text-center px-4 py-2 font-medium">
                           O₂
                         </th>
                         <th className="text-center px-4 py-2 font-medium">
-                          MUA
+                          {t("table.mua", { defaultValue: "MUA" })}
                         </th>
                         <th className="text-right px-4 py-2 font-medium">
-                          Latest
+                          {t("table.latest", { defaultValue: "Latest" })}
                         </th>
                         <th className="text-right px-4 py-2 font-medium">
                           Temp (°C)
@@ -675,7 +711,9 @@ export default function MiraV4Query() {
         {showResults && !dirtyRefuse && displayedMaterials.length === 0 && (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-sm">
-              No materials found for this query.
+              {t("results.noResults", {
+                defaultValue: "No materials found for this query.",
+              })}
             </p>
           </div>
         )}

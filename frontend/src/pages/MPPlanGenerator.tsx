@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -46,6 +47,7 @@ import {
   type MaptisSearchResult,
   type MPPlanComputeResult,
 } from '@/lib/api';
+import helpContent from '@/config/helpContent';
 
 type Step = 'setup' | 'environment' | 'materials' | 'analysis' | 'generate';
 
@@ -90,6 +92,7 @@ const QUESTION_TYPE_LABELS: Record<string, { label: string; color: string }> = {
 };
 
 export default function MPPlanGenerator() {
+  const { t } = useTranslation(['mpPlanGenerator', 'common']);
   // Step state
   const [step, setStep] = useState<Step>('setup');
   const [loading, setLoading] = useState(false);
@@ -404,22 +407,26 @@ export default function MPPlanGenerator() {
   return (
     <div>
       <PageHeader
-        title="M&P Plan Generator"
-        description="Generate Materials & Processes Plans with automated NASA-STD-6016C compliance analysis"
+        title={t('title', { ns: 'mpPlanGenerator', defaultValue: 'M&P Plan Generator' })}
+        description={t('description', {
+          ns: 'mpPlanGenerator',
+          defaultValue: 'Generate Materials & Processes Plans with automated NASA-STD-6016C compliance analysis',
+        })}
+        helpContent={helpContent.mpPlan}
       />
 
       {/* Progress Steps */}
       <div className="mb-8">
         <div className="flex items-center gap-2 text-sm">
-          <StepIndicator step="setup" currentStep={step} label="1. Setup" />
+          <StepIndicator step="setup" currentStep={step} label={`1. ${t('wizard.steps.setup', { ns: 'mpPlanGenerator', defaultValue: 'Setup' })}`} />
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          <StepIndicator step="environment" currentStep={step} label="2. Environment" />
+          <StepIndicator step="environment" currentStep={step} label={`2. ${t('wizard.steps.environment', { ns: 'mpPlanGenerator', defaultValue: 'Environment' })}`} />
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          <StepIndicator step="materials" currentStep={step} label="3. Materials" />
+          <StepIndicator step="materials" currentStep={step} label={`3. ${t('wizard.steps.materials', { ns: 'mpPlanGenerator', defaultValue: 'Materials' })}`} />
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          <StepIndicator step="analysis" currentStep={step} label="4. Analysis" />
+          <StepIndicator step="analysis" currentStep={step} label={`4. ${t('wizard.steps.analysis', { ns: 'mpPlanGenerator', defaultValue: 'Analysis' })}`} />
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          <StepIndicator step="generate" currentStep={step} label="5. Generate" />
+          <StepIndicator step="generate" currentStep={step} label={`5. ${t('wizard.steps.generate', { ns: 'mpPlanGenerator', defaultValue: 'Generate' })}`} />
         </div>
       </div>
 
@@ -435,27 +442,36 @@ export default function MPPlanGenerator() {
       {step === 'setup' && (
         <Card>
           <CardHeader>
-            <CardTitle>Create New M&P Plan Session</CardTitle>
+            <CardTitle>{t('session.title', { ns: 'mpPlanGenerator', defaultValue: 'Create New M&P Plan Session' })}</CardTitle>
             <CardDescription>
-              Enter program details to start a NASA-STD-6016C compliance session
+              {t('session.description', {
+                ns: 'mpPlanGenerator',
+                defaultValue: 'Enter program details to start a NASA-STD-6016C compliance session',
+              })}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="programName">Program Name *</Label>
+                <Label htmlFor="programName">{t('session.programName', { ns: 'mpPlanGenerator', defaultValue: 'Program Name *' })}</Label>
                 <Input
                   id="programName"
-                  placeholder="e.g., Artemis II, ISS Resupply"
+                  placeholder={t('session.programPlaceholder', {
+                    ns: 'mpPlanGenerator',
+                    defaultValue: 'e.g., Artemis II, ISS Resupply',
+                  })}
                   value={programName}
                   onChange={(e) => setProgramName(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="programPhase">Program Phase</Label>
+                <Label htmlFor="programPhase">{t('session.programPhase', { ns: 'mpPlanGenerator', defaultValue: 'Program Phase' })}</Label>
                 <Select value={programPhase} onValueChange={setProgramPhase}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select phase..." />
+                    <SelectValue placeholder={t('session.programPhasePlaceholder', {
+                      ns: 'mpPlanGenerator',
+                      defaultValue: 'Select phase...',
+                    })} />
                   </SelectTrigger>
                   <SelectContent>
                     {PROGRAM_PHASES.map((phase) => (
@@ -470,7 +486,7 @@ export default function MPPlanGenerator() {
 
             <Button onClick={handleCreateSession} disabled={loading || !programName}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create Session
+              {t('session.startSession', { ns: 'mpPlanGenerator', defaultValue: 'Create Session' })}
             </Button>
           </CardContent>
         </Card>
@@ -484,16 +500,21 @@ export default function MPPlanGenerator() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Thermometer className="h-5 w-5" />
-              Define Service Environment
+              {t('environment.title', { ns: 'mpPlanGenerator', defaultValue: 'Define Service Environment' })}
             </CardTitle>
             <CardDescription>
-              Define one or more environments where materials will be used
+              {t('environment.description', {
+                ns: 'mpPlanGenerator',
+                defaultValue: 'Define one or more environments where materials will be used',
+              })}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             {/* Quick-fill presets */}
             <div>
-              <Label className="text-sm font-medium mb-2 block">Quick Fill</Label>
+              <Label className="text-sm font-medium mb-2 block">
+                {t('environment.quickFill', { ns: 'mpPlanGenerator', defaultValue: 'Quick Fill' })}
+              </Label>
               <div className="flex flex-wrap gap-2">
                 {ENV_PRESETS.map((preset) => (
                   <Button
@@ -513,15 +534,22 @@ export default function MPPlanGenerator() {
             <div className="space-y-3">
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1">
-                  <Label className="text-xs">Environment Name *</Label>
+                  <Label className="text-xs">
+                    {t('environment.name', { ns: 'mpPlanGenerator', defaultValue: 'Environment Name *' })}
+                  </Label>
                   <Input
-                    placeholder="e.g., ISS Habitable Volume"
+                    placeholder={t('environment.namePlaceholder', {
+                      ns: 'mpPlanGenerator',
+                      defaultValue: 'e.g., ISS Habitable Volume',
+                    })}
                     value={envName}
                     onChange={(e) => setEnvName(e.target.value)}
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-xs">O₂ Concentration (%)</Label>
+                  <Label className="text-xs">
+                    {t('environment.o2', { ns: 'mpPlanGenerator', defaultValue: 'O₂ Concentration (%)' })}
+                  </Label>
                   <Input
                     type="number"
                     step="0.1"
@@ -532,7 +560,9 @@ export default function MPPlanGenerator() {
               </div>
               <div className="grid gap-3 sm:grid-cols-3">
                 <div className="space-y-1">
-                  <Label className="text-xs">Pressure (psia)</Label>
+                  <Label className="text-xs">
+                    {t('environment.pressure', { ns: 'mpPlanGenerator', defaultValue: 'Pressure (psia)' })}
+                  </Label>
                   <Input
                     type="number"
                     step="0.1"
@@ -541,7 +571,9 @@ export default function MPPlanGenerator() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-xs">Temp Min (°C)</Label>
+                  <Label className="text-xs">
+                    {t('environment.tempMin', { ns: 'mpPlanGenerator', defaultValue: 'Temp Min (°C)' })}
+                  </Label>
                   <Input
                     type="number"
                     value={envTempMin}
@@ -549,7 +581,9 @@ export default function MPPlanGenerator() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-xs">Temp Max (°C)</Label>
+                  <Label className="text-xs">
+                    {t('environment.tempMax', { ns: 'mpPlanGenerator', defaultValue: 'Temp Max (°C)' })}
+                  </Label>
                   <Input
                     type="number"
                     value={envTempMax}
@@ -565,7 +599,7 @@ export default function MPPlanGenerator() {
                     onChange={(e) => setEnvHabitable(e.target.checked)}
                     className="rounded"
                   />
-                  Habitable
+                  {t('environment.habitable', { ns: 'mpPlanGenerator', defaultValue: 'Habitable' })}
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer text-sm">
                   <input
@@ -574,7 +608,7 @@ export default function MPPlanGenerator() {
                     onChange={(e) => setEnvVacuum(e.target.checked)}
                     className="rounded"
                   />
-                  Vacuum Exposure
+                  {t('environment.vacuum', { ns: 'mpPlanGenerator', defaultValue: 'Vacuum Exposure' })}
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer text-sm">
                   <input
@@ -583,7 +617,7 @@ export default function MPPlanGenerator() {
                     onChange={(e) => setEnvLunarDust(e.target.checked)}
                     className="rounded"
                   />
-                  Lunar Dust
+                  {t('environment.lunarDust', { ns: 'mpPlanGenerator', defaultValue: 'Lunar Dust' })}
                 </label>
               </div>
             </div>
@@ -591,13 +625,15 @@ export default function MPPlanGenerator() {
             <Button onClick={handleAddEnvironment} disabled={loading || !envName} variant="outline">
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               <Plus className="mr-2 h-4 w-4" />
-              Add Environment
+              {t('environment.add', { ns: 'mpPlanGenerator', defaultValue: 'Add Environment' })}
             </Button>
 
             {/* Added environments */}
             {addedEnvironments.length > 0 && (
               <div className="space-y-2">
-                <Label className="text-sm font-medium">Added Environments</Label>
+                <Label className="text-sm font-medium">
+                  {t('environment.added', { ns: 'mpPlanGenerator', defaultValue: 'Added Environments' })}
+                </Label>
                 <div className="flex flex-wrap gap-2">
                   {addedEnvironments.map((env) => (
                     <Badge key={env.environment_id} variant="secondary" className="py-1 px-3 text-xs">
@@ -610,16 +646,16 @@ export default function MPPlanGenerator() {
             )}
 
             <div className="flex gap-3 pt-4 border-t">
-              <Button
-                onClick={() => setStep('materials')}
-                disabled={addedEnvironments.length === 0}
-              >
-                Continue to Materials
-              </Button>
-              <Button variant="ghost" onClick={() => setStep('setup')}>
-                Back
-              </Button>
-            </div>
+                <Button
+                  onClick={() => setStep('materials')}
+                  disabled={addedEnvironments.length === 0}
+                >
+                  {t('environment.continue', { ns: 'mpPlanGenerator', defaultValue: 'Continue to Materials' })}
+                </Button>
+                <Button variant="ghost" onClick={() => setStep('setup')}>
+                  {t('buttons.back', { ns: 'common', defaultValue: 'Back' })}
+                </Button>
+              </div>
           </CardContent>
         </Card>
       )}
@@ -630,9 +666,12 @@ export default function MPPlanGenerator() {
       {step === 'materials' && session && (
         <Card>
           <CardHeader>
-            <CardTitle>Add Materials</CardTitle>
+            <CardTitle>{t('materials.title', { ns: 'mpPlanGenerator', defaultValue: 'Add Materials' })}</CardTitle>
             <CardDescription>
-              Enter material names — MAPTIS codes will be automatically looked up
+              {t('materials.description', {
+                ns: 'mpPlanGenerator',
+                defaultValue: 'Enter material names — MAPTIS codes will be automatically looked up',
+              })}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -641,10 +680,15 @@ export default function MPPlanGenerator() {
                 <div key={material.id} className="space-y-2">
                   <div className="grid gap-3 sm:grid-cols-5 items-end">
                     <div className="space-y-1 relative">
-                      {index === 0 && <Label className="text-xs">Material Name *</Label>}
+                      {index === 0 && <Label className="text-xs">
+                        {t('materials.columns.material', { ns: 'mpPlanGenerator', defaultValue: 'Material Name *' })}
+                      </Label>}
                       <div className="relative">
                         <Input
-                          placeholder="e.g., Kapton, Viton A, 316L"
+                          placeholder={t('materials.materialPlaceholder', {
+                            ns: 'mpPlanGenerator',
+                            defaultValue: 'e.g., Kapton, Viton A, 316L',
+                          })}
                           value={material.name}
                           onChange={(e) => updateMaterial(material.id, 'name', e.target.value)}
                         />
@@ -654,15 +698,22 @@ export default function MPPlanGenerator() {
                       </div>
                     </div>
                     <div className="space-y-1">
-                      {index === 0 && <Label className="text-xs">Application</Label>}
+                      {index === 0 && <Label className="text-xs">
+                        {t('materials.application', { ns: 'mpPlanGenerator', defaultValue: 'Application' })}
+                      </Label>}
                       <Input
-                        placeholder="e.g., Insulation, O-Ring"
+                        placeholder={t('materials.applicationPlaceholder', {
+                          ns: 'mpPlanGenerator',
+                          defaultValue: 'e.g., Insulation, O-Ring',
+                        })}
                         value={material.application}
                         onChange={(e) => updateMaterial(material.id, 'application', e.target.value)}
                       />
                     </div>
                     <div className="space-y-1">
-                      {index === 0 && <Label className="text-xs">Quantity</Label>}
+                      {index === 0 && <Label className="text-xs">
+                        {t('materials.quantity', { ns: 'mpPlanGenerator', defaultValue: 'Quantity' })}
+                      </Label>}
                       <Input
                         type="number"
                         min="1"
@@ -673,9 +724,14 @@ export default function MPPlanGenerator() {
                       />
                     </div>
                     <div className="space-y-1">
-                      {index === 0 && <Label className="text-xs">MAPTIS Code</Label>}
+                      {index === 0 && <Label className="text-xs">
+                        {t('materials.maptisCode', { ns: 'mpPlanGenerator', defaultValue: 'MAPTIS Code' })}
+                      </Label>}
                       <Input
-                        placeholder="Auto-lookup"
+                        placeholder={t('materials.maptisPlaceholder', {
+                          ns: 'mpPlanGenerator',
+                          defaultValue: 'Auto-lookup',
+                        })}
                         value={material.maptis_code}
                         onChange={(e) => updateMaterial(material.id, 'maptis_code', e.target.value)}
                         className={material.maptis_code ? 'bg-green-50 border-green-300' : ''}
@@ -698,7 +754,11 @@ export default function MPPlanGenerator() {
                     <div className="ml-0 p-2 bg-blue-50 border border-blue-200 rounded-md">
                       <p className="text-xs text-blue-700 mb-1 flex items-center gap-1">
                         <Search className="h-3 w-3" />
-                        Found {maptisSearchResults[material.id].length} MAPTIS match(es):
+                        {t('materials.matchesFound', {
+                          ns: 'mpPlanGenerator',
+                          defaultValue: 'Found {{count}} MAPTIS match(es):',
+                          count: maptisSearchResults[material.id].length,
+                        })}
                       </p>
                       <div className="flex flex-wrap gap-1">
                         {maptisSearchResults[material.id].map((result, i) => (
@@ -724,16 +784,16 @@ export default function MPPlanGenerator() {
 
             <Button variant="outline" onClick={addMaterialRow}>
               <Plus className="mr-2 h-4 w-4" />
-              Add Material
+              {t('materials.add', { ns: 'mpPlanGenerator', defaultValue: 'Add Material' })}
             </Button>
 
             <div className="flex gap-3 pt-4 border-t">
               <Button onClick={handleAddMaterials} disabled={loading}>
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Compute Compliance
+                {t('analysis.compute', { ns: 'mpPlanGenerator', defaultValue: 'Compute Compliance' })}
               </Button>
               <Button variant="ghost" onClick={() => setStep('environment')}>
-                Back
+                {t('buttons.back', { ns: 'common', defaultValue: 'Back' })}
               </Button>
             </div>
           </CardContent>
@@ -751,36 +811,36 @@ export default function MPPlanGenerator() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Shield className="h-5 w-5" />
-                  Compliance Analysis
+                  {t('analysis.title', { ns: 'mpPlanGenerator', defaultValue: 'Compliance Analysis' })}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-3 sm:grid-cols-5">
                   <div className="text-center p-3 bg-muted rounded-lg">
                     <div className="text-xl font-bold">{computeResult.materials}</div>
-                    <div className="text-xs text-muted-foreground">Materials</div>
+                    <div className="text-xs text-muted-foreground">{t('materials.title', { ns: 'mpPlanGenerator', defaultValue: 'Materials' })}</div>
                   </div>
                   <div className="text-center p-3 bg-muted rounded-lg">
                     <div className="text-xl font-bold">{computeResult.environments}</div>
-                    <div className="text-xs text-muted-foreground">Environments</div>
+                    <div className="text-xs text-muted-foreground">{t('analysis.environments', { ns: 'mpPlanGenerator', defaultValue: 'Environments' })}</div>
                   </div>
                   <div className="text-center p-3 bg-muted rounded-lg">
                     <div className="text-xl font-bold">{computeResult.determinations}</div>
-                    <div className="text-xs text-muted-foreground">Determinations</div>
+                    <div className="text-xs text-muted-foreground">{t('analysis.determinations', { ns: 'mpPlanGenerator', defaultValue: 'Determinations' })}</div>
                   </div>
                   <div className="text-center p-3 bg-muted rounded-lg">
                     <div className="text-xl font-bold text-red-600">{computeResult.nonconformances}</div>
-                    <div className="text-xs text-muted-foreground">Nonconformances</div>
+                    <div className="text-xs text-muted-foreground">{t('analysis.nonconformances', { ns: 'mpPlanGenerator', defaultValue: 'Nonconformances' })}</div>
                   </div>
                   <div className="text-center p-3 bg-muted rounded-lg">
                     <div className="text-xl font-bold text-amber-600">{computeResult.hitl_required}</div>
-                    <div className="text-xs text-muted-foreground">HITL Required</div>
+                    <div className="text-xs text-muted-foreground">{t('analysis.hitlRequired', { ns: 'mpPlanGenerator', defaultValue: 'HITL Required' })}</div>
                   </div>
                 </div>
 
                 {session.blockers.length > 0 && (
                   <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p className="text-sm font-medium text-yellow-800">Blockers:</p>
+                    <p className="text-sm font-medium text-yellow-800">{t('analysis.blockers', { ns: 'mpPlanGenerator', defaultValue: 'Blockers:' })}</p>
                     <ul className="text-sm text-yellow-700 list-disc list-inside">
                       {session.blockers.map((blocker, i) => (
                         <li key={i}>{blocker}</li>
@@ -795,23 +855,29 @@ export default function MPPlanGenerator() {
           {/* Blocking Questions */}
           <Card>
             <CardHeader>
-              <CardTitle>Blocking Questions</CardTitle>
+              <CardTitle>{t('analysis.questionsTitle', { ns: 'mpPlanGenerator', defaultValue: 'Blocking Questions' })}</CardTitle>
               <CardDescription>
-                Answer these questions to resolve compliance gaps and proceed to generation
+                {t('analysis.questionsDescription', {
+                  ns: 'mpPlanGenerator',
+                  defaultValue: 'Answer these questions to resolve compliance gaps and proceed to generation',
+                })}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {questions.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   <CheckCircle className="h-12 w-12 mx-auto mb-3 text-green-500" />
-                  <p className="font-medium">All questions resolved!</p>
+                  <p className="font-medium">{t('analysis.allResolved', { ns: 'mpPlanGenerator', defaultValue: 'All questions resolved!' })}</p>
                   {session.can_generate ? (
                     <Button onClick={() => setStep('generate')} className="mt-4">
-                      Proceed to Generate
+                      {t('generate.proceed', { ns: 'mpPlanGenerator', defaultValue: 'Proceed to Generate' })}
                     </Button>
                   ) : (
                     <p className="text-sm mt-2">
-                      Generation is still blocked. Check blockers above.
+                      {t('generate.blockedHint', {
+                        ns: 'mpPlanGenerator',
+                        defaultValue: 'Generation is still blocked. Check blockers above.',
+                      })}
                     </p>
                   )}
                 </div>
@@ -843,7 +909,10 @@ export default function MPPlanGenerator() {
                               }
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder="Select an option..." />
+                                <SelectValue placeholder={t('analysis.selectOption', {
+                                  ns: 'mpPlanGenerator',
+                                  defaultValue: 'Select an option...',
+                                })} />
                               </SelectTrigger>
                               <SelectContent>
                                 {question.options.map((option) => (
@@ -855,7 +924,10 @@ export default function MPPlanGenerator() {
                             </Select>
                           ) : (
                             <Input
-                              placeholder="Enter your answer..."
+                              placeholder={t('analysis.answerPlaceholder', {
+                                ns: 'mpPlanGenerator',
+                                defaultValue: 'Enter your answer...',
+                              })}
                               value={answers[question.question_id] || ''}
                               onChange={(e) =>
                                 setAnswers({ ...answers, [question.question_id]: e.target.value })
@@ -869,7 +941,7 @@ export default function MPPlanGenerator() {
                             size="sm"
                           >
                             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Submit Answer
+                            {t('analysis.submitAnswer', { ns: 'mpPlanGenerator', defaultValue: 'Submit Answer' })}
                           </Button>
                         </div>
                       </CardContent>
@@ -882,7 +954,7 @@ export default function MPPlanGenerator() {
 
           <div className="flex gap-3">
             <Button variant="ghost" onClick={() => setStep('materials')}>
-              Back to Materials
+              {t('analysis.backToMaterials', { ns: 'mpPlanGenerator', defaultValue: 'Back to Materials' })}
             </Button>
           </div>
         </div>
@@ -902,15 +974,15 @@ export default function MPPlanGenerator() {
               <div className="grid gap-4 sm:grid-cols-4">
                 <div className="text-center p-4 bg-muted rounded-lg">
                   <div className="text-2xl font-bold">{session.material_count}</div>
-                  <div className="text-sm text-muted-foreground">Materials</div>
+                  <div className="text-sm text-muted-foreground">{t('materials.title', { ns: 'mpPlanGenerator', defaultValue: 'Materials' })}</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
                   <div className="text-2xl font-bold">{session.environment_count || addedEnvironments.length}</div>
-                  <div className="text-sm text-muted-foreground">Environments</div>
+                  <div className="text-sm text-muted-foreground">{t('analysis.environments', { ns: 'mpPlanGenerator', defaultValue: 'Environments' })}</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
                   <div className="text-2xl font-bold">{session.nonconformance_count}</div>
-                  <div className="text-sm text-muted-foreground">Gaps Found</div>
+                  <div className="text-sm text-muted-foreground">{t('generate.gapsFound', { ns: 'mpPlanGenerator', defaultValue: 'Gaps Found' })}</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
                   <div className="flex items-center justify-center gap-2">
@@ -920,16 +992,18 @@ export default function MPPlanGenerator() {
                       <AlertCircle className="h-5 w-5 text-yellow-500" />
                     )}
                     <span className="text-sm">
-                      {session.can_generate ? 'Ready' : 'Blocked'}
+                      {session.can_generate
+                        ? t('generate.ready', { ns: 'mpPlanGenerator', defaultValue: 'Ready' })
+                        : t('generate.blocked', { ns: 'mpPlanGenerator', defaultValue: 'Blocked' })}
                     </span>
                   </div>
-                  <div className="text-sm text-muted-foreground">Status</div>
+                  <div className="text-sm text-muted-foreground">{t('labels.status', { ns: 'common', defaultValue: 'Status' })}</div>
                 </div>
               </div>
 
               {session.blockers.length > 0 && (
                 <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <p className="text-sm font-medium text-yellow-800">Blockers:</p>
+                  <p className="text-sm font-medium text-yellow-800">{t('analysis.blockers', { ns: 'mpPlanGenerator', defaultValue: 'Blockers:' })}</p>
                   <ul className="text-sm text-yellow-700 list-disc list-inside">
                     {session.blockers.map((blocker, i) => (
                       <li key={i}>{blocker}</li>
@@ -946,13 +1020,16 @@ export default function MPPlanGenerator() {
               <CardContent className="pt-6">
                 <div className="text-center">
                   <FileText className="h-12 w-12 mx-auto mb-3 text-muted-foreground" />
-                  <h3 className="font-medium mb-2">Ready to Generate</h3>
+                  <h3 className="font-medium mb-2">{t('generate.title', { ns: 'mpPlanGenerator', defaultValue: 'Ready to Generate' })}</h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Generate your M&P Plan (DOCX) and structured JSON export
+                    {t('generate.description', {
+                      ns: 'mpPlanGenerator',
+                      defaultValue: 'Generate your M&P Plan (DOCX) and structured JSON export',
+                    })}
                   </p>
                   <Button onClick={handleGenerate} disabled={loading}>
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Generate Documents
+                    {t('generate.generatePlan', { ns: 'mpPlanGenerator', defaultValue: 'Generate Documents' })}
                   </Button>
                 </div>
               </CardContent>
@@ -963,7 +1040,7 @@ export default function MPPlanGenerator() {
           {artifacts.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>Generated Artifacts</CardTitle>
+                <CardTitle>{t('artifacts.title', { ns: 'mpPlanGenerator', defaultValue: 'Generated Artifacts' })}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -990,7 +1067,7 @@ export default function MPPlanGenerator() {
                           onClick={() => downloadArtifact(artifact)}
                         >
                           <Download className="mr-2 h-4 w-4" />
-                          Download
+                          {t('buttons.download', { ns: 'common', defaultValue: 'Download' })}
                         </Button>
                       ) : artifact.error ? (
                         <Badge variant="destructive">{artifact.error}</Badge>
@@ -1002,7 +1079,7 @@ export default function MPPlanGenerator() {
                 <div className="mt-4">
                   <Button variant="outline" size="sm" onClick={handleExportJson}>
                     <Download className="mr-2 h-4 w-4" />
-                    Export Full JSON
+                    {t('artifacts.exportJson', { ns: 'mpPlanGenerator', defaultValue: 'Export Full JSON' })}
                   </Button>
                 </div>
               </CardContent>
@@ -1013,7 +1090,7 @@ export default function MPPlanGenerator() {
           <div className="flex gap-3">
             <Button variant="outline" onClick={resetSession}>
               <RefreshCw className="mr-2 h-4 w-4" />
-              Start New Session
+              {t('generate.newPlan', { ns: 'mpPlanGenerator', defaultValue: 'Start New Session' })}
             </Button>
           </div>
         </div>

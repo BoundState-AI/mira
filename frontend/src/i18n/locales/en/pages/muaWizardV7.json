@@ -1,0 +1,48 @@
+{
+  "title": "MUA Wizard v7",
+  "description": "Materials Usage Agreement Generator",
+  "session": "Session",
+  "loadingSession": "Loading session...",
+  "steps": {
+    "define": {
+      "label": "Define",
+      "description": "Material & environment"
+    },
+    "investigate": {
+      "label": "Investigate",
+      "description": "Evidence search"
+    },
+    "review": {
+      "label": "Review",
+      "description": "Engineer decisions"
+    },
+    "draft": {
+      "label": "Draft",
+      "description": "MUA document"
+    },
+    "finalize": {
+      "label": "Finalize",
+      "description": "Audit & export"
+    }
+  },
+  "status": {
+    "finalized": "MUA finalized",
+    "stepOf": "Step {{step}} of {{total}}: {{description}}"
+  },
+  "buttons": {
+    "resume": "Resume",
+    "backTo": "Back to {{step}}"
+  },
+  "recentSessions": {
+    "title": "Recent Sessions"
+  },
+  "toasts": {
+    "sessionDeleted": "Session deleted",
+    "sessionDataRemoved": "Session data removed.",
+    "error": "Error",
+    "failedDelete": "Failed to delete session.",
+    "sessionResumed": "Session resumed",
+    "loadedSession": "Loaded session {{session}}",
+    "failedResume": "Failed to resume session."
+  }
+}

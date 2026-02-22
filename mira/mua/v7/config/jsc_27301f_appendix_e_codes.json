@@ -1,0 +1,72 @@
+{
+  "source": {
+    "document": "JSC 27301F",
+    "appendix": "E",
+    "title": "Category III MUA Rationale Codes"
+  },
+  "codes": {
+    "101": {"domain": "flammability", "description": "Approved Materials Usage Agreement (MUA) Category I."},
+    "102": {"domain": "flammability", "description": "Approved Materials Usage Agreement (MUA) Category II."},
+    "103": {"domain": "flammability", "description": "Materials passed requirements when tested in configuration."},
+    "104": {"domain": "flammability", "description": "Unexposed, overcoated, or sandwiched between nonflammable materials and no ignition source or propagation path."},
+    "105": {"domain": "flammability", "description": "Minor usage (less than 45 g mass and 13 cm2 surface area); no propagation path or ignition source."},
+    "106": {"domain": "flammability", "description": "Material is used in hermetically sealed container."},
+    "107": {"domain": "flammability", "description": "Passes NASA-STD-(I)-6001 Test No. 10 by test or analysis."},
+    "108": {"domain": "flammability", "description": "Off-the-shelf equipment having material acceptable in configuration; no ignition source or propagation path."},
+    "109": {"domain": "flammability", "description": "Material not exposed; totally immersed in fluid; evaluated for fluid compatibility only."},
+    "110": {"domain": "flammability", "description": "Acceptable when used on a metal substrate that provides a good heat sink; considered noncombustible in configuration by test or analysis."},
+    "111": {"domain": "flammability", "description": "Flammable material sandwiched between nonflammable materials, limited exposure, and separated from ignition/other flammable materials."},
+    "112": {"domain": "flammability", "description": "Flammable material is unexposed or overcoated with nonflammable material."},
+    "113": {"domain": "flammability", "description": "Flammable material thickness <0.25 mm and sprayed/bonded to metallic surface >1.6 mm thick."},
+    "114": {"domain": "flammability", "description": "Flammable material used in small amounts and separated from ignition and other flammable materials."},
+
+    "201": {"domain": "toxicity", "description": "Approved Material Usage Agreement (MUA) Category I."},
+    "202": {"domain": "toxicity", "description": "Meets toxicity requirements with performed cure."},
+    "203": {"domain": "toxicity", "description": "T value for material/component in usage weight is <0.5 for manned flight compartment volume."},
+    "204": {"domain": "toxicity", "description": "Materials usage in hermetically sealed container."},
+
+    "301": {"domain": "fluid_compatibility", "description": "Approved Material Usage Agreement (MUA) Category I."},
+    "302": {"domain": "fluid_compatibility", "description": "Passes requirements in configuration."},
+    "303": {"domain": "fluid_compatibility", "description": "Material is B-rated in MAPTIS (batch/lot testing required) but batch/lot used in hardware passed test."},
+    "304": {"domain": "fluid_compatibility", "description": "Approved Material Usage Agreement (MUA) Category II."},
+
+    "401": {"domain": "thermal_vacuum", "description": "Approved Material Usage Agreement (MUA) Category I."},
+    "402": {"domain": "thermal_vacuum", "description": "Approved Material Usage Agreement (MUA) Category II."},
+    "403": {"domain": "thermal_vacuum", "description": "VCM between 0.1 and 1.0 percent; exposed area is less than 13 cm2 and not near a critical surface."},
+    "404": {"domain": "thermal_vacuum", "description": "VCM >1.0 percent; exposed area is less than 1.6 cm2."},
+    "405": {"domain": "thermal_vacuum", "description": "Unexposed, overcoated, or encapsulated with approved material."},
+    "406": {"domain": "thermal_vacuum", "description": "Material is B-rated in MAPTIS (batch/lot testing required) but batch/lot used in hardware cured to meet requirements."},
+    "407": {"domain": "thermal_vacuum", "description": "Meets thermal vacuum stability requirements in configuration."},
+    "408": {"domain": "thermal_vacuum", "description": "Materials usage in hermetically sealed container."},
+    "409": {"domain": "thermal_vacuum", "description": "Material has VCM >0.1 percent but is enclosed in a sealed container (maximum leak rate <1 x 10^-4 cm3/sec)."},
+
+    "501": {"domain": "scc", "description": "Approved Material Usage Agreement (MUA) Category I."},
+    "502": {"domain": "scc", "description": "Approved Material Usage Agreement (MUA) Category II."},
+    "503": {"domain": "scc", "description": "Maximum tensile stress <50% of yield strength for part on electrical/electronic assemblies."},
+    "504": {"domain": "scc", "description": "Martensitic or PH stainless steels used where primary loading is compressive."},
+    "505": {"domain": "scc", "description": "Metal not listed in MSFC-STD-3029 SCC table and not exposed to corrosive environment after final assembly through end-item use."},
+    "506": {"domain": "scc", "description": "High-strength carbon/low-alloy steels used in applications with primary compressive loading, low tensile stress, or satisfactory history."},
+
+    "601": {"domain": "corrosion", "description": "Approved Material Usage Agreement (MUA) Category I."},
+    "602": {"domain": "corrosion", "description": "Approved Material Usage Agreement (MUA) Category II."},
+    "603": {"domain": "corrosion", "description": "Adequately finished for corrosion protection."},
+    "604": {"domain": "corrosion", "description": "Acceptable in use environment."},
+    "606": {"domain": "corrosion", "description": "Electrical grounding required; cladding plus conversion coating adequate."},
+    "607": {"domain": "corrosion", "description": "Thermal conductance/electrical bonding preclude painting; conversion coating is adequate (aluminum only)."},
+    "608": {"domain": "corrosion", "description": "Finished on a higher assembly."},
+    "609": {"domain": "corrosion", "description": "Laminated shim with minimum exposure of corrosion-resistant material."},
+    "610": {"domain": "corrosion", "description": "Does not meet MSFC-SPEC-250 Class II, but treatment/coating meets or exceeds MSFC-SPEC-250; actual surface treatment listed."},
+    "611": {"domain": "corrosion", "description": "Does not meet MSFC-SPEC-250 Class II, but not exposed to corrosive environment after final assembly through end-item use."},
+    "612": {"domain": "corrosion", "description": "Titanium alloy mixed-alloy welds using commercially pure filler where hydrogen embrittlement is not predicted in service."},
+
+    "S01": {"domain": "flammability_stowage", "description": "Maximum dimension 10 inches, and unstowed less than 1 day/week."},
+    "S02": {"domain": "flammability_stowage", "description": "Unstowed less than 1 hour/day."},
+    "S03": {"domain": "flammability_stowage", "description": "Contingency use only."},
+    "S04": {"domain": "flammability_stowage", "description": "Maximum dimension less than 6 inches, and always stowed when not in actual use."},
+    "S05": {"domain": "flammability_stowage", "description": "Used only when covered by crew clothing."},
+    "S06": {"domain": "flammability_stowage", "description": "Exposed surface area less than 1 square foot, and always worn by crew when unstowed."},
+
+    "702": {"domain": "general", "description": "Generic materials controlled by military/industry specification using MAPTIS averages for ratings/test results; generic material codes used."},
+    "703": {"domain": "general", "description": "Military/industry specification allows several material options where all options have acceptable ratings."}
+  }
+}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Shield, Search, Bot, Scale, FileText, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -39,17 +40,29 @@ interface BSMHQueryProps {
 
 export default function BSMHQuery({
   endpoint = "bsmh",
-  title = "Codex BSMH",
+  title,
   runLabel,
   subtitle,
   description,
   showPipelineBlurb = true,
 }: BSMHQueryProps) {
+  const { t } = useTranslation(["common", "query"]);
+  const localizedExamples = t("examples", {
+    ns: "query",
+    returnObjects: true,
+    defaultValue: EXAMPLES,
+  }) as string[];
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [result, setResult] = useState<BSMHQueryResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const effectiveTitle = title ?? t("pageTitle", { ns: "query", defaultValue: "MIRA Query" });
+  const effectiveSubtitle = subtitle ?? t("pageSubtitle", { ns: "query", defaultValue: "Decision Lineage Pipeline" });
+  const effectiveDescription = description ?? t("pageDescription", {
+    ns: "query",
+    defaultValue: "Evidence-first queries with transparent confidence scoring and NASA-compliant audit trails",
+  });
 
   useEffect(() => {
     if (!loading) {
@@ -96,13 +109,17 @@ export default function BSMHQuery({
         <div className="max-w-5xl mx-auto px-6 py-10">
           <h1 className="text-4xl font-serif font-bold mb-2 flex items-center gap-3">
             <Shield className="h-8 w-8 text-primary" />
-            {title}
+            {effectiveTitle}
           </h1>
-          {subtitle && <p className="text-lg text-muted-foreground mb-1">{subtitle}</p>}
-          {description && <p className="text-sm text-muted-foreground mb-1">{description}</p>}
+          {effectiveSubtitle && <p className="text-lg text-muted-foreground mb-1">{effectiveSubtitle}</p>}
+          {effectiveDescription && <p className="text-sm text-muted-foreground mb-1">{effectiveDescription}</p>}
           {showPipelineBlurb && (
             <p className="text-sm text-muted-foreground mb-6">
-              Pipeline: <code>Bouncer &rarr; Sonnet &rarr; MIRA Rules &rarr; Sonnet</code>
+              {t("pipelineLabel", { ns: "query", defaultValue: "Pipeline:" })}{" "}
+              <code>{t("pipelineFlow", {
+                ns: "query",
+                defaultValue: "Bouncer → Sonnet → MIRA Rules → Sonnet",
+              })}</code>
             </p>
           )}
 
@@ -113,17 +130,19 @@ export default function BSMHQuery({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && run()}
-                placeholder="Ask an M&P question..."
+                placeholder={t("placeholder", { ns: "query", defaultValue: "Ask an M&P question..." })}
                 className="pl-9 h-11"
               />
             </div>
             <Button onClick={run} disabled={loading || !query.trim()} className="h-11 px-6">
-              {loading ? "Running..." : (runLabel ?? (endpoint === "query" ? "Run Query" : "Run BSMH"))}
+              {loading
+                ? t("searching", { ns: "query", defaultValue: "Running..." })
+                : (runLabel ?? t("buttons.search", { ns: "common", defaultValue: endpoint === "query" ? "Run Query" : "Run BSMH" }))}
             </Button>
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {EXAMPLES.map((example) => (
+            {localizedExamples.map((example) => (
               <Button
                 key={example}
                 variant="ghost"
@@ -143,7 +162,9 @@ export default function BSMHQuery({
           <Card className="p-4 border-primary/30">
             <div className="flex items-center gap-2 mb-3">
               <Loader2 className="h-4 w-4 animate-spin text-primary" />
-              <p className="text-sm font-medium">MIRA is evaluating evidence...</p>
+              <p className="text-sm font-medium">
+                {t("status.processing", { ns: "common", defaultValue: "MIRA is evaluating evidence..." })}
+              </p>
             </div>
 
             <div className="flex items-center gap-3">
@@ -165,7 +186,10 @@ export default function BSMHQuery({
                   />
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  Bouncer &rarr; Sonnet &rarr; MIRA Rules &rarr; Sonnet
+                  {t("pipelineFlow", {
+                    ns: "query",
+                    defaultValue: "Bouncer → Sonnet → MIRA Rules → Sonnet",
+                  })}
                 </p>
               </div>
             </div>
@@ -183,11 +207,15 @@ export default function BSMHQuery({
             <Card className="p-4">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm text-muted-foreground">Pipeline status</p>
+                  <p className="text-sm text-muted-foreground">
+                    {t("labels.pipelineStatus", { ns: "query", defaultValue: "Pipeline status" })}
+                  </p>
                   <p className="font-semibold">{result.status.toUpperCase()}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-muted-foreground">Bouncer</p>
+                  <p className="text-sm text-muted-foreground">
+                    {t("labels.bouncer", { ns: "query", defaultValue: "Bouncer" })}
+                  </p>
                   <Badge variant={result.bouncer.status === "accepted" ? "default" : "destructive"}>
                     {result.bouncer.status.toUpperCase()}
                   </Badge>
@@ -201,7 +229,9 @@ export default function BSMHQuery({
             <Card className="p-4">
               <div className="flex items-center gap-2 mb-3">
                 <FileText className="h-4 w-4" />
-                <h2 className="font-semibold">Sonnet Answer</h2>
+                <h2 className="font-semibold">
+                  {t("sections.sonnetAnswer", { ns: "query", defaultValue: "Sonnet Answer" })}
+                </h2>
               </div>
               <div className="whitespace-pre-wrap text-sm leading-6">
                 {result.answer_sonnet ?? result.answer}
@@ -212,32 +242,43 @@ export default function BSMHQuery({
               <Card className="p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <Scale className="h-4 w-4" />
-                  <h2 className="font-semibold">Deterministic Rules (M)</h2>
+                  <h2 className="font-semibold">
+                    {t("sections.deterministicRules", {
+                      ns: "query",
+                      defaultValue: "Deterministic Rules (M)",
+                    })}
+                  </h2>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 mb-3">
                   <Badge variant={verdictVariant(result.rules.verdict)}>
                     {result.rules.verdict}
                   </Badge>
                   <Badge variant="outline">
-                    Confidence {(result.rules.confidence * 100).toFixed(0)}%
+                    {t("labels.confidence", { ns: "query", defaultValue: "Confidence" })}{" "}
+                    {(result.rules.confidence * 100).toFixed(0)}%
                   </Badge>
                   <Badge variant="outline">
-                    Scope {result.rules.aggregation_scope}
+                    {t("labels.scope", { ns: "query", defaultValue: "Scope" })}{" "}
+                    {result.rules.aggregation_scope}
                   </Badge>
                   <Badge variant="outline">
-                    Primary {result.rules.primary_material_count}
+                    {t("labels.primary", { ns: "query", defaultValue: "Primary" })}{" "}
+                    {result.rules.primary_material_count}
                   </Badge>
                   <Badge variant="outline">
-                    Associated {result.rules.associated_material_count}
+                    {t("labels.associated", { ns: "query", defaultValue: "Associated" })}{" "}
+                    {result.rules.associated_material_count}
                   </Badge>
                   {result.rules.bok_context_used && (
                     <Badge variant="outline">
-                      H2 BoK {result.rules.bok_evidence_count}
+                      {t("labels.h2Bok", { ns: "query", defaultValue: "H2 BoK" })}{" "}
+                      {result.rules.bok_evidence_count}
                     </Badge>
                   )}
                   {result.rules.standards_category && (
                     <Badge variant="outline">
-                      Category {result.rules.standards_category}
+                      {t("labels.category", { ns: "query", defaultValue: "Category" })}{" "}
+                      {result.rules.standards_category}
                     </Badge>
                   )}
                 </div>
@@ -249,7 +290,8 @@ export default function BSMHQuery({
                         <Badge variant={verdictVariant(material.verdict)}>{material.verdict}</Badge>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Score {(material.score * 100).toFixed(0)}%
+                        {t("labels.score", { ns: "query", defaultValue: "Score" })}{" "}
+                        {(material.score * 100).toFixed(0)}%
                       </p>
                       {material.warnings.length > 0 && (
                         <ul className="mt-2 text-xs text-muted-foreground list-disc pl-4 space-y-1">
@@ -267,29 +309,44 @@ export default function BSMHQuery({
             <Card className="p-4">
               <div className="flex items-center gap-2 mb-3">
                 <Bot className="h-4 w-4" />
-                <h2 className="font-semibold">Sonnet + DB Layer (S)</h2>
+                <h2 className="font-semibold">
+                  {t("sections.sonnetDbLayer", {
+                    ns: "query",
+                    defaultValue: "Sonnet + DB Layer (S)",
+                  })}
+                </h2>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-sm">
                 <div>
-                  <p className="text-muted-foreground">Materials</p>
+                  <p className="text-muted-foreground">
+                    {t("labels.materials", { ns: "query", defaultValue: "Materials" })}
+                  </p>
                   <p className="font-semibold">{result.materials.length}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Sonnet Calls</p>
+                  <p className="text-muted-foreground">
+                    {t("labels.sonnetCalls", { ns: "query", defaultValue: "Sonnet Calls" })}
+                  </p>
                   <p className="font-semibold">
                     {result.sonnet_calls_used ?? Number(result.sonnet_metadata?.sonnet_calls_used ?? 0)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Search Source</p>
+                  <p className="text-muted-foreground">
+                    {t("labels.searchSource", { ns: "query", defaultValue: "Search Source" })}
+                  </p>
                   <p className="font-semibold">{String(result.sonnet_metadata?.search_source ?? "n/a")}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">v4 Gate</p>
+                  <p className="text-muted-foreground">
+                    {t("labels.v4Gate", { ns: "query", defaultValue: "v4 Gate" })}
+                  </p>
                   <p className="font-semibold">{result.v4_gate_action ?? "n/a"}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">v4 Confidence</p>
+                  <p className="text-muted-foreground">
+                    {t("labels.v4Confidence", { ns: "query", defaultValue: "v4 Confidence" })}
+                  </p>
                   <p className="font-semibold">
                     {result.v4_confidence_score != null
                       ? `${(result.v4_confidence_score * 100).toFixed(0)}%`

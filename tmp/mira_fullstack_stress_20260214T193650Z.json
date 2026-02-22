@@ -1,0 +1,44 @@
+{
+  "summary": {
+    "generated_at": "2026-02-14T19:36:50.814792Z",
+    "materials_sampled": 0,
+    "questions_executed": 1,
+    "duration_s": 30.06,
+    "v4_ok": 1,
+    "bsmh_ok": 1,
+    "v4_nonempty_answers": 1,
+    "bsmh_nonempty_answers": 1,
+    "bsmh_rejected": 0,
+    "bsmh_sonnet_calls_total": 1
+  },
+  "materials": [],
+  "results": [
+    {
+      "question": "Is 316L stainless steel compatible with LOX at 500 PSI?",
+      "v4": {
+        "ok": true,
+        "duration_ms": 808.2,
+        "gate_action": "REFUSE",
+        "confidence": 0.32,
+        "search_source": "sonnet_candidates",
+        "material_count": 5,
+        "answer": "Found **5 materials** in MAPTIS. Top result: **STAINLESS STEEL 316L (CRES 316L) BAR ANNEALED** with 1 test records. O\u2082 compatible. Has MUA precedent. Confidence: 32% (REFUSE).",
+        "lineage_id": "4004337e-ee68-4c60-9ab4-01a0a0afcc02"
+      },
+      "bsmh": {
+        "ok": true,
+        "duration_ms": 22314.8,
+        "status": "ok",
+        "bouncer_status": "accepted",
+        "sonnet_calls_used": 1,
+        "v4_gate_action": "CLARIFY",
+        "v4_confidence_score": 0.53,
+        "search_source": "sonnet_candidates",
+        "material_count": 5,
+        "missing_requested_materials": [],
+        "answer": "**COMPATIBLE**\n\nBased on the provided decision packet, 316L stainless steel is considered compatible with LOX at 500 PSI. The evidence chain for each material type shows that while there is limited direct test evidence (total_tests = 1), there are 114 precedents preferred (mua_precedent_count) from the MUA Precedents v7 database, indicating a conditional verdict.\n\nConfidence in this decision is moderate at 30.8% due to the limited direct test evidence and below minimum threshold warning. Key warnings include \"Evidence volume is below minimum threshold\" for all material types.\n\nIt is essential to note that while the materials are considered compatible, further testing or validation may be necessary to confirm suitability for specific applications.",
+        "lineage_id": "cce11f29-cd60-41f5-a0db-0a0809034745"
+      }
+    }
+  ]
+}

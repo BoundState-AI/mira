@@ -1,0 +1,349 @@
+{
+  "rule_pack_id": "jsc-27301f-appendix-e",
+  "version": "1.0.0",
+  "effective_date": "2026-02-16",
+  "retired_date": null,
+  "citation": "JSC 27301F Rev F, Appendix E",
+  "domains": {
+    "FLAM": {
+      "applicable_codes": [
+        "103",
+        "104",
+        "105",
+        "106",
+        "107",
+        "108",
+        "109",
+        "110",
+        "111",
+        "112",
+        "113",
+        "114"
+      ],
+      "stowage_codes": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06"
+      ],
+      "questions": [
+        {
+          "id": "Q1",
+          "text": "What is the current MAPTIS flammability rating?",
+          "type": "select",
+          "options": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "X",
+            "U",
+            "None"
+          ],
+          "terminates": {
+            "A": {
+              "outcome": "PASS"
+            },
+            "B": {
+              "outcome": "PASS",
+              "note": "B-current, batch/lot note"
+            }
+          }
+        },
+        {
+          "id": "Q2",
+          "text": "Is the material used in a hermetically sealed container?",
+          "type": "yes_no",
+          "condition": {
+            "Q1": {
+              "not_in": [
+                "A",
+                "B"
+              ]
+            }
+          },
+          "terminates": {
+            "Yes": {
+              "outcome": "CAT_III",
+              "code": "106"
+            }
+          }
+        },
+        {
+          "id": "Q13",
+          "text": "Describe the ignition scenario and worst-case configuration:",
+          "type": "free_text",
+          "condition": {
+            "_no_cat3": true
+          },
+          "required_for": "CAT_I_II",
+          "shall_address": "Ignition scenario per §4.2"
+        },
+        {
+          "id": "Q14",
+          "text": "Describe the fire propagation path (or why none exists):",
+          "type": "free_text",
+          "condition": {
+            "_no_cat3": true
+          },
+          "required_for": "CAT_I_II",
+          "shall_address": "Fire propagation path per §4.2"
+        }
+      ]
+    },
+    "TOX": {
+      "applicable_codes": [
+        "201",
+        "202",
+        "203",
+        "204"
+      ],
+      "questions": [
+        {
+          "id": "Q1",
+          "text": "Is this a habitable environment?",
+          "type": "yes_no",
+          "terminates": {
+            "No": {
+              "outcome": "PASS"
+            }
+          }
+        },
+        {
+          "id": "Q2",
+          "text": "Is the material in a hermetically sealed container?",
+          "type": "yes_no",
+          "condition": {
+            "Q1": "Yes"
+          },
+          "terminates": {
+            "Yes": {
+              "outcome": "CAT_III",
+              "code": "204"
+            }
+          }
+        },
+        {
+          "id": "Q6",
+          "text": "Provide SMAC-level analysis or test data reference:",
+          "type": "free_text",
+          "condition": {
+            "_no_cat3": true
+          },
+          "required_for": "CAT_I_II",
+          "shall_address": "SMAC-level analysis per §4.2"
+        }
+      ]
+    },
+    "O2": {
+      "applicable_codes": [],
+      "questions": [
+        {
+          "id": "Q0",
+          "text": "Is this material used in oxygen-enriched service (LOX/GOX or O2% >= 23.5)?",
+          "type": "yes_no",
+          "terminates": {
+            "No": {
+              "outcome": "PASS"
+            }
+          }
+        },
+        {
+          "id": "Q1",
+          "text": "What is the oxygen medium?",
+          "type": "select",
+          "condition": {
+            "Q0": "Yes"
+          },
+          "options": [
+            "GOX",
+            "LOX",
+            "enriched air",
+            "compressed air"
+          ]
+        },
+        {
+          "id": "Q7",
+          "text": "Describe ignition scenario analysis:",
+          "type": "free_text",
+          "condition": {
+            "Q0": "Yes"
+          },
+          "required_for": "CAT_I_II",
+          "shall_address": "Ignition analysis per §5.1.4"
+        }
+      ]
+    },
+    "HEE": {
+      "applicable_codes": [],
+      "questions": [
+        {
+          "id": "Q0",
+          "text": "Is this material used in hydrogen service (GH2/LH2)?",
+          "type": "yes_no",
+          "terminates": {
+            "No": {
+              "outcome": "PASS"
+            }
+          }
+        },
+        {
+          "id": "Q1",
+          "text": "What is the hydrogen medium?",
+          "type": "select",
+          "condition": {
+            "Q0": "Yes"
+          },
+          "options": [
+            "GH2",
+            "LH2"
+          ]
+        },
+        {
+          "id": "Q7",
+          "text": "ASTM G142 or equivalent test data reference:",
+          "type": "free_text",
+          "condition": {
+            "Q0": "Yes"
+          },
+          "required_for": "CAT_I_II",
+          "shall_address": "ASTM G142 evidence per §5.1.5"
+        }
+      ]
+    },
+    "SCC": {
+      "applicable_codes": [
+        "501",
+        "502",
+        "503",
+        "504",
+        "505",
+        "506"
+      ],
+      "questions": [
+        {
+          "id": "Q1",
+          "text": "Is maximum tensile stress less than 50% of yield on EE assembly?",
+          "type": "yes_no",
+          "terminates": {
+            "Yes": {
+              "outcome": "CAT_III",
+              "code": "503"
+            }
+          }
+        },
+        {
+          "id": "Q5",
+          "text": "Describe stress state:",
+          "type": "free_text",
+          "condition": {
+            "_no_cat3": true
+          },
+          "required_for": "CAT_I_II",
+          "shall_address": "Stress state per SCC rationale"
+        }
+      ]
+    },
+    "CORR": {
+      "applicable_codes": [
+        "601",
+        "602",
+        "603",
+        "604",
+        "606",
+        "607",
+        "608",
+        "609",
+        "610",
+        "611",
+        "612"
+      ],
+      "questions": [
+        {
+          "id": "Q1",
+          "text": "Is the material adequately finished for corrosion protection?",
+          "type": "yes_no",
+          "terminates": {
+            "Yes": {
+              "outcome": "CAT_III",
+              "code": "603"
+            }
+          }
+        }
+      ]
+    },
+    "TVS": {
+      "applicable_codes": [
+        "401",
+        "402",
+        "403",
+        "404",
+        "405",
+        "406",
+        "407",
+        "408",
+        "409"
+      ],
+      "questions": [
+        {
+          "id": "Q1",
+          "text": "Is the material in a hermetically sealed container?",
+          "type": "yes_no",
+          "terminates": {
+            "Yes": {
+              "outcome": "CAT_III",
+              "code": "408"
+            }
+          }
+        }
+      ]
+    },
+    "FLUID": {
+      "applicable_codes": [
+        "301",
+        "302",
+        "303",
+        "304"
+      ],
+      "questions": [
+        {
+          "id": "Q0",
+          "text": "Does this material contact a hazardous fluid?",
+          "type": "yes_no",
+          "terminates": {
+            "No": {
+              "outcome": "PASS"
+            }
+          }
+        },
+        {
+          "id": "Q1",
+          "text": "Has the material passed compatibility requirements in configuration?",
+          "type": "yes_no",
+          "condition": {
+            "Q0": "Yes"
+          },
+          "terminates": {
+            "Yes": {
+              "outcome": "CAT_III",
+              "code": "302"
+            }
+          }
+        },
+        {
+          "id": "Q5",
+          "text": "Provide immersion test data or equivalent analysis reference:",
+          "type": "free_text",
+          "condition": {
+            "Q0": "Yes",
+            "_no_cat3": true
+          },
+          "required_for": "CAT_I_II",
+          "shall_address": "Immersion test data per §5.1.3"
+        }
+      ]
+    }
+  }
+}

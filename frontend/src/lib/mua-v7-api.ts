@@ -28,6 +28,11 @@ export type IssueCode =
   | 'SCC'
   | 'CORR'
   | 'FRACTURE';
+export type RelationshipType =
+  | 'exact_match'
+  | 'same_alloy_different_form'
+  | 'same_alloy_different_temper'
+  | 'family_match';
 
 // ---------------------------------------------------------------------------
 // Domain models (aligned to backend mira.mua.v7.models)
@@ -52,6 +57,48 @@ export interface MaterialResolution {
   is_process_sensitive: boolean;
   selection_method: string | null;
   selection_confidence: number | null;
+}
+
+export interface MaterialCodeCandidate {
+  material_code: string;
+  material_key: number | null;
+  designation: string;
+  form: string | null;
+  condition: string | null;
+  relationship: RelationshipType;
+  match_score: number;
+  rank: number;
+}
+
+export interface MaterialIdentity {
+  input_text: string;
+  canonical_name: string;
+  family: string | null;
+  material_class: MaterialClass | null;
+  is_process_sensitive: boolean;
+  form: string | null;
+  condition: string | null;
+  all_maptis_codes: MaterialCodeCandidate[];
+  truncated: boolean;
+  truncation_note: string | null;
+}
+
+export interface MaptisCodeRecommendation {
+  recommended_code: string;
+  recommended_key: number | null;
+  recommended_designation: string;
+  precedent_count: number;
+  test_data_count: number;
+  evidence_density_score: number;
+  rationale: string;
+  alternatives: {
+    material_code: string;
+    material_key: number | null;
+    designation: string;
+    relationship: RelationshipType;
+    precedent_count: number;
+    test_data_count: number;
+  }[];
 }
 
 export interface MaterialStatsItem {
@@ -165,6 +212,8 @@ export interface PrecedentMatch {
   issues: string[];
   category_label: string | null;
   search_tier: number;
+  relationship_type?: RelationshipType | null;
+  source_maptis_code?: string | null;
 }
 
 export interface TestDataRecord {
@@ -176,6 +225,16 @@ export interface TestDataRecord {
   test_date: string | null;
   test_medium?: string | null;
   medium_match?: boolean | null;
+}
+
+export interface BOKFinding {
+  domain: string;
+  source: string | null;
+  title: string | null;
+  section: string | null;
+  page: number | null;
+  relevance_score: number;
+  excerpt: string;
 }
 
 export interface EnvelopeResult {
@@ -222,11 +281,14 @@ export interface EvidenceStrengthResult {
 
 export interface InvestigationResult {
   material: MaterialResolution;
+  material_identity?: MaterialIdentity | null;
+  code_recommendation?: MaptisCodeRecommendation | null;
   environment: EnvironmentSpec;
   process_params: ProcessParams | null;
   supporting_precedents: PrecedentMatch[];
   conflicting_precedents: PrecedentMatch[];
   test_data: TestDataRecord[];
+  bok_findings?: BOKFinding[];
   envelope: EnvelopeResult | null;
   conflicts: ConflictFound[];
   gaps: GapIdentified[];
@@ -265,6 +327,10 @@ export interface ReviewDecisions {
   conflict_decisions: ConflictDecision[];
   all_items_reviewed: boolean;
   divergence_detected: boolean;
+  confirmed_maptis_code?: string | null;
+  confirmed_maptis_key?: number | null;
+  confirmed_maptis_designation?: string | null;
+  override_justification?: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -359,6 +425,7 @@ export interface SessionDetail {
   created_at: string | null;
   updated_at: string | null;
   approved_cat3_codes: string[] | null;
+  material_identity?: MaterialIdentity | null;
   investigation: InvestigationResult | null;
   review_decisions: ReviewDecisions | null;
   draft: MUADraft | null;
@@ -411,6 +478,8 @@ export interface InvestigateRequest {
   material_code?: string | null;
   material_key?: number | null;
   resolved_name?: string | null;
+  form?: string | null;
+  condition?: string | null;
   environment: EnvironmentSpec;
   process_params?: ProcessParams | null;
   issue_codes?: IssueCode[] | null;
@@ -523,10 +592,12 @@ export interface IssueCodeInfo {
 
 export async function resolveMaterial(
   material: string,
-): Promise<{ resolution: MaterialResolution }> {
+  form?: string | null,
+  condition?: string | null,
+): Promise<{ resolution: MaterialResolution; identity?: MaterialIdentity | null }> {
   return request('/resolve-material', {
     method: 'POST',
-    body: JSON.stringify({ material }),
+    body: JSON.stringify({ material, form: form ?? null, condition: condition ?? null }),
   });
 }
 

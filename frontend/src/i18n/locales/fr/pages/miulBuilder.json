@@ -1,0 +1,156 @@
+{
+  "title": "MIUL Builder",
+  "description": "Générer des listes d'identification d'utilisation des matériaux à partir de dessins d'ingénierie",
+  "badge": "Extraction IA 3 Passes",
+  "tabs": {
+    "compliant": "MIUL Conforme",
+    "bom": "Téléchargement BOM",
+    "pdf": "Dessins PDF"
+  },
+  "environment": {
+    "title": "Configuration de l'Environnement d'Utilisation",
+    "description": "Configurer l'environnement opérationnel pour l'évaluation des matériaux",
+    "useDefaults": "Utiliser Défauts SLS",
+    "h2Service": "Service H2",
+    "o2Service": "Service O2",
+    "pressure": "Pression (PSIA)",
+    "pressurePlaceholder": "ex: 3000",
+    "temperature": "Température (°F)",
+    "temperaturePlaceholder": "ex: 70",
+    "media": "Média/Fluide",
+    "mediaPlaceholder": "ex: GOX, LOX, GH2",
+    "o2Concentration": "Concentration O2 (%)",
+    "habitableLocation": "Zone Habitable",
+    "phase": "Phase",
+    "phases": {
+      "gas": "Gaz",
+      "liquid": "Liquide",
+      "cryogenic": "Cryogénique"
+    }
+  },
+  "upload": {
+    "title": "Télécharger Fichiers",
+    "drawingTreeHint": "Depuis l'éditeur DT. Inclure pour une hiérarchie NHA/Parent précise.",
+    "noDrawingTreeWarning": "Aucun JSON DT sélectionné : la génération utilisera un mode hiérarchique dégradé.",
+    "dragDrop": "Glissez-déposez les fichiers ici, ou cliquez pour parcourir",
+    "supportedFormats": "Supporte les dessins PDF et BOM Excel",
+    "drawingTree": "Arborescence des Dessins (auto-détectée)",
+    "drawings": "Dessins d'Ingénierie",
+    "bom": "Nomenclature",
+    "clear": "Tout Effacer",
+    "filesSelected": "{{count}} fichiers sélectionnés"
+  },
+  "program": {
+    "title": "Information Programme",
+    "name": "Nom du Programme",
+    "forExcel": "Pour la sortie Excel",
+    "namePlaceholder": "ex: ORION, SLS, Gateway",
+    "hardware": "Nom du Matériel",
+    "hardwarePlaceholder": "ex: Assemblage Valve Double Mouvement"
+  },
+  "steps": {
+    "upload": "Télécharger",
+    "generate": "Générer",
+    "enrich": "Enrichir",
+    "muas": "MUAs"
+  },
+  "stages": {
+    "uploadDetail": "Téléchargez les PDF de dessins pour commencer. Le JSON d'arborescence est facultatif (recommandé pour une hiérarchie précise).",
+    "loadingReviewItems": "Chargement des éléments à réviser...",
+    "reviewDetail": "{{open}} sur {{total}} éléments nécessitent votre expertise",
+    "approvedReady": "Approuvé — prêt à générer le MIUL",
+    "builtSuccess": "MIUL généré et exporté avec succès",
+    "reviewedReady": "Tous les éléments ont été révisés — prêt pour la validation ingénieur",
+    "exportReady": "Approuvé — cliquez sur Générer pour produire le MIUL Excel"
+  },
+  "generate": {
+    "title": "Générer MIUL de Base",
+    "description": "Extraire les matériaux des dessins téléchargés avec vision IA",
+    "button": "Générer MIUL de Base",
+    "generating": "Extraction des matériaux...",
+    "progress": "{{percent}}% terminé",
+    "passInfo": {
+      "pass1": "Passe 1 : Extraction des matériaux des dessins",
+      "pass2": "Passe 2 : Identification des hélicoils et fixations",
+      "pass3": "Passe 3 : Détection des finitions et revêtements"
+    }
+  },
+  "enrich": {
+    "title": "Enrichir avec Évaluations MAPTIS",
+    "description": "Rechercher les codes MAPTIS et remplir les colonnes d'évaluation",
+    "button": "Enrichir avec MAPTIS",
+    "uploaded": "Enrichir le MIUL téléversé",
+    "enriching": "Recherche des évaluations...",
+    "materialsFound": "{{count}} matériaux trouvés",
+    "ratingsPopulated": "{{count}} évaluations remplies",
+    "gapsIdentified": "{{count}} lacunes identifiées"
+  },
+  "muas": {
+    "title": "Générer MUAs",
+    "description": "Générer des Accords d'Utilisation des Matériaux pour les matériaux avec lacunes",
+    "button": "Générer MUAs",
+    "generating": "Génération des MUAs...",
+    "required": "{{count}} MUAs requis",
+    "generated": "{{count}} MUAs générés"
+  },
+  "results": {
+    "title": "Résultats d'Extraction",
+    "materials": "Matériaux",
+    "helicoils": "Hélicoils",
+    "finishes": "Finitions",
+    "hardware": "Quincaillerie",
+    "total": "Total Articles",
+    "exportExcel": "Exporter Excel",
+    "exportCsv": "Exporter CSV",
+    "viewDetails": "Voir Détails"
+  },
+  "table": {
+    "partNumber": "Numéro de Pièce",
+    "material": "Matériau",
+    "maptisCode": "Code MAPTIS",
+    "quantity": "Qté",
+    "parent": "Parent",
+    "flammability": "INFLAM",
+    "corrosion": "CORR",
+    "scc": "SCC",
+    "tvs": "TVS",
+    "toxicity": "TOX",
+    "fluidSystems": "FS",
+    "o2Compat": "O2",
+    "status": "Statut"
+  },
+  "status": {
+    "complete": "Complet",
+    "partial": "Partiel",
+    "needsEnrichment": "Enrichissement Requis",
+    "needsMua": "MUA Requis",
+    "noMatch": "Pas de Correspondance"
+  },
+  "toast": {
+    "filesUploaded": "{{count}} fichiers téléchargés",
+    "extractionComplete": "Extraction terminée : {{count}} matériaux trouvés",
+    "enrichmentComplete": "Enrichissement terminé : {{count}} évaluations remplies",
+    "muasGenerated": "{{count}} MUAs générés",
+    "exportStarted": "Export démarré",
+    "error": {
+      "noFiles": "Veuillez d'abord télécharger des fichiers",
+      "extractionFailed": "Échec de l'extraction des matériaux",
+      "enrichmentFailed": "Échec de l'enrichissement MAPTIS",
+      "muaFailed": "Échec de la génération MUA",
+      "invalidFormat": "Format de fichier invalide"
+    }
+  },
+  "labels": {
+    "sensitive": "Sensible"
+  },
+  "messages": {
+    "autoPurge": "Les données de session seront supprimées automatiquement du serveur après la génération"
+  },
+  "session": {
+    "recentSessions": "Sessions récentes"
+  },
+  "info": {
+    "compliantMiul": "Le MIUL Conforme utilise l'extraction IA 3 passes pour identifier matériaux, hélicoils, finitions et quincaillerie avec validation anti-hallucination.",
+    "drawingTreeTip": "Conseil : Nommez votre PDF d'arborescence avec 'Drawing Tree' dans le nom de fichier pour auto-détection."
+  }
+}

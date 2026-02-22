@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -147,6 +148,7 @@ interface HybridQueryResponse {
 }
 
 export default function KnowledgeTwins() {
+  const { t } = useTranslation('knowledgeTwins')
   const [mode, setMode] = useState<'browse' | 'ask'>('browse')
   const [activeFluid, setActiveFluid] = useState<'oxygen' | 'hydrogen'>('oxygen')
   const [query, setQuery] = useState('')
@@ -189,7 +191,7 @@ export default function KnowledgeTwins() {
       ])
 
       if (!bokResponse.ok || !materialResponse.ok) {
-        throw new Error('Search failed')
+        throw new Error(t('errors.searchError', { defaultValue: 'Search failed' }))
       }
 
       const bokData = await bokResponse.json()
@@ -202,7 +204,7 @@ export default function KnowledgeTwins() {
       setMaterials(materialData.results || [])
 
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Search failed')
+      setError(err instanceof Error ? err.message : t('errors.searchError', { defaultValue: 'Search failed' }))
       console.error('Search error:', err)
     } finally {
       setLoading(false)
@@ -233,7 +235,7 @@ export default function KnowledgeTwins() {
       )
 
       if (!response.ok) {
-        throw new Error('Question failed')
+        throw new Error(t('errors.questionError', { defaultValue: 'Question failed' }))
       }
 
       const data = await response.json()
@@ -241,7 +243,7 @@ export default function KnowledgeTwins() {
       setHybridResponse(data)
 
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Question failed')
+      setError(err instanceof Error ? err.message : t('errors.questionError', { defaultValue: 'Question failed' }))
       console.error('Ask error:', err)
     } finally {
       setLoading(false)
@@ -274,12 +276,14 @@ export default function KnowledgeTwins() {
       return (
         <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg ${config.bgColor} border-2 ${config.borderColor}`}>
           <Icon className={`h-5 w-5 ${config.color}`} />
-          <div>
-            <div className={`text-2xl font-bold ${config.color}`}>{rating}</div>
-            <div className={`text-xs ${config.color} opacity-75`}>{config.label}</div>
+            <div>
+              <div className={`text-2xl font-bold ${config.color}`}>{rating}</div>
+              <div className={`text-xs ${config.color} opacity-75`}>
+                {t(`ratings.${rating}.label`, { defaultValue: config.label })}
+              </div>
+            </div>
           </div>
-        </div>
-      )
+        )
     }
 
     return (
@@ -298,12 +302,14 @@ export default function KnowledgeTwins() {
           <div className="flex items-center gap-3 mb-1">
             <Brain className="h-6 w-6 text-primary" />
             <h1 className="text-2xl font-serif font-bold flex items-center gap-3">
-              Knowledge Twins
+              {t('title', { defaultValue: 'Knowledge Twins' })}
               <PageHelp content={helpContent.knowledgeTwins} />
             </h1>
           </div>
           <p className="text-sm text-muted-foreground">
-            Evidence-based O2/H2 material compatibility using NASA Body of Knowledge
+            {t('description', {
+              defaultValue: 'Evidence-based O2/H2 material compatibility using NASA Body of Knowledge',
+            })}
           </p>
         </div>
       </div>
@@ -315,11 +321,11 @@ export default function KnowledgeTwins() {
           <TabsList className="grid w-full max-w-md grid-cols-2">
             <TabsTrigger value="oxygen">
               <Droplet className="h-4 w-4 mr-2" />
-              Oxygen (O2)
+              {t('fluidTypes.oxygen', { defaultValue: 'Oxygen (O2)' })}
             </TabsTrigger>
             <TabsTrigger value="hydrogen">
               <Flame className="h-4 w-4 mr-2" />
-              Hydrogen (H2)
+              {t('fluidTypes.hydrogen', { defaultValue: 'Hydrogen (H2)' })}
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -331,33 +337,35 @@ export default function KnowledgeTwins() {
             onClick={() => setMode('browse')}
             size="sm"
           >
-            Browse Materials
+            {t('modes.browse', { defaultValue: 'Browse Materials' })}
           </Button>
           <Button
             variant={mode === 'ask' ? 'default' : 'outline'}
             onClick={() => setMode('ask')}
             size="sm"
           >
-            Ask Question
+            {t('modes.ask', { defaultValue: 'Ask Question' })}
           </Button>
 
           {/* LLM Provider Toggle (only in Ask mode) */}
           {mode === 'ask' && (
             <div className="ml-4 flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">LLM:</span>
+              <span className="text-muted-foreground">
+                {t('llm.label', { defaultValue: 'LLM:' })}
+              </span>
               <Button
                 variant={llmProvider === 'ollama' ? 'default' : 'outline'}
                 onClick={() => setLlmProvider('ollama')}
                 size="sm"
               >
-                Local (Ollama)
+                {t('llm.ollama', { defaultValue: 'Local (Ollama)' })}
               </Button>
               <Button
                 variant={llmProvider === 'haiku' ? 'default' : 'outline'}
                 onClick={() => setLlmProvider('haiku')}
                 size="sm"
               >
-                Claude Haiku
+                {t('llm.haiku', { defaultValue: 'Claude Haiku' })}
               </Button>
             </div>
           )}
@@ -370,8 +378,16 @@ export default function KnowledgeTwins() {
               <Input
                 placeholder={
                   mode === 'ask'
-                    ? `Ask a question about ${activeFluid} compatibility (e.g., "Can I use aluminum in ${activeFluid} service?")`
-                    : `Search ${activeFluid} compatibility (e.g., "materials compatible with ${activeFluid} at 20psi")`
+                    ? t('search.placeholderAsk', {
+                        fluid: activeFluid,
+                        defaultValue:
+                          `Ask a question about ${activeFluid} compatibility (e.g., "Can I use aluminum in ${activeFluid} service?")`,
+                      })
+                    : t('search.placeholderBrowse', {
+                        fluid: activeFluid,
+                        defaultValue:
+                          `Search ${activeFluid} compatibility (e.g., "materials compatible with ${activeFluid} at 20psi")`,
+                      })
                 }
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -384,12 +400,16 @@ export default function KnowledgeTwins() {
                 {loading ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    {mode === 'ask' ? 'Thinking...' : 'Searching...'}
+                    {mode === 'ask'
+                      ? t('search.thinking', { defaultValue: 'Thinking...' })
+                      : t('search.searching', { defaultValue: 'Searching...' })}
                   </>
                 ) : (
                   <>
                     <Search className="h-4 w-4 mr-2" />
-                    {mode === 'ask' ? 'Ask' : 'Search'}
+                    {mode === 'ask'
+                      ? t('search.buttonAsk', { defaultValue: 'Ask' })
+                      : t('search.buttonSearch', { defaultValue: 'Search' })}
                   </>
                 )}
               </Button>
@@ -401,13 +421,17 @@ export default function KnowledgeTwins() {
         {error && (
           <Card className="border-2 border-red-500">
             <CardContent className="pt-6">
-              <div className="flex items-center gap-3 text-red-600">
-                <XCircle className="h-6 w-6" />
-                <div>
-                  <div className="font-bold">{mode === 'ask' ? 'Question Error' : 'Search Error'}</div>
-                  <div className="text-sm">{error}</div>
+                <div className="flex items-center gap-3 text-red-600">
+                  <XCircle className="h-6 w-6" />
+                  <div>
+                    <div className="font-bold">
+                      {mode === 'ask'
+                        ? t('errors.questionError', { defaultValue: 'Question Error' })
+                        : t('errors.searchError', { defaultValue: 'Search Error' })}
+                    </div>
+                    <div className="text-sm">{error}</div>
+                  </div>
                 </div>
-              </div>
             </CardContent>
           </Card>
         )}
@@ -431,7 +455,7 @@ export default function KnowledgeTwins() {
                     ) : (
                       <AlertTriangle className="h-5 w-5 text-yellow-600" />
                     )}
-                    Decision: {hybridResponse.deterministic_decision}
+                    {t('hybridResults.decision', { defaultValue: 'Decision' })}: {hybridResponse.deterministic_decision}
                     <Badge variant="outline" className="ml-2">{hybridResponse.decision_source}</Badge>
                   </CardTitle>
                 </CardHeader>
@@ -447,7 +471,7 @@ export default function KnowledgeTwins() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Sparkles className="h-5 w-5 text-blue-600" />
-                    MIRA Analysis
+                    {t('hybridResults.miraAnalysis', { defaultValue: 'MIRA Analysis' })}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -456,7 +480,9 @@ export default function KnowledgeTwins() {
                   </div>
                   {hybridResponse.constraints && (
                     <div className="mt-4 pt-4 border-t border-blue-200">
-                      <p className="text-xs text-muted-foreground font-semibold mb-2">Extracted Constraints:</p>
+                      <p className="text-xs text-muted-foreground font-semibold mb-2">
+                        {t('hybridResults.extractedConstraints', { defaultValue: 'Extracted Constraints:' })}
+                      </p>
                       <pre className="text-xs bg-white p-3 rounded border border-blue-200 overflow-x-auto">
                         {JSON.stringify(hybridResponse.constraints, null, 2)}
                       </pre>
@@ -471,7 +497,7 @@ export default function KnowledgeTwins() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <HelpCircle className="h-5 w-5 text-blue-600" />
-                  Evidence Summary
+                  {t('hybridResults.evidenceSummary', { defaultValue: 'Evidence Summary' })}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -480,38 +506,50 @@ export default function KnowledgeTwins() {
                     <div className="text-2xl font-bold text-blue-600">
                       {hybridResponse.evidence_summary.mua_precedents_found}
                     </div>
-                    <div className="text-xs text-muted-foreground">MUA Precedents</div>
+                    <div className="text-xs text-muted-foreground">
+                      {t('hybridResults.muaPrecedents', { defaultValue: 'MUA Precedents' })}
+                    </div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">
                       {hybridResponse.evidence_summary.test_results_found}
                     </div>
-                    <div className="text-xs text-muted-foreground">Test Results</div>
+                    <div className="text-xs text-muted-foreground">
+                      {t('hybridResults.testResults', { defaultValue: 'Test Results' })}
+                    </div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-purple-600">
                       {hybridResponse.evidence_summary.requirements_evaluated}
                     </div>
-                    <div className="text-xs text-muted-foreground">Requirements</div>
+                    <div className="text-xs text-muted-foreground">
+                      {t('hybridResults.requirements', { defaultValue: 'Requirements' })}
+                    </div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-orange-600">
                       {hybridResponse.evidence_summary.semantic_results_found}
                     </div>
-                    <div className="text-xs text-muted-foreground">Semantic Results</div>
+                    <div className="text-xs text-muted-foreground">
+                      {t('hybridResults.semanticResults', { defaultValue: 'Semantic Results' })}
+                    </div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-indigo-600">
                       {hybridResponse.evidence_summary.high_confidence_semantic}
                     </div>
-                    <div className="text-xs text-muted-foreground">High Confidence</div>
+                    <div className="text-xs text-muted-foreground">
+                      {t('hybridResults.highConfidence', { defaultValue: 'High Confidence' })}
+                    </div>
                   </div>
                 </div>
                 {hybridResponse.insufficient_data && (
                   <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <div className="flex items-center gap-2 text-yellow-800">
                       <AlertTriangle className="h-4 w-4" />
-                      <span className="text-sm font-semibold">Insufficient Data</span>
+                      <span className="text-sm font-semibold">
+                        {t('hybridResults.insufficientData', { defaultValue: 'Insufficient Data' })}
+                      </span>
                     </div>
                   </div>
                 )}
@@ -524,7 +562,7 @@ export default function KnowledgeTwins() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <CheckCircle2 className="h-5 w-5 text-green-600" />
-                    Material Compatibility Decisions
+                    {t('hybridResults.materialDecisions', { defaultValue: 'Material Compatibility Decisions' })}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -538,7 +576,9 @@ export default function KnowledgeTwins() {
                         <p className="text-sm text-gray-700 mb-3">{decision.reasoning}</p>
                         {decision.citations && decision.citations.length > 0 && (
                           <div className="text-xs text-muted-foreground">
-                            <span className="font-semibold">Citations: </span>
+                            <span className="font-semibold">
+                              {t('hybridResults.citations', { defaultValue: 'Citations:' })}{" "}
+                            </span>
                             {decision.citations.join(', ')}
                           </div>
                         )}
@@ -554,7 +594,7 @@ export default function KnowledgeTwins() {
               <Card className="border-2 border-orange-500">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <span>Semantic Search Results</span>
+                    <span>{t('hybridResults.semanticSearchResults', { defaultValue: 'Semantic Search Results' })}</span>
                     <Badge variant="secondary">{hybridResponse.semantic_evidence.total_results}</Badge>
                   </CardTitle>
                 </CardHeader>
@@ -567,7 +607,7 @@ export default function KnowledgeTwins() {
                             {result.source}
                           </Badge>
                           <Badge variant="secondary">
-                            {(result.score * 100).toFixed(0)}% match
+                            {(result.score * 100).toFixed(0)}% {t('hybridResults.match', { defaultValue: 'match' })}
                           </Badge>
                         </div>
                         <p className="text-sm text-gray-700 leading-relaxed">{result.text}</p>
@@ -589,10 +629,13 @@ export default function KnowledgeTwins() {
               <div className="space-y-4">
                 <div>
                   <h2 className="text-xl font-bold mb-1">
-                    Recommended Materials
+                    {t('results.recommendedMaterials', { defaultValue: 'Recommended Materials' })}
                   </h2>
                   <p className="text-sm text-muted-foreground">
-                    Materials with {activeFluid} compatibility ratings from MAPTIS database
+                    {t('results.materialsDescription', {
+                      fluid: activeFluid,
+                      defaultValue: `Materials with ${activeFluid} compatibility ratings from MAPTIS database`,
+                    })}
                   </p>
                 </div>
 
@@ -608,10 +651,19 @@ export default function KnowledgeTwins() {
                           <Icon className={`h-5 w-5 ${config.color}`} />
                           <div>
                             <div className="text-lg font-bold">
-                              {config.label} (Rating {rating})
+                              {t(`ratings.${rating}.label`, {
+                                defaultValue: config.label,
+                              })}{" "}
+                              (Rating {rating})
                             </div>
                             <div className={`text-xs font-normal ${config.color} opacity-75`}>
-                              {config.description} - {materialsInRating.length} {materialsInRating.length === 1 ? 'material' : 'materials'}
+                              {t(`ratings.${rating}.description`, {
+                                defaultValue: config.description,
+                              })}{" "}
+                              - {materialsInRating.length}{" "}
+                              {materialsInRating.length === 1
+                                ? t('labels.material', { defaultValue: 'material' })
+                                : t('labels.materials', { defaultValue: 'materials' })}
                             </div>
                           </div>
                         </CardTitle>
@@ -631,25 +683,33 @@ export default function KnowledgeTwins() {
                                     <div className="grid grid-cols-4 gap-3 mb-3">
                                       {material.flamm_rating && material.flamm_rating !== 'No data' && (
                                         <div>
-                                          <div className="text-xs text-muted-foreground mb-1">FLAMM</div>
+                                          <div className="text-xs text-muted-foreground mb-1">
+                                            {t('ratingLabels.FLAMM', { defaultValue: 'FLAMM' })}
+                                          </div>
                                           {getRatingBadge(material.flamm_rating)}
                                         </div>
                                       )}
                                       {material.corr_rating && material.corr_rating !== 'No data' && (
                                         <div>
-                                          <div className="text-xs text-muted-foreground mb-1">CORR</div>
+                                          <div className="text-xs text-muted-foreground mb-1">
+                                            {t('ratingLabels.CORR', { defaultValue: 'CORR' })}
+                                          </div>
                                           {getRatingBadge(material.corr_rating)}
                                         </div>
                                       )}
                                       {material.scc_rating && material.scc_rating !== 'No data' && (
                                         <div>
-                                          <div className="text-xs text-muted-foreground mb-1">SCC</div>
+                                          <div className="text-xs text-muted-foreground mb-1">
+                                            {t('ratingLabels.SCC', { defaultValue: 'SCC' })}
+                                          </div>
                                           {getRatingBadge(material.scc_rating)}
                                         </div>
                                       )}
                                       {material.tvs_rating && material.tvs_rating !== 'No data' && (
                                         <div>
-                                          <div className="text-xs text-muted-foreground mb-1">TVS</div>
+                                          <div className="text-xs text-muted-foreground mb-1">
+                                            {t('ratingLabels.TVS', { defaultValue: 'TVS' })}
+                                          </div>
                                           {getRatingBadge(material.tvs_rating)}
                                         </div>
                                       )}
@@ -682,10 +742,13 @@ export default function KnowledgeTwins() {
               <div className="space-y-4">
                 <div>
                   <h2 className="text-xl font-bold mb-1">
-                    Standards Guidance
+                    {t('results.standardsGuidance', { defaultValue: 'Standards Guidance' })}
                   </h2>
                   <p className="text-sm text-muted-foreground">
-                    Supporting documentation from NASA {activeFluid.toUpperCase()} Body of Knowledge
+                    {t('results.standardsDescription', {
+                      fluid: activeFluid.toUpperCase(),
+                      defaultValue: `Supporting documentation from NASA ${activeFluid.toUpperCase()} Body of Knowledge`,
+                    })}
                   </p>
                 </div>
 
@@ -704,13 +767,13 @@ export default function KnowledgeTwins() {
                             </div>
                           </div>
                           <Badge variant="outline" className="ml-4">
-                            Score: {(result.relevance_score * 100).toFixed(0)}%
+                            {t('score', { defaultValue: 'Score' })}: {(result.relevance_score * 100).toFixed(0)}%
                           </Badge>
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <p className="text-sm text-muted-foreground">
-                          {result.text || 'No content available'}
+                          {result.text || t('results.noContent', { defaultValue: 'No content available' })}
                         </p>
                       </CardContent>
                     </Card>
@@ -727,9 +790,13 @@ export default function KnowledgeTwins() {
           <Card>
             <CardContent className="pt-8 pb-8 text-center">
               <Search className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-50" />
-              <h3 className="text-lg font-bold mb-1">No results found</h3>
+              <h3 className="text-lg font-bold mb-1">
+                {t('results.noResults', { defaultValue: 'No results found' })}
+              </h3>
               <p className="text-sm text-muted-foreground">
-                Try adjusting your search query or switching fluids
+                {t('results.noResultsHint', {
+                  defaultValue: 'Try adjusting your search query or switching fluids',
+                })}
               </p>
             </CardContent>
           </Card>

@@ -1,0 +1,2085 @@
+[
+  {
+    "row": 8,
+    "material_code": "54223",
+    "part_number": "MER07564-001",
+    "part_description": "BODY, VALVE, 10 INCH VALVE",
+    "nomenclature": "BODY, VALVE, 10 INCH VALVE",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "SCC",
+        "C"
+      ],
+      [
+        "CORR",
+        "B"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 9,
+    "material_code": "50181",
+    "part_number": "MER07561-001",
+    "part_description": "RING, RETAINING, 10 INCH VALVE",
+    "nomenclature": "RING, RETAINING, 10 INCH VALVE",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "SCC",
+        "N"
+      ],
+      [
+        "CORR",
+        "B"
+      ],
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 11,
+    "material_code": "54223",
+    "part_number": "MER07569-001",
+    "part_description": "BRACE, REAR, 10 INCH VALVE",
+    "nomenclature": "BRACE, REAR, 10 INCH VALVE",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "SCC",
+        "C"
+      ],
+      [
+        "CORR",
+        "B"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 14,
+    "material_code": "50181",
+    "part_number": "MER07568-001",
+    "part_description": "SHAFT, OFFSET, 10 INCH VALVE",
+    "nomenclature": "SHAFT, OFFSET, 10 INCH VALVE",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "SCC",
+        "N"
+      ],
+      [
+        "CORR",
+        "B"
+      ],
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 15,
+    "material_code": "10392",
+    "part_number": "MER07566-001",
+    "part_description": "ROTARY TANG, OFFSET SHAFT, 10 INCH VALVE",
+    "nomenclature": "ROTARY TANG, OFFSET SHAFT, 10 INCH VALVE",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 17,
+    "material_code": "10392",
+    "part_number": "MER07585-001",
+    "part_description": "POPPET, VALVE, 10 INCH",
+    "nomenclature": "POPPET, VALVE, 10 INCH",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 18,
+    "material_code": "10392",
+    "part_number": "MER07586-001",
+    "part_description": "COUPLING, POPPET",
+    "nomenclature": "COUPLING, POPPET",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 19,
+    "material_code": "10392",
+    "part_number": "MER07587-001",
+    "part_description": "INTERFACE RING, COUPLER TO POPPET",
+    "nomenclature": "INTERFACE RING, COUPLER TO POPPET",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 20,
+    "material_code": "55750",
+    "part_number": "MER07588-001",
+    "part_description": "PUSHER, BALL, POPPET",
+    "nomenclature": "PUSHER, BALL, POPPET",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "TVS",
+        "C"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 21,
+    "material_code": "54223",
+    "part_number": "MER07545-001",
+    "part_description": "LOWER CAM MOUNT, 10 INCH VALVE",
+    "nomenclature": "LOWER CAM MOUNT, 10 INCH VALVE",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "SCC",
+        "C"
+      ],
+      [
+        "CORR",
+        "B"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 22,
+    "material_code": "10392",
+    "part_number": "MER07546-001",
+    "part_description": "PRELOAD DISC, 10 INCH VALVE",
+    "nomenclature": "PRELOAD DISC, 10 INCH VALVE",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 23,
+    "material_code": "10392",
+    "part_number": "MER07553-001",
+    "part_description": "COVER, BEARING, 10 INCH VALVE",
+    "nomenclature": "COVER, BEARING, 10 INCH VALVE",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 24,
+    "material_code": "10392",
+    "part_number": "MER07554-001",
+    "part_description": "SLIDER, ROTARY TANG, 10 INCH VALVE",
+    "nomenclature": "SLIDER, ROTARY TANG, 10 INCH VALVE",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 25,
+    "material_code": "50678",
+    "part_number": "MER07555-001",
+    "part_description": "PIN, TRANSLATING, 10 INCH VALVE",
+    "nomenclature": "PIN, TRANSLATING, 10 INCH VALVE",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FLAM",
+        "C"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 26,
+    "material_code": "10392",
+    "part_number": "MER07556-001",
+    "part_description": "RING, INTERMEDIATE, ROTATIONAL, 10 INCH VALVE",
+    "nomenclature": "RING, INTERMEDIATE, ROTATIONAL, 10 INCH VALVE",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 27,
+    "material_code": "10392",
+    "part_number": "MER07557-001",
+    "part_description": "SHAFT, CENTER, 10 INCH VALVE",
+    "nomenclature": "SHAFT, CENTER, 10 INCH VALVE",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 28,
+    "material_code": "10392",
+    "part_number": "MER07558-001",
+    "part_description": "OFFSET ROTARY SHAFT, LOWER, 10 INCH VALVE",
+    "nomenclature": "OFFSET ROTARY SHAFT, LOWER, 10 INCH VALVE",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 29,
+    "material_code": "10392",
+    "part_number": "MER07559-001",
+    "part_description": "OFFSET ROTARY SHAFT, UPPER, 10 INCH VALVE",
+    "nomenclature": "OFFSET ROTARY SHAFT, UPPER, 10 INCH VALVE",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 32,
+    "material_code": "55461",
+    "part_number": "MER07580-001",
+    "part_description": "CAP, ACTUATOR",
+    "nomenclature": "CAP, ACTUATOR",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "SCC",
+        "N"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 33,
+    "material_code": "55750",
+    "part_number": "MER07574-001",
+    "part_description": "HOUSING, ACTUATOR",
+    "nomenclature": "HOUSING, ACTUATOR",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "TVS",
+        "C"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 34,
+    "material_code": "10727",
+    "part_number": "MER07581-001",
+    "part_description": "SHAFT, PISTON, ACTUATOR",
+    "nomenclature": "SHAFT, PISTON, ACTUATOR",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FLAM",
+        "C"
+      ],
+      [
+        "TVS",
+        "C"
+      ],
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 37,
+    "material_code": "55461",
+    "part_number": "MER07577-001",
+    "part_description": "MOUNT CAP, ACTUATOR",
+    "nomenclature": "MOUNT CAP, ACTUATOR",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "SCC",
+        "N"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 38,
+    "material_code": "55962",
+    "part_number": "MER07583-001",
+    "part_description": "BELLOWS, EXTERNAL, ACTUATOR",
+    "nomenclature": "BELLOWS, EXTERNAL, ACTUATOR",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FLAM",
+        "I"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 41,
+    "material_code": "51403",
+    "part_number": "MER07548-001",
+    "part_description": "MOUNT BRACKET, ACTUATOR, 10 INCH VALVE",
+    "nomenclature": "MOUNT BRACKET, ACTUATOR, 10 INCH VALVE",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "SCC",
+        "C"
+      ],
+      [
+        "CORR",
+        "B"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 42,
+    "material_code": "10392",
+    "part_number": "MER07572-001",
+    "part_description": "BRACKET, ANGLE, ACTUATOR",
+    "nomenclature": "BRACKET, ANGLE, ACTUATOR",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 43,
+    "material_code": "10392",
+    "part_number": "MER07550-001",
+    "part_description": "DRIVE LINK, 10 INCH VALVE",
+    "nomenclature": "DRIVE LINK, 10 INCH VALVE",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 44,
+    "material_code": "10392",
+    "part_number": "MER07571-001",
+    "part_description": "CONNECTING ROD, ACTUATOR, 10 INCH VALVE",
+    "nomenclature": "CONNECTING ROD, ACTUATOR, 10 INCH VALVE",
+    "nha": "MER07540",
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 45,
+    "material_code": "10011",
+    "part_number": "MER07550-001",
+    "part_description": "DRIVE LINK, 10 INCH VALVE",
+    "nomenclature": "DRIVE LINK, 10 INCH VALVE",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 46,
+    "material_code": "10392",
+    "part_number": "MER07571-001",
+    "part_description": "CONNECTING ROD, ACTUATOR, 10 INCH VALVE",
+    "nomenclature": "CONNECTING ROD, ACTUATOR, 10 INCH VALVE",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 47,
+    "material_code": "51429",
+    "part_number": "MER07545-001",
+    "part_description": "LOWER CAM MOUNT, 10 INCH VALVE",
+    "nomenclature": "LOWER CAM MOUNT, 10 INCH VALVE",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "SCC",
+        "C"
+      ],
+      [
+        "CORR",
+        "B"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 48,
+    "material_code": "10392",
+    "part_number": "MER07546-001",
+    "part_description": "PRELOAD DISC, 10 INCH VALVE",
+    "nomenclature": "PRELOAD DISC, 10 INCH VALVE",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 49,
+    "material_code": "10392",
+    "part_number": "MER07553-001",
+    "part_description": "COVER, BEARING, 10 INCH VALVE",
+    "nomenclature": "COVER, BEARING, 10 INCH VALVE",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 50,
+    "material_code": "10392",
+    "part_number": "MER07554-001",
+    "part_description": "SLIDER, ROTARY VALVE 10 INCH VALVE",
+    "nomenclature": "SLIDER, ROTARY VALVE 10 INCH VALVE",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 51,
+    "material_code": "50678",
+    "part_number": "MER07555-001",
+    "part_description": "PIN, TRANSL, FITTING, 10 INCH VALVE",
+    "nomenclature": "PIN, TRANSL, FITTING, 10 INCH VALVE",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FLAM",
+        "C"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 53,
+    "material_code": "10392",
+    "part_number": "MER07557-001",
+    "part_description": "SHAFT, CENTRAL, 10 INCH VALVE",
+    "nomenclature": "SHAFT, CENTRAL, 10 INCH VALVE",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 54,
+    "material_code": "10392",
+    "part_number": "MER07558-001",
+    "part_description": "OFFSET ROTARY SHAFT, LOWER, 10 INCH VALVE",
+    "nomenclature": "OFFSET ROTARY SHAFT, LOWER, 10 INCH VALVE",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 56,
+    "material_code": "51429",
+    "part_number": "MER07561-001",
+    "part_description": "RING, RETAINING, VALVE",
+    "nomenclature": "RING, RETAINING, VALVE",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "SCC",
+        "C"
+      ],
+      [
+        "CORR",
+        "B"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 58,
+    "material_code": "51429",
+    "part_number": "MER07569-001",
+    "part_description": "BRACE, BRACE",
+    "nomenclature": "BRACE, BRACE",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "SCC",
+        "C"
+      ],
+      [
+        "CORR",
+        "B"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 59,
+    "material_code": "51403",
+    "part_number": "MER07564-001",
+    "part_description": "BODY, VALVE, 10 INCH",
+    "nomenclature": "BODY, VALVE, 10 INCH",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "SCC",
+        "C"
+      ],
+      [
+        "CORR",
+        "B"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 60,
+    "material_code": "10392",
+    "part_number": "MER07566-001",
+    "part_description": "ROTARY TANG, OFFSET SHAFT, 10 INCH VALVE",
+    "nomenclature": "ROTARY TANG, OFFSET SHAFT, 10 INCH VALVE",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 61,
+    "material_code": "51429",
+    "part_number": "MER07568-001",
+    "part_description": "SHAFT, OFFSET, 10 INCH VALVE",
+    "nomenclature": "SHAFT, OFFSET, 10 INCH VALVE",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "SCC",
+        "C"
+      ],
+      [
+        "CORR",
+        "B"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 62,
+    "material_code": "10392",
+    "part_number": "MER07585-001",
+    "part_description": "POPPET, VALVE, 4 INCH",
+    "nomenclature": "POPPET, VALVE, 4 INCH",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 63,
+    "material_code": "10392",
+    "part_number": "MER07586-001",
+    "part_description": "COUPLING, POPPET",
+    "nomenclature": "COUPLING, POPPET",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 64,
+    "material_code": "10392",
+    "part_number": "MER07587-001",
+    "part_description": "INTERFACE RING, COUPLET SP-EXPT",
+    "nomenclature": "INTERFACE RING, COUPLET SP-EXPT",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 65,
+    "material_code": "55750",
+    "part_number": "MER07588-001",
+    "part_description": "PUSHER, BALL POPPET",
+    "nomenclature": "PUSHER, BALL POPPET",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "TVS",
+        "C"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 66,
+    "material_code": "54223",
+    "part_number": "MER07548-001",
+    "part_description": "MOUNT BRACKET, ACTUATOR, 10 INCH VALVE",
+    "nomenclature": "MOUNT BRACKET, ACTUATOR, 10 INCH VALVE",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "SCC",
+        "C"
+      ],
+      [
+        "CORR",
+        "B"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 67,
+    "material_code": "10392",
+    "part_number": "MER07572-001",
+    "part_description": "BRACKET, ANGLE, ACTUATOR",
+    "nomenclature": "BRACKET, ANGLE, ACTUATOR",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 69,
+    "material_code": "55461",
+    "part_number": "MER07574-001",
+    "part_description": "HOUSING, ACTUATOR",
+    "nomenclature": "HOUSING, ACTUATOR",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "SCC",
+        "N"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 70,
+    "material_code": "55461",
+    "part_number": "MER07577-001",
+    "part_description": "MOUNT CAP, ACTUATOR",
+    "nomenclature": "MOUNT CAP, ACTUATOR",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "SCC",
+        "N"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 71,
+    "material_code": "05057",
+    "part_number": "MER07578-001",
+    "part_description": "BUSHING, ACTUATOR, SMALL",
+    "nomenclature": "BUSHING, ACTUATOR, SMALL",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "TOX",
+        "K"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 72,
+    "material_code": "05057",
+    "part_number": "MER07579-001",
+    "part_description": "BUSHING, ACTUATOR, LARGE",
+    "nomenclature": "BUSHING, ACTUATOR, LARGE",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "TOX",
+        "K"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 73,
+    "material_code": "55461",
+    "part_number": "MER07580-001",
+    "part_description": "CAP, ACTUATOR",
+    "nomenclature": "CAP, ACTUATOR",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "SCC",
+        "N"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 74,
+    "material_code": "10727",
+    "part_number": "MER07581-001",
+    "part_description": "SHAFT, PISTON, ACTUATOR",
+    "nomenclature": "SHAFT, PISTON, ACTUATOR",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FLAM",
+        "C"
+      ],
+      [
+        "TVS",
+        "C"
+      ],
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 76,
+    "material_code": "55962",
+    "part_number": "MER07583-001",
+    "part_description": "BELLOWS, EXTERNAL, ACTUATOR",
+    "nomenclature": "BELLOWS, EXTERNAL, ACTUATOR",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FLAM",
+        "I"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 77,
+    "material_code": "55962",
+    "part_number": "01-885-06K",
+    "part_description": "ROD END, .375, .3750-24 RH THREAD",
+    "nomenclature": "ROD END, .375, .3750-24 RH THREAD",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FLAM",
+        "I"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 78,
+    "material_code": "55962",
+    "part_number": "11-885-06K",
+    "part_description": "ROD END, .375, .3750-24 LH THREAD",
+    "nomenclature": "ROD END, .375, .3750-24 LH THREAD",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FLAM",
+        "I"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 79,
+    "material_code": "52741",
+    "part_number": "2949T32",
+    "part_description": "HOIST RING, LIFTING, .3750-16 THD, 500LB",
+    "nomenclature": "HOIST RING, LIFTING, .3750-16 THD, 500LB",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FLAM",
+        "C"
+      ],
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 80,
+    "material_code": "52739",
+    "part_number": "50854SCS",
+    "part_description": "SPRING, COMPRESSION, 1.575 LG",
+    "nomenclature": "SPRING, COMPRESSION, 1.575 LG",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 81,
+    "material_code": "10474",
+    "part_number": "97022A388",
+    "part_description": "RING SHIM, 1.5 OD, 1.0 ID, .010 THICK",
+    "nomenclature": "RING SHIM, 1.5 OD, 1.0 ID, .010 THICK",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "TVS",
+        "C"
+      ],
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 82,
+    "material_code": "10474",
+    "part_number": "AS4307K04",
+    "part_description": "UNION FITTING, -04, (.250), .4375-20 UNJF 3A THD",
+    "nomenclature": "UNION FITTING, -04, (.250), .4375-20 UNJF 3A THD",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "TVS",
+        "C"
+      ],
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 86,
+    "material_code": "10392",
+    "part_number": "EH-22-C86",
+    "part_description": "RETAINING RING, INTERNAL, 22mm",
+    "nomenclature": "RETAINING RING, INTERNAL, 22mm",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 87,
+    "material_code": "50784",
+    "part_number": "F-400521-04",
+    "part_description": "SEAL, K-PORT, GOLD PLATE, .25 NOM DIA PORT",
+    "nomenclature": "SEAL, K-PORT, GOLD PLATE, .25 NOM DIA PORT",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 92,
+    "material_code": "50768",
+    "part_number": "M12133/2-100",
+    "part_description": "WASHER, SPRING TENSION, BELLEVILLE SPRING, 1.0 ID",
+    "nomenclature": "WASHER, SPRING TENSION, BELLEVILLE SPRING, 1.0 ID",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 93,
+    "material_code": "50768",
+    "part_number": "M12133/2-255",
+    "part_description": "WASHER, SPRING TENSION, BELLEVILLE SPRING, .25 ID",
+    "nomenclature": "WASHER, SPRING TENSION, BELLEVILLE SPRING, .25 ID",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 94,
+    "material_code": "50769",
+    "part_number": "M12133/2-255",
+    "part_description": "WASHER, SPRING TENSION, BELLEVILLE SPRING, .250 ID",
+    "nomenclature": "WASHER, SPRING TENSION, BELLEVILLE SPRING, .250 ID",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 96,
+    "material_code": "50769",
+    "part_number": "M12133/2-255",
+    "part_description": "WASHER, SPRING TENSION, BELLEVILLE SPRING, CRES",
+    "nomenclature": "WASHER, SPRING TENSION, BELLEVILLE SPRING, CRES",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 97,
+    "material_code": "10392",
+    "part_number": "M81935/3-6C",
+    "part_description": "LOCKING DEVICE FOR ROD END BEARINGS, .375",
+    "nomenclature": "LOCKING DEVICE FOR ROD END BEARINGS, .375",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 108,
+    "material_code": "10267",
+    "part_number": "MS21043-6",
+    "part_description": "NUT SELF-LOCKING, 800 F, REDUCED HEX, .3750-24 UNJF THD",
+    "nomenclature": "NUT SELF-LOCKING, 800 F, REDUCED HEX, .3750-24 UNJF THD",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 109,
+    "material_code": "10267",
+    "part_number": "MS21043-6",
+    "part_description": "NUT SELF-LOCKING, 800 F, REDUCED HEXAGON, .3750-24 UNJF-3B",
+    "nomenclature": "NUT SELF-LOCKING, 800 F, REDUCED HEXAGON, .3750-24 UNJF-3B",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 110,
+    "material_code": "10520",
+    "part_number": "MS21209C1610",
+    "part_description": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, 1.000-8, 1.000 LG",
+    "nomenclature": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, 1.000-8, 1.000 LG",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 111,
+    "material_code": "50769",
+    "part_number": "MS21209C4-10",
+    "part_description": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .2500-20 THD, .250 LG",
+    "nomenclature": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .2500-20 THD, .250 LG",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 112,
+    "material_code": "10520",
+    "part_number": "MS21209C4-10",
+    "part_description": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .2500-20, .250 LG",
+    "nomenclature": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .2500-20, .250 LG",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 113,
+    "material_code": "50769",
+    "part_number": "MS21209C4-15",
+    "part_description": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .2500-20 THD, .375 LG",
+    "nomenclature": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .2500-20 THD, .375 LG",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 114,
+    "material_code": "50769",
+    "part_number": "MS21209C5-15",
+    "part_description": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .3125-18 THD, .469 LG",
+    "nomenclature": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .3125-18 THD, .469 LG",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 115,
+    "material_code": "50769",
+    "part_number": "MS21209C6-20",
+    "part_description": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .3750-16 THD, .75 LG",
+    "nomenclature": "INSERT, SCREW THD, COARSE, LOCKING, HELICAL COIL, .3750-16 THD, .75 LG",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 116,
+    "material_code": "10267",
+    "part_number": "MS9390-440",
+    "part_description": "PIN, STRAIGHT, HEADLESS, DOWEL, .250 OD, .75 LG",
+    "nomenclature": "PIN, STRAIGHT, HEADLESS, DOWEL, .250 OD, .75 LG",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 117,
+    "material_code": "10392",
+    "part_number": "NAS1149E0432R",
+    "part_description": "WASHER, FLAT, .265 ID, .032 THK",
+    "nomenclature": "WASHER, FLAT, .265 ID, .032 THK",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 118,
+    "material_code": "10392",
+    "part_number": "NAS1149E0432R",
+    "part_description": "WASHER, FLAT, .250 NOM",
+    "nomenclature": "WASHER, FLAT, .250 NOM",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 119,
+    "material_code": "10392",
+    "part_number": "NAS1149E0516R",
+    "part_description": "WASHER, FLAT, .328 ID, .016 THK",
+    "nomenclature": "WASHER, FLAT, .328 ID, .016 THK",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 120,
+    "material_code": "10392",
+    "part_number": "NAS1149E0516R",
+    "part_description": "FLAT WASHER, .328 ID NOM, .063 THK",
+    "nomenclature": "FLAT WASHER, .328 ID NOM, .063 THK",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 121,
+    "material_code": "10267",
+    "part_number": "NAS1351N4-20",
+    "part_description": "SHCS, .2500-28 UNRF-3A, 1.250 LG",
+    "nomenclature": "SHCS, .2500-28 UNRF-3A, 1.250 LG",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 122,
+    "material_code": "10267",
+    "part_number": "NAS1351N4H16",
+    "part_description": "SHCS, DRILLED, .2500-28 UNRF-3A, 1.00 LG",
+    "nomenclature": "SHCS, DRILLED, .2500-28 UNRF-3A, 1.00 LG",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 123,
+    "material_code": "10267",
+    "part_number": "NAS1352N4-10",
+    "part_description": "SHCS, .2500-20 UNRC-3A, .625 LG",
+    "nomenclature": "SHCS, .2500-20 UNRC-3A, .625 LG",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 124,
+    "material_code": "10267",
+    "part_number": "NAS1352N4-12",
+    "part_description": "SHCS, .2500-20 UNRC-3A, .750 LG",
+    "nomenclature": "SHCS, .2500-20 UNRC-3A, .750 LG",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 125,
+    "material_code": "10267",
+    "part_number": "NAS1352N4-14",
+    "part_description": "SHCS, .2500-20 UNRC-3A, .875 LG",
+    "nomenclature": "SHCS, .2500-20 UNRC-3A, .875 LG",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 126,
+    "material_code": "10267",
+    "part_number": "NAS1352N5-12",
+    "part_description": "SHCS, .3125-24 UNRF-3A, .750 LG",
+    "nomenclature": "SHCS, .3125-24 UNRF-3A, .750 LG",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 127,
+    "material_code": "10267",
+    "part_number": "NAS1352N5-16",
+    "part_description": "SHCS, .3125-18 UNRC-3A, 1.000 LG",
+    "nomenclature": "SHCS, .3125-18 UNRC-3A, 1.000 LG",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 128,
+    "material_code": "10267",
+    "part_number": "NAS509-4C",
+    "part_description": "NUT, JAM, DRILLED, .2500-28 UNJF-3B",
+    "nomenclature": "NUT, JAM, DRILLED, .2500-28 UNJF-3B",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 129,
+    "material_code": "10267",
+    "part_number": "NAS509-6C",
+    "part_description": "NUT, JAM, DRILLED, .3750-24 RH THREAD",
+    "nomenclature": "NUT, JAM, DRILLED, .3750-24 RH THREAD",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 130,
+    "material_code": "10267",
+    "part_number": "NAS509L6C",
+    "part_description": "NUT, JAM, DRILLED, .3750-24 LH THREAD",
+    "nomenclature": "NUT, JAM, DRILLED, .3750-24 LH THREAD",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 131,
+    "material_code": "10267",
+    "part_number": "NAS6706U13",
+    "part_description": "BOLT, TENSION, HEX HEAD, CLOSE TOL, .3750-24 UNJF THD, 1.4 LG",
+    "nomenclature": "BOLT, TENSION, HEX HEAD, CLOSE TOL, .3750-24 UNJF THD, 1.4 LG",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 132,
+    "material_code": "10267",
+    "part_number": "NAS6706U13",
+    "part_description": "BOLT, TENSION, HEX HEAD, CLOSE TOL, .3750-24 UNJF-3A, 1.390 LG",
+    "nomenclature": "BOLT, TENSION, HEX HEAD, CLOSE TOL, .3750-24 UNJF-3A, 1.390 LG",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 134,
+    "material_code": "10392",
+    "part_number": "WHM-244-S86",
+    "part_description": "RETAINING RING, INTERNAL, 2-7/16 ID",
+    "nomenclature": "RETAINING RING, INTERNAL, 2-7/16 ID",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 135,
+    "material_code": "53430",
+    "part_number": "WHM-275-S86",
+    "part_description": "RETAINING RING, INTERNAL, 2 3/4",
+    "nomenclature": "RETAINING RING, INTERNAL, 2 3/4",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "TOX",
+        "K"
+      ],
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  },
+  {
+    "row": 136,
+    "material_code": "10392",
+    "part_number": "WSM-137-C86",
+    "part_description": "RETAINING RING, EXTERIOR",
+    "nomenclature": "RETAINING RING, EXTERIOR",
+    "nha": null,
+    "system": null,
+    "subsystem": null,
+    "environment": "GH2, LH2",
+    "overall_evaluation": null,
+    "criticality": null,
+    "triggers": [
+      [
+        "FS",
+        "U"
+      ]
+    ],
+    "mua_rationale": null,
+    "remarks": null
+  }
+]

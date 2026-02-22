@@ -14,6 +14,8 @@ import MIULBuilderV4 from "./pages/MIULBuilderV4";
 import MiraV4Query from "./pages/MiraV4Query";
 import BSMHQuery from "./pages/BSMHQuery";
 import MUAWizardV7 from "./pages/MUAWizardV7";
+import MUAMatchmaker from "./pages/MUAMatchmaker";
+import GasCompatibility from "./pages/GasCompatibility";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,25 +34,22 @@ const App = () => (
               element={
                 <BSMHQuery
                   endpoint="query"
-                  title="MIRA Query"
-                  runLabel="Run Query"
-                  subtitle="Decision Lineage Pipeline"
-                  description="Evidence-first queries with transparent confidence scoring and NASA-compliant audit trails"
                   showPipelineBlurb
                 />
               }
             />
-            <Route path="/gas-compatibility" element={<Navigate to="/query" replace />} />
+            <Route path="/gas-compatibility" element={<GasCompatibility />} />
             <Route path="/test-classes" element={<TestClasses />} />
             <Route path="/test-classes/:testType" element={<TestClassDetail />} />
             <Route path="/miul" element={<MIULBuilderV4 />} />
-            <Route path="/mua" element={<Navigate to="/mua-v7" replace />} />
+            <Route path="/mua" element={<Navigate to="/mua-v8" replace />} />
             <Route path="/compliance" element={<Navigate to="/query" replace />} />
             <Route path="/mp-plan" element={<MPPlanGenerator />} />
             <Route path="/dt-editor" element={<DTTreeEditor />} />
             <Route path="/v4-query" element={<MiraV4Query />} />
             <Route path="/bsmh" element={<Navigate to="/query" replace />} />
             <Route path="/mua-v7" element={<MUAWizardV7 />} />
+            <Route path="/mua-v8" element={<MUAMatchmaker />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AppLayout>

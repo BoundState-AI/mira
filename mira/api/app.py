@@ -22,15 +22,15 @@ from pathlib import Path
 
 # Load .env BEFORE importing routers (they check env vars at import time)
 from dotenv import load_dotenv
+
 _env_file = Path(__file__).parent.parent.parent / ".env"
 if _env_file.exists():
     load_dotenv(_env_file)
 
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI  # noqa: E402
+from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 
-from . import routers
-import uuid
+from . import routers  # noqa: E402
 
 
 def create_app() -> FastAPI:
@@ -68,6 +68,7 @@ def create_app() -> FastAPI:
     app.include_router(routers.mua_router, prefix="/mua", tags=["mua"])
     app.include_router(routers.mua_v6_router, prefix="/mua/v6", tags=["mua-v6"])
     app.include_router(routers.mua_v7_router, prefix="/mua/v7", tags=["mua-v7"])
+    app.include_router(routers.matchmaker_router, prefix="/mua/matchmaker", tags=["mua-matchmaker-v8"])
 
     # M&P Plan Generator V1 + V2 (Codex)
     app.include_router(routers.mp_plan_router, prefix="/mp-plan", tags=["mp-plan"])

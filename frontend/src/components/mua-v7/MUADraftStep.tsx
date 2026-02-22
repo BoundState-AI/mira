@@ -210,8 +210,8 @@ export default function MUADraftStep({ wizard, patchWizard, onNext }: Props) {
                   Category III — MIUL Rationale Code Report
                 </p>
                 <p className="text-blue-700 mt-1">
-                  This material qualifies for an Appendix B rationale code.
-                  Per NASA-STD-6016C, no MUA form is submitted for Category III items.
+                  This material qualifies for an Appendix E rationale code.
+                  Per JSC 27301F, no MUA form is submitted for Category III items.
                   Disposition is reported through the MIUL system with the assigned
                   rationale code.
                 </p>

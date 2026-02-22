@@ -1,0 +1,4693 @@
+SHALL STATEMENT EXTRACTION REPORT
+============================================================
+Source: 6016 rev c.pdf
+Pages: 157
+Date: 2026-02-10T12:04:35.644377
+Total Statements: 922
+
+BREAKDOWN BY TYPE:
+  mandatory           : 674
+  permission          : 88
+  recommendation      : 59
+  prohibition         : 59
+  intent              : 42
+
+============================================================
+
+SECTION (no section)
+----------------------------------------
+  [MANDATORY] [prohibition] p.2
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs
+    Requirement: are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] [prohibition] p.3
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs
+    Requirement: are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [PERMISSION] [prohibition] p.3
+    Volume 2 may only be used if the
+    Subject: should not use this minimized MUA
+    Requirement: only be used if the
+
+  [MANDATORY] [prohibition] p.4
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs
+    Requirement: are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [RECOMMENDATION] [prohibition] p.4
+    should not use this minimized MUA
+    Subject: should not use this minimized MUA
+    Requirement: use this minimized MUA
+
+  [MANDATORY] [documentation] p.5
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs
+    Requirement: are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [PERMISSION] [general] p.5
+    and Facilities, and applicable technical requirements may be cited in contract, program, and other
+    Subject: and Facilities, and applicable technical requirements
+    Requirement: may be cited in contract, program, and other
+
+  [PERMISSION] [general] p.5
+    It may also apply to the Jet Propulsion Laboratory (a Federally Funded
+    Subject: It
+    Requirement: may also apply to the Jet Propulsion Laboratory (a Federally Funded Research and Development Center)
+
+  [RECOMMENDATION] [handling] p.5
+    Requests for information should be submitted via “Feedback” at https://standards
+    Subject: Requests for information
+    Requirement: should be submitted via “Feedback” at <https://standards.nasa.gov>
+
+  [RECOMMENDATION] [approval] p.5
+    Requests for changes to this NASA Technical Standard should be submitted via MSFC Form
+    Subject: Requests for changes to this NASA Technical Standard
+    Requirement: should be submitted via MSFC Form 4230, Request for Change to a NASA Technical Standard
+
+  [MANDATORY] p.6
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.7
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.8
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.9
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.10
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.10
+    Requirement), numbered, and indicated by the word “shall
+    Subject: Requirement), numbered, and indicated by the word “
+    Requirement: 
+
+  [MANDATORY] p.11
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.12
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.13
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.14
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.15
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.16
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.17
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.18
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.19
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.20
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [PERMISSION] p.20
+    ground facility, or (2) a condition that may cause death or permanently disabling injury,
+    Subject: ground facility, or (2) a condition that
+    Requirement: cause death or permanently disabling injury,
+
+  [PERMISSION] p.20
+    Critical Hazard:  A condition that may cause severe injury or occupational illness,
+    Subject: Critical Hazard:  A condition that
+    Requirement: cause severe injury or occupational illness,
+
+  [MANDATORY] p.20
+    specimens required to develop design values are defined in applicable standards
+    Subject: specimens
+    Requirement: to develop design values are defined in applicable standards
+
+  [PERMISSION] p.20
+    to the electrical insulating properties of corrosion products that may build up at the
+    Subject: to the electrical insulating properties of corrosion products that
+    Requirement: build up at the
+
+  [PERMISSION] p.20
+    Mission Critical Hardware:  Hardware, the failure of which may result in the
+    Subject: Mission Critical Hardware:  Hardware, the failure of which
+    Requirement: result in the
+
+  [MANDATORY] p.20
+    inspection techniques are applied to materials and structures to verify required integrity
+    Subject: inspection techniques are applied to materials and structures to verify
+    Requirement: integrity
+
+  [MANDATORY] p.21
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.21
+    Also, the main structure that is required to sustain the significant applied
+    Subject: Also, the main structure that
+    Requirement: sustain the significant applied
+
+  [PERMISSION] p.21
+    Tin Pest:  The allotropic transformation of tin that may occur at or below 13
+    Subject: Tin Pest:  The allotropic transformation of tin that
+    Requirement: occur at or below 13
+
+  [PERMISSION] p.21
+    Whisker (Metal):  A spontaneous growth that may form on surfaces of metals,
+    Subject: Whisker (Metal):  A spontaneous growth that
+    Requirement: form on surfaces of metals,
+
+  [MANDATORY] p.22
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [PERMISSION] p.22
+    Metal whiskers may also detach from the surfaces on
+    Subject: Metal whiskers
+    Requirement: also detach from the surfaces on
+
+  [MANDATORY] p.23
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.23
+    equipment, hardware packaging, and hardware shipment shall be controlled to prevent damage to
+    Subject: equipment, hardware packaging, and hardware shipment
+    Requirement: be controlled to prevent damage to
+
+  [MANDATORY] p.24
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [RECOMMENDATION] p.24
+    The Materials and Processes Selection, Control, and Implementation Plan should be approved
+    Subject: The Materials and Processes Selection, Control, and Implementation Plan
+    Requirement: be approved
+
+  [MANDATORY] p.25
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.25
+    critical functions shall define process steps at a level of detail that ensures a repeatable/controlled
+    Subject: critical functions
+    Requirement: define process steps at a level of detail that ensures a repeatable/controlled
+
+  [MANDATORY] p.25
+    [MPR 20] Process qualification shall be conducted to demonstrate the repeatability of
+    Subject: [MPR 20] Process qualification
+    Requirement: be conducted to demonstrate the repeatability of
+
+  [RECOMMENDATION] p.25
+    produces a consistent and reliable product, so it should not be assumed that they are suitable to
+    Subject: produces a consistent and reliable product, so it
+    Requirement: be assumed that they are suitable to
+
+  [MANDATORY] p.26
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.27
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.28
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.29
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [PROHIBITION] p.29
+    [MPR 32] Distributors or other processors shall not heat treat, hot work, or cold work
+    Subject: [MPR 32] Distributors or other processors
+    Requirement: heat treat, hot work, or cold work
+
+  [RECOMMENDATION] p.29
+    Processing records should be retained for the life of the program
+    Subject: Processing records
+    Requirement: be retained for the life of the program
+
+  [RECOMMENDATION] p.29
+    program residual hardware should be delivered to the procuring authority as part of contract
+    Subject: program residual hardware
+    Requirement: be delivered to the procuring authority as part of contract
+
+  [MANDATORY] p.30
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.30
+    like fatigue and fracture, and verification of design values shall be representative of the material,
+    Subject: like fatigue and fracture, and verification of design values
+    Requirement: be representative of the material,
+
+  [RECOMMENDATION] p.30
+    The statistical basis for fatigue and fracture properties should be consistent with the governing
+    Subject: The statistical basis for fatigue and fracture properties
+    Requirement: be consistent with the governing
+
+  [MANDATORY] p.30
+    [MPR 35] A, B, or S-basis statistical methods shall be defined by, and values for
+    Subject: [MPR 35] A, B, or S-basis statistical methods
+    Requirement: be defined by, and values for
+
+  [PERMISSION] p.30
+    Design values from MMPDS, Volume 2, may only be used if the production facility substantiates
+    Subject: Design values from MMPDS, Volume 2
+    Requirement: only be used if the production facility substantiates
+
+  [PROHIBITION] p.30
+    term “S-basis,” it is used only for screening composite materials and such values may not be
+    Subject: term “S-basis,” it is used only for screening composite materials and such values
+    Requirement: be
+
+  [PERMISSION] p.30
+    Design values in CMH-17 Volume 2 may be used only if each production facility substantiates
+    Subject: Design values in CMH-17 Volume 2
+    Requirement: be used only if each production facility substantiates
+
+  [MANDATORY] p.30
+    product form, and thickness shall match the alloy, heat treatment, product specification, product
+    Subject: product form, and thickness
+    Requirement: match the alloy, heat treatment, product specification, product
+
+  [MANDATORY] p.31
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [PERMISSION] p.31
+    CMH-17 than those specified in section 2 may be used provided the methodology
+    Subject: CMH-17 than those specified in section 2
+    Requirement: be used provided the methodology
+
+  [PERMISSION] p.31
+    temperatures, may result in some alloys that are over-strengthened
+    Subject: temperatures
+    Requirement: result in some alloys that are over-strengthened
+
+  [PERMISSION] p.31
+    may be adversely affected when they are strengthened significantly beyond their
+    Requirement: be adversely affected when they are strengthened significantly beyond their
+
+  [PROHIBITION] p.31
+    (6) For composite structures, “pristine” A and B-basis design values may not be
+    Subject: (6) For composite structures, “pristine” A and B-basis design values
+    Requirement: be
+
+  [PERMISSION] p.31
+    Degraded design values that take into account damage tolerance may be
+    Subject: Degraded design values that take into account damage tolerance
+    Requirement: be
+
+  [PERMISSION] p.31
+    substantially lower than pristine design values and may be required in
+    Subject: substantially lower than pristine design values and
+    Requirement: be required in
+
+  [MANDATORY] p.31
+    not available, they shall be determined by methods described in MMPDS or SAE CMH-17 and a
+    Subject: not available, they
+    Requirement: be determined by methods described in MMPDS or SAE CMH-17 and a
+
+  [MANDATORY] p.32
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [PERMISSION] p.32
+    It is recognized that the development of statistical design values may, at times, be impractical for
+    Subject: It is recognized that the development of statistical design values
+    Requirement: at times, be impractical for
+
+  [RECOMMENDATION] p.32
+    contractor should develop a tailored approach to adequately substantiate the design values for
+    Subject: contractor
+    Requirement: develop a tailored approach to adequately substantiate the design values for
+
+  [MANDATORY] p.32
+    shall be approved with an MUA
+    Requirement: be approved with an MUA
+
+  [RECOMMENDATION] p.32
+    At a minimum, the following should be addressed in the MUA documenting the rationale for use
+    Subject: At a minimum, the following
+    Requirement: be addressed in the MUA documenting the rationale for use
+
+  [RECOMMENDATION] p.32
+    The following should be addressed in the MUA documenting the rationale for use of the
+    Subject: The following
+    Requirement: be addressed in the MUA documenting the rationale for use of the
+
+  [INTENT] p.32
+    (2) How future material lots will be verified for performance
+    Subject: (2) How future material lots
+    Requirement: be verified for performance
+
+  [RECOMMENDATION] p.32
+    the associated design values should be demonstrated at an appropriate structural scale
+    Subject: the associated design values
+    Requirement: be demonstrated at an appropriate structural scale
+
+  [MANDATORY] p.33
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.33
+    [MPR 39] All contractor-developed mechanical and physical property data shall be
+    Subject: [MPR 39] All contractor-developed mechanical and physical property data
+    Requirement: be
+
+  [MANDATORY] p.34
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [RECOMMENDATION] p.34
+    manufacturing) should not use this minimized MUA activity
+    Subject: manufacturing)
+    Requirement: use this minimized MUA activity
+
+  [MANDATORY] p.35
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [PERMISSION] p.35
+    6001B may be used in an environment with an oxygen concentration lower than the test level
+    Subject: 6001B
+    Requirement: be used in an environment with an oxygen concentration lower than the test level
+
+  [MANDATORY] p.36
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.36
+    (maximum leak rate less than 1 x 10-4 cm3/sec), shall meet the offgassing requirements of Test 7
+    Subject: (maximum leak rate less than 1 x 10-4 cm3/sec)
+    Requirement: meet the offgassing requirements of Test 7
+
+  [MANDATORY] p.36
+    [MPR 46] Spacecraft maximum allowable concentration (SMAC) values shall be
+    Subject: [MPR 46] Spacecraft maximum allowable concentration (SMAC) values
+    Requirement: be
+
+  [MANDATORY] p.37
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [INTENT] p.37
+    The test program needs to demonstrate that materials will not degrade sufficiently to affect
+    Subject: The test program needs to demonstrate that materials
+    Requirement: not degrade sufficiently to affect
+
+  [MANDATORY] p.37
+    [MPR 49] Materials degradation in long-term tests shall be characterized by post-test
+    Subject: [MPR 49] Materials degradation in long-term tests
+    Requirement: be characterized by post-test
+
+  [MANDATORY] p.37
+    heat-affected zone) shall be addressed in the compatibility determination
+    Subject: heat-affected zone)
+    Requirement: be addressed in the compatibility determination
+
+  [MANDATORY] p.37
+    [MPR 210] Materials used in nitrogen tetroxide systems shall be evaluated for
+    Subject: [MPR 210] Materials used in nitrogen tetroxide systems
+    Requirement: be evaluated for
+
+  [MANDATORY] p.37
+    compatibility assessment shall be conducted using the methodology described for oxygen
+    Subject: compatibility assessment
+    Requirement: be conducted using the methodology described for oxygen
+
+  [MANDATORY] p.37
+    [MPR 212] Materials used in other oxidizer systems shall be evaluated for potential
+    Subject: [MPR 212] Materials used in other oxidizer systems
+    Requirement: be evaluated for potential
+
+  [MANDATORY] p.38
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.38
+    oxygen compatibility assessment shall be conducted as described in NASA-STD-6001B and the
+    Subject: oxygen compatibility assessment
+    Requirement: be conducted as described in NASA-STD-6001B and the
+
+  [PERMISSION] p.38
+    As described in NASA-STD-6001B, material/component configurational testing may be required
+    Subject: As described in NASA-STD-6001B, material/component configurational testing
+    Requirement: be required
+
+  [MANDATORY] p.39
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.40
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.41
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.41
+    critical functions shall be solution heat-treated and quenched after welding except for the
+    Subject: critical functions
+    Requirement: be solution heat-treated and quenched after welding except for the
+
+  [PROHIBITION] p.41
+    such as 303, and these alloys shall not be used in spaceflight hardware that provides mission-
+    Subject: such as 303, and these alloys
+    Requirement: be used in spaceflight hardware that provides mission-
+
+  [MANDATORY] p.42
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.43
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [PROHIBITION] p.43
+    [MPR 72] Alloys containing more than 4 percent beryllium by weight shall not be
+    Subject: [MPR 72] Alloys containing more than 4 percent beryllium by weight
+    Requirement: be
+
+  [MANDATORY] p.43
+    critical functions shall address its low-impact resistance and notch sensitivity, particularly at low
+    Subject: critical functions
+    Requirement: address its low-impact resistance and notch sensitivity, particularly at low
+
+  [MANDATORY] p.43
+    critical functions shall be processed to ensure complete removal of the damaged layer (twins and
+    Subject: critical functions
+    Requirement: be processed to ensure complete removal of the damaged layer (twins and
+
+  [PROHIBITION] p.43
+    percent beryllium by weight) and oxides of beryllium shall not be machined inside spacecraft
+    Subject: percent beryllium by weight) and oxides of beryllium
+    Requirement: be machined inside spacecraft
+
+  [MANDATORY] p.43
+    critical functions shall be penetrant-inspected for crack-like flaws with a high-sensitivity
+    Subject: critical functions
+    Requirement: be penetrant-inspected for crack-like flaws with a high-sensitivity
+
+  [MANDATORY] p.44
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [RECOMMENDATION] p.44
+    Metallic zinc is less volatile than cadmium but should not be used in vacuum environments
+    Subject: Metallic zinc is less volatile than cadmium but
+    Requirement: be used in vacuum environments
+
+  [MANDATORY] p.45
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.45
+    surface in a high temperature, oxidizing environment shall be evaluated when a thin sheet of one
+    Subject: surface in a high temperature, oxidizing environment
+    Requirement: be evaluated when a thin sheet of one
+
+  [MANDATORY] p.46
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [PROHIBITION] p.46
+    tin pest formation but may not eliminate it completely
+    Subject: tin pest formation but
+    Requirement: eliminate it completely
+
+  [PROHIBITION] p.46
+    [MPR 88] Tin plating shall not be used for contacts in electrical interconnects
+    Subject: [MPR 88] Tin plating
+    Requirement: be used for contacts in electrical interconnects
+
+  [PERMISSION] p.46
+    Tin plating may be accepted through the MUA
+    Subject: Tin plating
+    Requirement: be accepted through the MUA
+
+  [MANDATORY] p.47
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [PERMISSION] p.47
+    Space Shuttle Challenger, and other elastomers may struggle to retain sealing performance at
+    Subject: Space Shuttle Challenger, and other elastomers
+    Requirement: struggle to retain sealing performance at
+
+  [MANDATORY] p.48
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.48
+    fasteners outside closed compartments, shall be tested using the technique of ASTM E595-15,
+    Subject: fasteners outside closed compartments
+    Requirement: be tested using the technique of ASTM E595-15,
+
+  [PERMISSION] p.48
+    More stringent requirements may be needed for materials that are line of sight to contamination-
+    Subject: More stringent requirements
+    Requirement: be needed for materials that are line of sight to contamination-
+
+  [PERMISSION] p.48
+    The approach taken depends on the specific program needs but may include
+    Subject: The approach taken depends on the specific program needs but
+    Requirement: include
+
+  [PERMISSION] p.48
+    cryogenic optics may be sensitive to water vapor deposition
+    Subject: cryogenic optics
+    Requirement: be sensitive to water vapor deposition
+
+  [MANDATORY] p.48
+    shall be vacuum baked at the maximum tolerable temperature of the component, 10 ºC above the
+    Requirement: be vacuum baked at the maximum tolerable temperature of the component, 10 ºC above the
+
+  [MANDATORY] p.49
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [PERMISSION] p.49
+    A vacuum-bake temperature of 125 ºC (257 ºF) (the ASTM E595-15 screening temperature) may
+    Subject: A vacuum-bake temperature of 125 ºC (257 ºF) (the ASTM E595-15 screening temperature)
+    Requirement: 
+
+  [RECOMMENDATION] p.49
+    bakeout should be adjusted to prevent damage to components
+    Subject: bakeout
+    Requirement: be adjusted to prevent damage to components
+
+  [RECOMMENDATION] p.49
+    are dependent on temperature, the chosen temperature should be the highest possible without
+    Subject: are dependent on temperature, the chosen temperature
+    Requirement: be the highest possible without
+
+  [RECOMMENDATION] p.49
+    A hardware functionality bench test should be performed to re-verify performance after baking
+    Subject: A hardware functionality bench test
+    Requirement: be performed to re-verify performance after baking
+
+  [MANDATORY] p.50
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [RECOMMENDATION] p.50
+    met) and an MUA is submitted for approval, supporting rationale should include how materials
+    Subject: met) and an MUA is submitted for approval, supporting rationale
+    Requirement: include how materials
+
+  [MANDATORY] p.51
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.51
+    Adhesion to the fluorocarbon surface is required for electrical wire or cable insulated or coated
+    Subject: Adhesion to the fluorocarbon surface
+    Requirement: for electrical wire or cable insulated or coated
+
+  [MANDATORY] p.51
+    [MPR 101] Etched surfaces shall be processed within 24 hours or within 1 year if
+    Subject: [MPR 101] Etched surfaces
+    Requirement: be processed within 24 hours or within 1 year if
+
+  [RECOMMENDATION] p.51
+    The open end of the wire should not be exposed to the etchant
+    Subject: The open end of the wire
+    Requirement: be exposed to the etchant
+
+  [MANDATORY] p.52
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.52
+    control tensile-test coupons shall be taken from the production part (or from the same material
+    Subject: control tensile-test coupons
+    Requirement: be taken from the production part (or from the same material
+
+  [MANDATORY] p.52
+    [MPR 107] When process-control tensile-test coupons are required, the requirement
+    Subject: [MPR 107] When process-control tensile-test coupons are
+    Requirement: the requirement
+
+  [MANDATORY] p.52
+    for the coupons shall be specified on the engineering drawing for the part
+    Subject: for the coupons
+    Requirement: be specified on the engineering drawing for the part
+
+  [MANDATORY] p.52
+    test acceptance values shall be specified on the engineering drawing for the part
+    Subject: test acceptance values
+    Requirement: be specified on the engineering drawing for the part
+
+  [PROHIBITION] p.52
+    [MPR 109] Materials shall not be used in spaceflight hardware that provides mission-
+    Subject: [MPR 109] Materials
+    Requirement: be used in spaceflight hardware that provides mission-
+
+  [MANDATORY] p.53
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [RECOMMENDATION] p.53
+    parallel to the principal stresses, parts should be designed such that the weakest grain flow
+    Subject: parallel to the principal stresses, parts
+    Requirement: be designed such that the weakest grain flow
+
+  [RECOMMENDATION] p.53
+    The forging pattern should be essentially free
+    Subject: The forging pattern
+    Requirement: be essentially free
+
+  [MANDATORY] p.53
+    (preproduction) approval shall be obtained from the procuring authority
+    Subject: (preproduction) approval
+    Requirement: be obtained from the procuring authority
+
+  [PERMISSION] p.53
+    first article requirements may be waived for hand forging by review of the forging plan through
+    Subject: first article requirements
+    Requirement: be waived for hand forging by review of the forging plan through
+
+  [MANDATORY] p.53
+    subsequent production forgings shall be in accordance with SAE AMS2375D, Control of
+    Subject: subsequent production forgings
+    Requirement: be in accordance with SAE AMS2375D, Control of
+
+  [PERMISSION] p.53
+    Mechanical properties testing requirements may include fracture, durability, or damage
+    Subject: Mechanical properties testing requirements
+    Requirement: include fracture, durability, or damage
+
+  [MANDATORY] p.53
+    the first production forging shall be sectioned to show the grain-flow patterns and to determine
+    Subject: the first production forging
+    Requirement: be sectioned to show the grain-flow patterns and to determine
+
+  [MANDATORY] p.53
+    (prolongations) for the first article shall be compared to the control coupons to show they are
+    Subject: (prolongations) for the first article
+    Requirement: be compared to the control coupons to show they are
+
+  [MANDATORY] p.53
+    properties at control areas shall be repeated after any substantive change in the forging
+    Subject: properties at control areas
+    Requirement: be repeated after any substantive change in the forging
+
+  [MANDATORY] p.53
+    [MPR 115] These data and results of tests on the redesign shall be retained and made
+    Subject: [MPR 115] These data and results of tests on the redesign
+    Requirement: be retained and made
+
+  [MANDATORY] p.53
+    [MPR 116] Trim ring or protrusion specimens (prolongations) shall be obtained for
+    Subject: [MPR 116] Trim ring or protrusion specimens (prolongations)
+    Requirement: be obtained for
+
+  [MANDATORY] p.53
+    each production forging used in safety-critical applications and tested for required minimum
+    Subject: each production forging used in safety-critical applications and tested for
+    Requirement: minimum
+
+  [MANDATORY] p.53
+    [MPR 117] Surface and volumetric nondestructive inspection (NDI) shall be
+    Subject: [MPR 117] Surface and volumetric nondestructive inspection (NDI)
+    Requirement: be
+
+  [MANDATORY] p.54
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.55
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.55
+    production panels shall be subjected to first-article inspection to verify proper material integrity,
+    Subject: production panels
+    Requirement: be subjected to first-article inspection to verify proper material integrity,
+
+  [MANDATORY] p.55
+    minimum required mechanical properties, proper grain size, and macro/microstructure
+    Subject: minimum
+    Requirement: mechanical properties, proper grain size, and macro/microstructure
+
+  [MANDATORY] p.55
+    [MPR 126] The mechanical properties of the first production article shall be
+    Subject: [MPR 126] The mechanical properties of the first production article
+    Requirement: be
+
+  [PERMISSION] p.55
+    Mechanical properties testing requirements may include fracture, durability, or damage
+    Subject: Mechanical properties testing requirements
+    Requirement: include fracture, durability, or damage
+
+  [MANDATORY] p.55
+    [MPR 127] The same forming practice and heat-treating procedure shall be used for
+    Subject: [MPR 127] The same forming practice and heat-treating procedure
+    Requirement: be used for
+
+  [MANDATORY] p.55
+    [MPR 128] Sectioning to determine mechanical properties at control areas shall be
+    Subject: [MPR 128] Sectioning to determine mechanical properties at control areas
+    Requirement: be
+
+  [MANDATORY] p.55
+    [MPR 129] Surface and volumetric NDI shall be performed on all safety-critical
+    Subject: [MPR 129] Surface and volumetric NDI
+    Requirement: be performed on all safety-critical
+
+  [PERMISSION] p.55
+    Given the complexities of some formed panels, volumetric NDI may be performed as a raw stock
+    Subject: Given the complexities of some formed panels, volumetric NDI
+    Requirement: be performed as a raw stock
+
+  [MANDATORY] p.56
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [RECOMMENDATION] p.56
+    cleanliness inspections should be conducted as part of the bonding process
+    Subject: cleanliness inspections
+    Requirement: be conducted as part of the bonding process
+
+  [MANDATORY] p.56
+    [MPR 132] Bonded primary structural joints shall demonstrate cohesive failure
+    Subject: [MPR 132] Bonded primary structural joints
+    Requirement: demonstrate cohesive failure
+
+  [MANDATORY] p.57
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.57
+    • Repair weld required after the weldment has been post-weld heat treated
+    Subject: • Repair weld
+    Requirement: after the weldment has been post-weld heat treated
+
+  [MANDATORY] p.57
+    • Repair weld required after final machining has been completed
+    Subject: • Repair weld
+    Requirement: after final machining has been completed
+
+  [MANDATORY] p.57
+    [MPR 135] A weld development and certification plan shall be developed for large
+    Subject: [MPR 135] A weld development and certification plan
+    Requirement: be developed for large
+
+  [RECOMMENDATION] p.57
+    This plan should include full scale pathfinder weldments, tooling development, and a design
+    Subject: This plan
+    Requirement: include full scale pathfinder weldments, tooling development, and a design
+
+  [MANDATORY] p.58
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.58
+    [MPR 141] Titanium welds shall be light/dark straw or better (Ref
+    Subject: [MPR 141] Titanium welds
+    Requirement: be light/dark straw or better (Ref
+
+  [MANDATORY] p.58
+    [MPR 142] Titanium and its alloys shall be welded with alloy-matching or
+    Subject: [MPR 142] Titanium and its alloys
+    Requirement: be welded with alloy-matching or
+
+  [MANDATORY] p.58
+    [MPR 143] Extra low interstitial (ELI) filler wires shall be used for titanium
+    Subject: [MPR 143] Extra low interstitial (ELI) filler wires
+    Requirement: be used for titanium
+
+  [PROHIBITION] p.58
+    [MPR 144] Commercially pure (CP) titanium filler shall not be used on Ti-6Al-4V or
+    Subject: [MPR 144] Commercially pure (CP) titanium filler
+    Requirement: be used on Ti-6Al-4V or
+
+  [PROHIBITION] p.58
+    shall not be used in welding titanium and its alloys
+    Requirement: be used in welding titanium and its alloys
+
+  [MANDATORY] p.58
+    (1) [MPR 146] The inert gas shall have a dew point of -60º C (-76º F) or lower
+    Subject: (1) [MPR 146] The inert gas
+    Requirement: have a dew point of -60º C (-76º F) or lower
+
+  [MANDATORY] p.58
+    [MPR 147] Welded alpha and alpha plus beta titanium alloys shall be stress relieved
+    Subject: [MPR 147] Welded alpha and alpha plus beta titanium alloys
+    Requirement: be stress relieved
+
+  [MANDATORY] p.58
+    [MPR 148] Titanium beta alloys that are welded shall be evaluated on a case-by-case
+    Subject: [MPR 148] Titanium beta alloys that are welded
+    Requirement: be evaluated on a case-by-case
+
+  [MANDATORY] p.58
+    functions shall comply with AWS D17
+    Subject: functions
+    Requirement: comply with AWS D17
+
+  [MANDATORY] p.59
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.59
+    critical functions shall comply with AWS D17
+    Subject: critical functions
+    Requirement: comply with AWS D17
+
+  [PROHIBITION] p.59
+    (2010) AMD 1 (2012) shall not be used without an approved MUA to document the acceptance
+    Subject: (2010) AMD 1 (2012)
+    Requirement: be used without an approved MUA to document the acceptance
+
+  [MANDATORY] p.59
+    [MPR 152] The Welding Procedure Specification (WPS) shall include the following
+    Subject: [MPR 152] The Welding Procedure Specification (WPS)
+    Requirement: include the following
+
+  [MANDATORY] p.59
+    content in addition to that required by AWS D17
+    Subject: content in addition to that
+    Requirement: by AWS D17
+
+  [RECOMMENDATION] p.59
+    Qualification strength requirements should be included in weld qualification test acceptance
+    Subject: Qualification strength requirements
+    Requirement: be included in weld qualification test acceptance
+
+  [MANDATORY] p.60
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.61
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.61
+    other operations involving high temperatures that might affect the brazed joint shall be
+    Subject: other operations involving high temperatures that might affect the brazed joint
+    Requirement: be
+
+  [PROHIBITION] p.61
+    prohibited for spaceflight hardware that provides mission-critical functions unless it can be
+    Requirement: for spaceflight hardware that provides mission-critical functions unless it can be
+
+  [INTENT] p.61
+    demonstrated that the fixturing, processes, methods, and/or procedures employed will preclude
+    Subject: demonstrated that the fixturing, processes, methods, and/or procedures employed
+    Requirement: preclude
+
+  [MANDATORY] p.61
+    functions shall be designed for shear loading and not be relied upon for strength in axial loading
+    Subject: functions
+    Requirement: be designed for shear loading and not be relied upon for strength in axial loading
+
+  [MANDATORY] p.61
+    provides mission-critical functions shall be evaluated in accordance with AWS C3
+    Subject: provides mission-critical functions
+    Requirement: be evaluated in accordance with AWS C3
+
+  [MANDATORY] p.61
+    testing shall be conducted on pre-production brazed joints to verify that the braze layer that
+    Subject: testing
+    Requirement: be conducted on pre-production brazed joints to verify that the braze layer that
+
+  [MANDATORY] p.62
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.63
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.64
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [PERMISSION] p.64
+    (2) When supporting rationale is provided, close tolerance parts may be machined
+    Subject: (2) When supporting rationale is provided, close tolerance parts
+    Requirement: be machined
+
+  [MANDATORY] p.64
+    [MPR 179] The etching procedure shall specify the minimum amount of material to
+    Subject: [MPR 179] The etching procedure
+    Requirement: specify the minimum amount of material to
+
+  [MANDATORY] p.64
+    [MPR 180] If etching is not feasible, it shall be demonstrated that the required flaw
+    Subject: [MPR 180] If etching is not feasible, it
+    Requirement: be demonstrated that the required flaw
+
+  [MANDATORY] p.65
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.66
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [PERMISSION] p.66
+    and which may be exposed to condensed moisture/water should be electrically isolated from
+    Subject: and which
+    Requirement: be exposed to condensed moisture/water should be electrically isolated from
+
+  [RECOMMENDATION] p.66
+    Alternate approaches should be identified in the corrosion
+    Subject: Alternate approaches
+    Requirement: be identified in the corrosion
+
+  [RECOMMENDATION] p.66
+    The method(s) selected to prevent galvanic corrosion should be evaluated against
+    Subject: The method(s) selected to prevent galvanic corrosion
+    Requirement: be evaluated against
+
+  [INTENT] p.66
+    [MPR 186] Structural honeycomb sandwich assemblies that will be subjected to
+    Subject: [MPR 186] Structural honeycomb sandwich assemblies that
+    Requirement: be subjected to
+
+  [MANDATORY] p.66
+    heating shall be tested for the expected environments to show that the construction can withstand
+    Subject: heating
+    Requirement: be tested for the expected environments to show that the construction can withstand
+
+  [RECOMMENDATION] p.66
+    / proof testing of each flight article should address the combined loading environment, including
+    Subject: / proof testing of each flight article
+    Requirement: address the combined loading environment, including
+
+  [MANDATORY] p.66
+    [MPR 187] Sandwich assemblies using perforated and moisture-absorbing cores shall
+    Subject: [MPR 187] Sandwich assemblies using perforated and moisture-absorbing cores
+    Requirement: 
+
+  [PERMISSION] p.66
+    Selection of such materials may require
+    Subject: Selection of such materials
+    Requirement: require
+
+  [MANDATORY] p.66
+    [MPR 188] Structural sandwich constructions and core materials shall be designed,
+    Subject: [MPR 188] Structural sandwich constructions and core materials
+    Requirement: be designed,
+
+  [MANDATORY] p.67
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [RECOMMENDATION] p.67
+    Acceptance / proof testing of each flight article should address the critical combined loading
+    Subject: Acceptance / proof testing of each flight article
+    Requirement: address the critical combined loading
+
+  [MANDATORY] p.68
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.68
+    metallic materials properties by hydrogen embrittlement shall be addressed in the Materials and
+    Subject: metallic materials properties by hydrogen embrittlement
+    Requirement: be addressed in the Materials and
+
+  [MANDATORY] p.68
+    [MPR 193] An MUA shall be written rationalizing the selection of metallic materials
+    Subject: [MPR 193] An MUA
+    Requirement: be written rationalizing the selection of metallic materials
+
+  [PERMISSION] p.68
+    Test data may have to be generated in a simulated environment to support the rationale
+    Subject: Test data
+    Requirement: have to be generated in a simulated environment to support the rationale
+
+  [MANDATORY] p.68
+    shall be controlled to prevent hydrogen embrittlement, or embrittlement relief treatment shall be
+    Requirement: be controlled to prevent hydrogen embrittlement, or embrittlement relief treatment shall be
+
+  [MANDATORY] p.68
+    for spaceflight hardware that provides mission-critical functions, the part shall be
+    Subject: for spaceflight hardware that provides mission-critical functions, the part
+    Requirement: be
+
+  [MANDATORY] p.69
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [PROHIBITION] p.69
+    [MPR 196] Gold shall not be used in contact with indium or an indium alloy (such as indium
+    Subject: [MPR 196] Gold
+    Requirement: be used in contact with indium or an indium alloy (such as indium
+
+  [MANDATORY] p.70
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.70
+    [MPR 199] Gold-aluminum brazing processes shall be controlled to minimize
+    Subject: [MPR 199] Gold-aluminum brazing processes
+    Requirement: be controlled to minimize
+
+  [MANDATORY] p.70
+    [MPR 200] Gold-aluminum bonding processes shall be controlled to prevent the
+    Subject: [MPR 200] Gold-aluminum bonding processes
+    Requirement: be controlled to prevent the
+
+  [MANDATORY] p.71
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [PERMISSION] p.71
+    during operations may interfere with mechanisms, bearings, and seals
+    Subject: during operations
+    Requirement: interfere with mechanisms, bearings, and seals
+
+  [PERMISSION] p.71
+    to remove contaminants from these systems may leave reactive residues if not
+    Subject: to remove contaminants from these systems
+    Requirement: leave reactive residues if not
+
+  [PERMISSION] p.71
+    • Microbial contamination within life support systems and ultrapure water systems may
+    Subject: • Microbial contamination within life support systems and ultrapure water systems
+    Requirement: 
+
+  [PERMISSION] p.71
+    • Control of terrestrial microbial contamination and extraterrestrial material may be
+    Subject: • Control of terrestrial microbial contamination and extraterrestrial material
+    Requirement: be
+
+  [MANDATORY] p.71
+    required in accordance with NASA Procedural Requirements (NPR) 8020
+    Requirement: in accordance with NASA Procedural Requirements (NPR) 8020
+
+  [MANDATORY] p.71
+    [MPR 203] A Contamination Control Plan shall be generated in accordance with the
+    Subject: [MPR 203] A Contamination Control Plan
+    Requirement: be generated in accordance with the
+
+  [MANDATORY] p.71
+    [MPR 204] The Contamination Control Plan shall include controls on contamination-
+    Subject: [MPR 204] The Contamination Control Plan
+    Requirement: include controls on contamination-
+
+  [MANDATORY] p.71
+    [MPR 205] The FOD prevention program shall be established for all ground
+    Subject: [MPR 205] The FOD prevention program
+    Requirement: be established for all ground
+
+  [MANDATORY] p.71
+    [MPR 206] The FOD prevention program shall conform to NAS 412 (Revision 1),
+    Subject: [MPR 206] The FOD prevention program
+    Requirement: conform to NAS 412 (Revision 1),
+
+  [MANDATORY] p.71
+    [MPR 207] Cleanliness levels for assembly- and subassembly-level hardware shall be
+    Subject: [MPR 207] Cleanliness levels for assembly- and subassembly-level hardware
+    Requirement: be
+
+  [MANDATORY] p.72
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [RECOMMENDATION] p.72
+    Additional aspects of the verification process should be documented in the Materials and
+    Subject: Additional aspects of the verification process
+    Requirement: be documented in the Materials and
+
+  [MANDATORY] p.73
+    MUAs are required for all M&P that are technically acceptable but do not meet the requirements of this NASA
+    Subject: MUAs are
+    Requirement: for all M&P that are technically acceptable but do not meet the requirements of this NASA
+
+  [MANDATORY] p.73
+    Requirement (“shall”) statements indicate
+    Subject: Requirement (“
+    Requirement: ”) statements indicate
+
+  [MANDATORY] p.74
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.74
+    [MPR 1] Programs shall apply these
+    Subject: [MPR 1] Programs
+    Requirement: apply these
+
+  [MANDATORY] p.74
+    [MPR 2] Programs shall be responsible
+    Subject: [MPR 2] Programs
+    Requirement: be responsible
+
+  [MANDATORY] p.74
+    specific programs/projects shall be
+    Subject: specific programs/projects
+    Requirement: be
+
+  [MANDATORY] p.75
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.76
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.76
+    Implementation Plan shall become the
+    Subject: Implementation Plan
+    Requirement: become the
+
+  [MANDATORY] p.77
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.77
+    functions shall be defined by standards
+    Subject: functions
+    Requirement: be defined by standards
+
+  [MANDATORY] p.77
+    functions shall be identified directly on
+    Subject: functions
+    Requirement: be identified directly on
+
+  [MANDATORY] p.77
+    shall be identified by document number
+    Requirement: be identified by document number
+
+  [INTENT] p.77
+    into all of the M&P that will be
+    Subject: into all of the M&P that
+    Requirement: be
+
+  [MANDATORY] p.77
+    provides mission-critical functions shall
+    Subject: provides mission-critical functions
+    Requirement: 
+
+  [MANDATORY] p.78
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.78
+    mission-critical functions shall define
+    Subject: mission-critical functions
+    Requirement: define
+
+  [MANDATORY] p.78
+    [MPR 20] Process qualification shall be
+    Subject: [MPR 20] Process qualification
+    Requirement: be
+
+  [MANDATORY] p.79
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [PERMISSION] p.79
+    critical functions may be limited to those
+    Subject: critical functions
+    Requirement: be limited to those
+
+  [MANDATORY] p.79
+    required to ensure safety of flight (for
+    Requirement: to ensure safety of flight (for
+
+  [MANDATORY] p.79
+    [MPR 23] An M&P control panel shall be
+    Subject: [MPR 23] An M&P control panel
+    Requirement: be
+
+  [MANDATORY] p.79
+    scope and membership shall be described
+    Subject: scope and membership
+    Requirement: be described
+
+  [MANDATORY] p.79
+    [MPR 25] M&P usage shall be
+    Subject: [MPR 25] M&P usage
+    Requirement: be
+
+  [MANDATORY] p.80
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.80
+    usage shall cover the final design as
+    Subject: usage
+    Requirement: cover the final design as
+
+  [MANDATORY] p.80
+    shall be defined in the Materials and
+    Requirement: be defined in the Materials and
+
+  [MANDATORY] p.80
+    application is acceptable shall be
+    Subject: application is acceptable
+    Requirement: be
+
+  [MANDATORY] p.81
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [PROHIBITION] p.81
+    [MPR 29] MUAs shall not be used to
+    Subject: [MPR 29] MUAs
+    Requirement: be used to
+
+  [MANDATORY] p.81
+    mission-critical functions shall be
+    Subject: mission-critical functions
+    Requirement: be
+
+  [MANDATORY] p.81
+    critical parts, shall be traceable through
+    Subject: critical parts
+    Requirement: be traceable through
+
+  [PROHIBITION] p.81
+    shall not heat treat, hot work, or cold
+    Requirement: heat treat, hot work, or cold
+
+  [MANDATORY] p.81
+    Required to control procurement of
+    Requirement: to control procurement of
+
+  [MANDATORY] p.81
+    materials shall be utilized for the design
+    Subject: materials
+    Requirement: be utilized for the design
+
+  [MANDATORY] p.82
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.82
+    verification of design values shall be
+    Subject: verification of design values
+    Requirement: be
+
+  [MANDATORY] p.82
+    other required mechanical
+    Subject: other
+    Requirement: mechanical
+
+  [MANDATORY] p.82
+    methods shall be defined by, and values
+    Subject: methods
+    Requirement: be defined by, and values
+
+  [MANDATORY] p.82
+    shall match the alloy, heat treatment,
+    Requirement: match the alloy, heat treatment,
+
+  [MANDATORY] p.82
+    are not available, they shall be determined
+    Subject: are not available, they
+    Requirement: be determined
+
+  [MANDATORY] p.83
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.83
+    shall be approved with an MUA
+    Requirement: be approved with an MUA
+
+  [INTENT] p.83
+    properties will be derived and
+    Subject: properties
+    Requirement: be derived and
+
+  [MANDATORY] p.83
+    shall be made available to the responsible
+    Requirement: be made available to the responsible
+
+  [MANDATORY] p.83
+    MUA is required per 4
+    Subject: MUA
+    Requirement: per 4
+
+  [PROHIBITION] p.83
+    shall not be used except in redundant
+    Requirement: be used except in redundant
+
+  [MANDATORY] p.84
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.84
+    MMPDS, Volume 1, shall require an
+    Subject: MMPDS, Volume 1
+    Requirement: require an
+
+  [INTENT] p.84
+    properties will be derived and
+    Subject: properties
+    Requirement: be derived and
+
+  [MANDATORY] p.85
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.86
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [PERMISSION] p.86
+    STD-6001B may be used in an
+    Subject: STD-6001B
+    Requirement: be used in an
+
+  [MANDATORY] p.87
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.87
+    than 1 x 10-4 cm3/sec), shall meet the
+    Subject: than 1 x 10-4 cm3/sec)
+    Requirement: meet the
+
+  [MANDATORY] p.87
+    toxic gases must be controlled in
+    Subject: toxic gases
+    Requirement: be controlled in
+
+  [MANDATORY] p.87
+    The required testing
+    Subject: The
+    Requirement: testing
+
+  [MANDATORY] p.87
+    concentration (SMAC) values shall be
+    Subject: concentration (SMAC) values
+    Requirement: be
+
+  [MANDATORY] p.88
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.88
+    [MPR 47] An MUA shall be written
+    Subject: [MPR 47] An MUA
+    Requirement: be written
+
+  [MANDATORY] p.89
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.89
+    enhance reactions or degradation shall be
+    Subject: enhance reactions or degradation
+    Requirement: be
+
+  [MANDATORY] p.89
+    term tests shall be characterized by post-
+    Subject: term tests
+    Requirement: be characterized by post-
+
+  [MANDATORY] p.89
+    occurred, post-test analyses must be
+    Subject: occurred, post-test analyses
+    Requirement: be
+
+  [MANDATORY] p.89
+    weld metal or heat-affected zone) shall be
+    Subject: weld metal or heat-affected zone)
+    Requirement: be
+
+  [MANDATORY] p.89
+    tetroxide systems shall be evaluated for
+    Subject: tetroxide systems
+    Requirement: be evaluated for
+
+  [MANDATORY] p.89
+    tetroxide compatibility assessment shall
+    Subject: tetroxide compatibility assessment
+    Requirement: 
+
+  [MANDATORY] p.90
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.90
+    oxidizer systems shall be evaluated for
+    Subject: oxidizer systems
+    Requirement: be evaluated for
+
+  [MANDATORY] p.90
+    systems containing enriched oxygen shall
+    Subject: systems containing enriched oxygen
+    Requirement: 
+
+  [INTENT] p.90
+    will come in contact with oxygen
+    Requirement: come in contact with oxygen
+
+  [MANDATORY] p.90
+    must be evaluated for compatibility
+    Requirement: be evaluated for compatibility
+
+  [MANDATORY] p.90
+    an oxygen compatibility assessment shall
+    Subject: an oxygen compatibility assessment
+    Requirement: 
+
+  [MANDATORY] p.91
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.91
+    shall undergo oxygen component
+    Requirement: undergo oxygen component
+
+  [MANDATORY] p.91
+    materials shall be evaluated for
+    Subject: materials
+    Requirement: be evaluated for
+
+  [MANDATORY] p.91
+    [MPR 55] Arc tracking shall be evaluated
+    Subject: [MPR 55] Arc tracking
+    Requirement: be evaluated
+
+  [MANDATORY] p.92
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.92
+    Environments, shall be used to select
+    Subject: Environments
+    Requirement: be used to select
+
+  [MANDATORY] p.92
+    exception that an MUA is not required for
+    Subject: exception that an MUA is not
+    Requirement: for
+
+  [MANDATORY] p.93
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.93
+    machining shall be used
+    Subject: machining
+    Requirement: be used
+
+  [MANDATORY] p.93
+    mission-critical functions shall be verified
+    Subject: mission-critical functions
+    Requirement: be verified
+
+  [PROHIBITION] p.93
+    shall not be processed or used above 371
+    Requirement: be processed or used above 371
+
+  [MANDATORY] p.93
+    mission-critical functions shall be
+    Subject: mission-critical functions
+    Requirement: be
+
+  [MANDATORY] p.94
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.94
+    alloys, such as 303, and these alloys shall
+    Subject: alloys, such as 303, and these alloys
+    Requirement: 
+
+  [MANDATORY] p.95
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.96
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.96
+    a spacecraft must be prevented
+    Subject: a spacecraft
+    Requirement: be prevented
+
+  [PROHIBITION] p.96
+    percent beryllium by weight shall not be
+    Subject: percent beryllium by weight
+    Requirement: be
+
+  [PROHIBITION] p.96
+    percent beryllium by weight shall not be
+    Subject: percent beryllium by weight
+    Requirement: be
+
+  [MANDATORY] p.96
+    mission-critical functions shall address its
+    Subject: mission-critical functions
+    Requirement: address its
+
+  [MANDATORY] p.96
+    When beryllium is required to be
+    Subject: When beryllium
+    Requirement: be
+
+  [MANDATORY] p.96
+    mission-critical functions shall be
+    Subject: mission-critical functions
+    Requirement: be
+
+  [MANDATORY] p.96
+    When beryllium is required to be
+    Subject: When beryllium
+    Requirement: be
+
+  [MANDATORY] p.97
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.97
+    must be removed
+    Requirement: be removed
+
+  [MANDATORY] p.97
+    removal must be by chemical etch
+    Subject: removal
+    Requirement: be by chemical etch
+
+  [INTENT] p.97
+    shallower cuts will reduce the depth
+    Subject: shallower cuts
+    Requirement: reduce the depth
+
+  [INTENT] p.97
+    of the damage but will never
+    Subject: of the damage but
+    Requirement: never
+
+  [PROHIBITION] p.97
+    of beryllium shall not be machined inside
+    Subject: of beryllium
+    Requirement: be machined inside
+
+  [MANDATORY] p.97
+    operations must be highly
+    Subject: operations
+    Requirement: be highly
+
+  [MANDATORY] p.97
+    mission-critical functions shall be
+    Subject: mission-critical functions
+    Requirement: be
+
+  [MANDATORY] p.98
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.98
+    such tools must be prevented
+    Subject: such tools
+    Requirement: be prevented
+
+  [MANDATORY] p.99
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.99
+    properties is also required
+    Subject: properties is also
+    Requirement: 
+
+  [MANDATORY] p.99
+    lubricants, shall be removed by suitable
+    Subject: lubricants
+    Requirement: be removed by suitable
+
+  [MANDATORY] p.99
+    oxidizing environment shall be evaluated
+    Subject: oxidizing environment
+    Requirement: be evaluated
+
+  [MANDATORY] p.99
+    and tin plating shall be alloyed with at
+    Subject: and tin plating
+    Requirement: be alloyed with at
+
+  [MANDATORY] p.99
+    shall comply with GEIA-STD-0005-1A,
+    Requirement: comply with GEIA-STD-0005-1A,
+
+  [MANDATORY] p.100
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [INTENT] p.100
+    and will also be exposed to temperatures
+    Subject: and
+    Requirement: also be exposed to temperatures
+
+  [MANDATORY] p.100
+    pest formation shall be documented in the
+    Subject: pest formation
+    Requirement: be documented in the
+
+  [INTENT] p.100
+    how the tin pest problem will be
+    Subject: how the tin pest problem
+    Requirement: be
+
+  [PROHIBITION] p.100
+    [MPR 88] Tin plating shall not be used
+    Subject: [MPR 88] Tin plating
+    Requirement: be used
+
+  [MANDATORY] p.101
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.101
+    mission-critical functions shall be
+    Subject: mission-critical functions
+    Requirement: be
+
+  [MANDATORY] p.101
+    cable clamps, shall be cure-dated for
+    Subject: cable clamps
+    Requirement: be cure-dated for
+
+  [PROHIBITION] p.101
+    during cure shall not be used because they
+    Subject: during cure
+    Requirement: be used because they
+
+  [MANDATORY] p.101
+    required elastomeric properties shall be
+    Requirement: elastomeric properties shall be
+
+  [MANDATORY] p.102
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.102
+    temperatures must be restricted
+    Subject: temperatures
+    Requirement: be restricted
+
+  [MANDATORY] p.103
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.103
+    unidentified materials shall be vacuum
+    Subject: unidentified materials
+    Requirement: be vacuum
+
+  [MANDATORY] p.104
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.105
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.106
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.107
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.107
+    mission-critical functions shall meet the
+    Subject: mission-critical functions
+    Requirement: meet the
+
+  [MANDATORY] p.107
+    provides mission-critical functions shall
+    Subject: provides mission-critical functions
+    Requirement: 
+
+  [MANDATORY] p.107
+    mission-critical functions shall meet the
+    Subject: mission-critical functions
+    Requirement: meet the
+
+  [MANDATORY] p.107
+    process-control tensile-test coupons shall
+    Subject: process-control tensile-test coupons
+    Requirement: 
+
+  [MANDATORY] p.108
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.108
+    test coupons are required, the requirement
+    Subject: test coupons are
+    Requirement: the requirement
+
+  [MANDATORY] p.108
+    for the coupons shall be specified on the
+    Subject: for the coupons
+    Requirement: be specified on the
+
+  [MANDATORY] p.108
+    tensile-test acceptance values shall be
+    Subject: tensile-test acceptance values
+    Requirement: be
+
+  [MANDATORY] p.109
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [PROHIBITION] p.109
+    [MPR 109] Materials shall not be used in
+    Subject: [MPR 109] Materials
+    Requirement: be used in
+
+  [MANDATORY] p.109
+    (preproduction) approval shall be
+    Subject: (preproduction) approval
+    Requirement: be
+
+  [MANDATORY] p.109
+    subsequent production forgings shall be
+    Subject: subsequent production forgings
+    Requirement: be
+
+  [MANDATORY] p.109
+    shall be sectioned to show the grain-flow
+    Requirement: be sectioned to show the grain-flow
+
+  [MANDATORY] p.109
+    (prolongations) for the first article shall
+    Subject: (prolongations) for the first article
+    Requirement: 
+
+  [INTENT] p.109
+    articles will be used to verify that
+    Subject: articles
+    Requirement: be used to verify that
+
+  [MANDATORY] p.110
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.110
+    shall be repeated after any substantive
+    Requirement: be repeated after any substantive
+
+  [MANDATORY] p.110
+    on the redesign shall be retained and
+    Subject: on the redesign
+    Requirement: be retained and
+
+  [MANDATORY] p.110
+    specimens (prolongations) shall be
+    Subject: specimens (prolongations)
+    Requirement: be
+
+  [MANDATORY] p.110
+    for required minimum mechanical
+    Subject: for
+    Requirement: minimum mechanical
+
+  [MANDATORY] p.111
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.111
+    nondestructive inspection (NDI) shall be
+    Subject: nondestructive inspection (NDI)
+    Requirement: be
+
+  [MANDATORY] p.111
+    functions shall meet the requirements of
+    Subject: functions
+    Requirement: meet the requirements of
+
+  [MANDATORY] p.111
+    production castings shall be subjected to
+    Subject: production castings
+    Requirement: be subjected to
+
+  [MANDATORY] p.111
+    minimum required mechanical properties,
+    Subject: minimum
+    Requirement: mechanical properties,
+
+  [MANDATORY] p.111
+    shall be compared to the control coupons
+    Requirement: be compared to the control coupons
+
+  [INTENT] p.111
+    Trim rings/protrusions will be
+    Subject: Trim rings/protrusions
+    Requirement: be
+
+  [MANDATORY] p.111
+    heat-treating procedure shall be used for
+    Subject: heat-treating procedure
+    Requirement: be used for
+
+  [INTENT] p.111
+    the production castings will have
+    Subject: the production castings
+    Requirement: have
+
+  [MANDATORY] p.112
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.112
+    bars at critical locations shall be
+    Subject: bars at critical locations
+    Requirement: be
+
+  [MANDATORY] p.112
+    testing shall be conducted for Class 1 and
+    Subject: testing
+    Requirement: be conducted for Class 1 and
+
+  [MANDATORY] p.112
+    nondestructive inspection shall be
+    Subject: nondestructive inspection
+    Requirement: be
+
+  [MANDATORY] p.112
+    production panels shall be subjected to
+    Subject: production panels
+    Requirement: be subjected to
+
+  [MANDATORY] p.112
+    material integrity, minimum required
+    Subject: material integrity, minimum
+    Requirement: 
+
+  [MANDATORY] p.112
+    the first production article shall be
+    Subject: the first production article
+    Requirement: be
+
+  [INTENT] p.112
+    Control coupons will be used for
+    Subject: Control coupons
+    Requirement: be used for
+
+  [MANDATORY] p.112
+    and heat-treating procedure shall be used
+    Subject: and heat-treating procedure
+    Requirement: be used
+
+  [INTENT] p.112
+    the production formed panels will
+    Subject: the production formed panels
+    Requirement: 
+
+  [MANDATORY] p.113
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.113
+    shall be repeated after any substantive
+    Requirement: be repeated after any substantive
+
+  [MANDATORY] p.113
+    shall be performed on all safety-critical
+    Requirement: be performed on all safety-critical
+
+  [PERMISSION] p.113
+    Formed panels may contain
+    Subject: Formed panels
+    Requirement: contain
+
+  [MANDATORY] p.113
+    shall meet MSFC-SPEC-445A, Adhesive
+    Requirement: meet MSFC-SPEC-445A, Adhesive
+
+  [MANDATORY] p.113
+    processes shall be controlled to prevent
+    Subject: processes
+    Requirement: be controlled to prevent
+
+  [MANDATORY] p.113
+    joints shall demonstrate cohesive failure
+    Subject: joints
+    Requirement: demonstrate cohesive failure
+
+  [MANDATORY] p.114
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.114
+    developed, those specifications shall meet
+    Subject: developed, those specifications
+    Requirement: meet
+
+  [MANDATORY] p.114
+    more detailed than is required by
+    Subject: more detailed than
+    Requirement: by
+
+  [PERMISSION] p.114
+    may develop their own standard,
+    Requirement: develop their own standard,
+
+  [MANDATORY] p.114
+    disposition shall be required for weld
+    Subject: disposition
+    Requirement: be required for weld
+
+  [MANDATORY] p.114
+    certification plan shall be developed for
+    Subject: certification plan
+    Requirement: be developed for
+
+  [MANDATORY] p.115
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.116
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.116
+    seal welds) shall comply with AWS
+    Subject: seal welds)
+    Requirement: comply with AWS
+
+  [MANDATORY] p.116
+    AMD 1 (2012), shall be qualified in
+    Subject: AMD 1 (2012)
+    Requirement: be qualified in
+
+  [MANDATORY] p.116
+    [MPR 141] Titanium welds shall be
+    Subject: [MPR 141] Titanium welds
+    Requirement: be
+
+  [MANDATORY] p.116
+    [MPR 142] Titanium and its alloys shall
+    Subject: [MPR 142] Titanium and its alloys
+    Requirement: 
+
+  [MANDATORY] p.116
+    filler wires shall be used for titanium
+    Subject: filler wires
+    Requirement: be used for titanium
+
+  [PROHIBITION] p.116
+    titanium filler shall not be used on Ti-
+    Subject: titanium filler
+    Requirement: be used on Ti-
+
+  [MANDATORY] p.117
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [PROHIBITION] p.117
+    gases shall not be used in welding
+    Subject: gases
+    Requirement: be used in welding
+
+  [MANDATORY] p.117
+    [MPR 146] The inert gas shall have a dew
+    Subject: [MPR 146] The inert gas
+    Requirement: have a dew
+
+  [MANDATORY] p.117
+    beta titanium alloys shall be stress
+    Subject: beta titanium alloys
+    Requirement: be stress
+
+  [PERMISSION] p.117
+    Welding of titanium alloys may
+    Subject: Welding of titanium alloys
+    Requirement: 
+
+  [MANDATORY] p.117
+    must be exercised
+    Requirement: be exercised
+
+  [MANDATORY] p.117
+    welded shall be evaluated on a case-by-
+    Subject: welded
+    Requirement: be evaluated on a case-by-
+
+  [MANDATORY] p.118
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.118
+    functions shall comply with AWS
+    Subject: functions
+    Requirement: comply with AWS
+
+  [MANDATORY] p.118
+    mission-critical functions shall comply
+    Subject: mission-critical functions
+    Requirement: comply
+
+  [PROHIBITION] p.118
+    shall not be used without an approved
+    Requirement: be used without an approved
+
+  [MANDATORY] p.119
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.119
+    Specification (WPS) shall include the
+    Subject: Specification (WPS)
+    Requirement: include the
+
+  [MANDATORY] p.119
+    required by AWS D17
+    Requirement: by AWS D17
+
+  [MANDATORY] p.120
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.121
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.121
+    mission-critical functions shall meet the
+    Subject: mission-critical functions
+    Requirement: meet the
+
+  [MANDATORY] p.121
+    provides mission-critical functions shall
+    Subject: provides mission-critical functions
+    Requirement: 
+
+  [MANDATORY] p.121
+    joint shall be prohibited for spaceflight
+    Subject: joint
+    Requirement: be prohibited for spaceflight
+
+  [INTENT] p.121
+    and/or procedures employed will preclude
+    Subject: and/or procedures employed
+    Requirement: preclude
+
+  [MANDATORY] p.121
+    mission-critical functions shall be
+    Subject: mission-critical functions
+    Requirement: be
+
+  [MANDATORY] p.122
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.122
+    provides mission-critical functions shall
+    Subject: provides mission-critical functions
+    Requirement: 
+
+  [MANDATORY] p.122
+    cold plates, destructive testing shall be
+    Subject: cold plates, destructive testing
+    Requirement: be
+
+  [MANDATORY] p.123
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.123
+    shall be controlled to limit the depth of
+    Requirement: be controlled to limit the depth of
+
+  [MANDATORY] p.123
+    [MPR 168] The oxide layer shall be
+    Subject: [MPR 168] The oxide layer
+    Requirement: be
+
+  [MANDATORY] p.123
+    crack-prone and must be removed
+    Subject: crack-prone and
+    Requirement: be removed
+
+  [MANDATORY] p.123
+    and the heat-affected zone shall be
+    Subject: and the heat-affected zone
+    Requirement: be
+
+  [MANDATORY] p.123
+    mission-critical functions shall be
+    Subject: mission-critical functions
+    Requirement: be
+
+  [MANDATORY] p.123
+    depth of the affected material must be
+    Subject: depth of the affected material
+    Requirement: be
+
+  [MANDATORY] p.123
+    amount of material that must be
+    Subject: amount of material that
+    Requirement: be
+
+  [MANDATORY] p.123
+    provides mission-critical functions shall
+    Subject: provides mission-critical functions
+    Requirement: 
+
+  [MANDATORY] p.124
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.124
+    mission-critical functions shall be applied
+    Subject: mission-critical functions
+    Requirement: be applied
+
+  [MANDATORY] p.124
+    mission-critical functions shall be
+    Subject: mission-critical functions
+    Requirement: be
+
+  [MANDATORY] p.124
+    them must be protected in corrosive
+    Subject: them
+    Requirement: be protected in corrosive
+
+  [MANDATORY] p.125
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.125
+    metallic and composite) hardware shall be
+    Subject: metallic and composite) hardware
+    Requirement: be
+
+  [MANDATORY] p.125
+    testing shall comply with NAS 410
+    Subject: testing
+    Requirement: comply with NAS 410
+
+  [MANDATORY] p.125
+    dye-penetrant inspected shall be
+    Subject: dye-penetrant inspected
+    Requirement: be
+
+  [MANDATORY] p.125
+    disturbed layer must be removed by
+    Subject: disturbed layer
+    Requirement: be removed by
+
+  [MANDATORY] p.126
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [PERMISSION] p.126
+    may be machined near-final and
+    Requirement: be machined near-final and
+
+  [MANDATORY] p.126
+    [MPR 179] The etching procedure shall
+    Subject: [MPR 179] The etching procedure
+    Requirement: 
+
+  [MANDATORY] p.126
+    a certain depth, it is required that at
+    Subject: a certain depth, it
+    Requirement: that at
+
+  [MANDATORY] p.126
+    shall be demonstrated that the required
+    Requirement: be demonstrated that the required
+
+  [MANDATORY] p.126
+    hardware shall be considered in structural
+    Subject: hardware
+    Requirement: be considered in structural
+
+  [MANDATORY] p.127
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.127
+    parts in structural hardware shall require
+    Subject: parts in structural hardware
+    Requirement: require
+
+  [MANDATORY] p.127
+    ascent shall be adequately relieved to
+    Subject: ascent
+    Requirement: be adequately relieved to
+
+  [MANDATORY] p.127
+    constructions must be large enough
+    Subject: constructions
+    Requirement: be large enough
+
+  [MANDATORY] p.127
+    are not vented shall be capable of
+    Subject: are not vented
+    Requirement: be capable of
+
+  [INTENT] p.127
+    Non-vented sandwich structure will
+    Subject: Non-vented sandwich structure
+    Requirement: 
+
+  [MANDATORY] p.127
+    structure must be verified to
+    Subject: structure
+    Requirement: be verified to
+
+  [MANDATORY] p.128
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.128
+    assemblies shall be designed to prevent
+    Subject: assemblies
+    Requirement: be designed to prevent
+
+  [INTENT] p.128
+    sandwich assemblies that will be
+    Subject: sandwich assemblies that
+    Requirement: be
+
+  [MANDATORY] p.128
+    subjected to heating shall be tested for the
+    Subject: subjected to heating
+    Requirement: be tested for the
+
+  [MANDATORY] p.129
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.129
+    shall be protected from water intrusion
+    Requirement: be protected from water intrusion
+
+  [MANDATORY] p.129
+    constructions and core materials shall be
+    Subject: constructions and core materials
+    Requirement: be
+
+  [MANDATORY] p.130
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.131
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.131
+    mission-critical functions, the part shall
+    Subject: mission-critical functions, the part
+    Requirement: 
+
+  [MANDATORY] p.132
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [RECOMMENDATION] p.132
+    catalyzed by silicon, so care should
+    Subject: catalyzed by silicon, so care
+    Requirement: 
+
+  [MANDATORY] p.132
+    processes shall be controlled to prevent
+    Subject: processes
+    Requirement: be controlled to prevent
+
+  [MANDATORY] p.133
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.134
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.134
+    shall conform to NAS 412 (Revision 1),
+    Requirement: conform to NAS 412 (Revision 1),
+
+  [MANDATORY] p.134
+    hardware shall be identified on the
+    Subject: hardware
+    Requirement: be identified on the
+
+  [MANDATORY] p.135
+    required for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved Materials and Processes Selection,
+    Requirement: for all M&P that are technically acceptable but do not meet the technical requirements of this NASA Technical Standard, as implemented by the approved
+
+  [MANDATORY] p.138
+    required for codes that were incorporated as exceptions
+    Requirement: for codes that were incorporated as exceptions
+
+  [PERMISSION] p.138
+    codes may do so through their approved Materials and Processes Selection, Control, and
+    Subject: codes
+    Requirement: do so through their approved Materials and Processes Selection, Control, and
+
+  [PERMISSION] p.144
+    approaches to NASA-STD-6016A may be submitted in this Plan, which meet or exceed
+    Subject: approaches to NASA-STD-6016A
+    Requirement: be submitted in this Plan, which meet or exceed
+
+  [INTENT] p.144
+    This tailoring approach will allow for NASA approval of
+    Subject: This tailoring approach
+    Requirement: allow for NASA approval of
+
+  [MANDATORY] p.144
+    Hardware Developer's Organization – Authority shall be assigned to an individual or
+    Subject: Hardware Developer's Organization – Authority
+    Requirement: be assigned to an individual or
+
+  [MANDATORY] p.144
+    group who shall be responsible for review and approval of all M&P specified prior to
+    Subject: group who
+    Requirement: be responsible for review and approval of all M&P specified prior to
+
+  [MANDATORY] p.144
+    used, both in the original design and in any changes, shall be contained in the Materials
+    Subject: used, both in the original design and in any changes
+    Requirement: be contained in the Materials
+
+  [MANDATORY] p.144
+    performed by the hardware developer shall require prior NASA approval
+    Subject: performed by the hardware developer
+    Requirement: require prior NASA approval
+
+  [MANDATORY] p.144
+    6016A shall be defined, including those that do not meet the established requirements but
+    Subject: 6016A
+    Requirement: be defined, including those that do not meet the established requirements but
+
+  [MANDATORY] p.144
+    considerations, and shall be contained in the Materials Usage Agreement (MUA) DRD
+    Subject: considerations, and
+    Requirement: be contained in the Materials Usage Agreement (MUA) DRD
+
+  [MANDATORY] p.144
+    Material Design Properties – The Plan shall contain the philosophy describing how
+    Subject: Material Design Properties – The Plan
+    Requirement: contain the philosophy describing how
+
+  [INTENT] p.144
+    material properties will be determined, and if those properties do not exist, how the
+    Subject: material properties
+    Requirement: be determined, and if those properties do not exist, how the
+
+  [INTENT] p.144
+    material properties will be developed, including, but not limited to, the statistical
+    Subject: material properties
+    Requirement: be developed, including, but not limited to, the statistical
+
+  [MANDATORY] p.144
+    Process Controls – The Plan shall identify all process specifications used to implement
+    Subject: Process Controls – The Plan
+    Requirement: identify all process specifications used to implement
+
+  [MANDATORY] p.144
+    manufacturing shall be documented in process specifications, and all applicable process
+    Subject: manufacturing
+    Requirement: be documented in process specifications, and all applicable process
+
+  [MANDATORY] p.144
+    specifications shall be identified on the engineering drawing
+    Subject: specifications
+    Requirement: be identified on the engineering drawing
+
+  [MANDATORY] p.144
+    process specification shall be identified in a level of detail that ensures the process is
+    Subject: process specification
+    Requirement: be identified in a level of detail that ensures the process is
+
+  [MANDATORY] p.146
+    Category III MUAs shall be reported in the Materials
+    Subject: Category III MUAs
+    Requirement: be reported in the Materials
+
+  [MANDATORY] p.146
+    here for completeness but are not required until after PDR
+    Subject: here for completeness but are not
+    Requirement: until after PDR
+
+  [PERMISSION] p.154
+    performing NDE before manufacturing processes that may significantly reduce flaw
+    Subject: performing NDE before manufacturing processes that
+    Requirement: significantly reduce flaw
+
+  [MANDATORY] p.154
+    inspection shall be specifically addressed in the Plan
+    Subject: inspection
+    Requirement: be specifically addressed in the Plan
+
+  [MANDATORY] p.154
+    NDE Material Compatibility – The Plan shall address compatibility of NDE materials
+    Subject: NDE Material Compatibility – The Plan
+    Requirement: address compatibility of NDE materials
+
+  [MANDATORY] p.154
+    Fracture-Critical Parts – The Plan shall address how the listing of all Fracture-Critical
+    Subject: Fracture-Critical Parts – The Plan
+    Requirement: address how the listing of all Fracture-Critical
+
+  [INTENT] p.154
+    parts, created according to the Fracture Control Plan, will be integrated with NDE
+    Subject: parts, created according to the Fracture Control Plan
+    Requirement: be integrated with NDE
+
+  [MANDATORY] p.154
+    The Plan shall address Special NDE and Standard NDE methods in
+    Subject: The Plan
+    Requirement: address Special NDE and Standard NDE methods in
+
+  [MANDATORY] p.154
+    NDE During Operations and Maintenance – The NDE Plan shall address the NDE
+    Subject: NDE During Operations and Maintenance – The NDE Plan
+    Requirement: address the NDE
+
+  [MANDATORY] p.154
+    The NDE Plan shall address NDE requirements during operations and
+    Subject: The NDE Plan
+    Requirement: address NDE requirements during operations and
+
+  [MANDATORY] p.154
+    The NDE Plan shall address NDE requirements for
+    Subject: The NDE Plan
+    Requirement: address NDE requirements for
+
+  [MANDATORY] p.154
+    The Plan shall address the NDE procedures and physical
+    Subject: The Plan
+    Requirement: address the NDE procedures and physical
+
+  [MANDATORY] p.154
+    standards required to perform the operations and maintenance NDE inspections
+    Subject: standards
+    Requirement: to perform the operations and maintenance NDE inspections
+
+  [MANDATORY] p.154
+    NDE Reporting and Record Retention – The NDE Plan shall describe the NDE
+    Subject: NDE Reporting and Record Retention – The NDE Plan
+    Requirement: describe the NDE
+
+  [MANDATORY] p.154
+    Process Audit – The Plan shall address periodic auditing of NDE processes at prime
+    Subject: Process Audit – The Plan
+    Requirement: address periodic auditing of NDE processes at prime
+
+  [MANDATORY] p.154
+    Personnel Training – The NDE Plan shall identify formal training and certification
+    Subject: Personnel Training – The NDE Plan
+    Requirement: identify formal training and certification
+
+SECTION 1
+----------------------------------------
+  [MANDATORY] p.9
+    this NASA Technical Standard only to the extent required to prevent damage to or contamination
+    Subject: this NASA Technical Standard only to the extent
+    Requirement: to prevent damage to or contamination
+
+  [INTENT] p.88
+    are in contact or will come in
+    Subject: are in contact or
+    Requirement: come in
+
+  [MANDATORY] p.88
+    An MUA is required to
+    Subject: An MUA
+    Requirement: 
+
+SECTION 1.2
+----------------------------------------
+  [MANDATORY] p.9
+    [MPR 1] Programs shall apply these controls to program/project hardware
+    Subject: [MPR 1] Programs
+    Requirement: apply these controls to program/project hardware
+
+  [MANDATORY] p.9
+    [MPR 2] Programs shall be responsible for demonstrating compliance with these
+    Subject: [MPR 2] Programs
+    Requirement: be responsible for demonstrating compliance with these
+
+  [PERMISSION] p.9
+    and Facilities, and applicable technical requirements may be cited in contract, program, and other
+    Subject: and Facilities, and applicable technical requirements
+    Requirement: be cited in contract, program, and other
+
+  [PERMISSION] p.9
+    It may also apply to the Jet Propulsion Laboratory (a Federally Funded
+    Subject: It
+    Requirement: also apply to the Jet Propulsion Laboratory (a Federally Funded
+
+SECTION 1.3
+----------------------------------------
+  [MANDATORY] p.10
+    and Processes Selection, Control, and Implementation Plan for specific programs/projects shall
+    Subject: and Processes Selection, Control, and Implementation Plan for specific programs/projects
+    Requirement: 
+
+  [PERMISSION] p.10
+    These requirements may be tailored simply by
+    Subject: These requirements
+    Requirement: be tailored simply by
+
+  [MANDATORY] p.10
+    submittal of the various required plans
+    Subject: submittal of the various
+    Requirement: plans
+
+  [PERMISSION] p.10
+    Otherwise, the tailoring of requirements may be
+    Subject: Otherwise, the tailoring of requirements
+    Requirement: be
+
+  [PERMISSION] p.10
+    the technical requirements of this NASA Technical Standard, the Plan may be used for the
+    Subject: the technical requirements of this NASA Technical Standard, the Plan
+    Requirement: be used for the
+
+SECTION 10
+----------------------------------------
+  [MANDATORY] p.145
+    MUAs shall be revised and resubmitted whenever
+    Subject: MUAs
+    Requirement: be revised and resubmitted whenever
+
+  [PERMISSION] p.150
+    SUBMISSION FREQUENCY:  The contractor may submit updates/revisions at any
+    Subject: SUBMISSION FREQUENCY:  The contractor
+    Requirement: submit updates/revisions at any
+
+  [MANDATORY] p.150
+    Final submission shall be at CDR
+    Subject: Final submission
+    Requirement: be at CDR
+
+  [PERMISSION] p.152
+    SUBMISSION FREQUENCY:  The contractor may submit updates/revisions at any
+    Subject: SUBMISSION FREQUENCY:  The contractor
+    Requirement: submit updates/revisions at any
+
+SECTION 114
+----------------------------------------
+  [PERMISSION] p.138
+    “Small amounts” for flammability may be quantified as follows:  total
+    Subject: “Small amounts” for flammability
+    Requirement: be quantified as follows:  total
+
+SECTION 13.1
+----------------------------------------
+  [MANDATORY] p.143
+    The Materials and Processes Selection, Control, and Implementation Plan shall describe
+    Subject: The Materials and Processes Selection, Control, and Implementation Plan
+    Requirement: describe
+
+  [MANDATORY] p.145
+    MUAs shall be submitted as described below
+    Subject: MUAs
+    Requirement: be submitted as described below
+
+  [MANDATORY] p.145
+    but must be used for functional reasons
+    Subject: but
+    Requirement: be used for functional reasons
+
+  [MANDATORY] p.145
+    and Processes organization and the NASA Program/Project Office shall be required
+    Subject: and Processes organization and the NASA Program/Project Office
+    Requirement: be required
+
+  [MANDATORY] p.145
+    by the responsible NASA Materials and Processes organization shall be required
+    Subject: by the responsible NASA Materials and Processes organization
+    Requirement: be required
+
+  [MANDATORY] p.147
+    Materials and processes usage shall be documented in an electronic searchable parts list
+    Subject: Materials and processes usage
+    Requirement: be documented in an electronic searchable parts list
+
+  [INTENT] p.147
+    procedures and formats for documentation of materials and processes usage will depend
+    Subject: procedures and formats for documentation of materials and processes usage
+    Requirement: depend
+
+  [MANDATORY] p.147
+    upon specific hardware but shall cover the as-built hardware
+    Subject: upon specific hardware but
+    Requirement: cover the as-built hardware
+
+  [MANDATORY] p.147
+    The system used shall be an
+    Subject: The system used
+    Requirement: be an
+
+  [MANDATORY] p.147
+    data shall be provided to NASA in a form compatible with the Materials and Processes
+    Subject: data
+    Requirement: be provided to NASA in a form compatible with the Materials and Processes
+
+  [MANDATORY] p.147
+    Wire, cable, and exposed surfaces of connectors shall be reported on the MIUL
+    Subject: Wire, cable, and exposed surfaces of connectors
+    Requirement: be reported on the MIUL
+
+  [MANDATORY] p.150
+    The Contamination Control Plan shall be generated in accordance with the guidelines of
+    Subject: The Contamination Control Plan
+    Requirement: be generated in accordance with the guidelines of
+
+  [MANDATORY] p.150
+    Plans (as specified by NASA-STD-6016A) and shall include:
+    Subject: Plans (as specified by NASA-STD-6016A) and
+    Requirement: include:
+
+  [MANDATORY] p.150
+    The FOD prevention program shall conform to NAS
+    Subject: The FOD prevention program
+    Requirement: conform to NAS
+
+  [MANDATORY] p.150
+    shall also contain a list identifying all system fluids, together with the fluid
+    Requirement: also contain a list identifying all system fluids, together with the fluid
+
+  [MANDATORY] p.150
+    specifications (for procurement or custom mixing) and the required cleanliness levels
+    Subject: specifications (for procurement or custom mixing) and the
+    Requirement: cleanliness levels
+
+  [MANDATORY] p.152
+    The NDE Plan shall address the process for establishment, implementation, execution,
+    Subject: The NDE Plan
+    Requirement: address the process for establishment, implementation, execution,
+
+  [MANDATORY] p.152
+    The Plan shall meet the intent of MIL-HDBK-6870, Inspection
+    Subject: The Plan
+    Requirement: meet the intent of MIL-HDBK-6870, Inspection
+
+SECTION 13.3
+----------------------------------------
+  [MANDATORY] p.143
+    The necessary interfaces with procuring activity in the operation of this Plan shall be
+    Subject: The necessary interfaces with procuring activity in the operation of this Plan
+    Requirement: be
+
+  [MANDATORY] p.143
+    shall be included in the hardware developer's plan
+    Requirement: be included in the hardware developer's plan
+
+  [MANDATORY] p.143
+    Plan shall address the following:
+    Subject: Plan
+    Requirement: address the following:
+
+  [MANDATORY] p.143
+    Conformance – The Plan shall address each applicable paragraph of NASA-STD-6016A
+    Subject: Conformance – The Plan
+    Requirement: address each applicable paragraph of NASA-STD-6016A
+
+  [MANDATORY] p.146
+    The MUA package shall include all technical information required to justify the
+    Subject: The MUA package
+    Requirement: include all technical information required to justify the
+
+  [MANDATORY] p.146
+    MUAs for stress corrosion shall include a Stress Corrosion Cracking
+    Subject: MUAs for stress corrosion
+    Requirement: include a Stress Corrosion Cracking
+
+  [MANDATORY] p.148
+    The parts list or MIUL shall identify the following applicable information:
+    Subject: The parts list or MIUL
+    Requirement: identify the following applicable information:
+
+  [MANDATORY] p.151
+    The FOD Control Plan shall address the following elements:
+    Subject: The FOD Control Plan
+    Requirement: address the following elements:
+
+  [MANDATORY] p.151
+    The contractor shall define cleanliness level acceptance limits and verification methods
+    Subject: The contractor
+    Requirement: define cleanliness level acceptance limits and verification methods
+
+  [MANDATORY] p.151
+    contractor shall also provide a list identifying all system fluids, together with the fluid
+    Subject: contractor
+    Requirement: also provide a list identifying all system fluids, together with the fluid
+
+  [MANDATORY] p.151
+    specifications (for procurement or custom mixing) and the required cleanliness levels for
+    Subject: specifications (for procurement or custom mixing) and the
+    Requirement: cleanliness levels for
+
+  [MANDATORY] p.153
+    NDE Specifications and Standards – The NDE Plan shall address the selection and the
+    Subject: NDE Specifications and Standards – The NDE Plan
+    Requirement: address the selection and the
+
+  [MANDATORY] p.153
+    implementation and flow down of the NDE requirements shall also be addressed
+    Subject: implementation and flow down of the NDE requirements
+    Requirement: also be addressed
+
+  [MANDATORY] p.153
+    Plan shall address commonly used aerospace industry NDE methods including, but not
+    Subject: Plan
+    Requirement: address commonly used aerospace industry NDE methods including, but not
+
+  [MANDATORY] p.153
+    The Plan shall address how all NDE
+    Subject: The Plan
+    Requirement: address how all NDE
+
+  [INTENT] p.153
+    specifications and standards will be approved by the appropriate Government authority
+    Subject: specifications and standards
+    Requirement: be approved by the appropriate Government authority
+
+  [MANDATORY] p.153
+    NDE Requirements During Hardware Design – The NDE Plan shall address how the
+    Subject: NDE Requirements During Hardware Design – The NDE Plan
+    Requirement: address how the
+
+  [MANDATORY] p.153
+    The Plan shall address how the operations and maintenance NDE requirements will be
+    Subject: The Plan
+    Requirement: address how the operations and maintenance NDE requirements will be
+
+  [MANDATORY] p.153
+    Part Classification – The Plan shall address appropriate spaceflight hardware and GSE
+    Subject: Part Classification – The Plan
+    Requirement: address appropriate spaceflight hardware and GSE
+
+  [MANDATORY] p.153
+    NDE Sensitivity Levels – NDE sensitivity levels shall be classified as Standard NDE,
+    Subject: NDE Sensitivity Levels – NDE sensitivity levels
+    Requirement: be classified as Standard NDE,
+
+  [MANDATORY] p.153
+    shall address procedures for defining NDE acceptance criteria for each of the sensitivity
+    Requirement: address procedures for defining NDE acceptance criteria for each of the sensitivity
+
+  [MANDATORY] p.153
+    NDE Acceptance Criteria – The Plan shall address how NDE acceptance criteria are
+    Subject: NDE Acceptance Criteria – The Plan
+    Requirement: address how NDE acceptance criteria are
+
+  [MANDATORY] p.153
+    shall require rejection of any crack-like flaw irrespective of the sensitivity level of the
+    Requirement: require rejection of any crack-like flaw irrespective of the sensitivity level of the
+
+  [MANDATORY] p.153
+    The Plan shall address how significant flaw indications, irrespective of the
+    Subject: The Plan
+    Requirement: address how significant flaw indications, irrespective of the
+
+  [INTENT] p.153
+    acceptance criteria, will be dispositioned
+    Subject: acceptance criteria
+    Requirement: be dispositioned
+
+  [MANDATORY] p.153
+    NDE During Manufacturing –The Plan shall address establishment of minimum NDE
+    Subject: NDE During Manufacturing –The Plan
+    Requirement: address establishment of minimum NDE
+
+  [MANDATORY] p.153
+    The NDE Plan shall
+    Subject: The NDE Plan
+    Requirement: 
+
+SECTION 13.4
+----------------------------------------
+  [MANDATORY] p.144
+    paragraph in section 4 of NASA-STD-6016A, the Plan shall state the requirement from
+    Subject: paragraph in section 4 of NASA-STD-6016A, the Plan
+    Requirement: state the requirement from
+
+  [MANDATORY] p.146
+    The complete MUA package shall be provided
+    Subject: The complete MUA package
+    Requirement: be provided
+
+  [MANDATORY] p.148
+    submittal of MIUL data shall be compatible with the NASA Materials and Processes
+    Subject: submittal of MIUL data
+    Requirement: be compatible with the NASA Materials and Processes
+
+SECTION 13.5
+----------------------------------------
+  [MANDATORY] p.144
+    MAINTENANCE:  Contractor-proposed changes to document shall be submitted to
+    Subject: MAINTENANCE:  Contractor-proposed changes to document
+    Requirement: be submitted to
+
+  [MANDATORY] p.144
+    Complete reissue of the document is required
+    Subject: Complete reissue of the document
+    Requirement: 
+
+  [MANDATORY] p.146
+    MAINTENANCE:  Contractor updates to the Category I and Category II MUAs shall be
+    Subject: MAINTENANCE:  Contractor updates to the Category I and Category II MUAs
+    Requirement: be
+
+  [MANDATORY] p.146
+    Complete reissue of the MUA is required
+    Subject: Complete reissue of the MUA
+    Requirement: 
+
+  [MANDATORY] p.149
+    MAINTENANCE:  Contractor updates to the MIUL shall be submitted to NASA for
+    Subject: MAINTENANCE:  Contractor updates to the MIUL
+    Requirement: be submitted to NASA for
+
+  [MANDATORY] p.149
+    Complete reissue of the document is not required
+    Subject: Complete reissue of the document is not
+    Requirement: 
+
+  [MANDATORY] p.151
+    MAINTENANCE:  Changes to the document proposed by the contractor shall be
+    Subject: MAINTENANCE:  Changes to the document proposed by the contractor
+    Requirement: be
+
+  [MANDATORY] p.151
+    Complete reissue of the document is required
+    Subject: Complete reissue of the document
+    Requirement: 
+
+  [MANDATORY] p.154
+    MAINTENANCE:  Changes to the document proposed by the contractor shall be
+    Subject: MAINTENANCE:  Changes to the document proposed by the contractor
+    Requirement: be
+
+  [MANDATORY] p.154
+    Complete reissue of the document is required
+    Subject: Complete reissue of the document
+    Requirement: 
+
+SECTION 2.1.1
+----------------------------------------
+  [MANDATORY] p.74
+    documents shall apply unless specific
+    Subject: documents
+    Requirement: apply unless specific
+
+SECTION 2.1.2
+----------------------------------------
+  [MANDATORY] p.75
+    designated versions shall be approved by
+    Subject: designated versions
+    Requirement: be approved by
+
+SECTION 2.4.1
+----------------------------------------
+  [MANDATORY] p.17
+    documents shall be resolved by the delegated Technical Authority
+    Subject: documents
+    Requirement: be resolved by the delegated Technical Authority
+
+SECTION 2.4.2
+----------------------------------------
+  [MANDATORY] p.75
+    requirements documents shall be resolved
+    Subject: requirements documents
+    Requirement: be resolved
+
+  [MANDATORY] p.75
+    [MPR 7] Materials shall meet the worst-
+    Subject: [MPR 7] Materials
+    Requirement: meet the worst-
+
+  [INTENT] p.75
+    materials will encounter during the
+    Subject: materials
+    Requirement: encounter during the
+
+  [MANDATORY] p.75
+    hardware shipment shall be controlled to
+    Subject: hardware shipment
+    Requirement: be controlled to
+
+  [INTENT] p.75
+    Ensures spaceflight hardware will
+    Subject: Ensures spaceflight hardware
+    Requirement: 
+
+  [MANDATORY] p.75
+    of spaceflight hardware shall provide a
+    Subject: of spaceflight hardware
+    Requirement: provide a
+
+  [MANDATORY] p.75
+    Plan shall also describe the methods used
+    Subject: Plan
+    Requirement: also describe the methods used
+
+SECTION 303
+----------------------------------------
+  [MANDATORY] p.139
+    Material is B-rated in MAPTIS (batch/lot testing required) but batch/lot used in
+    Subject: Material is B-rated in MAPTIS (batch/lot testing
+    Requirement: ) but batch/lot used in
+
+SECTION 4
+----------------------------------------
+  [MANDATORY] p.22
+    [MPR 7] Materials shall meet the worst-case useful-life requirements for the
+    Subject: [MPR 7] Materials
+    Requirement: meet the worst-case useful-life requirements for the
+
+  [PERMISSION] p.22
+    functions may have no useful-life requirements, provided that the safety of the crew, the space
+    Subject: functions
+    Requirement: have no useful-life requirements, provided that the safety of the crew, the space
+
+SECTION 4.1.1
+----------------------------------------
+  [MANDATORY] p.23
+    spaceflight hardware shall provide a Materials and Processes Selection, Control, and
+    Subject: spaceflight hardware
+    Requirement: provide a Materials and Processes Selection, Control, and
+
+  [MANDATORY] p.23
+    shall also describe the methods used to control compliance with these requirements by
+    Requirement: also describe the methods used to control compliance with these requirements by
+
+  [PERMISSION] p.23
+    Prime contractors may require subcontractors and vendors to develop a tailored plan to comply
+    Subject: Prime contractors
+    Requirement: require subcontractors and vendors to develop a tailored plan to comply
+
+  [PERMISSION] p.23
+    Alternatively, prime contractors may flow down a limited subset of (or even no) requirements,
+    Subject: Alternatively, prime contractors
+    Requirement: flow down a limited subset of (or even no) requirements,
+
+  [MANDATORY] p.23
+    Selection, Control, and Implementation Plan shall become the M&P implementation document
+    Subject: Selection, Control, and Implementation Plan
+    Requirement: become the M&P implementation document
+
+SECTION 4.1.1.1
+----------------------------------------
+  [MANDATORY] p.24
+    [MPR 12] The Materials and Processes Selection, Control, and Implementation Plan shall
+    Subject: [MPR 12] The Materials and Processes Selection, Control, and Implementation Plan
+    Requirement: 
+
+  [MANDATORY] p.76
+    Plan shall identify the method of
+    Subject: Plan
+    Requirement: identify the method of
+
+SECTION 4.1.1.2
+----------------------------------------
+  [MANDATORY] p.24
+    [MPR 13] The Materials and Processes Selection, Control, and Implementation Plan shall
+    Subject: [MPR 13] The Materials and Processes Selection, Control, and Implementation Plan
+    Requirement: 
+
+  [MANDATORY] p.76
+    Plan shall include a requirement that all
+    Subject: Plan
+    Requirement: include a requirement that all
+
+SECTION 4.1.1.3
+----------------------------------------
+  [MANDATORY] p.24
+    [MPR 14] The Materials and Processes Selection, Control, and Implementation Plan shall
+    Subject: [MPR 14] The Materials and Processes Selection, Control, and Implementation Plan
+    Requirement: 
+
+  [MANDATORY] p.76
+    Plan shall identify how the responsible
+    Subject: Plan
+    Requirement: identify how the responsible
+
+  [MANDATORY] p.76
+    M&P expertise is required in the
+    Subject: M&P expertise
+    Requirement: in the
+
+SECTION 4.1.2
+----------------------------------------
+  [MANDATORY] p.24
+    shall be defined by standards and specifications selected from government, industry, and
+    Requirement: be defined by standards and specifications selected from government, industry, and
+
+  [MANDATORY] p.24
+    shall be identified directly on the appropriate engineering drawing
+    Requirement: be identified directly on the appropriate engineering drawing
+
+  [MANDATORY] p.24
+    [MPR 17] Company M&P specifications shall be identified by document number in
+    Subject: [MPR 17] Company M&P specifications
+    Requirement: be identified by document number in
+
+  [MANDATORY] p.24
+    mission-critical functions shall be made available to the responsible NASA Program or Project
+    Subject: mission-critical functions
+    Requirement: be made available to the responsible NASA Program or Project
+
+SECTION 4.1.2.1
+----------------------------------------
+  [MANDATORY] p.25
+    [MPR 21] A process shall be established for ensuring that updated, alternate, or new material or
+    Subject: [MPR 21] A process
+    Requirement: be established for ensuring that updated, alternate, or new material or
+
+  [MANDATORY] p.78
+    [MPR 21] A process shall be established
+    Subject: [MPR 21] A process
+    Requirement: be established
+
+SECTION 4.1.3
+----------------------------------------
+  [MANDATORY] p.25
+    [MPR 22] A procedure shall be established to ensure that all vendor-designed, off-the-shelf, and
+    Subject: [MPR 22] A procedure
+    Requirement: be established to ensure that all vendor-designed, off-the-shelf, and
+
+  [PERMISSION] p.25
+    do not provide mission-critical functions may be limited to those required to ensure safety of
+    Subject: do not provide mission-critical functions
+    Requirement: be limited to those required to ensure safety of
+
+  [MANDATORY] p.78
+    [MPR 22] A procedure shall be
+    Subject: [MPR 22] A procedure
+    Requirement: be
+
+SECTION 4.1.4
+----------------------------------------
+  [MANDATORY] p.26
+    [MPR 23] An M&P control panel shall be established by each contractor hardware
+    Subject: [MPR 23] An M&P control panel
+    Requirement: be established by each contractor hardware
+
+  [MANDATORY] p.26
+    [MPR 24] The M&P control panel’s scope and membership shall be described in the
+    Subject: [MPR 24] The M&P control panel’s scope and membership
+    Requirement: be described in the
+
+SECTION 4.1.5
+----------------------------------------
+  [MANDATORY] p.26
+    [MPR 25] M&P usage shall be documented in an electronic, searchable parts list or
+    Subject: [MPR 25] M&P usage
+    Requirement: be documented in an electronic, searchable parts list or
+
+  [MANDATORY] p.26
+    [MPR 26] The documentation of M&P usage shall cover the final design as delivered
+    Subject: [MPR 26] The documentation of M&P usage
+    Requirement: cover the final design as delivered
+
+  [MANDATORY] p.26
+    [MPR 27] The documentation approach shall be defined in the Materials and
+    Subject: [MPR 27] The documentation approach
+    Requirement: be defined in the Materials and
+
+  [MANDATORY] p.26
+    When required, new material codes will be assigned by NASA’s Marshall Space
+    Subject: When
+    Requirement: new material codes will be assigned by NASA’s Marshall Space
+
+SECTION 4.1.6
+----------------------------------------
+  [MANDATORY] p.27
+    application is acceptable shall be submitted by the responsible M&P organization for all M&P
+    Subject: application is acceptable
+    Requirement: be submitted by the responsible M&P organization for all M&P
+
+  [PERMISSION] p.27
+    The use of M&P that do not comply with the requirements of this NASA Technical Standard may
+    Subject: The use of M&P that do not comply with the requirements of this NASA Technical Standard
+    Requirement: 
+
+  [PERMISSION] p.27
+    deviations may be accepted through the MUA process
+    Subject: deviations
+    Requirement: be accepted through the MUA process
+
+  [MANDATORY] p.27
+    specifically identified as required for documentation of hardware acceptability
+    Subject: specifically identified as
+    Requirement: for documentation of hardware acceptability
+
+  [RECOMMENDATION] p.27
+    The MUA generation and approval system should be defined in the Materials and Processes
+    Subject: The MUA generation and approval system
+    Requirement: be defined in the Materials and Processes
+
+  [PROHIBITION] p.27
+    [MPR 29] MUAs shall not be used to change the M&P requirements for a
+    Subject: [MPR 29] MUAs
+    Requirement: be used to change the M&P requirements for a
+
+  [PERMISSION] p.27
+    series hardware, an MUA may be generated to provide technical support for a change to the
+    Subject: series hardware, an MUA
+    Requirement: be generated to provide technical support for a change to the
+
+SECTION 4.1.6.1.3
+----------------------------------------
+  [PERMISSION] p.28
+    Contractors who want to use Category III rationale codes relevant to their hardware may do so
+    Subject: Contractors who want to use Category III rationale codes relevant to their hardware
+    Requirement: do so
+
+  [RECOMMENDATION] p.28
+    Appendix C, Retired Category III MUA Rationale Codes, for continuity purposes but should not
+    Subject: Appendix C, Retired Category III MUA Rationale Codes, for continuity purposes but
+    Requirement: 
+
+SECTION 4.1.7
+----------------------------------------
+  [MANDATORY] p.28
+    critical functions shall be certified as to composition, properties, and requirements as identified
+    Subject: critical functions
+    Requirement: be certified as to composition, properties, and requirements as identified
+
+  [MANDATORY] p.28
+    critical applications, such as life-limited materials and/or safety- and fracture-critical parts, shall
+    Subject: critical applications, such as life-limited materials and/or safety- and fracture-critical parts
+    Requirement: 
+
+SECTION 4.1.8.1
+----------------------------------------
+  [MANDATORY] p.29
+    shall be utilized for the design and analysis of hardware for all applications where structural
+    Requirement: be utilized for the design and analysis of hardware for all applications where structural
+
+  [MANDATORY] p.29
+    analysis is required
+    Subject: analysis
+    Requirement: 
+
+  [MANDATORY] p.29
+    Statistical design values are needed for any hardware where structural analysis is required to
+    Subject: Statistical design values are needed for any hardware where structural analysis
+    Requirement: 
+
+  [RECOMMENDATION] p.29
+    Each distinct form of a material should be assumed to have unique design values unless testing
+    Subject: Each distinct form of a material
+    Requirement: be assumed to have unique design values unless testing
+
+  [PERMISSION] p.29
+    For example, rolled bar may
+    Subject: For example, rolled bar
+    Requirement: 
+
+  [MANDATORY] p.29
+    Design values are also required for other mechanical properties, such as dynamic properties like
+    Subject: Design values are also
+    Requirement: for other mechanical properties, such as dynamic properties like
+
+SECTION 4.1.8.2
+----------------------------------------
+  [PROHIBITION] p.33
+    [MPR 40] Material “B” design values shall not be used except in redundant structure
+    Subject: [MPR 40] Material “B” design values
+    Requirement: be used except in redundant structure
+
+  [PERMISSION] p.33
+    Material “A” or “A-basis” design values may be used in lieu of Material “B” or “B-basis”
+    Subject: Material “A” or “A-basis” design values
+    Requirement: be used in lieu of Material “B” or “B-basis”
+
+  [RECOMMENDATION] p.33
+    For fracture-critical nonmetallic structures, B-basis design values should be used in
+    Subject: For fracture-critical nonmetallic structures, B-basis design values
+    Requirement: be used in
+
+  [PERMISSION] p.33
+    intentionally damaged structure as part of damage tolerance assessment may be acceptable for
+    Subject: intentionally damaged structure as part of damage tolerance assessment
+    Requirement: be acceptable for
+
+  [PERMISSION] p.33
+    testing, it may become necessary to first develop design values representing the intrinsic
+    Subject: testing, it
+    Requirement: become necessary to first develop design values representing the intrinsic
+
+  [PERMISSION] p.33
+    rather than establishing design values specific to the design feature may result in an
+    Subject: rather than establishing design values specific to the design feature
+    Requirement: result in an
+
+  [MANDATORY] p.33
+    shall require an approved MUA for use as design values
+    Requirement: require an approved MUA for use as design values
+
+SECTION 4.1.8.3
+----------------------------------------
+  [MANDATORY] p.34
+    [MPR 42] Structural fastener design values shall be defined by minimum load test requirements
+    Subject: [MPR 42] Structural fastener design values
+    Requirement: be defined by minimum load test requirements
+
+  [MANDATORY] p.84
+    values shall be defined by minimum load
+    Subject: values
+    Requirement: be defined by minimum load
+
+SECTION 4.2.1
+----------------------------------------
+  [MANDATORY] p.34
+    [MPR 43] Materials shall meet the requirements of NASA-STD-6001B, Flammability,
+    Subject: [MPR 43] Materials
+    Requirement: meet the requirements of NASA-STD-6001B, Flammability,
+
+  [MANDATORY] p.85
+    [MPR 43] Materials shall meet the
+    Subject: [MPR 43] Materials
+    Requirement: meet the
+
+  [MANDATORY] p.85
+    Ensures that the NASA-required
+    Subject: Ensures that the NASA-
+    Requirement: 
+
+SECTION 4.2.1.1
+----------------------------------------
+  [MANDATORY] p.34
+    NASA-STD-6001B, shall be used for flammability control with the following exceptions:
+    Subject: NASA-STD-6001B
+    Requirement: be used for flammability control with the following exceptions:
+
+  [MANDATORY] p.85
+    test per NASA-STD-6001B, shall be used
+    Subject: test per NASA-STD-6001B
+    Requirement: be used
+
+SECTION 4.2.1.3
+----------------------------------------
+  [MANDATORY] p.36
+    [MPR 47] An MUA shall be written rationalizing the selection of materials if any of
+    Subject: [MPR 47] An MUA
+    Requirement: be written rationalizing the selection of materials if any of
+
+  [INTENT] p.36
+    The number of seals to be considered for hazardous fluid exposure by leakage or permeation will
+    Subject: The number of seals to be considered for hazardous fluid exposure by leakage or permeation
+    Requirement: 
+
+  [MANDATORY] p.36
+    The MUA is always required for hardware acceptability and needs to document how new or
+    Subject: The MUA is always
+    Requirement: for hardware acceptability and needs to document how new or
+
+  [MANDATORY] p.36
+    and operational conditions that would enhance reactions or degradation shall be conducted for
+    Subject: and operational conditions that would enhance reactions or degradation
+    Requirement: be conducted for
+
+SECTION 4.2.1.4
+----------------------------------------
+  [MANDATORY] p.37
+    containing enriched oxygen shall be evaluated for oxygen compatibility in accordance with
+    Subject: containing enriched oxygen
+    Requirement: be evaluated for oxygen compatibility in accordance with
+
+SECTION 4.2.1.4.1
+----------------------------------------
+  [MANDATORY] p.38
+    (including composite overwrapped pressure vessels with metallic liners), shall undergo oxygen
+    Subject: (including composite overwrapped pressure vessels with metallic liners)
+    Requirement: undergo oxygen
+
+  [MANDATORY] p.38
+    This test is an acceptance test, not a qualification test, and is required for all sets of spaceflight
+    Subject: This test is an acceptance test, not a qualification test, and
+    Requirement: for all sets of spaceflight
+
+  [MANDATORY] p.38
+    Retesting is required if post-test actions (such as rework, repair, or interfacing with
+    Subject: Retesting
+    Requirement: if post-test actions (such as rework, repair, or interfacing with
+
+  [RECOMMENDATION] p.38
+    LOX system components should also be acceptance tested, but the system hardware acceptance
+    Subject: LOX system components
+    Requirement: also be acceptance tested, but the system hardware acceptance
+
+  [RECOMMENDATION] p.38
+    The number of test cycles should be as defined in the
+    Subject: The number of test cycles
+    Requirement: be as defined in the
+
+  [MANDATORY] p.38
+    system hardware acceptance test (typically well below the ten cycles required for gaseous
+    Subject: system hardware acceptance test (typically well below the ten cycles
+    Requirement: for gaseous
+
+  [INTENT] p.90
+    pressure and will be nonreactive to
+    Subject: pressure and
+    Requirement: be nonreactive to
+
+SECTION 4.2.1.5
+----------------------------------------
+  [MANDATORY] p.39
+    [MPR 54] Electrical wire insulation materials shall be evaluated for flammability in
+    Subject: [MPR 54] Electrical wire insulation materials
+    Requirement: be evaluated for flammability in
+
+  [RECOMMENDATION] p.39
+    Test 4 should be used for insulation on electrical power wiring where the maximum current
+    Subject: Test 4
+    Requirement: be used for insulation on electrical power wiring where the maximum current
+
+  [MANDATORY] p.39
+    [MPR 55] Arc tracking shall be evaluated in accordance with NASA-STD-6001B,
+    Subject: [MPR 55] Arc tracking
+    Requirement: be evaluated in accordance with NASA-STD-6001B,
+
+SECTION 4.2.2
+----------------------------------------
+  [MANDATORY] p.39
+    Corrosion Cracking Resistance in Sodium Chloride Environments, shall be used to select
+    Subject: Corrosion Cracking Resistance in Sodium Chloride Environments
+    Requirement: be used to select
+
+  [MANDATORY] p.39
+    environments, with the exception that an MUA is not required for the following conditions:
+    Subject: environments, with the exception that an MUA is not
+    Requirement: for the following conditions:
+
+SECTION 4.2.2.1
+----------------------------------------
+  [RECOMMENDATION] p.40
+    Aluminum alloys used in structural applications should be resistant to general corrosion, pitting,
+    Subject: Aluminum alloys used in structural applications
+    Requirement: be resistant to general corrosion, pitting,
+
+  [PROHIBITION] p.40
+    [MPR 57] The 5000-series alloys containing more than 3 percent magnesium shall not be used in
+    Subject: [MPR 57] The 5000-series alloys containing more than 3 percent magnesium
+    Requirement: be used in
+
+  [PROHIBITION] p.92
+    magnesium shall not be used in
+    Subject: magnesium
+    Requirement: be used in
+
+SECTION 4.2.2.10
+----------------------------------------
+  [MANDATORY] p.44
+    which could contain sulfur, such as oils, grease, and cutting lubricants, shall be removed by
+    Subject: which could contain sulfur, such as oils, grease, and cutting lubricants
+    Requirement: be removed by
+
+SECTION 4.2.2.11
+----------------------------------------
+  [PROHIBITION] p.45
+    mitigation may not be adequate to prevent tin pest from occurring:
+    Subject: mitigation
+    Requirement: be adequate to prevent tin pest from occurring:
+
+  [MANDATORY] p.45
+    tin plating shall be alloyed with at least 3 percent lead by weight or other proven alloying
+    Subject: tin plating
+    Requirement: be alloyed with at least 3 percent lead by weight or other proven alloying
+
+  [MANDATORY] p.45
+    in electrical/electronic applications shall comply with GEIA-STD-0005-1A, Performance
+    Subject: in electrical/electronic applications
+    Requirement: comply with GEIA-STD-0005-1A, Performance
+
+  [INTENT] p.45
+    provides mission-critical functions and will also be exposed to temperatures below 13 ˚C for
+    Subject: provides mission-critical functions and
+    Requirement: also be exposed to temperatures below 13 ˚C for
+
+  [MANDATORY] p.45
+    periods longer than 6 months, the method for preventing tin pest formation shall be documented
+    Subject: periods longer than 6 months, the method for preventing tin pest formation
+    Requirement: be documented
+
+SECTION 4.2.2.2.1
+----------------------------------------
+  [RECOMMENDATION] p.40
+    techniques with coolant should be used
+    Subject: techniques with coolant
+    Requirement: be used
+
+  [RECOMMENDATION] p.40
+    Heat Treated to 180 ksi or Over, should be used to prevent damage to the microstructure
+    Subject: Heat Treated to 180 ksi or Over
+    Requirement: be used to prevent damage to the microstructure
+
+  [MANDATORY] p.40
+    mission-critical functions, a validated process for machining shall be used
+    Subject: mission-critical functions, a validated process for machining
+    Requirement: be used
+
+  [MANDATORY] p.40
+    spaceflight hardware that provides mission-critical functions shall be verified by
+    Subject: spaceflight hardware that provides mission-critical functions
+    Requirement: be verified by
+
+SECTION 4.2.2.2.2
+----------------------------------------
+  [PROHIBITION] p.40
+    [MPR 60] Unstabilized, austenitic steels shall not be processed or used above 371 °C
+    Subject: [MPR 60] Unstabilized, austenitic steels
+    Requirement: be processed or used above 371 °C
+
+SECTION 4.2.2.2.3
+----------------------------------------
+  [PROHIBITION] p.41
+    [MPR 63] Steels shall not be used in tension below their ductile-brittle transition temperature
+    Subject: [MPR 63] Steels
+    Requirement: be used in tension below their ductile-brittle transition temperature
+
+  [PROHIBITION] p.94
+    [MPR 63] Steels shall not be used in
+    Subject: [MPR 63] Steels
+    Requirement: be used in
+
+  [MANDATORY] p.94
+    mission-critical functions shall be verified
+    Subject: mission-critical functions
+    Requirement: be verified
+
+  [MANDATORY] p.94
+    mission-critical functions shall be 100
+    Subject: mission-critical functions
+    Requirement: be 100
+
+SECTION 4.2.2.3.1
+----------------------------------------
+  [MANDATORY] p.41
+    shall be verified to be compatible and not detrimental to performance before use
+    Requirement: be verified to be compatible and not detrimental to performance before use
+
+  [MANDATORY] p.41
+    spaceflight hardware that provides mission-critical functions shall be 100 percent machined,
+    Subject: spaceflight hardware that provides mission-critical functions
+    Requirement: be 100 percent machined,
+
+  [PERMISSION] p.41
+    Contaminated zones and layers may be formed as a result of mill processing, heat treating, and
+    Subject: Contaminated zones and layers
+    Requirement: be formed as a result of mill processing, heat treating, and
+
+SECTION 4.2.2.3.2
+----------------------------------------
+  [MANDATORY] p.42
+    functions that are subject to fretting or wear shall be anodized per SAE AMS2488D, Anodic
+    Subject: functions that are subject to fretting or wear
+    Requirement: be anodized per SAE AMS2488D, Anodic
+
+  [MANDATORY] p.95
+    to fretting or wear shall be anodized per
+    Subject: to fretting or wear
+    Requirement: be anodized per
+
+  [PROHIBITION] p.95
+    [MPR 67] Titanium alloys shall not be
+    Subject: [MPR 67] Titanium alloys
+    Requirement: be
+
+  [MANDATORY] p.95
+    use in such environments must be
+    Subject: use in such environments
+    Requirement: be
+
+  [PROHIBITION] p.95
+    [MPR 68] Titanium alloys shall not be
+    Subject: [MPR 68] Titanium alloys
+    Requirement: be
+
+  [MANDATORY] p.95
+    spacecraft must be prevented
+    Subject: spacecraft
+    Requirement: be prevented
+
+  [PROHIBITION] p.95
+    [MPR 69] Magnesium alloys shall not be
+    Subject: [MPR 69] Magnesium alloys
+    Requirement: be
+
+  [PROHIBITION] p.95
+    [MPR 70] Magnesium alloys shall not be
+    Subject: [MPR 70] Magnesium alloys
+    Requirement: be
+
+SECTION 4.2.2.3.3
+----------------------------------------
+  [PROHIBITION] p.42
+    [MPR 67] Titanium alloys shall not be used with LOX or GOX at any pressure or
+    Subject: [MPR 67] Titanium alloys
+    Requirement: be used with LOX or GOX at any pressure or
+
+  [PROHIBITION] p.42
+    [MPR 68] Titanium alloys shall not be machined inside spacecraft modules during
+    Subject: [MPR 68] Titanium alloys
+    Requirement: be machined inside spacecraft modules during
+
+SECTION 4.2.2.4
+----------------------------------------
+  [PROHIBITION] p.42
+    [MPR 69] Magnesium alloys shall not be used in primary structure or in other areas
+    Subject: [MPR 69] Magnesium alloys
+    Requirement: be used in primary structure or in other areas
+
+  [PROHIBITION] p.42
+    [MPR 70] Magnesium alloys shall not be machined inside spacecraft modules during
+    Subject: [MPR 70] Magnesium alloys
+    Requirement: be machined inside spacecraft modules during
+
+SECTION 4.2.2.5
+----------------------------------------
+  [PROHIBITION] p.42
+    [MPR 71] Alloys containing more than 4 percent beryllium by weight shall not be
+    Subject: [MPR 71] Alloys containing more than 4 percent beryllium by weight
+    Requirement: be
+
+SECTION 4.2.2.6
+----------------------------------------
+  [PROHIBITION] p.43
+    [MPR 77] Cadmium shall not be used in crew or vacuum environments
+    Subject: [MPR 77] Cadmium
+    Requirement: be used in crew or vacuum environments
+
+  [PROHIBITION] p.43
+    [MPR 78] Cadmium-plated tools and other hardware shall not be used in the
+    Subject: [MPR 78] Cadmium-plated tools and other hardware
+    Requirement: be used in the
+
+SECTION 4.2.2.7
+----------------------------------------
+  [PROHIBITION] p.43
+    plating shall not be used in spaceflight hardware that provides mission-critical functions
+    Subject: plating
+    Requirement: be used in spaceflight hardware that provides mission-critical functions
+
+  [PROHIBITION] p.98
+    zinc-nickel plating shall not be used in
+    Subject: zinc-nickel plating
+    Requirement: be used in
+
+  [PROHIBITION] p.98
+    shall not be used where the mercury could
+    Requirement: be used where the mercury could
+
+  [MANDATORY] p.98
+    contact must be prevented
+    Subject: contact
+    Requirement: be prevented
+
+  [MANDATORY] p.98
+    mercury shall have three levels of
+    Subject: mercury
+    Requirement: have three levels of
+
+  [MANDATORY] p.98
+    environment must be
+    Subject: environment
+    Requirement: be
+
+SECTION 4.2.2.8
+----------------------------------------
+  [PROHIBITION] p.44
+    [MPR 80] Equipment containing mercury shall not be used where the mercury could
+    Subject: [MPR 80] Equipment containing mercury
+    Requirement: be used where the mercury could
+
+  [MANDATORY] p.44
+    shall have three levels of containment to prevent mercury leakage
+    Requirement: have three levels of containment to prevent mercury leakage
+
+SECTION 4.2.2.9
+----------------------------------------
+  [MANDATORY] p.44
+    and iridium) used in mission-critical applications, tests shall be performed to characterize critical
+    Subject: and iridium) used in mission-critical applications, tests
+    Requirement: be performed to characterize critical
+
+  [MANDATORY] p.98
+    mission-critical applications, tests shall be
+    Subject: mission-critical applications, tests
+    Requirement: be
+
+  [MANDATORY] p.98
+    Testing must be performed
+    Subject: Testing
+    Requirement: be performed
+
+SECTION 4.2.3.1
+----------------------------------------
+  [MANDATORY] p.46
+    critical functions shall be selected to operate within design parameters for the useful life of the
+    Subject: critical functions
+    Requirement: be selected to operate within design parameters for the useful life of the
+
+  [MANDATORY] p.46
+    critical functions, other than those used in off-the-shelf parts, such as cable clamps, shall be cure-
+    Subject: critical functions, other than those used in off-the-shelf parts, such as cable clamps
+    Requirement: be cure-
+
+  [PROHIBITION] p.46
+    during cure shall not be used because they can cause corrosion
+    Subject: during cure
+    Requirement: be used because they can cause corrosion
+
+  [MANDATORY] p.46
+    provide required elastomeric properties shall be verified
+    Subject: provide
+    Requirement: elastomeric properties shall be verified
+
+SECTION 4.2.3.10
+----------------------------------------
+  [MANDATORY] p.50
+    propylene (FEP) shall meet the requirements of SAE AMS2491F, Surface Treatment of
+    Subject: propylene (FEP)
+    Requirement: meet the requirements of SAE AMS2491F, Surface Treatment of
+
+  [MANDATORY] p.50
+    required, except that for insulated wire or cable a pull test on co-produced specimens may be
+    Requirement: except that for insulated wire or cable a pull test on co-produced specimens may be
+
+SECTION 4.2.3.2
+----------------------------------------
+  [MANDATORY] p.47
+    [MPR 93] Use of polyvinyl chloride on spaceflight hardware shall be limited to applications in
+    Subject: [MPR 93] Use of polyvinyl chloride on spaceflight hardware
+    Requirement: be limited to applications in
+
+  [MANDATORY] p.101
+    spaceflight hardware shall be limited to
+    Subject: spaceflight hardware
+    Requirement: be limited to
+
+SECTION 4.2.3.4
+----------------------------------------
+  [PERMISSION] p.47
+    containing chloro-fluoro components may react with newly exposed rubbing surfaces of
+    Subject: containing chloro-fluoro components
+    Requirement: react with newly exposed rubbing surfaces of
+
+SECTION 4.2.3.5
+----------------------------------------
+  [MANDATORY] p.47
+    [MPR 94] All materials shall be selected to meet the useful life of the hardware with no
+    Subject: [MPR 94] All materials
+    Requirement: be selected to meet the useful life of the hardware with no
+
+  [MANDATORY] p.102
+    [MPR 94] All materials shall be selected
+    Subject: [MPR 94] All materials
+    Requirement: be selected
+
+  [MANDATORY] p.102
+    which it is a part, then it must be
+    Subject: which it is a part, then it
+    Requirement: be
+
+  [MANDATORY] p.102
+    closed compartments, shall be tested
+    Subject: closed compartments
+    Requirement: be tested
+
+SECTION 4.2.3.7
+----------------------------------------
+  [MANDATORY] p.49
+    shall meet operational requirements for their intended life-cycle exposure
+    Requirement: meet operational requirements for their intended life-cycle exposure
+
+  [PERMISSION] p.49
+    environments, such as dust and planetary atmospheres, may also apply
+    Subject: environments, such as dust and planetary atmospheres
+    Requirement: also apply
+
+  [RECOMMENDATION] p.49
+    debris should also be considered in the analysis of long-term degradation
+    Subject: debris
+    Requirement: also be considered in the analysis of long-term degradation
+
+  [MANDATORY] p.104
+    external environment shall meet
+    Subject: external environment
+    Requirement: meet
+
+SECTION 4.2.3.8
+----------------------------------------
+  [MANDATORY] p.49
+    shall be used in launch vehicles and pressurized flight compartments, except when one of the
+    Requirement: be used in launch vehicles and pressurized flight compartments, except when one of the
+
+  [MANDATORY] p.104
+    Materials, Table 4-I, Group I, shall be
+    Subject: Materials, Table 4-I, Group I
+    Requirement: be
+
+  [MANDATORY] p.104
+    fungus are required in launch
+    Subject: fungus are
+    Requirement: in launch
+
+SECTION 4.2.3.9
+----------------------------------------
+  [MANDATORY] p.50
+    silver chelating agent, such as benzotriazole (BZT), shall be added to the solution to prevent
+    Subject: silver chelating agent, such as benzotriazole (BZT)
+    Requirement: be added to the solution to prevent
+
+  [PERMISSION] p.50
+    glycols may be exempted if testing is conducted to demonstrate that the spontaneous ignition
+    Subject: glycols
+    Requirement: be exempted if testing is conducted to demonstrate that the spontaneous ignition
+
+  [MANDATORY] p.106
+    agent, such as benzotriazole (BZT), shall
+    Subject: agent, such as benzotriazole (BZT)
+    Requirement: 
+
+  [MANDATORY] p.106
+    Required to prevent this unusual
+    Requirement: to prevent this unusual
+
+  [MANDATORY] p.106
+    ethylene propylene (FEP) shall meet the
+    Subject: ethylene propylene (FEP)
+    Requirement: meet the
+
+  [MANDATORY] p.106
+    fluorocarbon surface is required, except
+    Subject: fluorocarbon surface
+    Requirement: except
+
+  [PERMISSION] p.106
+    on co-produced specimens may be
+    Subject: on co-produced specimens
+    Requirement: be
+
+  [MANDATORY] p.106
+    [MPR 101] Etched surfaces shall be
+    Subject: [MPR 101] Etched surfaces
+    Requirement: be
+
+  [MANDATORY] p.106
+    provides mission-critical functions shall
+    Subject: provides mission-critical functions
+    Requirement: 
+
+SECTION 4.2.4.1
+----------------------------------------
+  [MANDATORY] p.51
+    provides mission-critical functions shall meet the requirements of SAE AMS2772G, Heat
+    Subject: provides mission-critical functions
+    Requirement: meet the requirements of SAE AMS2772G, Heat
+
+  [MANDATORY] p.51
+    mission-critical functions shall meet the requirements of SAE AMS-H-6875B, Heat Treatment of
+    Subject: mission-critical functions
+    Requirement: meet the requirements of SAE AMS-H-6875B, Heat Treatment of
+
+  [MANDATORY] p.51
+    provides mission-critical functions shall meet the requirements of SAE AMS-H-81200D, Heat
+    Subject: provides mission-critical functions
+    Requirement: meet the requirements of SAE AMS-H-81200D, Heat
+
+  [MANDATORY] p.51
+    hardware that provides mission-critical functions shall meet the requirements of SAE
+    Subject: hardware that provides mission-critical functions
+    Requirement: meet the requirements of SAE
+
+  [RECOMMENDATION] p.51
+    Care should be taken in design of heat treatment fixturing and in heat treatment procedures for
+    Subject: Care
+    Requirement: be taken in design of heat treatment fixturing and in heat treatment procedures for
+
+SECTION 4.2.4.10
+----------------------------------------
+  [MANDATORY] p.62
+    mission-critical functions shall be applied according to the requirements of SAE AMS2403N,
+    Subject: mission-critical functions
+    Requirement: be applied according to the requirements of SAE AMS2403N,
+
+  [MANDATORY] p.62
+    critical functions shall be applied per SAE AMS2404G, Plating, Electroless Nickel, or ASTM
+    Subject: critical functions
+    Requirement: be applied per SAE AMS2404G, Plating, Electroless Nickel, or ASTM
+
+  [MANDATORY] p.62
+    spaceflight hardware that provides mission-critical functions shall be protected from exposure to
+    Subject: spaceflight hardware that provides mission-critical functions
+    Requirement: be protected from exposure to
+
+SECTION 4.2.4.11
+----------------------------------------
+  [MANDATORY] p.62
+    [MPR 174] Spaceflight hardware manufactured by additive manufacturing techniques shall be
+    Subject: [MPR 174] Spaceflight hardware manufactured by additive manufacturing techniques
+    Requirement: be
+
+  [MANDATORY] p.124
+    techniques shall be designed, produced,
+    Subject: techniques
+    Requirement: be designed, produced,
+
+  [MANDATORY] p.124
+    [MPR 175] The NDE Plan shall address
+    Subject: [MPR 175] The NDE Plan
+    Requirement: address
+
+  [MANDATORY] p.124
+    [MPR 176] The Plan shall meet the intent
+    Subject: [MPR 176] The Plan
+    Requirement: meet the intent
+
+SECTION 4.2.4.2
+----------------------------------------
+  [RECOMMENDATION] p.52
+    forging techniques should be used that, whenever possible, produce an internal grain-flow
+    Subject: forging techniques
+    Requirement: be used that, whenever possible, produce an internal grain-flow
+
+SECTION 4.2.4.3
+----------------------------------------
+  [MANDATORY] p.54
+    functions shall meet the requirements of SAE AMS2175A (2010), Castings, Classification and
+    Subject: functions
+    Requirement: meet the requirements of SAE AMS2175A (2010), Castings, Classification and
+
+  [MANDATORY] p.54
+    castings shall be subjected to first-article inspection to verify proper material flow, proper
+    Subject: castings
+    Requirement: be subjected to first-article inspection to verify proper material flow, proper
+
+  [MANDATORY] p.54
+    material integrity, minimum required mechanical properties, proper grain size, and
+    Subject: material integrity, minimum
+    Requirement: mechanical properties, proper grain size, and
+
+  [MANDATORY] p.54
+    [MPR 120] The mechanical properties in trim ring/protrusion of the first article shall
+    Subject: [MPR 120] The mechanical properties in trim ring/protrusion of the first article
+    Requirement: 
+
+  [PERMISSION] p.54
+    Mechanical properties testing requirements may include fracture, durability, or damage tolerance
+    Subject: Mechanical properties testing requirements
+    Requirement: include fracture, durability, or damage tolerance
+
+  [MANDATORY] p.54
+    [MPR 121] The same casting practice and heat-treating procedure shall be used for the
+    Subject: [MPR 121] The same casting practice and heat-treating procedure
+    Requirement: be used for the
+
+  [MANDATORY] p.54
+    mechanical property testing of integrally cast or excised tensile bars at critical locations shall be
+    Subject: mechanical property testing of integrally cast or excised tensile bars at critical locations
+    Requirement: be
+
+  [MANDATORY] p.54
+    [MPR 123] Periodic cut-ups or functional testing shall be conducted for Class 1 and Class 2
+    Subject: [MPR 123] Periodic cut-ups or functional testing
+    Requirement: be conducted for Class 1 and Class 2
+
+  [MANDATORY] p.54
+    [MPR 124] Surface and volumetric nondestructive inspection shall be performed on all
+    Subject: [MPR 124] Surface and volumetric nondestructive inspection
+    Requirement: be performed on all
+
+SECTION 4.2.4.5
+----------------------------------------
+  [MANDATORY] p.55
+    [MPR 130] Structural adhesive bonding shall meet MSFC-SPEC-445A, Adhesive
+    Subject: [MPR 130] Structural adhesive bonding
+    Requirement: meet MSFC-SPEC-445A, Adhesive
+
+  [PERMISSION] p.55
+    The Operator Certification Plan and the Adhesive Control Plan may be described in the
+    Subject: The Operator Certification Plan and the Adhesive Control Plan
+    Requirement: be described in the
+
+  [MANDATORY] p.55
+    Retesting of adhesives used for production parts is not required if they are within shelf life
+    Subject: Retesting of adhesives used for production parts is not
+    Requirement: if they are within shelf life
+
+  [MANDATORY] p.55
+    [MPR 131] Structural adhesive bonding processes shall be controlled to prevent
+    Subject: [MPR 131] Structural adhesive bonding processes
+    Requirement: be controlled to prevent
+
+  [RECOMMENDATION] p.55
+    sensitivity studies should be conducted to verify that the required adhesive properties are
+    Subject: sensitivity studies
+    Requirement: be conducted to verify that the required adhesive properties are
+
+SECTION 4.2.4.6
+----------------------------------------
+  [RECOMMENDATION] p.56
+    The design selection of parent materials and weld methods should be based on consideration of
+    Subject: The design selection of parent materials and weld methods
+    Requirement: be based on consideration of
+
+  [RECOMMENDATION] p.56
+    Peaking and mismatch limits should be considered in the mechanical
+    Subject: Peaking and mismatch limits
+    Requirement: be considered in the mechanical
+
+  [RECOMMENDATION] p.56
+    Welding procedures should be selected to provide the required weld quality, minimum weld
+    Subject: Welding procedures
+    Requirement: be selected to provide the required weld quality, minimum weld
+
+  [RECOMMENDATION] p.56
+    selected should be demonstrated through qualification testing of welded specimens representing
+    Subject: selected
+    Requirement: be demonstrated through qualification testing of welded specimens representing
+
+  [INTENT] p.56
+    Programs/Projects will assess if it is more beneficial to directly use welding specifications cited
+    Subject: Programs/Projects
+    Requirement: assess if it is more beneficial to directly use welding specifications cited
+
+  [MANDATORY] p.56
+    developed, those specifications shall meet the requirements of NASA-STD-5006A, General
+    Subject: developed, those specifications
+    Requirement: meet the requirements of NASA-STD-5006A, General
+
+  [MANDATORY] p.56
+    [MPR 134] Material Review Board disposition shall be required for weld
+    Subject: [MPR 134] Material Review Board disposition
+    Requirement: be required for weld
+
+SECTION 4.2.4.6.1
+----------------------------------------
+  [MANDATORY] p.57
+    semiautomatic welding for spaceflight applications that provide mission-critical functions shall
+    Subject: semiautomatic welding for spaceflight applications that provide mission-critical functions
+    Requirement: 
+
+  [MANDATORY] p.57
+    [MPR 137] Mission-critical structural welds shall comply with AWS D17
+    Subject: [MPR 137] Mission-critical structural welds
+    Requirement: comply with AWS D17
+
+  [MANDATORY] p.57
+    [MPR 138] Other structural welds shall comply with AWS D17
+    Subject: [MPR 138] Other structural welds
+    Requirement: comply with AWS D17
+
+  [MANDATORY] p.57
+    [MPR 139] Non-critical welds (including seal welds) shall comply with AWS
+    Subject: [MPR 139] Non-critical welds (including seal welds)
+    Requirement: comply with AWS
+
+  [MANDATORY] p.115
+    mission-critical functions shall meet the
+    Subject: mission-critical functions
+    Requirement: meet the
+
+  [MANDATORY] p.115
+    welds shall comply with AWS
+    Subject: welds
+    Requirement: comply with AWS
+
+  [MANDATORY] p.115
+    critical are required to meet the
+    Subject: critical are
+    Requirement: to meet the
+
+  [MANDATORY] p.115
+    [MPR 138] Other structural welds shall
+    Subject: [MPR 138] Other structural welds
+    Requirement: 
+
+  [PERMISSION] p.115
+    Class A requirements may also be
+    Subject: Class A requirements
+    Requirement: also be
+
+SECTION 4.2.4.6.2
+----------------------------------------
+  [MANDATORY] p.60
+    including resistance spot welding (RSW), shall meet the requirements of AWS D17
+    Subject: including resistance spot welding (RSW)
+    Requirement: meet the requirements of AWS D17
+
+  [MANDATORY] p.119
+    resistance spot welding (RSW), shall
+    Subject: resistance spot welding (RSW)
+    Requirement: 
+
+SECTION 4.2.4.6.3
+----------------------------------------
+  [MANDATORY] p.60
+    mission-critical functions shall meet the requirements of AWS D17
+    Subject: mission-critical functions
+    Requirement: meet the requirements of AWS D17
+
+  [MANDATORY] p.119
+    shall meet the requirements of AWS
+    Requirement: meet the requirements of AWS
+
+SECTION 4.2.4.6.4
+----------------------------------------
+  [MANDATORY] p.60
+    [MPR 155] Inertia welding for spaceflight hardware that provides mission-critical functions shall
+    Subject: [MPR 155] Inertia welding for spaceflight hardware that provides mission-critical functions
+    Requirement: 
+
+  [MANDATORY] p.60
+    shall be performed
+    Requirement: be performed
+
+  [MANDATORY] p.60
+    [MPR 157] All welds shall be proof tested
+    Subject: [MPR 157] All welds
+    Requirement: be proof tested
+
+  [MANDATORY] p.60
+    [MPR 158] Inertia welds used in fluid systems shall be helium leak tested
+    Subject: [MPR 158] Inertia welds used in fluid systems
+    Requirement: be helium leak tested
+
+  [RECOMMENDATION] p.60
+    Acceptable helium leak rates should be defined by the system
+    Subject: Acceptable helium leak rates
+    Requirement: be defined by the system
+
+  [MANDATORY] p.120
+    functions shall meet the requirements of
+    Subject: functions
+    Requirement: meet the requirements of
+
+  [MANDATORY] p.120
+    shall be performed
+    Requirement: be performed
+
+  [MANDATORY] p.120
+    [MPR 157] All welds shall be proof
+    Subject: [MPR 157] All welds
+    Requirement: be proof
+
+  [MANDATORY] p.120
+    systems shall be helium leak tested
+    Subject: systems
+    Requirement: be helium leak tested
+
+  [MANDATORY] p.120
+    functions shall be conducted in
+    Subject: functions
+    Requirement: be conducted in
+
+SECTION 4.2.4.7
+----------------------------------------
+  [MANDATORY] p.60
+    shall be conducted in accordance with AWS C3
+    Requirement: be conducted in accordance with AWS C3
+
+  [MANDATORY] p.60
+    mission-critical functions shall meet the requirements of AWS C3
+    Subject: mission-critical functions
+    Requirement: meet the requirements of AWS C3
+
+  [MANDATORY] p.60
+    provides mission-critical functions shall meet the requirements of AWS C3
+    Subject: provides mission-critical functions
+    Requirement: meet the requirements of AWS C3
+
+SECTION 4.2.4.8
+----------------------------------------
+  [PROHIBITION] p.61
+    [MPR 166] Soldering shall not be used for structural applications
+    Subject: [MPR 166] Soldering
+    Requirement: be used for structural applications
+
+  [PROHIBITION] p.122
+    [MPR 166] Soldering shall not be used
+    Subject: [MPR 166] Soldering
+    Requirement: be used
+
+SECTION 4.2.4.9
+----------------------------------------
+  [MANDATORY] p.61
+    processes for spaceflight hardware that provides mission-critical functions shall be controlled to
+    Subject: processes for spaceflight hardware that provides mission-critical functions
+    Requirement: be controlled to
+
+  [MANDATORY] p.61
+    (1) [MPR 168] The oxide layer shall be removed from the surface
+    Subject: (1) [MPR 168] The oxide layer
+    Requirement: be removed from the surface
+
+  [MANDATORY] p.61
+    (2) [MPR 169] In addition, the recast layer and the heat-affected zone shall be
+    Subject: (2) [MPR 169] In addition, the recast layer and the heat-affected zone
+    Requirement: be
+
+  [PERMISSION] p.61
+    The recast layer and heat-affected zone may be left on a part if an engineering evaluation shows
+    Subject: The recast layer and heat-affected zone
+    Requirement: be left on a part if an engineering evaluation shows
+
+  [MANDATORY] p.61
+    that they are not of consequence to the required performance of the part
+    Subject: that they are not of consequence to the
+    Requirement: performance of the part
+
+  [MANDATORY] p.61
+    critical functions shall be qualified to determine the maximum thickness of the affected layers
+    Subject: critical functions
+    Requirement: be qualified to determine the maximum thickness of the affected layers
+
+  [MANDATORY] p.61
+    when the depth of the affected material must be known for removal or analysis
+    Subject: when the depth of the affected material
+    Requirement: be known for removal or analysis
+
+SECTION 4.2.5
+----------------------------------------
+  [PROHIBITION] p.97
+    [MPR 77] Cadmium shall not be used in
+    Subject: [MPR 77] Cadmium
+    Requirement: be used in
+
+  [PROHIBITION] p.97
+    other hardware shall not be used in the
+    Subject: other hardware
+    Requirement: be used in the
+
+SECTION 4.2.5.1
+----------------------------------------
+  [MANDATORY] p.63
+    [MPR 175] The NDE Plan shall address the process for establishment,
+    Subject: [MPR 175] The NDE Plan
+    Requirement: address the process for establishment,
+
+  [MANDATORY] p.63
+    [MPR 176] The Plan shall meet the intent of MIL-HDBK-6870B, Nondestructive
+    Subject: [MPR 176] The Plan
+    Requirement: meet the intent of MIL-HDBK-6870B, Nondestructive
+
+  [RECOMMENDATION] p.63
+    should be determined early in the design process so that proper flaw screening is accomplished
+    Requirement: be determined early in the design process so that proper flaw screening is accomplished
+
+  [MANDATORY] p.63
+    procedures used on all (metallic, non-metallic and composite) hardware shall be addressed in the
+    Subject: procedures used on all (metallic, non-metallic and composite) hardware
+    Requirement: be addressed in the
+
+  [MANDATORY] p.63
+    testing shall comply with NAS 410 (Revision 4), NAS Certification and Qualification of
+    Subject: testing
+    Requirement: comply with NAS 410 (Revision 4), NAS Certification and Qualification of
+
+SECTION 4.2.5.2
+----------------------------------------
+  [MANDATORY] p.63
+    parts that are to be fluorescent dye-penetrant inspected shall be adequately etched to assure
+    Subject: parts that are to be fluorescent dye-penetrant inspected
+    Requirement: be adequately etched to assure
+
+SECTION 4.2.6.1
+----------------------------------------
+  [PERMISSION] p.64
+    Residual stresses may be harmful in structural applications when the part is subjected to fatigue
+    Subject: Residual stresses
+    Requirement: be harmful in structural applications when the part is subjected to fatigue
+
+  [RECOMMENDATION] p.64
+    Special consideration should be given to
+    Subject: Special consideration
+    Requirement: be given to
+
+  [RECOMMENDATION] p.64
+    Residual stresses should be controlled or
+    Subject: Residual stresses
+    Requirement: be controlled or
+
+  [MANDATORY] p.64
+    hardware shall be considered in structural analyses and corrosion/stress-corrosion assessments
+    Subject: hardware
+    Requirement: be considered in structural analyses and corrosion/stress-corrosion assessments
+
+  [RECOMMENDATION] p.64
+    Residual stresses should be quantified by an appropriate technique (such as x-ray diffraction)
+    Subject: Residual stresses
+    Requirement: be quantified by an appropriate technique (such as x-ray diffraction)
+
+  [MANDATORY] p.64
+    [MPR 182] The straightening of warped parts in structural hardware shall require an
+    Subject: [MPR 182] The straightening of warped parts in structural hardware
+    Requirement: require an
+
+SECTION 4.2.6.2
+----------------------------------------
+  [PERMISSION] p.65
+    and/or vacuum exposure may be either vented to relieve internal pressure or sealed and
+    Subject: and/or vacuum exposure
+    Requirement: be either vented to relieve internal pressure or sealed and
+
+  [MANDATORY] p.65
+    shall be adequately relieved to preclude core-to-face sheet bond line “peel” failure modes that
+    Requirement: be adequately relieved to preclude core-to-face sheet bond line “peel” failure modes that
+
+  [PERMISSION] p.65
+    Venting analysis methods are complex and may be difficult to verify
+    Subject: Venting analysis methods are complex and
+    Requirement: be difficult to verify
+
+  [RECOMMENDATION] p.65
+    Testing should be
+    Subject: Testing
+    Requirement: be
+
+  [RECOMMENDATION] p.65
+    “Peel” failure modes at the core-to-face sheet bondline should be
+    Subject: “Peel” failure modes at the core-to-face sheet bondline
+    Requirement: be
+
+  [MANDATORY] p.65
+    [MPR 184] Sandwich architectures that are not vented shall be capable of
+    Subject: [MPR 184] Sandwich architectures that are not vented
+    Requirement: be capable of
+
+  [PERMISSION] p.65
+    Sandwich assemblies that are not vented may result in higher internal design pressures during
+    Subject: Sandwich assemblies that are not vented
+    Requirement: result in higher internal design pressures during
+
+  [RECOMMENDATION] p.65
+    should include evaluation of credible “peel” failure modes when exposed to all expected
+    Requirement: include evaluation of credible “peel” failure modes when exposed to all expected
+
+  [RECOMMENDATION] p.65
+    Additionally, fatigue performance should be interrogated to
+    Subject: Additionally, fatigue performance
+    Requirement: be interrogated to
+
+  [MANDATORY] p.65
+    [MPR 185] Structural sandwich assemblies shall be designed to prevent the entrance
+    Subject: [MPR 185] Structural sandwich assemblies
+    Requirement: be designed to prevent the entrance
+
+SECTION 4.2.6.3
+----------------------------------------
+  [MANDATORY] p.67
+    mission-critical functions, including spares, shall be finished to provide protection from
+    Subject: mission-critical functions, including spares
+    Requirement: be finished to provide protection from
+
+  [PERMISSION] p.67
+    Titanium fasteners may be used in contact with graphite composites, provided that
+    Subject: Titanium fasteners
+    Requirement: be used in contact with graphite composites, provided that
+
+  [MANDATORY] p.129
+    including spares, shall be finished to
+    Subject: including spares
+    Requirement: be finished to
+
+  [PERMISSION] p.129
+    Titanium fasteners may be used
+    Subject: Titanium fasteners
+    Requirement: be used
+
+  [INTENT] p.129
+    spaceflight hardware will be
+    Subject: spaceflight hardware
+    Requirement: be
+
+SECTION 4.2.6.3.1
+----------------------------------------
+  [MANDATORY] p.67
+    functions shall be passivated after machining
+    Subject: functions
+    Requirement: be passivated after machining
+
+  [MANDATORY] p.130
+    mission-critical functions shall be
+    Subject: mission-critical functions
+    Requirement: be
+
+SECTION 4.2.6.3.2
+----------------------------------------
+  [MANDATORY] p.67
+    shall be sealed either by mechanical seals or by separable, faying-surface sealing
+    Requirement: be sealed either by mechanical seals or by separable, faying-surface sealing
+
+  [MANDATORY] p.130
+    environments shall be sealed either by
+    Subject: environments
+    Requirement: be sealed either by
+
+  [MANDATORY] p.130
+    shall be addressed in the Materials and
+    Requirement: be addressed in the Materials and
+
+  [INTENT] p.130
+    structures containing hydrogen will
+    Subject: structures containing hydrogen
+    Requirement: 
+
+  [MANDATORY] p.130
+    [MPR 193] An MUA shall be written
+    Subject: [MPR 193] An MUA
+    Requirement: be written
+
+  [MANDATORY] p.130
+    mission-critical functions shall be
+    Subject: mission-critical functions
+    Requirement: be
+
+  [MANDATORY] p.130
+    treatment shall be performed promptly
+    Subject: treatment
+    Requirement: be performed promptly
+
+SECTION 4.2.6.5
+----------------------------------------
+  [INTENT] p.68
+    common systems that form intermetallic compounds that will degrade a metal joint
+    Subject: common systems that form intermetallic compounds that
+    Requirement: degrade a metal joint
+
+SECTION 4.2.6.5.1
+----------------------------------------
+  [PROHIBITION] p.131
+    [MPR 196] Gold shall not be used in
+    Subject: [MPR 196] Gold
+    Requirement: be used in
+
+  [MANDATORY] p.131
+    gold shall be removed from at least 95
+    Subject: gold
+    Requirement: be removed from at least 95
+
+  [INTENT] p.131
+    into tin-based solder will be
+    Subject: into tin-based solder
+    Requirement: be
+
+  [PROHIBITION] p.131
+    [MPR 198] Gold-coated contacts shall not
+    Subject: [MPR 198] Gold-coated contacts
+    Requirement: 
+
+  [INTENT] p.131
+    coated contacts will be avoided
+    Subject: coated contacts
+    Requirement: be avoided
+
+  [MANDATORY] p.131
+    processes shall be controlled to minimize
+    Subject: processes
+    Requirement: be controlled to minimize
+
+SECTION 4.2.6.5.2
+----------------------------------------
+  [INTENT] p.69
+    When tin-based solder is used to join gold-plated surfaces, the gold coatings will dissolve into
+    Subject: When tin-based solder is used to join gold-plated surfaces, the gold coatings
+    Requirement: dissolve into
+
+  [PERMISSION] p.69
+    approximately 3 percent by weight, then a brittle gold-tin intermetallic compound may form
+    Subject: approximately 3 percent by weight, then a brittle gold-tin intermetallic compound
+    Requirement: form
+
+  [MANDATORY] p.69
+    shall be removed from at least 95 percent of the surface to be soldered of all component leads,
+    Requirement: be removed from at least 95 percent of the surface to be soldered of all component leads,
+
+  [PERMISSION] p.69
+    A double tinning process or dynamic solder wave may be used for gold removal prior to
+    Subject: A double tinning process or dynamic solder wave
+    Requirement: be used for gold removal prior to
+
+  [PROHIBITION] p.69
+    [MPR 198] Gold-coated contacts shall not be mated with tin or tin alloy-coated
+    Subject: [MPR 198] Gold-coated contacts
+    Requirement: be mated with tin or tin alloy-coated
+
+SECTION 4.2.6.5.3
+----------------------------------------
+  [RECOMMENDATION] p.69
+    formation is catalyzed by silicon, so care should be taken to keep the braze joint zone free of
+    Subject: formation is catalyzed by silicon, so care
+    Requirement: be taken to keep the braze joint zone free of
+
+SECTION 4.2.6.6.1
+----------------------------------------
+  [MANDATORY] p.70
+    or disengagement would result in a critical or catastrophic hazard, its use shall comply with the
+    Subject: or disengagement would result in a critical or catastrophic hazard, its use
+    Requirement: comply with the
+
+  [MANDATORY] p.132
+    hazard, its use shall comply with the
+    Subject: hazard, its use
+    Requirement: comply with the
+
+  [INTENT] p.132
+    locking compounds will be
+    Subject: locking compounds
+    Requirement: be
+
+SECTION 4.2.6.6.2
+----------------------------------------
+  [PROHIBITION] p.70
+    [MPR 202] Silver-plated fasteners shall not be used in external applications where the silver
+    Subject: [MPR 202] Silver-plated fasteners
+    Requirement: be used in external applications where the silver
+
+  [MANDATORY] p.133
+    [MPR 202] Silver-plated fasteners shall
+    Subject: [MPR 202] Silver-plated fasteners
+    Requirement: 
+
+  [INTENT] p.133
+    atomic oxygen will not contaminate
+    Subject: atomic oxygen
+    Requirement: not contaminate
+
+  [MANDATORY] p.133
+    Plan shall be generated in accordance
+    Subject: Plan
+    Requirement: be generated in accordance
+
+  [MANDATORY] p.133
+    Plan shall include controls on
+    Subject: Plan
+    Requirement: include controls on
+
+  [MANDATORY] p.133
+    shall be established for all ground
+    Requirement: be established for all ground
+
+SECTION 4.2.6.7
+----------------------------------------
+  [PERMISSION] p.70
+    migration may degrade the performance of optical devices, thermal control surfaces,
+    Subject: migration
+    Requirement: degrade the performance of optical devices, thermal control surfaces,
+
+SECTION 4.2.6.8
+----------------------------------------
+  [MANDATORY] p.71
+    [MPR 208] Packaging shall protect spaceflight hardware from corrosion and contamination
+    Subject: [MPR 208] Packaging
+    Requirement: protect spaceflight hardware from corrosion and contamination
+
+  [MANDATORY] p.134
+    [MPR 208] Packaging shall protect
+    Subject: [MPR 208] Packaging
+    Requirement: protect
+
+SECTION 4.3
+----------------------------------------
+  [MANDATORY] p.71
+    shall consist of the following steps, as a minimum:
+    Requirement: consist of the following steps, as a minimum:
+
+  [MANDATORY] p.134
+    Technical Standard shall consist of the
+    Subject: Technical Standard
+    Requirement: consist of the
+
+SECTION 406
+----------------------------------------
+  [MANDATORY] p.139
+    Material is B-rated in MAPTIS (batch/lot testing required) but batch/lot used in
+    Subject: Material is B-rated in MAPTIS (batch/lot testing
+    Requirement: ) but batch/lot used in
+
+SECTION 6030
+----------------------------------------
+  [RECOMMENDATION] p.142
+    The specific DRDs and the content of those DRDs should be tailored to each spacecraft
+    Subject: The specific DRDs and the content of those DRDs
+    Requirement: be tailored to each spacecraft
+
+  [PERMISSION] p.142
+    program and additional DRDs may be appropriate
+    Subject: program and additional DRDs
+    Requirement: be appropriate
+
+SECTION 606
+----------------------------------------
+  [MANDATORY] p.140
+    Electrical grounding required, cladding plus conversion coating adequate
+    Subject: Electrical grounding
+    Requirement: cladding plus conversion coating adequate
+
+SECTION 610
+----------------------------------------
+  [MANDATORY] p.140
+    Actual surface treatment shall be listed
+    Subject: Actual surface treatment
+    Requirement: be listed
+
+SECTION 7
+----------------------------------------
+  [MANDATORY] p.143
+    This Plan shall document the degree of conformance and method of implementation for
+    Subject: This Plan
+    Requirement: document the degree of conformance and method of implementation for
+
+  [MANDATORY] p.143
+    It shall also describe the methods used to control
+    Subject: It
+    Requirement: also describe the methods used to control
+
+  [MANDATORY] p.143
+    activity, shall become the Materials and Processes implementation document used for
+    Subject: activity
+    Requirement: become the Materials and Processes implementation document used for
+
+  [MANDATORY] p.145
+    MUAs shall be submitted for all materials and processes that are technically acceptable
+    Subject: MUAs
+    Requirement: be submitted for all materials and processes that are technically acceptable
+
+  [PERMISSION] p.145
+    standard may be technically acceptable if hardware reliability and vehicle safety are not
+    Subject: standard
+    Requirement: be technically acceptable if hardware reliability and vehicle safety are not
+
+  [MANDATORY] p.152
+    The Nondestructive Evaluation (NDE) Plan shall address the NDE requirements
+    Subject: The Nondestructive Evaluation (NDE) Plan
+    Requirement: address the NDE requirements
+
+  [MANDATORY] p.152
+    This Plan shall identify all Nondestructive Evaluation (NDE) standards employed
+    Subject: This Plan
+    Requirement: identify all Nondestructive Evaluation (NDE) standards employed
+
+SECTION 702
+----------------------------------------
+  [MANDATORY] p.141
+    Material codes for generic material shall be
+    Subject: Material codes for generic material
+    Requirement: be
+

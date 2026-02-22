@@ -1,13 +1,14 @@
-"""NASA-STD-6016C Category Router — Corrected Semantics.
+"""JSC 27301F Category Router — Corrected Semantics.
 
-Routes MUA submissions to Category I, II, or III per NASA-STD-6016C,
+Routes MUA submissions to Category I, II, or III per JSC 27301F (with
+NASA-STD-6016C technical thresholds),
 producing a deterministic, fully-traceable audit trail.
 
 CRITICAL FIX (Feb 2026): Category semantics were INVERTED.
     Old:  Cat I = "strong evidence, standard env"   <- WRONG
           Cat III = "weak evidence, needs testing"   <- WRONG
     New:  Cat I = MOST RESTRICTIVE (safety/mission critical)
-          Cat III = SIMPLEST (Appendix B code, closed at MIUL level)
+          Cat III = SIMPLEST (Appendix E code, closed at MIUL level)
 
 Routing hierarchy (most restrictive wins):
 
@@ -26,17 +27,19 @@ Routing hierarchy (most restrictive wins):
                   APPROVAL: Hardware M&P -> NASA M&P (EM04).
                   REISSUE: Required for any update (§8).
 
-    Category III — Has approved Appendix B rationale code. Material doesn't
+    Category III — Has approved Appendix E rationale code. Material doesn't
                    meet requirements but has an accepted disposition code
-                   (103-108) in the approved M&P plan.
+                   (e.g., 103, 104, 105, 106, 107, 108, S01-S06)
+                   in the approved M&P plan.
                    OUTPUT: MIUL rationale-code report (NO MUA form submitted).
                    APPROVAL: Hardware M&P -> NASA M&P (via MIUL acceptance).
-                   NOTE: Per 6016C, "no MUA form is submitted" for Cat III.
+                   NOTE: Per JSC 27301F §4.3.3, "No MUA form is submitted"
+                   for Cat III.
 
 Key thresholds — ALL live in AuthorityPack with §-citations:
     - Enriched O2: >= 23.5% (§4.2.1.4)
     - O2 acceptance testing: > 1.83 MPa / 265 psia (§4.2.1.4.1)
-    - Minor quantity: < 45g AND < 13 cm² (Appendix B, Code 105)
+    - Minor quantity: < 45g AND < 13 cm² (JSC 27301F Appendix E, Code 105)
     - Cryogenic: <= -150°F (§4.2.6.1)
 
 BoundState AI 2026
@@ -64,6 +67,28 @@ from .models import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+# JSC 27301F Appendix E rationale-code families supported by Cat III.
+# We keep this set explicit so normalization is deterministic and auditable.
+_JSC_APPENDIX_E_CODES: set[str] = {
+    # Flammability
+    "101", "102", "103", "104", "105", "106", "107", "108", "109", "110", "111", "112", "113", "114",
+    # Toxicity
+    "201", "202", "203", "204",
+    # Fluid compatibility
+    "301", "302", "303", "304",
+    # Thermal vacuum stability
+    "401", "402", "403", "404", "405", "406", "407", "408", "409",
+    # SCC
+    "501", "502", "503", "504", "505", "506",
+    # Corrosion
+    "601", "602", "603", "604", "606", "607", "608", "609", "610", "611", "612",
+    # General
+    "702", "703",
+    # Stowage
+    "S01", "S02", "S03", "S04", "S05", "S06",
+}
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -122,19 +147,19 @@ class AuthorityPack(BaseModel):
         ),
     )
 
-    # ── Minor quantity thresholds (Appendix B, Code 105) ──
+    # ── Minor quantity thresholds (JSC 27301F Appendix E, Code 105) ──
     minor_quantity_mass_g: ThresholdEntry = ThresholdEntry(
         value=45.0,
         unit="grams",
-        source_doc="NASA-STD-6016C",
-        section="Appendix B, Code 105",
+        source_doc="JSC 27301F",
+        section="Appendix E, Code 105",
         description="Minor quantity exemption: total mass less than 45 grams",
     )
     minor_quantity_area_cm2: ThresholdEntry = ThresholdEntry(
         value=13.0,
         unit="cm2",
-        source_doc="NASA-STD-6016C",
-        section="Appendix B, Code 105",
+        source_doc="JSC 27301F",
+        section="Appendix E, Code 105",
         description=(
             "Minor quantity exemption: total exposed surface area less than "
             "13 cm2 (approximately 2 in2)"
@@ -203,7 +228,7 @@ class MUAOutputType(BaseModel):
     """Defines what artifact each category produces.
 
     CRITICAL: Category III does NOT produce a full MUA form.
-    Per 6016C, Cat III items are reported via MIUL rationale codes.
+    Per JSC 27301F §4.3.3, Cat III items are reported via MIUL rationale codes.
     Generating a full MUA for Cat III is WRONG PAPERWORK.
     """
     category: str
@@ -255,21 +280,24 @@ _OUTPUT_TYPES = {
             "NASA M&P (via MIUL acceptance)",
         ],
         description=(
-            "Category III: Appendix B rationale code applies. No MUA form "
+            "Category III: Appendix E rationale code applies. No MUA form "
             "submitted. Disposition reported in MIUL system with rationale "
-            "code (103-108)."
+            "code."
         ),
     ),
 }
 
 
 # ═══════════════════════════════════════════════════════════════════════
-# APPENDIX B CODE DETECTION
+# APPENDIX E CODE DETECTION
 # ═══════════════════════════════════════════════════════════════════════
 
 
 class AppendixBEvaluation(BaseModel):
-    """Result of Appendix B code eligibility check."""
+    """Result of Category III rationale-code eligibility check.
+
+    Legacy name preserved for API compatibility.
+    """
     eligible: bool
     code: Optional[str] = None       # "103", "104", "105", etc.
     code_description: str = ""
@@ -283,10 +311,11 @@ class AppendixBEvaluation(BaseModel):
 def _normalize_appendix_b_codes(
     codes: Optional[list[str]],
 ) -> list[str]:
-    """Normalize Category III Appendix B code allow-list values.
+    """Normalize Category III rationale-code allow-list values.
 
-    Accepts values in flexible forms ("104", "104,105", "Code 104")
-    and returns de-duplicated 3-digit code strings.
+    Legacy function name preserved for API compatibility.
+    Accepts values in flexible forms ("104", "104,105", "Code 104", "S01")
+    and returns de-duplicated valid JSC 27301F Appendix E codes.
     """
     if not codes:
         return []
@@ -301,10 +330,12 @@ def _normalize_appendix_b_codes(
         for chunk in chunks:
             if not chunk:
                 continue
-            m = re.search(r"\b(10[3-8])\b", chunk.upper())
+            m = re.search(r"\b(S0[1-6]|\d{3})\b", chunk.upper())
             if not m:
                 continue
             code = m.group(1)
+            if code not in _JSC_APPENDIX_E_CODES:
+                continue
             if code not in seen:
                 seen.add(code)
                 out.append(code)
@@ -321,7 +352,10 @@ def evaluate_appendix_b(
     engineer_notes: str = "",
     authority: Optional[AuthorityPack] = None,
 ) -> AppendixBEvaluation:
-    """Check if material qualifies for an Appendix B rationale code.
+    """Check if material qualifies for a Category III rationale code.
+
+    Legacy function name preserved for API compatibility.
+    Semantics follow JSC 27301F Appendix E.
 
     Codes checked (in order of specificity):
         105 -- Minor quantity (< 45g AND < 13 cm2)
@@ -338,20 +372,20 @@ def evaluate_appendix_b(
 
     notes_lower = engineer_notes.lower()
 
-    # ── Disqualifiers: no Appendix B if Cat I triggers present ──
+    # ── Disqualifiers: no Cat III rationale code if Cat I triggers present ──
     medium_upper = env.medium.upper() if env.medium else ""
     is_o2_service = medium_upper in [m.upper() for m in authority.o2_service_media]
 
     if is_o2_service or env.is_enriched_o2:
         return AppendixBEvaluation(
             eligible=False,
-            evidence=["O2/enriched O2 service: Appendix B codes do not apply"],
+            evidence=["O2/enriched O2 service: Appendix E code path not applicable"],
         )
 
     if env.is_hydrogen_service:
         return AppendixBEvaluation(
             eligible=False,
-            evidence=["Hydrogen service: Appendix B codes do not apply"],
+            evidence=["Hydrogen service: Appendix E code path not applicable"],
         )
 
     # ── Code 105: Minor quantity ──
@@ -396,7 +430,7 @@ def evaluate_appendix_b(
             eligible=True,
             code="104",
             code_description="Sandwiched between non-flammable materials",
-            citation="NASA-STD-6016C Appendix B, Code 104",
+            citation="JSC 27301F Appendix E, Code 104",
             rationale_template=(
                 f"The subject material ({material.resolved_name or material.input_text}) "
                 f"is acceptable because:\n"
@@ -419,7 +453,7 @@ def evaluate_appendix_b(
             eligible=True,
             code="106",
             code_description="Hermetically sealed container",
-            citation="NASA-STD-6016C Appendix B, Code 106",
+            citation="JSC 27301F Appendix E, Code 106",
             rationale_template=(
                 f"The subject material ({material.resolved_name or material.input_text}) "
                 f"is contained within hermetically sealed enclosure:\n"
@@ -442,7 +476,7 @@ def evaluate_appendix_b(
             eligible=True,
             code="103",
             code_description="Tested/passes when tested in actual use configuration",
-            citation="NASA-STD-6016C Appendix B, Code 103",
+            citation="JSC 27301F Appendix E, Code 103",
             rationale_template=(
                 f"The subject material ({material.resolved_name or material.input_text}) "
                 f"passes when tested in the actual use configuration:\n"
@@ -464,7 +498,7 @@ def evaluate_appendix_b(
             eligible=True,
             code="108",
             code_description="Off-the-shelf equipment acceptable in configuration",
-            citation="NASA-STD-6016C Appendix B, Code 108",
+            citation="JSC 27301F Appendix E, Code 108",
             rationale_template=(
                 f"The subject material ({material.resolved_name or material.input_text}) "
                 f"is part of off-the-shelf equipment:\n"
@@ -476,10 +510,10 @@ def evaluate_appendix_b(
             evidence=["Engineer notes indicate OTS/COTS equipment"],
         )
 
-    # ── No Appendix B code applies ──
+    # ── No Appendix E code applies ──
     return AppendixBEvaluation(
         eligible=False,
-        evidence=["No Appendix B rationale code criteria met"],
+        evidence=["No Appendix E rationale code criteria met"],
     )
 
 
@@ -494,7 +528,7 @@ class CategoryRouter:
     CORRECTED SEMANTICS (Feb 2026):
         Cat I  = MOST RESTRICTIVE (safety critical, LOX/GOX/H2, enriched O2)
         Cat II = DEFAULT (non-conforming, needs engineering disposition)
-        Cat III = SIMPLEST (has Appendix B code, reported in MIUL, no MUA form)
+        Cat III = SIMPLEST (has Appendix E code, reported in MIUL, no MUA form)
 
     Usage::
 
@@ -505,7 +539,7 @@ class CategoryRouter:
         print(result.routing_basis)     # [RoutingRuleHit, ...]
 
     The router checks Category I triggers first (most restrictive), then
-    evaluates Category III eligibility (Appendix B). If neither applies,
+    evaluates Category III eligibility (Appendix E). If neither applies,
     Category II is assigned (the default bucket).
     """
 
@@ -540,17 +574,17 @@ class CategoryRouter:
         material_resolution:
             Material resolution result from Step 1.
         weight_lb:
-            Optional material weight (for Appendix B Code 105 check).
+            Optional material weight (for Appendix E Code 105 check).
         area_in2:
             Optional exposed surface area (for Code 105 check).
         engineer_notes:
-            Free-text engineer notes (for Appendix B keyword detection).
+            Free-text engineer notes (for Appendix E keyword detection).
 
         Returns
         -------
         CategoryRoutingResult
             Contains category, output type, ordered rule hits, required
-            approvals, required verifications, and Appendix B evaluation.
+            approvals, required verifications, and rationale-code evaluation.
         """
         ap = self.authority_pack
         rule_hits: list[RoutingRuleHit] = []
@@ -564,7 +598,7 @@ class CategoryRouter:
             output_type = _OUTPUT_TYPES["I"]
             appendix_b = None
         else:
-            # ── Phase 2: Evaluate Category III (Appendix B eligibility) ──
+            # ── Phase 2: Evaluate Category III (Appendix E eligibility) ──
             appendix_b = evaluate_appendix_b(
                 env=environment,
                 test_data=test_data,
@@ -589,13 +623,13 @@ class CategoryRouter:
                 rule_hits.append(RoutingRuleHit(
                     rule_id="CAT3-PLAN-001",
                     rule_description=(
-                        f"Appendix B Code {appendix_b.code} is not listed "
+                        f"Appendix E Code {appendix_b.code} is not listed "
                         "as an approved Category III rationale code for "
                         "this hardware/program plan."
                     ),
                     citation=f"{ap.name} §4.1.6.1.3",
                     triggered_by=(
-                        f"appendix_b_code={appendix_b.code}, "
+                        f"rationale_code={appendix_b.code}, "
                         f"approved_codes={approved_codes}"
                     ),
                 ))
@@ -623,7 +657,7 @@ class CategoryRouter:
                 rule_hits.append(RoutingRuleHit(
                     rule_id="CAT3-ELIGIBLE",
                     rule_description=(
-                        f"Appendix B Code {appendix_b.code} applies: "
+                        f"Appendix E Code {appendix_b.code} applies: "
                         f"{appendix_b.code_description}. No MUA form required."
                     ),
                     citation=appendix_b.citation,
@@ -917,15 +951,15 @@ class CategoryRouter:
                 triggered_by=f"open_gap_count={len(open_gaps)}",
             ))
 
-        # Appendix B not eligible (explain why)
+        # Category III rationale code not eligible (explain why)
         if appendix_b and not appendix_b.eligible:
             hits.append(RoutingRuleHit(
                 rule_id="CAT2-004",
                 rule_description=(
-                    f"Appendix B code not applicable: "
+                    f"Appendix E code not applicable: "
                     f"{'; '.join(appendix_b.evidence)}"
                 ),
-                citation=f"{ap.name} Appendix B",
+                citation="JSC 27301F Appendix E",
                 triggered_by="appendix_b_eligible=False",
             ))
 
@@ -1004,7 +1038,7 @@ class CategoryRouter:
 
         else:  # Category III
             verifications.extend([
-                "Verify Appendix B code applicability",
+                "Verify Appendix E code applicability",
                 "Confirm MIUL rationale code entry",
                 "Standard MAPTIS data verification (ratings and currency)",
             ])

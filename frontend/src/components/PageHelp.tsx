@@ -4,6 +4,8 @@
  */
 
 import { HelpCircle, BookOpen, Lightbulb, Target, CheckCircle2 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -33,6 +35,8 @@ interface PageHelpProps {
 }
 
 export function PageHelp({ content, className = "" }: PageHelpProps) {
+  const { t } = useTranslation("help");
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -40,7 +44,7 @@ export function PageHelp({ content, className = "" }: PageHelpProps) {
           variant="ghost"
           size="icon"
           className={`h-8 w-8 rounded-full ${className}`}
-          title="Help - What does this page do?"
+          title={t("common.whatItDoes", { defaultValue: "Help" })}
         >
           <HelpCircle className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
         </Button>
@@ -62,7 +66,7 @@ export function PageHelp({ content, className = "" }: PageHelpProps) {
           <div>
             <h3 className="text-lg font-semibold flex items-center gap-2 mb-3">
               <Target className="h-5 w-5 text-blue-500" />
-              What This Page Does
+              {t("common.whatItDoes", { defaultValue: "What This Page Does" })}
             </h3>
             <ul className="space-y-2">
               {content.whatItDoes.map((item, index) => (
@@ -80,7 +84,7 @@ export function PageHelp({ content, className = "" }: PageHelpProps) {
           <div>
             <h3 className="text-lg font-semibold flex items-center gap-2 mb-3">
               <Lightbulb className="h-5 w-5 text-yellow-500" />
-              How To Use
+              {t("common.howToUse", { defaultValue: "How To Use" })}
             </h3>
             <ol className="space-y-2 list-decimal list-inside">
               {content.howToUse.map((step, index) => (
@@ -96,7 +100,7 @@ export function PageHelp({ content, className = "" }: PageHelpProps) {
           {/* Use Cases Section */}
           <div>
             <h3 className="text-lg font-semibold mb-3">
-              Example Use Cases
+              {t("common.useCases", { defaultValue: "Example Use Cases" })}
             </h3>
             <div className="space-y-3">
               {content.useCases.map((useCase, index) => (
@@ -113,7 +117,7 @@ export function PageHelp({ content, className = "" }: PageHelpProps) {
               <Separator />
               <div>
                 <h3 className="text-lg font-semibold mb-3">
-                  Pro Tips
+                  {t("common.tips", { defaultValue: "Pro Tips" })}
                 </h3>
                 <ul className="space-y-2">
                   {content.tips.map((tip, index) => (
@@ -133,7 +137,7 @@ export function PageHelp({ content, className = "" }: PageHelpProps) {
               <Separator />
               <div>
                 <h3 className="text-lg font-semibold mb-2">
-                  API Endpoint
+                  {t("common.apiEndpoint", { defaultValue: "API Endpoint" })}
                 </h3>
                 <code className="block bg-muted p-2 rounded text-sm font-mono">
                   {content.apiEndpoint}
@@ -148,12 +152,12 @@ export function PageHelp({ content, className = "" }: PageHelpProps) {
               <Separator />
               <div>
                 <h3 className="text-lg font-semibold mb-3">
-                  Related Pages
+                  {t("common.relatedPages", { defaultValue: "Related Pages" })}
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {content.relatedPages.map((page, index) => (
                     <Badge key={index} variant="outline" className="cursor-pointer hover:bg-primary/10">
-                      <a href={page.path}>{page.name}</a>
+                      <Link to={page.path}>{page.name}</Link>
                     </Badge>
                   ))}
                 </div>
@@ -170,12 +174,14 @@ export function PageHelp({ content, className = "" }: PageHelpProps) {
  * Compact version for tight spaces
  */
 export function PageHelpCompact({ content }: PageHelpProps) {
+  const { t } = useTranslation("help");
+
   return (
     <Dialog>
       <DialogTrigger asChild>
         <button
           className="text-muted-foreground hover:text-primary transition-colors"
-          title="What does this page do?"
+          title={t("common.whatItDoes", { defaultValue: "What does this page do?" })}
         >
           <HelpCircle className="h-4 w-4" />
         </button>
@@ -189,7 +195,9 @@ export function PageHelpCompact({ content }: PageHelpProps) {
 
         <div className="space-y-4">
           <div>
-            <h4 className="font-semibold mb-2">What it does:</h4>
+            <h4 className="font-semibold mb-2">
+              {t("common.whatItDoes", { defaultValue: "What it does:" })}
+            </h4>
             <ul className="text-sm space-y-1">
               {content.whatItDoes.slice(0, 3).map((item, i) => (
                 <li key={i}>• {item}</li>

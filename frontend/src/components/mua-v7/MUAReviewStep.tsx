@@ -79,6 +79,14 @@ interface ConflictLocal {
 
 export default function MUAReviewStep({ wizard, patchWizard, onNext }: Props) {
   const inv = wizard.investigation;
+  const identityCandidates = inv?.material_identity?.all_maptis_codes ?? [];
+  const recommendedCode = inv?.code_recommendation?.recommended_code ?? identityCandidates[0]?.material_code ?? null;
+  const [confirmedMaptisCode, setConfirmedMaptisCode] = useState<string>(
+    wizard.reviewDecisions?.confirmed_maptis_code ?? recommendedCode ?? "",
+  );
+  const [overrideJustification, setOverrideJustification] = useState<string>(
+    wizard.reviewDecisions?.override_justification ?? "",
+  );
 
   // Build initial local review state from investigation data
   const allPrecedents = useMemo(
@@ -139,7 +147,16 @@ export default function MUAReviewStep({ wizard, patchWizard, onNext }: Props) {
   }, [precedents, allPrecedents]);
 
   const allReviewed = reviewedFlagged >= totalFlagged && rationaleRequired.length === 0;
-  const canSubmit = allReviewed && !submitting;
+  const requiresCodeConfirmation = identityCandidates.length > 0;
+  const hasCodeConfirmation = !requiresCodeConfirmation || Boolean(confirmedMaptisCode);
+  const overrideRequired = Boolean(
+    requiresCodeConfirmation
+      && recommendedCode
+      && confirmedMaptisCode
+      && confirmedMaptisCode !== recommendedCode
+      && !overrideJustification.trim(),
+  );
+  const canSubmit = allReviewed && hasCodeConfirmation && !overrideRequired && !submitting;
 
   // ---------------------------------------------------------------------------
   // Handlers
@@ -203,7 +220,20 @@ export default function MUAReviewStep({ wizard, patchWizard, onNext }: Props) {
             rationale: c.rationale,
           }),
         ),
+      confirmed_maptis_code: requiresCodeConfirmation ? confirmedMaptisCode : null,
+      confirmed_maptis_key: null,
+      confirmed_maptis_designation: null,
+      override_justification:
+        requiresCodeConfirmation && confirmedMaptisCode !== recommendedCode
+          ? overrideJustification.trim() || null
+          : null,
     };
+
+    if (requiresCodeConfirmation) {
+      const selected = identityCandidates.find((c) => c.material_code === confirmedMaptisCode) ?? null;
+      decisions.confirmed_maptis_key = selected?.material_key ?? null;
+      decisions.confirmed_maptis_designation = selected?.designation ?? null;
+    }
 
     try {
       const saveResult = await saveReviewDecisions({ session_id: wizard.sessionId, decisions });
@@ -276,6 +306,70 @@ export default function MUAReviewStep({ wizard, patchWizard, onNext }: Props) {
           )}
         </CardContent>
       </Card>
+
+      {requiresCodeConfirmation && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">MAPTIS Code Confirmation</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {recommendedCode && (
+              <Alert>
+                <AlertTitle>Recommended Code: {recommendedCode}</AlertTitle>
+                <AlertDescription>
+                  {inv?.code_recommendation?.rationale
+                    ?? "Recommendation based on precedent and test coverage."}
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <div className="space-y-2">
+              <Label>Confirm MAPTIS code for draft/final traceability</Label>
+              <div className="space-y-2">
+                {identityCandidates.slice(0, 20).map((candidate) => {
+                  const isSelected = confirmedMaptisCode === candidate.material_code;
+                  return (
+                    <button
+                      key={`${candidate.material_code}-${candidate.rank}`}
+                      type="button"
+                      onClick={() => setConfirmedMaptisCode(candidate.material_code)}
+                      className={`w-full rounded border p-2 text-left ${
+                        isSelected ? "border-primary bg-primary/5" : "border-border"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div>
+                          <p className="text-sm font-medium">{candidate.designation}</p>
+                          <p className="text-xs text-muted-foreground">
+                            code {candidate.material_code}
+                            {candidate.relationship ? ` • ${candidate.relationship}` : ""}
+                          </p>
+                        </div>
+                        {recommendedCode === candidate.material_code && (
+                          <Badge variant="secondary">Recommended</Badge>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {recommendedCode && confirmedMaptisCode && confirmedMaptisCode !== recommendedCode && (
+              <div className="space-y-1.5">
+                <Label className="text-xs">Override Justification (required)</Label>
+                <Textarea
+                  rows={2}
+                  placeholder="Explain why you selected a different MAPTIS code than recommended..."
+                  value={overrideJustification}
+                  onChange={(e) => setOverrideJustification(e.target.value)}
+                  className={!overrideJustification.trim() ? "border-amber-400" : ""}
+                />
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Pre-included precedents */}
       {precedents.filter((p) => p.autoIncluded).length > 0 && (
@@ -606,6 +700,26 @@ export default function MUAReviewStep({ wizard, patchWizard, onNext }: Props) {
                 <li key={i}>{msg}</li>
               ))}
             </ul>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {requiresCodeConfirmation && !hasCodeConfirmation && (
+        <Alert className="border-amber-300 bg-amber-50">
+          <AlertTriangle className="h-4 w-4 text-amber-600" />
+          <AlertTitle className="text-amber-800">MAPTIS Code Required</AlertTitle>
+          <AlertDescription className="text-amber-700">
+            Confirm the MAPTIS code before generating a draft.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {overrideRequired && (
+        <Alert className="border-amber-300 bg-amber-50">
+          <AlertTriangle className="h-4 w-4 text-amber-600" />
+          <AlertTitle className="text-amber-800">Override Justification Required</AlertTitle>
+          <AlertDescription className="text-amber-700">
+            You selected a different code than the recommendation. Add a brief rationale.
           </AlertDescription>
         </Alert>
       )}

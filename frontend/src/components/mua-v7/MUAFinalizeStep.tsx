@@ -37,6 +37,8 @@ interface Props {
   patchWizard: (patch: Partial<WizardClientState>) => void;
 }
 
+type ExportFormat = 'text' | 'nasa';
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -91,7 +93,7 @@ export default function MUAFinalizeStep({ wizard, patchWizard }: Props) {
   };
 
   const handleCopy = async () => {
-    const text = wizard.exportText ?? buildPlainText(finalized);
+    const text = buildExportText(finalized, 'text');
     if (!text) return;
     try {
       await navigator.clipboard.writeText(text);
@@ -100,6 +102,24 @@ export default function MUAFinalizeStep({ wizard, patchWizard }: Props) {
     } catch {
       /* clipboard API may be blocked */
     }
+  };
+
+  const handleDownload = (format: ExportFormat) => {
+    if (!finalized) return;
+    const text = buildExportText(finalized, format);
+    if (!text) return;
+    const safeMuaId = finalized.mua_id.replace(/[^a-z0-9_-]/gi, "_");
+    const suffix = format === 'nasa' ? 'nasa' : 'miul';
+    const filename = `${safeMuaId}_${suffix}.txt`;
+    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
   };
 
   // ---------------------------------------------------------------------------
@@ -242,7 +262,7 @@ export default function MUAFinalizeStep({ wizard, patchWizard }: Props) {
                 )}
               </Button>
               <Button
-                onClick={() => handleFinalize('nasa')}
+                onClick={() => handleDownload('nasa')}
                 variant="outline"
                 disabled={submitting}
               >
@@ -250,7 +270,7 @@ export default function MUAFinalizeStep({ wizard, patchWizard }: Props) {
                 Export NASA Format
               </Button>
               <Button
-                onClick={() => handleFinalize('text')}
+                onClick={() => handleDownload('text')}
                 variant="outline"
                 disabled={submitting}
               >
@@ -452,4 +472,66 @@ function buildPlainText(mua: FinalizedMUA | null): string {
     'responsibility for the accuracy and completeness of this MUA.'
   );
   return lines.join('\n');
+}
+
+function buildNasaText(mua: FinalizedMUA | null): string {
+  if (!mua) return '';
+  const lines: string[] = [];
+  lines.push("========================================================================");
+  lines.push("NASA MATERIAL USAGE AGREEMENT (MUA) - NASA EXPORT");
+  lines.push("========================================================================");
+  lines.push("");
+  lines.push(`MUA ID:             ${mua.mua_id}`);
+  lines.push(`Session ID:         ${mua.session_id}`);
+  lines.push(`Material:           ${mua.material.input_text}`);
+  if (mua.material.material_code) {
+    lines.push(`MAPTIS Code:        ${mua.material.material_code}`);
+  }
+  lines.push(`Category:           ${mua.category.category}`);
+  lines.push(
+    `Evidence Strength:  ${mua.evidence_strength.band.toUpperCase()} (${mua.evidence_strength.score.toFixed(2)})`,
+  );
+  lines.push(`Center:             ${mua.center}`);
+  lines.push(`Applied Standard:   ${mua.applied_standard_version}`);
+  lines.push(`Reviewer:           ${mua.reviewer}`);
+  lines.push(`Finalized:          ${mua.finalized_at}`);
+  lines.push("");
+  lines.push("------------------------------------------------------------------------");
+  lines.push("ENVIRONMENT");
+  lines.push("------------------------------------------------------------------------");
+  lines.push(`Medium:             ${mua.environment.medium}`);
+  lines.push(`O2 Percent:         ${mua.environment.o2_percent}%`);
+  lines.push(`Pressure:           ${mua.environment.pressure_psia} psia`);
+  lines.push(
+    `Temperature Range:  ${mua.environment.temp_min_f} degF to ${mua.environment.temp_max_f} degF`,
+  );
+  lines.push(`Location:           ${mua.environment.location}`);
+  lines.push(`Application:        ${mua.environment.application}`);
+  lines.push("");
+
+  for (const s of mua.draft.sections) {
+    lines.push("------------------------------------------------------------------------");
+    lines.push(`Section ${s.section_number}: ${s.title}`);
+    lines.push("------------------------------------------------------------------------");
+    lines.push(s.content);
+    lines.push("");
+  }
+
+  if (mua.dependency_links && mua.dependency_links.length > 0) {
+    lines.push("------------------------------------------------------------------------");
+    lines.push("DEPENDENCY LINKS");
+    lines.push("------------------------------------------------------------------------");
+    for (const link of mua.dependency_links) {
+      lines.push(`  - ${link}`);
+    }
+    lines.push("");
+  }
+  lines.push("========================================================================");
+  lines.push("END OF DOCUMENT");
+  lines.push("========================================================================");
+  return lines.join("\n");
+}
+
+function buildExportText(mua: FinalizedMUA | null, format: ExportFormat): string {
+  return format === 'nasa' ? buildNasaText(mua) : buildPlainText(mua);
 }

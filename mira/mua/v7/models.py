@@ -160,6 +160,15 @@ class ResolutionStatus(str, Enum):
     UNRESOLVED = "unresolved"
 
 
+class RelationshipType(str, Enum):
+    """Relationship between query material identity and MAPTIS candidate."""
+
+    EXACT_MATCH = "exact_match"
+    SAME_ALLOY_DIFFERENT_FORM = "same_alloy_different_form"
+    SAME_ALLOY_DIFFERENT_TEMPER = "same_alloy_different_temper"
+    FAMILY_MATCH = "family_match"
+
+
 class DeterminationStatus(str, Enum):
     """Outcome determination for an MUA or precedent."""
 
@@ -256,7 +265,7 @@ class EvidenceQuality(BaseModel):
     physics_relevance: float = Field(0.0, ge=0.0, le=1.0)
     regulatory_relevance: float = Field(0.0, ge=0.0, le=1.0)
     # ADDED Feb 2026: Fields from mua_precedents_v7 PG schema
-    appendix_b_code: Optional[str] = None   # Appendix B rationale code (103-108)
+    appendix_b_code: Optional[str] = None   # Legacy field name: stores Cat III rationale code (JSC 27301F Appendix E)
     closure_path: Optional[str] = None      # How this MUA was closed
     issues: list[str] = Field(default_factory=list)  # Issue codes (FLAM, SCC, HEE...)
     category_label: Optional[str] = None    # Cat I/II/III of the precedent itself
@@ -368,6 +377,47 @@ class MaterialResolution(BaseModel):
     selection_confidence: Optional[float] = None  # 0..1 score, if available
 
 
+class MaterialCodeCandidate(BaseModel):
+    """A MAPTIS candidate code associated with a canonical material identity."""
+
+    material_code: str
+    material_key: Optional[int] = None
+    designation: str
+    form: Optional[str] = None
+    condition: Optional[str] = None
+    relationship: RelationshipType = RelationshipType.FAMILY_MATCH
+    match_score: float = Field(0.0, ge=0.0, le=1.0)
+    rank: int = Field(0, ge=0)
+
+
+class MaterialIdentity(BaseModel):
+    """Step 1 material identity without forcing MAPTIS code selection."""
+
+    input_text: str
+    canonical_name: str
+    family: Optional[str] = None
+    material_class: Optional[MaterialClass] = None
+    is_process_sensitive: bool = False
+    form: Optional[str] = None
+    condition: Optional[str] = None
+    all_maptis_codes: list[MaterialCodeCandidate] = Field(default_factory=list)
+    truncated: bool = False
+    truncation_note: Optional[str] = None
+
+
+class MaptisCodeRecommendation(BaseModel):
+    """Evidence-based recommended MAPTIS code from Step 2 investigation."""
+
+    recommended_code: str
+    recommended_key: Optional[int] = None
+    recommended_designation: str
+    precedent_count: int = 0
+    test_data_count: int = 0
+    evidence_density_score: float = Field(0.0, ge=0.0, le=1.0)
+    rationale: str = ""
+    alternatives: list[dict] = Field(default_factory=list)
+
+
 class EnvironmentSpec(BaseModel):
     """Environment definition with all required fields.
 
@@ -449,11 +499,13 @@ class PrecedentMatch(BaseModel):
     regulatory_relevance: float = Field(0.0, ge=0.0, le=1.0)
 
     # ADDED Feb 2026: PG search fields from mua_precedents_v7
-    appendix_b_code: Optional[str] = None   # Appendix B rationale code (103-108)
+    appendix_b_code: Optional[str] = None   # Legacy field name: stores Cat III rationale code (JSC 27301F Appendix E)
     closure_path: Optional[str] = None      # How this MUA was closed
     issues: list[str] = Field(default_factory=list)  # Issue codes (FLAM, SCC, HEE...)
     category_label: Optional[str] = None    # Cat I/II/III of the precedent itself
     search_tier: int = 0                    # Which PG search tier found this (0=best)
+    relationship_type: Optional[RelationshipType] = None
+    source_maptis_code: Optional[str] = None
 
 
 class TestDataRecord(BaseModel):
@@ -473,6 +525,18 @@ class TestDataRecord(BaseModel):
     test_date: Optional[str] = None
     test_medium: Optional[str] = None
     medium_match: Optional[bool] = None
+
+
+class BOKFinding(BaseModel):
+    """Body-of-Knowledge evidence hit for domain-specific safety context."""
+
+    domain: str  # hydrogen | oxygen
+    source: Optional[str] = None
+    title: Optional[str] = None
+    section: Optional[str] = None
+    page: Optional[int] = None
+    relevance_score: float = Field(0.0, ge=0.0, le=1.0)
+    excerpt: str = ""
 
 
 class EnvelopeResult(BaseModel):
@@ -563,6 +627,7 @@ class InvestigationResult(BaseModel):
     supporting_precedents: list[PrecedentMatch] = Field(default_factory=list)
     conflicting_precedents: list[PrecedentMatch] = Field(default_factory=list)
     test_data: list[TestDataRecord] = Field(default_factory=list)
+    bok_findings: list[BOKFinding] = Field(default_factory=list)
     envelope: Optional[EnvelopeResult] = None
 
     # Analysis
@@ -579,6 +644,8 @@ class InvestigationResult(BaseModel):
 
     # Novel material flag
     is_novel_material: bool = False
+    material_identity: Optional[MaterialIdentity] = None
+    code_recommendation: Optional[MaptisCodeRecommendation] = None
 
 
 # ---------------------------------------------------------------------------
@@ -634,6 +701,10 @@ class ReviewDecisions(BaseModel):
     # Divergence tracking (silent)
     divergence_detected: bool = False
     divergence_rationale: Optional[str] = None
+    confirmed_maptis_code: Optional[str] = None
+    confirmed_maptis_key: Optional[int] = None
+    confirmed_maptis_designation: Optional[str] = None
+    override_justification: Optional[str] = None
 
 
 # ---------------------------------------------------------------------------
@@ -716,7 +787,7 @@ class CategoryRoutingResult(BaseModel):
     authority_pack_version: str = ""
     # ADDED Feb 2026: Corrected 6016C output type routing
     output_type: Optional[dict] = None          # MUAOutputType: full_mua vs miul_rationale_code
-    appendix_b_evaluation: Optional[dict] = None # AppendixBEvaluation: code + rationale template
+    appendix_b_evaluation: Optional[dict] = None # Legacy field name: Cat III rationale-code evaluation (JSC 27301F Appendix E)
 
 
 class FinalizedMUA(BaseModel):
@@ -750,12 +821,15 @@ class ResolveMaterialRequest(BaseModel):
     """Request to resolve a free-text material string."""
 
     material: str
+    form: Optional[str] = None
+    condition: Optional[str] = None
 
 
 class ResolveMaterialResponse(BaseModel):
     """Response containing the material resolution result."""
 
     resolution: MaterialResolution
+    identity: Optional[MaterialIdentity] = None
 
 
 class InvestigateRequest(BaseModel):
@@ -766,10 +840,12 @@ class InvestigateRequest(BaseModel):
     material_code: Optional[str] = None  # Optional explicit MAPTIS code chosen in HITL
     material_key: Optional[int] = None  # Optional explicit materials.material_key
     resolved_name: Optional[str] = None  # Optional explicit designation chosen in HITL
+    form: Optional[str] = None
+    condition: Optional[str] = None
     environment: EnvironmentSpec
     process_params: Optional[ProcessParams] = None
     issue_codes: Optional[list[str]] = None  # Engineer-selected MAPTIS issue codes (override auto-detection)
-    approved_cat3_codes: Optional[list[str]] = None  # Category III Appendix B codes approved in the M&P plan
+    approved_cat3_codes: Optional[list[str]] = None  # Category III rationale codes approved in the M&P plan (JSC 27301F Appendix E)
     program: Optional[str] = None
     hardware: Optional[str] = None
     miul_ref: Optional[str] = None

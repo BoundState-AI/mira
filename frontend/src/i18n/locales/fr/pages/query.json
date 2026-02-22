@@ -1,0 +1,118 @@
+{
+  "pageTitle": "MIRA",
+  "pageSubtitle": "Intelligence Matériaux et Analyse des Risques",
+  "pageDescription": "Posez des questions MAPTIS en langage naturel",
+  "placeholder": "Posez une question M&P...",
+  "searching": "Analyse en cours...",
+  "search": "Rechercher",
+  "exampleQueries": [
+    "Afficher les métaux compatibles oxygène pour service cryogénique",
+    "Matériaux classés pour 3000 psi GOX à faible perméabilité",
+    "Comparer les propriétés mécaniques Inconel 718 vs Hastelloy C-276",
+    "Résultats d'essais pour polymères exposés à l'hydrazine"
+  ],
+  "examples": [
+    "Comparer la couverture des tests de corrosion 304L et 316L dans MAPTIS.",
+    "Quelles preuves de test MAPTIS existent pour Inconel 625 barre versus formes moulées ?",
+    "Inconel 718 a-t-il des évaluations différentes à l'état vieilli versus brut de coulée ?",
+    "Quelles données de test de compatibilité fluide existent pour CRES 304L dans MAPTIS ?",
+    "Quels matériaux ont la meilleure combinaison de précédents MUA et de couverture de tests pour la quincaillerie haute résistance ?"
+  ],
+  "pipelineLabel": "Pipeline :",
+  "pipelineFlow": "Bouncer → Sonnet → Règles MIRA → Sonnet",
+  "advancedEnvironment": "Environnement avancé",
+  "searchedFor": "Recherché :",
+  "buttons": {
+    "showAnswerEvidence": "Afficher les preuves de réponse ({{count}})",
+    "showFullPool": "Afficher le pool complet ({{count}})"
+  },
+  "sections": {
+    "sonnetAnswer": "Réponse Sonnet",
+    "deterministicRules": "Règles déterministes (M)",
+    "sonnetDbLayer": "Couche Sonnet + BD (S)"
+  },
+  "labels": {
+    "pipelineStatus": "État du pipeline",
+    "bouncer": "Bouncer",
+    "confidence": "Confiance",
+    "scope": "Portée",
+    "primary": "Principal",
+    "associated": "Associé",
+    "h2Bok": "BoK H2",
+    "category": "Catégorie",
+    "score": "Score",
+    "materials": "Matériaux",
+    "sonnetCalls": "Appels Sonnet",
+    "searchSource": "Source de recherche",
+    "v4Gate": "Porte v4",
+    "v4Confidence": "Confiance v4"
+  },
+  "environment": {
+    "temperature": "Température (C)",
+    "pressure": "Pression (kPa)",
+    "o2": "O2 %",
+    "fluid": "Fluide",
+    "duration": "Durée (h)",
+    "cycles": "Cycles"
+  },
+  "messages": {
+    "noDirectTestData": "Aucune donnée de test directe dans MAPTIS"
+  },
+  "hybridSearch": {
+    "title": "Recherche Hybride Active.",
+    "description": "Les requêtes sont analysées pour l'intention, les contraintes et les entités avant la recherche sémantique.",
+    "yourQuery": "Votre requête :",
+    "intentActive": "Classification d'intention + extraction de contraintes active",
+    "parsedConstraints": "Contraintes analysées :"
+  },
+  "noSearch": {
+    "title": "Aucune recherche effectuée",
+    "hint": "Essayez l'un des exemples ci-dessus pour commencer"
+  },
+  "results": {
+    "found": "{{count}} matériaux trouvés",
+    "noResults": "Aucun résultat trouvé",
+    "exportCsv": "Exporter CSV",
+    "cards": "Cartes",
+    "table": "Tableau",
+    "score": "Score",
+    "code": "Code",
+    "viewDetails": "Voir les détails",
+    "temp": "Temp"
+  },
+  "table": {
+    "materialName": "Nom du matériau",
+    "type": "Type",
+    "tests": "Tests",
+    "mua": "MUA",
+    "latest": "Dernier",
+    "o2Compatible": "Compatible O₂",
+    "o2": "O2",
+    "flammability": "Inflammabilité",
+    "corrosion": "Corrosion",
+    "stressCorr": "Corr. contrainte",
+    "outgassing": "Dégazage",
+    "matchScore": "Score de correspondance"
+  },
+  "dialog": {
+    "title": "Détails du matériau",
+    "basicInfo": "Informations de base",
+    "materialCode": "Code matériau",
+    "materialKey": "Clé matériau",
+    "materialType": "Type de matériau",
+    "matchScore": "Score de correspondance",
+    "unknown": "Inconnu",
+    "maptisRatings": "Évaluations MAPTIS",
+    "flammability": "Inflammabilité",
+    "corrosion": "Corrosion",
+    "scc": "SCC",
+    "tvs": "TVS",
+    "toxicity": "Toxicité",
+    "fluidSystems": "Systèmes fluides",
+    "o2Compatibility": "Compatibilité O2",
+    "mechanicalImpact": "Impact mécanique",
+    "mechanicalProperties": "Propriétés mécaniques",
+    "yieldStrength": "Limite d'élasticité",
+    "close": "Fermer"
+  }
+}

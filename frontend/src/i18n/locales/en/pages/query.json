@@ -1,0 +1,118 @@
+{
+  "pageTitle": "MIRA",
+  "pageSubtitle": "Materials Intelligence & Risk Analysis",
+  "pageDescription": "Ask MAPTIS questions in natural language",
+  "placeholder": "Describe what you're looking for...",
+  "searching": "Searching...",
+  "search": "Search",
+  "exampleQueries": [
+    "Show me oxygen-compatible metals for cryogenic service",
+    "Materials rated for 3000 psi GOX with low permeability",
+    "Compare Inconel 718 vs Hastelloy C-276 mechanical properties",
+    "Test results for polymers exposed to hydrazine"
+  ],
+  "examples": [
+    "Compare 304L and 316L corrosion test coverage in MAPTIS.",
+    "What MAPTIS test evidence exists for Inconel 625 bar versus cast forms?",
+    "Does Inconel 718 have different ratings in aged versus as-cast condition?",
+    "What fluid compatibility test data exists for CRES 304L in MAPTIS?",
+    "Which materials have the strongest combined MUA precedent and test coverage for high-strength hardware?"
+  ],
+  "pipelineLabel": "Pipeline:",
+  "pipelineFlow": "Bouncer → Sonnet → MIRA Rules → Sonnet",
+  "advancedEnvironment": "Advanced Environment",
+  "searchedFor": "Searched for:",
+  "buttons": {
+    "showAnswerEvidence": "Show answer evidence ({{count}})",
+    "showFullPool": "Show full pool ({{count}})"
+  },
+  "sections": {
+    "sonnetAnswer": "Sonnet Answer",
+    "deterministicRules": "Deterministic Rules (M)",
+    "sonnetDbLayer": "Sonnet + DB Layer (S)"
+  },
+  "labels": {
+    "pipelineStatus": "Pipeline status",
+    "bouncer": "Bouncer",
+    "confidence": "Confidence",
+    "scope": "Scope",
+    "primary": "Primary",
+    "associated": "Associated",
+    "h2Bok": "H2 BoK",
+    "category": "Category",
+    "score": "Score",
+    "materials": "Materials",
+    "sonnetCalls": "Sonnet Calls",
+    "searchSource": "Search Source",
+    "v4Gate": "v4 Gate",
+    "v4Confidence": "v4 Confidence"
+  },
+  "environment": {
+    "temperature": "Temperature (C)",
+    "pressure": "Pressure (kPa)",
+    "o2": "O2 %",
+    "fluid": "Fluid Medium",
+    "duration": "Duration (hrs)",
+    "cycles": "Cycles"
+  },
+  "messages": {
+    "noDirectTestData": "No direct test data in MAPTIS"
+  },
+  "hybridSearch": {
+    "title": "Hybrid Search Active.",
+    "description": "Queries are parsed for intent, constraints, and entities before semantic search.",
+    "yourQuery": "Your query:",
+    "intentActive": "Intent classification + constraint extraction active",
+    "parsedConstraints": "Parsed constraints:"
+  },
+  "noSearch": {
+    "title": "No search yet",
+    "hint": "Try one of the example queries above to get started"
+  },
+  "results": {
+    "found": "Found {{count}} materials",
+    "noResults": "No results found",
+    "exportCsv": "Export CSV",
+    "cards": "Cards",
+    "table": "Table",
+    "score": "Score",
+    "code": "Code",
+    "viewDetails": "View details",
+    "temp": "Temp"
+  },
+  "table": {
+    "materialName": "Material Name",
+    "type": "Type",
+    "tests": "Tests",
+    "mua": "MUA",
+    "latest": "Latest",
+    "o2Compatible": "O₂ Compatible",
+    "o2": "O2",
+    "flammability": "Flammability",
+    "corrosion": "Corrosion",
+    "stressCorr": "Stress Corr",
+    "outgassing": "Outgassing",
+    "matchScore": "Match Score"
+  },
+  "dialog": {
+    "title": "Material Details",
+    "basicInfo": "Basic Information",
+    "materialCode": "Material Code",
+    "materialKey": "Material Key",
+    "materialType": "Material Type",
+    "matchScore": "Match Score",
+    "unknown": "Unknown",
+    "maptisRatings": "MAPTIS Ratings",
+    "flammability": "Flammability",
+    "corrosion": "Corrosion",
+    "scc": "SCC",
+    "tvs": "TVS",
+    "toxicity": "Toxicity",
+    "fluidSystems": "Fluid Systems",
+    "o2Compatibility": "O2 Compatibility",
+    "mechanicalImpact": "Mechanical Impact",
+    "mechanicalProperties": "Mechanical Properties",
+    "yieldStrength": "Yield Strength",
+    "close": "Close"
+  }
+}

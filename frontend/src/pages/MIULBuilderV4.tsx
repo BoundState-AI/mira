@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useMemo, Fragment } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -731,6 +732,7 @@ function DrawingRemovalPanel({
 // ============================================================================
 
 export default function MIULBuilderV4() {
+  const { t } = useTranslation("miulBuilder");
   const { toast } = useToast();
 
   // ---- Upload state ----
@@ -809,28 +811,43 @@ export default function MIULBuilderV4() {
   const stageDetail = useMemo(() => {
     switch (currentStage) {
       case "upload":
-        return "Upload drawing PDFs to begin. Drawing Tree JSON is optional (recommended for accurate hierarchy).";
+        return t("stages.uploadDetail", {
+          defaultValue:
+            "Upload drawing PDFs to begin. Drawing Tree JSON is optional (recommended for accurate hierarchy).",
+        });
       case "extract":
         return EXTRACT_SUBSTAGES[extractSubStage];
       case "review":
-        if (reviewItems.length === 0) return "Loading review items...";
-        return `${openCount} of ${reviewItems.length} items need your expertise`;
+        if (reviewItems.length === 0) {
+          return t("stages.loadingReviewItems", { defaultValue: "Loading review items..." });
+        }
+        return t("stages.reviewDetail", {
+          open: openCount,
+          total: reviewItems.length,
+          defaultValue: `${openCount} of ${reviewItems.length} items need your expertise`,
+        });
       case "approve":
         if (isApproved && !isBuilding && !buildComplete)
-          return "Approved — ready to build MIUL";
+          return t("stages.approvedReady", { defaultValue: "Approved — ready to build MIUL" });
         if (isBuilding)
           return BUILD_SUBSTAGES[buildSubStage];
         if (buildComplete)
-          return "MIUL built and exported successfully";
-        return "All items reviewed — ready for engineer sign-off";
+          return t("stages.builtSuccess", { defaultValue: "MIUL built and exported successfully" });
+        return t("stages.reviewedReady", {
+          defaultValue: "All items reviewed — ready for engineer sign-off",
+        });
       case "export":
-        if (buildComplete) return "MIUL built and exported successfully";
+        if (buildComplete) {
+          return t("stages.builtSuccess", { defaultValue: "MIUL built and exported successfully" });
+        }
         if (isBuilding) return BUILD_SUBSTAGES[buildSubStage];
-        return "Approved — click Build to generate the MIUL Excel";
+        return t("stages.exportReady", {
+          defaultValue: "Approved — click Build to generate the MIUL Excel",
+        });
       default:
         return "";
     }
-  }, [currentStage, extractSubStage, openCount, reviewItems.length, isApproved, isBuilding, buildSubStage, buildComplete]);
+  }, [currentStage, extractSubStage, openCount, reviewItems.length, isApproved, isBuilding, buildSubStage, buildComplete, t]);
 
   const overallProgress = useMemo(() => {
     switch (currentStage) {
@@ -1445,9 +1462,13 @@ export default function MIULBuilderV4() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">MIUL Builder</h1>
+          <h1 className="text-2xl font-bold">
+            {t("title", { defaultValue: "MIUL Builder" })}
+          </h1>
           <p className="text-muted-foreground">
-            Vision extraction with human-in-the-loop review
+            {t("description", {
+              defaultValue: "Vision extraction with human-in-the-loop review",
+            })}
           </p>
         </div>
         <PageHelp content={helpContent.miulBuilder} />
@@ -1501,15 +1522,19 @@ export default function MIULBuilderV4() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <Upload className="h-5 w-5 text-blue-600" />
-              Upload Drawings
+              {t("upload.drawings", { defaultValue: "Upload Drawings" })}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-sm font-medium">Drawing Tree JSON (Optional)</Label>
+                <Label className="text-sm font-medium">
+                  {t("upload.drawingTree", { defaultValue: "Drawing Tree JSON (Optional)" })}
+                </Label>
                 <p className="text-xs text-muted-foreground mb-1">
-                  From DT Editor. Include for accurate NHA/Parent hierarchy.
+                  {t("upload.drawingTreeHint", {
+                    defaultValue: "From DT Editor. Include for accurate NHA/Parent hierarchy.",
+                  })}
                 </p>
                 <Input
                   type="file"
@@ -1524,13 +1549,19 @@ export default function MIULBuilderV4() {
                 )}
                 {!dtJsonFile && (
                   <p className="text-xs text-amber-600 mt-1">
-                    No DT JSON selected: build will run in degraded hierarchy mode.
+                    {t("upload.noDrawingTreeWarning", {
+                      defaultValue: "No DT JSON selected: build will run in degraded hierarchy mode.",
+                    })}
                   </p>
                 )}
               </div>
               <div>
-                <Label className="text-sm font-medium">Project Name</Label>
-                <p className="text-xs text-muted-foreground mb-1">For Excel output</p>
+                <Label className="text-sm font-medium">
+                  {t("program.name", { defaultValue: "Project Name" })}
+                </Label>
+                <p className="text-xs text-muted-foreground mb-1">
+                  {t("program.forExcel", { defaultValue: "For Excel output" })}
+                </p>
                 <Input
                   placeholder="e.g., DMLLV"
                   value={project}
@@ -1542,19 +1573,21 @@ export default function MIULBuilderV4() {
             {/* Environment Configuration */}
             <div className="border rounded-lg p-3 space-y-3">
               <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium">Use Environment</Label>
+                <Label className="text-sm font-medium">
+                  {t("environment.title", { defaultValue: "Use Environment" })}
+                </Label>
                 <div className="flex gap-1">
                   <Button variant="outline" size="sm" className="h-6 text-xs"
                     onClick={() => { setMaxTemp("120"); setMinTemp("0"); setMaxPressure("14.7"); setMinPressure("0"); setFluidType("Air"); setEnvMedia("Air, VAC"); setO2Percent("20.9"); }}>
-                    SLS Default
+                    {t("environment.useDefaults", { defaultValue: "SLS Default" })}
                   </Button>
                   <Button variant="outline" size="sm" className="h-6 text-xs"
                     onClick={() => { setMaxTemp("200"); setMinTemp("-423"); setMaxPressure("6000"); setMinPressure("0"); setFluidType("H2"); setEnvMedia("GH2, LH2"); setO2Percent("0"); }}>
-                    H2 Service
+                    {t("environment.h2Service", { defaultValue: "H2 Service" })}
                   </Button>
                   <Button variant="outline" size="sm" className="h-6 text-xs"
                     onClick={() => { setMaxTemp("120"); setMinTemp("-297"); setMaxPressure("3000"); setMinPressure("0"); setFluidType("O2"); setEnvMedia("GOX, LOX"); setO2Percent("100"); }}>
-                    O2 Service
+                    {t("environment.o2Service", { defaultValue: "O2 Service" })}
                   </Button>
                 </div>
               </div>
@@ -1593,9 +1626,13 @@ export default function MIULBuilderV4() {
             </div>
 
             <div>
-              <Label className="text-sm font-medium">Drawing PDFs</Label>
+              <Label className="text-sm font-medium">
+                {t("upload.drawings", { defaultValue: "Drawing PDFs" })}
+              </Label>
               <p className="text-xs text-muted-foreground mb-1">
-                Engineering drawings containing material data
+                {t("upload.supportedFormats", {
+                  defaultValue: "Engineering drawings containing material data",
+                })}
               </p>
               <Input
                 type="file"
@@ -1617,7 +1654,7 @@ export default function MIULBuilderV4() {
                 className="flex-1 h-11 text-base"
               >
                 <Sparkles className="h-4 w-4 mr-2" />
-                Extract Materials
+                {t("generate.button", { defaultValue: "Extract Materials" })}
               </Button>
 
               {/* Sensitive Build toggle */}
@@ -1627,7 +1664,7 @@ export default function MIULBuilderV4() {
               >
                 <Lock className={cn("h-4 w-4", sensitiveBuild ? "text-amber-600" : "text-slate-300")} />
                 <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">
-                  Sensitive
+                  {t("labels.sensitive", { defaultValue: "Sensitive" })}
                 </span>
                 <input
                   type="checkbox"
@@ -1650,7 +1687,9 @@ export default function MIULBuilderV4() {
             {sensitiveBuild && (
               <p className="text-xs text-amber-600 flex items-center gap-1">
                 <Lock className="h-3 w-3" />
-                Session data will be auto-purged from server after build completes
+                {t("messages.autoPurge", {
+                  defaultValue: "Session data will be auto-purged from server after build completes",
+                })}
               </p>
             )}
           </CardContent>
@@ -1662,12 +1701,15 @@ export default function MIULBuilderV4() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <Sparkles className="h-4 w-4 text-blue-600" />
-            Standalone MIUL Enrich
+            {t("enrich.title", { defaultValue: "Standalone MIUL Enrich" })}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-sm text-muted-foreground">
-            Upload a non-enriched MIUL Excel file and run MAPTIS enrichment without re-running extraction.
+            {t("enrich.description", {
+              defaultValue:
+                "Upload a non-enriched MIUL Excel file and run MAPTIS enrichment without re-running extraction.",
+            })}
           </p>
           <div className="flex items-end gap-3">
             <div className="flex-1">
@@ -1694,7 +1736,9 @@ export default function MIULBuilderV4() {
               ) : (
                 <Sparkles className="h-4 w-4 mr-2" />
               )}
-              {isEnriching ? "Enriching..." : "Enrich Uploaded MIUL"}
+              {isEnriching
+                ? t("enrich.enriching", { defaultValue: "Enriching..." })
+                : t("enrich.uploaded", { defaultValue: "Enrich Uploaded MIUL" })}
             </Button>
           </div>
         </CardContent>
@@ -1706,7 +1750,7 @@ export default function MIULBuilderV4() {
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <History className="h-4 w-4" />
-              Recent Sessions
+              {t("session.recentSessions", { defaultValue: "Recent Sessions" })}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
@@ -2061,7 +2105,9 @@ export default function MIULBuilderV4() {
                   ) : (
                     <Sparkles className="h-4 w-4 mr-2" />
                   )}
-                  {isEnriching ? "Enriching..." : "Enrich with MAPTIS Ratings"}
+                  {isEnriching
+                    ? t("enrich.enriching", { defaultValue: "Enriching..." })
+                    : t("enrich.button", { defaultValue: "Enrich with MAPTIS Ratings" })}
                 </Button>
               )}
               <Button variant="outline" onClick={handleBuild}>
