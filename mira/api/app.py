@@ -86,6 +86,10 @@ def create_app() -> FastAPI:
     # Note: test_classes_router has its own /api prefix on routes
     app.include_router(routers.test_classes_router, tags=["test-classes"])
 
+    @app.get("/health")
+    def health_check():
+        return {"status": "ok"}
+
     return app
 
 
