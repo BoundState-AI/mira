@@ -38,6 +38,7 @@ import {
   getMPPlanArtifactDownloadUrl,
   exportMPPlanJson,
   searchMaptisCode,
+  listMPPlanVehiclePresets,
   type MPPlanSessionSummary,
   type MPPlanBlockingQuestion,
   type AddMPMaterialRequest,
@@ -46,6 +47,7 @@ import {
   type GeneratedMPArtifact,
   type MaptisSearchResult,
   type MPPlanComputeResult,
+  type MPPlanVehiclePreset,
 } from '@/lib/api';
 import helpContent from '@/config/helpContent';
 
@@ -101,7 +103,16 @@ export default function MPPlanGenerator() {
   // Session state
   const [programName, setProgramName] = useState('');
   const [programPhase, setProgramPhase] = useState('');
+  const [vehiclePreset, setVehiclePreset] = useState('');
+  const [vehiclePresets, setVehiclePresets] = useState<MPPlanVehiclePreset[]>([]);
   const [session, setSession] = useState<MPPlanSessionSummary | null>(null);
+
+  // Fetch vehicle presets on mount
+  useEffect(() => {
+    listMPPlanVehiclePresets()
+      .then((data) => setVehiclePresets(data.presets))
+      .catch((err) => console.warn('Could not load vehicle presets:', err));
+  }, []);
 
   // Environment state
   const [envName, setEnvName] = useState('');
@@ -142,6 +153,7 @@ export default function MPPlanGenerator() {
       const response = await createMPPlanSession({
         program_name: programName,
         program_phase: programPhase || undefined,
+        vehicle_preset: vehiclePreset || undefined,
       });
       setSession(response);
       setStep('environment');
@@ -391,6 +403,7 @@ export default function MPPlanGenerator() {
     setSession(null);
     setProgramName('');
     setProgramPhase('');
+    setVehiclePreset('');
     setAddedEnvironments([]);
     setMaterials([{ id: '1', name: '', application: '', quantity: 1, maptis_code: '' }]);
     setMaptisSearchResults({});
@@ -451,7 +464,7 @@ export default function MPPlanGenerator() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-2">
                 <Label htmlFor="programName">{t('session.programName', { ns: 'mpPlanGenerator', defaultValue: 'Program Name *' })}</Label>
                 <Input
@@ -479,6 +492,29 @@ export default function MPPlanGenerator() {
                         {phase}
                       </SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="vehiclePreset">{t('session.vehiclePreset', { ns: 'mpPlanGenerator', defaultValue: 'Vehicle Preset' })}</Label>
+                <Select value={vehiclePreset} onValueChange={setVehiclePreset}>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('session.vehiclePresetPlaceholder', {
+                      ns: 'mpPlanGenerator',
+                      defaultValue: 'Select vehicle...',
+                    })} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {vehiclePresets.map((preset) => (
+                      <SelectItem key={preset.preset_id} value={preset.preset_id}>
+                        {preset.name}
+                      </SelectItem>
+                    ))}
+                    {vehiclePresets.length === 0 && (
+                      <SelectItem value="_none" disabled>
+                        No presets available
+                      </SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
