@@ -5,7 +5,7 @@
       "destination": "https://mira-production-33c3.up.railway.app/:path*"
     },
     {
-      "source": "/((?!assets/).*)",
+      "source": "/:path*",
       "destination": "/index.html"
     }
   ]
