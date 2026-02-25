@@ -85,6 +85,16 @@ def create_app() -> FastAPI:
     # Note: test_classes_router has its own /api prefix on routes
     app.include_router(routers.test_classes_router, tags=["test-classes"])
 
+    @app.get("/health", tags=["system"])
+    async def health() -> dict[str, str]:
+        """ALB/container health check endpoint."""
+        return {"status": "ok"}
+
+    @app.get("/api/health", tags=["system"])
+    async def api_health() -> dict[str, str]:
+        """Backward-compatible health endpoint for /api clients."""
+        return {"status": "ok"}
+
     return app
 
 
