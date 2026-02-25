@@ -22,9 +22,16 @@ from pathlib import Path
 from typing import List, Optional, Set
 from dataclasses import dataclass
 
-import faiss
 import numpy as np
-from sentence_transformers import SentenceTransformer
+try:
+    import faiss  # type: ignore
+except Exception:  # pragma: no cover - optional runtime dependency
+    faiss = None
+
+try:
+    from sentence_transformers import SentenceTransformer  # type: ignore
+except Exception:  # pragma: no cover - optional runtime dependency
+    SentenceTransformer = None
 
 # Default index location
 DEFAULT_INDEX_DIR = Path(__file__).parent.parent / "databases" / "mua_bok_v2"
@@ -46,6 +53,8 @@ MATERIAL_FAMILIES = {
 
 def _get_gpu_resources():
     """Get GPU resources if available."""
+    if faiss is None:
+        return None
     try:
         if faiss.get_num_gpus() > 0:
             return faiss.StandardGpuResources()
@@ -112,6 +121,15 @@ class MUAFAISSSearch:
 
     def _load(self):
         """Load FAISS index and metadata."""
+        if faiss is None:
+            raise RuntimeError(
+                "MUA FAISS search dependency missing: install 'faiss-cpu' to enable this feature."
+            )
+        if SentenceTransformer is None:
+            raise RuntimeError(
+                "MUA embedding dependency missing: install 'sentence-transformers' to enable this feature."
+            )
+
         index_path = self.index_dir / "mua_bok_v2.faiss"
         metadata_path = self.index_dir / "mua_bok_v2_metadata.pkl"
 
