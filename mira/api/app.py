@@ -73,6 +73,7 @@ def create_app() -> FastAPI:
     include_with_api_alias(routers.mua_router, prefix="/mua", tags=["mua"])
     include_with_api_alias(routers.mua_v6_router, prefix="/mua/v6", tags=["mua-v6"])
     include_with_api_alias(routers.mua_v7_router, prefix="/mua/v7", tags=["mua-v7"])
+    include_with_api_alias(routers.matchmaker_router, prefix="/mua/matchmaker", tags=["mua-matchmaker-v8"])
 
     # M&P Plan Generator V1 + V2 (Codex)
     include_with_api_alias(routers.mp_plan_router, prefix="/mp-plan", tags=["mp-plan"])
