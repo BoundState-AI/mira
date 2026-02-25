@@ -297,7 +297,7 @@ class MaterialCodeLookupService:
         """
         Look up materials in MAPTIS by UNS code.
 
-        Uses boundary-safe regex matching (\\y) to prevent false positives like:
+        Uses boundary-safe regex matching (\y) to prevent false positives like:
         - "302" matching "AMS 3302" (should only match "302" as a word)
         - "625" matching part numbers containing 625
 

@@ -35,8 +35,6 @@ from mira.mua.v7.models import (
     EvidenceStrengthBand,
     FinalizedMUA,
     InvestigationResult,
-    MaterialCodeCandidate,
-    MaterialIdentity,
     MaterialResolution,
     MUADraft,
     ReviewDecisions,
@@ -45,7 +43,6 @@ from mira.mua.v7.models import (
     # Request / Response models
     ResolveMaterialRequest,
     ResolveMaterialResponse,
-    ResolutionStatus,
     InvestigateRequest,
     SaveReviewRequest,
     SaveReviewResponse,
@@ -56,7 +53,7 @@ from mira.mua.v7.models import (
     QualificationPlanRequest,
     QualificationPlanResponse,
 )
-from mira.mua.v7.material_resolver import identify_material, resolve_material
+from mira.mua.v7.material_resolver import resolve_material
 from mira.mua.v7.session import SessionManager
 from mira.mua.v7.investigator import MUAInvestigator
 from mira.mua.v7.draft_renderer import DraftRenderer
@@ -131,7 +128,6 @@ class SessionDetailResponse(BaseModel):
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     approved_cat3_codes: Optional[list[str]] = None
-    material_identity: Optional[MaterialIdentity] = None
     investigation: Optional[InvestigationResult] = None
     review_decisions: Optional[ReviewDecisions] = None
     draft: Optional[MUADraft] = None
@@ -489,28 +485,6 @@ def _adjust_fs_issue_scope(
     return issues, reasons
 
 
-def _materialize_resolution_from_candidate(
-    *,
-    identity: MaterialIdentity,
-    candidate: MaterialCodeCandidate,
-    input_text: str,
-) -> MaterialResolution:
-    """Create a fully-populated MaterialResolution from a Step 3 code confirmation."""
-    return MaterialResolution(
-        status=ResolutionStatus.RESOLVED,
-        input_text=input_text,
-        material_code=candidate.material_code,
-        material_key=candidate.material_key,
-        resolved_name=candidate.designation,
-        material_class=identity.material_class,
-        family=identity.family,
-        suggestions=[],
-        is_process_sensitive=identity.is_process_sensitive,
-        selection_method="review_confirmed",
-        selection_confidence=1.0,
-    )
-
-
 # ---------------------------------------------------------------------------
 # Step 1: Resolve Material
 # ---------------------------------------------------------------------------
@@ -534,12 +508,6 @@ async def resolve_material_endpoint(
 
     try:
         resolution = resolve_material(request.material)
-        identity = identify_material(
-            request.material,
-            form=request.form,
-            condition=request.condition,
-            resolution=resolution,
-        )
     except Exception:
         logger.exception(
             "Unexpected error resolving material '%s'", request.material
@@ -550,12 +518,11 @@ async def resolve_material_endpoint(
         )
 
     logger.info(
-        "Step 1 -- resolve-material: status=%s, code=%s identity_codes=%d",
+        "Step 1 -- resolve-material: status=%s, code=%s",
         resolution.status,
         resolution.material_code,
-        len(identity.all_maptis_codes),
     )
-    return ResolveMaterialResponse(resolution=resolution, identity=identity)
+    return ResolveMaterialResponse(resolution=resolution)
 
 
 # ---------------------------------------------------------------------------
@@ -1364,12 +1331,6 @@ async def investigate_endpoint(
         preferred_name=request.resolved_name,
         preferred_key=request.material_key,
     )
-    identity = identify_material(
-        request.material,
-        form=request.form,
-        condition=request.condition,
-        resolution=resolution,
-    )
 
     # Store define inputs so the step gate passes.
     session_manager.store_define_inputs(
@@ -1384,7 +1345,6 @@ async def investigate_endpoint(
         miul_ref=getattr(request, 'miul_ref', None),
         approved_cat3_codes=getattr(request, 'approved_cat3_codes', None),
     )
-    session_manager.store_material_identity(session_id, identity)
 
     # Initialize progress tracking and launch background task.
     _investigation_progress[session_id] = {
@@ -1396,7 +1356,6 @@ async def investigate_endpoint(
         _run_investigation_background(
             session_id=session_id,
             material=resolution,
-            material_identity=identity,
             environment=request.environment,
             process_params=request.process_params,
             center=request.center,
@@ -1417,7 +1376,6 @@ async def _run_investigation_background(
     *,
     session_id: str,
     material: "MaterialResolution",
-    material_identity: "Optional[MaterialIdentity]",
     environment: "EnvironmentSpec",
     process_params: "Optional[ProcessParams]",
     center: "Center",
@@ -1429,13 +1387,7 @@ async def _run_investigation_background(
     Updates ``_investigation_progress`` as it runs so the polling
     endpoint can report progress to the frontend.
     """
-    from mira.mua.v7.models import (
-        Center,
-        EnvironmentSpec,
-        MaterialIdentity,
-        MaterialResolution,
-        ProcessParams,
-    )
+    from mira.mua.v7.models import MaterialResolution, EnvironmentSpec, ProcessParams, Center
 
     try:
         _investigation_progress[session_id] = {
@@ -1446,7 +1398,6 @@ async def _run_investigation_background(
         investigation_result: InvestigationResult = await investigator.investigate(
             material=material,
             environment=environment,
-            material_identity=material_identity,
             process_params=process_params,
             center=center,
             issue_codes=issue_codes,
@@ -1594,81 +1545,6 @@ async def review_decisions_endpoint(
 
     # --- Completion gate: all flagged items must have decisions ---
     decisions = request.decisions
-
-    # New flow: MAPTIS code confirmation happens in REVIEW, not DEFINE.
-    identity = investigation.material_identity or session_manager.get_material_identity(
-        request.session_id
-    )
-    if identity is not None and identity.all_maptis_codes:
-        if not (decisions.confirmed_maptis_code or "").strip():
-            raise HTTPException(
-                status_code=400,
-                detail=(
-                    "MAPTIS code confirmation is required in REVIEW before "
-                    "draft generation."
-                ),
-            )
-
-        candidate_by_code = {
-            str(candidate.material_code): candidate
-            for candidate in identity.all_maptis_codes
-            if str(candidate.material_code or "").strip()
-        }
-        confirmed_code = str(decisions.confirmed_maptis_code).strip()
-        confirmed_candidate = candidate_by_code.get(confirmed_code)
-        if confirmed_candidate is None:
-            raise HTTPException(
-                status_code=400,
-                detail=(
-                    f"Confirmed MAPTIS code '{confirmed_code}' is not in the "
-                    "resolved candidate set."
-                ),
-            )
-
-        recommended_code = (
-            investigation.code_recommendation.recommended_code
-            if investigation.code_recommendation is not None
-            else None
-        )
-        override_note = (decisions.override_justification or "").strip()
-        if (
-            recommended_code
-            and confirmed_code != recommended_code
-            and not override_note
-        ):
-            raise HTTPException(
-                status_code=400,
-                detail=(
-                    "Override justification is required when confirming a "
-                    "different code than the recommendation."
-                ),
-            )
-
-        decisions.confirmed_maptis_code = confirmed_code
-        decisions.confirmed_maptis_key = confirmed_candidate.material_key
-        decisions.confirmed_maptis_designation = confirmed_candidate.designation
-        decisions.override_justification = override_note or None
-
-        material_resolution = _materialize_resolution_from_candidate(
-            identity=identity,
-            candidate=confirmed_candidate,
-            input_text=session.material_input or identity.input_text,
-        )
-        investigation.material = material_resolution
-        investigation.material_identity = identity
-        session_manager.store_investigation(request.session_id, investigation)
-        session_manager.store_define_inputs(
-            request.session_id,
-            material_resolution=material_resolution,
-            environment=session.environment or investigation.environment,
-            process_params=session.process_params,
-            material_input=session.material_input,
-            application=session.application,
-            program=session.program,
-            hardware=session.hardware,
-            miul_ref=session.miul_ref,
-            approved_cat3_codes=session.approved_cat3_codes,
-        )
 
     # Count required items from the investigation.
     total_precedents = len(investigation.supporting_precedents) + len(
@@ -2160,7 +2036,6 @@ async def get_session_endpoint(session_id: str) -> SessionDetailResponse:
         created_at=session_manager.get_created_at(session_id),
         updated_at=session_manager.get_updated_at(session_id),
         approved_cat3_codes=session_manager.get_approved_cat3_codes(session_id),
-        material_identity=session_manager.get_material_identity(session_id),
         investigation=session_manager.get_investigation(session_id),
         review_decisions=session_manager.get_review_decisions(session_id),
         draft=session_manager.get_draft(session_id),
@@ -2584,21 +2459,13 @@ def _generate_export_text(
     Raises:
         ValueError: If the export format is not supported.
     """
-    fmt = (export_format or "").strip().lower()
-    if fmt in {"miul"}:
-        fmt = "text"
-    if fmt not in {"text", "nasa"}:
+    if export_format != "text":
         raise ValueError(f"Unsupported export format: '{export_format}'")
 
     lines: list[str] = []
-    if fmt == "nasa":
-        lines.append("=" * 72)
-        lines.append("NASA MATERIAL USAGE AGREEMENT (MUA) - NASA EXPORT")
-        lines.append("=" * 72)
-    else:
-        lines.append("=" * 72)
-        lines.append("NASA MATERIAL USAGE AGREEMENT (MUA)")
-        lines.append("=" * 72)
+    lines.append("=" * 72)
+    lines.append("NASA MATERIAL USAGE AGREEMENT (MUA)")
+    lines.append("=" * 72)
     lines.append("")
     lines.append(f"MUA ID:             {finalized_mua.mua_id}")
     lines.append(f"Session ID:         {finalized_mua.session_id}")

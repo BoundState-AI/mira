@@ -147,7 +147,7 @@ class DraftRenderer:
 
         Notes
         -----
-        Category III (Appendix E) produces a MIUL rationale-code report,
+        Category III (Appendix B) produces a MIUL rationale-code report,
         NOT a full 7-section MUA.  Per 6016C, "no MUA form is submitted"
         for Category III items.
         """
@@ -182,11 +182,7 @@ class DraftRenderer:
                 category_routing,
             ),
             self._render_rationale(investigation, review_decisions),
-            self._render_mitigations(
-                review_decisions,
-                investigation.conflicts,
-                category_routing,
-            ),
+            self._render_mitigations(review_decisions, investigation.conflicts),
             self._render_verification(review_decisions.gap_decisions),
             self._render_traceability(investigation, review_decisions),
         ]
@@ -218,13 +214,13 @@ class DraftRenderer:
     ) -> MUADraft:
         """Render a MIUL rationale-code report for Category III.
 
-        Per JSC 27301F, Category III items have an approved Appendix E
+        Per NASA-STD-6016C, Category III items have an approved Appendix B
         rationale code and are reported through the MIUL system.
         NO full MUA form is submitted.
 
         The report contains 4 sections:
             1. Disposition Header — material, environment, code, category
-            2. Appendix E Rationale — code template with engineer fill-ins
+            2. Appendix B Rationale — code template with engineer fill-ins
             3. Ratings Summary — compact MAPTIS data
             4. Traceability — evidence citations
         """
@@ -262,7 +258,7 @@ class DraftRenderer:
             f"  Location:        {env.location}",
             f"  Application:     {env.application}",
             f"",
-            f"Appendix E Code:   {code} — {code_desc}",
+            f"Appendix B Code:   {code} — {code_desc}",
             f"Citation:          {citation}",
             f"Authority:         {category_routing.authority_pack}",
         ]
@@ -274,9 +270,9 @@ class DraftRenderer:
             editable=False,
         )
 
-        # ── Section 2: Appendix E Rationale ──
+        # ── Section 2: Appendix B Rationale ──
         rationale_lines = [
-            f"Appendix E Code {code}: {code_desc}",
+            f"Appendix B Code {code}: {code_desc}",
             f"",
         ]
 
@@ -304,7 +300,7 @@ class DraftRenderer:
 
         section_rationale = DraftSection(
             section_number=2,
-            title="Appendix E Rationale",
+            title="Appendix B Rationale",
             content="\n".join(rationale_lines),
             editable=True,
         )
@@ -330,7 +326,7 @@ class DraftRenderer:
         else:
             ratings_content = (
                 "No MAPTIS test data records found. "
-                "Cat III disposition based on Appendix E code only."
+                "Cat III disposition based on Appendix B code only."
             )
 
         section_ratings = DraftSection(
@@ -363,7 +359,7 @@ class DraftRenderer:
             trace_lines.append("")
 
         trace_lines.append(f"Governing Standard: NASA-STD-6016C")
-        trace_lines.append(f"Disposition Code:   Appendix E, Code {code}")
+        trace_lines.append(f"Disposition Code:   Appendix B, Code {code}")
         trace_lines.append(f"Approval Chain:     Hardware M&P -> NASA M&P (via MIUL acceptance)")
 
         section_trace = DraftSection(
@@ -409,60 +405,31 @@ class DraftRenderer:
         mua_id: str,
         program: Optional[str],
     ) -> DraftSection:
-        """Section 1: Header -- Appendix D-style identification block."""
+        """Section 1: Header -- identification and classification."""
         mat = investigation.material
         env = investigation.environment
 
         material_name = mat.resolved_name or mat.input_text
         material_code = mat.material_code or "N/A"
         resolution_label = mat.status.value.upper()
-        hardware_label = env.application or "N/A"
-        req_deviated = "NASA-STD-6016C / JSC-27301F M&P screening requirements"
-        if routing.routing_basis:
-            citations = [
-                str(rule.get("citation", "")).strip()
-                for rule in routing.routing_basis
-                if str(rule.get("citation", "")).strip()
-            ]
-            if citations:
-                req_deviated = "; ".join(citations[:2])
 
         lines = [
-            "JSC MATERIALS USAGE AGREEMENT",
-            "Form Basis: JSC 27301F Appendix D (D-2) field layout for Cat I/II",
-            "",
-            f"MUA NUMBER:                {mua_id}",
-            f"USER MUA NUMBER:           {mua_id}",
-            "REV:                       DRAFT",
-            "PAGE:                      1 OF 2",
-            "",
-            f"TITLE:                     {hardware_label}",
-            f"CATEGORY:                  {routing.category.value}",
-            "EFFECTIVITY:               Pending review disposition",
-            "TYPE OF DEVIATION:         MATERIAL / PROCESS USAGE DEVIATION",
-            f"REQUIREMENT DEVIATED:      {req_deviated}",
-            "",
-            f"PROGRAM / PROJECT:         {program or 'N/A'}",
-            "EQUIPMENT PART NUMBER(S):  N/A",
-            "MANUFACTURER:              N/A",
-            f"MATERIAL DESIGNATION:      {material_name}",
-            f"SPECIFICATION:             MAPTIS code {material_code}",
-            f"MATERIAL CODE:             {material_code}",
-            f"MATERIAL CLASS:            {mat.material_class.value if mat.material_class else 'N/A'}",
-            f"RESOLUTION STATUS:         {resolution_label}",
+            f"MUA ID:            {mua_id}",
+            f"Program:           {program or 'N/A'}",
+            f"Material:          {material_name} ({material_code})",
+            f"Resolution:        {resolution_label}",
+            f"Material Class:    {mat.material_class.value if mat.material_class else 'N/A'}",
             f"",
-            "ENVIRONMENT / APPLICATION:",
-            f"  LOCATION:                {env.location}",
-            f"  HABITABILITY:            {'HABITABLE' if env.location.lower().startswith('hab') else 'NONHABITABLE'}",
-            f"  PRESSURE (PSIA):         {env.pressure_psia:.1f}",
-            f"  TEMPERATURE (DEGF):      {env.temp_min_f:.0f} to {env.temp_max_f:.0f}",
-            f"  MEDIA:                   {env.medium}",
-            f"  O2 PERCENT:              {env.o2_percent:.1f}%",
-            f"  APPLICATION:             {hardware_label}",
+            f"Environment:",
+            f"  Medium:          {env.medium}",
+            f"  O2:              {env.o2_percent:.1f}%",
+            f"  Pressure:        {env.pressure_psia:.1f} psia",
+            f"  Temperature:     {env.temp_min_f:.0f} to {env.temp_max_f:.0f} degF",
+            f"  Location:        {env.location}",
+            f"  Application:     {env.application}",
             f"",
-            f"AUTHORITY PACK:            {routing.authority_pack}",
-            "RATIONALE:                 See Section 4 (Me-Too Rationale) and supporting investigation attachment.",
-            "NOTE:                      Full MUA form is used for Cat I/II. Cat III uses MIUL rationale code only.",
+            f"Category:          {routing.category.value}",
+            f"Authority:         {routing.authority_pack}",
         ]
 
         if investigation.banners:
@@ -482,13 +449,11 @@ class DraftRenderer:
         )
 
     def _render_ratings(self, test_data: list[TestDataRecord]) -> DraftSection:
-        """Section 2: Ratings -- concise screening summary for the form body."""
+        """Section 2: Ratings -- per test class with MAPTIS evidence and currency."""
         if not test_data:
             content = (
-                "SCREENING SUMMARY\n"
-                "- No MAPTIS test data records were found for this material in the queried environment.\n"
-                "- Engineering disposition required for unrated classes.\n"
-                "- Detailed investigation data is recorded in the supporting attachment package."
+                "No MAPTIS test data records were found for this material "
+                "in the queried environment.  All test classes are unrated."
             )
             return DraftSection(
                 section_number=2,
@@ -502,25 +467,40 @@ class DraftRenderer:
         for rec in test_data:
             by_class.setdefault(rec.test_class, []).append(rec)
 
-        lines: list[str] = ["SCREENING SUMMARY"]
+        lines: list[str] = []
         for test_class in sorted(by_class.keys()):
             records = by_class[test_class]
-            ratings = [r.rating or "U" for r in records]
-            rating_summary = ", ".join(sorted(set(ratings)))
-            lines.append(
-                f"- {test_class}: {len(records)} record(s); ratings observed: {rating_summary}"
-            )
+            lines.append(f"--- {test_class} ---")
+            for rec in records:
+                rating_str = rec.rating or "U"
+                currency = _CURRENCY_LABEL.get(rec.is_current, "Unknown")
+                test_num = f"Test #{rec.test_number}" if rec.test_number else "No test number"
+                report = rec.report_number or "No report"
+                date_str = rec.test_date or "No date"
+                lines.append(
+                    f"  Rating: {rating_str}  |  {test_num}  |  {report}  "
+                    f"|  Date: {date_str}  |  Currency: {currency}"
+                )
+                if rec.is_current is False:
+                    lines.append(
+                        f"    [WARNING] This test record is EXPIRED. "
+                        f"Currency should be confirmed before relying on this rating."
+                    )
+                elif rec.is_current is None:
+                    lines.append(
+                        f"    [NOTE] Currency status is UNKNOWN for this record. "
+                        f"Verification recommended."
+                    )
+            lines.append("")
 
         # Summary counts
         current_count = sum(1 for r in test_data if r.is_current is True)
         expired_count = sum(1 for r in test_data if r.is_current is False)
         unknown_count = sum(1 for r in test_data if r.is_current is None)
-        lines.append("")
         lines.append(
-            f"- Data currency: {current_count} current, {expired_count} expired, {unknown_count} unknown."
-        )
-        lines.append(
-            "- Full record-level detail (test numbers, reports, dates) is preserved in the supporting investigation attachment."
+            f"Summary: {len(test_data)} total record(s) -- "
+            f"{current_count} current, {expired_count} expired, "
+            f"{unknown_count} unknown currency."
         )
 
         return DraftSection(
@@ -626,15 +606,22 @@ class DraftRenderer:
         investigation: InvestigationResult,
         review_decisions: ReviewDecisions,
     ) -> DraftSection:
-        """Section 4: Rationale -- form-ready "me-too" rationale narrative.
+        """Section 4: Rationale -- numbered engineering claims backed by evidence.
 
-        The investigation packet stays in supporting attachments; this section
-        captures the signed-review argument:
-        1) which historical acceptances are materially similar,
-        2) why they were accepted,
-        3) which of those conditions the engineer confirms apply now.
+        Modeled on real NASA MUA rationale sections: each numbered point
+        makes one specific claim with supporting citation.  Ends with an
+        assessment summary paragraph.
+
+        Key guarantees:
+        - Every included precedent appears with a numbered claim.
+        - Gap acceptance rationale is QUOTED from engineer's own words.
+        - Conflict dispositions are explained.
+        - Judgment claims are tagged "(Engineering assessment)".
+        - Never claims "APPROVED" -- says "may be acceptable".
         """
         lines: list[str] = []
+        point = 0  # running counter for numbered rationale points
+
         strength = investigation.evidence_strength
         band_label = strength.band.value if strength.band else "insufficient"
         material_name = (
@@ -642,6 +629,13 @@ class DraftRenderer:
             or investigation.material.input_text
         )
 
+        # --- Evidence strength one-liner ---
+        lines.append(
+            f"Evidence Strength: {band_label.upper()} ({strength.score:.2f})"
+        )
+        lines.append("")
+
+        # --- Build decision lookups ---
         precedent_decision_map: dict[str, PrecedentDecision] = {
             pd.mua_number: pd for pd in review_decisions.precedent_decisions
         }
@@ -666,164 +660,202 @@ class DraftRenderer:
             if p.determination == DeterminationStatus.APPROVED
         )
 
-        env = investigation.environment
-        medium_upper = (env.medium or "").upper()
-        is_o2_service = env.is_enriched_o2 or medium_upper in (
-            "GOX",
-            "LOX",
-            "OXYGEN",
-            "O2",
-            "ENRICHED_AIR",
-            "ENRICHED_O2",
-        )
-        lines.append("ME-TOO RATIONALE (PRECEDENT CONSISTENCY)")
-        lines.append(
-            f"- Material and use case: {material_name} in {env.medium} service "
-            f"at {env.pressure_psia:.1f} psia and {env.temp_min_f:.0f} to {env.temp_max_f:.0f} degF."
-        )
-        if env.is_hydrogen_service:
-            lines.append(
-                "- Hydrogen assessment focus: whether this material is susceptible to "
-                "hydrogen embrittlement in the stated envelope, and how severe that risk is."
-            )
-        if is_o2_service:
-            lines.append(
-                "- Oxygen assessment focus: whether this material presents ignition / "
-                "combustion hazard in the stated oxygen environment."
-            )
-        lines.append(
-            f"- Evidence strength band: {band_label.upper()} ({strength.score:.2f})."
-        )
-        lines.append("")
-
+        # --- Point: Material characterization ---
+        point += 1
         if included_supporting:
             lines.append(
-                f"Supporting precedents selected by review: {len(included_supporting)} "
-                f"({approved_count} with approved determinations)."
+                f"{point}. {material_name} has {len(included_supporting)} "
+                f"supporting precedent(s) in the MUA corpus"
+                f"{f', {approved_count} with approved determinations' if approved_count else ''}. "
+                f"The material is characterized for the queried environment."
             )
-            lines.append("Applicable acceptance reasons from prior decisions:")
-            for idx, prec in enumerate(included_supporting[:6], 1):
-                reason = (
-                    prec.supporting_rationale
-                    or prec.relationship_explanation
-                    or prec.rationale_excerpt
-                    or "Prior acceptance in a comparable material/environment configuration."
-                )
-                reason = reason.strip().strip('"')
-                relationship = (
-                    prec.relationship_type.value.replace("_", " ")
-                    if prec.relationship_type
-                    else "relationship not classified"
-                )
-                lines.append(f"{idx}. [{prec.mua_number}] {reason}")
-                lines.append(
-                    f"   Match: {relationship}; Relevance: {prec.relevance_score:.0%}."
-                )
-                pd = precedent_decision_map.get(prec.mua_number)
-                if pd and pd.rationale:
-                    lines.append(f'   Engineer confirmation: "{pd.rationale}"')
         elif investigation.is_novel_material:
             lines.append(
-                "No prior supporting precedents were selected for this "
-                "material/environment pair; this is treated as a novel "
-                "application pending additional qualification."
+                f"{point}. No prior MUA precedents were identified for "
+                f"{material_name} in the queried environment. This material "
+                f"is flagged as novel for this application. A Qualification "
+                f"Test Plan may be required."
             )
         else:
             lines.append(
-                "No supporting precedents were selected for this case; "
-                "the rationale relies on direct MAPTIS evidence and gap dispositions."
+                f"{point}. Limited prior usage data exists for "
+                f"{material_name} in the queried environment."
             )
+        lines.append("")
 
+        # --- Points: Key precedent citations (top 3) ---
+        for prec in included_supporting[:3]:
+            point += 1
+            det_label = prec.determination.value if prec.determination else "unknown"
+            relevance_pct = f"{prec.relevance_score:.0%}"
+            line = (
+                f"{point}. {prec.mua_number} ({prec.material_designation}) "
+                f"-- {det_label} in {prec.environment_description}. "
+                f"Relevance: {relevance_pct}."
+            )
+            if prec.rationale_excerpt:
+                line += f' Excerpt: "{prec.rationale_excerpt}"'
+            lines.append(line)
+            lines.append("")
+
+        # Context precedents (brief)
         if included_context:
-            context_refs = ", ".join(p.mua_number for p in included_context[:6])
-            lines.append("")
+            point += 1
+            context_refs = ", ".join(p.mua_number for p in included_context[:5])
             lines.append(
-                f"Context precedents reviewed (non-primary basis): {context_refs}."
+                f"{point}. {len(included_context)} additional precedent(s) "
+                f"included for context: {context_refs}."
             )
-
-        if investigation.bok_findings:
             lines.append("")
-            lines.append("Standards / BoK context considered:")
-            for hit in investigation.bok_findings[:4]:
-                parts: list[str] = []
-                if hit.source:
-                    parts.append(hit.source)
-                if hit.section:
-                    parts.append(hit.section)
-                if hit.page:
-                    parts.append(f"p.{hit.page}")
-                locator = ", ".join(parts) if parts else "BoK reference"
-                lines.append(
-                    f"- [{hit.domain.upper()}] {locator}: {hit.excerpt}"
-                )
 
+        # --- Point: Test data ---
+        test_data = investigation.test_data
+        point += 1
+        if test_data:
+            current = [t for t in test_data if t.is_current is True]
+            expired = [t for t in test_data if t.is_current is False]
+            ratings_summary = ", ".join(
+                f"{t.test_class} ({t.rating or 'U'})"
+                for t in test_data[:6]
+            )
+            extra = f" (+{len(test_data) - 6} more)" if len(test_data) > 6 else ""
+            currency_note = ""
+            if expired:
+                currency_note = (
+                    f" {len(expired)} record(s) are expired; "
+                    f"currency should be confirmed."
+                )
+            lines.append(
+                f"{point}. MAPTIS test data: {len(test_data)} record(s), "
+                f"{len(current)} current. Ratings: {ratings_summary}{extra}."
+                f"{currency_note}"
+            )
+        else:
+            lines.append(
+                f"{point}. No MAPTIS test data records are available for "
+                f"{material_name} in the queried environment. All required "
+                f"test classes are unrated."
+            )
+        lines.append("")
+
+        # --- Point: Envelope coverage ---
+        if investigation.envelope:
+            env = investigation.envelope
+            point += 1
+            lines.append(
+                f"{point}. Environmental envelope coverage: "
+                f"{env.coverage_ratio:.0%}. "
+                f"O2: {env.o2_status.value}, "
+                f"Pressure: {env.pressure_status.value}, "
+                f"Temperature: {env.temp_status.value}."
+            )
+            if env.details:
+                for detail in env.details:
+                    lines.append(f"   {detail}")
+            lines.append("")
+
+        # --- Process sensitivity ---
+        if self._is_process_sensitive(investigation):
+            point += 1
+            lines.append(
+                f"{point}. {self._render_process_caveat(investigation)}"
+            )
+            lines.append("")
+
+        # --- Gaps accepted by engineering judgment ---
         accepted_gaps = [
             gd
             for gd in review_decisions.gap_decisions
             if gd.decision == GapDecisionType.ACCEPT_WITH_RATIONALE
         ]
         if accepted_gaps:
+            lines.append("GAPS ACCEPTED BY ENGINEERING JUDGMENT:")
             lines.append("")
-            lines.append("Accepted evidence gaps (engineer-owned rationale):")
             for gd in accepted_gaps:
+                point += 1
                 gap_obj = self._find_gap(investigation.gaps, gd.gap_id)
-                gap_label = (
-                    gap_obj.dimension.replace("_", " ").title()
-                    if gap_obj
-                    else gd.gap_id
+                if gap_obj:
+                    dimension = gap_obj.dimension.replace("_", " ").title()
+                    severity = gap_obj.severity
+                    desc = gap_obj.description
+                else:
+                    dimension = gd.gap_id
+                    severity = "unknown"
+                    desc = "No description available."
+                lines.append(
+                    f"{point}. {dimension} gap ({severity}): {desc} "
+                    f'Accepted per engineer rationale: "{gd.rationale}"'
                 )
-                lines.append(f'- {gap_label}: "{gd.rationale}"')
+                lines.append("")
 
+        # --- Gaps flagged for testing ---
         testing_gaps = [
             gd
             for gd in review_decisions.gap_decisions
             if gd.decision == GapDecisionType.FLAG_FOR_TESTING
         ]
         if testing_gaps:
+            lines.append("GAPS FLAGGED FOR TESTING:")
             lines.append("")
-            lines.append("Open gaps requiring verification before closeout:")
             for gd in testing_gaps:
+                point += 1
                 gap_obj = self._find_gap(investigation.gaps, gd.gap_id)
-                gap_label = (
+                dimension = (
                     gap_obj.dimension.replace("_", " ").title()
                     if gap_obj
                     else gd.gap_id
                 )
-                lines.append(f'- {gap_label}: "{gd.rationale}"')
+                lines.append(
+                    f"{point}. {dimension}: Testing required. "
+                    f'Engineer note: "{gd.rationale}"'
+                )
+                lines.append("")
 
+        # --- Conflict dispositions ---
         if investigation.conflicts:
+            lines.append("CONFLICT DISPOSITIONS:")
             lines.append("")
-            lines.append("Conflict dispositions:")
             for conflict in investigation.conflicts:
+                point += 1
                 cd = conflict_decision_map.get(conflict.conflict_id)
                 decision_text = (
                     cd.decision.value.replace("_", " ").title()
                     if cd
-                    else "Pending Review"
+                    else "PENDING"
                 )
-                rationale_text = f' "{cd.rationale}"' if cd and cd.rationale else ""
+                rationale_text = (
+                    f' Rationale: "{cd.rationale}"' if cd and cd.rationale else ""
+                )
                 lines.append(
-                    f"- {conflict.conflict_id} ({conflict.severity.value}): "
-                    f"{conflict.description} | Disposition: {decision_text}.{rationale_text}"
+                    f"{point}. {conflict.severity.value.upper()} conflict: "
+                    f"{conflict.description} "
+                    f"({conflict.source_a} vs {conflict.source_b}). "
+                    f"Disposition: {decision_text}.{rationale_text}"
                 )
+                lines.append("")
 
+        # --- Assessment summary ---
+        lines.append("ASSESSMENT:")
         lines.append("")
-        lines.append("Assessment Statement:")
         if band_label in ("strong", "moderate"):
             lines.append(
-                "This application may be acceptable when operated within the "
-                "confirmed bounds above and under the controls in Section 5. "
-                "(Engineering assessment)"
+                f"Based on the reviewed evidence "
+                f"({len(included_supporting)} supporting precedent(s), "
+                f"{approved_count} approved), the material may be acceptable "
+                f"for the specified environment and application. "
+                f"(Engineering assessment)"
             )
         elif band_label == "weak":
             lines.append(
-                "Evidence is limited; additional verification is recommended "
-                "before final disposition. (Engineering assessment)"
+                "The available evidence is limited. Additional testing or "
+                "evaluation may be required before a determination can be "
+                "made. (Engineering assessment)"
             )
         else:
             lines.append(
-                "Evidence is insufficient for disposition without additional "
-                "test data. (Engineering assessment)"
+                "The available evidence is insufficient to support a "
+                "determination. Testing per NASA-STD-6001B may be required. "
+                "(Engineering assessment)"
             )
 
         return DraftSection(
@@ -837,18 +869,11 @@ class DraftRenderer:
         self,
         review_decisions: ReviewDecisions,
         conflicts: list[ConflictFound],
-        routing: CategoryRoutingResult,
     ) -> DraftSection:
         """Section 5: Mitigations / Controls -- operational constraints."""
-        lines: list[str] = [
-            "CONTROLLED USE CONDITIONS",
-            (
-                "This MUA is valid only for the material, form, processing, and "
-                "environment captured in Section 1 and Section 4."
-            ),
-            "",
-        ]
+        lines: list[str] = []
 
+        # Mitigations derived from gaps accepted with rationale
         accepted_gaps = [
             gd
             for gd in review_decisions.gap_decisions
@@ -861,14 +886,18 @@ class DraftRenderer:
             for gd in accepted_gaps:
                 lines.append(f"Gap {gd.gap_id}:")
                 lines.append(
-                    "  Use is bounded by the engineer rationale recorded in review:"
+                    f"  This gap has been accepted per engineering rationale. "
+                    f"Operational use must remain within the bounds of the "
+                    f"rationale provided:"
                 )
                 lines.append(f"  \"{gd.rationale}\"")
                 lines.append(
-                    "  Any deviation from these conditions requires re-review."
+                    "  Any deviation from the stated conditions invalidates "
+                    "this acceptance and requires re-evaluation."
                 )
                 lines.append("")
 
+        # Mitigations derived from conflicts
         hard_conflicts = [c for c in conflicts if c.severity.value == "hard"]
         soft_conflicts = [c for c in conflicts if c.severity.value == "soft"]
 
@@ -878,9 +907,10 @@ class DraftRenderer:
             for conflict in hard_conflicts:
                 lines.append(f"Conflict {conflict.conflict_id} ({conflict.severity.value}):")
                 lines.append(f"  {conflict.description}")
-                lines.append(f"  Required control: {conflict.recommendation}")
+                lines.append(f"  Recommendation: {conflict.recommendation}")
                 lines.append(
-                    "  [!] This conflict must be resolved or explicitly accepted before finalization."
+                    "  [!] This conflict must be resolved or mitigated prior to "
+                    "final approval."
                 )
                 lines.append("")
 
@@ -890,7 +920,7 @@ class DraftRenderer:
             for conflict in soft_conflicts:
                 lines.append(f"Conflict {conflict.conflict_id} ({conflict.severity.value}):")
                 lines.append(f"  {conflict.description}")
-                lines.append(f"  Recommended control: {conflict.recommendation}")
+                lines.append(f"  Recommendation: {conflict.recommendation}")
                 lines.append("")
 
         if not accepted_gaps and not hard_conflicts and not soft_conflicts:
@@ -898,16 +928,6 @@ class DraftRenderer:
                 "No mitigations or operational controls are required based on "
                 "the current evidence and review decisions."
             )
-
-        lines.append("")
-        lines.append("APPROVALS (Appendix D signature block style):")
-        lines.append("  ORIGINATOR / ORGANIZATION: _____________________   DATE: __________")
-        lines.append("  JSC MATERIALS AND PROCESSES TECHNOLOGY BRANCH: ___ DATE: __________")
-        lines.append("  PROJECT MANAGER: ________________________________  DATE: __________")
-        if routing.category == MUACategory.I:
-            lines.append("  PROGRAM MANAGER / PROGRAM OFFICE: ______________  DATE: __________")
-        else:
-            lines.append("  PROGRAM MANAGER / PROGRAM OFFICE: N/A for Cat II unless specifically required")
 
         return DraftSection(
             section_number=5,
@@ -1010,22 +1030,6 @@ class DraftRenderer:
                     lines.append(f"  Program:        {prec.program}")
                 if prec.center:
                     lines.append(f"  Center:         {prec.center}")
-                lines.append("")
-
-        if investigation.bok_findings:
-            lines.append("--- BoK / Standards Evidence ---")
-            lines.append("")
-            for finding in investigation.bok_findings:
-                lines.append(f"[{finding.domain.upper()}]")
-                lines.append(f"  Source:         {finding.source or 'BoK'}")
-                if finding.title:
-                    lines.append(f"  Title:          {finding.title}")
-                if finding.section:
-                    lines.append(f"  Section:        {finding.section}")
-                if finding.page:
-                    lines.append(f"  Page:           {finding.page}")
-                lines.append(f"  Relevance:      {finding.relevance_score:.2f}")
-                lines.append(f"  Excerpt:        \"{finding.excerpt}\"")
                 lines.append("")
 
         # --- Test data citations ---

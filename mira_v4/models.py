@@ -47,7 +47,6 @@ class SafetyContext(str, Enum):
     HYDROGEN = "hydrogen"          # LH2/GH2 service
     CRYOGENIC = "cryogenic"        # T < -100F (-73C)
     HIGH_PRESSURE = "high_pressure"  # > 3000 psi (20.7 MPa)
-    FRACTURE_CONTROL = "fracture_control"  # Fracture-critical classification per 5019A
     GENERAL = "general"            # Non-safety-critical
 
 

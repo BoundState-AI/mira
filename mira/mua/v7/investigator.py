@@ -36,15 +36,11 @@ from typing import Optional
 
 from .models import (
     MaterialResolution,
-    MaterialIdentity,
-    MaterialCodeCandidate,
-    MaptisCodeRecommendation,
     EnvironmentSpec,
     ProcessParams,
     InvestigationResult,
     PrecedentMatch,
     TestDataRecord,
-    BOKFinding,
     EnvelopeResult,
     GapIdentified,
     DependencyWarning,
@@ -56,7 +52,6 @@ from .models import (
     EvidenceRef,
     SourceType,
     SourceLocator,
-    RelationshipType,
 )
 
 logger = logging.getLogger(__name__)
@@ -233,8 +228,6 @@ class MUAInvestigator:
         self,
         material: MaterialResolution,
         environment: EnvironmentSpec,
-        *,
-        material_identity: Optional[MaterialIdentity] = None,
         process_params: Optional[ProcessParams] = None,
         center: str = "MSFC",
         issue_codes: Optional[list[str]] = None,
@@ -298,64 +291,18 @@ class MUAInvestigator:
         # Phase 2 -- parallel evidence gathering.
         all_precedents: list[PrecedentMatch] = []
         test_data: list[TestDataRecord] = []
-        bok_findings: list[BOKFinding] = []
-
-        material_codes = self._material_codes_for_investigation(material, material_identity)
 
         try:
-            (
-                precedents_result,
-                test_data_result,
-                bok_result,
-            ) = await asyncio.gather(
+            all_precedents, test_data = await asyncio.gather(
                 self._search_precedents(material, environment),
-                self._query_test_data(
-                    material,
-                    environment,
-                    material_codes=material_codes,
-                ),
-                self._query_domain_bok(
-                    material,
-                    environment,
-                    issue_scope=set(self._effective_issue_codes),
-                ),
-                return_exceptions=True,
+                self._query_test_data(material, environment),
             )
-            if isinstance(precedents_result, Exception):
-                logger.warning(
-                    "Precedent gathering failed; continuing with partial data: %s",
-                    precedents_result,
-                )
-            else:
-                all_precedents = precedents_result
-
-            if isinstance(test_data_result, Exception):
-                logger.warning(
-                    "MAPTIS test-data gathering failed; continuing with partial data: %s",
-                    test_data_result,
-                )
-            else:
-                test_data = test_data_result
-
-            if isinstance(bok_result, Exception):
-                logger.warning(
-                    "Domain BoK gathering failed; continuing without BoK context: %s",
-                    bok_result,
-                )
-            else:
-                bok_findings = bok_result
         except Exception:
             logger.exception("Evidence gathering failed; continuing with partial data")
 
         # Phase 3 -- classify supporting vs conflicting.
         supporting = [p for p in all_precedents if p.is_supporting]
         conflicting = [p for p in all_precedents if p.is_conflicting]
-        if material_identity is not None:
-            self._annotate_precedent_relationships(
-                supporting_precedents=supporting,
-                conflicting_precedents=conflicting,
-                identity=material_identity,
-            )
 
         # Phase 2b -- envelope (needs precedent bounds).
         envelope: Optional[EnvelopeResult] = None
@@ -437,29 +384,12 @@ class MUAInvestigator:
         # Banners.
         banners = self._generate_banners(environment)
         banners.extend(scope_adjust_notes)
-        if (
-            {"HEE", "O2_COMPAT"}.intersection(set(self._effective_issue_codes))
-            and not bok_findings
-        ):
-            banners.append(
-                "No H2/O2 Body-of-Knowledge references were retrieved for this run; "
-                "disposition relies on MAPTIS tests and MUA precedents only."
-            )
 
         # S-4 safety fix: novel material must surface qualification plan offer.
         if is_novel:
             banners.append(
                 "Novel material with limited precedent data. "
                 "A Qualification Test Plan can be generated after MUA finalization."
-            )
-
-        code_recommendation = None
-        if material_identity is not None and material_identity.all_maptis_codes:
-            code_recommendation = self._recommend_maptis_code(
-                identity=material_identity,
-                supporting_precedents=supporting,
-                conflicting_precedents=conflicting,
-                test_data=test_data,
             )
 
         result = InvestigationResult(
@@ -469,7 +399,6 @@ class MUAInvestigator:
             supporting_precedents=supporting,
             conflicting_precedents=conflicting,
             test_data=test_data,
-            bok_findings=bok_findings,
             envelope=envelope,
             conflicts=conflicts,
             gaps=gaps,
@@ -478,8 +407,6 @@ class MUAInvestigator:
             preliminary_category=preliminary_category,
             banners=banners,
             is_novel_material=is_novel,
-            material_identity=material_identity,
-            code_recommendation=code_recommendation,
         )
 
         logger.info(
@@ -1175,215 +1102,24 @@ class MUAInvestigator:
 
         return records
 
-    @staticmethod
-    def _material_codes_for_investigation(
-        material: MaterialResolution,
-        material_identity: Optional[MaterialIdentity],
-    ) -> list[str]:
-        codes: list[str] = []
-        if material_identity is not None:
-            for candidate in material_identity.all_maptis_codes:
-                code = str(candidate.material_code or "").strip()
-                if code and code not in codes:
-                    codes.append(code)
-        primary_code = str(material.material_code or "").strip()
-        if primary_code and primary_code not in codes:
-            codes.insert(0, primary_code)
-        return codes
-
-    @staticmethod
-    def _extract_code_from_report_number(report_number: Optional[str]) -> Optional[str]:
-        text = str(report_number or "").strip()
-        if not text:
-            return None
-        code = text.split(":", 1)[0].strip()
-        return code or None
-
-    @staticmethod
-    def _normalize_material_text(value: Optional[str]) -> str:
-        return re.sub(r"[^A-Z0-9]+", "", str(value or "").upper())
-
-    def _annotate_precedent_relationships(
-        self,
-        *,
-        supporting_precedents: list[PrecedentMatch],
-        conflicting_precedents: list[PrecedentMatch],
-        identity: MaterialIdentity,
-    ) -> None:
-        candidates = identity.all_maptis_codes or []
-        if not candidates:
-            return
-
-        indexed_candidates: list[tuple[str, MaterialCodeCandidate]] = [
-            (self._normalize_material_text(c.designation), c)
-            for c in candidates
-        ]
-        canonical_norm = self._normalize_material_text(identity.canonical_name)
-
-        for precedent in [*supporting_precedents, *conflicting_precedents]:
-            designation_norm = self._normalize_material_text(precedent.material_designation)
-            matched_candidate: Optional[MaterialCodeCandidate] = None
-            for candidate_norm, candidate in indexed_candidates:
-                if candidate_norm and candidate_norm in designation_norm:
-                    matched_candidate = candidate
-                    break
-            if matched_candidate is not None:
-                precedent.source_maptis_code = matched_candidate.material_code
-                precedent.relationship_type = matched_candidate.relationship
-                continue
-
-            if canonical_norm and canonical_norm in designation_norm:
-                precedent.relationship_type = RelationshipType.EXACT_MATCH
-            else:
-                precedent.relationship_type = RelationshipType.FAMILY_MATCH
-
-    def _recommend_maptis_code(
-        self,
-        *,
-        identity: MaterialIdentity,
-        supporting_precedents: list[PrecedentMatch],
-        conflicting_precedents: list[PrecedentMatch],
-        test_data: list[TestDataRecord],
-    ) -> Optional[MaptisCodeRecommendation]:
-        candidates = identity.all_maptis_codes or []
-        if not candidates:
-            return None
-
-        def _designation_score(candidate: MaterialCodeCandidate, precedent: PrecedentMatch) -> float:
-            cand = self._normalize_material_text(candidate.designation)
-            pred = self._normalize_material_text(precedent.material_designation)
-            if not cand or not pred:
-                return 0.0
-            if cand in pred or pred in cand:
-                return 1.0
-            return 0.0
-
-        by_code: dict[str, dict[str, float | int | str]] = {}
-        for candidate in candidates:
-            by_code[candidate.material_code] = {
-                "precedent_count": 0,
-                "test_data_count": 0,
-                "latest_year": 0,
-                "designation": candidate.designation,
-                "material_key": candidate.material_key or 0,
-            }
-
-        for precedent in supporting_precedents:
-            best_code = None
-            best_score = 0.0
-            for candidate in candidates:
-                score = _designation_score(candidate, precedent)
-                if score > best_score:
-                    best_score = score
-                    best_code = candidate.material_code
-            if best_code and best_score > 0:
-                by_code[best_code]["precedent_count"] = int(by_code[best_code]["precedent_count"]) + 1
-
-        for precedent in conflicting_precedents:
-            best_code = None
-            best_score = 0.0
-            for candidate in candidates:
-                score = _designation_score(candidate, precedent)
-                if score > best_score:
-                    best_score = score
-                    best_code = candidate.material_code
-            if best_code and best_score > 0:
-                current = int(by_code[best_code]["precedent_count"])
-                by_code[best_code]["precedent_count"] = max(0, current - 1)
-
-        for record in test_data:
-            code = self._extract_code_from_report_number(record.report_number)
-            if not code or code not in by_code:
-                continue
-            by_code[code]["test_data_count"] = int(by_code[code]["test_data_count"]) + 1
-            year = 0
-            if record.test_date:
-                date_text = str(record.test_date)
-                if len(date_text) >= 4 and date_text[:4].isdigit():
-                    year = int(date_text[:4])
-            by_code[code]["latest_year"] = max(int(by_code[code]["latest_year"]), year)
-
-        max_precedent = max(int(v["precedent_count"]) for v in by_code.values()) if by_code else 0
-        max_test_data = max(int(v["test_data_count"]) for v in by_code.values()) if by_code else 0
-
-        ranked = sorted(
-            candidates,
-            key=lambda c: (
-                -int(by_code[c.material_code]["precedent_count"]),
-                -int(by_code[c.material_code]["test_data_count"]),
-                -int(by_code[c.material_code]["latest_year"]),
-                c.rank,
-            ),
-        )
-        if not ranked:
-            return None
-
-        top = ranked[0]
-        top_metrics = by_code[top.material_code]
-        precedent_count = int(top_metrics["precedent_count"])
-        test_data_count = int(top_metrics["test_data_count"])
-        score = 0.0
-        if max_precedent > 0:
-            score = precedent_count / max_precedent
-        elif max_test_data > 0:
-            score = test_data_count / max_test_data
-
-        alternatives: list[dict] = []
-        for candidate in ranked[1:8]:
-            metrics = by_code[candidate.material_code]
-            alternatives.append(
-                {
-                    "material_code": candidate.material_code,
-                    "material_key": candidate.material_key,
-                    "designation": candidate.designation,
-                    "relationship": candidate.relationship.value,
-                    "precedent_count": int(metrics["precedent_count"]),
-                    "test_data_count": int(metrics["test_data_count"]),
-                }
-            )
-
-        rationale = (
-            f"Recommended {top.material_code}: highest precedent coverage ({precedent_count}). "
-            f"Test coverage ({test_data_count}) used as tie-break."
-        )
-        return MaptisCodeRecommendation(
-            recommended_code=top.material_code,
-            recommended_key=top.material_key,
-            recommended_designation=top.designation,
-            precedent_count=precedent_count,
-            test_data_count=test_data_count,
-            evidence_density_score=max(0.0, min(1.0, score)),
-            rationale=rationale,
-            alternatives=alternatives,
-        )
-
     async def _query_test_data(
         self,
         material: MaterialResolution,
         environment: EnvironmentSpec,
-        *,
-        material_codes: Optional[list[str]] = None,
     ) -> list[TestDataRecord]:
         """Query MAPTIS test data for the selected code + related sibling codes.
 
         C2: records with missing currency default to is_current=None (scored 0.0).
         """
         primary_code = str(material.material_code or "").strip()
-
-        if material_codes:
-            material_codes = [str(c).strip() for c in material_codes if str(c).strip()]
-        else:
-            if not primary_code:
-                logger.warning("No material code for MAPTIS query")
-                return []
-            material_codes = [primary_code]
-            for code in self._find_related_maptis_codes(material):
-                if code not in material_codes:
-                    material_codes.append(code)
-
-        if not material_codes:
-            logger.warning("No MAPTIS material codes available for test-data query")
+        if not primary_code:
+            logger.warning("No material code for MAPTIS query")
             return []
+
+        material_codes = [primary_code]
+        for code in self._find_related_maptis_codes(material):
+            if code not in material_codes:
+                material_codes.append(code)
 
         try:
             from mira.mua.v6.maptis_test_data import query_maptis_test_data
@@ -1466,235 +1202,6 @@ class MUAInvestigator:
             primary_code,
         )
         return records
-
-    @staticmethod
-    def _is_o2_service(environment: EnvironmentSpec) -> bool:
-        medium_upper = (environment.medium or "").upper()
-        return environment.is_enriched_o2 or medium_upper in (
-            "GOX",
-            "LOX",
-            "OXYGEN",
-            "O2",
-            "ENRICHED_AIR",
-            "ENRICHED_O2",
-        )
-
-    @staticmethod
-    def _truncate_excerpt(text: str, limit: int = 320) -> str:
-        clean = str(text or "").strip()
-        if len(clean) <= limit:
-            return clean
-        return clean[:limit].rstrip() + "..."
-
-    @staticmethod
-    def _safe_bok_score(value: object) -> float:
-        try:
-            score = float(value)
-        except Exception:
-            return 0.0
-        if score < 0.0:
-            return 0.0
-        if score > 1.0:
-            return 1.0
-        return score
-
-    @staticmethod
-    def _collect_h2_bok_hits_sync(
-        *,
-        queries: list[str],
-        k_per_query: int = 3,
-        max_total: int = 8,
-    ) -> list[dict]:
-        try:
-            from mira.h2 import get_h2_engine
-        except Exception:
-            return []
-
-        engine = get_h2_engine()
-        if engine is None or not hasattr(engine, "search_h2_bok"):
-            return []
-
-        gathered: list[dict] = []
-        for query in queries:
-            q = str(query or "").strip()
-            if not q:
-                continue
-            try:
-                rows = engine.search_h2_bok(q, k=k_per_query)  # type: ignore[attr-defined]
-            except Exception:
-                continue
-            for row in rows or []:
-                if isinstance(row, dict):
-                    gathered.append(row)
-
-        gathered.sort(
-            key=lambda row: float(row.get("relevance_score") or 0.0),
-            reverse=True,
-        )
-        return gathered[:max_total]
-
-    @staticmethod
-    def _collect_o2_bok_hits_sync(
-        *,
-        queries: list[str],
-        k_per_query: int = 3,
-        max_total: int = 8,
-    ) -> list[dict]:
-        try:
-            from mira.o2.engine import get_o2_engine
-        except Exception:
-            return []
-
-        try:
-            engine = get_o2_engine()
-        except Exception:
-            return []
-        if engine is None or not hasattr(engine, "search_o2_bok"):
-            return []
-
-        gathered: list[dict] = []
-        for query in queries:
-            q = str(query or "").strip()
-            if not q:
-                continue
-            try:
-                rows = engine.search_o2_bok(
-                    q,
-                    k=k_per_query,
-                    use_hybrid=True,
-                )  # type: ignore[attr-defined]
-            except Exception:
-                continue
-            for row in rows or []:
-                if isinstance(row, dict):
-                    gathered.append(row)
-
-        gathered.sort(
-            key=lambda row: float(row.get("relevance_score") or 0.0),
-            reverse=True,
-        )
-        return gathered[:max_total]
-
-    def _normalize_bok_rows(
-        self,
-        *,
-        domain: str,
-        rows: list[dict],
-    ) -> list[BOKFinding]:
-        findings: list[BOKFinding] = []
-        for row in rows:
-            source = str(
-                row.get("source")
-                or row.get("source_document")
-                or ""
-            ).strip() or None
-            section = str(row.get("section") or "").strip() or None
-            title = str(row.get("title") or "").strip() or None
-            page_raw = row.get("page", row.get("page_number"))
-            page: Optional[int]
-            if isinstance(page_raw, int):
-                page = page_raw
-            else:
-                try:
-                    page = int(str(page_raw).strip()) if str(page_raw).strip() else None
-                except Exception:
-                    page = None
-
-            excerpt = self._truncate_excerpt(
-                str(row.get("text") or row.get("excerpt") or "")
-            )
-            if not excerpt:
-                continue
-
-            findings.append(
-                BOKFinding(
-                    domain=domain,
-                    source=source,
-                    title=title,
-                    section=section,
-                    page=page,
-                    relevance_score=self._safe_bok_score(row.get("relevance_score")),
-                    excerpt=excerpt,
-                )
-            )
-        return findings
-
-    async def _query_domain_bok(
-        self,
-        material: MaterialResolution,
-        environment: EnvironmentSpec,
-        *,
-        issue_scope: set[str],
-    ) -> list[BOKFinding]:
-        """Fetch H2/O2 BoK hits for safety-critical domains.
-
-        H2 scope answer: embrittlement susceptibility and severity.
-        O2 scope answer: ignition/combustion hazard in the target environment.
-        """
-        normalized_scope = {str(code or "").upper() for code in issue_scope}
-        material_name = (
-            material.resolved_name
-            or material.input_text
-            or "material"
-        )
-        findings: list[BOKFinding] = []
-
-        use_h2 = "HEE" in normalized_scope or environment.is_hydrogen_service
-        if use_h2:
-            h2_queries = [
-                f"{material_name} hydrogen embrittlement susceptibility",
-                f"{material_name} hydrogen embrittlement severity at {environment.pressure_psia:.1f} psia",
-            ]
-            h2_rows = await asyncio.to_thread(
-                self._collect_h2_bok_hits_sync,
-                queries=h2_queries,
-                k_per_query=3,
-                max_total=8,
-            )
-            findings.extend(self._normalize_bok_rows(domain="hydrogen", rows=h2_rows))
-
-        use_o2 = "O2_COMPAT" in normalized_scope or self._is_o2_service(environment)
-        if use_o2:
-            o2_queries = [
-                f"{material_name} oxygen ignition hazard",
-                f"{material_name} oxygen flammability at {environment.pressure_psia:.1f} psia and {environment.o2_percent:.1f}% oxygen",
-            ]
-            o2_rows = await asyncio.to_thread(
-                self._collect_o2_bok_hits_sync,
-                queries=o2_queries,
-                k_per_query=3,
-                max_total=8,
-            )
-            findings.extend(self._normalize_bok_rows(domain="oxygen", rows=o2_rows))
-
-        findings.sort(
-            key=lambda finding: finding.relevance_score,
-            reverse=True,
-        )
-        deduped: list[BOKFinding] = []
-        seen: set[str] = set()
-        for finding in findings:
-            key = "|".join(
-                [
-                    finding.domain,
-                    str(finding.source or ""),
-                    str(finding.section or ""),
-                    str(finding.page or ""),
-                    finding.excerpt[:96],
-                ]
-            )
-            if key in seen:
-                continue
-            seen.add(key)
-            deduped.append(finding)
-
-        if deduped:
-            logger.info(
-                "BoK query returned %d hit(s) for %s",
-                len(deduped),
-                material_name,
-            )
-        return deduped[:8]
 
     # ------------------------------------------------------------------
     # Phase 2c -- envelope computation

@@ -36,7 +36,6 @@ from .models import (
     EvidenceStrengthResult,
     FinalizedMUA,
     InvestigationResult,
-    MaterialIdentity,
     MaterialResolution,
     MUADraft,
     ProcessParams,
@@ -95,7 +94,6 @@ class MuaSessionState(BaseModel):
     # -- Step 1: Define -----------------------------------------------------
     material_input: Optional[str] = None
     material_resolution: Optional[MaterialResolution] = None
-    material_identity: Optional[MaterialIdentity] = None
     environment: Optional[EnvironmentSpec] = None
     process_params: Optional[ProcessParams] = None
     application: Optional[str] = None
@@ -169,10 +167,10 @@ def _validate_step_advancement(
 
     # Gate predicates for each forward transition.
     if to_step == StepName.INVESTIGATE:
-        # Gate: DEFINE must have material identity/resolution + environment populated.
-        if session.material_resolution is None and session.material_identity is None:
+        # Gate: DEFINE must have material + environment populated.
+        if session.material_resolution is None:
             raise StepValidationError(
-                "Cannot advance to INVESTIGATE: material has not been identified.  "
+                "Cannot advance to INVESTIGATE: material has not been resolved.  "
                 "Complete the DEFINE step first."
             )
         if session.environment is None:
@@ -201,15 +199,6 @@ def _validate_step_advancement(
                 "Cannot advance to DRAFT: not all evidence items have been "
                 "reviewed.  Complete reviewing all precedents, gaps, and "
                 "conflicts before generating a draft."
-            )
-        if (
-            session.material_identity is not None
-            and session.material_identity.all_maptis_codes
-            and not session.review_decisions.confirmed_maptis_code
-        ):
-            raise StepValidationError(
-                "Cannot advance to DRAFT: MAPTIS code is not confirmed. "
-                "Confirm the recommended code in REVIEW."
             )
 
     elif to_step == StepName.FINALIZE:
@@ -532,9 +521,6 @@ class SessionManager:
     def get_material_input(self, session_id: str) -> Optional[str]:
         return self._get(session_id).material_input
 
-    def get_material_identity(self, session_id: str) -> Optional[MaterialIdentity]:
-        return self._get(session_id).material_identity
-
     def get_center(self, session_id: str) -> Optional[Center]:
         return self._get(session_id).center
 
@@ -589,11 +575,6 @@ class SessionManager:
         session.hardware = hardware
         session.miul_ref = miul_ref
         session.approved_cat3_codes = approved_cat3_codes
-        session.updated_at = datetime.utcnow()
-
-    def store_material_identity(self, session_id: str, identity: MaterialIdentity) -> None:
-        session = self._get(session_id)
-        session.material_identity = identity
         session.updated_at = datetime.utcnow()
 
     def store_investigation(self, session_id: str, investigation: InvestigationResult) -> None:
