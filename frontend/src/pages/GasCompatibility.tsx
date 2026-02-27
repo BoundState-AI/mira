@@ -12,6 +12,7 @@ import { Loader2, Search, BookOpen, Layers, AlertTriangle, CheckCircle, XCircle 
 import {
   checkO2Compatibility,
   checkH2Compatibility,
+  getH2Conditions,
   o2Evaluate,
   o2SearchBOK,
   o2GetFamilies,
@@ -27,12 +28,16 @@ type GasType = 'O2' | 'H2';
 export default function GasCompatibility() {
   const [gasType, setGasType] = useState<GasType>('O2');
   const [materialKey, setMaterialKey] = useState('');
+  const [condition, setCondition] = useState('');
   const [pressure, setPressure] = useState('');
   const [temperature, setTemperature] = useState('');
   const [phase, setPhase] = useState<'gox' | 'lox'>('gox');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<CompatibilityResponse | null>(null);
   const [o2Result, setO2Result] = useState<O2EvaluateResponse | null>(null);
+  const [h2ConditionOptions, setH2ConditionOptions] = useState<string[]>([]);
+  const [h2ConditionLookupLoading, setH2ConditionLookupLoading] = useState(false);
+  const [h2ConditionLookupNote, setH2ConditionLookupNote] = useState<string | null>(null);
 
   // O2 BOK Search state
   const [bokQuery, setBokQuery] = useState('');
@@ -47,6 +52,60 @@ export default function GasCompatibility() {
   useEffect(() => {
     loadFamilies();
   }, []);
+
+  useEffect(() => {
+    if (gasType !== 'H2') {
+      setH2ConditionOptions([]);
+      setH2ConditionLookupNote(null);
+      setH2ConditionLookupLoading(false);
+      return;
+    }
+
+    const material = materialKey.trim();
+    if (material.length < 2) {
+      setH2ConditionOptions([]);
+      setH2ConditionLookupNote(null);
+      setH2ConditionLookupLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      setH2ConditionLookupLoading(true);
+      try {
+        const response = await getH2Conditions(material);
+        if (cancelled) return;
+
+        const options = Array.from(
+          new Set(
+            (response.available_conditions || [])
+              .map((item) => item.condition_name?.trim())
+              .filter((item): item is string => Boolean(item)),
+          ),
+        );
+
+        setH2ConditionOptions(options);
+        setH2ConditionLookupNote(response.notes || null);
+
+        if (!condition.trim() && options.length === 1) {
+          setCondition(options[0]);
+        }
+      } catch {
+        if (cancelled) return;
+        setH2ConditionOptions([]);
+        setH2ConditionLookupNote(null);
+      } finally {
+        if (!cancelled) {
+          setH2ConditionLookupLoading(false);
+        }
+      }
+    }, 300);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [gasType, materialKey]);
 
   const loadFamilies = async () => {
     setFamiliesLoading(true);
@@ -73,6 +132,7 @@ export default function GasCompatibility() {
         material_key: materialKey,
         pressure: parseFloat(pressure),
         temperature: parseFloat(temperature),
+        condition: gasType === 'H2' ? (condition.trim() || undefined) : undefined,
       };
 
       if (gasType === 'O2') {
@@ -202,6 +262,31 @@ export default function GasCompatibility() {
                   onChange={(e) => setTemperature(e.target.value)}
                 />
               </div>
+              {gasType === 'H2' && (
+                <div className="space-y-2">
+                  <Label htmlFor="condition">Condition</Label>
+                  <Input
+                    id="condition"
+                    list={h2ConditionOptions.length > 0 ? 'h2-condition-options' : undefined}
+                    placeholder="e.g., ST 1900F, Annealed"
+                    value={condition}
+                    onChange={(e) => setCondition(e.target.value)}
+                  />
+                  {h2ConditionOptions.length > 0 && (
+                    <datalist id="h2-condition-options">
+                      {h2ConditionOptions.map((option) => (
+                        <option key={option} value={option} />
+                      ))}
+                    </datalist>
+                  )}
+                  {h2ConditionLookupLoading && (
+                    <p className="text-xs text-muted-foreground">Loading known conditions...</p>
+                  )}
+                  {!h2ConditionLookupLoading && h2ConditionLookupNote && (
+                    <p className="text-xs text-muted-foreground">{h2ConditionLookupNote}</p>
+                  )}
+                </div>
+              )}
               {gasType === 'O2' && (
                 <div className="space-y-2">
                   <Label htmlFor="phase">Phase</Label>

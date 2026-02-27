@@ -7,6 +7,7 @@ export interface CompatibilityRequest {
   pressure: number;
   temperature: number;
   environment?: string;
+  condition?: string;
 }
 
 export interface Evidence {
@@ -20,6 +21,26 @@ export interface CompatibilityResponse {
   rationale: string;
   evidence: Evidence[];
   notes?: string;
+}
+
+export interface H2ConditionOption {
+  condition_name: string;
+  hee_band: string;
+  verdict_if_selected: string;
+  evidence_count: number;
+  source: string;
+}
+
+export interface H2ConditionLookupResponse {
+  material_key: string;
+  canonical_material?: string | null;
+  has_matches: boolean;
+  requires_clarification: boolean;
+  match_type: string;
+  available_conditions: H2ConditionOption[];
+  band_distribution?: Record<string, number> | null;
+  unresolved_condition_count?: number;
+  notes?: string | null;
 }
 
 export interface SearchRequest {
@@ -107,20 +128,37 @@ export async function checkO2Compatibility(req: CompatibilityRequest): Promise<C
 }
 
 export async function checkH2Compatibility(req: CompatibilityRequest): Promise<CompatibilityResponse> {
+  const conditionSuffix = req.condition?.trim()
+    ? ` under ${req.condition.trim()} condition`
+    : '';
+
   const response = await fetch(`${API_BASE}/mira/h2/compatibility`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      question: `Is ${req.material_key} compatible with hydrogen?`,
+      question: `Is ${req.material_key} compatible with hydrogen${conditionSuffix}?`,
       material_key: req.material_key,
       pressure_psia: req.pressure,
       temperature_k: fToK(req.temperature),
       phase: 'gh2', // Default to gaseous hydrogen
+      condition: req.condition?.trim() || undefined,
     }),
   });
 
   if (!response.ok) {
     throw new Error(`H2 compatibility check failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function getH2Conditions(materialKey: string): Promise<H2ConditionLookupResponse> {
+  const response = await fetch(
+    `${API_BASE}/mira/h2/conditions?material_key=${encodeURIComponent(materialKey)}`,
+  );
+
+  if (!response.ok) {
+    throw new Error(`H2 condition lookup failed: ${response.statusText}`);
   }
 
   return response.json();
