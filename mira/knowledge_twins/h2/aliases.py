@@ -936,33 +936,89 @@ def normalize(name: str) -> str:
     # Lowercase
     s = name.lower()
 
-    # Replace separators with space
-    s = re.sub(r'[-_/\\()]', ' ', s)
+    # Keep alnum + decimal points, flatten all other separators.
+    # This absorbs OCR punctuation noise without changing token order.
+    s = re.sub(r"[^a-z0-9.]+", " ", s)
 
     # Collapse multiple spaces
-    s = re.sub(r'\s+', ' ', s)
+    s = re.sub(r"\s+", " ", s)
 
     # Strip
-    s = s.strip()
-
-    return s
+    return s.strip()
 
 
-# Build reverse lookup at module load time
+def _compact_key(value: str) -> str:
+    """Build a compact alphanumeric key for separator-insensitive matching."""
+    return re.sub(r"[^a-z0-9]+", "", value.lower())
+
+
+def _titanium_numeric_signature(value: str) -> Optional[str]:
+    """Return deterministic shorthand key for Ti alloy notations.
+
+    Examples:
+    - Ti-6Al-4V -> ti64
+    - Ti 6/4 -> ti64
+    - Titanium 6-2-4-2 -> ti6242
+    """
+    norm = normalize(value)
+    if not norm:
+        return None
+
+    if norm.startswith("ti "):
+        tail = norm[3:]
+    elif norm.startswith("titanium "):
+        tail = norm[len("titanium "):]
+    else:
+        return None
+
+    nums = re.findall(r"\d+(?:\.\d+)?", tail)
+    if len(nums) < 2:
+        return None
+
+    folded = "".join(n.replace(".", "") for n in nums)
+    return f"ti{folded}" if folded else None
+
+
+# Build reverse lookup indexes at module load time
 CANONICAL_NAMES: dict[str, str] = {}
+CANONICAL_COMPACT_NAMES: dict[str, str] = {}
+CANONICAL_TITANIUM_SIGNATURES: dict[str, str] = {}
+
+
+def _canonical_priority(canonical: str) -> tuple[int, int]:
+    """Lower is better.
+
+    Prefer base names (no parenthetical condition) over condition-specific variants.
+    """
+    return (1 if "(" in canonical else 0, len(canonical))
+
+
+def _insert_lookup(lookup: dict[str, str], key: str, canonical: str) -> None:
+    if not key:
+        return
+    existing = lookup.get(key)
+    if existing is None or _canonical_priority(canonical) < _canonical_priority(existing):
+        lookup[key] = canonical
+
+
+def _index_term(term: str, canonical: str) -> None:
+    norm = normalize(term)
+    _insert_lookup(CANONICAL_NAMES, norm, canonical)
+
+    compact = _compact_key(norm)
+    _insert_lookup(CANONICAL_COMPACT_NAMES, compact, canonical)
+
+    ti_sig = _titanium_numeric_signature(norm)
+    if ti_sig:
+        _insert_lookup(CANONICAL_TITANIUM_SIGNATURES, ti_sig, canonical)
 
 def _build_reverse_lookup() -> None:
     """Build the reverse lookup dictionary."""
     for canonical, aliases in MATERIAL_ALIASES.items():
-        # Map the canonical name to itself (normalized)
-        norm_canonical = normalize(canonical)
-        CANONICAL_NAMES[norm_canonical] = canonical
-
-        # Map each alias to its canonical name
+        # Map canonical term and all aliases.
+        _index_term(canonical, canonical)
         for alias in aliases:
-            norm_alias = normalize(alias)
-            if norm_alias and norm_alias not in CANONICAL_NAMES:
-                CANONICAL_NAMES[norm_alias] = canonical
+            _index_term(alias, canonical)
 
 # Build on import
 _build_reverse_lookup()
@@ -986,7 +1042,22 @@ def get_canonical_name(query: str) -> Optional[str]:
         None
     """
     norm = normalize(query)
-    return CANONICAL_NAMES.get(norm)
+    if not norm:
+        return None
+
+    direct = CANONICAL_NAMES.get(norm)
+    if direct:
+        return direct
+
+    compact = CANONICAL_COMPACT_NAMES.get(_compact_key(norm))
+    if compact:
+        return compact
+
+    ti_sig = _titanium_numeric_signature(norm)
+    if ti_sig:
+        return CANONICAL_TITANIUM_SIGNATURES.get(ti_sig)
+
+    return None
 
 
 def get_all_aliases(canonical: str) -> tuple[str, ...]:

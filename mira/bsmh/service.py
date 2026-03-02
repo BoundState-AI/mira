@@ -11,6 +11,11 @@ import os
 import re
 from uuid import uuid4
 
+from mira.providers.llm_provider import complete as llm_complete, resolve_model
+from mira.utils.json_extract import ExtractionError, extract_json
+
+LOGGER = logging.getLogger(__name__)
+
 from .bouncer import run_bouncer
 from .bok_adapter import fetch_h2_bok_evidence
 from .models import BSMHQueryRequest, BSMHQueryResponse
@@ -698,6 +703,90 @@ async def _run_bsmh_retrieval_only(v4_request: Any) -> _BSMHRetrievalResult:
     )
 
 
+_FC_CONTEXT_PARSE_PROMPT = """You are a NASA fracture control engineer. Extract structured context from the user's query.
+
+Return STRICT JSON only with these fields (use null for anything not explicitly stated):
+{
+  "material": "string or null — material designation exactly as stated",
+  "part_name": "string or null — part or component name",
+  "pressure_boundary": true/false/null,
+  "consequence_of_failure": "catastrophic" | "critical" | "non_critical" | null,
+  "inspectability": "inspectable" | "limited_access" | "non_inspectable" | null,
+  "geometry_type": "pressure_vessel" | "fitting" | "line" | "structural" | "fastener" | "mechanism" | "other" | null,
+  "material_condition": "wrought" | "cast" | "forged" | "welded" | "am_printed" | "powder_metallurgy" | null,
+  "center_code": "MSFC" | "JSC" | "KSC" | "GRC" | null,
+  "design_life_cycles": integer or null,
+  "operating_pressure_psi": number or null,
+  "operating_pressure_unit": "string or null — unit as stated (psi, psia, kPa, etc.)",
+  "operating_temperature_f": number or null,
+  "operating_temperature_unit": "string or null — unit as stated (F, C, K, etc.)",
+  "proof_factor": number or null
+}
+
+Definitions (per NASA-STD-5019A):
+- consequence_of_failure:
+  • "catastrophic" = could result in loss of life, disabling injury, or loss of a major national asset (crew, vehicle, major station element)
+  • "critical" = could result in loss of mission or major degradation requiring immediate corrective action
+  • "non_critical" = failure does not meet critical or catastrophic criteria (part still requires classification rationale)
+- "pressure_boundary" = the part contains, seals, or is integral to a pressurized system
+
+Critical rules:
+- Use null (not empty string "") for anything not explicitly stated in the query.
+- Never infer or assume values the user did not provide.
+- Extract numeric values and units exactly as stated; do not convert units.
+- Only output JSON. No prose, no explanation, no markdown.
+
+Respond with ONLY valid JSON. No markdown fences, preamble, or commentary.
+
+Examples:
+
+Query: "Classify this Ti-6Al-4V pressure vessel for the SLS upper stage"
+Answer:
+{"material": "Ti-6Al-4V", "part_name": "pressure vessel", "pressure_boundary": true, "consequence_of_failure": null, "inspectability": null, "geometry_type": "pressure_vessel", "material_condition": null, "center_code": null, "design_life_cycles": null, "operating_pressure_psi": null, "operating_pressure_unit": null, "operating_temperature_f": null, "operating_temperature_unit": null, "proof_factor": null}
+
+Query: "Non-inspectable Inconel 718 turbopump bolt, catastrophic if it fails, 4000 cycles design life at MSFC"
+Answer:
+{"material": "Inconel 718", "part_name": "turbopump bolt", "pressure_boundary": null, "consequence_of_failure": "catastrophic", "inspectability": "non_inspectable", "geometry_type": "fastener", "material_condition": null, "center_code": "MSFC", "design_life_cycles": 4000, "operating_pressure_psi": null, "operating_pressure_unit": null, "operating_temperature_f": null, "operating_temperature_unit": null, "proof_factor": null}
+
+Query: "Is a bracket fracture critical?"
+Answer:
+{"material": null, "part_name": "bracket", "pressure_boundary": null, "consequence_of_failure": null, "inspectability": null, "geometry_type": "structural", "material_condition": null, "center_code": null, "design_life_cycles": null, "operating_pressure_psi": null, "operating_pressure_unit": null, "operating_temperature_f": null, "operating_temperature_unit": null, "proof_factor": null}
+"""
+
+
+async def _parse_fracture_context_from_query(raw_query: str) -> FractureContextInput:
+    """Use provider to extract structured fracture context from natural language.
+
+    Falls back to empty context (which triggers CLARIFY) on any failure.
+    """
+    import asyncio as _asyncio
+
+    model = os.environ.get("BSMH_SONNET_MODEL", resolve_model("sonnet"))
+
+    def _call() -> FractureContextInput:
+        response = llm_complete(
+            system=_FC_CONTEXT_PARSE_PROMPT,
+            user=raw_query,
+            model=model,
+            max_tokens=500,
+            temperature=0.0,
+            timeout_s=20,
+        )
+        try:
+            parsed = extract_json(response.text, expect="object")
+        except ExtractionError:
+            LOGGER.warning("[FC] Provider did not return JSON; using empty context")
+            return FractureContextInput()
+        return FractureContextInput.model_validate(parsed)
+
+    try:
+        loop = _asyncio.get_running_loop()
+        return await loop.run_in_executor(None, _call)
+    except Exception as exc:
+        LOGGER.error("[FC] Fracture context parse failed: %s", exc)
+        return FractureContextInput()
+
+
 async def run_bsmh_query(request: BSMHQueryRequest) -> BSMHQueryResponse:
     """
     Execute temporary BSMH flow:
@@ -718,6 +807,62 @@ async def run_bsmh_query(request: BSMHQueryRequest) -> BSMHQueryResponse:
         if bouncer.structured_query
         else {}
     )
+
+    # =========================================================================
+    # FRACTURE CONTROL EARLY EXIT
+    # If query is fracture-domain, route to deterministic classification engine.
+    # No materials retrieval needed — fracture is a rule engine, not search.
+    # =========================================================================
+    inferred_context_early = _infer_safety_context_from_query(request.query, structured_query)
+    if inferred_context_early == "fracture_control":
+        fc_sonnet_calls = 0
+        try:
+            fc_context = await _parse_fracture_context_from_query(request.query)
+            fc_sonnet_calls += 1
+            fc_result = build_fracture_decision(context=fc_context)
+            fc_answer = await format_fracture_decision_sonnet(
+                query=request.query,
+                decision=fc_result,
+            )
+            fc_sonnet_calls += 1
+            LOGGER.info(
+                "[FC] classification=%s verdict=%s rules=%s sonnet_calls=%d",
+                fc_result.classification.part_class if fc_result.classification else "NONE",
+                fc_result.verdict,
+                fc_result.rules_applied,
+                fc_sonnet_calls,
+            )
+            return BSMHQueryResponse(
+                status="ok",
+                pipeline="B-FC-S",
+                answer=fc_answer,
+                answer_sonnet=fc_answer,
+                answer_mode="sonnet",
+                sonnet_calls_used=fc_sonnet_calls,
+                bouncer=bouncer,
+                fracture_result=fc_result,
+                sonnet_metadata={
+                    "executed": True,
+                    "safety_context": "fracture_control",
+                    "parsed_intent": "fracture_classification",
+                    "fracture_verdict": fc_result.verdict,
+                    "fracture_part_class": fc_result.classification.part_class if fc_result.classification else None,
+                    "fracture_rules_applied": fc_result.rules_applied,
+                },
+                v4_gate_action="PASS" if fc_result.verdict == "CLASSIFIED" else "CLARIFY",
+                v4_confidence_score=fc_result.classification.classification_confidence if fc_result.classification else 0.0,
+            )
+        except Exception as exc:
+            LOGGER.error("[FC] Fracture control routing failed: %s", exc, exc_info=True)
+            return BSMHQueryResponse(
+                status="error",
+                pipeline="B-FC-S",
+                answer=f"Fracture control assessment encountered an error: {exc}",
+                sonnet_calls_used=fc_sonnet_calls,
+                bouncer=bouncer,
+                sonnet_metadata={"safety_context": "fracture_control", "error": str(exc)},
+                error=str(exc),
+            )
 
     requested_materials = _dedupe_keep_order(
         [

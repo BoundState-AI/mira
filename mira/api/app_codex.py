@@ -8,6 +8,7 @@ drop-in run target that includes `/mp-plan/v2/*` endpoints.
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -19,21 +20,36 @@ if _env_file.exists():
     load_dotenv(_env_file)
 
 from . import routers
+from .auth import CognitoAuthzMiddleware, validate_auth_configuration
 from .routers.mp_plan_v2_codex import router as mp_plan_v2_codex_router
+
+
+def _build_cors_origins() -> list[str]:
+    origins = [
+        "http://localhost:8080",
+        "http://localhost:8081",
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:8080",
+    ]
+    extra_origins = os.getenv("CORS_EXTRA_ORIGINS", "")
+    if extra_origins:
+        origins.extend([o.strip() for o in extra_origins.split(",") if o.strip()])
+    cognito_ui_origin = os.getenv("COGNITO_HOSTED_UI_ORIGIN", "").strip()
+    if cognito_ui_origin:
+        origins.append(cognito_ui_origin)
+    return sorted(set(origins))
 
 
 def create_app_codex() -> FastAPI:
     app = FastAPI(title="BoundState API (Codex)", version="0.2.0-codex")
 
+    validate_auth_configuration()
+    app.add_middleware(CognitoAuthzMiddleware)
+
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[
-            "http://localhost:8080",
-            "http://localhost:8081",
-            "http://localhost:5173",
-            "http://localhost:3000",
-            "http://127.0.0.1:8080",
-        ],
+        allow_origins=_build_cors_origins(),
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -60,19 +76,24 @@ def create_app_codex() -> FastAPI:
 
     app.include_router(routers.search_router, prefix="/search", tags=["search"])
     app.include_router(routers.mira_router, prefix="/mira", tags=["mira"])
+    app.include_router(routers.mira_router, prefix="/api/mira", tags=["mira"])
     app.include_router(routers.query_router, prefix="/mira", tags=["query"])
     app.include_router(routers.aegis_router, prefix="/aegis", tags=["aegis"])
     app.include_router(routers.compliance_router, prefix="/compliance", tags=["compliance"])
     app.include_router(routers.o2_router, prefix="/o2", tags=["o2"])
+    app.include_router(routers.o2_router, prefix="/api/o2", tags=["o2"])
     app.include_router(routers.hybrid_query_router, tags=["hybrid-query"])
     app.include_router(routers.miul_router, prefix="/miul", tags=["miul"])
     app.include_router(routers.bom_router, prefix="/bom", tags=["bom"])
     app.include_router(routers.mua_router, prefix="/mua", tags=["mua"])
-    app.include_router(routers.mua_v6_router, prefix="/mua/v6", tags=["mua-v6"])
-    app.include_router(routers.mua_v7_router, prefix="/mua/v7", tags=["mua-v7"])
+    app.include_router(routers.mua_v10_router, prefix="/mua/v10", tags=["mua-v10"])
+    app.include_router(routers.mua_v10_router, prefix="/api/mua/v10", tags=["mua-v10"])
+    app.include_router(routers.matchmaker_router, prefix="/mua/matchmaker", tags=["mua-matchmaker-v8"])
+    app.include_router(routers.matchmaker_router, prefix="/api/mua/matchmaker", tags=["mua-matchmaker-v8"])
     app.include_router(routers.mp_plan_router, prefix="/mp-plan", tags=["mp-plan"])
     app.include_router(mp_plan_v2_codex_router, prefix="/mp-plan/v2", tags=["mp-plan-v2-codex"])
     app.include_router(routers.mira_v4_router, prefix="/mira/v4", tags=["mira-v4"])
+    app.include_router(routers.mira_v4_router, prefix="/api/mira/v4", tags=["mira-v4"])
     app.include_router(routers.bsmh_router, prefix="/mira/bsmh", tags=["bsmh-temp"])
     app.include_router(routers.ui_router, tags=["ui"])
     app.include_router(routers.test_classes_router, tags=["test-classes"])

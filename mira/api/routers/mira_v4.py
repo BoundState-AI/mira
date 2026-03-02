@@ -37,6 +37,9 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
+from mira.providers.llm_provider import complete as llm_complete, resolve_model
+from mira.utils.json_extract import ExtractionError, extract_json
+
 LOGGER = logging.getLogger(__name__)
 router = APIRouter()
 
@@ -68,6 +71,10 @@ class V4QueryRequest(BaseModel):
     fluid_medium: Optional[str] = Field(None, description="Fluid medium (LOX, GOX, LH2, etc.)")
     duration_hr: Optional[float] = Field(None, ge=0, description="Exposure duration hours")
     cycles: Optional[int] = Field(None, ge=0, description="Thermal/pressure cycles")
+    llm_model: Optional[str] = Field(
+        None,
+        description="Requested response model hint (kept for UI backward compatibility)",
+    )
 
     model_config = {"extra": "forbid"}
 
@@ -289,54 +296,45 @@ CRITICAL RULES:
   * Cryogenic toughness
   * Corrosion resistance in the stated environment
   * Common NASA/aerospace material selections for the application
+
+Respond with ONLY valid JSON. No markdown fences, preamble, or commentary.
 """
 
 
 async def _parse_query_with_sonnet(raw_query: str) -> Dict[str, Any]:
-    """Parse a natural language query into structured fields via Anthropic SDK.
+    """Parse a natural language query into structured fields via LLM provider.
 
-    Falls back to a heuristic parse if the Anthropic SDK or credentials
-    are unavailable. Defaults to direct Anthropic API (set USE_BEDROCK=1
-    to use AWS Bedrock instead).
+    Falls back to a heuristic parse if the provider call fails.
+    Uses LLM_PROVIDER env var for backend selection; set USE_BEDROCK=1
+    to force AWS Bedrock.
     """
     use_bedrock = os.environ.get("USE_BEDROCK", "0").lower() in ("1", "true", "yes")
-    bedrock_region = os.environ.get("AWS_REGION", os.environ.get("BEDROCK_REGION", "us-east-1"))
-
-    # Bedrock model ID vs direct API model ID
-    model_bedrock = "anthropic.claude-sonnet-4-5-20250929-v1:0"
-    model_direct = "claude-sonnet-4-5-20250929"
+    model_bedrock = os.environ.get(
+        "MIRA_V4_SONNET_BEDROCK_MODEL",
+        resolve_model("sonnet"),
+    )
+    model_direct = os.environ.get(
+        "MIRA_V4_SONNET_DIRECT_MODEL",
+        resolve_model("sonnet"),
+    )
 
     def _call_sonnet() -> Dict[str, Any]:
         try:
-            if use_bedrock:
-                from anthropic import AnthropicBedrock
-                client = AnthropicBedrock(aws_region=bedrock_region)
-                model = model_bedrock
-            else:
-                from anthropic import Anthropic
-                api_key = (os.environ.get("ANTHROPIC_API_KEY") or "").strip()
-                if not api_key:
-                    raise RuntimeError("ANTHROPIC_API_KEY is missing or empty.")
-                client = Anthropic(api_key=api_key)
-                model = model_direct
-
-            message = client.messages.create(
+            model = model_bedrock if use_bedrock else model_direct
+            response = llm_complete(
+                system=_PARSE_SYSTEM_PROMPT,
+                user=raw_query,
                 model=model,
                 max_tokens=1024,
-                temperature=0,
-                system=_PARSE_SYSTEM_PROMPT,
-                messages=[{"role": "user", "content": raw_query}],
+                temperature=0.0,
+                provider="bedrock-converse" if use_bedrock else None,
             )
 
-            text = message.content[0].text
-
-            # Extract JSON from response (handle markdown code blocks)
-            json_match = re.search(r"\{[\s\S]*\}", text)
-            if json_match:
-                return json.loads(json_match.group())
-
-            LOGGER.warning("[MIRA_V4] Sonnet returned non-JSON: %s", text[:200])
-            return {}
+            try:
+                return extract_json(response.text, expect="object")
+            except ExtractionError:
+                LOGGER.warning("[MIRA_V4] Sonnet returned non-JSON: %s", response.text[:200])
+                return {}
 
         except Exception as exc:
             LOGGER.warning(
@@ -401,6 +399,17 @@ async def _generate_answer(
     """
     # Build evidence summary for Sonnet — explicit about what IS and ISN'T in the data
     top_materials = materials[:10]  # Don't overwhelm the prompt
+    source_set = {
+        str(m.get("data_source") or "MAPTIS").upper()
+        for m in top_materials
+    }
+    if source_set and source_set == {"H2_KNOWLEDGE"}:
+        evidence_source_label = "H2 knowledge corpus"
+    elif source_set and source_set <= {"MAPTIS", "MAPTIS_FAISS"}:
+        evidence_source_label = "MAPTIS database"
+    else:
+        evidence_source_label = "materials databases"
+
     evidence_lines = []
     for m in top_materials:
         line = f"- {m.get('designation', '?')}"
@@ -410,12 +419,13 @@ async def _generate_answer(
             parts = [f"{k}={v}" for k, v in tc.items() if v]
             line += f" — {total} tests ({', '.join(parts)})"
         else:
-            line += " — no test data in MAPTIS"
+            line += " — no test data found"
         # O₂ compatibility: EXPLICITLY tag both present AND absent
-        if m.get("oxygen_compatible"):
-            line += " [O₂ COMPATIBLE - NASA-STD-6001 A/B rated]"
-        else:
-            line += " [NO O₂ RATING IN MAPTIS]"
+        if safety_context == "oxygen":
+            if m.get("oxygen_compatible"):
+                line += " [O₂ COMPATIBLE - NASA-STD-6001 A/B rated]"
+            else:
+                line += " [NO O₂ RATING IN DATA]"
         # MUA precedent
         if m.get("has_mua_precedent"):
             line += f" [MUA precedent: {m.get('mua_count', 0)} records]"
@@ -438,35 +448,30 @@ Safety context: {safety_context}
 Focus material: {focus_material_key or "none"}
 Materials found: {len(materials)} ({len(top_materials)} shown)
 
-Evidence from MAPTIS database:
+Evidence from {evidence_source_label}:
 {evidence_text}
 """
 
     use_bedrock = os.environ.get("USE_BEDROCK", "0").lower() in ("1", "true", "yes")
-    bedrock_region = os.environ.get("AWS_REGION", os.environ.get("BEDROCK_REGION", "us-east-1"))
 
     def _call_sonnet() -> str:
         try:
-            if use_bedrock:
-                from anthropic import AnthropicBedrock
-                client = AnthropicBedrock(aws_region=bedrock_region)
-                model = "anthropic.claude-sonnet-4-5-20250929-v1:0"
-            else:
-                from anthropic import Anthropic
-                api_key = (os.environ.get("ANTHROPIC_API_KEY") or "").strip()
-                if not api_key:
-                    raise RuntimeError("ANTHROPIC_API_KEY is missing or empty.")
-                client = Anthropic(api_key=api_key)
-                model = "claude-sonnet-4-5-20250929"
-
-            message = client.messages.create(
+            model = os.environ.get(
+                "MIRA_V4_SONNET_BEDROCK_MODEL",
+                resolve_model("sonnet"),
+            ) if use_bedrock else os.environ.get(
+                "MIRA_V4_SONNET_DIRECT_MODEL",
+                resolve_model("sonnet"),
+            )
+            response = llm_complete(
+                system=_RESPONSE_SYSTEM_PROMPT,
+                user=user_message,
                 model=model,
                 max_tokens=1024,
-                temperature=0,
-                system=_RESPONSE_SYSTEM_PROMPT,
-                messages=[{"role": "user", "content": user_message}],
+                temperature=0.0,
+                provider="bedrock-converse" if use_bedrock else None,
             )
-            return message.content[0].text
+            return response.text
 
         except Exception as exc:
             LOGGER.warning("[MIRA_V4] Response engine Sonnet call failed: %s", exc)
@@ -478,7 +483,7 @@ Evidence from MAPTIS database:
     # Fallback: template-based answer if Sonnet failed
     if not answer:
         if not materials:
-            answer = "No matching materials found in MAPTIS for this query."
+            answer = "No matching materials found in available data for this query."
         else:
             top = materials[0]
             name = top.get("designation", "Unknown")
@@ -486,7 +491,7 @@ Evidence from MAPTIS database:
             o2 = " O₂ compatible." if top.get("oxygen_compatible") else ""
             mua = " Has MUA precedent." if top.get("has_mua_precedent") else ""
             answer = (
-                f"Found **{len(materials)} materials** in MAPTIS. "
+                f"Found **{len(materials)} materials** in {evidence_source_label}. "
                 f"Top result: **{name}** with {tests} test records.{o2}{mua} "
                 f"Confidence: {confidence_score:.0%} ({gate_action})."
             )
@@ -1036,21 +1041,289 @@ async def query_v4(request: V4QueryRequest) -> V4QueryResponse:
                 return None
             return round(float(psia_val) * 6.89476, 2)
 
+        query_fluid = str(
+            request.fluid_medium or parsed_query.environment.fluid_medium or ""
+        ).strip().lower()
+        safety_context_value = str(parsed_query.safety_context or "").strip().lower()
+        prefer_h2_knowledge = (
+            safety_context_value == "hydrogen"
+            or safety_context_value.endswith(".hydrogen")
+            or "hydrogen" in query_fluid
+            or query_fluid in {"h2", "gh2", "lh2"}
+            or bool(re.search(r"\b(hydrogen|h2|gh2|lh2)\b", request.query.lower()))
+        )
+
+        def _table_exists(cur, relation_name: str) -> bool:
+            """Check if a relation is visible to the current DB user."""
+            cur.execute("SELECT to_regclass(%s) IS NOT NULL AS exists", (relation_name,))
+            row = cur.fetchone()
+            if not row:
+                return False
+            return bool(row["exists"] if isinstance(row, dict) else row[0])
+
+        def _get_data_source_capabilities() -> Dict[str, bool]:
+            """Detect which material corpora are available in the connected DB."""
+            import psycopg2
+            from psycopg2.extras import RealDictCursor
+            from mira.core.db_config import get_db_connection_params
+
+            conn = psycopg2.connect(**get_db_connection_params())
+            try:
+                with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                    return {
+                        "has_primary": _table_exists(cur, "materials"),
+                        "has_h2_knowledge": _table_exists(cur, "h2_knowledge.materials"),
+                    }
+            finally:
+                conn.close()
+
+        source_caps = _get_data_source_capabilities()
+        h2_only_mode = source_caps["has_h2_knowledge"] and not source_caps["has_primary"]
+        if h2_only_mode and not prefer_h2_knowledge:
+            LOGGER.info(
+                "[MIRA_V4] H2-only dataset active; refusing non-hydrogen query."
+            )
+
+            parsed_query = parsed_query.model_copy(update={
+                "intent": "out_of_scope",
+                "filters": {
+                    **parsed_query.filters,
+                    "domain_scope": "out_of_scope",
+                    "scope_reason": (
+                        "H2-only dataset is active; this endpoint accepts hydrogen "
+                        "compatibility queries only."
+                    ),
+                },
+            })
+
+            builder = DecisionLineageBuilder()
+            lineage = builder.build(
+                parsed_query=parsed_query,
+                evidence_rows=[],
+                schema_version="1.0.0",
+            )
+
+            return _serialize_lineage(
+                lineage=lineage,
+                materials=[],
+                all_materials=[],
+                material_families=[],
+                search_source="h2_only_refuse",
+                answer=(
+                    "This compatibility path is currently configured for **hydrogen (H2)** "
+                    "data only. Non-hydrogen queries are refused. Use an H2 query "
+                    "(e.g., include hydrogen/H2/GH2/LH2) or switch to the O2 path."
+                ),
+            )
+
+        def _run_primary_search(cur, pattern: str, limit: int) -> list:
+            """Primary MAPTIS-style search against materials + test tables."""
+            type_clause = "AND m.material_type_key = %s" if type_filter_key else ""
+            params: list = [f"%{pattern.lower()}%"]
+            if type_filter_key:
+                params.append(type_filter_key)
+            params.append(limit)
+
+            cur.execute(
+                f"""
+                SELECT
+                    m.material_key,
+                    m.material_code,
+                    m.designation,
+                    m.composition,
+                    m.material_type_key,
+                    m.material_type_name,
+                    m.use_temp_min_f,
+                    m.use_temp_max_f,
+                    -- Test counts per type
+                    (SELECT COUNT(*) FROM flammability_tests ft
+                     WHERE ft.material_code = m.material_key) AS flammability_tests,
+                    (SELECT COUNT(*) FROM mechanical_impact_tests mt
+                     WHERE mt.material_code = m.material_key) AS impact_tests,
+                    (SELECT COUNT(*) FROM tvs_outgassing_tests tv
+                     WHERE tv.material_code = m.material_key) AS outgassing_tests,
+                    (SELECT COUNT(*) FROM toxicity_tests tx
+                     WHERE tx.material_code = m.material_key) AS toxicity_tests,
+                    (SELECT COUNT(*) FROM corrosion_tests ct
+                     WHERE ct.material_code = m.material_key) AS corrosion_tests,
+                    (SELECT COUNT(*) FROM tensile_strength_tests ts
+                     WHERE ts.material_code = m.material_key) AS tensile_tests,
+                    (SELECT COUNT(*) FROM fluid_compatibility_tests fc
+                     WHERE fc.material_code = m.material_key) AS fluid_compat_tests,
+                    (SELECT COUNT(*) FROM high_cycle_fatigue_tests hc
+                     WHERE hc.material_code = m.material_key) AS fatigue_tests,
+                    -- Latest test year across all test types
+                    (SELECT MAX(dt) FROM (
+                        SELECT MAX(date_tested) AS dt FROM flammability_tests
+                            WHERE material_code = m.material_key
+                        UNION ALL
+                        SELECT MAX(date_tested) FROM mechanical_impact_tests
+                            WHERE material_code = m.material_key
+                        UNION ALL
+                        SELECT MAX(date_tested) FROM tvs_outgassing_tests
+                            WHERE material_code = m.material_key
+                        UNION ALL
+                        SELECT MAX(date_tested) FROM toxicity_tests
+                            WHERE material_code = m.material_key
+                        UNION ALL
+                        SELECT MAX(date_tested) FROM corrosion_tests
+                            WHERE material_code = m.material_key
+                        UNION ALL
+                        SELECT MAX(date_tested) FROM tensile_strength_tests
+                            WHERE material_code = m.material_key
+                        UNION ALL
+                        SELECT MAX(date_tested) FROM fluid_compatibility_tests
+                            WHERE material_code = m.material_key
+                    ) sub) AS latest_test_date,
+                    -- MUA precedent count (smart match: use CRES/alloy
+                    -- identifier from parenthetical, e.g. "CRES 347"
+                    -- from "STAINLESS STEEL 347 (CRES 347) BAR ANNEALED",
+                    -- or fall back to first two words if no parens)
+                    (SELECT COUNT(*) FROM public.mua_precedents_v7 mp
+                     WHERE LOWER(mp.material_designation) LIKE
+                           '%%' || LOWER(
+                               CASE
+                                   WHEN m.designation LIKE '%%(%%)%%' THEN
+                                       TRIM(SUBSTRING(m.designation FROM '\\(([^)]+)\\)'))
+                                   ELSE
+                                       CONCAT(
+                                           SPLIT_PART(m.designation, ' ', 1), ' ',
+                                           SPLIT_PART(m.designation, ' ', 2)
+                                       )
+                               END
+                           ) || '%%'
+                     AND LENGTH(TRIM(COALESCE(
+                           SUBSTRING(m.designation FROM '\\(([^)]+)\\)'),
+                           CONCAT(SPLIT_PART(m.designation, ' ', 1), ' ', SPLIT_PART(m.designation, ' ', 2))
+                     ))) >= 4
+                    ) AS mua_count,
+                    -- Oxygen compatibility flags (flammability + promoted combustion)
+                    COALESCE(
+                        (SELECT bool_or(
+                            nasa_6001_rating IN ('A', 'B')
+                            OR nasa_6001b_rating IN ('A', 'B')
+                         ) FROM flammability_tests
+                         WHERE material_code = m.material_key
+                        ),
+                        (SELECT bool_or(
+                            prom_rating IN ('A', 'B')
+                            OR prom_rtg_6001b IN ('A', 'B')
+                         ) FROM maptis.promoted_combustion_tests
+                         WHERE CAST(materialkey AS INTEGER) = m.material_key
+                        )
+                    ) AS oxygen_flam_compatible,
+                    'MAPTIS'::text AS data_source
+                FROM materials m
+                WHERE LOWER(m.designation) LIKE %s
+                {type_clause}
+                ORDER BY m.designation
+                LIMIT %s
+                """,
+                params,
+            )
+            return [dict(r) for r in cur.fetchall()]
+
+        def _run_h2_knowledge_search(cur, pattern: str, limit: int) -> list:
+            """Fallback search against h2_knowledge corpus tables."""
+            cur.execute(
+                """
+                SELECT
+                    m.material_key,
+                    NULL::text AS material_code,
+                    TRIM(CONCAT_WS(' ', m.common_name, NULLIF(m.form, ''), NULLIF(m.temper, ''))) AS designation,
+                    m.specification AS composition,
+                    NULL::integer AS material_type_key,
+                    'H2_KNOWLEDGE'::text AS material_type_name,
+                    NULL::double precision AS use_temp_min_f,
+                    NULL::double precision AS use_temp_max_f,
+                    COALESCE(agg.total_tests, 0) AS total_tests,
+                    COALESCE(agg.h2_tests, 0) AS h2_tests,
+                    COALESCE(agg.fracture_tests, 0) AS fracture_tests,
+                    COALESCE(agg.fatigue_tests, 0) AS fatigue_tests,
+                    COALESCE(agg.tensile_tests, 0) AS tensile_tests,
+                    NULL::integer AS mua_count,
+                    FALSE AS oxygen_flam_compatible,
+                    'H2_KNOWLEDGE'::text AS data_source
+                FROM h2_knowledge.materials m
+                LEFT JOIN (
+                    SELECT
+                        pr.material_key,
+                        COUNT(*) AS total_tests,
+                        COUNT(*) FILTER (WHERE UPPER(COALESCE(pr.gas, '')) LIKE 'H2%%') AS h2_tests,
+                        COUNT(*) FILTER (WHERE pr.record_type = 'fracture_toughness') AS fracture_tests,
+                        COUNT(*) FILTER (WHERE pr.record_type LIKE 'fatigue%%') AS fatigue_tests,
+                        COUNT(*) FILTER (WHERE pr.record_type = 'tensile_properties') AS tensile_tests
+                    FROM h2_knowledge.property_records pr
+                    GROUP BY pr.material_key
+                ) agg ON agg.material_key = m.material_key
+                WHERE LOWER(
+                    CONCAT_WS(
+                        ' ',
+                        COALESCE(m.common_name, ''),
+                        COALESCE(m.form, ''),
+                        COALESCE(m.temper, ''),
+                        COALESCE(m.specification, ''),
+                        COALESCE(m.material_key, '')
+                    )
+                ) LIKE %s
+                ORDER BY COALESCE(agg.h2_tests, 0) DESC, COALESCE(agg.total_tests, 0) DESC, m.common_name
+                LIMIT %s
+                """,
+                (f"%{pattern.lower()}%", limit),
+            )
+            return [dict(r) for r in cur.fetchall()]
+
+        def _normalize_material_row(row: Dict[str, Any], decimal_type: Any) -> Dict[str, Any]:
+            """Normalize heterogeneous DB rows into v4 material response shape."""
+            normalized = dict(row)
+            for key, value in list(normalized.items()):
+                if isinstance(value, decimal_type):
+                    normalized[key] = float(value)
+
+            data_source = str(normalized.get("data_source") or "MAPTIS").upper()
+            if data_source == "H2_KNOWLEDGE":
+                test_counts = {
+                    "hydrogen": normalized.pop("h2_tests", 0) or 0,
+                    "fracture_toughness": normalized.pop("fracture_tests", 0) or 0,
+                    "fatigue": normalized.pop("fatigue_tests", 0) or 0,
+                    "tensile": normalized.pop("tensile_tests", 0) or 0,
+                }
+                normalized["total_tests"] = int(normalized.pop("total_tests", 0) or 0)
+                normalized["latest_test_year"] = None
+                normalized["mua_count"] = 0
+                normalized["has_mua_precedent"] = False
+                normalized["oxygen_compatible"] = False
+                normalized["use_temp_min_c"] = None
+                normalized["use_temp_max_c"] = None
+            else:
+                test_counts = {
+                    "flammability": normalized.pop("flammability_tests", 0) or 0,
+                    "impact": normalized.pop("impact_tests", 0) or 0,
+                    "outgassing": normalized.pop("outgassing_tests", 0) or 0,
+                    "toxicity": normalized.pop("toxicity_tests", 0) or 0,
+                    "corrosion": normalized.pop("corrosion_tests", 0) or 0,
+                    "tensile": normalized.pop("tensile_tests", 0) or 0,
+                    "fluid_compatibility": normalized.pop("fluid_compat_tests", 0) or 0,
+                    "fatigue": normalized.pop("fatigue_tests", 0) or 0,
+                }
+                normalized["total_tests"] = sum(test_counts.values())
+                latest_date = normalized.pop("latest_test_date", None)
+                normalized["latest_test_year"] = latest_date.year if latest_date else None
+                mua_count = normalized.pop("mua_count", 0) or 0
+                normalized["mua_count"] = mua_count
+                normalized["has_mua_precedent"] = mua_count > 0
+                normalized["oxygen_compatible"] = bool(
+                    normalized.pop("oxygen_flam_compatible", False)
+                )
+                normalized["use_temp_min_c"] = _f_to_c(normalized.get("use_temp_min_f"))
+                normalized["use_temp_max_c"] = _f_to_c(normalized.get("use_temp_max_f"))
+
+            normalized["test_counts"] = test_counts
+            normalized["data_source"] = data_source
+            return normalized
+
         def _db_rich_search(pattern: str, limit: int = 25) -> list:
-            """Search materials with full test data enrichment.
-
-            Returns material rows enriched with:
-            - test_counts: dict of test type → count
-            - total_tests: sum of all test counts
-            - latest_test_year: most recent date_tested across all test tables
-            - mua_count: number of MUA precedent records
-            - mua_determination: most favorable MUA determination
-            - use_temp_min_c / use_temp_max_c: converted to Celsius
-            - oxygen_compatible: bool from flammability A/B rating or impact LOX tests
-
-            NOTE: psycopg2 returns Decimal for NUMERIC columns; we convert
-            to float so the dicts are JSON-serializable.
-            """
+            """Search materials with hydrogen-aware source selection."""
             import psycopg2
             from decimal import Decimal as _Decimal
             from psycopg2.extras import RealDictCursor
@@ -1059,156 +1332,23 @@ async def query_v4(request: V4QueryRequest) -> V4QueryResponse:
             conn = psycopg2.connect(**get_db_connection_params())
             try:
                 with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                    # Main material search with test counts via subqueries
-                    # This is more efficient than LEFT JOIN aggregation for
-                    # pattern-limited searches (only materializing matching rows).
-                    type_clause = "AND m.material_type_key = %s" if type_filter_key else ""
-                    params: list = [f"%{pattern.lower()}%"]
-                    if type_filter_key:
-                        params.append(type_filter_key)
-                    params.append(limit)
+                    rows: list = []
+                    has_primary = _table_exists(cur, "materials")
+                    has_h2 = _table_exists(cur, "h2_knowledge.materials")
+                    use_h2_only = prefer_h2_knowledge
 
-                    cur.execute(
-                        f"""
-                        SELECT
-                            m.material_key,
-                            m.material_code,
-                            m.designation,
-                            m.composition,
-                            m.material_type_key,
-                            m.material_type_name,
-                            m.use_temp_min_f,
-                            m.use_temp_max_f,
-                            -- Test counts per type
-                            (SELECT COUNT(*) FROM flammability_tests ft
-                             WHERE ft.material_code = m.material_key) AS flammability_tests,
-                            (SELECT COUNT(*) FROM mechanical_impact_tests mt
-                             WHERE mt.material_code = m.material_key) AS impact_tests,
-                            (SELECT COUNT(*) FROM tvs_outgassing_tests tv
-                             WHERE tv.material_code = m.material_key) AS outgassing_tests,
-                            (SELECT COUNT(*) FROM toxicity_tests tx
-                             WHERE tx.material_code = m.material_key) AS toxicity_tests,
-                            (SELECT COUNT(*) FROM corrosion_tests ct
-                             WHERE ct.material_code = m.material_key) AS corrosion_tests,
-                            (SELECT COUNT(*) FROM tensile_strength_tests ts
-                             WHERE ts.material_code = m.material_key) AS tensile_tests,
-                            (SELECT COUNT(*) FROM fluid_compatibility_tests fc
-                             WHERE fc.material_code = m.material_key) AS fluid_compat_tests,
-                            (SELECT COUNT(*) FROM high_cycle_fatigue_tests hc
-                             WHERE hc.material_code = m.material_key) AS fatigue_tests,
-                            -- Latest test year across all test types
-                            (SELECT MAX(dt) FROM (
-                                SELECT MAX(date_tested) AS dt FROM flammability_tests
-                                    WHERE material_code = m.material_key
-                                UNION ALL
-                                SELECT MAX(date_tested) FROM mechanical_impact_tests
-                                    WHERE material_code = m.material_key
-                                UNION ALL
-                                SELECT MAX(date_tested) FROM tvs_outgassing_tests
-                                    WHERE material_code = m.material_key
-                                UNION ALL
-                                SELECT MAX(date_tested) FROM toxicity_tests
-                                    WHERE material_code = m.material_key
-                                UNION ALL
-                                SELECT MAX(date_tested) FROM corrosion_tests
-                                    WHERE material_code = m.material_key
-                                UNION ALL
-                                SELECT MAX(date_tested) FROM tensile_strength_tests
-                                    WHERE material_code = m.material_key
-                                UNION ALL
-                                SELECT MAX(date_tested) FROM fluid_compatibility_tests
-                                    WHERE material_code = m.material_key
-                            ) sub) AS latest_test_date,
-                            -- MUA precedent count (smart match: use CRES/alloy
-                            -- identifier from parenthetical, e.g. "CRES 347"
-                            -- from "STAINLESS STEEL 347 (CRES 347) BAR ANNEALED",
-                            -- or fall back to first two words if no parens)
-                            (SELECT COUNT(*) FROM public.mua_precedents_v7 mp
-                             WHERE LOWER(mp.material_designation) LIKE
-                                   '%%' || LOWER(
-                                       CASE
-                                           WHEN m.designation LIKE '%%(%%)%%' THEN
-                                               TRIM(SUBSTRING(m.designation FROM '\\(([^)]+)\\)'))
-                                           ELSE
-                                               CONCAT(
-                                                   SPLIT_PART(m.designation, ' ', 1), ' ',
-                                                   SPLIT_PART(m.designation, ' ', 2)
-                                               )
-                                       END
-                                   ) || '%%'
-                             AND LENGTH(TRIM(COALESCE(
-                                   SUBSTRING(m.designation FROM '\\(([^)]+)\\)'),
-                                   CONCAT(SPLIT_PART(m.designation, ' ', 1), ' ', SPLIT_PART(m.designation, ' ', 2))
-                             ))) >= 4
-                            ) AS mua_count,
-                            -- Oxygen compatibility flags (flammability + promoted combustion)
-                            COALESCE(
-                                (SELECT bool_or(
-                                    nasa_6001_rating IN ('A', 'B')
-                                    OR nasa_6001b_rating IN ('A', 'B')
-                                 ) FROM flammability_tests
-                                 WHERE material_code = m.material_key
-                                ),
-                                (SELECT bool_or(
-                                    prom_rating IN ('A', 'B')
-                                    OR prom_rtg_6001b IN ('A', 'B')
-                                 ) FROM maptis.promoted_combustion_tests
-                                 WHERE CAST(materialkey AS INTEGER) = m.material_key
-                                )
-                            ) AS oxygen_flam_compatible
-                        FROM materials m
-                        WHERE LOWER(m.designation) LIKE %s
-                        {type_clause}
-                        ORDER BY m.designation
-                        LIMIT %s
-                        """,
-                        params,
-                    )
-
-                    rows = []
-                    for r in cur.fetchall():
-                        row = dict(r)
-                        # Convert Decimal → float for JSON serialization
-                        for k, v in row.items():
-                            if isinstance(v, _Decimal):
-                                row[k] = float(v)
-
-                        # Build enriched test_counts dict
-                        test_counts = {
-                            "flammability": row.pop("flammability_tests", 0) or 0,
-                            "impact": row.pop("impact_tests", 0) or 0,
-                            "outgassing": row.pop("outgassing_tests", 0) or 0,
-                            "toxicity": row.pop("toxicity_tests", 0) or 0,
-                            "corrosion": row.pop("corrosion_tests", 0) or 0,
-                            "tensile": row.pop("tensile_tests", 0) or 0,
-                            "fluid_compatibility": row.pop("fluid_compat_tests", 0) or 0,
-                            "fatigue": row.pop("fatigue_tests", 0) or 0,
-                        }
-                        row["test_counts"] = test_counts
-                        row["total_tests"] = sum(test_counts.values())
-
-                        # Latest test year
-                        latest_date = row.pop("latest_test_date", None)
-                        row["latest_test_year"] = (
-                            latest_date.year if latest_date else None
-                        )
-
-                        # MUA status
-                        mua_count = row.pop("mua_count", 0) or 0
-                        row["mua_count"] = mua_count
-                        row["has_mua_precedent"] = mua_count > 0
-
-                        # Oxygen compatibility
-                        row["oxygen_compatible"] = bool(
-                            row.pop("oxygen_flam_compatible", False)
-                        )
-
-                        # Unit conversions: add Celsius/kPa alongside original F/psia
-                        row["use_temp_min_c"] = _f_to_c(row.get("use_temp_min_f"))
-                        row["use_temp_max_c"] = _f_to_c(row.get("use_temp_max_f"))
-
-                        rows.append(row)
-                    return rows
+                    if use_h2_only and has_h2:
+                        rows = _run_h2_knowledge_search(cur, pattern, limit)
+                    if not rows and has_primary and not use_h2_only:
+                        try:
+                            rows = _run_primary_search(cur, pattern, limit)
+                        except Exception as exc:
+                            LOGGER.warning(
+                                "[MIRA_V4] Primary MAPTIS search failed for '%s': %s",
+                                pattern,
+                                exc,
+                            )
+                    return [_normalize_material_row(r, _Decimal) for r in rows]
             finally:
                 conn.close()
 
@@ -1218,11 +1358,7 @@ async def query_v4(request: V4QueryRequest) -> V4QueryResponse:
             return _db_rich_search(pattern, limit)
 
         def _db_batch_search(patterns: List[str], per_pattern_limit: int = 5) -> list:
-            """Search multiple patterns in a single DB connection.
-
-            More efficient than calling _db_rich_search() per pattern — opens
-            ONE connection, runs all queries, then closes.
-            """
+            """Search multiple patterns using one connection."""
             import psycopg2
             from decimal import Decimal as _Decimal
             from psycopg2.extras import RealDictCursor
@@ -1232,110 +1368,37 @@ async def query_v4(request: V4QueryRequest) -> V4QueryResponse:
             conn = psycopg2.connect(**get_db_connection_params())
             try:
                 with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                    type_clause = "AND m.material_type_key = %s" if type_filter_key else ""
+                    has_primary = _table_exists(cur, "materials")
+                    has_h2 = _table_exists(cur, "h2_knowledge.materials")
+                    use_h2_only = prefer_h2_knowledge
+
                     for pattern in patterns:
-                        params: list = [f"%{pattern.lower()}%"]
-                        if type_filter_key:
-                            params.append(type_filter_key)
-                        params.append(per_pattern_limit)
+                        rows_for_pattern: list = []
+                        if use_h2_only and has_h2:
+                            rows_for_pattern = _run_h2_knowledge_search(
+                                cur,
+                                pattern,
+                                per_pattern_limit,
+                            )
 
-                        cur.execute(
-                            f"""
-                            SELECT
-                                m.material_key, m.material_code, m.designation,
-                                m.composition, m.material_type_key, m.material_type_name,
-                                m.use_temp_min_f, m.use_temp_max_f,
-                                (SELECT COUNT(*) FROM flammability_tests ft
-                                 WHERE ft.material_code = m.material_key) AS flammability_tests,
-                                (SELECT COUNT(*) FROM mechanical_impact_tests mt
-                                 WHERE mt.material_code = m.material_key) AS impact_tests,
-                                (SELECT COUNT(*) FROM tvs_outgassing_tests tv
-                                 WHERE tv.material_code = m.material_key) AS outgassing_tests,
-                                (SELECT COUNT(*) FROM toxicity_tests tx
-                                 WHERE tx.material_code = m.material_key) AS toxicity_tests,
-                                (SELECT COUNT(*) FROM corrosion_tests ct
-                                 WHERE ct.material_code = m.material_key) AS corrosion_tests,
-                                (SELECT COUNT(*) FROM tensile_strength_tests ts
-                                 WHERE ts.material_code = m.material_key) AS tensile_tests,
-                                (SELECT COUNT(*) FROM fluid_compatibility_tests fc
-                                 WHERE fc.material_code = m.material_key) AS fluid_compat_tests,
-                                (SELECT COUNT(*) FROM high_cycle_fatigue_tests hc
-                                 WHERE hc.material_code = m.material_key) AS fatigue_tests,
-                                (SELECT MAX(dt) FROM (
-                                    SELECT MAX(date_tested) AS dt FROM flammability_tests
-                                        WHERE material_code = m.material_key
-                                    UNION ALL SELECT MAX(date_tested) FROM mechanical_impact_tests
-                                        WHERE material_code = m.material_key
-                                    UNION ALL SELECT MAX(date_tested) FROM tvs_outgassing_tests
-                                        WHERE material_code = m.material_key
-                                    UNION ALL SELECT MAX(date_tested) FROM toxicity_tests
-                                        WHERE material_code = m.material_key
-                                    UNION ALL SELECT MAX(date_tested) FROM corrosion_tests
-                                        WHERE material_code = m.material_key
-                                    UNION ALL SELECT MAX(date_tested) FROM tensile_strength_tests
-                                        WHERE material_code = m.material_key
-                                    UNION ALL SELECT MAX(date_tested) FROM fluid_compatibility_tests
-                                        WHERE material_code = m.material_key
-                                ) sub) AS latest_test_date,
-                                (SELECT COUNT(*) FROM public.mua_precedents_v7 mp
-                                 WHERE LOWER(mp.material_designation) LIKE
-                                       '%%' || LOWER(SPLIT_PART(m.designation, ' ', 1)) || '%%'
-                                 AND LENGTH(SPLIT_PART(m.designation, ' ', 1)) >= 4
-                                ) AS mua_count,
-                                -- Oxygen compatibility flags (flammability + promoted combustion)
-                                COALESCE(
-                                    (SELECT bool_or(
-                                        nasa_6001_rating IN ('A', 'B')
-                                        OR nasa_6001b_rating IN ('A', 'B')
-                                     ) FROM flammability_tests
-                                     WHERE material_code = m.material_key
-                                    ),
-                                    (SELECT bool_or(
-                                        prom_rating IN ('A', 'B')
-                                        OR prom_rtg_6001b IN ('A', 'B')
-                                     ) FROM maptis.promoted_combustion_tests
-                                     WHERE CAST(materialkey AS INTEGER) = m.material_key
-                                    )
-                                ) AS oxygen_flam_compatible
-                            FROM materials m
-                            WHERE LOWER(m.designation) LIKE %s
-                            {type_clause}
-                            ORDER BY m.designation
-                            LIMIT %s
-                            """,
-                            params,
+                        if not rows_for_pattern and has_primary and not use_h2_only:
+                            try:
+                                rows_for_pattern = _run_primary_search(
+                                    cur,
+                                    pattern,
+                                    per_pattern_limit,
+                                )
+                            except Exception as exc:
+                                LOGGER.warning(
+                                    "[MIRA_V4] Primary batch search failed for '%s': %s",
+                                    pattern,
+                                    exc,
+                                )
+
+                        all_rows.extend(
+                            _normalize_material_row(r, _Decimal)
+                            for r in rows_for_pattern
                         )
-
-                        for r in cur.fetchall():
-                            row = dict(r)
-                            for k, v in row.items():
-                                if isinstance(v, _Decimal):
-                                    row[k] = float(v)
-                            test_counts = {
-                                "flammability": row.pop("flammability_tests", 0) or 0,
-                                "impact": row.pop("impact_tests", 0) or 0,
-                                "outgassing": row.pop("outgassing_tests", 0) or 0,
-                                "toxicity": row.pop("toxicity_tests", 0) or 0,
-                                "corrosion": row.pop("corrosion_tests", 0) or 0,
-                                "tensile": row.pop("tensile_tests", 0) or 0,
-                                "fluid_compatibility": row.pop("fluid_compat_tests", 0) or 0,
-                                "fatigue": row.pop("fatigue_tests", 0) or 0,
-                            }
-                            row["test_counts"] = test_counts
-                            row["total_tests"] = sum(test_counts.values())
-                            latest_date = row.pop("latest_test_date", None)
-                            row["latest_test_year"] = (
-                                latest_date.year if latest_date else None
-                            )
-                            mua_count = row.pop("mua_count", 0) or 0
-                            row["mua_count"] = mua_count
-                            row["has_mua_precedent"] = mua_count > 0
-                            row["oxygen_compatible"] = bool(
-                                row.pop("oxygen_flam_compatible", False)
-                            )
-                            row["use_temp_min_c"] = _f_to_c(row.get("use_temp_min_f"))
-                            row["use_temp_max_c"] = _f_to_c(row.get("use_temp_max_f"))
-                            all_rows.append(row)
             finally:
                 conn.close()
             return all_rows
@@ -1362,11 +1425,14 @@ async def query_v4(request: V4QueryRequest) -> V4QueryResponse:
 
                     evidence_rows.append(EvidenceRow(
                         record_id=str(mk),
-                        source="MAPTIS",
+                        source=str(row.get("data_source") or "MAPTIS"),
                         data_class=data_class,
                         dirty_flag=dirty_flag,
                         test_year=latest_year,
                     ))
+
+        def _rows_include_h2(rows: list) -> bool:
+            return any(str(r.get("data_source") or "").upper() == "H2_KNOWLEDGE" for r in rows)
 
         # — Tier 0: Sonnet candidate_materials lookup (PRIMARY PATH) —
         # Uses _db_batch_search for single-connection efficiency
@@ -1377,11 +1443,16 @@ async def query_v4(request: V4QueryRequest) -> V4QueryResponse:
                 _add_rows(rows)
 
                 if materials:
-                    search_source = "sonnet_candidates"
+                    search_source = (
+                        "h2_knowledge_candidates"
+                        if _rows_include_h2(rows)
+                        else "sonnet_candidates"
+                    )
                     LOGGER.info(
                         "[MIRA_V4] Tier-0 Sonnet candidates: searched %d candidates, "
-                        "found %d materials in MAPTIS",
+                        "found %d materials (source=%s)",
                         len(candidate_materials), len(materials),
+                        search_source,
                     )
             except Exception as exc:
                 LOGGER.warning("[MIRA_V4] Tier-0 candidate search error: %s", exc)
@@ -1392,10 +1463,10 @@ async def query_v4(request: V4QueryRequest) -> V4QueryResponse:
                 rows = _db_ilike_search(parsed_query.material_key, limit=25)
                 _add_rows(rows)
                 if materials:
-                    search_source = "postgresql"
+                    search_source = "h2_knowledge" if _rows_include_h2(rows) else "postgresql"
                     LOGGER.info(
-                        "[MIRA_V4] Tier-1 DB search for '%s': %d results",
-                        parsed_query.material_key, len(materials),
+                        "[MIRA_V4] Tier-1 DB search for '%s': %d results (source=%s)",
+                        parsed_query.material_key, len(materials), search_source,
                     )
             except Exception as exc:
                 LOGGER.warning("[MIRA_V4] Tier-1 DB search error: %s", exc)
@@ -1409,16 +1480,20 @@ async def query_v4(request: V4QueryRequest) -> V4QueryResponse:
                 _add_rows(family_rows)
 
                 if materials:
-                    search_source = "postgresql_families"
+                    search_source = (
+                        "h2_knowledge_families"
+                        if _rows_include_h2(family_rows)
+                        else "postgresql_families"
+                    )
                     LOGGER.info(
-                        "[MIRA_V4] Tier-2 family search for %s: %d results",
-                        material_families, len(materials),
+                        "[MIRA_V4] Tier-2 family search for %s: %d results (source=%s)",
+                        material_families, len(materials), search_source,
                     )
             except Exception as exc:
                 LOGGER.warning("[MIRA_V4] Tier-2 family search error: %s", exc)
 
         # — Tier 3: FAISS semantic fallback (safety net) —
-        if not materials:
+        if not materials and not prefer_h2_knowledge:
             try:
                 from mira.api.routers.ui_endpoints import get_semantic_search
 
@@ -1455,6 +1530,7 @@ async def query_v4(request: V4QueryRequest) -> V4QueryResponse:
                             "mua_count": 0,
                             "has_mua_precedent": False,
                             "oxygen_compatible": False,
+                            "data_source": "MAPTIS_FAISS",
                             "similarity_score": sr.get("similarity_score"),
                         })
                         evidence_rows.append(EvidenceRow(
@@ -1476,6 +1552,11 @@ async def query_v4(request: V4QueryRequest) -> V4QueryResponse:
                 LOGGER.warning("[MIRA_V4] Semantic search not importable")
             except Exception as exc:
                 LOGGER.warning("[MIRA_V4] Tier-3 FAISS search error: %s", exc)
+        elif not materials and prefer_h2_knowledge:
+            LOGGER.info(
+                "[MIRA_V4] Skipping MAPTIS/FAISS fallback for hydrogen query; "
+                "using H2 corpus only."
+            )
 
         # Sort materials: prioritize those with more test data, then by designation
         materials.sort(

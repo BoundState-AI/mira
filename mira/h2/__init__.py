@@ -28,6 +28,11 @@ from .models import (
     H2CompatibilityRequest,
     H2CompatibilityResponse,
     ConditionOptionResponse,
+    H2ConditionLookupResponse,
+    H2ConditionAliasRecord,
+    H2ConditionAliasListResponse,
+    H2ConditionAliasVerifyRequest,
+    H2ConditionAliasVerifyResponse,
 )
 
 __all__ = [
@@ -43,4 +48,9 @@ __all__ = [
     "H2CompatibilityRequest",
     "H2CompatibilityResponse",
     "ConditionOptionResponse",
+    "H2ConditionLookupResponse",
+    "H2ConditionAliasRecord",
+    "H2ConditionAliasListResponse",
+    "H2ConditionAliasVerifyRequest",
+    "H2ConditionAliasVerifyResponse",
 ]

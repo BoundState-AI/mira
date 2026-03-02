@@ -412,46 +412,8 @@ class H2Engine:
             "K-Monel aged" → ("K-Monel", "aged")
             "316L" → ("316L", None)
         """
-        # Known condition suffixes (check longer patterns first)
-        # Format: (suffix_pattern, canonical_condition)
-        CONDITION_SUFFIXES = [
-            # Multi-word patterns first
-            ("solution treated aged", "solution_treated_aged"),
-            ("solution treated and aged", "solution_treated_aged"),
-            ("st aged", "solution_treated_aged"),
-            ("st + aged", "solution_treated_aged"),
-            ("solution treated", "solution_treated"),
-            # Abbreviations
-            ("sta", "solution_treated_aged"),
-            ("st", "solution_treated"),
-            # Full words
-            ("annealed", "annealed"),
-            ("ann", "annealed"),
-            ("aged", "aged"),
-            ("quenched and tempered", "quenched_tempered"),
-            ("quenched tempered", "quenched_tempered"),
-            ("q&t", "quenched_tempered"),
-            ("qt", "quenched_tempered"),
-            ("normalized", "normalized"),
-            ("norm", "normalized"),
-            ("as received", "as_received"),
-            ("as-received", "as_received"),
-            ("peak aged", "peak_aged"),
-            ("overaged", "overaged"),
-            ("cold worked", "cold_worked"),
-            ("cw", "cold_worked"),
-        ]
-
-        norm = normalize(query)
-
-        for suffix, condition in CONDITION_SUFFIXES:
-            # Check if query ends with " suffix"
-            if norm.endswith(" " + suffix):
-                # Extract material name (original case preserved)
-                suffix_start = len(query) - len(suffix) - 1
-                material = query[:suffix_start].strip()
-                return material, condition
-
+        # Condition parsing is delegated to explicit condition input + the
+        # resolver pipeline. Avoid ad-hoc suffix parsing here.
         return query, None
 
     def _find_matches(self, query: str) -> list[MatchedEvidence]:
@@ -559,53 +521,20 @@ class H2Engine:
         Prefers condition-matched evidence but falls back to all matches
         if no condition matches found.
         """
-        norm_condition = normalize(query_condition)
-
-        # Common condition aliases
-        condition_map = {
-            "annealed": ["annealed", "ann"],
-            "aged": ["aged", "solution_treated_aged", "sta", "st aged", "peak aged"],
-            "solution treated": ["solution_treated", "st", "solution treated"],
-            "quenched": ["quenched", "q&t", "qt", "quench"],
-            "normalized": ["normalized", "norm"],
-            "as received": ["as_received", "as received", "ar"],
-        }
-
-        # Find which condition category the query matches
-        query_conditions = set()
-        for canonical, aliases in condition_map.items():
-            for alias in aliases:
-                if alias in norm_condition:
-                    query_conditions.add(canonical)
-                    break
-
-        if not query_conditions:
-            # Can't parse condition, return all matches
+        query_label = self._resolve_condition(query_condition, query_condition, "query").display_label
+        query_norm = normalize(query_label)
+        if not query_norm or query_norm in {"generic unknown", "unknown"}:
             return matches
 
-        # Filter matches
-        condition_matches = []
-        other_matches = []
-
+        condition_matches: list[MatchedEvidence] = []
         for m in matches:
-            if m.record.condition:
-                norm_record_cond = normalize(m.record.condition)
-                matched = False
-                for canonical, aliases in condition_map.items():
-                    if canonical in query_conditions:
-                        for alias in aliases:
-                            if alias in norm_record_cond:
-                                condition_matches.append(m)
-                                matched = True
-                                break
-                    if matched:
-                        break
-                if not matched:
-                    other_matches.append(m)
-            else:
-                other_matches.append(m)
+            record_label = self._condition_label(m.record)
+            record_norm = normalize(record_label)
+            if not record_norm:
+                continue
+            if query_norm == record_norm or query_norm in record_norm or record_norm in query_norm:
+                condition_matches.append(m)
 
-        # Return condition matches if found, otherwise all matches
         return condition_matches if condition_matches else matches
 
     def _generate_verdict(
@@ -659,7 +588,7 @@ class H2Engine:
         # =================================================================
         if not condition_specified and len(bands) > 1:
             # Check if we have multiple distinct conditions
-            condition_options = self._extract_condition_options(matches, bands)
+            condition_options, unresolved_count = self._extract_condition_options(matches, bands)
 
             # Only ask for clarification if we have multiple condition options
             # with DIFFERENT HEE bands
@@ -672,7 +601,6 @@ class H2Engine:
                         hee_band=None,
                         rationale=f"{material_name} shows varying HEE bands depending on "
                                   "heat treatment condition. Please specify the condition.",
-                        warnings=[],
                         evidence_count=len(matches),
                         band_distribution=band_dist,
                         top_evidence=top_evidence,
@@ -681,6 +609,11 @@ class H2Engine:
                         available_conditions=condition_options,
                         clarification_prompt="Multiple heat treatment conditions found with "
                                             "different hydrogen compatibility. Please specify:",
+                        warnings=(
+                            [f"{unresolved_count} condition label(s) need mapping review."]
+                            if unresolved_count > 0
+                            else []
+                        ),
                     )
 
         # =================================================================
@@ -736,7 +669,7 @@ class H2Engine:
         self,
         matches: list[MatchedEvidence],
         bands: dict[str, list[MatchedEvidence]],
-    ) -> list[ConditionOption]:
+    ) -> tuple[list[ConditionOption], int]:
         """Extract unique condition options from evidence matches.
 
         Groups evidence by condition and returns ConditionOption objects
@@ -752,10 +685,18 @@ class H2Engine:
             "unknown": "unknown",
         }
 
-        # Group by condition (treating None/empty as "Generic/Unknown")
+        # Group by condition (including condition hints embedded in material_name)
         condition_groups: dict[str, list[MatchedEvidence]] = defaultdict(list)
+        unresolved_count = 0
         for m in matches:
-            cond = m.record.condition or "Generic/Unknown"
+            resolved = self._resolve_condition(
+                m.record.condition or "",
+                m.record.material_name,
+                m.record.source_document,
+            )
+            cond = resolved.display_label
+            if resolved.needs_review:
+                unresolved_count += 1
             condition_groups[cond].append(m)
 
         # Build condition options
@@ -790,7 +731,30 @@ class H2Engine:
         band_priority["unknown"] = len(HEE_BAND_ORDER)
         options.sort(key=lambda o: band_priority.get(o.hee_band, 999))
 
-        return options
+        return options, unresolved_count
+
+    def _resolve_condition(
+        self,
+        raw_condition: str,
+        material_name: str,
+        source_document: str,
+    ):
+        """Resolve condition label through cache-backed LLM normalizer."""
+        from mira.h2.condition_resolver import resolve_condition_label
+
+        return resolve_condition_label(
+            raw_condition=raw_condition,
+            material_name=material_name,
+            source_document=source_document,
+        )
+
+    def _condition_label(self, record: EvidenceRecord) -> str:
+        """Resolve display condition from alias table / LLM cache."""
+        return self._resolve_condition(
+            record.condition or "",
+            record.material_name,
+            record.source_document,
+        ).display_label
 
     def _generate_rationale(
         self,
@@ -874,6 +838,54 @@ class H2Engine:
             "band_distribution": dict(band_counts),
             "family_distribution": dict(family_counts),
             "source_distribution": dict(source_counts),
+        }
+
+    def get_condition_options(self, material: str) -> dict:
+        """Return condition options for a material without requiring full query.
+
+        This is used by UI dropdown/autocomplete to pre-populate known
+        heat-treatment conditions before running a full compatibility check.
+        """
+        self._ensure_loaded()
+        matches = self._find_matches(material)
+        if not matches:
+            return {
+                "has_matches": False,
+                "canonical_material": None,
+                "match_type": "none",
+                "available_conditions": [],
+                "band_distribution": {},
+                "requires_clarification": False,
+            }
+
+        bands = defaultdict(list)
+        for m in matches:
+            bands[m.record.hee_band].append(m)
+
+        options, unresolved_count = self._extract_condition_options(matches, bands)
+        unique_bands = {opt.hee_band for opt in options}
+        best_match = max(matches, key=lambda m: m.match_score)
+        canonical = get_canonical_name(material)
+        if not canonical:
+            canonical = best_match.record.material_name
+
+        return {
+            "has_matches": True,
+            "canonical_material": canonical,
+            "match_type": best_match.match_type,
+            "available_conditions": [
+                {
+                    "condition_name": opt.condition_name,
+                    "hee_band": opt.hee_band,
+                    "verdict_if_selected": opt.verdict_if_selected,
+                    "evidence_count": opt.evidence_count,
+                    "source": opt.source,
+                }
+                for opt in options
+            ],
+            "band_distribution": {band: len(records) for band, records in bands.items()},
+            "requires_clarification": len(options) > 1 and len(unique_bands) > 1,
+            "unresolved_condition_count": unresolved_count,
         }
 
 

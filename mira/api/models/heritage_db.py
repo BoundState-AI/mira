@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 from typing import Any, Dict, List, Optional
 
 import psycopg2
@@ -36,6 +37,11 @@ from psycopg2.extras import RealDictCursor
 from mira.core.db_config import get_db_connection_params
 
 logger = logging.getLogger(__name__)
+
+
+def _heritage_db_disabled() -> bool:
+    """Check whether heritage DB integration is disabled via environment."""
+    return os.getenv("MIRA_DISABLE_HERITAGE_DB", "").strip().lower() in {"1", "true", "yes"}
 
 # SQL for table creation (idempotent)
 CREATE_TABLE_SQL = """
@@ -54,6 +60,9 @@ CREATE INDEX IF NOT EXISTS idx_heritage_failures_material_key
 
 def _get_connection():
     """Get a psycopg2 connection using centralised config."""
+    if _heritage_db_disabled():
+        raise RuntimeError("heritage DB disabled via MIRA_DISABLE_HERITAGE_DB")
+
     try:
         from mira.core.db_config import get_db_connection_params
         return psycopg2.connect(**get_db_connection_params())
@@ -72,6 +81,10 @@ def _get_connection():
 
 def ensure_table() -> None:
     """Create the heritage_failures table if it does not exist."""
+    if _heritage_db_disabled():
+        logger.info("[HERITAGE_DB] Skipping table ensure (MIRA_DISABLE_HERITAGE_DB enabled)")
+        return
+
     conn = _get_connection()
     try:
         with conn.cursor() as cur:
@@ -98,6 +111,9 @@ def get_heritage_records(material_key: str) -> List[Dict[str, Any]]:
         [{"failure_id": str, "material_key": str,
           "failure_environment": dict, "failure_description": str}, ...]
     """
+    if _heritage_db_disabled():
+        return []
+
     conn = _get_connection()
     try:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
@@ -160,6 +176,10 @@ def insert_heritage_record(
     Returns:
         True if inserted, False on error.
     """
+    if _heritage_db_disabled():
+        logger.info("[HERITAGE_DB] Insert skipped (MIRA_DISABLE_HERITAGE_DB enabled)")
+        return False
+
     conn = _get_connection()
     try:
         with conn.cursor() as cur:

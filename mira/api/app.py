@@ -18,6 +18,7 @@ Safety Critical: True
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 # Load .env BEFORE importing routers (they check env vars at import time)
@@ -29,8 +30,25 @@ if _env_file.exists():
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from . import routers
-import uuid
+from . import routers  # noqa: E402
+from .auth import CognitoAuthzMiddleware, validate_auth_configuration  # noqa: E402
+
+
+def _build_cors_origins() -> list[str]:
+    origins = [
+        "http://localhost:8080",
+        "http://localhost:8081",
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:8080",
+    ]
+    extra_origins = os.getenv("CORS_EXTRA_ORIGINS", "")
+    if extra_origins:
+        origins.extend([o.strip() for o in extra_origins.split(",") if o.strip()])
+    cognito_ui_origin = os.getenv("COGNITO_HOSTED_UI_ORIGIN", "").strip()
+    if cognito_ui_origin:
+        origins.append(cognito_ui_origin)
+    return sorted(set(origins))
 
 
 def create_app() -> FastAPI:
@@ -38,10 +56,13 @@ def create_app() -> FastAPI:
 
     app = FastAPI(title="BoundState API", version="0.1.0")
 
-    # CORS middleware for frontend development
+    validate_auth_configuration()
+    app.add_middleware(CognitoAuthzMiddleware)
+
+    # CORS middleware for frontend development and Cognito-authenticated clients
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:8080", "http://localhost:8081", "http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:8080"],
+        allow_origins=_build_cors_origins(),
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -73,6 +94,7 @@ def create_app() -> FastAPI:
     include_with_api_alias(routers.mua_router, prefix="/mua", tags=["mua"])
     include_with_api_alias(routers.mua_v6_router, prefix="/mua/v6", tags=["mua-v6"])
     include_with_api_alias(routers.mua_v7_router, prefix="/mua/v7", tags=["mua-v7"])
+    include_with_api_alias(routers.mua_v10_router, prefix="/mua/v10", tags=["mua-v10"])
     include_with_api_alias(routers.matchmaker_router, prefix="/mua/matchmaker", tags=["mua-matchmaker-v8"])
 
     # M&P Plan Generator V1 + V2 (Codex)
@@ -100,6 +122,18 @@ def create_app() -> FastAPI:
     async def api_health() -> dict[str, str]:
         """Backward-compatible health endpoint for /api clients."""
         return {"status": "ok"}
+
+    # Startup instrumentation: prove which Python + app is serving
+    import logging as _logging
+    _startup_log = _logging.getLogger("mira.startup")
+    import sys as _sys
+    _startup_log.warning(
+        "APP IDENTITY  python=%s  app_module=%s  routes=%d  mua_v10_routes=%s",
+        _sys.executable,
+        __file__,
+        len([r for r in app.router.routes if hasattr(r, "path")]),
+        [r.path for r in app.router.routes if hasattr(r, "path") and "mua/v10" in r.path],
+    )
 
     return app
 

@@ -555,6 +555,7 @@ from core.models.answer import AnswerSeverity, EvidenceItem
 from .models import (
     H2CompatibilityRequest,
     H2CompatibilityResponse,
+    H2ConditionLookupResponse,
     HydrogenPhase,
     ConditionOptionResponse,
 )
@@ -615,7 +616,7 @@ def evaluate_h2_compatibility(request: H2CompatibilityRequest) -> H2Compatibilit
         result = engine.query(
             material=request.material_key,
             pressure_psi=request.pressure_psia,
-            condition=None,  # Could parse from material_key if needed
+            condition=request.condition,
         )
 
         # Convert evidence to EvidenceItem
@@ -697,6 +698,61 @@ def evaluate_h2_compatibility(request: H2CompatibilityRequest) -> H2Compatibilit
             rationale=f"H2 evaluation error: {str(e)}",
             evidence=[],
             notes="Check server logs for details",
+        )
+
+
+def lookup_h2_conditions(material_key: str) -> H2ConditionLookupResponse:
+    """Lookup known heat-treatment conditions for a material from H2 evidence."""
+    material = (material_key or "").strip()
+    if not material:
+        return H2ConditionLookupResponse(
+            material_key=material_key,
+            has_matches=False,
+            notes="material_key is required",
+        )
+
+    engine = _get_h2_simple_engine()
+    if engine is None:
+        return H2ConditionLookupResponse(
+            material_key=material,
+            has_matches=False,
+            notes="H2 Knowledge Twin not available",
+        )
+
+    try:
+        payload = engine.get_condition_options(material)
+        options = [
+            ConditionOptionResponse(
+                condition_name=str(item.get("condition_name", "")),
+                hee_band=str(item.get("hee_band", "unknown")),
+                verdict_if_selected=str(item.get("verdict_if_selected", "unknown")),
+                evidence_count=int(item.get("evidence_count", 0)),
+                source=str(item.get("source", "unknown")),
+            )
+            for item in payload.get("available_conditions", [])
+            if isinstance(item, dict) and item.get("condition_name")
+        ]
+        return H2ConditionLookupResponse(
+            material_key=material,
+            canonical_material=payload.get("canonical_material"),
+            has_matches=bool(payload.get("has_matches")),
+            requires_clarification=bool(payload.get("requires_clarification")),
+            match_type=str(payload.get("match_type", "none")),
+            available_conditions=options,
+            band_distribution=payload.get("band_distribution") or {},
+            unresolved_condition_count=int(payload.get("unresolved_condition_count") or 0),
+            notes=(
+                f"{int(payload.get('unresolved_condition_count') or 0)} condition label(s) need review."
+                if int(payload.get("unresolved_condition_count") or 0) > 0
+                else (None if options else "No condition-specific evidence variants found for this material.")
+            ),
+        )
+    except Exception as exc:
+        LOGGER.error("H2 condition lookup failed for %s: %s", material, exc)
+        return H2ConditionLookupResponse(
+            material_key=material,
+            has_matches=False,
+            notes=f"H2 condition lookup error: {exc}",
         )
 
 

@@ -109,6 +109,15 @@ class TestCanonicalLookup:
     def test_not_found(self):
         assert get_canonical_name("xyzalloy") is None
 
+    @pytest.mark.parametrize("query", [
+        "Ti 6/4",
+        "Ti 6 4",
+        "Ti-6-4",
+        "Titanium 6-4",
+    ])
+    def test_ti64_shorthand_variants(self, query):
+        assert get_canonical_name(query) == "Ti-6Al-4V"
+
 
 # =============================================================================
 # ENGINE TESTS - KNOWN FAILURE CASES
@@ -165,6 +174,13 @@ class TestKnownFailures:
         assert result.verdict != Verdict.UNKNOWN, "MA 754 should find matches"
         assert result.hee_band == "extreme", \
             f"MA 754 should show extreme, got {result.hee_band}"
+
+    @pytest.mark.parametrize("query", ["Ti 6/4", "Ti 6 4", "Ti-6-4"])
+    def test_ti64_query_variants_find_evidence(self, engine, query):
+        """Common Ti-6Al-4V shorthand variants should resolve deterministically."""
+        result = engine.query(query)
+        assert result.verdict != Verdict.UNKNOWN, f"{query} should find Ti-6Al-4V evidence"
+        assert result.evidence_count > 0
 
 
 # =============================================================================

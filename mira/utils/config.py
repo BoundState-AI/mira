@@ -285,8 +285,25 @@ class AppConfig(BaseSettings):
     @classmethod
     def validate_environment(cls, v):
         """Validate and normalize environment value."""
+        if isinstance(v, Environment):
+            return v.value
+
         if isinstance(v, str):
-            v = v.lower()
+            normalized = v.strip().lower()
+            aliases = {
+                "prod": Environment.PRODUCTION.value,
+                "production": Environment.PRODUCTION.value,
+                "stage": Environment.STAGING.value,
+                "staging": Environment.STAGING.value,
+                "stg": Environment.STAGING.value,
+                "dev": Environment.DEVELOPMENT.value,
+                "development": Environment.DEVELOPMENT.value,
+                "test": Environment.TEST.value,
+                "testing": Environment.TEST.value,
+                "qa": Environment.TEST.value,
+            }
+            return aliases.get(normalized, normalized)
+
         return v
         
     @field_validator("port")

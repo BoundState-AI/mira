@@ -13,6 +13,7 @@ import re
 from typing import Any, Dict, List
 
 from data_laundering.bedrock_client import LLMClient
+from mira.providers.llm_provider import complete as llm_complete, resolve_model
 
 from .models import RuleDecisionPacket
 
@@ -378,35 +379,26 @@ async def format_decision_haiku(
     bedrock_region = os.environ.get("AWS_REGION", os.environ.get("BEDROCK_REGION", "us-east-1"))
     model_bedrock = os.environ.get(
         "BSMH_HAIKU_BEDROCK_MODEL",
-        "anthropic.claude-3-haiku-20240307-v1:0",
+        resolve_model("haiku"),
     )
     model_direct = os.environ.get(
         "BSMH_HAIKU_DIRECT_MODEL",
-        "claude-3-5-haiku-20241022",
+        resolve_model("haiku"),
     )
     max_tokens = int(os.environ.get("BSMH_HAIKU_MAX_TOKENS", "900"))
 
     def _call_haiku() -> str:
         try:
-            if use_bedrock:
-                from anthropic import AnthropicBedrock
-
-                client = AnthropicBedrock(aws_region=bedrock_region)
-                model = model_bedrock
-            else:
-                from anthropic import Anthropic
-
-                client = Anthropic()
-                model = model_direct
-
-            message = client.messages.create(
+            model = model_bedrock if use_bedrock else model_direct
+            response = llm_complete(
+                system=_FORMATTER_SYSTEM_PROMPT,
+                user=user_message,
                 model=model,
                 max_tokens=max_tokens,
                 temperature=0.0,
-                system=_FORMATTER_SYSTEM_PROMPT,
-                messages=[{"role": "user", "content": user_message}],
+                provider="bedrock-converse" if use_bedrock else None,
             )
-            return (message.content[0].text or "").strip()
+            return response.text.strip()
         except Exception as exc:
             LOGGER.warning("[BSMH] Haiku formatter call failed; using template fallback: %s", exc)
             return ""
@@ -451,40 +443,27 @@ async def format_decision_sonnet(
     user_message = json.dumps(payload, indent=2)
 
     use_bedrock = os.environ.get("USE_BEDROCK", "0").lower() in ("1", "true", "yes")
-    bedrock_region = os.environ.get("AWS_REGION", os.environ.get("BEDROCK_REGION", "us-east-1"))
     model_bedrock = os.environ.get(
         "BSMH_SONNET_BEDROCK_MODEL",
-        "anthropic.claude-3-5-sonnet-20241022-v2:0",
+        resolve_model("sonnet"),
     )
     model_direct = os.environ.get(
         "BSMH_SONNET_DIRECT_MODEL",
-        "claude-sonnet-4-5-20250929",
+        resolve_model("sonnet"),
     )
     max_tokens = int(os.environ.get("BSMH_SONNET_MAX_TOKENS", "1200"))
 
     def _call_sonnet() -> str:
-        if use_bedrock:
-            from anthropic import AnthropicBedrock
-
-            client = AnthropicBedrock(aws_region=bedrock_region)
-            model = model_bedrock
-        else:
-            from anthropic import Anthropic
-            api_key = (os.environ.get("ANTHROPIC_API_KEY") or "").strip()
-            if not api_key:
-                raise RuntimeError("ANTHROPIC_API_KEY is missing or empty.")
-
-            client = Anthropic(api_key=api_key)
-            model = model_direct
-
-        message = client.messages.create(
+        model = model_bedrock if use_bedrock else model_direct
+        response = llm_complete(
+            system=_FORMATTER_SYSTEM_PROMPT,
+            user=user_message,
             model=model,
             max_tokens=max_tokens,
             temperature=0.0,
-            system=_FORMATTER_SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": user_message}],
+            provider="bedrock-converse" if use_bedrock else None,
         )
-        text = (message.content[0].text or "").strip()
+        text = response.text.strip()
         if not text:
             raise RuntimeError("Sonnet formatter returned empty response.")
         return text
@@ -657,25 +636,25 @@ async def format_fracture_decision_sonnet(
     }
     user_message = json.dumps(payload, indent=2)
 
-    model = os.environ.get("BSMH_SONNET_DIRECT_MODEL", "claude-sonnet-4-5-20250929")
+    use_bedrock = os.environ.get("USE_BEDROCK", "0").lower() in ("1", "true", "yes")
+    model_bedrock = os.environ.get(
+        "BSMH_SONNET_BEDROCK_MODEL",
+        resolve_model("sonnet"),
+    )
+    model_direct = os.environ.get("BSMH_SONNET_DIRECT_MODEL", resolve_model("sonnet"))
     max_tokens = int(os.environ.get("BSMH_SONNET_MAX_TOKENS", "1200"))
 
     def _call_sonnet() -> str:
-        from anthropic import Anthropic
-
-        api_key = (os.environ.get("ANTHROPIC_API_KEY") or "").strip()
-        if not api_key:
-            raise RuntimeError("ANTHROPIC_API_KEY missing")
-
-        client = Anthropic(api_key=api_key)
-        message = client.messages.create(
+        model = model_bedrock if use_bedrock else model_direct
+        response = llm_complete(
+            system=_FC_FORMATTER_SYSTEM_PROMPT,
+            user=user_message,
             model=model,
             max_tokens=max_tokens,
             temperature=0.0,
-            system=_FC_FORMATTER_SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": user_message}],
+            provider="bedrock-converse" if use_bedrock else None,
         )
-        return (message.content[0].text or "").strip()
+        return response.text.strip()
 
     loop = asyncio.get_event_loop()
     try:

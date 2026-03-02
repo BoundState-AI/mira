@@ -88,6 +88,10 @@ class H2CompatibilityRequest(BaseModel):
         default=None,
         description="Material yield strength in ksi (critical for HE risk).",
     )
+    condition: Optional[str] = Field(
+        default=None,
+        description="Optional heat-treatment/material condition filter (e.g., ST 1900F, annealed).",
+    )
 
 
 class H2CompatibilityResponse(EngineAnswer):
@@ -131,3 +135,91 @@ class H2CompatibilityResponse(EngineAnswer):
         default=None,
         description="Distribution of HEE bands across all evidence (e.g., {'extreme': 2, 'severe': 1}).",
     )
+
+
+class H2ConditionLookupResponse(BaseModel):
+    """Condition lookup response for UI pre-fill/selection."""
+
+    material_key: str = Field(
+        description="Requested material identifier/text.",
+    )
+    canonical_material: Optional[str] = Field(
+        default=None,
+        description="Resolved canonical material name if known.",
+    )
+    has_matches: bool = Field(
+        default=False,
+        description="True when evidence records were found for the material.",
+    )
+    requires_clarification: bool = Field(
+        default=False,
+        description="True when multiple conditions have different HEE bands.",
+    )
+    match_type: str = Field(
+        default="none",
+        description="Best match quality (exact/alias/fuzzy/family/none).",
+    )
+    available_conditions: List[ConditionOptionResponse] = Field(
+        default_factory=list,
+        description="Available heat-treatment condition options for this material.",
+    )
+    band_distribution: Optional[dict[str, int]] = Field(
+        default=None,
+        description="HEE band counts across matched evidence records.",
+    )
+    unresolved_condition_count: int = Field(
+        default=0,
+        description="Number of matched records whose condition label needs review.",
+    )
+    notes: Optional[str] = Field(
+        default=None,
+        description="Optional informational note for the UI.",
+    )
+
+
+class H2ConditionAliasRecord(BaseModel):
+    """Condition alias-cache record for review/approval."""
+
+    raw_key: str
+    raw_text: str
+    canonical_condition: str
+    display_label: str
+    is_condition: bool
+    confidence: Optional[float] = None
+    resolver_provider: Optional[str] = None
+    resolver_model: Optional[str] = None
+    source_document: Optional[str] = None
+    material_name: Optional[str] = None
+    needs_review: bool = False
+    human_verified: bool = False
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
+
+
+class H2ConditionAliasListResponse(BaseModel):
+    """Condition alias review listing for the UI."""
+
+    material_key: Optional[str] = None
+    unresolved_only: bool = True
+    count: int = 0
+    aliases: List[H2ConditionAliasRecord] = Field(default_factory=list)
+
+
+class H2ConditionAliasVerifyRequest(BaseModel):
+    """Request to human-verify/override a condition alias mapping."""
+
+    raw_key: str
+    display_label: str
+    canonical_condition: Optional[str] = None
+    is_condition: bool = True
+    raw_text: Optional[str] = None
+    source_document: Optional[str] = None
+    material_name: Optional[str] = None
+
+
+class H2ConditionAliasVerifyResponse(BaseModel):
+    """Response after verifying a condition alias."""
+
+    status: str = "ok"
+    cache_entries_cleared: int = 0
+    alias: H2ConditionAliasRecord

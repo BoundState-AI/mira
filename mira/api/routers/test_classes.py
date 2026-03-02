@@ -101,6 +101,120 @@ RATING_FIELDS = [
     'fri_rating', 'crk_rating', 'frac_rating', 'crp_rating'
 ]
 
+# Reverse mapping: contract_id -> URL slug
+CONTRACT_TO_SLUG = {v: k for k, v in SLUG_TO_CONTRACT.items()}
+
+# Display names for test classes (matches frontend TEST_CLASS_FALLBACK)
+TEST_CLASS_NAMES = {
+    'tvs-outgassing': 'TVS Outgassing',
+    'flammability': 'Flammability',
+    'mechanical-impact': 'Mechanical Impact',
+    'toxicity': 'Toxicity',
+    'stress-corrosion-cracking': 'Stress Corrosion Cracking',
+    'corrosion': 'Corrosion',
+    'fluid-compatibility': 'Fluid Compatibility',
+    'odor': 'Odor',
+    'flash-fire': 'Flash Fire',
+    'tensile-strength': 'Tensile Strength',
+    'pneumatic-impact': 'Pneumatic Impact',
+    'promoted-combustion': 'Promoted Combustion',
+    'particle-impact': 'Particle Impact',
+    'electrical-overload': 'Electrical Overload',
+    'vcm-optical': 'VCM Optical',
+    'electric-wire-insulation': 'Electric Wire Insulation',
+    'low-cycle-fatigue': 'Low Cycle Fatigue',
+    'fungus': 'Fungus',
+    'fracture-mechanics': 'Fracture Mechanics',
+    'creep-rupture': 'Creep Rupture',
+    'high-cycle-fatigue': 'High Cycle Fatigue',
+    'friction-heat': 'Friction Heat',
+    'crack-growth': 'Crack Growth',
+    'arc-tracking': 'Arc Tracking',
+}
+
+# Canonical rating fields per test type — single source of truth.
+# Each entry: {'fields': [field_names_in_priority_order], 'context': label_or_None}
+# For multi-context types (toxicity, flash-fire), each context gets its own entry.
+# For single-rating types, one entry with context=None; fields tried in order.
+CANONICAL_RATINGS = {
+    'tvs_outgassing_report': [
+        {'fields': ['tvs_rating', 'rating'], 'context': None},
+    ],
+    'flammability_report': [
+        {'fields': ['flam_rtg', 'flam_rating', 'rating'], 'context': None},
+    ],
+    'mechanical_impact_report': [
+        {'fields': ['mech_rating', 'rating'], 'context': None},
+    ],
+    'toxicity_report': [
+        {'fields': ['tox_emurating'], 'context': 'EMU'},
+        {'fields': ['tox_orionrating'], 'context': 'Orion'},
+        {'fields': ['tox_shuttlerating'], 'context': 'Shuttle'},
+        {'fields': ['tox_spacestationrating', 'tox_spacestationrtg'], 'context': 'Space Station'},
+    ],
+    'stress_corrosion_cracking_report': [
+        {'fields': ['stress_rating', 'rating'], 'context': None},
+    ],
+    'corrosion_report': [
+        {'fields': ['cor_rating', 'rating'], 'context': None},
+    ],
+    'fluid_compatibility_report': [
+        {'fields': ['fluc_rating', 'fluid_rating', 'rating'], 'context': None},
+    ],
+    'odor_report': [
+        {'fields': ['odor_rating', 'rating'], 'context': None},
+    ],
+    'flash_fire_report': [
+        {'fields': ['fla_firerating'], 'context': 'Fire'},
+        {'fields': ['fla_flashrating'], 'context': 'Flash'},
+    ],
+    'tensile_strength_report': [
+        {'fields': ['tens_rating', 'rating'], 'context': None},
+    ],
+    'pneumatic_impact_report': [
+        {'fields': ['pneu_rating', 'rating'], 'context': None},
+    ],
+    'promoted_combustion_report': [
+        {'fields': ['prom_rating', 'rating'], 'context': None},
+    ],
+    'particle_impact_report': [
+        {'fields': ['partimp_rating', 'rating'], 'context': None},
+    ],
+    'electrical_overload_report': [
+        {'fields': ['elo_rating', 'rating'], 'context': None},
+    ],
+    'vcm_optical_report': [
+        {'fields': ['vcm_rating', 'rating'], 'context': None},
+    ],
+    'electric_wire_insulation_report': [
+        {'fields': ['ewi_rating', 'rating'], 'context': None},
+    ],
+    'low_cycle_fatigue_report': [
+        {'fields': ['lowcyc_rating', 'rating'], 'context': None},
+    ],
+    'fungus_report': [
+        {'fields': ['fung_rating', 'rating'], 'context': None},
+    ],
+    'fracture_mechanics_report': [
+        {'fields': ['frac_rating', 'rating'], 'context': None},
+    ],
+    'creep_rupture_report': [
+        {'fields': ['crp_rating', 'rating'], 'context': None},
+    ],
+    'high_cycle_fatigue_report': [
+        {'fields': ['highcyc_rating', 'rating'], 'context': None},
+    ],
+    'friction_heat_report': [
+        {'fields': ['fri_rating', 'rating'], 'context': None},
+    ],
+    'crack_growth_report': [
+        {'fields': ['crk_rating', 'rating'], 'context': None},
+    ],
+    'arc_tracking_report': [
+        {'fields': ['arc_rating', 'rating'], 'context': None},
+    ],
+}
+
 
 def get_db_connection():
     """Get database connection using centralized config."""
@@ -125,6 +239,28 @@ def extract_rating(payload: dict) -> Optional[str]:
         if payload.get(field):
             return payload.get(field)
     return None
+
+
+def extract_canonical_ratings(contract_id: str, payload: dict) -> list:
+    """Extract ratings with context labels using the canonical mapping.
+
+    Returns list of {'value': str, 'context': str|None} dicts.
+    For multi-context types (toxicity → EMU/Orion/Shuttle/ISS,
+    flash-fire → Fire/Flash), returns one entry per populated context.
+    For single-rating types, returns one entry with context=None.
+    """
+    entries = CANONICAL_RATINGS.get(contract_id, [])
+    ratings = []
+    for entry in entries:
+        value = None
+        for field in entry['fields']:
+            v = payload.get(field)
+            if v and str(v).strip() and str(v).strip().upper() not in ('NULL', 'N/A', 'NONE'):
+                value = str(v).strip()
+                break
+        if value:
+            ratings.append({'value': value, 'context': entry.get('context')})
+    return ratings
 
 
 def build_rating_filter(contract_id: str, rating: str, rating_type: Optional[str] = None):
@@ -159,6 +295,28 @@ def build_rating_filter(contract_id: str, rating: str, rating_type: Optional[str
         params = [rating] * len(rating_conditions)
 
     return where_clause, params
+
+
+@router.get("/api/materials/types")
+async def get_material_types():
+    """Get list of available material types for filter dropdowns."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor.execute("""
+            SELECT material_type_name, COUNT(*) as count
+            FROM materials
+            WHERE material_type_name IS NOT NULL
+            GROUP BY material_type_name
+            ORDER BY count DESC
+        """)
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return {"types": [{"name": r["material_type_name"], "count": r["count"]} for r in rows]}
+    except Exception as e:
+        logger.error(f"Error fetching material types: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/api/test-classes/counts")
@@ -481,6 +639,174 @@ async def export_test_records(
 
     except Exception as e:
         logger.error(f"Error exporting test records for {test_type}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/api/materials/search")
+async def search_materials(
+    q: str = Query(..., min_length=2, max_length=100, description="Search query"),
+    limit: int = Query(20, ge=1, le=50, description="Max materials to return"),
+    material_type: Optional[str] = Query(None, description="Filter by material type (Metal, Polymer, etc.)"),
+    test_class: Optional[str] = Query(None, description="Filter by test class slug (flammability, toxicity, etc.)"),
+    rating: Optional[str] = Query(None, description="Filter by rating value (A, B, X, etc.)"),
+):
+    """Search materials across all test classes and return test profile scorecards.
+
+    Queries the materials table by designation, composition, material type,
+    and material code, then aggregates all test records across every test class
+    for each matching material. Returns ratings extracted via the canonical
+    mapping so each test type's rating(s) are normalized and labelled.
+    """
+    # Sanitize input
+    search_sanitized = ''.join(c for c in q[:100] if c.isalnum() or c in ' -_.')
+    if not search_sanitized.strip():
+        return {"query": q, "results": [], "total_materials": 0}
+
+    like = f"%{search_sanitized}%"
+
+    # Resolve optional test_class slug to contract_id
+    filter_contract_id = SLUG_TO_CONTRACT.get(test_class) if test_class else None
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+
+        # Build material WHERE clause
+        mat_conditions = [
+            "(designation ILIKE %s OR composition ILIKE %s OR material_type_name ILIKE %s OR material_code ILIKE %s)"
+        ]
+        mat_params: list = [like, like, like, like]
+
+        if material_type:
+            mat_conditions.append("material_type_name = %s")
+            mat_params.append(material_type)
+
+        mat_where = " AND ".join(mat_conditions)
+
+        # Count total matching materials
+        cursor.execute(f"""
+            SELECT COUNT(DISTINCT material_code) as total
+            FROM materials
+            WHERE {mat_where}
+        """, mat_params)
+        total_materials = cursor.fetchone()['total']
+
+        if total_materials == 0:
+            cursor.close()
+            conn.close()
+            return {"query": q, "results": [], "total_materials": 0}
+
+        # Build silver_report_rows WHERE clause
+        silver_conditions = [
+            "s.normalized_payload->>'materialkey' IN (SELECT material_code FROM matching_materials)"
+        ]
+        silver_params: list = []
+
+        if filter_contract_id:
+            silver_conditions.append("s.contract_id = %s")
+            silver_params.append(filter_contract_id)
+
+        if rating and filter_contract_id:
+            rating_clause, rating_params = build_rating_filter(filter_contract_id, rating)
+            # Prefix table alias on the clause (replace normalized_payload with s.normalized_payload)
+            rating_clause_aliased = rating_clause.replace("normalized_payload", "s.normalized_payload")
+            silver_conditions.append(rating_clause_aliased)
+            silver_params.extend(rating_params)
+
+        silver_where = " AND ".join(silver_conditions)
+
+        # Get one representative test record per (material, test_type) with counts.
+        cursor.execute(f"""
+            WITH matching_materials AS (
+                SELECT DISTINCT ON (material_code)
+                    material_code, designation, composition, material_type_name
+                FROM materials
+                WHERE {mat_where}
+                ORDER BY material_code
+                LIMIT %s
+            ),
+            grouped AS (
+                SELECT
+                    s.normalized_payload->>'materialkey' as material_code,
+                    s.contract_id,
+                    s.row_uid,
+                    s.normalized_payload,
+                    COUNT(*) OVER (
+                        PARTITION BY s.normalized_payload->>'materialkey', s.contract_id
+                    ) as record_count,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY s.normalized_payload->>'materialkey', s.contract_id
+                        ORDER BY s.row_uid DESC
+                    ) as rn
+                FROM silver_report_rows s
+                WHERE {silver_where}
+            )
+            SELECT
+                g.material_code,
+                mm.designation,
+                mm.composition,
+                mm.material_type_name,
+                g.contract_id,
+                g.row_uid,
+                g.normalized_payload,
+                g.record_count
+            FROM grouped g
+            JOIN matching_materials mm ON mm.material_code = g.material_code
+            WHERE g.rn = 1
+            ORDER BY mm.designation, g.contract_id
+        """, [*mat_params, limit, *silver_params])
+
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        # Assemble material scorecards
+        materials: dict = {}
+        for row in rows:
+            mc = row['material_code']
+            if mc not in materials:
+                materials[mc] = {
+                    'material_code': mc,
+                    'designation': row['designation'] or f'Material {mc}',
+                    'composition': row['composition'],
+                    'material_type': row['material_type_name'],
+                    'test_profile': [],
+                }
+
+            contract_id = row['contract_id']
+            slug = CONTRACT_TO_SLUG.get(contract_id)
+            if not slug:
+                continue
+
+            payload = row['normalized_payload'] or {}
+            ratings = extract_canonical_ratings(contract_id, payload)
+
+            materials[mc]['test_profile'].append({
+                'test_class': slug,
+                'test_name': TEST_CLASS_NAMES.get(slug, slug),
+                'record_count': row['record_count'],
+                'record_id': row['row_uid'],
+                'ratings': ratings,
+            })
+
+        # Attach summary counts
+        total_classes = len(SLUG_TO_CONTRACT)
+        results = []
+        for mat in materials.values():
+            mat['tested_classes'] = len(mat['test_profile'])
+            mat['total_classes'] = total_classes
+            results.append(mat)
+
+        return {
+            "query": q,
+            "results": results,
+            "total_materials": total_materials,
+        }
+
+    except Exception as e:
+        logger.error(f"Error in material search: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
 
 
