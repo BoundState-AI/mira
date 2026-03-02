@@ -1,0 +1,448 @@
+[
+  {
+    "id": "FS_U_GH2_THIN",
+    "description": "FS=U in GH2 should be THIN_SCREENING (Test 15 not relevant to hydrogen service).",
+    "input": {
+      "maptis_code": "10392",
+      "material_designation": "A286 CRES",
+      "material_class": "metal",
+      "media": "GH2",
+      "environment": "non-habitable",
+      "ratings": {
+        "FS": "U"
+      }
+    },
+    "expected": {
+      "mua_type": "THIN_SCREENING",
+      "automatable": true,
+      "category": "II",
+      "flag_type": "NO_DATA",
+      "hazard_applies": false,
+      "rationale_must_contain": [
+        "no test data exists",
+        "not in service with the fluids for which this screening was designed"
+      ],
+      "disposition_must_contain": [
+        "accepted",
+        "fs=u reflects absence of screening data"
+      ]
+    }
+  },
+  {
+    "id": "FS_U_N2H4_REAL_GAP",
+    "description": "FS=U in hydrazine class propellant should be REAL_GAP.",
+    "input": {
+      "maptis_code": "10392",
+      "material_designation": "A286 CRES",
+      "material_class": "metal",
+      "media": "N2H4",
+      "environment": "non-habitable",
+      "ratings": {
+        "FS": "U"
+      }
+    },
+    "expected": {
+      "mua_type": "REAL_GAP",
+      "automatable": false,
+      "category": "II",
+      "flag_type": "NO_DATA",
+      "hazard_applies": true
+    }
+  },
+  {
+    "id": "FLAM_C_GH2_ANTI_RULE",
+    "description": "FLAM=C in GH2 with no O2 enrichment should be ANTI_RULE.",
+    "input": {
+      "maptis_code": "10727",
+      "material_designation": "INCONEL 625",
+      "material_class": "metal",
+      "media": "GH2",
+      "environment": "non-habitable",
+      "ratings": {
+        "FLAM": "C"
+      }
+    },
+    "expected": {
+      "mua_type": "ANTI_RULE",
+      "automatable": true,
+      "category": "II",
+      "flag_type": "REAL_FAIL",
+      "hazard_applies": false,
+      "rationale_must_contain": [
+        "failure mode underlying the c rating",
+        "not credible"
+      ],
+      "disposition_must_contain": [
+        "accepted",
+        "does not constitute a hazard"
+      ]
+    }
+  },
+  {
+    "id": "FLAM_C_GOX_REAL_PROBLEM",
+    "description": "FLAM=C in oxygen service should be REAL_PROBLEM.",
+    "input": {
+      "maptis_code": "10727",
+      "material_designation": "INCONEL 625",
+      "material_class": "metal",
+      "media": "GOX",
+      "environment": "non-habitable",
+      "ratings": {
+        "FLAM": "C"
+      }
+    },
+    "expected": {
+      "mua_type": "REAL_PROBLEM",
+      "automatable": false,
+      "category": "I",
+      "flag_type": "REAL_FAIL",
+      "hazard_applies": true
+    }
+  },
+  {
+    "id": "FLAM_I_GH2_INCOMPLETE_PASS",
+    "description": "FLAM=I should be INCOMPLETE_PASS (administrative gap).",
+    "input": {
+      "maptis_code": "10727",
+      "material_designation": "INCONEL 625",
+      "material_class": "metal",
+      "media": "GH2",
+      "environment": "non-habitable",
+      "ratings": {
+        "FLAM": "I"
+      }
+    },
+    "expected": {
+      "mua_type": "INCOMPLETE_PASS",
+      "automatable": true,
+      "category": "II",
+      "flag_type": "ADMIN_GAP",
+      "hazard_applies": false,
+      "rationale_must_contain": [
+        "administrative rather than technical"
+      ],
+      "disposition_must_contain": [
+        "incomplete sample count",
+        "all tested specimens passed"
+      ]
+    }
+  },
+  {
+    "id": "SCC_B_VERIFIED_STANDARD",
+    "description": "SCC=B with batch verification should collapse to STANDARD.",
+    "input": {
+      "maptis_code": "10392",
+      "material_designation": "A286 CRES",
+      "material_class": "metal",
+      "media": "WATER",
+      "environment": "non-habitable",
+      "batch_verified": true,
+      "ratings": {
+        "SCC": "B"
+      }
+    },
+    "expected": {
+      "mua_type": "STANDARD",
+      "automatable": false,
+      "category": null,
+      "flag_type": "BATCH_REQUIRED",
+      "hazard_applies": null
+    }
+  },
+  {
+    "id": "SCC_B_UNVERIFIED_HUMAN",
+    "description": "SCC=B without verification should route to human.",
+    "input": {
+      "maptis_code": "10392",
+      "material_designation": "A286 CRES",
+      "material_class": "metal",
+      "media": "WATER",
+      "environment": "non-habitable",
+      "batch_verified": false,
+      "ratings": {
+        "SCC": "B"
+      }
+    },
+    "expected": {
+      "mua_type": "FLAG_FOR_HUMAN",
+      "automatable": false,
+      "category": "II",
+      "flag_type": "BATCH_REQUIRED",
+      "hazard_applies": null
+    }
+  },
+  {
+    "id": "TOX_U_NONMET_HAB_REAL_GAP",
+    "description": "TOX=U in habitable nonmetallic use should be REAL_GAP.",
+    "input": {
+      "maptis_code": "00367",
+      "material_designation": "PTFE",
+      "material_class": "nonmetallic",
+      "media": "AIR",
+      "environment": "habitable",
+      "ratings": {
+        "TOX": "U"
+      }
+    },
+    "expected": {
+      "mua_type": "REAL_GAP",
+      "automatable": false,
+      "category": "II",
+      "flag_type": "NO_DATA",
+      "hazard_applies": true
+    }
+  },
+  {
+    "id": "TOX_U_METAL_STANDARD",
+    "description": "TOX screening does not apply to metal; should return STANDARD.",
+    "input": {
+      "maptis_code": "10392",
+      "material_designation": "A286 CRES",
+      "material_class": "metal",
+      "media": "AIR",
+      "environment": "habitable",
+      "ratings": {
+        "TOX": "U"
+      }
+    },
+    "expected": {
+      "mua_type": "STANDARD",
+      "automatable": false,
+      "category": null,
+      "flag_type": null,
+      "hazard_applies": null,
+      "screening_applicable": false
+    }
+  },
+  {
+    "id": "TVS_C_NONMET_REAL_PROBLEM",
+    "description": "TVS=C on nonmetallic should be REAL_PROBLEM.",
+    "input": {
+      "maptis_code": "00367",
+      "material_designation": "PTFE",
+      "material_class": "nonmetallic",
+      "media": "VACUUM",
+      "environment": "non-habitable",
+      "ratings": {
+        "TVS": "C"
+      }
+    },
+    "expected": {
+      "mua_type": "REAL_PROBLEM",
+      "automatable": false,
+      "category": "I",
+      "flag_type": "REAL_FAIL",
+      "hazard_applies": true
+    }
+  },
+  {
+    "id": "TVS_C_METAL_STANDARD",
+    "description": "TVS screening does not apply to metal; should return STANDARD.",
+    "input": {
+      "maptis_code": "10392",
+      "material_designation": "A286 CRES",
+      "material_class": "metal",
+      "media": "VACUUM",
+      "environment": "non-habitable",
+      "ratings": {
+        "TVS": "C"
+      }
+    },
+    "expected": {
+      "mua_type": "STANDARD",
+      "automatable": false,
+      "category": null,
+      "flag_type": null,
+      "hazard_applies": null,
+      "screening_applicable": false
+    }
+  },
+  {
+    "id": "CORR_U_LH2_THIN",
+    "description": "CORR=U in LH2 should be THIN_SCREENING due to suppressed corrosion mechanism.",
+    "input": {
+      "maptis_code": "10392",
+      "material_designation": "A286 CRES",
+      "material_class": "metal",
+      "media": "LH2",
+      "environment": "non-habitable",
+      "ratings": {
+        "CORR": "U"
+      }
+    },
+    "expected": {
+      "mua_type": "THIN_SCREENING",
+      "automatable": true,
+      "category": "II",
+      "flag_type": "NO_DATA",
+      "hazard_applies": false
+    }
+  },
+  {
+    "id": "CORR_U_WATER_REAL_GAP",
+    "description": "CORR=U in aqueous service should be REAL_GAP.",
+    "input": {
+      "maptis_code": "10392",
+      "material_designation": "A286 CRES",
+      "material_class": "metal",
+      "media": "WATER",
+      "environment": "non-habitable",
+      "ratings": {
+        "CORR": "U"
+      }
+    },
+    "expected": {
+      "mua_type": "REAL_GAP",
+      "automatable": false,
+      "category": "II",
+      "flag_type": "NO_DATA",
+      "hazard_applies": true
+    }
+  },
+  {
+    "id": "SCC_C_LH2_ANTI_RULE",
+    "description": "SCC=C in LH2 should be ANTI_RULE because aqueous SCC mechanism is suppressed.",
+    "input": {
+      "maptis_code": "10392",
+      "material_designation": "A286 CRES",
+      "material_class": "metal",
+      "media": "LH2",
+      "environment": "non-habitable",
+      "ratings": {
+        "SCC": "C"
+      }
+    },
+    "expected": {
+      "mua_type": "ANTI_RULE",
+      "automatable": true,
+      "category": "II",
+      "flag_type": "REAL_FAIL",
+      "hazard_applies": false,
+      "rationale_must_contain": [
+        "requires aqueous environment"
+      ]
+    }
+  },
+  {
+    "id": "SCC_C_WATER_REAL_PROBLEM",
+    "description": "SCC=C in water should be REAL_PROBLEM.",
+    "input": {
+      "maptis_code": "10392",
+      "material_designation": "A286 CRES",
+      "material_class": "metal",
+      "media": "WATER",
+      "environment": "non-habitable",
+      "ratings": {
+        "SCC": "C"
+      }
+    },
+    "expected": {
+      "mua_type": "REAL_PROBLEM",
+      "automatable": false,
+      "category": "I",
+      "flag_type": "REAL_FAIL",
+      "hazard_applies": true
+    }
+  },
+  {
+    "id": "TOX_K_BAD_DATA",
+    "description": "TOX=K should route to human as BAD_DATA.",
+    "input": {
+      "maptis_code": "00367",
+      "material_designation": "PTFE",
+      "material_class": "nonmetallic",
+      "media": "AIR",
+      "environment": "habitable",
+      "ratings": {
+        "TOX": "K"
+      }
+    },
+    "expected": {
+      "mua_type": "FLAG_FOR_HUMAN",
+      "automatable": false,
+      "category": null,
+      "flag_type": "BAD_DATA",
+      "hazard_applies": null
+    }
+  },
+  {
+    "id": "FLAM_U_GH2_THIN",
+    "description": "FLAM=U in GH2 should be THIN_SCREENING.",
+    "input": {
+      "maptis_code": "10727",
+      "material_designation": "INCONEL 625",
+      "material_class": "metal",
+      "media": "GH2",
+      "environment": "non-habitable",
+      "ratings": {
+        "FLAM": "U"
+      }
+    },
+    "expected": {
+      "mua_type": "THIN_SCREENING",
+      "automatable": true,
+      "category": "II",
+      "flag_type": "NO_DATA",
+      "hazard_applies": false
+    }
+  },
+  {
+    "id": "FLAM_U_GOX_REAL_GAP",
+    "description": "FLAM=U in oxygen service should be REAL_GAP.",
+    "input": {
+      "maptis_code": "10727",
+      "material_designation": "INCONEL 625",
+      "material_class": "metal",
+      "media": "GOX",
+      "environment": "non-habitable",
+      "ratings": {
+        "FLAM": "U"
+      }
+    },
+    "expected": {
+      "mua_type": "REAL_GAP",
+      "automatable": false,
+      "category": "II",
+      "flag_type": "NO_DATA",
+      "hazard_applies": true
+    }
+  },
+  {
+    "id": "CORR_U_GH2_THIN",
+    "description": "CORR=U in GH2 should be THIN_SCREENING because corrosion hazard does not apply in dry hydrogen service.",
+    "input": {
+      "maptis_code": "10392",
+      "material_designation": "A286 CRES",
+      "material_class": "metal",
+      "media": "GH2",
+      "environment": "non-habitable",
+      "ratings": {
+        "CORR": "U"
+      }
+    },
+    "expected": {
+      "mua_type": "THIN_SCREENING",
+      "automatable": true,
+      "category": "II"
+    }
+  },
+  {
+    "id": "SCC_C_WATER_REAL_PROBLEM",
+    "description": "SCC=C in aqueous service should be REAL_PROBLEM.",
+    "input": {
+      "maptis_code": "10392",
+      "material_designation": "A286 CRES",
+      "material_class": "metal",
+      "media": "WATER",
+      "environment": "non-habitable",
+      "ratings": {
+        "SCC": "C"
+      }
+    },
+    "expected": {
+      "mua_type": "REAL_PROBLEM",
+      "automatable": false,
+      "category": "I"
+    }
+  }
+]
