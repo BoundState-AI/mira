@@ -1,5 +1,5 @@
 {
-  "title": "テストクラス",
+  "title": "MAPTIS Search",
   "description": "テストタイプ別に整理された材料テストデータを閲覧",
   "loading": "読み込み中...",
   "summary": "{{count}}件のテスト種別 | 合計{{total}}件のテスト記録",
@@ -136,7 +136,7 @@
     "unknownTestType": "不明なテスト種別",
     "notFoundTitle": "テスト種別が見つかりません",
     "notFoundDescription": "要求されたテスト種別は見つかりませんでした。",
-    "backToClasses": "テストクラスへ戻る",
+    "backToClasses": "MAPTIS Searchへ戻る",
     "totalRecords": "合計{{count}}件の記録",
     "searchPlaceholder": "材料を検索...",
     "loadingRecords": "記録を読み込み中...",

@@ -5,14 +5,25 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  define: {
+    global: "globalThis",
+  },
   server: {
     host: "::",
     port: 8080,
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8000',
+        target: process.env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:8000',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        rewrite: (requestPath) => {
+          // Keep /api prefix for MUA v10 to support backend builds that only
+          // expose /api/mua/v10, while preserving legacy rewrite behavior for
+          // the rest of the API surface.
+          if (requestPath.startsWith('/api/mua/v10')) {
+            return requestPath;
+          }
+          return requestPath.replace(/^\/api/, '');
+        },
         timeout: 600000, // 10 minutes for long-running extractions
         proxyTimeout: 600000,
         selfHandleResponse: false, // Let proxy handle response normally

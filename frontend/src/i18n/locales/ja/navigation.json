@@ -1,12 +1,13 @@
 {
   "mpPlan": "M&Pプラン",
   "query": "クエリ",
-  "testClasses": "テストクラス",
+  "testClasses": "MAPTIS Search",
   "miulBuilder": "MIULビルダー",
   "dtEditor": "DTエディター",
   "muaV8": "MUA V8",
   "muaGenerator": "MUAジェネレーター",
   "compliance": "コンプライアンス",
   "gasCompatibility": "ガス適合性",
-  "knowledgeTwins": "ナレッジツイン"
+  "knowledgeTwins": "ナレッジツイン",
+  "muaV10": "MUA Writer"
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, DragEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlaskConical, FileStack, FileCheck, Brain, ClipboardList, FolderTree, GripVertical, RotateCcw, Zap, Sparkles, LucideIcon } from 'lucide-react';
+import { FlaskConical, FileStack, Brain, ClipboardList, FolderTree, GripVertical, RotateCcw, Zap, Sparkles, Wind, LucideIcon } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { BoundStateLogo } from '@/components/BoundStateLogo';
 import { LanguageSelector } from '@/components/LanguageSelector';
@@ -33,12 +33,11 @@ interface NavItem {
 const DEFAULT_NAV_ITEMS: NavItem[] = [
   { id: 'mp-plan', title: 'M&P Plan', navKey: 'mpPlan', url: '/mp-plan', icon: ClipboardList },
   { id: 'query', title: 'MIRA Query', navKey: 'query', url: '/query', icon: Zap },
-  { id: 'gas-compatibility', title: 'Gas Compatibility', navKey: 'gasCompatibility', url: '/gas-compatibility', icon: FlaskConical },
-  { id: 'test-classes', title: 'Test Classes', navKey: 'testClasses', url: '/test-classes', icon: FlaskConical },
+  { id: 'gas-compatibility', title: 'Gas Compatibility', navKey: 'gasCompatibility', url: '/gas-compatibility', icon: Wind },
+  { id: 'test-classes', title: 'MAPTIS Search', navKey: 'testClasses', url: '/test-classes', icon: FlaskConical },
   { id: 'miul', title: 'MIUL Builder', navKey: 'miulBuilder', url: '/miul', icon: FileStack },
   { id: 'dt-editor', title: 'DT Editor', navKey: 'dtEditor', url: '/dt-editor', icon: FolderTree },
-  { id: 'mua-v8', title: 'MUA V8', navKey: 'muaV8', url: '/mua-v8', icon: Sparkles },
-  { id: 'mua-v7', title: 'MUA Generator', navKey: 'muaGenerator', url: '/mua-v7', icon: FileCheck },
+  { id: 'mua-v10', title: 'MUA Writer', navKey: 'muaV10', url: '/mua-v10', icon: Sparkles },
   { id: 'knowledge-twins', title: 'Knowledge Twins', navKey: 'knowledgeTwins', url: '/', icon: Brain },
 ];
 

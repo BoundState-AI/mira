@@ -10,10 +10,13 @@ interface StatusBadgeProps {
 const statusStyles: Record<string, string> = {
   OK: 'status-ok',
   APPROVED: 'status-ok',
+  PASS: 'status-ok',
   CAUTION: 'status-caution',
   'PENDING REVIEW': 'status-caution',
   CONDITIONAL: 'status-caution',
+  CLARIFY: 'status-caution',
   PROHIBITED: 'status-prohibited',
+  REFUSE: 'status-prohibited',
   UNKNOWN: 'status-unknown',
 };
 

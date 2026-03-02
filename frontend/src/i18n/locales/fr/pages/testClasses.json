@@ -1,5 +1,5 @@
 {
-  "title": "Classes de Tests",
+  "title": "MAPTIS Search",
   "description": "Parcourir les données de tests matériaux organisées par type de test",
   "loading": "Chargement...",
   "summary": "{{count}} types de tests | {{total}} enregistrements au total",
@@ -136,7 +136,7 @@
     "unknownTestType": "Type de test inconnu",
     "notFoundTitle": "Type de test introuvable",
     "notFoundDescription": "Le type de test demandé est introuvable.",
-    "backToClasses": "Retour aux classes de tests",
+    "backToClasses": "Retour à MAPTIS Search",
     "totalRecords": "{{count}} enregistrements au total",
     "searchPlaceholder": "Rechercher des matériaux...",
     "loadingRecords": "Chargement des enregistrements...",

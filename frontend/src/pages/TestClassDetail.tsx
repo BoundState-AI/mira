@@ -1,6 +1,6 @@
 import { Fragment, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -82,11 +82,12 @@ export default function TestClassDetail() {
   const { t } = useTranslation(["testClasses", "common"]);
   const { testType } = useParams<{ testType: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [records, setRecords] = useState<TestRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || "");
   const [ratingFilter, setRatingFilter] = useState<string>("all");
   const [ratingType, setRatingType] = useState<string>("all");
   const [stdTestFlag, setStdTestFlag] = useState<string>("all");
@@ -234,7 +235,7 @@ export default function TestClassDetail() {
           </p>
           <Button onClick={() => navigate('/test-classes')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            {t("detail.backToClasses", { ns: "testClasses", defaultValue: "Back to Test Classes" })}
+            {t("detail.backToClasses", { ns: "testClasses", defaultValue: "Back to MAPTIS Search" })}
           </Button>
         </Card>
       </div>
@@ -251,7 +252,7 @@ export default function TestClassDetail() {
           className="mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          {t("detail.backToClasses", { ns: "testClasses", defaultValue: "Back to Test Classes" })}
+          {t("detail.backToClasses", { ns: "testClasses", defaultValue: "Back to MAPTIS Search" })}
         </Button>
 
         <h1 className="text-2xl font-serif font-bold mb-1">{testInfo.name}</h1>

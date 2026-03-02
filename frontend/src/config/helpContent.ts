@@ -28,14 +28,14 @@ const HELP_METADATA: Record<
   query: {
     relatedPages: [
       { navKey: "knowledgeTwins", defaultName: "Knowledge Twins", path: "/" },
-      { navKey: "testClasses", defaultName: "Test Classes", path: "/test-classes" },
+      { navKey: "testClasses", defaultName: "MAPTIS Search", path: "/test-classes" },
     ],
     apiEndpoint: "POST /mira/query",
   },
   knowledgeTwins: {
     relatedPages: [
       { navKey: "query", defaultName: "MIRA Query", path: "/query" },
-      { navKey: "testClasses", defaultName: "Test Classes", path: "/test-classes" },
+      { navKey: "testClasses", defaultName: "MAPTIS Search", path: "/test-classes" },
     ],
     apiEndpoint: "POST /api/v1/o2/search-bok, POST /api/v1/h2/search-bok",
   },
@@ -48,7 +48,7 @@ const HELP_METADATA: Record<
   },
   miulBuilder: {
     relatedPages: [
-      { navKey: "muaGenerator", defaultName: "MUA Wizard", path: "/mua-v7" },
+      { navKey: "muaV10", defaultName: "MUA Writer", path: "/mua-v10" },
       { navKey: "mpPlan", defaultName: "M&P Plan", path: "/mp-plan" },
     ],
     apiEndpoint: "POST /api/miul/v4/extract, POST /api/miul/v4/build",
@@ -69,7 +69,7 @@ const HELP_METADATA: Record<
   },
   complianceAnalysis: {
     relatedPages: [
-      { navKey: "muaGenerator", defaultName: "MUA Wizard", path: "/mua-v7" },
+      { navKey: "muaV10", defaultName: "MUA Writer", path: "/mua-v10" },
       { navKey: "mpPlan", defaultName: "M&P Plan", path: "/mp-plan" },
     ],
     apiEndpoint: "POST /compliance/analyze",
@@ -81,7 +81,7 @@ const HELP_METADATA: Record<
   mpPlan: {
     relatedPages: [
       { navKey: "miulBuilder", defaultName: "MIUL Builder", path: "/miul" },
-      { navKey: "muaGenerator", defaultName: "MUA Wizard", path: "/mua-v7" },
+      { navKey: "muaV10", defaultName: "MUA Writer", path: "/mua-v10" },
     ],
     apiEndpoint: "POST /api/mp-plan/*",
   },

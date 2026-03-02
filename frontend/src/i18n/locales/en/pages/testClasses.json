@@ -1,5 +1,5 @@
 {
-  "title": "Test Classes",
+  "title": "MAPTIS Search",
   "description": "Browse material test data organized by test type",
   "loading": "Loading...",
   "summary": "{{count}} test types | {{total}} total test records",
@@ -136,7 +136,7 @@
     "unknownTestType": "Unknown test type",
     "notFoundTitle": "Test Type Not Found",
     "notFoundDescription": "The requested test type could not be found.",
-    "backToClasses": "Back to Test Classes",
+    "backToClasses": "Back to MAPTIS Search",
     "totalRecords": "{{count}} total records",
     "searchPlaceholder": "Search materials...",
     "loadingRecords": "Loading records...",

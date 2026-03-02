@@ -1,12 +1,13 @@
 {
   "mpPlan": "M&P Plan",
   "query": "Query",
-  "testClasses": "Test Classes",
+  "testClasses": "MAPTIS Search",
   "miulBuilder": "MIUL Builder",
   "dtEditor": "DT Editor",
   "muaV8": "MUA V8",
   "muaGenerator": "MUA Generator",
   "compliance": "Compliance",
   "gasCompatibility": "Gas Compatibility",
-  "knowledgeTwins": "Knowledge Twins"
+  "knowledgeTwins": "Knowledge Twins",
+  "muaV10": "MUA Writer"
 }

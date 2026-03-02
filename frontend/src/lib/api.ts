@@ -7,6 +7,7 @@ export interface CompatibilityRequest {
   pressure: number;
   temperature: number;
   environment?: string;
+  condition?: string;
 }
 
 export interface Evidence {
@@ -20,6 +21,70 @@ export interface CompatibilityResponse {
   rationale: string;
   evidence: Evidence[];
   notes?: string;
+  needs_clarification?: boolean;
+  clarification_prompt?: string | null;
+  available_conditions?: H2ConditionOption[];
+  band_distribution?: Record<string, number> | null;
+}
+
+export interface H2ConditionOption {
+  condition_name: string;
+  hee_band: string;
+  verdict_if_selected: string;
+  evidence_count: number;
+  source: string;
+}
+
+export interface H2ConditionLookupResponse {
+  material_key: string;
+  canonical_material?: string | null;
+  has_matches: boolean;
+  requires_clarification: boolean;
+  match_type: string;
+  available_conditions: H2ConditionOption[];
+  band_distribution?: Record<string, number> | null;
+  unresolved_condition_count?: number;
+  notes?: string | null;
+}
+
+export interface H2ConditionAliasRecord {
+  raw_key: string;
+  raw_text: string;
+  canonical_condition: string;
+  display_label: string;
+  is_condition: boolean;
+  confidence?: number | null;
+  resolver_provider?: string | null;
+  resolver_model?: string | null;
+  source_document?: string | null;
+  material_name?: string | null;
+  needs_review: boolean;
+  human_verified: boolean;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
+export interface H2ConditionAliasListResponse {
+  material_key?: string | null;
+  unresolved_only: boolean;
+  count: number;
+  aliases: H2ConditionAliasRecord[];
+}
+
+export interface H2ConditionAliasVerifyRequest {
+  raw_key: string;
+  display_label: string;
+  canonical_condition?: string | null;
+  is_condition?: boolean;
+  raw_text?: string | null;
+  source_document?: string | null;
+  material_name?: string | null;
+}
+
+export interface H2ConditionAliasVerifyResponse {
+  status: string;
+  cache_entries_cleared: number;
+  alias: H2ConditionAliasRecord;
 }
 
 export interface SearchRequest {
@@ -107,15 +172,20 @@ export async function checkO2Compatibility(req: CompatibilityRequest): Promise<C
 }
 
 export async function checkH2Compatibility(req: CompatibilityRequest): Promise<CompatibilityResponse> {
+  const conditionSuffix = req.condition?.trim()
+    ? ` under ${req.condition.trim()} condition`
+    : '';
+
   const response = await fetch(`${API_BASE}/mira/h2/compatibility`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      question: `Is ${req.material_key} compatible with hydrogen?`,
+      question: `Is ${req.material_key} compatible with hydrogen${conditionSuffix}?`,
       material_key: req.material_key,
       pressure_psia: req.pressure,
       temperature_k: fToK(req.temperature),
       phase: 'gh2', // Default to gaseous hydrogen
+      condition: req.condition?.trim() || undefined,
     }),
   });
 
@@ -123,6 +193,49 @@ export async function checkH2Compatibility(req: CompatibilityRequest): Promise<C
     throw new Error(`H2 compatibility check failed: ${response.statusText}`);
   }
 
+  return response.json();
+}
+
+export async function getH2Conditions(materialKey: string): Promise<H2ConditionLookupResponse> {
+  const response = await fetch(
+    `${API_BASE}/mira/h2/conditions?material_key=${encodeURIComponent(materialKey)}`,
+  );
+
+  if (!response.ok) {
+    throw new Error(`H2 condition lookup failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function getH2ConditionAliases(
+  materialKey: string,
+  unresolvedOnly: boolean = true,
+  limit: number = 100,
+): Promise<H2ConditionAliasListResponse> {
+  const params = new URLSearchParams({
+    material_key: materialKey,
+    unresolved_only: String(unresolvedOnly),
+    limit: String(limit),
+  });
+  const response = await fetch(`${API_BASE}/mira/h2/condition-aliases?${params.toString()}`);
+  if (!response.ok) {
+    throw new Error(`H2 condition alias listing failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+export async function verifyH2ConditionAlias(
+  req: H2ConditionAliasVerifyRequest,
+): Promise<H2ConditionAliasVerifyResponse> {
+  const response = await fetch(`${API_BASE}/mira/h2/condition-aliases/verify`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+  if (!response.ok) {
+    throw new Error(`H2 condition alias verify failed: ${response.statusText}`);
+  }
   return response.json();
 }
 
