@@ -1,6 +1,9 @@
+# VCS and local env
 .git
 .github
 .gitignore
+.env
+.env.*
 
 # Dev/test/docs assets not needed at API runtime
 docs/
@@ -10,11 +13,34 @@ tests/
 examples/
 scripts/
 
-# Local/editor/cache artifacts
+# Python cache/build artifacts
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# Node artifacts
+node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# Logs/temp/runtime data
+logs/
+temp/
+uploads/
+*.log
+
+# Editor/OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
 *.swp
 *.tmp
 

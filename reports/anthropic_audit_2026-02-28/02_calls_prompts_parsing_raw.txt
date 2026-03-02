@@ -1,0 +1,1940 @@
+### athena/extraction/bok/extractor_v10.py
+CALLS:
+480:    response = client.messages.create(
+MODELS:
+476:    model: str = "claude-haiku-4-5-20251001",
+481:        model=model,
+611:        model: str = "claude-haiku-4-5-20251001",
+615:        self.model = model
+PROMPTS:
+361:TABLE_EXTRACTION_PROMPT = """Read this table image and return the exact grid structure.
+401:TABLE_DETECTION_PROMPT = """Find all tables in this page image.
+483:        messages=[
+722:                self.client, img_b64, TABLE_EXTRACTION_PROMPT, self.model
+754:                self.client, img_b64, TABLE_DETECTION_PROMPT, self.model
+PARSING:
+503:    return response.content[0].text
+506:def parse_json_response(response_text: str) -> dict[str, Any]:
+507:    """Parse JSON from vision response."""
+527:        return json.loads(json_str)
+529:        return {"error": f"JSON parse error: {e}"}
+532:def parse_table_grid(
+538:    """Parse vision response into TableGrid."""
+539:    data = parse_json_response(response_text)
+551:    # Parse cells
+567:            logger.warning(f"Failed to parse cell {raw_cell}: {e}")
+727:            grid = parse_table_grid(response, table_id, source, extract_time)
+758:            data = parse_json_response(response)
+931:    import argparse
+938:    parser = argparse.ArgumentParser(
+940:        formatter_class=argparse.RawDescriptionHelpFormatter,
+955:    parser.add_argument("input", type=Path, help="PDF file or directory")
+956:    parser.add_argument("--output", "-o", type=Path, help="Output JSON path")
+957:    parser.add_argument("--no-vision-fallback", action="store_true",
+959:    parser.add_argument("--verbose", "-v", action="store_true")
+961:    args = parser.parse_args()
+
+### athena/extraction/bok/standards_extractor_v6.py
+CALLS:
+476:        response = client.messages.create(
+520:        response = client.messages.create(
+MODELS:
+55:SONNET_MODEL_BEDROCK = "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0"
+56:SONNET_MODEL_DIRECT = "claude-sonnet-4-5-20250929"
+57:HAIKU_MODEL = "claude-haiku-4-5-20251001"
+60:DEFAULT_MODEL = os.getenv("BOK_EXTRACTOR_MODEL", "haiku")
+358:        model: Literal["haiku", "sonnet"] = None,
+368:            model: Model to use - "haiku" (default, cost efficient) or "sonnet" (higher quality)
+374:        self.model_choice = model or DEFAULT_MODEL
+378:        self._model = None
+387:                    self._model = SONNET_MODEL_BEDROCK
+401:                        self._model = HAIKU_MODEL
+403:                        self._model = SONNET_MODEL_DIRECT
+477:            model=self._model,
+521:            model=self._model,
+854:    model: Literal["haiku", "sonnet"] = "haiku",
+864:        model: Model to use (haiku or sonnet)
+869:    extractor = BOKStandardsExtractorV6(mode=mode, use_bedrock=use_bedrock, model=model)
+896:    model: Literal["haiku", "sonnet"] = "haiku",
+906:        model: Model to use (default: haiku for cost efficiency)
+912:    extractor = BOKStandardsExtractorV6(mode=mode, use_bedrock=use_bedrock, model=model)
+1039:            model=args.model,
+1054:            model=args.model,
+PROMPTS:
+221:SECTION_EXTRACTION_PROMPT = """You are an expert at extracting structured data from NASA safety standards.
+479:            messages=[
+482:                    "content": f"Gas type context: {gas_type.value}\n\n{SECTION_EXTRACTION_PROMPT}\n\nDocument section:\n{text}"
+517:            "text": f"Gas type context: {gas_type.value}\n\n{SECTION_EXTRACTION_PROMPT}"
+523:            messages=[{"role": "user", "content": content}]
+PARSING:
+344:    Uses same architecture as MUA Parser v6:
+451:            if re.search(r'table\s+[a-z]?\d', text_lower) and numeric_ratio > 0.10:
+487:        response_text = response.content[0].text.strip()
+488:        return self._parse_json_response(response_text, "text", text)
+526:        if not response.content:
+527:            return {"extraction_mode": "vision", "parse_error": "Empty API response"}
+529:        response_text = response.content[0].text.strip()
+530:        return self._parse_json_response(response_text, "vision", raw_text)
+532:    def _parse_json_response(self, response_text: str, mode: str, raw_text: str) -> Dict[str, Any]:
+533:        """Parse JSON from LLM response."""
+554:            result = json.loads(response_text)
+560:            self.logger.error(f"Failed to parse JSON: {e}")
+567:                "title": "Parse Error",
+569:                "parse_error": str(e)
+576:        skip_keys = {"extraction_mode", "full_text", "parse_error"}
+878:        data = json.loads(json_path.read_text())
+926:                h2_sections_data = json.loads(h2_json_path.read_text())
+966:                o2_sections_data = json.loads(o2_json_path.read_text())
+1003:    import argparse
+1014:    parser = argparse.ArgumentParser(description="BOK Standards Extractor V6")
+1015:    parser.add_argument("--rebuild", action="store_true", help="Rebuild all BOK indices (starts fresh)")
+1016:    parser.add_argument("--continue", dest="continue_run", action="store_true", help="Continue from checkpoint (skip already-processed PDFs)")
+1017:    parser.add_argument("--pdf", type=str, help="Extract single PDF")
+1018:    parser.add_argument("--gas", choices=["H2", "O2"], help="Gas type for single PDF")
+1019:    parser.add_argument(
+1025:    parser.add_argument("--bedrock", action="store_true", help="Use Bedrock API (default: direct Anthropic API)")
+1026:    parser.add_argument(
+1033:    args = parser.parse_args()
+1069:        parser.print_help()
+
+### athena/extraction/detector.py
+CALLS:
+147:            response = self.client.messages.create(
+MODELS:
+65:        model: str = "claude-sonnet-4-20250514",  # Sonnet for borderless detection
+69:        self.model = model
+148:                model=self.model,
+PROMPTS:
+32:from athena.extraction.prompts import TABLE_DETECTION_PROMPT
+150:                messages=[
+164:                                "text": TABLE_DETECTION_PROMPT,
+PARSING:
+170:            response_text = response.content[0].text
+175:        # Parse response
+176:        tables = self._parse_detection_response(response_text, page_number, page.height)
+180:    def _parse_detection_response(
+186:        """Parse vision detection response into DetectedTable objects."""
+204:            data = json.loads(text[start_idx:end_idx + 1])
+208:        # Parse tables
+
+### athena/extraction/haiku_vision.py
+CALLS:
+154:        resp = self.client.messages.create(
+MODELS:
+62:HAIKU_MODEL_DIRECT = "claude-3-haiku-20240307"
+63:HAIKU_MODEL_BEDROCK = "anthropic.claude-3-haiku-20240307-v1:0"
+76:        return AnthropicBedrock(aws_region=region), HAIKU_MODEL_BEDROCK
+79:        return Anthropic(api_key=api_key), HAIKU_MODEL_DIRECT
+90:        self.client, self.model = get_anthropic_client(api_key=api_key, use_bedrock=use_bedrock)
+91:        logger.info(f"Initialized extractor with model: {self.model}")
+155:            model=self.model,
+PROMPTS:
+158:            messages=[{"role": "user", "content": content}]
+221:        prompt = """You are looking at an Engineering Drawing Tree diagram.
+260:        prompt = """Look at this engineering drawing and extract info from the title block AND notes.
+308:            prompt = """Look at this DETAIL engineering drawing.
+330:                prompt = """You are a STRICT forensic engineering drawing parser extracting the ENGINEERING PARTS LIST (EPL).
+368:                prompt = f"""You are a STRICT forensic engineering drawing parser extracting the ENGINEERING PARTS LIST (EPL).
+PARSING:
+160:        return resp.content[0].text.strip()
+162:    def parse_json_response(self, raw: str) -> Any:
+163:        """Parse JSON from Haiku response, handling markdown wrappers and surrounding text."""
+197:        return json.loads(raw)
+241:            hierarchy = self.parse_json_response(raw)
+255:            logger.warning(f"Drawing tree parse failed: {e}")
+281:            return self.parse_json_response(raw)
+299:        # Detect scanned PDFs (sparse text extraction)
+330:                prompt = """You are a STRICT forensic engineering drawing parser extracting the ENGINEERING PARTS LIST (EPL).
+368:                prompt = f"""You are a STRICT forensic engineering drawing parser extracting the ENGINEERING PARTS LIST (EPL).
+414:            parts = self.parse_json_response(raw)
+417:            # BUT skip validation if text extraction was too sparse (likely a scanned PDF)
+1078:    import argparse
+1080:    parser = argparse.ArgumentParser(description="Haiku BOM Extractor - 2-Step Process")
+1081:    subparsers = parser.add_subparsers(dest="command", help="Commands")
+1084:    extract_parser = subparsers.add_parser("extract", help="Step 1: Extract PDFs to JSON using Haiku vision")
+1085:    extract_parser.add_argument("directory", help="Folder containing PDF drawings")
+1086:    extract_parser.add_argument("--output", "-o", help="Output JSON path")
+1087:    extract_parser.add_argument("--api-key", help="Anthropic API key (or set ANTHROPIC_API_KEY)")
+1090:    assemble_parser = subparsers.add_parser("assemble", help="Step 2: Convert JSON to MIUL Excel")
+1091:    assemble_parser.add_argument("json_file", help="Path to extraction_results.json")
+1092:    assemble_parser.add_argument("--output", "-o", help="Output Excel path")
+1093:    assemble_parser.add_argument("--default-nha", default="", help="Default NHA if resolution fails")
+1094:    assemble_parser.add_argument("--project", default="PROJECT", help="Project name")
+1097:    full_parser = subparsers.add_parser("full", help="Run both steps: Extract then Assemble")
+1098:    full_parser.add_argument("directory", help="Folder containing PDF drawings")
+1099:    full_parser.add_argument("--api-key", help="Anthropic API key")
+1100:    full_parser.add_argument("--project", default="PROJECT", help="Project name")
+1102:    args = parser.parse_args()
+1128:        parser.print_help()
+
+### athena/extraction/standards_extractor.py
+CALLS:
+258:        response = self.client.messages.create(
+MODELS:
+132:        model: str = "claude-sonnet-4-20250514",
+140:            model: Claude model for vision extraction
+144:        self.model = model
+259:            model=self.model,
+PROMPTS:
+46:STANDARDS_EXTRACTION_PROMPT = """Extract requirements from this standards document page as JSON.
+261:            messages=[
+275:                            "text": STANDARDS_EXTRACTION_PROMPT,
+PARSING:
+119:        return json.dumps(self.to_dict(), indent=indent)
+287:        # Parse response
+288:        content = response.content[0].text
+305:            raw_requirements = json.loads(content)
+307:            self.logger.warning(f"Failed to parse page {page_num}: {e}")
+412:            match = re.search(pattern, name, re.IGNORECASE)
+
+### athena/extraction/transcriber.py
+CALLS:
+124:            response = self.client.messages.create(
+MODELS:
+57:        model: str = "claude-sonnet-4-20250514",  # Sonnet for borderless accuracy
+61:        self.model = model
+125:                model=self.model,
+PROMPTS:
+34:from athena.extraction.prompts import TABLE_EXTRACTION_PROMPT
+127:                messages=[
+141:                                "text": TABLE_EXTRACTION_PROMPT,
+PARSING:
+147:            response_text = response.content[0].text
+154:        # Parse response into TableGrid
+157:        grid = self._parse_response(
+200:    def _parse_response(
+210:        """Parse vision response into TableGrid."""
+230:            data = json.loads(text[start_idx:end_idx + 1])
+234:                f"JSON parse error: {e}"
+
+### athena/legacy/v6.py
+CALLS:
+475:        response = client.messages.create(
+519:        response = client.messages.create(
+MODELS:
+54:SONNET_MODEL_BEDROCK = "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0"
+55:SONNET_MODEL_DIRECT = "claude-sonnet-4-5-20250929"
+56:HAIKU_MODEL = "claude-haiku-4-5-20251001"
+59:DEFAULT_MODEL = os.getenv("BOK_EXTRACTOR_MODEL", "haiku")
+357:        model: Literal["haiku", "sonnet"] = None,
+367:            model: Model to use - "haiku" (default, cost efficient) or "sonnet" (higher quality)
+373:        self.model_choice = model or DEFAULT_MODEL
+377:        self._model = None
+386:                    self._model = SONNET_MODEL_BEDROCK
+400:                        self._model = HAIKU_MODEL
+402:                        self._model = SONNET_MODEL_DIRECT
+476:            model=self._model,
+520:            model=self._model,
+853:    model: Literal["haiku", "sonnet"] = "haiku",
+863:        model: Model to use (haiku or sonnet)
+868:    extractor = BOKStandardsExtractorV6(mode=mode, use_bedrock=use_bedrock, model=model)
+895:    model: Literal["haiku", "sonnet"] = "haiku",
+905:        model: Model to use (default: haiku for cost efficiency)
+911:    extractor = BOKStandardsExtractorV6(mode=mode, use_bedrock=use_bedrock, model=model)
+1038:            model=args.model,
+1053:            model=args.model,
+PROMPTS:
+220:SECTION_EXTRACTION_PROMPT = """You are an expert at extracting structured data from NASA safety standards.
+478:            messages=[
+481:                    "content": f"Gas type context: {gas_type.value}\n\n{SECTION_EXTRACTION_PROMPT}\n\nDocument section:\n{text}"
+516:            "text": f"Gas type context: {gas_type.value}\n\n{SECTION_EXTRACTION_PROMPT}"
+522:            messages=[{"role": "user", "content": content}]
+PARSING:
+343:    Uses same architecture as MUA Parser v6:
+450:            if re.search(r'table\s+[a-z]?\d', text_lower) and numeric_ratio > 0.10:
+486:        response_text = response.content[0].text.strip()
+487:        return self._parse_json_response(response_text, "text", text)
+525:        if not response.content:
+526:            return {"extraction_mode": "vision", "parse_error": "Empty API response"}
+528:        response_text = response.content[0].text.strip()
+529:        return self._parse_json_response(response_text, "vision", raw_text)
+531:    def _parse_json_response(self, response_text: str, mode: str, raw_text: str) -> Dict[str, Any]:
+532:        """Parse JSON from LLM response."""
+553:            result = json.loads(response_text)
+559:            self.logger.error(f"Failed to parse JSON: {e}")
+566:                "title": "Parse Error",
+568:                "parse_error": str(e)
+575:        skip_keys = {"extraction_mode", "full_text", "parse_error"}
+877:        data = json.loads(json_path.read_text())
+925:                h2_sections_data = json.loads(h2_json_path.read_text())
+965:                o2_sections_data = json.loads(o2_json_path.read_text())
+1002:    import argparse
+1013:    parser = argparse.ArgumentParser(description="BOK Standards Extractor V6")
+1014:    parser.add_argument("--rebuild", action="store_true", help="Rebuild all BOK indices (starts fresh)")
+1015:    parser.add_argument("--continue", dest="continue_run", action="store_true", help="Continue from checkpoint (skip already-processed PDFs)")
+1016:    parser.add_argument("--pdf", type=str, help="Extract single PDF")
+1017:    parser.add_argument("--gas", choices=["H2", "O2"], help="Gas type for single PDF")
+1018:    parser.add_argument(
+1024:    parser.add_argument("--bedrock", action="store_true", help="Use Bedrock API (default: direct Anthropic API)")
+1025:    parser.add_argument(
+1032:    args = parser.parse_args()
+1068:        parser.print_help()
+
+### athena/legacy/v7.py
+CALLS:
+845:        response = client.messages.create(
+MODELS:
+827:    model: str,
+846:            model=model,
+897:        llm_model: str = "claude-haiku-4-5-20251001",
+905:            llm_model: Model to use for enrichment
+909:        self.llm_model = llm_model
+PROMPTS:
+805:LLM_ENRICHMENT_PROMPT = """Analyze this table from a NASA {gas_type} safety standard.
+838:    prompt = LLM_ENRICHMENT_PROMPT.format(
+848:            messages=[{"role": "user", "content": prompt}]
+PARSING:
+120:    # Parsed records
+205:    return any(re.search(p, text_lower) for p in patterns)
+211:    return sum(1 for p in patterns if re.search(p, text_lower))
+265:    has_sigma_hdr = re.search(r"(σ|sigma)", header_text) is not None
+266:    has_ra_hdr = re.search(r"\bra\b|reduction\s*of\s*area", header_text) is not None
+267:    has_he = re.search(r"\bhe\b", rt) is not None
+268:    has_h2 = (re.search(r"\bh\s*2\b", rt) is not None) or ("hydrogen" in rt)
+319:def parse_float(val: Optional[str]) -> Optional[float]:
+320:    """Try to parse float from string."""
+424:            if s.strip() == "2" and out and re.search(r"\bH$", out[-1]):
+438:    def _parse_multifloats(cell: Optional[str]) -> list[Optional[float]]:
+441:            vals.append(parse_float(s))
+449:                if re.search(r"\bhe\b", el):
+452:                if re.search(r"\bh\s*2\b", el) or ("hydrogen" in el):
+475:            sigma_vals = _parse_multifloats(safe_get(row, sigma_col)) if sigma_col is not None else []
+476:            ra_vals = _parse_multifloats(safe_get(row, ra_col)) if ra_col is not None else []
+557:            parsed = parse_float(val)
+558:            if parsed is None:
+563:                hee_index = parsed
+565:                nts_ratio = parsed
+627:        ait_f = parse_float(ait_val) if ait_val else None
+851:        response_text = response.content[0].text.strip()
+853:        # Parse JSON response
+855:            result = json.loads(response_text)
+944:            List of ExtractedTable with parsed records
+1087:    import argparse
+1095:    parser = argparse.ArgumentParser(
+1097:        formatter_class=argparse.RawDescriptionHelpFormatter,
+1112:  3. Rules parse records per table type (no LLM)
+1120:    parser.add_argument(
+1125:    parser.add_argument(
+1131:    parser.add_argument(
+1136:    parser.add_argument(
+1141:    parser.add_argument(
+1147:    args = parser.parse_args()
+
+### athena/legacy/v8.py
+CALLS:
+647:        response = client.messages.create(
+MODELS:
+630:    model: str,
+648:            model=model,
+717:        llm_model: str = "claude-haiku-4-5-20251001",
+720:        self.llm_model = llm_model
+PROMPTS:
+592:PAIRED_TABLE_PROMPT = """You are extracting hydrogen embrittlement data from a materials test table.
+641:    prompt = PAIRED_TABLE_PROMPT.format(
+650:            messages=[{"role": "user", "content": prompt}]
+PARSING:
+177:    if not re.search(r"test\s*environ|environment", header_text):
+184:        if re.search(r"(he|helium)", row_text) and re.search(r"h\s*2|hydrogen", row_text):
+187:        if re.search(r"\bair\b", row_text) and re.search(r"h\s*2|hydrogen", row_text):
+213:    if re.search(r"\b(fe|cr|ni|mo|mn|si|c)\b.*\b(fe|cr|ni|mo|mn|si|c)\b", header_text):
+217:    if re.search(r"(permeab|diffus|solubil)", header_text):
+221:    if re.search(r"(s\s*y|s\s*u|ra\s*\(%\)|el\s*[tu]|strain\s*rate)", header_text):
+225:    if re.search(r"k\s*(ic|ih|th|q)", header_text):
+230:        if re.search(r"(ait|ignition|flammab|impact)", header_text):
+240:def parse_float(val: str) -> Optional[float]:
+241:    """Parse float from string, handling common formats."""
+251:    match = re.search(r"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?", val)
+273:            if re.search(pattern, header_lower):
+368:        # Parse environment column to determine baseline vs H2
+384:            if re.search(r"h\s*2|h2|hydrogen", env_lower):
+386:            elif re.search(r"(he\b|helium|\bair\b)", env_lower):
+398:                return parse_float(lines[idx])
+449:            ref_matches = re.findall(r"\[([^\]]+)\]", ref_text)
+516:                    v1 = parse_float(lines[0])
+517:                    v2 = parse_float(lines[1])
+521:                    v = parse_float(lines[0])
+653:        response_text = response.content[0].text.strip()
+656:        json_match = re.search(r"\[[\s\S]*\]", response_text)
+658:            data = json.loads(json_match.group())
+708:    2. Parse multi-value cells to separate baseline vs H2 results
+963:    import argparse
+970:    parser = argparse.ArgumentParser(
+972:        formatter_class=argparse.RawDescriptionHelpFormatter,
+983:  2. Parses multi-value cells (stacked He/H2 results)
+987:    parser.add_argument("input", type=Path, help="PDF file or directory")
+988:    parser.add_argument("--gas", choices=["H2", "O2"], required=True)
+989:    parser.add_argument("--output", "-o", type=Path, help="Output JSON path")
+990:    parser.add_argument("--no-llm", action="store_true", help="Disable LLM fallback")
+991:    parser.add_argument("--verbose", "-v", action="store_true")
+993:    args = parser.parse_args()
+
+### athena/providers/anthropic.py
+CALLS:
+93:        response = self.client.messages.create(
+136:        response = self.client.messages.create(
+MODELS:
+26:    "claude-3-5-haiku-20241022": {"input": 1.00, "output": 5.00},
+27:    "claude-3-5-sonnet-20241022": {"input": 3.00, "output": 15.00},
+28:    "claude-sonnet-4-5-20250929": {"input": 3.00, "output": 15.00},
+54:            "triage": "claude-3-5-haiku-20241022",
+55:            "extract": "claude-3-5-sonnet-20241022",
+91:        model = self.models.get(model_key, self.models["extract"])
+94:            model=model,
+109:            model=model,
+134:        model = self.models.get(model_key, self.models["extract"])
+137:            model=model,
+152:            model=model,
+157:    def _calculate_cost(self, model: str, input_tokens: int, output_tokens: int) -> float:
+PROMPTS:
+96:            system=system_prompt,
+97:            messages=[{"role": "user", "content": content}],
+139:            system=system_prompt,
+140:            messages=[{"role": "user", "content": [{"type": "text", "text": user_prompt}]}],
+PARSING:
+106:            content=response.content[0].text,
+149:            content=response.content[0].text,
+
+### athena/providers/bedrock.py
+CALLS:
+91:        response = self.client.messages.create(
+134:        response = self.client.messages.create(
+214:        response = self.client.messages.create(
+252:        response = self.client.messages.create(
+MODELS:
+47:                "triage": "us-gov.anthropic.claude-3-5-haiku-20241022-v1:0",
+48:                "extract": "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0",
+52:                "triage": "us.anthropic.claude-3-5-haiku-20241022-v1:0",
+53:                "extract": "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+89:        model = self.models.get(model_key, self.models["extract"])
+92:            model=model,
+107:            model=model,
+132:        model = self.models.get(model_key, self.models["extract"])
+135:            model=model,
+150:            model=model,
+155:    def _calculate_cost(self, model: str, tokens_in: int, tokens_out: int) -> float:
+159:            model: Model ID
+187:            "triage": "claude-3-5-haiku-20241022",
+188:            "extract": "claude-sonnet-4-5-20250929",
+212:        model = self.models.get(model_key, self.models["extract"])
+215:            model=model,
+224:        if "haiku" in model:
+235:            model=model,
+250:        model = self.models.get(model_key, self.models["extract"])
+253:            model=model,
+261:        if "haiku" in model:
+272:            model=model,
+PROMPTS:
+94:            system=system_prompt,
+95:            messages=[{"role": "user", "content": content}],
+137:            system=system_prompt,
+138:            messages=[{"role": "user", "content": user_prompt}],
+217:            system=system_prompt,
+218:            messages=[{"role": "user", "content": content}],
+255:            system=system_prompt,
+256:            messages=[{"role": "user", "content": user_prompt}],
+PARSING:
+104:            content=response.content[0].text,
+147:            content=response.content[0].text,
+232:            content=response.content[0].text,
+269:            content=response.content[0].text,
+
+### core/evidence/llm_answer_generator.py
+CALLS:
+712:                message = self.haiku_client.client.messages.create(
+MODELS:
+398:        model: str = "llama3.1:8b-instruct-q4_K_M",
+406:            model: Model name (default: llama3.1:8b-instruct-q4_K_M)
+411:        self.model = model
+425:            logger.info(f"Using local model: {self.model} at {self.base_url}")
+713:                    model="claude-3-haiku-20240307",
+PROMPTS:
+40:    "EXPLANATION_SYSTEM_PROMPT",
+172:# EXPLANATION-ONLY SYSTEM PROMPT (NO DECISION AUTHORITY)
+175:EXPLANATION_SYSTEM_PROMPT = """# MIRA Explanation Generator Contract
+670:        full_prompt = f"""{EXPLANATION_SYSTEM_PROMPT}
+716:                    messages=[{"role": "user", "content": full_prompt}]
+PARSING:
+718:                llm_answer = message.content[0].text.strip()
+
+### data_laundering/bedrock_client.py
+CALLS:
+342:    #         resp = await client.invoke_model(
+384:    #         resp = await client.invoke_model(
+427:    #         resp = await client.invoke_model(
+MODELS:
+23:  - Layer 2 (Reason):   anthropic.claude-sonnet-4-5-20250929-v1:0
+25:  - Layer 4 (Present):  anthropic.claude-3-haiku-20240307-v1:0
+52:    model: str
+76:            model="llama3",
+82:    BEDROCK_SONNET = "anthropic.claude-sonnet-4-5-20250929-v1:0"
+83:    BEDROCK_HAIKU = "anthropic.claude-3-haiku-20240307-v1:0"
+121:        model: str = "llama3",
+130:            model: Model name for the local API.
+157:            "LLM call completed: model=%s, tokens=%d/%d, latency=%.0fms",
+168:        model: str,
+207:            model=model,
+218:        model: str,
+254:            model=model,
+269:        model: str = "llama3",
+277:            prompt=prompt, system=system, model=model,
+285:        model: str = "llama3",
+295:            prompt=prompt, system=system, model=model,
+303:        model: str = "llama3",
+312:            prompt=prompt, system=system, model=model,
+352:    #             model=self.BEDROCK_LLAMA,
+368:    #     Model: anthropic.claude-sonnet-4-5-20250929-v1:0
+396:    #             model=self.BEDROCK_SONNET,
+411:    #     Model: anthropic.claude-3-haiku-20240307-v1:0
+439:    #             model=self.BEDROCK_HAIKU,
+PROMPTS:
+74:            prompt="Parse this query...",
+75:            system="You are a query parser.",
+277:            prompt=prompt, system=system, model=model,
+295:            prompt=prompt, system=system, model=model,
+312:            prompt=prompt, system=system, model=model,
+PARSING:
+74:            prompt="Parse this query...",
+75:            system="You are a query parser.",
+336:    #         body = json.dumps({
+348:    #         raw = json.loads(await resp["body"].read())
+376:    #         body = json.dumps({
+390:    #         raw = json.loads(await resp["body"].read())
+419:    #         body = json.dumps({
+433:    #         raw = json.loads(await resp["body"].read())
+
+### mira/MIRA_V2/src/haiku_client.py
+CALLS:
+56:            message = self.client.messages.create(
+MODELS:
+36:        self.model = "claude-3-haiku-20240307"
+57:                model=self.model,
+PROMPTS:
+60:                messages=[{"role": "user", "content": prompt}]
+121:        prompt = f"""You are extracting data from a NASA Material Usage Agreement (MUA) form.
+190:        prompt = f"""You are an assistant that converts NASA standards into a structured Body of Knowledge for an oxygen/hydrogen materials constraint engine.
+PARSING:
+53:            Parsed JSON dict or None if parsing fails
+63:            response_text = message.content[0].text.strip()
+65:            # Parse JSON from response
+66:            return self._parse_json_response(response_text)
+72:    def _parse_json_response(self, response_text: str) -> Optional[Dict[str, Any]]:
+87:                    return json.loads(part.strip())
+93:            return json.loads(response_text.strip())
+98:        json_match = re.search(r'\{[\s\S]*\}', response_text, re.DOTALL)
+102:                return json.loads(json_str)
+107:                    return json.loads(json_str_fixed)
+183:        Uses Haiku to enrich Python-parsed sections with:
+
+### mira/MIRA_V2/src/llm_answer_generator.py
+CALLS:
+712:                message = self.haiku_client.client.messages.create(
+MODELS:
+396:    def __init__(self, base_url: Optional[str] = None, model: str = "llama3.1:8b-instruct-q4_K_M", provider: str = "ollama"):
+402:            model: Model name (default: llama3.1:8b-instruct-q4_K_M)
+407:        self.model = model
+413:            print(f"[LLM] Using Claude Haiku (claude-3-haiku-20240307)")
+416:            print(f"[LLM] Using local model: {self.model} at {self.base_url}")
+713:                    model="claude-3-haiku-20240307",
+PROMPTS:
+27:# ENHANCED SYSTEM PROMPT WITH HARD SAFETY RULES
+30:DECISION_SYSTEM_PROMPT = """# MIRA LLM CONTRACT - DO NOT VIOLATE
+660:            evidence_prompt = bundle.to_llm_prompt()
+663:            full_prompt = f"""{DECISION_SYSTEM_PROMPT}
+700:            full_prompt = self._create_prompt(query, context, numeric_limits)
+716:                    messages=[{"role": "user", "content": full_prompt}]
+PARSING:
+520:                    # Skip if value can't be parsed as float
+646:                required_env=None,  # TODO: Extract from query parse
+718:                llm_answer = message.content[0].text.strip()
+
+### mira/api/routers/mira_v4.py
+CALLS:
+327:            message = client.messages.create(
+478:            message = client.messages.create(
+MODELS:
+71:    llm_model: Optional[str] = Field(
+310:    model_bedrock = "anthropic.claude-sonnet-4-5-20250929-v1:0"
+311:    model_direct = "claude-sonnet-4-5-20250929"
+318:                model = model_bedrock
+325:                model = model_direct
+328:                model=model,
+469:                model = "anthropic.claude-sonnet-4-5-20250929-v1:0"
+476:                model = "claude-sonnet-4-5-20250929"
+479:                model=model,
+926:@router.post("/query", response_model=V4QueryResponse, deprecated=True)
+1857:            sanitizer_model=os.environ.get("DL_SANITIZER_MODEL", "llama3.1:8b"),
+1858:            reasoner_model=os.environ.get("DL_REASONER_MODEL", "llama3.1:8b"),
+1859:            presenter_model=os.environ.get("DL_PRESENTER_MODEL", "llama3.1:8b"),
+1928:@router.post("/query/batch", response_model=V4BatchQueryResponse)
+1981:@router.post("/heritage/override", response_model=V4HeritageOverrideResponse)
+2043:@router.get("/schema/validate", response_model=V4SchemaValidationResponse)
+PROMPTS:
+243:_PARSE_SYSTEM_PROMPT = """You are a NASA materials engineer AI for the MIRA system.
+331:                system=_PARSE_SYSTEM_PROMPT,
+332:                messages=[{"role": "user", "content": raw_query}],
+360:_RESPONSE_SYSTEM_PROMPT = """You are MIRA, a NASA materials engineer AI assistant.
+482:                system=_RESPONSE_SYSTEM_PROMPT,
+483:                messages=[{"role": "user", "content": user_message}],
+PARSING:
+180:    parsed_query: Dict[str, Any] = Field(default_factory=dict)
+243:_PARSE_SYSTEM_PROMPT = """You are a NASA materials engineer AI for the MIRA system.
+299:async def _parse_query_with_sonnet(raw_query: str) -> Dict[str, Any]:
+300:    """Parse a natural language query into structured fields via Anthropic SDK.
+302:    Falls back to a heuristic parse if the Anthropic SDK or credentials
+331:                system=_PARSE_SYSTEM_PROMPT,
+335:            text = message.content[0].text
+338:            json_match = re.search(r"\{[\s\S]*\}", text)
+340:                return json.loads(json_match.group())
+485:            return message.content[0].text
+513:def _heuristic_parse(raw_query: str) -> Dict[str, Any]:
+623:        "scope_reason": "Heuristic fallback parser cannot reliably classify domain scope.",
+644:def _is_out_of_scope(parsed: Dict[str, Any]) -> bool:
+646:    return _normalize_domain_scope(parsed.get("domain_scope")) == "out_of_scope"
+649:def _build_out_of_scope_answer(parsed: Dict[str, Any]) -> str:
+651:    reason = str(parsed.get("scope_reason") or "").strip()
+668:    return set(re.findall(r"[a-z0-9]+", str(value or "").lower()))
+737:def _build_parsed_query(
+739:    sonnet_parsed: Dict[str, Any],
+741:) -> "ParsedQuery":
+742:    """Build a ParsedQuery from Sonnet output + user overrides."""
+743:    from mira_v4.models import EnvironmentSpec, ParsedQuery, SafetyContext
+745:    # Environment: merge Sonnet-parsed with user-supplied overrides
+746:    sonnet_env = sonnet_parsed.get("environment", {}) or {}
+757:    raw_context = sonnet_parsed.get("safety_context", "general")
+764:    sonnet_intent = sonnet_parsed.get("intent", "general_search")
+765:    material_key = request.material_key or sonnet_parsed.get("material_key")
+766:    filters = dict(sonnet_parsed.get("filters", {}) or {})
+767:    filters["domain_scope"] = _normalize_domain_scope(sonnet_parsed.get("domain_scope"))
+768:    scope_reason = sonnet_parsed.get("scope_reason")
+772:    return ParsedQuery(
+906:        parsed_query=lineage.parsed_query.model_dump(),
+934:    1. Parse NL query with Sonnet (Bedrock)
+953:        # --- Step 1: Parse query with Sonnet ---
+954:        sonnet_parsed = await _parse_query_with_sonnet(request.query)
+955:        if not sonnet_parsed:
+956:            sonnet_parsed = _heuristic_parse(request.query)
+957:            LOGGER.info("[MIRA_V4] Using heuristic fallback parser")
+959:        parsed_query = _build_parsed_query(request.query, sonnet_parsed, request)
+962:        if _is_out_of_scope(sonnet_parsed):
+963:            scope_reason = str(sonnet_parsed.get("scope_reason") or "").strip()
+969:            parsed_query = parsed_query.model_copy(update={
+972:                    **parsed_query.filters,
+980:                parsed_query=parsed_query,
+991:                answer=_build_out_of_scope_answer(sonnet_parsed),
+999:                sonnet_intent=parsed_query.intent,
+1002:            # Update parsed query with resolved intent
+1003:            parsed_query = parsed_query.model_copy(update={
+1005:                "heuristic_intent": resolved_intent if intent_disagreement else parsed_query.heuristic_intent,
+1036:        sonnet_material_type = sonnet_parsed.get("material_type")
+1056:            request.fluid_medium or parsed_query.environment.fluid_medium or ""
+1058:        safety_context_value = str(parsed_query.safety_context or "").strip().lower()
+1064:            or bool(re.search(r"\b(hydrogen|h2|gh2|lh2)\b", request.query.lower()))
+1098:            parsed_query = parsed_query.model_copy(update={
+1101:                    **parsed_query.filters,
+1112:                parsed_query=parsed_query,
+1450:        candidate_materials = sonnet_parsed.get("candidate_materials") or []
+1472:        if not materials and parsed_query.material_key:
+1474:                rows = _db_ilike_search(parsed_query.material_key, limit=25)
+1480:                        parsed_query.material_key, len(materials), search_source,
+1486:        material_families = sonnet_parsed.get("material_families") or []
+1599:            if parsed_query.material_key:
+1602:                heritage_records = get_heritage_records(parsed_query.material_key)
+1606:                        material_key=parsed_query.material_key,
+1607:                        query_env=parsed_query.environment,
+1609:                        safety_context=parsed_query.safety_context,
+1614:                        vetoed_keys = {parsed_query.material_key}
+1622:            parsed_query=parsed_query,
+1646:            parsed_query.material_key,
+1649:        if parsed_query.material_key and answer_materials is not materials:
+1652:                parsed_query.material_key,
+1663:                safety_context=parsed_query.safety_context.value,
+1664:                focus_material_key=parsed_query.material_key,
+
+### mira/bsmh/bouncer.py
+CALLS:
+622:        message = client.messages.create(
+MODELS:
+170:    local_model = (os.environ.get("BSMH_BOUNCER_LOCAL_MODEL") or "").strip()
+171:    if local_model:
+173:    shared_model = (os.environ.get("BSMH_BOUNCER_MODEL") or "").strip()
+174:    if shared_model:
+176:    return (os.environ.get("DL_SANITIZER_MODEL") or "llama3.1:8b").strip()
+180:    explicit_haiku = (os.environ.get("BSMH_BOUNCER_HAIKU_MODEL") or "").strip()
+184:    shared_model = (os.environ.get("BSMH_BOUNCER_MODEL") or "").strip()
+185:    if shared_model:
+187:        if normalized.startswith("claude") or normalized.startswith("anthropic.claude"):
+190:            "[BSMH] Ignoring non-Anthropic BSMH_BOUNCER_MODEL='%s' in haiku mode; using default Haiku model.",
+194:    return "claude-haiku-4-5-20251001"
+552:    model = _resolve_local_bouncer_model()
+562:                model=model,
+615:    model = _resolve_haiku_bouncer_model()
+623:            model=model,
+PROMPTS:
+20:_BOUNCER_SYSTEM_PROMPT = """You are a retired NASA Materials & Processes engineer with 40 years of Shuttle-era experience.
+33:(for example: "If data is insufficient, say so explicitly").
+560:                prompt=raw_query,
+561:                system=_BOUNCER_SYSTEM_PROMPT,
+626:            system=_BOUNCER_SYSTEM_PROMPT,
+627:            messages=[{"role": "user", "content": raw_query}],
+PARSING:
+232:    if re.search(r"\b\d+(?:\.\d+)?\s*(?:PSI|PSIA|F|C|K|%)\b", c):
+237:    if re.search(
+353:    return any(re.search(pattern, query_lower) for pattern in _INJECTION_PATTERNS)
+397:    match = re.search(r"\{[\s\S]*\}", text)
+401:        return json.loads(match.group())
+420:def _parse_pressure_psi(query: str) -> Optional[float]:
+421:    match = re.search(r"(-?\d+(?:\.\d+)?)\s*(?:psi|psia)\b", query, flags=re.IGNORECASE)
+425:def _parse_temperature_f(query: str) -> Optional[float]:
+426:    match = re.search(r"(-?\d+(?:\.\d+)?)\s*(?:°?\s*f|fahrenheit)\b", query, flags=re.IGNORECASE)
+430:def _parse_o2_pct(query: str) -> Optional[float]:
+431:    match = re.search(r"(\d+(?:\.\d+)?)\s*%?\s*o2\b", query, flags=re.IGNORECASE)
+434:    match = re.search(r"o2\s*(\d+(?:\.\d+)?)\s*%", query, flags=re.IGNORECASE)
+464:        pressure_psi=_parse_pressure_psi(raw_query),
+465:        temperature_f=_parse_temperature_f(raw_query),
+466:        o2_pct=_parse_o2_pct(raw_query),
+486:                "[BSMH] %s bouncer rejected an in-scope query; overriding with deterministic parser: %s",
+578:            LOGGER.warning("[BSMH] local-LLM bouncer JSON invalid after retries; using deterministic parser")
+580:        LOGGER.error("[BSMH] Bouncer local-LLM output did not parse; failing closed")
+648:            LOGGER.warning("[BSMH] Haiku bouncer JSON invalid after retries; using deterministic parser")
+650:        LOGGER.error("[BSMH] Bouncer Haiku output did not parse; failing closed")
+
+### mira/bsmh/response_formatter.py
+CALLS:
+402:            message = client.messages.create(
+480:        message = client.messages.create(
+671:        message = client.messages.create(
+MODELS:
+321:    model = os.environ.get("BSMH_HAIKU_MODEL", os.environ.get("DL_PRESENTER_MODEL", "llama3.1:8b"))
+329:            model=model,
+380:        "BSMH_HAIKU_BEDROCK_MODEL",
+381:        "anthropic.claude-3-haiku-20240307-v1:0",
+384:        "BSMH_HAIKU_DIRECT_MODEL",
+385:        "claude-3-5-haiku-20241022",
+395:                model = model_bedrock
+400:                model = model_direct
+403:                model=model,
+456:        "BSMH_SONNET_BEDROCK_MODEL",
+457:        "anthropic.claude-3-5-sonnet-20241022-v2:0",
+460:        "BSMH_SONNET_DIRECT_MODEL",
+461:        "claude-sonnet-4-5-20250929",
+470:            model = model_bedrock
+478:            model = model_direct
+481:            model=model,
+660:    model = os.environ.get("BSMH_SONNET_DIRECT_MODEL", "claude-sonnet-4-5-20250929")
+672:            model=model,
+PROMPTS:
+21:_FORMATTER_SYSTEM_PROMPT = """You are a senior NASA Materials & Processes engineer writing assessment responses.
+317:    prompt = json.dumps(payload, indent=2)
+327:            prompt=prompt,
+328:            system=_FORMATTER_SYSTEM_PROMPT,
+406:                system=_FORMATTER_SYSTEM_PROMPT,
+407:                messages=[{"role": "user", "content": user_message}],
+484:            system=_FORMATTER_SYSTEM_PROMPT,
+485:            messages=[{"role": "user", "content": user_message}],
+559:_FC_FORMATTER_SYSTEM_PROMPT = """You are a senior NASA structural engineer writing fracture control assessments.
+675:            system=_FC_FORMATTER_SYSTEM_PROMPT,
+676:            messages=[{"role": "user", "content": user_message}],
+PARSING:
+39:- When a material has linkage_gap=true, it means substantial MUA heritage exists but MAPTIS test records are sparse.
+207:    match = re.search(
+317:    prompt = json.dumps(payload, indent=2)
+375:    user_message = json.dumps(payload, indent=2)
+409:            return (message.content[0].text or "").strip()
+451:    user_message = json.dumps(payload, indent=2)
+487:        text = (message.content[0].text or "").strip()
+658:    user_message = json.dumps(payload, indent=2)
+678:        return (message.content[0].text or "").strip()
+
+### mira/bsmh/service.py
+CALLS:
+914:        message = client.messages.create(
+MODELS:
+709:    parsed_query_model = mira_v4_router._build_parsed_query(
+724:        parsed_query_model = parsed_query_model.model_copy(
+912:        model = os.environ.get("BSMH_SONNET_MODEL", "claude-sonnet-4-5-20250929")
+915:            model=model,
+PROMPTS:
+848:_FC_CONTEXT_PARSE_PROMPT = """You are a NASA fracture control engineer. Extract structured context from the user's query.
+918:            system=_FC_CONTEXT_PARSE_PROMPT,
+919:            messages=[{"role": "user", "content": raw_query}],
+PARSING:
+79:    parsed_query: Dict[str, Any]
+279:    if re.search(r"\b(?:lox|gox|oxygen)\b", candidate) or re.search(r"\bo2\b", candidate):
+283:    if re.search(r"\b(?:lh2|gh2|hydrogen)\b", candidate) or re.search(r"\bh2\b", candidate):
+287:    if re.search(r"\b(?:cryogenic|cryo)\b", candidate) or any(
+293:    if re.search(r"\b\d+(?:\.\d+)?\s*(?:psi|psia)\b", candidate):
+328:        if re.search(r"\b\d+(?:\.\d+)?\s*(PSI|PSIA|F|C|K|%)\b", upper):
+358:        if re.fullmatch(r"\d{3,4}L?", req) and re.search(rf"\b{re.escape(req)}\b", field):
+377:    grade_match = re.search(r"\b(\d{3,4}L?)\b", upper)
+392:    inconel_match = re.search(r"\bINCONEL\s*-?\s*(\d{2,4}[A-Z]?)\b", upper)
+398:    cres_match = re.search(r"\bCRES\s+(\d{3,4}L?)\b", upper)
+412:    if re.search(r"\b(?:WITH|TO|ON)\b", upper):
+699:    Sonnet parse -> DB retrieval (no FAISS) -> lineage confidence/gate.
+705:    sonnet_parsed = await mira_v4_router._parse_query_with_sonnet(v4_request.query)
+706:    if not sonnet_parsed:
+707:        raise RuntimeError("Sonnet parse failed; fallback parser is disabled for BSMH.")
+709:    parsed_query_model = mira_v4_router._build_parsed_query(
+711:        sonnet_parsed,
+721:            sonnet_intent=parsed_query_model.intent,
+724:        parsed_query_model = parsed_query_model.model_copy(
+728:                    resolved_intent if intent_disagreement else parsed_query_model.heuristic_intent
+735:    sonnet_material_type = sonnet_parsed.get("material_type")
+772:    candidate_materials = _normalize_search_patterns(sonnet_parsed.get("candidate_materials"))
+787:    if not materials and parsed_query_model.material_key:
+791:                    [str(parsed_query_model.material_key)],
+801:    material_families = _normalize_search_patterns(sonnet_parsed.get("material_families"))
+825:            parsed_query=parsed_query_model,
+839:        parsed_query=parsed_query_model.model_dump(mode="json"),
+848:_FC_CONTEXT_PARSE_PROMPT = """You are a NASA fracture control engineer. Extract structured context from the user's query.
+897:async def _parse_fracture_context_from_query(raw_query: str) -> FractureContextInput:
+918:            system=_FC_CONTEXT_PARSE_PROMPT,
+926:        match = re.search(r"\{[\s\S]*\}", text)
+931:        parsed = _json.loads(match.group())
+932:        return FractureContextInput.model_validate(parsed)
+934:        LOGGER.error("[FC] Fracture context parse failed: %s", exc)
+941:    Bouncer -> Sonnet parse+DB retrieval -> deterministic rules -> formatter.
+970:            fc_context = await _parse_fracture_context_from_query(request.query)
+999:                    "parsed_intent": "fracture_classification",
+1072:                "parsed_intent": structured_query.get("intent"),
+1082:    parsed_query = dict(retrieval_result.parsed_query or {})
+1083:    safety_context = _normalize_safety_context(parsed_query.get("safety_context", "general"))
+1215:                "parsed_intent": parsed_query.get("intent"),
+1259:            "parsed_intent": parsed_query.get("intent"),
+
+### mira/knowledge_twins/bok_extractor_v10.py
+CALLS:
+480:    response = client.messages.create(
+MODELS:
+476:    model: str = "claude-haiku-4-5-20251001",
+481:        model=model,
+611:        model: str = "claude-haiku-4-5-20251001",
+615:        self.model = model
+PROMPTS:
+361:TABLE_EXTRACTION_PROMPT = """Read this table image and return the exact grid structure.
+401:TABLE_DETECTION_PROMPT = """Find all tables in this page image.
+483:        messages=[
+722:                self.client, img_b64, TABLE_EXTRACTION_PROMPT, self.model
+754:                self.client, img_b64, TABLE_DETECTION_PROMPT, self.model
+PARSING:
+503:    return response.content[0].text
+506:def parse_json_response(response_text: str) -> dict[str, Any]:
+507:    """Parse JSON from vision response."""
+527:        return json.loads(json_str)
+529:        return {"error": f"JSON parse error: {e}"}
+532:def parse_table_grid(
+538:    """Parse vision response into TableGrid."""
+539:    data = parse_json_response(response_text)
+551:    # Parse cells
+567:            logger.warning(f"Failed to parse cell {raw_cell}: {e}")
+727:            grid = parse_table_grid(response, table_id, source, extract_time)
+758:            data = parse_json_response(response)
+931:    import argparse
+938:    parser = argparse.ArgumentParser(
+940:        formatter_class=argparse.RawDescriptionHelpFormatter,
+955:    parser.add_argument("input", type=Path, help="PDF file or directory")
+956:    parser.add_argument("--output", "-o", type=Path, help="Output JSON path")
+957:    parser.add_argument("--no-vision-fallback", action="store_true",
+959:    parser.add_argument("--verbose", "-v", action="store_true")
+961:    args = parser.parse_args()
+
+### mira/knowledge_twins/bok_extractor_v7.py
+CALLS:
+846:        response = client.messages.create(
+MODELS:
+828:    model: str,
+847:            model=model,
+898:        llm_model: str = "claude-haiku-4-5-20251001",
+906:            llm_model: Model to use for enrichment
+910:        self.llm_model = llm_model
+PROMPTS:
+806:LLM_ENRICHMENT_PROMPT = """Analyze this table from a NASA {gas_type} safety standard.
+839:    prompt = LLM_ENRICHMENT_PROMPT.format(
+849:            messages=[{"role": "user", "content": prompt}]
+PARSING:
+121:    # Parsed records
+206:    return any(re.search(p, text_lower) for p in patterns)
+212:    return sum(1 for p in patterns if re.search(p, text_lower))
+266:    has_sigma_hdr = re.search(r"(σ|sigma)", header_text) is not None
+267:    has_ra_hdr = re.search(r"\bra\b|reduction\s*of\s*area", header_text) is not None
+268:    has_he = re.search(r"\bhe\b", rt) is not None
+269:    has_h2 = (re.search(r"\bh\s*2\b", rt) is not None) or ("hydrogen" in rt)
+320:def parse_float(val: Optional[str]) -> Optional[float]:
+321:    """Try to parse float from string."""
+425:            if s.strip() == "2" and out and re.search(r"\bH$", out[-1]):
+439:    def _parse_multifloats(cell: Optional[str]) -> list[Optional[float]]:
+442:            vals.append(parse_float(s))
+450:                if re.search(r"\bhe\b", el):
+453:                if re.search(r"\bh\s*2\b", el) or ("hydrogen" in el):
+476:            sigma_vals = _parse_multifloats(safe_get(row, sigma_col)) if sigma_col is not None else []
+477:            ra_vals = _parse_multifloats(safe_get(row, ra_col)) if ra_col is not None else []
+558:            parsed = parse_float(val)
+559:            if parsed is None:
+564:                hee_index = parsed
+566:                nts_ratio = parsed
+628:        ait_f = parse_float(ait_val) if ait_val else None
+852:        response_text = response.content[0].text.strip()
+854:        # Parse JSON response
+856:            result = json.loads(response_text)
+945:            List of ExtractedTable with parsed records
+1088:    import argparse
+1096:    parser = argparse.ArgumentParser(
+1098:        formatter_class=argparse.RawDescriptionHelpFormatter,
+1113:  3. Rules parse records per table type (no LLM)
+1121:    parser.add_argument(
+1126:    parser.add_argument(
+1132:    parser.add_argument(
+1137:    parser.add_argument(
+1142:    parser.add_argument(
+1148:    args = parser.parse_args()
+
+### mira/knowledge_twins/bok_extractor_v8.py
+CALLS:
+648:        response = client.messages.create(
+MODELS:
+631:    model: str,
+649:            model=model,
+718:        llm_model: str = "claude-haiku-4-5-20251001",
+721:        self.llm_model = llm_model
+PROMPTS:
+593:PAIRED_TABLE_PROMPT = """You are extracting hydrogen embrittlement data from a materials test table.
+642:    prompt = PAIRED_TABLE_PROMPT.format(
+651:            messages=[{"role": "user", "content": prompt}]
+PARSING:
+178:    if not re.search(r"test\s*environ|environment", header_text):
+185:        if re.search(r"(he|helium)", row_text) and re.search(r"h\s*2|hydrogen", row_text):
+188:        if re.search(r"\bair\b", row_text) and re.search(r"h\s*2|hydrogen", row_text):
+214:    if re.search(r"\b(fe|cr|ni|mo|mn|si|c)\b.*\b(fe|cr|ni|mo|mn|si|c)\b", header_text):
+218:    if re.search(r"(permeab|diffus|solubil)", header_text):
+222:    if re.search(r"(s\s*y|s\s*u|ra\s*\(%\)|el\s*[tu]|strain\s*rate)", header_text):
+226:    if re.search(r"k\s*(ic|ih|th|q)", header_text):
+231:        if re.search(r"(ait|ignition|flammab|impact)", header_text):
+241:def parse_float(val: str) -> Optional[float]:
+242:    """Parse float from string, handling common formats."""
+252:    match = re.search(r"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?", val)
+274:            if re.search(pattern, header_lower):
+369:        # Parse environment column to determine baseline vs H2
+385:            if re.search(r"h\s*2|h2|hydrogen", env_lower):
+387:            elif re.search(r"(he\b|helium|\bair\b)", env_lower):
+399:                return parse_float(lines[idx])
+450:            ref_matches = re.findall(r"\[([^\]]+)\]", ref_text)
+517:                    v1 = parse_float(lines[0])
+518:                    v2 = parse_float(lines[1])
+522:                    v = parse_float(lines[0])
+654:        response_text = response.content[0].text.strip()
+657:        json_match = re.search(r"\[[\s\S]*\]", response_text)
+659:            data = json.loads(json_match.group())
+709:    2. Parse multi-value cells to separate baseline vs H2 results
+964:    import argparse
+971:    parser = argparse.ArgumentParser(
+973:        formatter_class=argparse.RawDescriptionHelpFormatter,
+984:  2. Parses multi-value cells (stacked He/H2 results)
+988:    parser.add_argument("input", type=Path, help="PDF file or directory")
+989:    parser.add_argument("--gas", choices=["H2", "O2"], required=True)
+990:    parser.add_argument("--output", "-o", type=Path, help="Output JSON path")
+991:    parser.add_argument("--no-llm", action="store_true", help="Disable LLM fallback")
+992:    parser.add_argument("--verbose", "-v", action="store_true")
+994:    args = parser.parse_args()
+
+### mira/knowledge_twins/bok_standards_extractor_v6.py
+CALLS:
+476:        response = client.messages.create(
+520:        response = client.messages.create(
+MODELS:
+55:SONNET_MODEL_BEDROCK = "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0"
+56:SONNET_MODEL_DIRECT = "claude-sonnet-4-5-20250929"
+57:HAIKU_MODEL = "claude-haiku-4-5-20251001"
+60:DEFAULT_MODEL = os.getenv("BOK_EXTRACTOR_MODEL", "haiku")
+358:        model: Literal["haiku", "sonnet"] = None,
+368:            model: Model to use - "haiku" (default, cost efficient) or "sonnet" (higher quality)
+374:        self.model_choice = model or DEFAULT_MODEL
+378:        self._model = None
+387:                    self._model = SONNET_MODEL_BEDROCK
+401:                        self._model = HAIKU_MODEL
+403:                        self._model = SONNET_MODEL_DIRECT
+477:            model=self._model,
+521:            model=self._model,
+854:    model: Literal["haiku", "sonnet"] = "haiku",
+864:        model: Model to use (haiku or sonnet)
+869:    extractor = BOKStandardsExtractorV6(mode=mode, use_bedrock=use_bedrock, model=model)
+896:    model: Literal["haiku", "sonnet"] = "haiku",
+906:        model: Model to use (default: haiku for cost efficiency)
+912:    extractor = BOKStandardsExtractorV6(mode=mode, use_bedrock=use_bedrock, model=model)
+1039:            model=args.model,
+1054:            model=args.model,
+PROMPTS:
+221:SECTION_EXTRACTION_PROMPT = """You are an expert at extracting structured data from NASA safety standards.
+479:            messages=[
+482:                    "content": f"Gas type context: {gas_type.value}\n\n{SECTION_EXTRACTION_PROMPT}\n\nDocument section:\n{text}"
+517:            "text": f"Gas type context: {gas_type.value}\n\n{SECTION_EXTRACTION_PROMPT}"
+523:            messages=[{"role": "user", "content": content}]
+PARSING:
+344:    Uses same architecture as MUA Parser v6:
+451:            if re.search(r'table\s+[a-z]?\d', text_lower) and numeric_ratio > 0.10:
+487:        response_text = response.content[0].text.strip()
+488:        return self._parse_json_response(response_text, "text", text)
+526:        if not response.content:
+527:            return {"extraction_mode": "vision", "parse_error": "Empty API response"}
+529:        response_text = response.content[0].text.strip()
+530:        return self._parse_json_response(response_text, "vision", raw_text)
+532:    def _parse_json_response(self, response_text: str, mode: str, raw_text: str) -> Dict[str, Any]:
+533:        """Parse JSON from LLM response."""
+554:            result = json.loads(response_text)
+560:            self.logger.error(f"Failed to parse JSON: {e}")
+567:                "title": "Parse Error",
+569:                "parse_error": str(e)
+576:        skip_keys = {"extraction_mode", "full_text", "parse_error"}
+878:        data = json.loads(json_path.read_text())
+926:                h2_sections_data = json.loads(h2_json_path.read_text())
+966:                o2_sections_data = json.loads(o2_json_path.read_text())
+1003:    import argparse
+1014:    parser = argparse.ArgumentParser(description="BOK Standards Extractor V6")
+1015:    parser.add_argument("--rebuild", action="store_true", help="Rebuild all BOK indices (starts fresh)")
+1016:    parser.add_argument("--continue", dest="continue_run", action="store_true", help="Continue from checkpoint (skip already-processed PDFs)")
+1017:    parser.add_argument("--pdf", type=str, help="Extract single PDF")
+1018:    parser.add_argument("--gas", choices=["H2", "O2"], help="Gas type for single PDF")
+1019:    parser.add_argument(
+1025:    parser.add_argument("--bedrock", action="store_true", help="Use Bedrock API (default: direct Anthropic API)")
+1026:    parser.add_argument(
+1033:    args = parser.parse_args()
+1069:        parser.print_help()
+
+### mira/knowledge_twins/extract h2.py
+CALLS:
+200:    response = client.messages.create(
+MODELS:
+201:        model="claude-sonnet-4-20250514",
+PROMPTS:
+28:PROMPT = """Extract ALL hydrogen embrittlement test data from this document into JSON.
+203:        messages=[{
+214:                {"type": "text", "text": PROMPT}
+PARSING:
+219:    text = response.content[0].text
+231:        data = json.loads(text)
+257:        print(f"  JSON parse error: {e}")
+
+### mira/maptis/pdf_extractor.py
+CALLS:
+232:        response = client.messages.create(
+MODELS:
+32:SONNET_MODEL_BEDROCK = "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0"
+33:SONNET_MODEL_DIRECT = "claude-sonnet-4-5-20250929"
+186:        self._model = None
+196:                    self._model = SONNET_MODEL_BEDROCK
+205:                    self._model = SONNET_MODEL_DIRECT
+233:            model=self._model,
+PROMPTS:
+84:MATERIAL_TABLE_PROMPT = """Extract ALL materials from this MAPTIS material family report PDF.
+105:FLAMMABILITY_TEST_PROMPT = """Extract ALL flammability test records from this MAPTIS report PDF.
+130:PNEUMATIC_TEST_PROMPT = """Extract ALL pneumatic impact test records from this MAPTIS report PDF.
+235:            messages=[{
+287:        raw = self._extract_via_vision(pdf_path, MATERIAL_TABLE_PROMPT)
+307:        raw = self._extract_via_vision(pdf_path, FLAMMABILITY_TEST_PROMPT)
+327:        raw = self._extract_via_vision(pdf_path, PNEUMATIC_TEST_PROMPT)
+PARSING:
+160:    Vision-first MAPTIS PDF extractor following MUAParserV6 pattern.
+190:        """Lazy-load Anthropic client (same pattern as MUAParserV6)."""
+218:        Extract using vision mode (same pattern as MUAParserV6).
+252:        # Parse JSON response (same cleanup as MUAParserV6)
+253:        if not response.content:
+257:        response_text = response.content[0].text.strip()
+268:            result = json.loads(response_text)
+272:            self.logger.error(f"Failed to parse JSON: {e}")
+293:                self.logger.warning(f"Failed to parse material record: {e}")
+313:                self.logger.warning(f"Failed to parse flam test record: {e}")
+333:                self.logger.warning(f"Failed to parse pneu test record: {e}")
+416:    import argparse
+424:    parser = argparse.ArgumentParser(description="MAPTIS PDF Extractor")
+425:    parser.add_argument("pdf_path", type=str, help="Path to MAPTIS PDF")
+426:    parser.add_argument(
+432:    parser.add_argument(
+437:    parser.add_argument(
+443:    args = parser.parse_args()
+458:    output_json = json.dumps(records, indent=2)
+
+### mira/miul/material_code_selector.py
+CALLS:
+208:            message = self.client.messages.create(
+MODELS:
+35:HAIKU_MODEL_DIRECT = "claude-3-haiku-20240307"
+36:HAIKU_MODEL_BEDROCK = "anthropic.claude-3-haiku-20240307-v1:0"
+120:        self.model = HAIKU_MODEL_BEDROCK if self.use_bedrock else HAIKU_MODEL_DIRECT
+209:                model=self.model,
+PROMPTS:
+39:SELECTION_PROMPT = """You are a NASA materials engineer selecting the correct MAPTIS material code for a spacecraft part.
+200:        prompt = SELECTION_PROMPT.format(
+212:                messages=[{"role": "user", "content": prompt}]
+PARSING:
+215:            response_text = message.content[0].text.strip()
+216:            result = self._parse_response(response_text, candidates)
+228:                logger.warning(f"Failed to parse AI response for '{designation}'")
+235:    def _parse_response(
+240:        """Parse Haiku JSON response with robust error handling."""
+252:                    data = json.loads(part)
+259:            data = json.loads(response_text)
+265:        json_match = re.search(r'\{[\s\S]*?\}', response_text)
+268:                data = json.loads(json_match.group())
+280:        """Validate parsed JSON and build SelectionResult."""
+
+### mira/miul/mua_parser_v6.py
+CALLS:
+331:        response = client.messages.create(
+402:        response = client.messages.create(
+MODELS:
+50:SONNET_MODEL_BEDROCK = "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0"
+51:SONNET_MODEL_DIRECT = "claude-sonnet-4-5-20250929"
+246:        self._model = None
+255:                    self._model = SONNET_MODEL_BEDROCK
+267:                    self._model = SONNET_MODEL_DIRECT
+332:            model=self._model,
+403:            model=self._model,
+PROMPTS:
+164:EXTRACTION_PROMPT = """You are an expert at extracting structured data from NASA Material Usage Agreement (MUA) documents.
+334:            messages=[
+337:                    "content": f"{EXTRACTION_PROMPT}\n\nDocument text:\n{text}"
+399:            {"type": "text", "text": EXTRACTION_PROMPT}
+405:            messages=[
+PARSING:
+3:Module: Mua Parser V6
+4:Purpose: MUA PDF Parser v6 - Vision-First Parser with Text/Vision/Hybrid Modes.
+39:__all__ = ["MUAParserV6", "MUAExtractedFieldsV6", "parse_mua_pdf_v6"]
+156:    parse_confidence: float = Field(default=0.0, description="Overall parse confidence 0-1")
+215:# MUA Parser V6
+218:class MUAParserV6:
+220:    Vision-first MUA parser with text/vision/hybrid modes.
+232:        Initialize parser.
+342:        # Parse JSON response
+343:        response_text = response.content[0].text.strip()
+359:            result = json.loads(response_text)
+364:            self.logger.error(f"Failed to parse JSON from text extraction: {e}")
+366:            return {"extraction_mode": "text", "raw_text": text, "parse_error": str(e)}
+413:        # Parse JSON response - handle empty responses
+414:        if not response.content:
+416:            return {"extraction_mode": "vision", "parse_error": "Empty API response"}
+418:        response_text = response.content[0].text.strip()
+434:            result = json.loads(response_text)
+438:            self.logger.error(f"Failed to parse JSON from vision extraction: {e}")
+440:            return {"extraction_mode": "vision", "parse_error": str(e)}
+461:        skip_keys = {"extraction_mode", "raw_text", "parse_error"}
+489:    def parse_pdf(self, pdf_path: Path, pages: List[int] | None = None) -> MUAExtractedFieldsV6:
+491:        Parse MUA PDF and extract fields.
+518:            result["parse_confidence"] = self._calculate_confidence(result)
+520:            # Remove parse_error before building Pydantic model (not a valid field)
+521:            parse_error = result.pop("parse_error", None)
+522:            if parse_error:
+523:                self.logger.warning(f"Parse error during extraction: {parse_error}")
+529:                f"Parsed {pdf_path.name}: "
+533:                f"Confidence={fields.parse_confidence:.2f}"
+539:            self.logger.error(f"Failed to parse {pdf_path}: {e}")
+543:        """Calculate overall parse confidence score."""
+602:    parse_timestamp: datetime = field(default_factory=datetime.now)
+603:    parse_success: bool = True
+604:    parse_errors: list[str] = field(default_factory=list)
+614:            self.fields.parse_confidence > 0.5
+627:            "parse_timestamp": self.parse_timestamp.isoformat(),
+628:            "parse_success": self.parse_success,
+629:            "parse_errors": self.parse_errors,
+636:        return json.dumps(self.to_dict(), indent=2)
+668:            "parse_confidence": self.fields.parse_confidence,
+677:def parse_mua_pdf_v6(
+684:    Parse a MUA PDF file.
+693:        Parsed MUA document
+696:    parser = MUAParserV6(mode=mode, use_bedrock=use_bedrock)
+699:        fields = parser.parse_pdf(pdf_path, pages=pages)
+700:        success = fields.parse_confidence > 0.3
+705:            parse_success=success
+708:        logger.error(f"Failed to parse {pdf_path}: {e}")
+712:            parse_success=False,
+713:            parse_errors=[str(e)]
+722:    import argparse
+729:    parser = argparse.ArgumentParser(description="MUA PDF Parser V6")
+730:    parser.add_argument("pdf_path", type=str, help="Path to MUA PDF")
+731:    parser.add_argument(
+737:    parser.add_argument(
+742:    parser.add_argument(
+748:    args = parser.parse_args()
+755:    # Parse
+756:    doc = parse_mua_pdf_v6(
+766:        print(f"MUA Parse Results - V6 ({doc.fields.extraction_mode} mode)")
+769:        print(f"Success: {doc.parse_success}")
+770:        print(f"Confidence: {doc.fields.parse_confidence:.0%}")
+
+### mira/miul/mua_synthesizer.py
+CALLS:
+468:            response = self.client.messages.create(
+544:            response = self.client.messages.create(
+MODELS:
+38:SONNET_MODEL_DIRECT = "claude-sonnet-4-5-20250929"
+39:SONNET_MODEL_BEDROCK = "anthropic.claude-sonnet-4-5-20250929-v1:0"
+201:        return AnthropicBedrock(aws_region=BEDROCK_REGION), SONNET_MODEL_BEDROCK
+205:        return Anthropic(api_key=api_key), SONNET_MODEL_DIRECT
+224:        self.client, self.model = get_llm_client(use_bedrock)
+469:                model=self.model,
+545:                model=self.model,
+PROMPTS:
+430:        prompt = f"""You are a NASA materials engineer analyzing MUA precedent applicability.
+471:                messages=[{"role": "user", "content": prompt}]
+507:        prompt = f"""You are a NASA materials engineer writing an MUA rationale.
+547:                messages=[{"role": "user", "content": prompt}]
+PARSING:
+85:    def parse(cls, precedent_id: str, response_text: str) -> "ApplicabilityAnalysis":
+86:        """Parse LLM response into ApplicabilityAnalysis."""
+89:            json_match = re.search(r'\{[\s\S]*\}', response_text)
+91:                data = json.loads(json_match.group())
+122:            logger.warning(f"Failed to parse applicability response: {e}")
+473:            response_text = response.content[0].text
+474:            return ApplicabilityAnalysis.parse(precedent.mua_number, response_text)
+549:            rationale = response.content[0].text
+
+### mira/miul/v1_archive/drawing_inventory.py
+CALLS:
+230:        response = self.client.messages.create(
+MODELS:
+44:SONNET_BEDROCK = "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0"
+45:SONNET_DIRECT = "claude-sonnet-4-5-20250929"
+203:            self.model = SONNET_BEDROCK
+205:            self.model = SONNET_DIRECT
+231:            model=self.model,
+PROMPTS:
+234:            messages=[{"role": "user", "content": content}]
+299:# EXTRACTION PROMPTS
+302:PROMPT_DRAWING_TREE = """Analyze this Drawing Tree document and extract the COMPLETE hierarchy.
+327:PROMPT_TITLE_BLOCK = """Extract the TITLE BLOCK information from this engineering drawing.
+353:PROMPT_PARTS_LIST = """Extract the COMPLETE PARTS LIST / EPL table from this assembly drawing.
+384:PROMPT_EMBEDDED_HARDWARE = """Extract ALL embedded hardware callouts from this DETAIL drawing.
+417:PROMPT_SURFACE_FINISH = """Extract ALL surface finish specifications from this drawing.
+537:            response = self.vision.call(images, PROMPT_DRAWING_TREE)
+595:            response = self.vision.call([image], PROMPT_TITLE_BLOCK, max_tokens=1000)
+623:                response = self.vision.call([image], PROMPT_PARTS_LIST)
+656:                response = self.vision.call([image], PROMPT_EMBEDDED_HARDWARE)
+682:            response = self.vision.call([image], PROMPT_SURFACE_FINISH)
+PARSING:
+236:        return response.content[0].text.strip()
+238:    def parse_json(self, text: str) -> Any:
+239:        """Parse JSON from API response."""
+251:            return json.loads(text)
+254:            match = re.search(r'[\[{][\s\S]*[\]}]', text)
+257:                    return json.loads(match.group())
+398:For EACH item, extract the COMPLETE callout text plus parsed details.
+538:            data = self.vision.parse_json(response)
+596:            data = self.vision.parse_json(response)
+624:                data = self.vision.parse_json(response)
+632:                            quantity=self._parse_qty(p.get("qty", 1)),
+657:                data = self.vision.parse_json(response)
+683:            data = self.vision.parse_json(response)
+714:    def _parse_qty(self, val) -> int:
+715:        """Parse quantity value."""
+782:    import argparse
+789:    parser = argparse.ArgumentParser(
+792:    parser.add_argument("directory", type=Path, help="Directory containing drawing PDFs")
+793:    parser.add_argument("-o", "--output", type=Path, help="Output JSON path")
+794:    parser.add_argument("--bedrock", action="store_true", help="Use AWS Bedrock")
+795:    parser.add_argument("--api-key", help="Anthropic API key")
+797:    args = parser.parse_args()
+
+### mira/miul/v1_archive/dt_miul_builder.py
+CALLS:
+411:        response = client.messages.create(
+751:            response = client.messages.create(
+1206:            response = client.messages.create(
+1361:            response = client.messages.create(
+MODELS:
+412:            model="claude-sonnet-4-20250514",
+752:                model="claude-sonnet-4-20250514",
+1207:                model="claude-sonnet-4-20250514",
+1362:                model="claude-sonnet-4-20250514",
+PROMPTS:
+356:        prompt = """Analyze this Engineering Drawing Tree document and extract the COMPLETE assembly hierarchy.
+414:            messages=[{"role": "user", "content": content}]
+687:        # CORRECTED EPL PROMPT - Distinguishes MATERIAL PART NUMBER from MATERIAL columns
+691:        prompt = f"""Extract ALL items from the PARTS LIST or EPL table on this assembly drawing.
+754:                messages=[{"role": "user", "content": content}]
+1078:        prompt = """Extract material and process specifications from these engineering drawings.
+1209:                messages=[{"role": "user", "content": content}]
+1326:        prompt = f"""STOP! This is an MSFC drawing. The material is NOT in the title block - look for FLAGGED NOTES.
+1364:                messages=[{
+PARSING:
+45:        parse_embedded_material,
+417:        # Parse response
+418:        response_text = response.content[0].text
+429:            data = json.loads(json_match.strip())
+431:            logger.error(f"[DT-MIUL] Failed to parse JSON from Vision response: {e}")
+444:            elif not _re.search(r'[A-Z0-9]{3,}', top_assembly, _re.IGNORECASE):
+757:            response_text = response.content[0].text
+760:            # Parse JSON
+768:            data = json.loads(json_str.strip())
+776:            logger.info(f"[DT-MIUL] EPL parsed {len(parts)} parts for {assembly_pn}")
+782:            logger.error(f"[DT-MIUL] EPL JSON parse error for {assembly_pn}: {e}")
+847:                parsed = parse_embedded_material(desc, pn)
+848:                if parsed and parsed.designation:
+850:                        parsed.designation,
+857:                        part["material_confidence"] = parsed.confidence
+858:                        logger.debug(f"[DT-MIUL] Parsed embedded: {sanitized} (conf={parsed.confidence:.2f})")
+1114:When you find "MATERIAL:" in notes, parse it:
+1212:            response_text = response.content[0].text
+1214:            # Parse JSON
+1222:            data = json.loads(json_str.strip())
+1301:            logger.error(f"[DT-MIUL] Material JSON parse error: {e}")
+1339:PARSE THE MATERIAL NOTE:
+1380:            response_text = response.content[0].text
+1382:            # Parse JSON
+1390:            data = json.loads(json_str.strip())
+1589:                # Parse quantity
+1808:    import argparse
+1810:    parser = argparse.ArgumentParser(description="Build MIUL from Drawing Tree")
+1811:    parser.add_argument("dt_pdf", type=Path, help="Path to -DT PDF file")
+1812:    parser.add_argument("-n", "--miul-number", required=True, help="MIUL identifier")
+1813:    parser.add_argument("-d", "--drawing-dir", type=Path, help="Directory with detail drawings")
+1814:    parser.add_argument("-o", "--output", type=Path, help="Output Excel path")
+1815:    parser.add_argument("-p", "--project", default="", help="Project name")
+1816:    args = parser.parse_args()
+
+### mira/miul/v1_archive/extractors/haiku_drawing_extractor.py
+CALLS:
+293:            response = self.client.messages.create(
+MODELS:
+37:SONNET_MODEL_BEDROCK = "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0"
+38:SONNET_MODEL_DIRECT = "claude-sonnet-4-5-20250929"
+66:        self.model = SONNET_MODEL_BEDROCK if self.use_bedrock else SONNET_MODEL_DIRECT
+294:                model=self.model,
+PROMPTS:
+297:                messages=[
+PARSING:
+31:# Configuration from environment (same as MUA parser)
+122:            if re.search(pattern, standard, re.IGNORECASE):
+135:            if re.search(pattern, standard, re.IGNORECASE):
+153:        from mira.miul.extractors.drawing_parser import (
+158:            DrawingParserPrompts,
+180:                prompts = DrawingParserPrompts()
+205:                            LOGGER.warning(f"Failed to parse hardware item: {e}")
+286:            Parsed JSON response.
+315:            return self._parse_json_response(response.content[0].text)
+388:        from mira.miul.extractors.drawing_parser import (
+404:            match = re.search(pattern, text, re.IGNORECASE)
+445:            match = re.search(pattern, text, re.IGNORECASE)
+452:    def _parse_json_response(text: str) -> Dict[str, Any]:
+459:            Parsed JSON dict.
+474:        match = re.search(r"[\[{][\s\S]*[\]}]", text)
+477:                return json.loads(match.group())
+479:                LOGGER.error(f"JSON parse error: {e}")
+
+### mira/miul/v1_archive/haiku_bom_extractor.py
+CALLS:
+154:        resp = self.client.messages.create(
+MODELS:
+62:HAIKU_MODEL_DIRECT = "claude-3-haiku-20240307"
+63:HAIKU_MODEL_BEDROCK = "anthropic.claude-3-haiku-20240307-v1:0"
+76:        return AnthropicBedrock(aws_region=region), HAIKU_MODEL_BEDROCK
+79:        return Anthropic(api_key=api_key), HAIKU_MODEL_DIRECT
+90:        self.client, self.model = get_anthropic_client(api_key=api_key, use_bedrock=use_bedrock)
+91:        logger.info(f"Initialized extractor with model: {self.model}")
+155:            model=self.model,
+PROMPTS:
+158:            messages=[{"role": "user", "content": content}]
+221:        prompt = """You are looking at an Engineering Drawing Tree diagram.
+260:        prompt = """Look at this engineering drawing and extract info from the title block AND notes.
+308:            prompt = """Look at this DETAIL engineering drawing.
+330:                prompt = """You are a STRICT forensic engineering drawing parser extracting the ENGINEERING PARTS LIST (EPL).
+368:                prompt = f"""You are a STRICT forensic engineering drawing parser extracting the ENGINEERING PARTS LIST (EPL).
+PARSING:
+160:        return resp.content[0].text.strip()
+162:    def parse_json_response(self, raw: str) -> Any:
+163:        """Parse JSON from Haiku response, handling markdown wrappers and surrounding text."""
+197:        return json.loads(raw)
+241:            hierarchy = self.parse_json_response(raw)
+255:            logger.warning(f"Drawing tree parse failed: {e}")
+281:            return self.parse_json_response(raw)
+299:        # Detect scanned PDFs (sparse text extraction)
+330:                prompt = """You are a STRICT forensic engineering drawing parser extracting the ENGINEERING PARTS LIST (EPL).
+368:                prompt = f"""You are a STRICT forensic engineering drawing parser extracting the ENGINEERING PARTS LIST (EPL).
+414:            parts = self.parse_json_response(raw)
+417:            # BUT skip validation if text extraction was too sparse (likely a scanned PDF)
+1078:    import argparse
+1080:    parser = argparse.ArgumentParser(description="Haiku BOM Extractor - 2-Step Process")
+1081:    subparsers = parser.add_subparsers(dest="command", help="Commands")
+1084:    extract_parser = subparsers.add_parser("extract", help="Step 1: Extract PDFs to JSON using Haiku vision")
+1085:    extract_parser.add_argument("directory", help="Folder containing PDF drawings")
+1086:    extract_parser.add_argument("--output", "-o", help="Output JSON path")
+1087:    extract_parser.add_argument("--api-key", help="Anthropic API key (or set ANTHROPIC_API_KEY)")
+1090:    assemble_parser = subparsers.add_parser("assemble", help="Step 2: Convert JSON to MIUL Excel")
+1091:    assemble_parser.add_argument("json_file", help="Path to extraction_results.json")
+1092:    assemble_parser.add_argument("--output", "-o", help="Output Excel path")
+1093:    assemble_parser.add_argument("--default-nha", default="", help="Default NHA if resolution fails")
+1094:    assemble_parser.add_argument("--project", default="PROJECT", help="Project name")
+1097:    full_parser = subparsers.add_parser("full", help="Run both steps: Extract then Assemble")
+1098:    full_parser.add_argument("directory", help="Folder containing PDF drawings")
+1099:    full_parser.add_argument("--api-key", help="Anthropic API key")
+1100:    full_parser.add_argument("--project", default="PROJECT", help="Project name")
+1102:    args = parser.parse_args()
+1128:        parser.print_help()
+
+### mira/miul/v1_archive/haiku_bom_extractor_old.py
+CALLS:
+270:            message = self.client.messages.create(
+332:            message = self.client.messages.create(
+MODELS:
+120:        self.model = "claude-3-haiku-20240307"
+271:                model=self.model,
+333:                model=self.model,
+PROMPTS:
+174:        prompt = f"""You are extracting parts list data from an aerospace engineering drawing.
+274:                messages=[{"role": "user", "content": prompt}]
+306:        prompt = f"""Extract drawing title block information from this engineering drawing.
+336:                messages=[{"role": "user", "content": prompt}]
+PARSING:
+92:    mer_numbers = re.findall(r'(MER\d{5}-\d{3})', text, re.IGNORECASE)
+160:        parts_header = re.search(r'ENGINEERING\s+PARTS\s+LIST', anon_text, flags=re.IGNORECASE)
+277:            response_text = message.content[0].text.strip()
+278:            parts = self._parse_json_array(response_text)
+339:            response_text = message.content[0].text.strip()
+340:            result = self._parse_json_object(response_text)
+360:    def _parse_json_array(self, response_text: str) -> List[Dict[str, Any]]:
+361:        """Parse JSON array from Haiku response."""
+373:                        return json.loads(part)
+377:        # Try direct parse
+379:            return json.loads(response_text)
+384:        match = re.search(r'\[[\s\S]*\]', response_text, re.DOTALL)
+387:                return json.loads(match.group())
+393:    def _parse_json_object(self, response_text: str) -> Optional[Dict[str, Any]]:
+394:        """Parse JSON object from Haiku response."""
+406:                        return json.loads(part)
+410:        # Try direct parse
+412:            return json.loads(response_text)
+417:        match = re.search(r'\{[\s\S]*\}', response_text, re.DOTALL)
+420:                return json.loads(match.group())
+680:    import argparse
+682:    parser = argparse.ArgumentParser(description="Haiku BOM Extractor - Base MIUL Generator")
+683:    parser.add_argument("directory", help="Directory containing PDF drawings")
+684:    parser.add_argument("--api-key", help="Anthropic API key (or set ANTHROPIC_API_KEY env var)")
+685:    args = parser.parse_args()
+
+### mira/miul/v1_archive/miul_extractor_v2.py
+CALLS:
+174:        resp = self.client.messages.create(
+MODELS:
+51:SONNET_MODEL_DIRECT = "claude-sonnet-4-5-20250929"
+54:SONNET_MODEL_BEDROCK = "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0"
+80:    return SONNET_MODEL_BEDROCK if use_bedrock else SONNET_MODEL_DIRECT
+84:MODEL_ID = get_model_id()
+140:        self.model = get_model_id(use_bedrock)
+169:    def call_vision(self, images: List[str], prompt: str, model: str, max_tokens: int = 4096) -> str:
+175:            model=model,
+1148:            raw_response = self.call_vision(images, prompt, model=MODEL_ID, max_tokens=4096)
+PROMPTS:
+178:            messages=[{"role": "user", "content": content}]
+239:            prompt = """Analyze this engineering Drawing Tree document.
+358:            title_prompt = """Extract from this engineering drawing:
+438:        prompt = f"""Extract the ENGINEERING PARTS LIST (EPL) table from this assembly drawing.
+514:            prompt = f"""Analyze this DETAIL engineering drawing carefully.
+1122:        prompt = """Analyze this Drawing Tree document and extract the COMPLETE assembly hierarchy.
+PARSING:
+180:        return resp.content[0].text.strip()
+182:    def parse_json(self, raw: str) -> Any:
+183:        """Parse JSON from AI response."""
+202:        return json.loads(raw)
+268:                data = self.parse_json(raw)
+390:                title_data = self.parse_json(raw)
+465:            parts = self.parse_json(raw)
+558:                data = self.parse_json(raw)
+880:                "qty": self._parse_qty(p.get("qty", p.get("quantity", 1))),
+1045:    def _parse_qty(self, val) -> int:
+1046:        """Parse quantity, handling A/R, REF, etc."""
+1149:            dt_data = self.parse_json(raw_response)
+1152:                return {"status": "ERROR", "error": "Could not parse DT extraction response"}
+1337:    import argparse
+1338:    parser = argparse.ArgumentParser(description="MIUL Extractor v2 - Dynamic 3-Pass AI Extraction")
+1339:    parser.add_argument("directory", type=Path, help="Directory containing drawing PDFs")
+1340:    parser.add_argument("-o", "--output", type=Path, help="Output JSON path")
+1341:    parser.add_argument("--api-key", help="Anthropic API key (or set ANTHROPIC_API_KEY)")
+1342:    parser.add_argument("--bedrock", action="store_true", help="Use AWS Bedrock instead of direct API (or set USE_BEDROCK=1)")
+1343:    parser.add_argument("--region", default="us-gov-west-1", help="AWS region for Bedrock (default: us-gov-west-1)")
+1344:    args = parser.parse_args()
+
+### mira/miul/v1_archive/msfc/extractor.py
+CALLS:
+560:            response = self.client.messages.create(
+MODELS:
+221:    def __init__(self, api_key: str | None = None, use_bedrock: bool = True, model: str | None = None):
+227:            model: Model to use. Defaults to Sonnet 4.5 on Bedrock, Haiku on direct API.
+245:            self.model = model or os.getenv("BEDROCK_MODEL", "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0")
+254:            self.model = model or "claude-3-haiku-20240307"
+561:                model=self.model,
+PROMPTS:
+564:                messages=[
+PARSING:
+315:            logger.info(f"Vision fallback for {len(pages_needing_vision)} pages with unparsed inserts")
+444:                    logger.warning(f"Vision hardware parse failed: {e}")
+557:            ExtractionResult with parsed JSON or error.
+582:            raw_text = response.content[0].text
+583:            parsed = self._parse_json_response(raw_text)
+585:            if parsed is None:
+588:                    error="Failed to parse JSON from response",
+592:            return ExtractionResult(success=True, data=parsed, raw_response=raw_text)
+670:    def _parse_json_response(text: str) -> dict[str, Any] | None:
+671:        """Extract and parse JSON from model response.
+677:            Parsed JSON dict or None if parsing fails.
+690:        match = re.search(r"[\[{][\s\S]*[\]}]", text)
+693:                return json.loads(match.group())
+695:                logger.warning(f"JSON parse error: {e}")
+
+### mira/miul/v1_archive/parts_inventory_extractor.py
+CALLS:
+504:            response = self.client.messages.create(
+MODELS:
+36:SONNET_MODEL_BEDROCK = "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0"
+37:SONNET_MODEL_DIRECT = "claude-sonnet-4-5-20250929"
+152:        self.model = SONNET_MODEL_BEDROCK if self.use_bedrock else SONNET_MODEL_DIRECT
+505:                model=self.model,
+PROMPTS:
+284:        prompt = """Analyze this engineering drawing and extract the TITLE BLOCK information.
+303:        prompt = """Analyze this engineering drawing and determine its type.
+340:            prompt = """You are a STRICT forensic engineering drawing parser extracting the ENGINEERING PARTS LIST (EPL).
+373:            prompt = f"""You are a STRICT forensic engineering drawing parser extracting the ENGINEERING PARTS LIST (EPL).
+438:        prompt = """Extract ALL embedded hardware callouts from this drawing.
+484:        prompt = """List ALL standards and specifications referenced on this drawing.
+508:                messages=[
+PARSING:
+129:        return json.dumps(self.to_dict(), indent=indent)
+333:        # Detect scanned PDFs (sparse text extraction)
+340:            prompt = """You are a STRICT forensic engineering drawing parser extracting the ENGINEERING PARTS LIST (EPL).
+373:            prompt = f"""You are a STRICT forensic engineering drawing parser extracting the ENGINEERING PARTS LIST (EPL).
+525:            return self._parse_json_response(response.content[0].text)
+530:    def _parse_json_response(self, text: str) -> Dict[str, Any]:
+531:        """Parse JSON from LLM response."""
+543:            return json.loads(text)
+547:            match = re.search(r'\{[\s\S]*\}', text)
+550:                    return json.loads(match.group())
+657:    # Parse args
+
+### mira/miul/v1_archive/stages/parse_drawings.py
+CALLS:
+345:        response = client.messages.create(
+444:        response = client.messages.create(
+MODELS:
+346:            model="claude-sonnet-4-20250514",
+445:            model="claude-sonnet-4-20250514",
+PROMPTS:
+290:    prompt = """Extract material information from these engineering drawings.
+348:            messages=[{"role": "user", "content": content}]
+402:    prompt = f"""Extract the Engineering Parts List (EPL) or PARTS LIST table from this assembly drawing.
+447:            messages=[{"role": "user", "content": content}]
+PARSING:
+3:Module: Parse Drawings
+4:Purpose: Stage 2-3 - Drawing Parser
+32:    "parse_detail_drawings",
+33:    "parse_assembly_epls",
+57:            qty=_parse_qty(data.get("qty", 1)),
+104:                "stage": "parse_drawings",
+145:def parse_detail_drawings(
+151:    """Parse detail drawings to extract material data.
+192:def parse_assembly_epls(
+198:    """Parse assembly drawings to extract EPL (Engineering Parts List).
+351:        response_text = response.content[0].text
+353:        # Parse JSON
+361:        data = json.loads(json_str.strip())
+450:        response_text = response.content[0].text
+452:        # Parse JSON
+460:        data = json.loads(json_str.strip())
+468:        logger.warning(f"[Stage 3] EPL parse error for {assembly_pn}: {e}")
+520:def _parse_qty(qty_raw) -> int:
+521:    """Parse quantity, handling AR/REF."""
+
+### mira/miul/v1_archive/stages/parse_dt.py
+CALLS:
+231:    response = client.messages.create(
+MODELS:
+232:        model="claude-sonnet-4-20250514",
+PROMPTS:
+193:    prompt = """Analyze this Drawing Tree diagram and extract the COMPLETE assembly hierarchy.
+234:        messages=[{"role": "user", "content": content}]
+PARSING:
+3:Module: Parse Dt
+4:Purpose: Stage 1 - Drawing Tree Parser
+31:__all__ = ["parse_drawing_tree", "DTHierarchy", "DTNode"]
+92:                "stage": "parse_dt",
+127:def parse_drawing_tree(
+133:    """Parse Drawing Tree PDF to extract complete hierarchy.
+237:    response_text = response.content[0].text
+239:    # Parse JSON from response
+246:    data = json.loads(json_str.strip())
+
+### mira/miul/v2/cli.py
+CALLS:
+MODELS:
+PROMPTS:
+PARSING:
+19:import argparse
+237:    parser = argparse.ArgumentParser(
+239:        formatter_class=argparse.RawDescriptionHelpFormatter,
+262:    parser.add_argument(
+268:    parser.add_argument(
+273:    parser.add_argument(
+278:    parser.add_argument(
+283:    parser.add_argument(
+288:    parser.add_argument(
+293:    parser.add_argument(
+298:    parser.add_argument(
+303:    parser.add_argument(
+308:    parser.add_argument(
+314:    args = parser.parse_args()
+318:        parser.error(f"Input directory does not exist: {args.input}")
+321:        parser.error(f"Drawing Tree PDF does not exist: {args.dt}")
+324:        parser.error("Must specify at least one of --output or --json")
+
+### mira/miul/v2/extract.py
+CALLS:
+264:    message = anthropic_client.messages.create(
+MODELS:
+50:MODEL_VERSION = "claude-sonnet-4-20250514"
+252:    model: str = MODEL_VERSION,
+265:        model=model,
+597:        cache_key = compute_cache_key(source_file, page_index, PROMPT_VERSION, MODEL_VERSION)
+PROMPTS:
+49:PROMPT_VERSION = "v2.3.3"  # MSFC notes-based material extraction
+57:VISION_EXTRACTION_PROMPT = """You are a STRICT forensic engineering drawing parser.
+267:        messages=[{
+280:                    "text": VISION_EXTRACTION_PROMPT,
+597:        cache_key = compute_cache_key(source_file, page_index, PROMPT_VERSION, MODEL_VERSION)
+PARSING:
+57:VISION_EXTRACTION_PROMPT = """You are a STRICT forensic engineering drawing parser.
+162:- When you find "MATERIAL:" in notes, parse it and populate title_block fields:
+286:    response_text = message.content[0].text
+288:    # Parse JSON from response
+289:    json_match = re.search(r'```json\s*(.*?)\s*```', response_text, re.DOTALL)
+302:        return json.loads(json_str)
+304:        LOGGER.warning(f"Failed to parse vision response: {e}")
+369:def parse_vision_result(
+372:    """Parse vision JSON response into model objects."""
+525:        if re.search(r'(\d)\1{2,}', pn):
+562:    4. Parse result into PageExtract
+586:                issue_type=IssueType.PARSE_FAILURE,
+615:                    issue_type=IssueType.PARSE_FAILURE,
+621:    # Step 3: Parse results
+623:        title_block, occurrences, layout_flags, parts_list, hardware = parse_vision_result(vision_result)
+768:                        issue_type=IssueType.PARSE_FAILURE,
+
+### mira/miul/v2/graph.py
+CALLS:
+180:    message = anthropic_client.messages.create(
+MODELS:
+181:        model="claude-sonnet-4-20250514",
+PROMPTS:
+66:DT_EXTRACTION_PROMPT = """Analyze this Engineering Drawing Tree document and extract the parent-child hierarchy.
+183:        messages=[{
+196:                    "text": DT_EXTRACTION_PROMPT,
+PARSING:
+159:    if not re.search(r'[A-Z0-9]{3,}', value, re.IGNORECASE):
+169:    Parse Drawing Tree PDF with Vision API.
+202:    response_text = message.content[0].text
+205:    # Parse JSON
+212:            raw_hierarchy = json.loads(json_str)
+237:        LOGGER.warning(f"Failed to parse DT response: {e}")
+296:    1. If DT exists and we have a client → parse DT (source of truth)
+
+### mira/miul/v3/extract.py
+CALLS:
+303:            response = self.client.messages.create(
+1215:        response = client.client.messages.create(**api_kwargs)
+1281:        response = client.client.messages.create(
+1505:        response = client.client.messages.create(
+MODELS:
+58:# SONNET_MODEL_BEDROCK = "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0"
+59:SONNET_MODEL = "claude-sonnet-4-5-20250929"
+280:        self.model = SONNET_MODEL
+304:                model=self.model,
+1282:            model=client.model,
+1506:            model=client.model,
+PROMPTS:
+66:V3_EXTRACTION_PROMPT = """You are a PRECISION engineering drawing parser for NASA/MSFC aerospace drawings.
+307:                messages=[{
+733:    raw = client.call_vision(images[page_idx], V3_EXTRACTION_PROMPT)
+807:DT_SYSTEM_PROMPT = """You extract drawing tree hierarchies using a LEVEL-BY-LEVEL approach.
+835:DT_EXTRACTION_PROMPT = """Extract this drawing tree by answering level-by-level:
+945:DT_EXTRACTION_PROMPT_FLAT = """You are parsing a NASA/MSFC DRAWING TREE document.
+1181:    full_prompt = prompt
+1250:    validation_prompt = f"""Validate this extracted drawing tree by checking LEVEL BY LEVEL:
+1285:            messages=[{
+1444:            DT_EXTRACTION_PROMPT,
+1445:            system_prompt=DT_SYSTEM_PROMPT,
+1509:            messages=[{"role": "user", "content": content}],
+PARSING:
+66:V3_EXTRACTION_PROMPT = """You are a PRECISION engineering drawing parser for NASA/MSFC aerospace drawings.
+102:- Parse these to get designation, UNS, and spec
+233:      "parsed_designation": "extracted material name",
+234:      "parsed_spec": "extracted spec",
+235:      "parsed_uns": "extracted UNS"
+322:            return self._parse_json_response(response.content[0].text)
+328:    def _parse_json_response(text: str) -> Dict[str, Any]:
+342:        match = re.search(r"[\[{][\s\S]*[\]}]", text)
+345:                return json.loads(match.group())
+347:                LOGGER.error(f"JSON parse error: {e}")
+521:            if mn.get("parsed_designation"):
+522:                tb["material_designation"] = correct_ocr_errors(mn["parsed_designation"])
+523:                tb["material_spec"] = mn.get("parsed_spec", tb.get("material_spec", ""))
+524:                tb["uns_number"] = mn.get("parsed_uns", tb.get("uns_number", ""))
+667:                # Try to parse find_no as quantity
+1175:        Parsed JSON response from vision API
+1185:            f"Previous JSON:\n{json.dumps(previous_attempt, indent=2)}\n\n"
+1216:        return client._parse_json_response(response.content[0].text)
+1253:{json.dumps(extracted_tree, indent=2)}
+1301:        response_text = response.content[0].text.strip()
+1303:        # Parse validation result - handle both strict and verbose responses
+1415:    The extraction uses a vision model to parse the visual hierarchy,
+1511:        return client._parse_json_response(response.content[0].text)
+
+### mira/mua/final/renderer.py
+CALLS:
+309:        response = client.messages.create(
+MODELS:
+38:DEFAULT_MODEL = "claude-sonnet-4-5-20250929"
+41:# DEFAULT_MODEL_BEDROCK = "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0"
+56:        self._model_id = model_id or DEFAULT_MODEL
+63:        #     self._model_id = DEFAULT_MODEL_BEDROCK
+310:            model=self._model_id,
+PROMPTS:
+306:        system_prompt = self._build_system_prompt()
+307:        user_prompt = self._build_user_prompt(session, data_context, precedent_context)
+312:            system=system_prompt,
+313:            messages=[{"role": "user", "content": user_prompt}],
+328:7. If precedent MUA examples are provided, match their tone and technical depth.
+PARSING:
+316:        return response.content[0].text
+
+### mira/mua/v6/logic_validator.py
+CALLS:
+175:            message = self._client.messages.create(
+MODELS:
+109:    MODEL = "claude-3-5-haiku-20241022"
+171:                f"LogicValidator calling {self.MODEL}",
+176:                model=self.MODEL,
+PROMPTS:
+167:            prompt = self._build_prompt(material, environment_desc, precedents)
+179:                messages=[{"role": "user", "content": prompt}],
+PARSING:
+182:            response_text = message.content[0].text.strip()
+184:            # Parse JSON response
+185:            parsed = self._parse_json_response(response_text)
+186:            if parsed is None:
+188:                    "LogicValidator failed to parse LLM response",
+193:                    reasoning=f"Failed to parse LLM response: {response_text[:200]}",
+197:            # Build result from parsed JSON
+198:            result = self._build_result_from_json(parsed, req_id)
+294:    def _parse_json_response(self, response_text: str) -> Optional[dict[str, Any]]:
+310:                    return json.loads(part.strip())
+316:            return json.loads(response_text.strip())
+321:        json_match = re.search(r'\{[\s\S]*\}', response_text, re.DOTALL)
+325:                return json.loads(json_str)
+330:                    return json.loads(json_str_fixed)
+338:        parsed: dict[str, Any],
+341:        """Build RationaleValidationResult from parsed JSON.
+346:            is_valid=bool(parsed.get("is_valid", False)),
+347:            synthesized_rationale=str(parsed.get("synthesized_rationale", "")),
+348:            citations=list(parsed.get("citations", [])),
+349:            rejected_precedents=list(parsed.get("rejected_precedents", [])),
+350:            rejection_reasons=dict(parsed.get("rejection_reasons", {})),
+351:            reasoning=str(parsed.get("reasoning", "")),
+
+### mira/mua/v7/draft_polish.py
+CALLS:
+259:        response = client.messages.create(
+MODELS:
+33:_DEFAULT_MODEL = "claude-sonnet-4-5-20250929"
+180:    model: str = _DEFAULT_MODEL,
+198:    model:
+260:            model=model,
+PROMPTS:
+1:"""MUA v7 Draft Polish -- LLM enhancement layer using real MUA examples.
+37:_POLISH_SYSTEM_PROMPT = """\
+71:def _fetch_example_rationale(
+88:        logger.warning("psycopg2 not available -- skipping example fetch.")
+95:        logger.warning("Could not connect to PostgreSQL -- skipping example fetch.", exc_info=True)
+163:        logger.warning("Failed to query mua_precedents_v7 for examples.", exc_info=True)
+195:        Canonical material family for example lookup (e.g. "ALUMINUM").
+197:        Canonical environment type for example lookup (e.g. "CABIN_AIR").
+220:    examples = _fetch_example_rationale(material_family, env_type, limit=3)
+222:    if not examples:
+224:            "No example MUA rationale found (family=%s, env=%s) -- "
+232:    example_block = "\n\n".join(
+236:        for ex in examples
+239:    user_prompt = (
+241:        f"{example_block}\n\n"
+263:            system=_POLISH_SYSTEM_PROMPT,
+264:            messages=[{"role": "user", "content": user_prompt}],
+PARSING:
+267:        polished_text = response.content[0].text.strip()
+
+### mira/mua/v8/renderer.py
+CALLS:
+297:        response = client.messages.create(
+MODELS:
+44:DEFAULT_MODEL_BEDROCK = "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0"
+45:DEFAULT_MODEL_DIRECT = "claude-sonnet-4-5-20250929"
+82:                    self._model_id = DEFAULT_MODEL_BEDROCK
+87:                    self._model_id = DEFAULT_MODEL_DIRECT
+298:            model=self._model_id,
+PROMPTS:
+60:      - Real MUA precedent rationale from Postgres as writing examples
+260:        """Build precedent examples for the LLM."""
+294:        system_prompt = self._build_system_prompt()
+295:        user_prompt = self._build_user_prompt(session, data_context, precedent_context)
+300:            system=system_prompt,
+301:            messages=[{"role": "user", "content": user_prompt}],
+316:7. If precedent MUA examples are provided, match their tone and technical depth
+PARSING:
+304:        return response.content[0].text
+
+### mira/precedent_engine/core/narrator.py
+CALLS:
+151:        response = client.invoke_model(
+MODELS:
+PROMPTS:
+33:NARRATOR_SYSTEM_PROMPT = """You are NASA's MUA precedent narrator. You synthesize rationale text from existing precedent MUAs.
+51:NARRATOR_USER_PROMPT = """Generate rationale for this new MUA case based on the provided precedents.
+141:        user_prompt = NARRATOR_USER_PROMPT.format(
+158:                    "system": NARRATOR_SYSTEM_PROMPT,
+PARSING:
+146:            precedents_json=json.dumps(precedents_data, indent=2),
+153:            body=json.dumps(
+164:        response_body = json.loads(response["body"].read())
+167:        # Parse response
+169:            result = json.loads(raw_text)
+182:                "confidence_note": "Parse error - escalate for review",
+
+### mira/precedent_engine/utils/bedrock.py
+CALLS:
+65:        response = bedrock.invoke_model(
+MODELS:
+PROMPTS:
+PARSING:
+67:            body=json.dumps(
+77:        response_body = json.loads(response["body"].read())
+104:            # Parse the input from the prompt
+
+### scripts/drawing_tree_extractor.py
+CALLS:
+97:    response = client.messages.create(
+179:    response = client.messages.create(
+MODELS:
+98:        model="claude-sonnet-4-20250514",
+180:        model="claude-sonnet-4-20250514",
+PROMPTS:
+36:    system_prompt = """You are an expert at analyzing engineering drawing trees (also called parts lists or assembly trees).
+90:    user_prompt = f"Extract the complete drawing tree hierarchy from this PDF: {filename}\n\nReturn ONLY valid JSON matching the schema - no markdown, no explanation."
+100:        system=system_prompt,
+101:        messages=[
+136:    system_prompt = """You are a quality assurance expert validating drawing tree extractions.
+182:        system=system_prompt,
+183:        messages=[
+PARSING:
+93:        user_prompt += f"\n\nPREVIOUS ATTEMPT HAD ERRORS:\n{feedback}\n\nPrevious JSON:\n{json.dumps(previous_attempt, indent=2)}\n\nPlease correct these issues and return the fixed JSON."
+107:    response_text = response.content[0].text.strip()
+125:    return json.loads(response_text)
+164:{json.dumps(extracted_tree, indent=2)}
+188:    response_text = response.content[0].text.strip()
+
+### scripts/extract_fc_vision_v2.py
+CALLS:
+90:    response = client.messages.create(
+MODELS:
+86:    model: str = "claude-sonnet-4-5-20250929",
+91:        model=model,
+PROMPTS:
+29:FC_EXTRACTION_PROMPT = """Extract ALL fluid compatibility test rows from this MAPTIS table page.
+94:        messages=[{
+170:            response_text = call_vision(client, img_b64, FC_EXTRACTION_PROMPT)
+PARSING:
+9:import argparse
+112:    return response.content[0].text
+115:def parse_json_response(response_text: str) -> Dict[str, Any]:
+116:    """Parse JSON from vision model response."""
+140:        return json.loads(json_str)
+142:        return {"error": f"JSON parse error: {e}"}
+172:            # Parse JSON
+173:            result = parse_json_response(response_text)
+234:    parser = argparse.ArgumentParser(description='Extract FC MAPTIS using vision API')
+235:    parser.add_argument('--pdf', type=Path,
+238:    parser.add_argument('--output', type=Path,
+241:    parser.add_argument('--limit', type=int, default=None,
+243:    parser.add_argument('--api-key', type=str, default=None,
+246:    args = parser.parse_args()
+
+### scripts/test_material_debug.py
+CALLS:
+43:response = client.messages.create(
+MODELS:
+44:    model="claude-sonnet-4-20250514",
+PROMPTS:
+14:MATERIAL_PROMPT = """Extract material and process specifications from this engineering drawing.
+46:    messages=[{
+57:            {"type": "text", "text": MATERIAL_PROMPT}
+PARSING:
+65:print(response.content[0].text)
+
+### scripts/test_material_extraction.py
+CALLS:
+68:    response = client.messages.create(
+MODELS:
+69:        model="claude-sonnet-4-20250514",
+PROMPTS:
+20:MATERIAL_PROMPT = """Extract material and process specifications from this engineering drawing.
+71:        messages=[{
+82:                {"type": "text", "text": MATERIAL_PROMPT}
+PARSING:
+87:    response_text = response.content[0].text
+89:    # Parse JSON
+97:    return json.loads(json_str.strip())
+
+### sentinel-main/gptl/claude_client.py
+CALLS:
+504:                response = self._client.messages.create(**kwargs)
+MODELS:
+71:# MODEL ID MAPPING
+74:MODEL_IDS: dict[ModelTier, str] = {
+75:    ModelTier.HAIKU: "claude-3-5-haiku-20241022",
+76:    ModelTier.SONNET: "claude-sonnet-4-20250514",
+81:MODEL_ID_FALLBACKS: dict[ModelTier, list[str]] = {
+82:    ModelTier.HAIKU: ["claude-3-haiku-20240307"],
+83:    ModelTier.SONNET: ["claude-3-5-sonnet-20241022", "claude-3-sonnet-20240229"],
+84:    ModelTier.OPUS: ["claude-3-opus-20240229"],
+90:    return MODEL_IDS.get(tier, MODEL_IDS[ModelTier.SONNET])
+391:            model=response.tier,
+811:    "MODEL_IDS",
+PROMPTS:
+319:            retry_prompt = (
+465:            prompt=prompt,
+467:            system=system,
+PARSING:
+111:class ParsedResponse(Generic[T]):
+112:    """Response with parsed JSON content."""
+115:    parse_success: bool = True
+116:    parse_error: str | None = None
+198:        retry_on_parse_error: bool = True,
+199:    ) -> ParsedResponse[dict[str, Any]]:
+289:        retry_on_parse_error: bool = True,
+290:    ) -> ParsedResponse[dict[str, Any]]:
+294:        Automatically extracts and parses JSON from the response.
+295:        Optionally retries with a clarification prompt on parse error.
+303:            retry_on_parse_error: Whether to retry on JSON parse failure
+306:            ParsedResponse with parsed dict and metadata
+310:        # Try to parse JSON
+311:        data, error = self._extract_json(response.content)
+314:            return ParsedResponse(data=data, raw=response)
+316:        # Parse failed
+317:        if retry_on_parse_error:
+318:            logger.warning(f"JSON parse failed, retrying: {error}")
+325:            data, error = self._extract_json(response.content)
+328:                return ParsedResponse(data=data, raw=response)
+331:        logger.error(f"Failed to parse JSON after retry: {error}")
+332:        return ParsedResponse(
+335:            parse_success=False,
+336:            parse_error=error,
+350:        # Try direct parse
+352:            return json.loads(content), None
+363:            match = re.search(pattern, content)
+366:                    return json.loads(match.group(1).strip()), None
+376:                return json.loads(content[brace_start:brace_end + 1]), None
+508:                if response.content:
+509:                    content = response.content[0].text if response.content else ""
+779:) -> ParsedResponse[dict[str, Any]]:
+789:) -> ParsedResponse[dict[str, Any]]:
+798:    "ParsedResponse",
+

@@ -1,0 +1,213 @@
+sentinel-main/gptl/claude_client.py:447:            import anthropic
+sentinel-main/gptl/claude_client.py:448:            self._client = anthropic.Anthropic(api_key=self.api_key)
+sentinel-main/gptl/claude_client.py:504:                response = self._client.messages.create(**kwargs)
+scripts/test_material_extraction.py:68:    response = client.messages.create(
+scripts/test_material_debug.py:43:response = client.messages.create(
+data_laundering/bedrock_client.py:342:    #         resp = await client.invoke_model(
+data_laundering/bedrock_client.py:384:    #         resp = await client.invoke_model(
+data_laundering/bedrock_client.py:427:    #         resp = await client.invoke_model(
+core/evidence/llm_answer_generator.py:712:                message = self.haiku_client.client.messages.create(
+athena/legacy/v8.py:647:        response = client.messages.create(
+athena/legacy/v8.py:728:                from anthropic import Anthropic
+athena/legacy/v8.py:734:                self._client = Anthropic(api_key=api_key)
+mira/bsmh/bouncer.py:599:        from anthropic import Anthropic
+mira/bsmh/bouncer.py:621:        client = Anthropic(api_key=api_key, timeout=timeout_s)
+mira/bsmh/bouncer.py:622:        message = client.messages.create(
+athena/legacy/v7.py:845:        response = client.messages.create(
+athena/legacy/v7.py:919:                from anthropic import Anthropic
+athena/legacy/v7.py:925:                self._client = Anthropic(api_key=api_key)
+mira/bsmh/service.py:905:        from anthropic import Anthropic
+mira/bsmh/service.py:913:        client = Anthropic(api_key=api_key, timeout=20)
+mira/bsmh/service.py:914:        message = client.messages.create(
+athena/legacy/v6.py:384:                    from anthropic import AnthropicBedrock
+athena/legacy/v6.py:385:                    self._client = AnthropicBedrock(aws_region=self.bedrock_region)
+athena/legacy/v6.py:393:                    from anthropic import Anthropic
+athena/legacy/v6.py:397:                    self._client = Anthropic(api_key=api_key)
+athena/legacy/v6.py:475:        response = client.messages.create(
+athena/legacy/v6.py:519:        response = client.messages.create(
+mira/bsmh/response_formatter.py:392:                from anthropic import AnthropicBedrock
+mira/bsmh/response_formatter.py:394:                client = AnthropicBedrock(aws_region=bedrock_region)
+mira/bsmh/response_formatter.py:397:                from anthropic import Anthropic
+mira/bsmh/response_formatter.py:399:                client = Anthropic()
+mira/bsmh/response_formatter.py:402:            message = client.messages.create(
+mira/bsmh/response_formatter.py:467:            from anthropic import AnthropicBedrock
+mira/bsmh/response_formatter.py:469:            client = AnthropicBedrock(aws_region=bedrock_region)
+mira/bsmh/response_formatter.py:472:            from anthropic import Anthropic
+mira/bsmh/response_formatter.py:477:            client = Anthropic(api_key=api_key)
+mira/bsmh/response_formatter.py:480:        message = client.messages.create(
+mira/bsmh/response_formatter.py:664:        from anthropic import Anthropic
+mira/bsmh/response_formatter.py:670:        client = Anthropic(api_key=api_key)
+mira/bsmh/response_formatter.py:671:        message = client.messages.create(
+mira/precedent_engine/utils/bedrock.py:65:        response = bedrock.invoke_model(
+mira/MIRA_V2/src/llm_answer_generator.py:712:                message = self.haiku_client.client.messages.create(
+mira/api/routers/mira_v4.py:316:                from anthropic import AnthropicBedrock
+mira/api/routers/mira_v4.py:317:                client = AnthropicBedrock(aws_region=bedrock_region)
+mira/api/routers/mira_v4.py:320:                from anthropic import Anthropic
+mira/api/routers/mira_v4.py:324:                client = Anthropic(api_key=api_key)
+mira/api/routers/mira_v4.py:327:            message = client.messages.create(
+mira/api/routers/mira_v4.py:467:                from anthropic import AnthropicBedrock
+mira/api/routers/mira_v4.py:468:                client = AnthropicBedrock(aws_region=bedrock_region)
+mira/api/routers/mira_v4.py:471:                from anthropic import Anthropic
+mira/api/routers/mira_v4.py:475:                client = Anthropic(api_key=api_key)
+mira/api/routers/mira_v4.py:478:            message = client.messages.create(
+mira/MIRA_V2/src/haiku_client.py:23:from anthropic import Anthropic
+mira/MIRA_V2/src/haiku_client.py:35:        self.client = Anthropic(api_key=self.api_key)
+mira/MIRA_V2/src/haiku_client.py:56:            message = self.client.messages.create(
+mira/maptis/pdf_extractor.py:194:                    from anthropic import AnthropicBedrock
+mira/maptis/pdf_extractor.py:195:                    self._client = AnthropicBedrock(aws_region=self.bedrock_region)
+mira/maptis/pdf_extractor.py:203:                    from anthropic import Anthropic
+mira/maptis/pdf_extractor.py:204:                    self._client = Anthropic()
+mira/maptis/pdf_extractor.py:232:        response = client.messages.create(
+scripts/extract_fc_vision_v2.py:17:    from anthropic import Anthropic
+scripts/extract_fc_vision_v2.py:90:    response = client.messages.create(
+scripts/extract_fc_vision_v2.py:161:    client = Anthropic(api_key=api_key)
+mira/knowledge_twins/extract h2.py:19:import anthropic
+mira/knowledge_twins/extract h2.py:26:client = anthropic.Anthropic()
+mira/knowledge_twins/extract h2.py:200:    response = client.messages.create(
+mira/mua/v8/renderer.py:79:                from anthropic import AnthropicBedrock
+mira/mua/v8/renderer.py:80:                self._client = AnthropicBedrock(aws_region=self._bedrock_region)
+mira/mua/v8/renderer.py:84:                from anthropic import Anthropic
+mira/mua/v8/renderer.py:85:                self._client = Anthropic()
+mira/mua/v8/renderer.py:297:        response = client.messages.create(
+mira/knowledge_twins/bok_standards_extractor_v6.py:385:                    from anthropic import AnthropicBedrock
+mira/knowledge_twins/bok_standards_extractor_v6.py:386:                    self._client = AnthropicBedrock(aws_region=self.bedrock_region)
+mira/knowledge_twins/bok_standards_extractor_v6.py:394:                    from anthropic import Anthropic
+mira/knowledge_twins/bok_standards_extractor_v6.py:398:                    self._client = Anthropic(api_key=api_key)
+mira/knowledge_twins/bok_standards_extractor_v6.py:476:        response = client.messages.create(
+mira/knowledge_twins/bok_standards_extractor_v6.py:520:        response = client.messages.create(
+scripts/drawing_tree_extractor.py:8:import anthropic
+scripts/drawing_tree_extractor.py:97:    response = client.messages.create(
+scripts/drawing_tree_extractor.py:179:    response = client.messages.create(
+scripts/drawing_tree_extractor.py:233:    client = anthropic.Anthropic()
+mira/knowledge_twins/bok_extractor_v8.py:648:        response = client.messages.create(
+mira/knowledge_twins/bok_extractor_v8.py:729:                from anthropic import Anthropic
+mira/knowledge_twins/bok_extractor_v8.py:735:                self._client = Anthropic(api_key=api_key)
+mira/knowledge_twins/bok_extractor_v7.py:846:        response = client.messages.create(
+mira/knowledge_twins/bok_extractor_v7.py:920:                from anthropic import Anthropic
+mira/knowledge_twins/bok_extractor_v7.py:926:                self._client = Anthropic(api_key=api_key)
+mira/knowledge_twins/bok_extractor_v10.py:37:    from anthropic import Anthropic
+mira/knowledge_twins/bok_extractor_v10.py:480:    response = client.messages.create(
+mira/knowledge_twins/bok_extractor_v10.py:627:        self.client = Anthropic(api_key=api_key)
+athena/providers/bedrock.py:39:        import anthropic
+athena/providers/bedrock.py:41:        self.client = anthropic.AnthropicBedrock(aws_region=region)
+athena/providers/bedrock.py:91:        response = self.client.messages.create(
+athena/providers/bedrock.py:134:        response = self.client.messages.create(
+athena/providers/bedrock.py:183:        import anthropic
+athena/providers/bedrock.py:185:        self.client = anthropic.Anthropic(api_key=api_key)
+athena/providers/bedrock.py:214:        response = self.client.messages.create(
+athena/providers/bedrock.py:252:        response = self.client.messages.create(
+athena/providers/anthropic.py:44:        import anthropic
+athena/providers/anthropic.py:50:        self.client = anthropic.Anthropic(api_key=self.api_key)
+athena/providers/anthropic.py:93:        response = self.client.messages.create(
+athena/providers/anthropic.py:136:        response = self.client.messages.create(
+athena/extraction/transcriber.py:38:    from anthropic import Anthropic
+athena/extraction/transcriber.py:78:            self._client = Anthropic(api_key=api_key)
+athena/extraction/transcriber.py:124:            response = self.client.messages.create(
+athena/extraction/standards_extractor.py:32:import anthropic
+athena/extraction/standards_extractor.py:147:        self.client = anthropic.Anthropic()
+athena/extraction/standards_extractor.py:258:        response = self.client.messages.create(
+mira/precedent_engine/core/narrator.py:151:        response = client.invoke_model(
+mira/mua/final/renderer.py:61:        #     from anthropic import AnthropicBedrock
+mira/mua/final/renderer.py:62:        #     self._client = AnthropicBedrock(aws_region=BEDROCK_REGION)
+mira/mua/final/renderer.py:68:            from anthropic import Anthropic
+mira/mua/final/renderer.py:69:            self._client = Anthropic()
+mira/mua/final/renderer.py:309:        response = client.messages.create(
+athena/extraction/haiku_vision.py:70:            from anthropic import AnthropicBedrock
+athena/extraction/haiku_vision.py:76:        return AnthropicBedrock(aws_region=region), HAIKU_MODEL_BEDROCK
+athena/extraction/haiku_vision.py:78:        from anthropic import Anthropic
+athena/extraction/haiku_vision.py:79:        return Anthropic(api_key=api_key), HAIKU_MODEL_DIRECT
+athena/extraction/haiku_vision.py:154:        resp = self.client.messages.create(
+mira/miul/v3/extract.py:286:            from anthropic import Anthropic
+mira/miul/v3/extract.py:287:            self._client = Anthropic(api_key=self.api_key)
+mira/miul/v3/extract.py:303:            response = self.client.messages.create(
+mira/miul/v3/extract.py:1215:        response = client.client.messages.create(**api_kwargs)
+mira/miul/v3/extract.py:1281:        response = client.client.messages.create(
+mira/miul/v3/extract.py:1505:        response = client.client.messages.create(
+athena/extraction/detector.py:35:    from anthropic import Anthropic
+athena/extraction/detector.py:86:            self._client = Anthropic(api_key=api_key)
+athena/extraction/detector.py:147:            response = self.client.messages.create(
+mira/mua/v7/draft_polish.py:256:        from anthropic import Anthropic
+mira/mua/v7/draft_polish.py:258:        client = Anthropic(api_key=api_key)
+mira/mua/v7/draft_polish.py:259:        response = client.messages.create(
+athena/extraction/bok/standards_extractor_v6.py:385:                    from anthropic import AnthropicBedrock
+athena/extraction/bok/standards_extractor_v6.py:386:                    self._client = AnthropicBedrock(aws_region=self.bedrock_region)
+athena/extraction/bok/standards_extractor_v6.py:394:                    from anthropic import Anthropic
+athena/extraction/bok/standards_extractor_v6.py:398:                    self._client = Anthropic(api_key=api_key)
+athena/extraction/bok/standards_extractor_v6.py:476:        response = client.messages.create(
+athena/extraction/bok/standards_extractor_v6.py:520:        response = client.messages.create(
+athena/extraction/bok/extractor_v10.py:37:    from anthropic import Anthropic
+athena/extraction/bok/extractor_v10.py:480:    response = client.messages.create(
+athena/extraction/bok/extractor_v10.py:627:        self.client = Anthropic(api_key=api_key)
+mira/miul/v2/graph.py:180:    message = anthropic_client.messages.create(
+mira/miul/v2/extract.py:264:    message = anthropic_client.messages.create(
+mira/miul/v2/cli.py:27:    import anthropic
+mira/miul/v2/cli.py:347:                anthropic_client = anthropic.Anthropic()
+mira/mua/v6/logic_validator.py:129:        from anthropic import Anthropic
+mira/mua/v6/logic_validator.py:130:        self._client = Anthropic(api_key=self._api_key)
+mira/mua/v6/logic_validator.py:175:            message = self._client.messages.create(
+mira/miul/material_code_selector.py:128:                    from anthropic import AnthropicBedrock
+mira/miul/material_code_selector.py:129:                    self._client = AnthropicBedrock(aws_region=BEDROCK_REGION)
+mira/miul/material_code_selector.py:136:                    from anthropic import Anthropic
+mira/miul/material_code_selector.py:137:                    self._client = Anthropic(api_key=self.api_key)
+mira/miul/material_code_selector.py:208:            message = self.client.messages.create(
+mira/miul/mua_synthesizer.py:196:            from anthropic import AnthropicBedrock
+mira/miul/mua_synthesizer.py:201:        return AnthropicBedrock(aws_region=BEDROCK_REGION), SONNET_MODEL_BEDROCK
+mira/miul/mua_synthesizer.py:203:        from anthropic import Anthropic
+mira/miul/mua_synthesizer.py:205:        return Anthropic(api_key=api_key), SONNET_MODEL_DIRECT
+mira/miul/mua_synthesizer.py:468:            response = self.client.messages.create(
+mira/miul/mua_synthesizer.py:544:            response = self.client.messages.create(
+mira/miul/v1_archive/dt_miul_builder.py:181:            from anthropic import Anthropic
+mira/miul/v1_archive/dt_miul_builder.py:182:            self._client = Anthropic()
+mira/miul/v1_archive/dt_miul_builder.py:411:        response = client.messages.create(
+mira/miul/v1_archive/dt_miul_builder.py:751:            response = client.messages.create(
+mira/miul/v1_archive/dt_miul_builder.py:1206:            response = client.messages.create(
+mira/miul/v1_archive/dt_miul_builder.py:1361:            response = client.messages.create(
+mira/miul/v1_archive/haiku_bom_extractor_old.py:49:from anthropic import Anthropic
+mira/miul/v1_archive/haiku_bom_extractor_old.py:119:        self.client = Anthropic(api_key=self.api_key)
+mira/miul/v1_archive/haiku_bom_extractor_old.py:270:            message = self.client.messages.create(
+mira/miul/v1_archive/haiku_bom_extractor_old.py:332:            message = self.client.messages.create(
+mira/miul/mua_parser_v6.py:253:                    from anthropic import AnthropicBedrock
+mira/miul/mua_parser_v6.py:254:                    self._client = AnthropicBedrock(aws_region=self.bedrock_region)
+mira/miul/mua_parser_v6.py:265:                    from anthropic import Anthropic
+mira/miul/mua_parser_v6.py:266:                    self._client = Anthropic()
+mira/miul/mua_parser_v6.py:331:        response = client.messages.create(
+mira/miul/mua_parser_v6.py:402:        response = client.messages.create(
+mira/miul/v1_archive/drawing_inventory.py:211:                from anthropic import AnthropicBedrock
+mira/miul/v1_archive/drawing_inventory.py:212:                self._client = AnthropicBedrock(aws_region=BEDROCK_REGION)
+mira/miul/v1_archive/drawing_inventory.py:215:                from anthropic import Anthropic
+mira/miul/v1_archive/drawing_inventory.py:216:                self._client = Anthropic(api_key=self._api_key)
+mira/miul/v1_archive/drawing_inventory.py:230:        response = self.client.messages.create(
+mira/miul/v1_archive/haiku_bom_extractor.py:70:            from anthropic import AnthropicBedrock
+mira/miul/v1_archive/haiku_bom_extractor.py:76:        return AnthropicBedrock(aws_region=region), HAIKU_MODEL_BEDROCK
+mira/miul/v1_archive/haiku_bom_extractor.py:78:        from anthropic import Anthropic
+mira/miul/v1_archive/haiku_bom_extractor.py:79:        return Anthropic(api_key=api_key), HAIKU_MODEL_DIRECT
+mira/miul/v1_archive/haiku_bom_extractor.py:154:        resp = self.client.messages.create(
+mira/miul/v1_archive/parts_inventory_extractor.py:159:                from anthropic import AnthropicBedrock
+mira/miul/v1_archive/parts_inventory_extractor.py:160:                self._client = AnthropicBedrock(aws_region=self.bedrock_region)
+mira/miul/v1_archive/parts_inventory_extractor.py:163:                from anthropic import Anthropic
+mira/miul/v1_archive/parts_inventory_extractor.py:164:                self._client = Anthropic(api_key=self.api_key)
+mira/miul/v1_archive/parts_inventory_extractor.py:504:            response = self.client.messages.create(
+mira/miul/v1_archive/miul_extractor_v2.py:57:from anthropic import Anthropic
+mira/miul/v1_archive/miul_extractor_v2.py:64:            from anthropic import AnthropicBedrock
+mira/miul/v1_archive/miul_extractor_v2.py:70:        return AnthropicBedrock(aws_region=region)
+mira/miul/v1_archive/miul_extractor_v2.py:75:        return Anthropic(api_key=api_key)
+mira/miul/v1_archive/miul_extractor_v2.py:174:        resp = self.client.messages.create(
+mira/miul/v1_archive/extractors/haiku_drawing_extractor.py:74:                    from anthropic import AnthropicBedrock
+mira/miul/v1_archive/extractors/haiku_drawing_extractor.py:75:                    self._client = AnthropicBedrock(aws_region=self.bedrock_region)
+mira/miul/v1_archive/extractors/haiku_drawing_extractor.py:82:                    from anthropic import Anthropic
+mira/miul/v1_archive/extractors/haiku_drawing_extractor.py:83:                    self._client = Anthropic(api_key=self.api_key)
+mira/miul/v1_archive/extractors/haiku_drawing_extractor.py:293:            response = self.client.messages.create(
+mira/miul/v1_archive/stages/parse_drawings.py:271:    from anthropic import Anthropic
+mira/miul/v1_archive/stages/parse_drawings.py:322:    client = Anthropic()
+mira/miul/v1_archive/stages/parse_drawings.py:345:        response = client.messages.create(
+mira/miul/v1_archive/stages/parse_drawings.py:396:    from anthropic import Anthropic
+mira/miul/v1_archive/stages/parse_drawings.py:430:    client = Anthropic()
+mira/miul/v1_archive/stages/parse_drawings.py:444:        response = client.messages.create(
+mira/miul/v1_archive/msfc/extractor.py:237:                from anthropic import AnthropicBedrock
+mira/miul/v1_archive/msfc/extractor.py:242:            self.client = AnthropicBedrock(aws_region=region)
+mira/miul/v1_archive/msfc/extractor.py:249:                from anthropic import Anthropic
+mira/miul/v1_archive/msfc/extractor.py:253:            self.client = Anthropic(api_key=api_key)
+mira/miul/v1_archive/msfc/extractor.py:560:            response = self.client.messages.create(
+mira/miul/v1_archive/stages/parse_dt.py:191:    from anthropic import Anthropic
+mira/miul/v1_archive/stages/parse_dt.py:218:    client = Anthropic()
+mira/miul/v1_archive/stages/parse_dt.py:231:    response = client.messages.create(

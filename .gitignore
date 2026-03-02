@@ -26,6 +26,9 @@ mira/MIRA_V2/data/bok_embeddings/
 mira/MIRA_V2/data/mua_embeddings/
 
 # --- GENERATED OUTPUT ---
+tests/model_eval/results/*.json
+tests/model_eval/results/*.csv
+tests/model_eval/results/*.md
 bok_triage_output/
 bok_ultimate_output/
 discovery_index/

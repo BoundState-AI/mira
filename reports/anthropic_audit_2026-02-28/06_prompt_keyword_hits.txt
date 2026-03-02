@@ -1,0 +1,502 @@
+/mnt/d/BoundState/boundstate_mira/docs/mira_v4_architecture_1.md:711:- MUA Writing Skills (templates, envelopes, citation format)
+/mnt/d/BoundState/boundstate_mira/docs/work-logs/2026-01-04_knowledge_twin_port_and_compliance.md:58:- Created `EXTRACTION_DRAWING_SYSTEM_PROMPT` for title block extraction
+/mnt/d/BoundState/boundstate_mira/docs/work-logs/2026-01-04_knowledge_twin_port_and_compliance.md:145:3. **Defense Port**: Use D:/knowledge_twin_port/ as template for ITAR/EAR domain
+/mnt/d/BoundState/boundstate_mira/docs/mira_compatibility_report_maptis_v0_2026-02-13.md:166:- Reusable template: `docs/mira_compatibility_report_template.md`
+/mnt/d/BoundState/boundstate_mira/common/models/compatibility.py:25:- DO NOT generate narrator text with invented facts (template assembly only)
+/mnt/d/BoundState/boundstate_mira/docs/mira-schema-viewer.html:64:  .quality-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
+/mnt/d/BoundState/boundstate_mira/docs/mira-schema-viewer.html:91:    .quality-grid { grid-template-columns: 1fr; }
+/mnt/d/BoundState/boundstate_mira/data_laundering/domain_pack.py:233:_MIRA_LAYER_1_PROMPT = """You are a rigid query parser for NASA materials data. Your job is to convert
+/mnt/d/BoundState/boundstate_mira/data_laundering/domain_pack.py:269:_MIRA_LAYER_2_PROMPT = """You are a materials science expert with 40 years of aerospace experience.
+/mnt/d/BoundState/boundstate_mira/data_laundering/domain_pack.py:285:_MIRA_LAYER_4_PROMPT = """You are a technical writer preparing materials data responses for NASA engineers.
+/mnt/d/BoundState/boundstate_mira/data_laundering/domain_pack.py:299:_AEGIS_LAYER_1_PROMPT = """You are a rigid query parser for PFAS detection queries. Extract chemical
+/mnt/d/BoundState/boundstate_mira/data_laundering/domain_pack.py:307:_AEGIS_LAYER_2_PROMPT = """You are an analytical chemist specializing in PFAS detection.
+/mnt/d/BoundState/boundstate_mira/data_laundering/domain_pack.py:312:_AEGIS_LAYER_4_PROMPT = """You are a regulatory compliance writer preparing PFAS screening reports.
+/mnt/d/BoundState/boundstate_mira/data_laundering/domain_pack.py:317:_SENTINEL_LAYER_1_PROMPT = """You are a rigid query parser for export compliance screening.
+/mnt/d/BoundState/boundstate_mira/data_laundering/domain_pack.py:324:_SENTINEL_LAYER_2_PROMPT = """You are an export control officer with expertise in ITAR, EAR,
+/mnt/d/BoundState/boundstate_mira/data_laundering/domain_pack.py:329:_SENTINEL_LAYER_4_PROMPT = """You are a compliance documentation specialist preparing
+/mnt/d/BoundState/boundstate_mira/docs/mira-real-schema.jsx:79:          { name: "expected_columns", type: "JSONB", note: "Schema template per test type" },
+/mnt/d/BoundState/boundstate_mira/docs/mira-real-schema.jsx:477:    expected_columns        JSONB DEFAULT '[]'          -- template for this test type
+/mnt/d/BoundState/boundstate_mira/core/evidence/__init__.py:36:    EXPLANATION_SYSTEM_PROMPT,
+/mnt/d/BoundState/boundstate_mira/core/evidence/__init__.py:75:    "EXPLANATION_SYSTEM_PROMPT",
+/mnt/d/BoundState/boundstate_mira/scripts/test_material_extraction.py:20:MATERIAL_PROMPT = """Extract material and process specifications from this engineering drawing.
+/mnt/d/BoundState/boundstate_mira/scripts/test_material_debug.py:14:MATERIAL_PROMPT = """Extract material and process specifications from this engineering drawing.
+/mnt/d/BoundState/boundstate_mira/docs/claude_code_insights_2026-02-09.html:82:    .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 24px 0; }
+/mnt/d/BoundState/boundstate_mira/docs/claude_code_insights_2026-02-09.html:116:    @media (max-width: 640px) { .charts-row { grid-template-columns: 1fr; } .stats-row { justify-content: center; } }
+/mnt/d/BoundState/boundstate_mira/docs/FRACTURE_AUTHORITY_PACK_BSMS_PG_SPEC.md:416:1. Extend formatter templates for fracture output structure.
+/mnt/d/BoundState/boundstate_mira/core/evidence/llm_answer_generator.py:40:    "EXPLANATION_SYSTEM_PROMPT",
+/mnt/d/BoundState/boundstate_mira/core/evidence/llm_answer_generator.py:175:EXPLANATION_SYSTEM_PROMPT = """# MIRA Explanation Generator Contract
+/mnt/d/BoundState/boundstate_mira/core/evidence/llm_answer_generator.py:670:        full_prompt = f"""{EXPLANATION_SYSTEM_PROMPT}
+/mnt/d/BoundState/boundstate_mira/docs/ATHENA_Complete_Spec_v3.md:356:EXTRACTION_SYSTEM_PROMPT = """You are a document extraction system.
+/mnt/d/BoundState/boundstate_mira/docs/ATHENA_Complete_Spec_v3.md:796:TRIAGE_SYSTEM_PROMPT = """You are a document classification system.
+/mnt/d/BoundState/boundstate_mira/docs/ATHENA_Complete_Spec_v3.md:850:            system_prompt=TRIAGE_SYSTEM_PROMPT,
+/mnt/d/BoundState/boundstate_mira/docs/ATHENA_Complete_Spec_v3.md:918:EXTRACTION_SYSTEM_PROMPT = """You are a document extraction system.
+/mnt/d/BoundState/boundstate_mira/docs/ATHENA_Complete_Spec_v3.md:992:            prompt = EXTRACTION_SYSTEM_PROMPT.format(
+/mnt/d/BoundState/boundstate_mira/docs/ATHENA_Complete_Spec_v3.md:1237:BOUNDARY_CONFIRMATION_PROMPT = """Analyze consecutive pages for document boundary.
+/mnt/d/BoundState/boundstate_mira/sentinel-main/SENTINEL_SPEC.md:74:| `gptl/.env.example` | ✅ Environment template |
+/mnt/d/BoundState/boundstate_mira/docs/athena_1_5.md:1728:EXTRACTION_PROMPT = """Read this table image. Return the EXACT structure as JSON.
+/mnt/d/BoundState/boundstate_mira/docs/athena_1_5.md:1767:TABLE_DETECTION_PROMPT = """Find all tables in this page image.
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:5:    "description_template": "SHCS, Socket Head Cap Screw",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:17:    "description_template": "SHCS, Socket Head Cap Screw",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:30:    "description_template": "SHCS, Socket Head Cap Screw",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:43:    "description_template": "PIN, STRAIGHT, HEADLESS",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:53:    "description_template": "PIN, STRAIGHT, HEADED",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:63:    "description_template": "NUT, JAM, DRILLED",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:76:    "description_template": "WASHER, FLAT",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:87:    "description_template": "BOLT, TENSION, HEX HEAD",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:100:    "description_template": "WASHER, FLAT",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:113:    "description_template": "PIN, SPRING, SLOTTED",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:123:    "description_template": "PIN, SPRING, COILED",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:133:    "description_template": "SCREW, MACHINE",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:144:    "description_template": "NUT, SELF-LOCKING, 800F",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:155:    "description_template": "NUT, SELF-LOCKING, 450F",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:166:    "description_template": "NUT, SELF-LOCKING, 250F",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:177:    "description_template": "PIN, STRAIGHT, HEADLESS, DOWEL",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:187:    "description_template": "PIN, STRAIGHT",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:197:    "description_template": "PIN, TAPER",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:207:    "description_template": "COLLAR, LOCKBOLT",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:218:    "description_template": "COLLAR, LOCKBOLT",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:229:    "description_template": "WIRE, SAFETY OR LOCK",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:240:    "description_template": "PIN, COTTER",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:250:    "description_template": "PIN, COTTER",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:260:    "description_template": "SPRING, HELICAL, COMPRESSION",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:270:    "description_template": "SPRING, HELICAL, EXTENSION",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:280:    "description_template": "O-RING, PACKING",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:291:    "description_template": "LOCK, ROD END",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:302:    "description_template": "INSERT, SCREW THREAD, HELICAL COIL",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:313:    "description_template": "INSERT, SCREW THREAD, HELICAL COIL",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:324:    "description_template": "SCREW, MACHINE",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:334:    "description_template": "CLAMP, LOOP, CUSHIONED",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:345:    "description_template": "CLAMP, SUPPORT",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:355:    "description_template": "LOCKING DEVICE, ROD END BEARINGS",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:365:    "description_template": "WASHER, SPRING TENSION, BELLEVILLE",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:375:    "description_template": "BOLT, HEX HEAD",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:386:    "description_template": "NUT, CASTLE",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:397:    "description_template": "NUT, PLAIN, HEX",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:407:    "description_template": "NUT, CHECK",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:417:    "description_template": "WASHER, FLAT",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:428:    "description_template": "WASHER, FLAT, LARGE AREA",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:438:    "description_template": "RETAINING RING, INTERNAL",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:449:    "description_template": "RETAINING RING, EXTERNAL",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:460:    "description_template": "RETAINING RING, SPIRAL",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:471:    "description_template": "RETAINING RING, INTERNAL",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:482:    "description_template": "UNION FITTING, FLARELESS",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:493:    "description_template": "FITTING, ADAPTER, UNION",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:504:    "description_template": "FITTING, TUBE, FLARED",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:515:    "description_template": "FITTING, BOSS PORT",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:525:    "description_template": "FITTING, BOSS PORT",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:535:    "description_template": "O-RING (SIZE STANDARD)",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:546:    "description_template": "SBHCS, Socket Button Head Cap Screw",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:557:    "description_template": "ROD END BEARING",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:568:    "description_template": "SEAL, K-PORT",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:578:    "description_template": "BEARING, HYBRID CERAMIC",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:589:    "description_template": "FASTENER, HI-LOK",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:600:    "description_template": "RIVET, BLIND",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:611:    "description_template": "BOLT, EDDIE-BOLT",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:622:    "description_template": "FASTENER, SPEED NUT",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:633:    "description_template": "PLUG, PROTECTIVE",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:644:    "description_template": "WIRE, WELD, TITANIUM",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:655:    "description_template": "WIRE, WELD, STAINLESS",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:666:    "description_template": "WIRE, WELD, STAINLESS",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:677:    "description_template": "WIRE, WELD, NICKEL",
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/std_parts_reference.json:688:    "description_template": "WIRE, WELD, NICKEL",
+/mnt/d/BoundState/boundstate_mira/docs/MUA_DEEP_DIVE_AND_REDESIGN_2.md:369:    # Rationale synthesis (deterministic template + LLM polish)
+/mnt/d/BoundState/boundstate_mira/docs/MUA_DEEP_DIVE_AND_REDESIGN_2.md:371:    template_rationale = build_template_rationale(
+/mnt/d/BoundState/boundstate_mira/docs/MUA_DEEP_DIVE_AND_REDESIGN_2.md:379:    # Input: template + all precedent rationale excerpts
+/mnt/d/BoundState/boundstate_mira/docs/MUA_DEEP_DIVE_AND_REDESIGN_2.md:383:        template=template_rationale,
+/mnt/d/BoundState/boundstate_mira/docs/MUA_DEEP_DIVE_AND_REDESIGN_2.md:478:- **Two-layer synthesis.** Template first (deterministic, reliable), then LLM polish (for natural language). This is the same pattern as MIUL: deterministic structure with AI smoothing. If the LLM fails, the template version is still a valid MUA.
+/mnt/d/BoundState/boundstate_mira/docs/MUA_DEEP_DIVE_AND_REDESIGN_2.md:576:| `mua_generator.py:269-391` | Full NASA document format template |
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/MIUL_HITL_SPEC.md:63:    description_template TEXT,                  -- "SHCS, Socket Head Cap Screw"
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/MIUL_HITL_SPEC.md:202:        (part_number_pattern, part_number_regex, description_template,
+/mnt/d/BoundState/boundstate_mira/docs/extracted_files/MIUL_HITL_SPEC.md:208:        p.get('description_template'), p['designation'],
+/mnt/d/BoundState/boundstate_mira/docs/MP_PLAN_V2_CODEX_README.md:55:- `citation_helper`: one-click citation templates + quick action tokens
+/mnt/d/BoundState/boundstate_mira/docs/MUA_DEEP_DIVE_AND_REDESIGN_1.md:369:    # Rationale synthesis (deterministic template + LLM polish)
+/mnt/d/BoundState/boundstate_mira/docs/MUA_DEEP_DIVE_AND_REDESIGN_1.md:371:    template_rationale = build_template_rationale(
+/mnt/d/BoundState/boundstate_mira/docs/MUA_DEEP_DIVE_AND_REDESIGN_1.md:379:    # Input: template + all precedent rationale excerpts
+/mnt/d/BoundState/boundstate_mira/docs/MUA_DEEP_DIVE_AND_REDESIGN_1.md:383:        template=template_rationale,
+/mnt/d/BoundState/boundstate_mira/docs/MUA_DEEP_DIVE_AND_REDESIGN_1.md:478:- **Two-layer synthesis.** Template first (deterministic, reliable), then LLM polish (for natural language). This is the same pattern as MIUL: deterministic structure with AI smoothing. If the LLM fails, the template version is still a valid MUA.
+/mnt/d/BoundState/boundstate_mira/docs/MUA_DEEP_DIVE_AND_REDESIGN_1.md:576:| `mua_generator.py:269-391` | Full NASA document format template |
+/mnt/d/BoundState/boundstate_mira/docs/MP_PLAN_GENERATOR_SPEC_V2.md:31:| 9 | Logic in templates | Templates are dumb renderers - all conditionals from computed state |
+/mnt/d/BoundState/boundstate_mira/docs/MP_PLAN_GENERATOR_SPEC_V2.md:577:    prompt_template_id: str
+/mnt/d/BoundState/boundstate_mira/docs/MP_PLAN_GENERATOR_SPEC_V2.md:681:BANNED in templates:
+/mnt/d/BoundState/boundstate_mira/docs/MP_PLAN_GENERATOR_SPEC_V2.md:686:ALLOWED in templates:
+/mnt/d/BoundState/boundstate_mira/docs/MP_PLAN_GENERATOR_SPEC_V2.md:691:All conditionals are resolved BEFORE template rendering.
+/mnt/d/BoundState/boundstate_mira/docs/MP_PLAN_GENERATOR_SPEC_V2.md:692:The template receives a fully computed SectionContent object.
+/mnt/d/BoundState/boundstate_mira/docs/MP_PLAN_GENERATOR_SPEC_V2.md:698:    Pre-computed section content for template.
+/mnt/d/BoundState/boundstate_mira/docs/MP_PLAN_GENERATOR_SPEC_V2.md:709:    # Pre-computed content (template just renders)
+/mnt/d/BoundState/boundstate_mira/docs/MP_PLAN_GENERATOR_SPEC_V2.md:725:def render_section(template: str, content: SectionContent) -> str:
+/mnt/d/BoundState/boundstate_mira/docs/MP_PLAN_GENERATOR_SPEC_V2.md:727:    Render section using dumb template.
+/mnt/d/BoundState/boundstate_mira/docs/MP_PLAN_GENERATOR_SPEC_V2.md:744:    return env.from_string(template).render(content=content)
+/mnt/d/BoundState/boundstate_mira/docs/MP_PLAN_GENERATOR_SPEC_V2.md:1020:| 6 | Document Generation | 3 | + Dumb templates, + ReviewPacket |
+/mnt/d/BoundState/boundstate_mira/docs/MP_PLAN_GENERATOR_SPEC_V2.md:1038:| 9 | Templates have no logic | Grep for `if.*pct` in templates returns nothing |
+/mnt/d/BoundState/boundstate_mira/docs/summary.md:64:             system=TRIAGE_SYSTEM_PROMPT,
+/mnt/d/BoundState/boundstate_mira/docs/summary.md:1001:prompts/ - LLM prompt templates
+/mnt/d/BoundState/boundstate_mira/docs/summary.md:19637:Effort: Low (copy system prompt templates)
+/mnt/d/BoundState/boundstate_mira/docs/summary.md:29754:EXTRACT_PROMPT = """Extract structured requirements and technical content from this document page.
+/mnt/d/BoundState/boundstate_mira/docs/summary.md:30315:Have schema templates per doc_family
+/mnt/d/BoundState/boundstate_mira/docs/summary.md:30321:Doc-type schema templates - different extraction patterns for nasa_standard vs test_report vs oca_report
+/mnt/d/BoundState/boundstate_mira/docs/summary.md:30478:     - Doc-type schema templates
+/mnt/d/BoundState/boundstate_mira/docs/summary.md:30653:DISCOVER_PROMPT = """Analyze this document page and propose a schema for extracting its structured data.
+/mnt/d/BoundState/boundstate_mira/docs/summary.md:31648:PAGE_SCAN_PROMPT = """Quickly scan this single page and identify what structured data exists.
+/mnt/d/BoundState/boundstate_mira/docs/summary.md:41460:     TRIAGE_PROMPT = """Classify this technical document's first page.
+/mnt/d/BoundState/boundstate_mira/docs/summary.md:41732:TRIAGE_PROMPT = """Analyze this document and classify it for processing.
+/mnt/d/BoundState/boundstate_mira/docs/summary.md:43605:TRIAGE_PROMPT = """Analyze the provided document sample (images and/or text).
+/mnt/d/BoundState/boundstate_mira/docs/summary.md:45034:TRIAGE_PROMPT = """Analyze the provided document sample.
+/mnt/d/BoundState/boundstate_mira/docs/mua-pipeline-analysis.md:88:  |   -> Simple template: MATERIAL | ENVIRONMENT | LOCATION | RATIONALE | CITATIONS
+/mnt/d/BoundState/boundstate_mira/docs/mua-pipeline-analysis.md:106:  |   -> _synthesize_rationale() -> template + precedent excerpts (NO LLM)
+/mnt/d/BoundState/boundstate_mira/docs/mua-pipeline-analysis.md:494:Issue-specific templates (lines 96-124):
+/mnt/d/BoundState/boundstate_mira/docs/mua-pipeline-analysis.md:599:| Draft generation | Deterministic (templates) | - | `v6/draft_generator.py` |
+/mnt/d/BoundState/boundstate_mira/docs/mua-pipeline-analysis.md:600:| Final rendering | Deterministic (template) | - | `mua_v6.py:412-455` |
+/mnt/d/BoundState/boundstate_mira/docs/plan_session_v2.py:418:    prompt_template_id: str
+/mnt/d/BoundState/boundstate_mira/docs/MUA_V7_ORACLE_CONVERGENCE_1.md:85:- **Fran:** Two-layer synthesis (template + LLM polish)
+/mnt/d/BoundState/boundstate_mira/docs/MUA_V7_OPUS_HANDOFF.md:66:├── draft_renderer.py       # 7-section NASA document (template-first + LLM polish)
+/mnt/d/BoundState/boundstate_mira/docs/MUA_V7_OPUS_HANDOFF.md:192:7. **Don't skip the template fallback.** If LLM fails, template draft must still work.
+/mnt/d/BoundState/boundstate_mira/docs/MUA_V7_OPUS_HANDOFF.md:207:- `test_draft_renderer.py` — Full 7-section output, template fallback, process constraints
+/mnt/d/BoundState/boundstate_mira/docs/MUA_V7_ORACLE_BRIEF_1.md:133:6. **Multi-center deployment.** MIRA is expanding beyond MSFC. JSC, GRC, KSC all have different MUA templates, different approval workflows, different local conventions. Does this design accommodate center-specific customization? Or does it assume one NASA-wide format?
+/mnt/d/BoundState/boundstate_mira/athena/tagging/tagger.py:1103:        ("form_document", re.compile(r'\b(form|template|checklist|worksheet)\b', re.IGNORECASE)),
+/mnt/d/BoundState/boundstate_mira/docs/MUA_V7_ORACLE_CONVERGENCE.md:85:- **Fran:** Two-layer synthesis (template + LLM polish)
+/mnt/d/BoundState/boundstate_mira/docs/mua_audit/mua_validation_10.md:330:> The characters associated with the CTRL function keys are silk screened in yellow using Part Number ER-131. Approximately 0.04 lbs total was used for the templates. This ink has not been flammability nor toxicity tested, but it is considered to be similar to the ER-111 black ink. The ink is silk screened onto an aluminum template which acts as a heat sink and the 0.04 lbs used is within the 0.8364 lbs. weight limit. Therefore, the yellow ink is acceptable for this application. The characters on 
+/mnt/d/BoundState/boundstate_mira/docs/mua_audit/mua_validation_10.md:334:- `heat_sink` -- "...to an aluminum template which acts as a heat sink and the 0.04 lbs used is with..."
+/mnt/d/BoundState/boundstate_mira/docs/mua_audit/mua_validation_10.md:337:> Three templates for PGSC keyboard with silk screened characters. CTRL function key characters silk screened in yellow (ER-131), ALT function key characters silk screened with mixture of ER-112 (white) and ER-159 (permanent blue). Templates attached to PGSC keyboard via two 1" x 1" patches of fastene
+/mnt/d/BoundState/boundstate_mira/docs/MUA_V7_FINAL_SPEC.md:57:├── draft_renderer.py       # 7-section NASA document (template-first)
+/mnt/d/BoundState/boundstate_mira/docs/MUA_V7_FINAL_SPEC.md:76:- `mua/mua_generator.py` (v1 generator) — templates extracted to draft_renderer.py
+/mnt/d/BoundState/boundstate_mira/docs/MUA_V7_FINAL_SPEC.md:143:- Loads AuthorityPack for center-specific routing and templates
+/mnt/d/BoundState/boundstate_mira/docs/MUA_V7_FINAL_SPEC.md:385:If LLM fails → template version is still a valid NASA MUA. No blocked workflows.
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/synthesis.py:559:            prompt_template = get_prompt("L5_SYNTHESIS_CRITICAL_V1")
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/synthesis.py:561:            prompt_template = get_prompt("L5_SYNTHESIS_V1")
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/synthesis.py:577:        prompt = prompt_template.template.format(
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/signal_extraction.py:471:        prompt_template = get_prompt("L4_ANOMALY_EXPLANATION_V1")
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/signal_extraction.py:483:        prompt = prompt_template.template.format(
+/mnt/d/BoundState/boundstate_mira/scripts/extract_fc_vision_v2.py:29:FC_EXTRACTION_PROMPT = """Extract ALL fluid compatibility test rows from this MAPTIS table page.
+/mnt/d/BoundState/boundstate_mira/scripts/extract_fc_vision.py:22:EXTRACTION_PROMPT = """You are extracting fluid compatibility test data from a MAPTIS database table.
+/mnt/d/BoundState/boundstate_mira/scripts/extract_fc_maptis_vision.py:22:FC_EXTRACTION_PROMPT = """Extract ALL fluid compatibility test rows from this table page.
+/mnt/d/BoundState/boundstate_mira/scripts/demo_v8_output.py:2:"""Demo: Show v8 template-rendered MUA output for the same session data as v7."""
+/mnt/d/BoundState/boundstate_mira/mira/utils/exceptions.py:591:                "Use configuration template as reference",
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/intent_framing.py:294:        prompt_template = get_prompt("L2_INTENT_CLASSIFICATION_V1")
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/intent_framing.py:301:        prompt = prompt_template.template.format(
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/intent_framing.py:430:        prompt_template = get_prompt("L2_INTENT_DISAMBIGUATION_V1")
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/intent_framing.py:432:        prompt = prompt_template.template.format(
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/prompts.py:282:    prompt_template: str
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/prompts.py:301:        content = f"{self.name}:{self.version}:{self.prompt_template}"
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/prompts.py:306:        return self.prompt_template.format(**kwargs)
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/prompts.py:323:    prompt_template="""You are validating evidence type derivation for a document.
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/prompts.py:363:    prompt_template="""Analyze this document excerpt for noise indicators.
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/prompts.py:400:    prompt_template="""You are classifying user intent for a {domain} document intelligence system.
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/prompts.py:448:    prompt_template="""You are disambiguating a complex query for a {domain} document intelligence system.
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/prompts.py:499:    prompt_template="""You are evaluating if a document should be eliminated from search results.
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/prompts.py:538:    prompt_template="""A document was flagged by constraint rule: {rule_name}
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/prompts.py:576:    prompt_template="""You are analyzing anomalies detected in document search results.
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/prompts.py:610:    prompt_template="""Analyze the temporal patterns in these documents related to: {query}
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/prompts.py:644:    prompt_template="""You are generating actionable intelligence for a {domain} query.
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/prompts.py:709:    prompt_template="""You are generating intelligence for a CRITICAL {domain} query.
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/prompts.py:783:    prompt_template="""Calibrate the confidence for this intelligence output.
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/prompts.py:847:def get_prompt(name: str) -> VersionedPrompt:
+/mnt/d/BoundState/boundstate_mira/sentinel-main/gptl/claude_client.py:212:    Implements common logic with template method pattern.
+/mnt/d/BoundState/boundstate_mira/tests/mira/test_extractors.py:578:    """Tests for prompt templates."""
+/mnt/d/BoundState/boundstate_mira/tests/mira/mp_plan/test_security.py:382:                prompt_template_id="test",
+/mnt/d/BoundState/boundstate_mira/tests/mira/mp_plan/test_security.py:397:                prompt_template_id="test",
+/mnt/d/BoundState/boundstate_mira/tests/mira/mp_plan/test_models.py:226:            prompt_template_id="test-template",
+/mnt/d/BoundState/boundstate_mira/tests/mira/mp_plan/test_models.py:240:                prompt_template_id="test-template",
+/mnt/d/BoundState/boundstate_mira/tests/mira/mp_plan/test_models.py:253:                prompt_template_id="test-template",
+/mnt/d/BoundState/boundstate_mira/athena/extraction/standards_extractor.py:46:STANDARDS_EXTRACTION_PROMPT = """Extract requirements from this standards document page as JSON.
+/mnt/d/BoundState/boundstate_mira/athena/extraction/prompts.py:25:TABLE_EXTRACTION_PROMPT = """Extract ALL tables from this document page as JSON.
+/mnt/d/BoundState/boundstate_mira/athena/extraction/prompts.py:46:TABLE_DETECTION_PROMPT = """Find all tables in this page image.
+/mnt/d/BoundState/boundstate_mira/athena/prompts/__init__.py:19:from athena.prompts.triage import TRIAGE_SYSTEM_PROMPT, TRIAGE_USER_PROMPT_TEMPLATE
+/mnt/d/BoundState/boundstate_mira/athena/prompts/__init__.py:20:from athena.prompts.extract import EXTRACTION_SYSTEM_PROMPT, EXTRACTION_USER_PROMPT_TEMPLATE
+/mnt/d/BoundState/boundstate_mira/athena/prompts/__init__.py:27:    "TRIAGE_SYSTEM_PROMPT",
+/mnt/d/BoundState/boundstate_mira/athena/prompts/__init__.py:28:    "TRIAGE_USER_PROMPT_TEMPLATE",
+/mnt/d/BoundState/boundstate_mira/athena/prompts/__init__.py:29:    "EXTRACTION_SYSTEM_PROMPT",
+/mnt/d/BoundState/boundstate_mira/athena/prompts/__init__.py:30:    "EXTRACTION_USER_PROMPT_TEMPLATE",
+/mnt/d/BoundState/boundstate_mira/athena/extraction/bok/standards_extractor_v6.py:221:SECTION_EXTRACTION_PROMPT = """You are an expert at extracting structured data from NASA safety standards.
+/mnt/d/BoundState/boundstate_mira/athena/extraction/prompts/h2.py:38:H2_TABLE_EXTRACTION_PROMPT = """Extract hydrogen embrittlement test data from this table.
+/mnt/d/BoundState/boundstate_mira/athena/extraction/prompts/h2.py:154:H2_ENRICHMENT_PROMPT = """Given this extracted table data and the original page context,
+/mnt/d/BoundState/boundstate_mira/athena/prompts/triage.py:19:TRIAGE_SYSTEM_PROMPT = """You are a document classification system.
+/mnt/d/BoundState/boundstate_mira/athena/prompts/triage.py:80:TRIAGE_USER_PROMPT_TEMPLATE = """Classify this document. Pages provided: {page_info}
+/mnt/d/BoundState/boundstate_mira/athena/legacy/v8.py:592:PAIRED_TABLE_PROMPT = """You are extracting hydrogen embrittlement data from a materials test table.
+/mnt/d/BoundState/boundstate_mira/athena/extraction/bok/extractor_v10.py:361:TABLE_EXTRACTION_PROMPT = """Read this table image and return the exact grid structure.
+/mnt/d/BoundState/boundstate_mira/athena/extraction/bok/extractor_v10.py:401:TABLE_DETECTION_PROMPT = """Find all tables in this page image.
+/mnt/d/BoundState/boundstate_mira/tests/mira/mua/v8/test_renderer.py:5:Tests the template-only fallback path (no LLM required) and validates
+/mnt/d/BoundState/boundstate_mira/tests/mira/mua/v8/test_renderer.py:93:    """Test the template-only renderer (no LLM)."""
+/mnt/d/BoundState/boundstate_mira/tests/mira/mua/v8/test_renderer.py:102:        assert doc.model_used == "template-only"
+/mnt/d/BoundState/boundstate_mira/athena/prompts/extract.py:19:EXTRACTION_SYSTEM_PROMPT = """You are a document extraction system.
+/mnt/d/BoundState/boundstate_mira/athena/prompts/extract.py:111:EXTRACTION_USER_PROMPT_TEMPLATE = """Extract all data from pages {start_page}-{end_page}.
+/mnt/d/BoundState/boundstate_mira/athena/prompts/extract.py:118:EXTRACTION_LIGHT_SYSTEM_PROMPT = """You are a document extraction system for simple documents.
+/mnt/d/BoundState/boundstate_mira/athena/prompts/extract.py:145:EXTRACTION_DRAWING_SYSTEM_PROMPT = """You are a technical drawing metadata extraction system.
+/mnt/d/BoundState/boundstate_mira/athena/legacy/v7.py:805:LLM_ENRICHMENT_PROMPT = """Analyze this table from a NASA {gas_type} safety standard.
+/mnt/d/BoundState/boundstate_mira/athena/prompts/boundary.py:19:BOUNDARY_CONFIRMATION_PROMPT = """Analyze consecutive pages for document boundary.
+/mnt/d/BoundState/boundstate_mira/athena/prompts/boundary.py:49:PAGE_NUMBER_DETECTION_PROMPT = """Analyze this footer region for page numbering.
+/mnt/d/BoundState/boundstate_mira/athena/prompts/boundary.py:68:LETTERHEAD_COMPARISON_PROMPT = """Compare the headers/letterheads of these two page images.
+/mnt/d/BoundState/boundstate_mira/athena/parsers/document.py:673:                        section['tags'] = section.get('tags', []) + ['template']
+/mnt/d/BoundState/boundstate_mira/athena/parsers/document.py:675:                            section['doc_type'] = 'template'
+/mnt/d/BoundState/boundstate_mira/athena/parsers/document.py:1091:        """Check if Excel file is an empty template."""
+/mnt/d/BoundState/boundstate_mira/athena/parsers/document.py:1123:            is_empty_template = self.is_empty_spreadsheet(wb)
+/mnt/d/BoundState/boundstate_mira/athena/parsers/document.py:1171:                if is_empty_template:
+/mnt/d/BoundState/boundstate_mira/athena/parsers/document.py:1175:                        "Empty spreadsheet template - ready for data entry"
+/mnt/d/BoundState/boundstate_mira/athena/legacy/v6.py:220:SECTION_EXTRACTION_PROMPT = """You are an expert at extracting structured data from NASA safety standards.
+/mnt/d/BoundState/boundstate_mira/athena/indexing/smart.py:859:            ("form_document", re.compile(r'\b(form|template|checklist|worksheet)\b', re.IGNORECASE)),
+/mnt/d/BoundState/boundstate_mira/tests/mira/compliance/test_adapters.py:324:            prompt_template_version="1.0.0",
+/mnt/d/BoundState/boundstate_mira/mira/h2/ft_temp.py:45:_SYSTEM_PROMPT = (
+/mnt/d/BoundState/boundstate_mira/mira/h2/ft_temp.py:579:        instructions=_SYSTEM_PROMPT,
+/mnt/d/BoundState/boundstate_mira/mira/h2/ft_temp.py:613:        "Use exactly this template and labels:\n"
+/mnt/d/BoundState/boundstate_mira/athena/pipeline/discovery.py:38:__all__ = ["DiscoveryStage", "DISCOVERY_SYSTEM_PROMPT"]
+/mnt/d/BoundState/boundstate_mira/athena/pipeline/discovery.py:43:DISCOVERY_SYSTEM_PROMPT = """You are analyzing documents from an unknown archive.
+/mnt/d/BoundState/boundstate_mira/athena/pipeline/discovery.py:111:            system_prompt=DISCOVERY_SYSTEM_PROMPT,
+/mnt/d/BoundState/boundstate_mira/athena/pipeline/triage.py:89:            system_prompt=TRIAGE_SYSTEM_PROMPT,
+/mnt/d/BoundState/boundstate_mira/athena/pipeline/triage.py:90:            user_prompt=TRIAGE_USER_PROMPT_TEMPLATE.format(page_info=page_info),
+/mnt/d/BoundState/boundstate_mira/athena/pipeline/triage.py:277:V2_TRIAGE_SYSTEM_PROMPT = """You are a document classification system.
+/mnt/d/BoundState/boundstate_mira/athena/pipeline/triage.py:419:        return V2_TRIAGE_SYSTEM_PROMPT.format(
+/mnt/d/BoundState/boundstate_mira/athena/pipeline/extract.py:42:    EXTRACTION_SYSTEM_PROMPT,
+/mnt/d/BoundState/boundstate_mira/athena/pipeline/extract.py:43:    EXTRACTION_LIGHT_SYSTEM_PROMPT,
+/mnt/d/BoundState/boundstate_mira/athena/pipeline/extract.py:44:    EXTRACTION_DRAWING_SYSTEM_PROMPT,
+/mnt/d/BoundState/boundstate_mira/athena/pipeline/extract.py:45:    EXTRACTION_USER_PROMPT_TEMPLATE,
+/mnt/d/BoundState/boundstate_mira/athena/pipeline/extract.py:101:            system_prompt = EXTRACTION_SYSTEM_PROMPT
+/mnt/d/BoundState/boundstate_mira/athena/pipeline/extract.py:104:            system_prompt = EXTRACTION_DRAWING_SYSTEM_PROMPT
+/mnt/d/BoundState/boundstate_mira/athena/pipeline/extract.py:107:            system_prompt = EXTRACTION_LIGHT_SYSTEM_PROMPT
+/mnt/d/BoundState/boundstate_mira/athena/pipeline/extract.py:145:            user_prompt = EXTRACTION_USER_PROMPT_TEMPLATE.format(
+/mnt/d/BoundState/boundstate_mira/athena/pipeline/extract.py:453:V2_EXTRACTION_SYSTEM_PROMPT = """You are a document data extraction system.
+/mnt/d/BoundState/boundstate_mira/athena/pipeline/extract.py:707:        return V2_EXTRACTION_SYSTEM_PROMPT.format(
+/mnt/d/BoundState/boundstate_mira/tests/mira/mua/v7/test_draft_renderer.py:6:  1. Produce valid output even without an LLM (template fallback).
+/mnt/d/BoundState/boundstate_mira/tests/mira/mua/v7/test_draft_renderer.py:318:# Template fallback (always template-based, no LLM dependency)
+/mnt/d/BoundState/boundstate_mira/tests/mira/mua/v7/test_draft_renderer.py:323:    def test_template_produces_valid_sections(
+/mnt/d/BoundState/boundstate_mira/tests/mira/mua/v7/test_draft_renderer.py:327:        template-based rendering (no LLM needed).  This ensures
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/service.py:848:_FC_CONTEXT_PARSE_PROMPT = """You are a NASA fracture control engineer. Extract structured context from the user's query.
+/mnt/d/BoundState/boundstate_mira/athena/config/settings.py:130:    # Prompt template
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/migrations/001_authority_fc_schema.sql:382:    document_template   VARCHAR(128),
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/response_formatter.py:21:_FORMATTER_SYSTEM_PROMPT = """You are a senior NASA Materials & Processes engineer writing assessment responses.
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/response_formatter.py:147:def _template_response(
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/response_formatter.py:304:    Format deterministic decision output using local LLM first, template fallback.
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/response_formatter.py:328:            system=_FORMATTER_SYSTEM_PROMPT,
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/response_formatter.py:341:        LOGGER.warning("[BSMH] Formatter returned empty text; using template fallback")
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/response_formatter.py:343:        LOGGER.warning("[BSMH] Formatter local-LLM call failed; using template fallback: %s", exc)
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/response_formatter.py:347:    return _template_response(query, decision, missing_requested_materials)
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/response_formatter.py:362:    Format deterministic decision output using Anthropic Haiku, template fallback.
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/response_formatter.py:406:                system=_FORMATTER_SYSTEM_PROMPT,
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/response_formatter.py:411:            LOGGER.warning("[BSMH] Haiku formatter call failed; using template fallback: %s", exc)
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/response_formatter.py:423:    return _template_response(query, decision, missing_requested_materials)
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/response_formatter.py:438:    Format deterministic decision output using Anthropic Sonnet, template fallback.
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/response_formatter.py:484:            system=_FORMATTER_SYSTEM_PROMPT,
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/response_formatter.py:559:_FC_FORMATTER_SYSTEM_PROMPT = """You are a senior NASA structural engineer writing fracture control assessments.
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/response_formatter.py:602:def _fc_template_response(decision) -> str:
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/response_formatter.py:641:    """Format fracture classification using Sonnet, with template fallback."""
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/response_formatter.py:645:        return _fc_template_response(decision)
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/response_formatter.py:675:            system=_FC_FORMATTER_SYSTEM_PROMPT,
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/response_formatter.py:686:        LOGGER.warning("[FC] Sonnet formatter failed; using template: %s", exc)
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/response_formatter.py:688:    return _fc_template_response(decision)
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/bouncer.py:20:_BOUNCER_SYSTEM_PROMPT = """You are a retired NASA Materials & Processes engineer with 40 years of Shuttle-era experience.
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/bouncer.py:561:                system=_BOUNCER_SYSTEM_PROMPT,
+/mnt/d/BoundState/boundstate_mira/mira/bsmh/bouncer.py:626:            system=_BOUNCER_SYSTEM_PROMPT,
+/mnt/d/BoundState/boundstate_mira/mira/compliance/models/manifest.py:78:    prompt_template_version: str
+/mnt/d/BoundState/boundstate_mira/mira/compliance/models/manifest.py:79:    """Version of prompt template used."""
+/mnt/d/BoundState/boundstate_mira/tests/core/evidence/test_llm_answer_generator.py:25:    EXPLANATION_SYSTEM_PROMPT,
+/mnt/d/BoundState/boundstate_mira/tests/core/evidence/test_llm_answer_generator.py:39:        assert "TECHNICAL WRITER" in EXPLANATION_SYSTEM_PROMPT
+/mnt/d/BoundState/boundstate_mira/tests/core/evidence/test_llm_answer_generator.py:40:        assert "decision maker" not in EXPLANATION_SYSTEM_PROMPT.lower() or \
+/mnt/d/BoundState/boundstate_mira/tests/core/evidence/test_llm_answer_generator.py:41:               "not a decision maker" in EXPLANATION_SYSTEM_PROMPT.lower()
+/mnt/d/BoundState/boundstate_mira/tests/core/evidence/test_llm_answer_generator.py:45:        assert "DO NOT override" in EXPLANATION_SYSTEM_PROMPT or \
+/mnt/d/BoundState/boundstate_mira/tests/core/evidence/test_llm_answer_generator.py:46:               "override the decision" in EXPLANATION_SYSTEM_PROMPT
+/mnt/d/BoundState/boundstate_mira/tests/core/evidence/test_llm_answer_generator.py:50:        assert "ALREADY BEEN MADE" in EXPLANATION_SYSTEM_PROMPT or \
+/mnt/d/BoundState/boundstate_mira/tests/core/evidence/test_llm_answer_generator.py:51:               "already been made" in EXPLANATION_SYSTEM_PROMPT.lower()
+/mnt/d/BoundState/boundstate_mira/mira/api/routers/mua_v7.py:1920:    # Step 4b: Render the draft document (template layer -- deterministic).
+/mnt/d/BoundState/boundstate_mira/mira/api/routers/mua_v7.py:1936:    # Step 4b½: LLM polish (optional -- falls back to template on failure).
+/mnt/d/BoundState/boundstate_mira/mira/api/routers/mua_v7.py:1958:        # Layer 2 failure is non-fatal -- template ships.
+/mnt/d/BoundState/boundstate_mira/mira/api/routers/mua_v7.py:1960:            "LLM polish failed for session '%s' -- using template.",
+/mnt/d/BoundState/boundstate_mira/tests/mira/mua/final/test_renderer.py:4:Tests the template-only fallback path (no LLM required) and validates
+/mnt/d/BoundState/boundstate_mira/tests/mira/mua/final/test_renderer.py:97:    """Test the template-only renderer (no LLM)."""
+/mnt/d/BoundState/boundstate_mira/tests/mira/mua/final/test_renderer.py:106:        assert doc.model_used == "template-only"
+/mnt/d/BoundState/boundstate_mira/mira/api/routers/mua_v6.py:421:    This is a simple template. The real MUA format is more complex
+/mnt/d/BoundState/boundstate_mira/mira/api/routers/mua_v6.py:422:    and should be replaced with proper template rendering.
+/mnt/d/BoundState/boundstate_mira/mira/compliance/adapters/mua_adapter.py:96:        prompt_template_version: str = "1.0.0",
+/mnt/d/BoundState/boundstate_mira/mira/compliance/adapters/mua_adapter.py:106:            prompt_template_version: Version of prompt templates
+/mnt/d/BoundState/boundstate_mira/mira/compliance/adapters/mua_adapter.py:113:        self._prompt_template_version = prompt_template_version
+/mnt/d/BoundState/boundstate_mira/mira/compliance/adapters/mua_adapter.py:361:            prompt_template_version=self._prompt_template_version,
+/mnt/d/BoundState/boundstate_mira/mira/precedent_engine/models/precedent.py:159:    # Recommended base template
+/mnt/d/BoundState/boundstate_mira/frontend/src/lib/mua-v7-api.ts:382:  rationale_template: string;
+/mnt/d/BoundState/boundstate_mira/mira/api/routers/miul.py:199:                    "or OPIV template columns (FLAMM Rating/SCC Rating/CORR Rating/TVS Rating/TOX Rating/FS Rating)."
+/mnt/d/BoundState/boundstate_mira/mira/api/routers/miul.py:347:        # Ignore blank template rows to avoid false gap reports.
+/mnt/d/BoundState/boundstate_mira/mira/api/routers/mira_v4.py:243:_PARSE_SYSTEM_PROMPT = """You are a NASA materials engineer AI for the MIRA system.
+/mnt/d/BoundState/boundstate_mira/mira/api/routers/mira_v4.py:331:                system=_PARSE_SYSTEM_PROMPT,
+/mnt/d/BoundState/boundstate_mira/mira/api/routers/mira_v4.py:360:_RESPONSE_SYSTEM_PROMPT = """You are MIRA, a NASA materials engineer AI assistant.
+/mnt/d/BoundState/boundstate_mira/mira/api/routers/mira_v4.py:404:    Falls back to a template-based answer if Sonnet is unavailable.
+/mnt/d/BoundState/boundstate_mira/mira/api/routers/mira_v4.py:482:                system=_RESPONSE_SYSTEM_PROMPT,
+/mnt/d/BoundState/boundstate_mira/mira/api/routers/mira_v4.py:494:    # Fallback: template-based answer if Sonnet failed
+/mnt/d/BoundState/boundstate_mira/mira/mua/v8/workflow.py:92:    used_for: str  # e.g., "rationale basis", "mitigation template", "gap disposition"
+/mnt/d/BoundState/boundstate_mira/mira/mua/v8/renderer.py:9:    are rendered via string templates (no LLM hallucination risk)
+/mnt/d/BoundState/boundstate_mira/mira/mua/v8/renderer.py:55:      1. Deterministic template for header/classification/structure
+/mnt/d/BoundState/boundstate_mira/mira/mua/v8/renderer.py:127:        Render using templates only (no LLM call). Useful for testing
+/mnt/d/BoundState/boundstate_mira/mira/mua/v8/renderer.py:131:        body = self._render_template_body(session)
+/mnt/d/BoundState/boundstate_mira/mira/mua/v8/renderer.py:138:            model_used="template-only",
+/mnt/d/BoundState/boundstate_mira/mira/mua/v8/renderer.py:370:    def _render_template_body(self, s: MUASessionData) -> str:
+/mnt/d/BoundState/boundstate_mira/mira/mua/v8/renderer.py:371:        """Render body using templates when LLM is unavailable."""
+/mnt/d/BoundState/boundstate_mira/mira/MIRA_V2/src/llm_answer_generator.py:30:DECISION_SYSTEM_PROMPT = """# MIRA LLM CONTRACT - DO NOT VIOLATE
+/mnt/d/BoundState/boundstate_mira/mira/MIRA_V2/src/llm_answer_generator.py:663:            full_prompt = f"""{DECISION_SYSTEM_PROMPT}
+/mnt/d/BoundState/boundstate_mira/mira/MIRA_V2/guardrails/__init__.py:20:    DECISION_SYSTEM_PROMPT,
+/mnt/d/BoundState/boundstate_mira/mira/MIRA_V2/guardrails/__init__.py:26:    "DECISION_SYSTEM_PROMPT",
+/mnt/d/BoundState/boundstate_mira/mira/MIRA_V2/guardrails/llm_decision_guardrails.py:27:DECISION_SYSTEM_PROMPT = """You are a safety-critical material compatibility expert for aerospace applications.
+/mnt/d/BoundState/boundstate_mira/mira/knowledge_twins/verdict_engine.py:307:        # Step 10: Generate reasoning (template-based, NO invented facts)
+/mnt/d/BoundState/boundstate_mira/mira/knowledge_twins/verdict_engine.py:433:        """Generate template-based reasoning.
+/mnt/d/BoundState/boundstate_mira/mira/precedent_engine/core/narrator.py:33:NARRATOR_SYSTEM_PROMPT = """You are NASA's MUA precedent narrator. You synthesize rationale text from existing precedent MUAs.
+/mnt/d/BoundState/boundstate_mira/mira/precedent_engine/core/narrator.py:51:NARRATOR_USER_PROMPT = """Generate rationale for this new MUA case based on the provided precedents.
+/mnt/d/BoundState/boundstate_mira/mira/precedent_engine/core/narrator.py:141:        user_prompt = NARRATOR_USER_PROMPT.format(
+/mnt/d/BoundState/boundstate_mira/mira/precedent_engine/core/narrator.py:158:                    "system": NARRATOR_SYSTEM_PROMPT,
+/mnt/d/BoundState/boundstate_mira/mira/knowledge_twins/bok_standards_extractor_v6.py:221:SECTION_EXTRACTION_PROMPT = """You are an expert at extracting structured data from NASA safety standards.
+/mnt/d/BoundState/boundstate_mira/mira/precedent_engine/core/enrichment.py:42:MULTI_MATERIAL_PROMPT = """Extract individual materials from this designation.
+/mnt/d/BoundState/boundstate_mira/mira/precedent_engine/core/enrichment.py:190:ISSUE_CLASSIFICATION_PROMPT = """Classify this MUA issue into deviation categories.
+/mnt/d/BoundState/boundstate_mira/mira/knowledge_twins/bok_extractor_v7.py:806:LLM_ENRICHMENT_PROMPT = """Analyze this table from a NASA {gas_type} safety standard.
+/mnt/d/BoundState/boundstate_mira/mira/maptis/pdf_extractor.py:84:MATERIAL_TABLE_PROMPT = """Extract ALL materials from this MAPTIS material family report PDF.
+/mnt/d/BoundState/boundstate_mira/mira/maptis/pdf_extractor.py:105:FLAMMABILITY_TEST_PROMPT = """Extract ALL flammability test records from this MAPTIS report PDF.
+/mnt/d/BoundState/boundstate_mira/mira/maptis/pdf_extractor.py:130:PNEUMATIC_TEST_PROMPT = """Extract ALL pneumatic impact test records from this MAPTIS report PDF.
+/mnt/d/BoundState/boundstate_mira/mira/knowledge_twins/bok_extractor_v10.py:361:TABLE_EXTRACTION_PROMPT = """Read this table image and return the exact grid structure.
+/mnt/d/BoundState/boundstate_mira/mira/knowledge_twins/bok_extractor_v10.py:401:TABLE_DETECTION_PROMPT = """Find all tables in this page image.
+/mnt/d/BoundState/boundstate_mira/mira/knowledge_twins/bok_extractor_v8.py:593:PAIRED_TABLE_PROMPT = """You are extracting hydrogen embrittlement data from a materials test table.
+/mnt/d/BoundState/boundstate_mira/mira/knowledge_twins/extract h2.py:28:PROMPT = """Extract ALL hydrogen embrittlement test data from this document into JSON.
+/mnt/d/BoundState/boundstate_mira/mira/mua/final/workflow.py:62:    used_for: str  # "rationale basis", "mitigation template", "gap disposition"
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/__init__.py:21:9. Logic-free templates
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/category_router.py:304:    rationale_template: str = ""
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/category_router.py:405:                rationale_template=(
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/category_router.py:434:            rationale_template=(
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/category_router.py:457:            rationale_template=(
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/category_router.py:480:            rationale_template=(
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/category_router.py:502:            rationale_template=(
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/material_resolver.py:1421:    for pattern, template in patterns:
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/material_resolver.py:1428:        if template == "{0}" and groups:
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/material_resolver.py:1430:        if template == "{1}" and len(groups) > 1:
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/material_resolver.py:1432:        if template == "{0} {1}" and len(groups) > 1:
+/mnt/d/BoundState/boundstate_mira/mira/mua/final/renderer.py:11:The template fallback always produces a valid document if the LLM fails.
+/mnt/d/BoundState/boundstate_mira/mira/mua/final/renderer.py:52:      - render_without_llm() -- template fallback, no API call
+/mnt/d/BoundState/boundstate_mira/mira/mua/final/renderer.py:77:        Falls back to template if LLM call fails.
+/mnt/d/BoundState/boundstate_mira/mira/mua/final/renderer.py:88:                "LLM render failed for %s -- falling back to template.",
+/mnt/d/BoundState/boundstate_mira/mira/mua/final/renderer.py:92:            prose = self._render_template_body(session)
+/mnt/d/BoundState/boundstate_mira/mira/mua/final/renderer.py:106:        body = self._render_template_body(session)
+/mnt/d/BoundState/boundstate_mira/mira/mua/final/renderer.py:113:            model_used="template-only",
+/mnt/d/BoundState/boundstate_mira/mira/mua/final/renderer.py:400:    def _render_template_body(self, s: MUASessionData) -> str:
+/mnt/d/BoundState/boundstate_mira/mira/mua/final/renderer.py:401:        """Render body using templates when LLM is unavailable."""
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/fact_checker.py:155:        is theater (the template produces correct output by construction).
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/fact_checker.py:186:            # Skip template-only sections unless they were edited/polished
+/mnt/d/BoundState/boundstate_mira/mira/miul/mua_bok_engine.py:433:                # Use template if no specific precedent
+/mnt/d/BoundState/boundstate_mira/mira/miul/mua_bok_engine.py:810:        # Default rationale templates
+/mnt/d/BoundState/boundstate_mira/mira/miul/mua_bok_engine.py:811:        templates = {
+/mnt/d/BoundState/boundstate_mira/mira/miul/mua_bok_engine.py:838:        base = templates.get(gap_type, "Engineering analysis supports material suitability.")
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/draft_renderer.py:11:The template MUST produce valid output even if the LLM fails entirely.
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/draft_renderer.py:13:deterministic template path that produces compliant NASA-format text from
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/draft_renderer.py:227:            2. Appendix E Rationale — code template with engineer fill-ins
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/draft_renderer.py:239:        rationale_template = app_b.get("rationale_template", "")
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/draft_renderer.py:283:        if rationale_template:
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/draft_renderer.py:286:            rationale_lines.append(rationale_template)
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/draft_renderer.py:293:                "No rationale template available for this code. "
+/mnt/d/BoundState/boundstate_mira/mira/mua/v6/draft_generator.py:94:        self._issue_templates = self._build_issue_templates()
+/mnt/d/BoundState/boundstate_mira/mira/mua/v6/draft_generator.py:96:    def _build_issue_templates(self) -> dict:
+/mnt/d/BoundState/boundstate_mira/mira/mua/v6/draft_generator.py:97:        """Build rationale templates for each issue category."""
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/draft_polish.py:3:Layer 2 of the two-layer draft architecture.  The template layer
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/draft_polish.py:12:- If the LLM call fails for any reason, the template ships unchanged.
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/draft_polish.py:37:_POLISH_SYSTEM_PROMPT = """\
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/draft_polish.py:59:in the template input.  Rewrite language only.
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/draft_polish.py:185:    Claude to rewrite the template output in professional NASA tone.
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/draft_polish.py:188:    unchanged — the template is always the safety net.
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/draft_polish.py:193:        The template-rendered MUA draft.
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/draft_polish.py:225:            "shipping template as-is.",
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/draft_polish.py:232:    example_block = "\n\n".join(
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/draft_polish.py:241:        f"{example_block}\n\n"
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/draft_polish.py:263:            system=_POLISH_SYSTEM_PROMPT,
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/draft_polish.py:272:                "keeping template.",
+/mnt/d/BoundState/boundstate_mira/mira/mua/v7/draft_polish.py:316:            "LLM polish failed -- shipping template as-is.", exc_info=True
+/mnt/d/BoundState/boundstate_mira/mira/miul/material_code_selector.py:39:SELECTION_PROMPT = """You are a NASA materials engineer selecting the correct MAPTIS material code for a spacecraft part.
+/mnt/d/BoundState/boundstate_mira/mira/miul/v3/extract.py:66:V3_EXTRACTION_PROMPT = """You are a PRECISION engineering drawing parser for NASA/MSFC aerospace drawings.
+/mnt/d/BoundState/boundstate_mira/mira/miul/v3/extract.py:807:DT_SYSTEM_PROMPT = """You extract drawing tree hierarchies using a LEVEL-BY-LEVEL approach.
+/mnt/d/BoundState/boundstate_mira/mira/miul/v3/extract.py:835:DT_EXTRACTION_PROMPT = """Extract this drawing tree by answering level-by-level:
+/mnt/d/BoundState/boundstate_mira/mira/miul/v3/extract.py:1445:            system_prompt=DT_SYSTEM_PROMPT,
+/mnt/d/BoundState/boundstate_mira/mira/miul/v3/extract.py:2064:        # Use first candidate as template, update with winning PN
+/mnt/d/BoundState/boundstate_mira/mira/miul/v3/builder.py:2305:    Standard output uses the OPIV macro-enabled template format.
+/mnt/d/BoundState/boundstate_mira/mira/miul/v3/builder.py:2306:    Falls back to the legacy generated workbook if template export fails.
+/mnt/d/BoundState/boundstate_mira/mira/miul/v3/builder.py:2637:    template_path = Path(__file__).resolve().parents[3] / "docs" / "OPIV_MIUL_Updated.xlsm"
+/mnt/d/BoundState/boundstate_mira/mira/miul/v3/builder.py:2638:    if template_path.exists():
+/mnt/d/BoundState/boundstate_mira/mira/miul/v3/builder.py:2640:            # Load template without preserving VBA so output workbook is macro-free.
+/mnt/d/BoundState/boundstate_mira/mira/miul/v3/builder.py:2641:            wb = load_workbook(template_path, keep_vba=False)
+/mnt/d/BoundState/boundstate_mira/mira/miul/v3/builder.py:2648:            # (AN/AO/AP) untouched so template logic remains available.
+/mnt/d/BoundState/boundstate_mira/mira/miul/v3/builder.py:2664:            # New builds should not carry template conditional color shading.
+/mnt/d/BoundState/boundstate_mira/mira/miul/v3/builder.py:2670:            # Populate template rows.
+/mnt/d/BoundState/boundstate_mira/mira/miul/v3/builder.py:2739:            LOGGER.info(f"[2Phase] Exported MIUL using OPIV template: {output_path}")
+/mnt/d/BoundState/boundstate_mira/mira/miul/v3/builder.py:2743:                "[2Phase] OPIV template export failed; falling back to legacy exporter: %s",
+/mnt/d/BoundState/boundstate_mira/mira/miul/v3/builder.py:2747:    # Legacy fallback export (non-template)
+/mnt/d/BoundState/boundstate_mira/mira/miul/extraction_fixes.py:57:CORRECTED_EPL_PROMPT = """Extract ALL items from the PARTS LIST or EPL table on this assembly drawing.
+/mnt/d/BoundState/boundstate_mira/mira/miul/extraction_fixes.py:130:CORRECTED_DETAIL_PROMPT = """Extract material information from this DETAIL engineering drawing.
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/engines/compliance_eval_codex.py:201:            "template": (
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/engines/compliance_eval_codex.py:211:            "template": (
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/engines/compliance_eval_codex.py:221:            "template": (
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/engines/compliance_eval_codex.py:235:                "template": (
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/models/draft.py:59:    prompt_template_id: str
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/models/draft.py:60:    """ID of the prompt template used."""
+/mnt/d/BoundState/boundstate_mira/mira/miul/builder.py:187:                           template_headers: Optional[List[str]] = None) -> MIULBuildResult:
+/mnt/d/BoundState/boundstate_mira/mira/miul/builder.py:196:            "template_headers": template_headers
+/mnt/d/BoundState/boundstate_mira/mira/miul/builder.py:354:        template_headers=kwargs.get("template_headers")
+/mnt/d/BoundState/boundstate_mira/frontend/src/i18n/locales/en/help.json:139:      "Format MUAs per NASA-STD-6016C templates",
+/mnt/d/BoundState/boundstate_mira/mira/miul/mua_synthesizer.py:560:            # Fallback to template-based rationale
+/mnt/d/BoundState/boundstate_mira/mira/miul/mua_synthesizer.py:602:        issue_templates = {
+/mnt/d/BoundState/boundstate_mira/mira/miul/mua_synthesizer.py:639:        base = issue_templates.get(request.issue, (
+/mnt/d/BoundState/boundstate_mira/mira/miul/mua_precedent_lookup.py:202:        Returns a template that can be reviewed and customized.
+/mnt/d/BoundState/boundstate_mira/mira/miul/v2/graph.py:66:DT_EXTRACTION_PROMPT = """Analyze this Engineering Drawing Tree document and extract the parent-child hierarchy.
+/mnt/d/BoundState/boundstate_mira/mira/miul/mua_remarks_generator.py:42:# Brief rationale templates by rating type and severity
+/mnt/d/BoundState/boundstate_mira/mira/miul/mua_remarks_generator.py:43:# Format: {rating_type: {rating_value: template}}
+/mnt/d/BoundState/boundstate_mira/mira/miul/mua_remarks_generator.py:82:# Default template when no specific template matches
+/mnt/d/BoundState/boundstate_mira/mira/miul/mua_remarks_generator.py:104:def _get_template(rating_type: str, rating_value: str) -> str:
+/mnt/d/BoundState/boundstate_mira/mira/miul/mua_remarks_generator.py:105:    """Get the appropriate template for a rating type and value."""
+/mnt/d/BoundState/boundstate_mira/mira/miul/mua_remarks_generator.py:106:    # Try specific template first
+/mnt/d/BoundState/boundstate_mira/mira/miul/mua_remarks_generator.py:107:    type_templates = BRIEF_RATIONALE_TEMPLATES.get(rating_type, {})
+/mnt/d/BoundState/boundstate_mira/mira/miul/mua_remarks_generator.py:108:    if rating_value in type_templates:
+/mnt/d/BoundState/boundstate_mira/mira/miul/mua_remarks_generator.py:109:        return type_templates[rating_value]
+/mnt/d/BoundState/boundstate_mira/mira/miul/mua_remarks_generator.py:202:    # Build remark from templates
+/mnt/d/BoundState/boundstate_mira/mira/miul/mua_remarks_generator.py:213:        template = _get_template(rating_type, rating_value)
+/mnt/d/BoundState/boundstate_mira/mira/miul/mua_remarks_generator.py:215:        # Format template
+/mnt/d/BoundState/boundstate_mira/mira/miul/mua_remarks_generator.py:216:        remark = template.format(
+/mnt/d/BoundState/boundstate_mira/mira/miul/mua_parser_v6.py:164:EXTRACTION_PROMPT = """You are an expert at extracting structured data from NASA Material Usage Agreement (MUA) documents.
+/mnt/d/BoundState/boundstate_mira/mira/miul/v2/extract.py:57:VISION_EXTRACTION_PROMPT = """You are a STRICT forensic engineering drawing parser.
+/mnt/d/BoundState/boundstate_mira/mira/miul/v1_archive/drawing_inventory.py:299:# EXTRACTION PROMPTS
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/__init__.py:19:from .template_renderer import (
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/adapters/mua_adapter.py:109:            prompt_template_id=f"mua_{closure_path.lower()}",
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/adapters/mua_adapter.py:110:            prompt_hash=hashlib.sha256(f"mua_template_{closure_path}".encode()).hexdigest(),
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/adapters/mua_adapter.py:186:                f"[REQUIRES HUMAN REVIEW: Complete MUA per template]"
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:4:Purpose: Logic-free Jinja2 template rendering
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:33:# Default template directory
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:34:DEFAULT_TEMPLATE_DIR = Path(__file__).parent / "templates"
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:39:    Logic-free template renderer.
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:51:        template_dir: Optional[Path] = None,
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:57:            template_dir: Template directory. Defaults to built-in templates.
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:59:        self._template_dir = template_dir or DEFAULT_TEMPLATE_DIR
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:61:        # Ensure template directory exists
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:62:        self._template_dir.mkdir(parents=True, exist_ok=True)
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:66:            loader=FileSystemLoader(str(self._template_dir)),
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:75:        template_name: Optional[str] = None,
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:78:        Render a section using its template.
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:82:            template_name: Optional template name override.
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:87:        # Determine template name
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:88:        if template_name is None:
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:89:            template_name = f"{section.section_id}.html"
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:91:        # Check if template exists, otherwise use default
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:92:        template_path = self._template_dir / template_name
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:93:        if not template_path.exists():
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:94:            template_name = "default_section.html"
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:95:            template_path = self._template_dir / template_name
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:97:        # If no templates exist at all, return plain text
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:98:        if not template_path.exists():
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:102:            template = self._env.get_template(template_name)
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:103:            return template.render(section=section)
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:152:        document_template: str = "document.html",
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:159:            document_template: Document template name.
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:164:        template_path = self._template_dir / document_template
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:165:        if not template_path.exists():
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:172:            template = self._env.get_template(document_template)
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:173:            return template.render(sections=sections)
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:183:    template_dir: Optional[Path] = None,
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:190:        template_dir: Optional template directory.
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/template_renderer.py:195:    renderer = TemplateRenderer(template_dir)
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/section_builder.py:4:Purpose: Pre-compute section content for logic-free templates
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/section_builder.py:10:Fran Fix #9: "Logic in templates" -> All logic in SectionBuilder.
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/section_builder.py:44:    All logic is computed here - templates only insert values.
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/section_builder.py:81:    Fran Fix #9: All decision logic happens here, NOT in templates.
+/mnt/d/BoundState/boundstate_mira/mira/mp_plan/generation/section_builder.py:87:    Forbidden in templates: {% if material.o2_pct > 23.5 %}
+/mnt/d/BoundState/boundstate_mira/mira/miul/v1_archive/miul_to_excel.py:38:# MAPTIS MIUL column specification - matches DMLLV template.xlsx exactly (38 columns)
+/mnt/d/BoundState/boundstate_mira/mira/miul/v1_archive/miul_to_excel.py:85:    Matches the exact DMLLV template.xlsx structure:
+/mnt/d/BoundState/boundstate_mira/mira/miul/v1_archive/miul_to_excel.py:183:        """Write main MIUL data sheet matching template exactly."""
+/mnt/d/BoundState/boundstate_mira/mira/miul/v1_archive/miul_to_excel.py:253:        """Write single material row matching template columns."""
+/mnt/d/BoundState/boundstate_mira/mira/miul/v1_archive/miul_to_excel.py:266:            # Map JSON keys to template columns
+/mnt/d/BoundState/boundstate_mira/mira/miul/v1_archive/miul_to_excel.py:446:        description="Convert MIUL extractor v2 JSON to MAPTIS Excel format (DMLLV template)"
+/mnt/d/BoundState/boundstate_mira/mira/miul/production/extractor.py:264:SYSTEM_PROMPT = """\
+/mnt/d/BoundState/boundstate_mira/mira/miul/v1_archive/miul_extractor_v2.py:584:        """Build final MIUL structure per NASA MIUL Excel template format.
+/mnt/d/BoundState/boundstate_mira/mira/miul/v1_archive/extractors/drawing_parser.py:320:    """Prompt templates for multi-pass drawing extraction."""
