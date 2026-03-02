@@ -1,0 +1,3 @@
+rank,tier,model,provider,weighted_avg,parseable,classification,key_facts,uncertainty,latency_score,cost_score,avg_latency_s,failures,total_cases
+1,sonnet,meta.llama3-70b-instruct-v1:0,bedrock,0.823,0.800,0.758,0.883,0.927,0.550,1.000,4.46,0,20
+1,haiku,meta.llama3-8b-instruct-v1:0,bedrock,1.000,1.000,1.000,1.000,1.000,1.000,1.000,1.31,0,7
