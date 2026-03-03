@@ -124,6 +124,7 @@ class MaterialResolution(BaseModel):
     is_process_sensitive: bool = False
     selection_method: Optional[str] = None
     selection_confidence: Optional[float] = Field(default=None, ge=0.0, le=1.0)
+    suggestions: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class EnvironmentSpec(BaseModel):

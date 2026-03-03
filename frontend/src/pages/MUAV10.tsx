@@ -19,10 +19,12 @@ import {
   downloadBlob,
   finalizeMua,
   processSingleMaterial,
+  processMuaV10MiulWorkbook,
   generateMuaDocx,
   type GenerateDocxRequest,
   type MaterialClass,
   type MuaV10PipelineResult,
+  type ProcessMiulResponse,
 } from '@/lib/mua-v10-api';
 
 const ISSUE_COLUMNS = ['FLAM', 'FS', 'TOX', 'TVS', 'SCC', 'CORR'] as const;
@@ -30,6 +32,7 @@ const ISSUE_COLUMNS = ['FLAM', 'FS', 'TOX', 'TVS', 'SCC', 'CORR'] as const;
 type IssueColumn = (typeof ISSUE_COLUMNS)[number];
 type RatingsState = Record<IssueColumn, string>;
 type WizardStep = 1 | 2 | 3 | 4 | 5;
+type ReviewAction = 'approve' | 'edit' | 'reject';
 
 const DEFAULT_RATINGS: RatingsState = {
   FLAM: '',
@@ -117,6 +120,10 @@ export default function MUAV10() {
   const [pressure, setPressure] = useState('');
   const [temperature, setTemperature] = useState('');
   const [partNumbers, setPartNumbers] = useState('');
+  const [miulFile, setMiulFile] = useState<File | null>(null);
+  const [miulImporting, setMiulImporting] = useState(false);
+  const [miulImport, setMiulImport] = useState<ProcessMiulResponse | null>(null);
+  const [miulSelectedIndex, setMiulSelectedIndex] = useState(0);
 
   // Step 2
   const [ratings, setRatings] = useState<RatingsState>({ ...DEFAULT_RATINGS });
@@ -133,6 +140,10 @@ export default function MUAV10() {
   const [downloading, setDownloading] = useState<Record<string, boolean>>({});
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [finalizing, setFinalizing] = useState(false);
+  const [formActions, setFormActions] = useState<Record<string, ReviewAction>>({});
+  const [resolutionCandidates, setResolutionCandidates] = useState<Array<Record<string, unknown>>>([]);
+  const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
+  const [precedentExpanded, setPrecedentExpanded] = useState<Record<string, boolean>>({});
 
   const clearDownstreamState = () => {
     setPipelineResult(null);
@@ -141,6 +152,10 @@ export default function MUAV10() {
     setDownloading({});
     setSessionId(null);
     setFinalizing(false);
+    setFormActions({});
+    setResolutionCandidates([]);
+    setDraftSavedAt(null);
+    setPrecedentExpanded({});
   };
 
   const resetWizard = () => {
@@ -157,6 +172,10 @@ export default function MUAV10() {
     setPressure('');
     setTemperature('');
     setPartNumbers('');
+    setMiulFile(null);
+    setMiulImporting(false);
+    setMiulImport(null);
+    setMiulSelectedIndex(0);
     setRatings({ ...DEFAULT_RATINGS });
     setLoading(false);
     setError(null);
@@ -182,6 +201,81 @@ export default function MUAV10() {
     clearDownstreamState();
     setError(null);
     setStep(2);
+  };
+
+  const applyImportedMiulRow = (row: ProcessMiulResponse['results'][number]) => {
+    const importedRatings: RatingsState = { ...DEFAULT_RATINGS };
+    for (const column of ISSUE_COLUMNS) {
+      importedRatings[column] = row.ratings[column] || '';
+    }
+
+    const normalizedEnvironment = row.environment.toLowerCase().includes('habitable')
+      && !row.environment.toLowerCase().includes('non')
+      ? 'habitable'
+      : 'non-habitable';
+
+    setMaptisCode(row.maptis_code);
+    setMaterialDesignation(row.material_designation || row.pipeline_result.material_designation || '');
+    setMaterialClass(row.pipeline_result.material_class);
+    setMedia(row.media || media);
+    setEnvironment(normalizedEnvironment);
+    setPartNumbers(row.part_number || '');
+    setRatings(importedRatings);
+
+    clearDownstreamState();
+    setPipelineResult(row.pipeline_result);
+    setResolutionCandidates([]);
+    setDraftSavedAt(null);
+
+    const initRationales: Record<string, string> = {};
+    const initDispositions: Record<string, string> = {};
+    const nextActions: Record<string, ReviewAction> = {};
+    for (const form of row.pipeline_result.forms) {
+      initRationales[form.issue] = form.rationale;
+      initDispositions[form.issue] = form.disposition;
+      nextActions[form.issue] = 'approve';
+    }
+    setEditedRationales(initRationales);
+    setEditedDispositions(initDispositions);
+    setFormActions(nextActions);
+
+    setError(null);
+    setStep(3);
+  };
+
+  const handleImportMiul = async () => {
+    if (!miulFile) {
+      setError('Choose a completed MIUL workbook (.xlsx/.xlsm) first.');
+      return;
+    }
+
+    setMiulImporting(true);
+    setError(null);
+    clearDownstreamState();
+
+    try {
+      const response = await processMuaV10MiulWorkbook(miulFile, {
+        media_override: media.trim() || undefined,
+        environment_override: environment,
+        project: project.trim() || undefined,
+        system: system.trim() || undefined,
+        max_rows: 200,
+      });
+
+      setMiulImport(response);
+      setMiulSelectedIndex(0);
+
+      if (!response.results.length) {
+        throw new Error('MIUL import succeeded but no non-A trigger rows were found.');
+      }
+
+      applyImportedMiulRow(response.results[0]);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to process MIUL workbook';
+      setError(message);
+    } finally {
+      setMiulImporting(false);
+    }
   };
 
   const handleClassify = async () => {
@@ -218,6 +312,7 @@ export default function MUAV10() {
         });
 
         if (response.status !== 'ok' || !response.pipeline_result) {
+          setResolutionCandidates(response.candidates || []);
           const message =
             response.material_resolution?.message ||
             'Material resolution requires manual MAPTIS code selection.';
@@ -226,6 +321,7 @@ export default function MUAV10() {
 
         pipeline = response.pipeline_result;
         resolvedSessionId = response.session_id ?? null;
+        setResolutionCandidates([]);
       } catch (runtimeErr) {
         const message = runtimeErr instanceof Error ? runtimeErr.message : String(runtimeErr);
         const isRouteMiss = message.includes('404') || message.toLowerCase().includes('not found');
@@ -237,6 +333,7 @@ export default function MUAV10() {
         // expose /process-single.
         pipeline = await classifyMuaV10Row(payload);
         resolvedSessionId = null;
+        setResolutionCandidates([]);
       }
 
       if (!pipeline) {
@@ -246,15 +343,19 @@ export default function MUAV10() {
       setPipelineResult(pipeline);
       setMaptisCode(pipeline.maptis_code);
       setSessionId(resolvedSessionId);
+      setDraftSavedAt(resolvedSessionId ? new Date().toISOString() : null);
 
       const initRationales: Record<string, string> = {};
       const initDispositions: Record<string, string> = {};
+      const nextActions: Record<string, ReviewAction> = {};
       for (const form of pipeline.forms) {
         initRationales[form.issue] = form.rationale;
         initDispositions[form.issue] = form.disposition;
+        nextActions[form.issue] = 'approve';
       }
       setEditedRationales(initRationales);
       setEditedDispositions(initDispositions);
+      setFormActions(nextActions);
 
       setStep(3);
     } catch (err) {
@@ -289,10 +390,12 @@ export default function MUAV10() {
         const changed =
           (editedRationale ?? form.rationale) !== form.rationale ||
           (editedDisposition ?? form.disposition) !== form.disposition;
+        const selectedAction = formActions[form.issue];
+        const action: ReviewAction = selectedAction || (changed ? 'edit' : 'approve');
 
         return {
           issue: form.issue,
-          action: changed ? 'edit' as const : 'approve' as const,
+          action,
           rationale: editedRationale ?? form.rationale,
           disposition: editedDisposition ?? form.disposition,
           comment: '',
@@ -333,6 +436,7 @@ export default function MUAV10() {
       }
       setEditedRationales(nextRationales);
       setEditedDispositions(nextDispositions);
+      setDraftSavedAt(response.session_id ? new Date().toISOString() : draftSavedAt);
       setSessionId(response.session_id ?? sessionId);
 
       setStep(5);
@@ -400,6 +504,12 @@ export default function MUAV10() {
   const automatableCount = pipelineResult?.automatable_count ?? 0;
   const humanRequiredCount = pipelineResult?.human_required_count ?? 0;
   const hasMaterialIdentifier = Boolean(maptisCode.trim() || materialDesignation.trim());
+  const saveDraftLabel = draftSavedAt ? `Draft saved ${new Date(draftSavedAt).toLocaleString()}` : 'Save Draft';
+
+  const getConfidencePct = (value: number): number => {
+    if (!Number.isFinite(value)) return 0;
+    return Math.max(0, Math.min(100, Math.round(value * 100)));
+  };
 
   return (
     <div className="space-y-6">
@@ -408,12 +518,19 @@ export default function MUAV10() {
           title="MUA Writer"
           description="Flag-first classifier - walk through each classification step"
         />
-        {step > 1 ? (
-          <Button variant="outline" size="sm" onClick={resetWizard}>
-            <RotateCcw className="mr-2 h-4 w-4" />
-            Start Over
-          </Button>
-        ) : null}
+        <div className="flex items-center gap-2">
+          {sessionId ? (
+            <Button type="button" variant="outline" size="sm" onClick={() => setDraftSavedAt(new Date().toISOString())}>
+              {saveDraftLabel}
+            </Button>
+          ) : null}
+          {step > 1 ? (
+            <Button variant="outline" size="sm" onClick={resetWizard}>
+              <RotateCcw className="mr-2 h-4 w-4" />
+              Start Over
+            </Button>
+          ) : null}
+        </div>
       </div>
 
       <Card className={step === 1 ? '' : 'opacity-75'}>
@@ -424,6 +541,90 @@ export default function MUAV10() {
               <CardDescription>Identify the material, MAPTIS code, and service environment.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              <div className="rounded-md border p-3 space-y-3">
+                <div className="space-y-2">
+                  <Label htmlFor="miul-upload">Optional: Import completed MIUL workbook</Label>
+                  <Input
+                    id="miul-upload"
+                    type="file"
+                    accept=".xlsx,.xlsm"
+                    onChange={(event) => setMiulFile(event.target.files?.[0] ?? null)}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Uses MAPTIS codes + non-A ratings from your MIUL and runs the v10 pipeline.
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button type="button" variant="outline" onClick={handleImportMiul} disabled={miulImporting || !miulFile}>
+                    {miulImporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    Import MIUL
+                  </Button>
+                  {miulImport ? (
+                    <span className="text-xs text-muted-foreground">
+                      {miulImport.processed_rows} processed / {miulImport.total_rows} total
+                    </span>
+                  ) : null}
+                </div>
+                {miulImport && miulImport.results.length > 0 ? (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <select
+                      value={String(miulSelectedIndex)}
+                      onChange={(event) => setMiulSelectedIndex(Number(event.target.value))}
+                      className="h-9 min-w-[280px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    >
+                      {miulImport.results.map((row, idx) => (
+                        <option key={`${row.row_index}-${row.maptis_code}-${idx}`} value={idx}>
+                          Row {row.row_index} | {row.maptis_code} | {row.part_number || 'part N/A'} | {Object.entries(row.ratings).map(([k, v]) => `${k}=${v}`).join(', ')}
+                        </option>
+                      ))}
+                    </select>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => applyImportedMiulRow(miulImport.results[miulSelectedIndex])}
+                    >
+                      Load Selected Row
+                    </Button>
+                  </div>
+                ) : null}
+              </div>
+
+              {resolutionCandidates.length > 0 ? (
+                <div className="rounded-md border border-amber-300 bg-amber-50 p-3">
+                  <p className="text-sm font-medium text-amber-900">Material resolution candidates</p>
+                  <p className="mt-1 text-xs text-amber-800">
+                    Select a MAPTIS code below and re-run Classify.
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {resolutionCandidates.slice(0, 8).map((candidate, idx) => {
+                      const code = String(
+                        candidate.material_code ?? candidate.materialCode ?? candidate.code ?? '',
+                      ).trim();
+                      const name = String(
+                        candidate.canonical_name ?? candidate.canonicalName ?? candidate.designation ?? '',
+                      ).trim();
+                      const label = code ? `${code}${name ? ` - ${name}` : ''}` : name || `candidate-${idx + 1}`;
+                      return (
+                        <Button
+                          key={`${label}-${idx}`}
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            if (code) setMaptisCode(code);
+                            if (name) setMaterialDesignation(name);
+                            setResolutionCandidates([]);
+                            setError(null);
+                          }}
+                        >
+                          {label}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null}
+
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
                   <Label htmlFor="maptis-code">MAPTIS Code (optional)</Label>
@@ -657,12 +858,70 @@ export default function MUAV10() {
 
                       <p className="mt-2 text-sm text-muted-foreground">{classification.classification_reason}</p>
 
+                      <div className="mt-3 space-y-1">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-muted-foreground">Confidence</span>
+                          <span>{getConfidencePct(classification.confidence)}%</span>
+                        </div>
+                        <div className="h-2 w-full rounded bg-muted">
+                          <div
+                            className="h-2 rounded bg-slate-700"
+                            style={{ width: `${getConfidencePct(classification.confidence)}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      {classification.precedent ? (
+                        <div className="mt-3 rounded-md border border-slate-200 bg-slate-50 p-2">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <Badge variant="outline">
+                              {classification.precedent.approved_count}/{classification.precedent.total_count} approved precedent
+                            </Badge>
+                            {classification.evidence_bundle?.exemplars && classification.evidence_bundle.exemplars.length > 0 ? (
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                onClick={() =>
+                                  setPrecedentExpanded((prev) => ({
+                                    ...prev,
+                                    [classification.issue_key]: !prev[classification.issue_key],
+                                  }))
+                                }
+                              >
+                                {precedentExpanded[classification.issue_key] ? 'Hide citations' : 'Show top citations'}
+                              </Button>
+                            ) : null}
+                          </div>
+                          {precedentExpanded[classification.issue_key] ? (
+                            <div className="mt-2 space-y-1 text-xs text-muted-foreground">
+                              {(classification.evidence_bundle?.exemplars || []).slice(0, 3).map((exemplar) => (
+                                <div key={`${classification.issue_key}-${exemplar.mua_number}`} className="rounded border bg-white px-2 py-1">
+                                  {exemplar.mua_number} - {exemplar.material_name || 'material N/A'} ({exemplar.media_category || 'media N/A'})
+                                </div>
+                              ))}
+                            </div>
+                          ) : null}
+                        </div>
+                      ) : null}
+
                       {!classification.screening_applicable ? (
                         <p className="mt-1 text-xs text-green-700">{classification.screening_reason}</p>
                       ) : null}
 
                       {classification.hazard_applies !== null ? (
                         <p className="mt-1 text-xs">Hazard present in {media}: {classification.hazard_applies ? 'Yes' : 'No'}</p>
+                      ) : null}
+
+                      {classification.synthesis?.suggested_elements && classification.synthesis.suggested_elements.length > 0 ? (
+                        <div className="mt-3 rounded-md border border-amber-300 bg-amber-50 p-2">
+                          <p className="text-xs font-medium text-amber-900">Suggested rationale elements (engineer review)</p>
+                          <ul className="mt-1 list-disc space-y-1 pl-5 text-xs text-amber-900">
+                            {classification.synthesis.suggested_elements.slice(0, 5).map((item, idx) => (
+                              <li key={`${classification.issue_key}-suggestion-${idx}`}>{item}</li>
+                            ))}
+                          </ul>
+                        </div>
                       ) : null}
                     </div>
                   );
@@ -703,10 +962,45 @@ export default function MUAV10() {
               <CardContent className="space-y-4">
                 {pipelineResult.forms.map((form, index) => (
                   <div key={`${form.issue}-${index}`} className="rounded-md border p-3">
+                    {(() => {
+                      const classification = pipelineResult.classifications.find((item) => item.issue_key === form.issue);
+                      const selectedAction = formActions[form.issue] || 'approve';
+                      const claims = classification?.synthesis?.claims || [];
+                      const evidenceHash = classification?.evidence_bundle?.evidence_hash || '';
+                      return (
+                        <>
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge>{form.issue}</Badge>
                       <Badge variant="outline">{form.rating}</Badge>
                       <Badge variant="outline">Category {form.category || 'N/A'}</Badge>
+                      <Badge variant="outline">{classification?.mua_type || 'N/A'}</Badge>
+                    </div>
+
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant={selectedAction === 'approve' ? 'default' : 'outline'}
+                        onClick={() => setFormActions((prev) => ({ ...prev, [form.issue]: 'approve' }))}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant={selectedAction === 'edit' ? 'default' : 'outline'}
+                        onClick={() => setFormActions((prev) => ({ ...prev, [form.issue]: 'edit' }))}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant={selectedAction === 'reject' ? 'destructive' : 'outline'}
+                        onClick={() => setFormActions((prev) => ({ ...prev, [form.issue]: 'reject' }))}
+                      >
+                        Reject
+                      </Button>
                     </div>
 
                     <div className="mt-3 space-y-2">
@@ -716,13 +1010,44 @@ export default function MUAV10() {
                         rows={6}
                         className="w-full rounded-md border p-2 text-sm font-mono"
                         onChange={(event) =>
-                          setEditedRationales((prev) => ({
-                            ...prev,
-                            [form.issue]: event.target.value,
-                          }))
+                          {
+                            setEditedRationales((prev) => ({
+                              ...prev,
+                              [form.issue]: event.target.value,
+                            }));
+                            setFormActions((prev) => ({ ...prev, [form.issue]: 'edit' }));
+                          }
                         }
                       />
                     </div>
+
+                    {claims.length > 0 ? (
+                      <div className="mt-3 space-y-2">
+                        <Label>Claim Sources</Label>
+                        <div className="space-y-2">
+                          {claims.map((claim, claimIdx) => {
+                            const sourceType = (claim.source_type || '').toLowerCase();
+                            const sourceClass = sourceType === 'precedent'
+                              ? 'border-blue-300 bg-blue-50'
+                              : sourceType === 'template'
+                                ? 'border-slate-300 bg-slate-50'
+                                : 'border-purple-300 bg-purple-50';
+                            return (
+                              <div key={`${form.issue}-claim-${claimIdx}`} className={`rounded-md border p-2 text-xs ${sourceClass}`}>
+                                <div className="font-medium">
+                                  {claim.source_type} - {claim.source_mua}
+                                </div>
+                                <div className="mt-1">{claim.text}</div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ) : null}
+
+                    {evidenceHash ? (
+                      <p className="mt-2 text-[11px] text-muted-foreground">Evidence hash: {evidenceHash}</p>
+                    ) : null}
 
                     <div className="mt-3 space-y-2">
                       <Label>Disposition</Label>
@@ -731,13 +1056,19 @@ export default function MUAV10() {
                         rows={3}
                         className="w-full rounded-md border p-2 text-sm"
                         onChange={(event) =>
-                          setEditedDispositions((prev) => ({
-                            ...prev,
-                            [form.issue]: event.target.value,
-                          }))
+                          {
+                            setEditedDispositions((prev) => ({
+                              ...prev,
+                              [form.issue]: event.target.value,
+                            }));
+                            setFormActions((prev) => ({ ...prev, [form.issue]: 'edit' }));
+                          }
                         }
                       />
                     </div>
+                        </>
+                      );
+                    })()}
                   </div>
                 ))}
 
@@ -750,6 +1081,13 @@ export default function MUAV10() {
                         <Badge variant="destructive">Needs Engineer</Badge>
                       </div>
                       <p className="mt-2 text-sm text-muted-foreground">{classification.classification_reason}</p>
+                      {classification.synthesis?.suggested_elements && classification.synthesis.suggested_elements.length > 0 ? (
+                        <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-red-900">
+                          {classification.synthesis.suggested_elements.slice(0, 5).map((item, idx) => (
+                            <li key={`${classification.issue_key}-step4-suggested-${idx}`}>{item}</li>
+                          ))}
+                        </ul>
+                      ) : null}
                     </div>
                   ))}
 
@@ -758,6 +1096,12 @@ export default function MUAV10() {
                   Generate MUA Documents
                   <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
+                {sessionId ? (
+                  <p className="text-xs text-muted-foreground">
+                    Session: {sessionId}
+                    {draftSavedAt ? ` | Draft saved: ${new Date(draftSavedAt).toLocaleString()}` : ''}
+                  </p>
+                ) : null}
               </CardContent>
             </>
           ) : (

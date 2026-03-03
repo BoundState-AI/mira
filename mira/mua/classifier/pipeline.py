@@ -336,10 +336,12 @@ def process_miul_row(
         result.precedent_ring = ring
         result.confidence = adjust_confidence(result.confidence, precedent)
 
-        if form and result.automatable:
-            evidence = None
-            synthesis = None
+        evidence = None
+        synthesis = None
 
+        # Retrieve evidence for all non-standard outcomes so review UI has
+        # precedent context even when a flag is routed to human.
+        if result.mua_type != MUAType.STANDARD:
             try:
                 evidence = retrieve_evidence_bundle(
                     result=result,
@@ -349,31 +351,37 @@ def process_miul_row(
                 logger.warning("Evidence retrieval failed; continuing with template rationale: %s", exc)
                 evidence = None
 
-            if evidence:
-                try:
-                    synthesis = synthesize_rationale(
-                        result=result,
-                        evidence=evidence,
-                        material_name=material_designation or maptis_code,
-                    )
-                except Exception as exc:  # pragma: no cover - guardrail only
-                    logger.warning("Synthesis failed; continuing with template rationale: %s", exc)
-                    synthesis = None
+        if evidence is not None:
+            result.evidence_bundle = evidence
 
-            if synthesis and not synthesis.template_fallback and evidence:
-                _verified_claims, blocked_claims = verify_claims(synthesis, evidence)
-                if blocked_claims:
-                    logger.warning(
-                        "Blocked %d ungrounded claims for %s=%s, using template rationale",
-                        len(blocked_claims),
-                        result.issue_key,
-                        result.rating,
-                    )
-                    synthesis = None
-                else:
-                    result.synthesis = synthesis
-                    result.evidence_bundle = evidence
+        # Synthesis runs for automatable outcomes and for REAL_PROBLEM/REAL_GAP
+        # where we surface suggested rationale elements for engineers.
+        if evidence and result.mua_type != MUAType.STANDARD:
+            try:
+                synthesis = synthesize_rationale(
+                    result=result,
+                    evidence=evidence,
+                    material_name=material_designation or maptis_code,
+                )
+            except Exception as exc:  # pragma: no cover - guardrail only
+                logger.warning("Synthesis failed; continuing with template rationale: %s", exc)
+                synthesis = None
 
+        if synthesis and not synthesis.template_fallback and evidence:
+            _verified_claims, blocked_claims = verify_claims(synthesis, evidence)
+            if blocked_claims:
+                logger.warning(
+                    "Blocked %d ungrounded claims for %s=%s, using template rationale",
+                    len(blocked_claims),
+                    result.issue_key,
+                    result.rating,
+                )
+                synthesis = None
+
+        if synthesis is not None:
+            result.synthesis = synthesis
+
+        if form and result.automatable:
             if synthesis and not synthesis.template_fallback:
                 form.rationale = synthesis.rationale
                 form.disposition = synthesis.disposition
@@ -383,10 +391,6 @@ def process_miul_row(
                     material_name=material_designation or maptis_code,
                 )
                 form.disposition = render_disposition(result)
-                if evidence is not None:
-                    result.evidence_bundle = evidence
-                if synthesis is not None:
-                    result.synthesis = synthesis
 
         classifications.append(result)
 

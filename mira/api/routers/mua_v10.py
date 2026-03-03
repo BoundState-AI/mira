@@ -9,10 +9,11 @@ import logging
 import os
 import re
 import uuid
+from dataclasses import asdict, is_dataclass
 from datetime import date as date_type
-from typing import Optional
+from typing import Any, Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
@@ -103,6 +104,31 @@ class FinalizeAction(BaseModel):
 class FinalizeRequest(ClassifyRowRequest):
     session_id: Optional[str] = None
     actions: list[FinalizeAction] = Field(default_factory=list)
+
+
+class ProcessMiulRowResult(BaseModel):
+    row_index: int
+    line_number: str = ""
+    part_number: str = ""
+    maptis_code: str
+    material_designation: str = ""
+    media: str
+    environment: str
+    ratings: dict[str, str] = Field(default_factory=dict)
+    pipeline_result: PipelineResult
+
+
+class ProcessMiulResponse(BaseModel):
+    filename: str
+    total_rows: int
+    processed_rows: int
+    skipped_rows: int
+    skipped_reasons: dict[str, int] = Field(default_factory=dict)
+    results: list[ProcessMiulRowResult] = Field(default_factory=list)
+
+
+ProcessMiulRowResult.model_rebuild()
+ProcessMiulResponse.model_rebuild()
 
 
 def _offline_lookup_enabled() -> bool:
@@ -257,6 +283,25 @@ def _normalize_ratings_or_raise(ratings: dict[str, Optional[str]]) -> dict[str, 
     return normalized
 
 
+def _cell_to_text(value: Any) -> str:
+    if value is None:
+        return ""
+    text = str(value).strip()
+    if not text or text.lower() == "nan":
+        return ""
+    if re.fullmatch(r"\d+\.0+", text):
+        return text.split(".", 1)[0]
+    return text
+
+
+def _match_column(columns: dict[str, str], *candidates: str) -> Optional[str]:
+    for candidate in candidates:
+        key = candidate.strip().lower()
+        if key in columns:
+            return columns[key]
+    return None
+
+
 def _runtime_connect():
     if not _runtime_db_enabled() or psycopg2 is None:
         return None
@@ -268,6 +313,106 @@ def _runtime_connect():
     except Exception as exc:  # pragma: no cover - infra dependent
         LOGGER.warning("mua_runtime DB unavailable: %s", exc)
         return None
+
+
+def _to_jsonable(value: Any) -> Any:
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    if isinstance(value, dict):
+        return {str(k): _to_jsonable(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple, set)):
+        return [_to_jsonable(v) for v in value]
+    if is_dataclass(value):
+        return _to_jsonable(asdict(value))
+    if hasattr(value, "model_dump"):
+        try:
+            return value.model_dump(mode="json")
+        except Exception:
+            return value.model_dump()
+    if hasattr(value, "value"):
+        return str(getattr(value, "value"))
+    return str(value)
+
+
+def _persist_runtime_artifacts(
+    *,
+    cur,
+    session_id: str,
+    pipeline_result: PipelineResult,
+) -> None:
+    for classification in pipeline_result.classifications:
+        evidence = classification.evidence_bundle
+        synthesis = classification.synthesis
+        evidence_id: Optional[str] = None
+        issue = str(classification.issue_key or "").upper().strip()
+        rating = str(classification.rating or "").upper().strip()
+
+        if evidence is not None:
+            evidence_id = str(uuid.uuid4())
+            cur.execute(
+                """
+                INSERT INTO mua_runtime.evidence_bundles(
+                    id,
+                    session_id,
+                    issue,
+                    rating,
+                    evidence_hash,
+                    precedent_count,
+                    precedent_ring,
+                    exemplar_muas,
+                    extracted_phrases
+                ) VALUES (%s, %s, %s, %s, %s, %s::jsonb, %s, %s::jsonb, %s::jsonb)
+                """,
+                (
+                    evidence_id,
+                    session_id,
+                    issue,
+                    rating,
+                    str(getattr(evidence, "evidence_hash", "") or ""),
+                    json.dumps(_to_jsonable(getattr(evidence, "precedent_summary", None) or {})),
+                    str(getattr(evidence, "precedent_ring", "") or ""),
+                    json.dumps(_to_jsonable(getattr(evidence, "exemplars", []) or [])),
+                    json.dumps(_to_jsonable(getattr(evidence, "phrases", []) or [])),
+                ),
+            )
+
+        if synthesis is not None:
+            cur.execute(
+                """
+                INSERT INTO mua_runtime.synthesis_drafts(
+                    session_id,
+                    evidence_id,
+                    issue,
+                    rationale_draft,
+                    disposition_draft,
+                    claims,
+                    model_id,
+                    prompt_version,
+                    tokens_used,
+                    latency_ms,
+                    template_fallback,
+                    verified,
+                    blocked_claims
+                ) VALUES (
+                    %s, %s, %s, %s, %s, %s::jsonb, %s, %s, %s, %s, %s, %s, %s::jsonb
+                )
+                """,
+                (
+                    session_id,
+                    evidence_id,
+                    issue,
+                    str(getattr(synthesis, "rationale", "") or ""),
+                    str(getattr(synthesis, "disposition", "") or ""),
+                    json.dumps(_to_jsonable(getattr(synthesis, "claims", []) or [])),
+                    str(getattr(synthesis, "model_id", "") or ""),
+                    str(getattr(synthesis, "prompt_version", "") or ""),
+                    int(getattr(synthesis, "tokens_used", 0) or 0),
+                    int(getattr(synthesis, "latency_ms", 0) or 0),
+                    bool(getattr(synthesis, "template_fallback", False)),
+                    not bool(getattr(synthesis, "template_fallback", False)),
+                    json.dumps([]),
+                ),
+            )
 
 
 def _create_runtime_session(
@@ -321,6 +466,11 @@ def _create_runtime_session(
                         json.dumps(pipeline_result.model_dump(mode="json")),
                         "draft",
                     ),
+                )
+                _persist_runtime_artifacts(
+                    cur=cur,
+                    session_id=session_id,
+                    pipeline_result=pipeline_result,
                 )
         return session_id
     except Exception as exc:  # pragma: no cover - infra dependent
@@ -523,11 +673,13 @@ def _run_pipeline_from_request(
     normalized_ratings: dict[str, str],
     resolved_maptis_code: str,
     material_designation: str,
+    alloy_family: str = "",
 ) -> PipelineResult:
     return process_miul_row(
         ratings=normalized_ratings,
         maptis_code=resolved_maptis_code,
         material_designation=material_designation.strip(),
+        alloy_family=alloy_family.strip(),
         material_class=request.material_class,
         media=request.media.strip(),
         environment=request.environment.strip() or "non-habitable",
@@ -546,6 +698,217 @@ def _run_pipeline_from_request(
 @router.get("/ping")
 async def ping() -> dict[str, str]:
     return {"status": "ok", "domain": "mua-v10"}
+
+
+@router.post("/process-miul", response_model=ProcessMiulResponse)
+async def process_miul_workbook(
+    file: UploadFile = File(...),
+    media_override: Optional[str] = Form(None),
+    environment_override: Optional[str] = Form(None),
+    project: str = Form(""),
+    system: str = Form(""),
+    max_rows: int = Form(200),
+) -> ProcessMiulResponse:
+    """Process completed MIUL workbook rows with the V10 classifier pipeline."""
+    filename = file.filename or "miul.xlsx"
+    if not filename.lower().endswith((".xlsx", ".xlsm")):
+        raise HTTPException(status_code=400, detail="Only .xlsx/.xlsm MIUL files are supported.")
+
+    if max_rows < 1:
+        raise HTTPException(status_code=400, detail="max_rows must be >= 1")
+
+    try:
+        import pandas as pd
+    except Exception as exc:  # pragma: no cover - dependency/install specific
+        raise HTTPException(
+            status_code=500,
+            detail="pandas/openpyxl are required for MIUL upload processing.",
+        ) from exc
+
+    content = await file.read()
+    if not content:
+        raise HTTPException(status_code=400, detail="Uploaded file is empty.")
+
+    try:
+        df = pd.read_excel(io.BytesIO(content), sheet_name="MIUL", engine="openpyxl")
+    except ValueError:
+        df = pd.read_excel(io.BytesIO(content), engine="openpyxl")
+    except Exception as exc:
+        raise HTTPException(
+            status_code=400,
+            detail="Failed to parse workbook. Confirm this is a valid MIUL Excel file.",
+        ) from exc
+
+    if df is None or df.empty:
+        return ProcessMiulResponse(
+            filename=filename,
+            total_rows=0,
+            processed_rows=0,
+            skipped_rows=0,
+            skipped_reasons={},
+            results=[],
+        )
+
+    raw_columns = [str(c).strip() for c in df.columns]
+    column_lookup = {c.lower(): c for c in raw_columns if c}
+
+    maptis_col = _match_column(
+        column_lookup,
+        "Material Code",
+        "MAPTIS Code",
+        "MAPTIS",
+        "material_code",
+        "maptis_code",
+    )
+    designation_col = _match_column(
+        column_lookup,
+        "Designation",
+        "Material Designation",
+        "Manufacturer Designation",
+        "material_designation",
+    )
+    class_col = _match_column(
+        column_lookup,
+        "Material Class",
+        "material_class",
+    )
+    media_col = _match_column(
+        column_lookup,
+        "Fluid Type",
+        "Media",
+        "Medium",
+        "fluid_type",
+    )
+    env_col = _match_column(
+        column_lookup,
+        "Environment",
+        "Location",
+        "environment",
+    )
+    part_col = _match_column(
+        column_lookup,
+        "Part Number",
+        "part_number",
+    )
+    line_col = _match_column(
+        column_lookup,
+        "Line Number",
+        "Line Item",
+        "line_number",
+    )
+
+    rating_cols = {
+        "FLAM": _match_column(column_lookup, "FLAM", "FLAMM Rating", "FLAM Rating"),
+        "FS": _match_column(column_lookup, "FS", "FS Rating"),
+        "TOX": _match_column(column_lookup, "TOX", "TOX Rating"),
+        "TVS": _match_column(column_lookup, "TVS", "TVS Rating"),
+        "SCC": _match_column(column_lookup, "SCC", "SCC Rating"),
+        "CORR": _match_column(column_lookup, "CORR", "CORR Rating"),
+    }
+
+    if maptis_col is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Missing required MIUL column: Material Code (MAPTIS code).",
+        )
+
+    results: list[ProcessMiulRowResult] = []
+    skipped_reasons: dict[str, int] = {}
+
+    def _skip(reason: str) -> None:
+        skipped_reasons[reason] = skipped_reasons.get(reason, 0) + 1
+
+    for idx, row in df.iterrows():
+        if len(results) >= max_rows:
+            _skip("max_rows_limit")
+            continue
+
+        maptis_code = _cell_to_text(row.get(maptis_col))
+        if not maptis_code:
+            _skip("missing_maptis_code")
+            continue
+
+        designation = _cell_to_text(row.get(designation_col)) if designation_col else ""
+        media = (media_override or (_cell_to_text(row.get(media_col)) if media_col else "")).strip()
+        environment = (
+            environment_override
+            or (_cell_to_text(row.get(env_col)) if env_col else "")
+            or "non-habitable"
+        ).strip()
+
+        if not media:
+            _skip("missing_media")
+            continue
+
+        all_ratings: dict[str, str] = {}
+        for issue_key, col_name in rating_cols.items():
+            if not col_name:
+                continue
+            value = _cell_to_text(row.get(col_name)).upper()
+            if value:
+                all_ratings[issue_key] = value
+
+        # Mirror the v8 helper intent: queue only rows with actionable (non-A) triggers.
+        trigger_ratings = {k: v for k, v in all_ratings.items() if v != "A"}
+        if not trigger_ratings:
+            _skip("no_non_a_ratings")
+            continue
+
+        part_number = _cell_to_text(row.get(part_col)) if part_col else ""
+        line_number = _cell_to_text(row.get(line_col)) if line_col else str(idx + 2)
+
+        material_class_value: Optional[str] = None
+        if class_col:
+            material_class_value = _cell_to_text(row.get(class_col)).lower()
+        if material_class_value not in {"metal", "nonmetallic"}:
+            inferred = material_class_from_miul(designation)
+            material_class_value = inferred.value if inferred else "metal"
+
+        try:
+            pipeline_result = process_miul_row(
+                ratings=trigger_ratings,
+                maptis_code=maptis_code,
+                material_designation=designation,
+                material_class=material_class_value,
+                media=media,
+                environment=environment,
+                o2_percent=None,
+                batch_verified=False,
+                part_numbers=[part_number] if part_number else None,
+                part_count=1,
+                project=project.strip(),
+                system=system.strip(),
+                material_specification=None,
+                pressure="",
+                temperature="",
+            )
+        except Exception:
+            LOGGER.exception("Failed to process MIUL row %s (MAPTIS %s)", idx + 2, maptis_code)
+            _skip("pipeline_error")
+            continue
+
+        results.append(
+            ProcessMiulRowResult(
+                row_index=int(idx) + 2,
+                line_number=line_number,
+                part_number=part_number,
+                maptis_code=maptis_code,
+                material_designation=designation,
+                media=media,
+                environment=environment,
+                ratings=trigger_ratings,
+                pipeline_result=pipeline_result,
+            )
+        )
+
+    return ProcessMiulResponse(
+        filename=filename,
+        total_rows=int(len(df)),
+        processed_rows=len(results),
+        skipped_rows=int(len(df)) - len(results),
+        skipped_reasons=skipped_reasons,
+        results=results,
+    )
 
 
 @router.post("/classify-row", response_model=PipelineResult)
@@ -576,26 +939,65 @@ async def process_single_material(request: SingleMaterialRequest) -> dict:
     if not designation and not request.maptis_code:
         raise HTTPException(status_code=400, detail="Provide material_text or maptis_code")
 
-    try:
-        resolved_maptis_code = _resolve_maptis_code_or_raise(request.maptis_code, designation)
-    except HTTPException as exc:
-        if exc.status_code in {400, 503} and not request.maptis_code:
-            return {
-                "status": "needs_resolution",
-                "material_resolution": {
-                    "input_text": designation,
-                    "status": "unresolved",
-                    "message": exc.detail,
-                },
-            }
-        raise
+    resolved_maptis_code = ""
+    resolved_name = designation
+    resolved_family = ""
+    resolved_candidates: list[dict[str, Any]] = []
+    material_class = request.material_class
 
-    inferred_class = request.material_class
-    if inferred_class is None and designation:
+    if request.maptis_code:
+        resolved_maptis_code = request.maptis_code.strip()
+        resolved_name = designation or resolved_maptis_code
+    else:
+        try:
+            from mira.mua.matchmaker.adapters import resolve_material as resolve_material_v7
+
+            resolution = resolve_material_v7(designation)
+            resolved_candidates = list(resolution.suggestions or [])
+
+            if resolution.status.value != "resolved" or not resolution.material_code:
+                return {
+                    "status": "needs_resolution",
+                    "material_resolution": {
+                        "input_text": designation,
+                        "status": resolution.status.value,
+                        "message": "Material resolution requires engineer confirmation.",
+                    },
+                    "candidates": resolved_candidates,
+                }
+
+            resolved_maptis_code = str(resolution.material_code).strip()
+            resolved_name = str(resolution.resolved_name or designation or resolved_maptis_code).strip()
+            resolved_family = str(resolution.family or "").strip()
+
+            if material_class is None:
+                resolved_class = str(resolution.material_class or "").strip().lower()
+                if resolved_class in {"metal", "nonmetallic"}:
+                    material_class = MaterialClassEnum(resolved_class)
+        except Exception as exc:
+            LOGGER.warning("v7 adapter material resolver failed, falling back to local resolver: %s", exc)
+            try:
+                resolved_maptis_code = _resolve_maptis_code_or_raise(request.maptis_code, designation)
+            except HTTPException as resolver_exc:
+                if resolver_exc.status_code in {400, 503} and not request.maptis_code:
+                    return {
+                        "status": "needs_resolution",
+                        "material_resolution": {
+                            "input_text": designation,
+                            "status": "unresolved",
+                            "message": resolver_exc.detail,
+                        },
+                    }
+                raise
+
+    if not resolved_maptis_code:
+        raise HTTPException(status_code=400, detail="Unable to resolve MAPTIS code for input material")
+
+    if material_class is None and designation:
         inferred_class = material_class_from_miul(designation)
-
-    material_class = inferred_class or MaterialClassEnum.METAL
-    resolved_name = designation or resolved_maptis_code
+        material_class = inferred_class or MaterialClassEnum.METAL
+    elif material_class is None:
+        material_class = MaterialClassEnum.METAL
 
     classify_payload = ClassifyRowRequest(
         maptis_code=resolved_maptis_code,
@@ -615,14 +1017,20 @@ async def process_single_material(request: SingleMaterialRequest) -> dict:
         temperature=request.temperature,
     )
 
-    pipeline_result = await classify_row(classify_payload)
+    pipeline_result = _run_pipeline_from_request(
+        request=classify_payload,
+        normalized_ratings=normalized_ratings,
+        resolved_maptis_code=resolved_maptis_code,
+        material_designation=resolved_name,
+        alloy_family=resolved_family,
+    )
 
     material_resolution = {
         "input_text": designation,
         "status": "resolved",
         "maptis_code": resolved_maptis_code,
         "resolved_name": resolved_name,
-        "family": "",
+        "family": resolved_family,
         "material_class": material_class.value,
     }
 
@@ -648,6 +1056,7 @@ async def process_single_material(request: SingleMaterialRequest) -> dict:
         "status": "ok",
         "session_id": session_id,
         "material_resolution": material_resolution,
+        "candidates": resolved_candidates,
         "pipeline_result": pipeline_result,
     }
 

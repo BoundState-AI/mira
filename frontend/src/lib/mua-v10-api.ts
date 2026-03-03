@@ -51,9 +51,53 @@ export interface MuaV10ClassifierResult {
     most_common_category: string;
   } | null;
   precedent_ring?: string | null;
+  evidence_bundle?: {
+    issue: string;
+    rating: string;
+    mua_type: string;
+    material_class: string;
+    media: string;
+    precedent_summary?: {
+      issue: string;
+      media_category: string;
+      material_class: string;
+      alloy_family: string;
+      total_count: number;
+      approved_count: number;
+      rejected_count: number;
+      distinct_materials: number;
+      most_common_category: string;
+    } | null;
+    precedent_ring?: string | null;
+    exemplars?: Array<{
+      mua_number: string;
+      material_name: string;
+      alloy_family: string;
+      media_category: string;
+      determination: string;
+      category: string;
+      rationale_text: string;
+      confidence: number;
+      match_ring: string;
+      match_score: number;
+    }>;
+    phrases?: Array<{
+      phrase: string;
+      mua_number: string;
+      score: number;
+    }>;
+    evidence_hash?: string;
+  } | null;
   synthesis?: {
     rationale: string;
     disposition: string;
+    claims?: Array<{
+      text: string;
+      source_mua: string;
+      source_type: string;
+      confidence: number;
+    }>;
+    suggested_elements?: string[];
     model_id: string;
     prompt_version: string;
     template_fallback: boolean;
@@ -102,6 +146,7 @@ export interface ProcessSingleRequest {
 export interface ProcessSingleResponse {
   status: 'ok' | 'needs_resolution';
   session_id?: string | null;
+  candidates?: Array<Record<string, unknown>>;
   material_resolution?: {
     input_text: string;
     status: string;
@@ -112,6 +157,27 @@ export interface ProcessSingleResponse {
     message?: string;
   };
   pipeline_result?: MuaV10PipelineResult;
+}
+
+export interface ProcessMiulRowResult {
+  row_index: number;
+  line_number: string;
+  part_number: string;
+  maptis_code: string;
+  material_designation: string;
+  media: string;
+  environment: string;
+  ratings: Record<string, string>;
+  pipeline_result: MuaV10PipelineResult;
+}
+
+export interface ProcessMiulResponse {
+  filename: string;
+  total_rows: number;
+  processed_rows: number;
+  skipped_rows: number;
+  skipped_reasons: Record<string, number>;
+  results: ProcessMiulRowResult[];
 }
 
 export interface FinalizeAction {
@@ -235,6 +301,59 @@ export function finalizeMua(payload: FinalizeRequest): Promise<{ status: string;
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
+}
+
+export async function processMuaV10MiulWorkbook(
+  file: File,
+  options?: {
+    media_override?: string;
+    environment_override?: string;
+    project?: string;
+    system?: string;
+    max_rows?: number;
+  },
+): Promise<ProcessMiulResponse> {
+  const bases = getApiBases();
+  let lastError: Error | null = null;
+
+  for (let i = 0; i < bases.length; i += 1) {
+    const base = bases[i];
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      if (options?.media_override) formData.append('media_override', options.media_override);
+      if (options?.environment_override) formData.append('environment_override', options.environment_override);
+      if (options?.project) formData.append('project', options.project);
+      if (options?.system) formData.append('system', options.system);
+      if (typeof options?.max_rows === 'number') formData.append('max_rows', String(options.max_rows));
+
+      const response = await fetch(`${base}/process-miul`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const text = await response.text();
+      const json = parseJsonSafely(text) as Record<string, unknown>;
+
+      if (!response.ok) {
+        const message = String(json?.detail || json?.error || `Request failed with status ${response.status}`);
+        if (response.status === 404 && i < bases.length - 1) {
+          lastError = new Error(message);
+          continue;
+        }
+        throw new Error(message);
+      }
+
+      return json as ProcessMiulResponse;
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error('Failed to process MIUL workbook');
+      if (i === bases.length - 1) {
+        throw lastError;
+      }
+    }
+  }
+
+  throw lastError || new Error('Failed to process MIUL workbook');
 }
 
 export interface GenerateDocxRequest extends MuaV10ClassifyRowRequest {

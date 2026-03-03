@@ -27,3 +27,4 @@ class SynthesisResult:
     tokens_used: int = 0
     latency_ms: int = 0
     template_fallback: bool = False
+    suggested_elements: list[str] = field(default_factory=list)

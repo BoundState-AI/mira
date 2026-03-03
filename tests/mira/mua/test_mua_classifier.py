@@ -103,12 +103,11 @@ class TestStep1IdentifyFlags:
         columns = {f[0] for f in flags}
         assert columns == {"FLAM", "FS"}
 
-    def test_missing_column_produces_flag(self):
-        """Missing/blank rating produces a flag (MISSING_DATA)."""
+    def test_missing_column_is_ignored(self):
+        """Blank/omitted ratings are ignored (not auto-flagged)."""
         ratings = {"FLAM": "A", "FS": None, "SCC": "A", "CORR": "A", "TVS": "A", "TOX": "A"}
         flags = step1_identify_flags(ratings)
-        assert len(flags) == 1
-        assert flags[0] == ("FS", "")
+        assert flags == []
 
     def test_n_rating_skipped(self):
         """N (not applicable) should be treated as pass — no flag."""

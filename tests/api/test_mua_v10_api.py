@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import asyncio
 import importlib.util
+import io
 import os
 import sys
 import types
@@ -14,6 +15,7 @@ from unittest.mock import patch
 
 import pytest
 from fastapi import HTTPException
+from starlette.datastructures import UploadFile
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 ROUTER_PATH = PROJECT_ROOT / "mira" / "api" / "routers" / "mua_v10.py"
@@ -159,3 +161,60 @@ def test_resolve_maptis_uses_offline_fallback_when_lookup_raises():
         with patch.dict(os.environ, env, clear=False):
             resolved = mua_v10_module._resolve_maptis_code_or_raise(None, "A286 CRES")
     assert resolved == "10392"
+
+
+@patch.object(mua_v10_module, "process_miul_row")
+def test_process_miul_workbook_uses_non_a_ratings(mock_process):
+    pd = pytest.importorskip("pandas")
+
+    df = pd.DataFrame(
+        [
+            {
+                "Line Number": 1,
+                "Part Number": "MER07581-001",
+                "Material Code": "10392",
+                "Designation": "A286 CRES",
+                "Fluid Type": "GH2",
+                "Environment": "non-habitable",
+                "FLAM": "A",
+                "FS": "U",
+                "SCC": "A",
+            },
+            {
+                "Line Number": 2,
+                "Part Number": "MER07581-002",
+                "Material Code": "10392",
+                "Designation": "A286 CRES",
+                "Fluid Type": "GH2",
+                "Environment": "non-habitable",
+                "FLAM": "A",
+                "FS": "A",
+                "SCC": "A",
+            },
+        ]
+    )
+
+    buffer = io.BytesIO()
+    with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
+        df.to_excel(writer, sheet_name="MIUL", index=False)
+    buffer.seek(0)
+
+    mock_process.return_value = _stub_pipeline_result("10392")
+    upload = UploadFile(filename="completed_miul.xlsx", file=io.BytesIO(buffer.getvalue()))
+
+    response = asyncio.run(
+        mua_v10_module.process_miul_workbook(
+            file=upload,
+            media_override=None,
+            environment_override=None,
+            project="DMLLV",
+            system="Valve",
+            max_rows=200,
+        )
+    )
+
+    assert response.processed_rows == 1
+    assert response.skipped_rows == 1
+    assert response.results[0].ratings == {"FS": "U"}
+    assert response.results[0].maptis_code == "10392"
+    assert mock_process.call_count == 1

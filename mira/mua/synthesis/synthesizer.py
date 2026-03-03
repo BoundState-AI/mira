@@ -49,12 +49,33 @@ def synthesize_rationale(
     template_rationale = render_rationale(result=result, material_name=material_name)
     template_disposition = render_disposition(result=result)
 
-    # Standard/no-MUA and human-routed outcomes stay deterministic.
-    if result.mua_type in {MUAType.STANDARD, MUAType.REAL_PROBLEM, MUAType.REAL_GAP, MUAType.FLAG_FOR_HUMAN}:
+    # Standard/no-MUA and hard human-routed outcomes stay deterministic.
+    if result.mua_type in {MUAType.STANDARD, MUAType.FLAG_FOR_HUMAN}:
         return _template_fallback(
             rationale=template_rationale,
             disposition=template_disposition,
             reason="non-automatable or no-MUA type",
+        )
+
+    # REAL_PROBLEM / REAL_GAP: provide structured precedent guidance for engineers.
+    if result.mua_type in {MUAType.REAL_PROBLEM, MUAType.REAL_GAP}:
+        return SynthesisResult(
+            rationale=template_rationale,
+            disposition=template_disposition,
+            claims=[
+                Claim(
+                    text=template_rationale,
+                    source_mua="TEMPLATE",
+                    source_type="template",
+                    confidence=1.0,
+                )
+            ],
+            model_id="suggested-elements-only",
+            prompt_version=_PROMPT_VERSION,
+            tokens_used=0,
+            latency_ms=0,
+            template_fallback=True,
+            suggested_elements=_build_suggested_elements(evidence),
         )
 
     if not result.automatable:
@@ -309,3 +330,40 @@ def _template_fallback(rationale: str, disposition: str, reason: str) -> Synthes
         latency_ms=0,
         template_fallback=True,
     )
+
+
+def _build_suggested_elements(evidence) -> list[str]:
+    suggestions: list[str] = []
+    seen: set[str] = set()
+
+    for phrase in (getattr(evidence, "phrases", None) or [])[:8]:
+        text = str(getattr(phrase, "phrase", "") or "").strip()
+        mua_number = str(getattr(phrase, "mua_number", "") or "").strip()
+        if not text:
+            continue
+        line = f"{text} ({mua_number})" if mua_number else text
+        key = line.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        suggestions.append(line)
+        if len(suggestions) >= 5:
+            return suggestions
+
+    for exemplar in (getattr(evidence, "exemplars", None) or [])[:5]:
+        snippet = str(getattr(exemplar, "rationale_text", "") or "").strip().replace("\n", " ")
+        if not snippet:
+            continue
+        if len(snippet) > 180:
+            snippet = f"{snippet[:177]}..."
+        mua_number = str(getattr(exemplar, "mua_number", "") or "").strip()
+        line = f"{snippet} ({mua_number})" if mua_number else snippet
+        key = line.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        suggestions.append(line)
+        if len(suggestions) >= 5:
+            break
+
+    return suggestions

@@ -66,6 +66,7 @@ def resolve_material(text: str) -> MaterialResolution:
         is_process_sensitive=bool(_read_attr(resolved, "is_process_sensitive", default=False)),
         selection_method=_read_attr(resolved, "selection_method"),
         selection_confidence=_read_attr(resolved, "selection_confidence"),
+        suggestions=_coerce_suggestions(_read_attr(resolved, "suggestions", default=[])),
     )
 
 
@@ -240,6 +241,16 @@ def _string_or_none(value: Any) -> Optional[str]:
     if value is None:
         return None
     return str(getattr(value, "value", value))
+
+
+def _coerce_suggestions(value: Any) -> list[dict[str, Any]]:
+    if not isinstance(value, list):
+        return []
+    suggestions: list[dict[str, Any]] = []
+    for item in value:
+        if isinstance(item, Mapping):
+            suggestions.append(dict(item))
+    return suggestions
 
 
 def _ensure_list(value: Any) -> list[Any]:
