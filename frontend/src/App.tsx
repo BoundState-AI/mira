@@ -18,6 +18,8 @@ import BSMHQuery from "./pages/BSMHQuery";
 import MUAV10 from "./pages/MUAV10";
 import GasCompatibility from "./pages/GasCompatibility";
 import NotFound from "./pages/NotFound";
+import FORGE from "./pages/FORGE";
+import FORGEExplorer from "./pages/FORGEExplorer";
 
 const queryClient = new QueryClient();
 
@@ -73,6 +75,8 @@ const App = () => (
                 <Route path="/mua-v7" element={<Navigate to="/mua-v10" replace />} />
                 <Route path="/mua-v8" element={<Navigate to="/mua-v10" replace />} />
                 <Route path="/mua-v10" element={<MUAV10 />} />
+                <Route path="/forge" element={<FORGE />} />
+                <Route path="/forge-explorer" element={<FORGEExplorer />} />
                 <Route path="/knowledge-twins" element={<Navigate to="/" replace />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

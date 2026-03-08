@@ -146,6 +146,90 @@ export interface MUAResponse {
   generated_at: string;
 }
 
+export interface ForgeCompileRequest {
+  database_url: string;
+  app_name?: string;
+  sample_rows_per_table?: number;
+  persist_artifacts?: boolean;
+  output_dir?: string;
+  generate_bundle?: boolean;
+  require_llm_refinement?: boolean;
+  max_generated_questions?: number;
+}
+
+export interface ForgeCompilationSummary {
+  app_name: string;
+  database_url_redacted: string;
+  dialect: string;
+  schemas: string[];
+  table_count: number;
+  column_count: number;
+  relationship_count: number;
+  latent_relationship_count: number;
+  generated_question_count: number;
+}
+
+export interface ForgeGeneratedBundle {
+  root_dir: string;
+  artifacts_dir: string;
+  app_dir: string;
+  backend_dir: string;
+  frontend_dir: string;
+  authority_pack_dir: string;
+  bsms_pipeline_dir: string;
+  lineage_dir: string;
+  files: string[];
+}
+
+export interface ForgeCompileResponse {
+  status: 'ok';
+  summary: ForgeCompilationSummary;
+  schema_manifest: Record<string, unknown>;
+  semantic_map: Record<string, unknown>;
+  relationship_graph: Record<string, unknown>;
+  latent_relationships: Record<string, unknown>;
+  data_quality_report: Record<string, unknown>;
+  capabilities: Record<string, unknown>;
+  question_map: Record<string, unknown>;
+  scaffold_plan: Record<string, unknown>;
+  bsms_pipeline: Record<string, unknown>;
+  authority_pack: Record<string, unknown>;
+  lineage_schema: Record<string, unknown>;
+  warnings: string[];
+  output_dir?: string | null;
+  generated_bundle?: ForgeGeneratedBundle | null;
+}
+
+export interface ForgeCompileAcceptedResponse {
+  status: 'accepted';
+  job_id: string;
+  status_url: string;
+  poll_after_ms: number;
+}
+
+export interface ForgeCompileJobEvent {
+  timestamp: string;
+  status: 'queued' | 'running' | 'completed' | 'failed';
+  stage: string;
+  message: string;
+  progress: number;
+}
+
+export interface ForgeCompileJobResponse {
+  job_id: string;
+  status: 'queued' | 'running' | 'completed' | 'failed';
+  stage: string;
+  message: string;
+  progress: number;
+  created_at: string;
+  updated_at: string;
+  started_at?: string | null;
+  completed_at?: string | null;
+  error?: string | null;
+  result?: ForgeCompileResponse | null;
+  events: ForgeCompileJobEvent[];
+}
+
 // Convert Fahrenheit to Kelvin
 function fToK(f: number): number {
   return (f - 32) * 5/9 + 273.15;
@@ -1064,11 +1148,18 @@ export async function exportMPPlanJson(sessionId: string): Promise<Record<string
  * List vehicle presets.
  */
 export async function listMPPlanVehiclePresets(): Promise<{ presets: MPPlanVehiclePreset[] }> {
-  const response = await fetch(`${API_BASE}/mp-plan/vehicle-presets`);
-  if (!response.ok) {
-    throw new Error(`Failed to list vehicle presets: ${response.statusText}`);
+  // Prefer v2 endpoint (same namespace as the rest of MP Plan v2 API), then
+  // fall back to legacy path for older backend builds.
+  const v2Response = await fetch(`${API_BASE}/mp-plan/v2/vehicle-presets`);
+  if (v2Response.ok) {
+    return v2Response.json();
   }
-  return response.json();
+
+  const legacyResponse = await fetch(`${API_BASE}/mp-plan/vehicle-presets`);
+  if (!legacyResponse.ok) {
+    throw new Error(`Failed to list vehicle presets: ${legacyResponse.statusText}`);
+  }
+  return legacyResponse.json();
 }
 
 /**
@@ -1453,6 +1544,129 @@ export async function v4SchemaValidate(): Promise<V4SchemaValidationResponse> {
   if (!response.ok) {
     throw new Error(`Schema validation failed: ${response.statusText}`);
   }
+  return response.json();
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchJsonWithTimeout(input: string, init: RequestInit, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(input, {
+      ...init,
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+export async function forgeCompileStart(req: ForgeCompileRequest): Promise<ForgeCompileAcceptedResponse> {
+  const response = await fetchJsonWithTimeout(
+    `${API_BASE}/forge/compile`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req),
+    },
+    30_000,
+  );
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `FORGE compile failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function forgeCompileStatus(jobId: string): Promise<ForgeCompileJobResponse> {
+  const response = await fetchJsonWithTimeout(
+    `${API_BASE}/forge/compile/${jobId}`,
+    { method: 'GET' },
+    30_000,
+  );
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `FORGE compile status failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function forgeCompile(
+  req: ForgeCompileRequest,
+  options?: {
+    timeoutMs?: number;
+    pollIntervalMs?: number;
+    onProgress?: (job: ForgeCompileJobResponse) => void;
+  },
+): Promise<ForgeCompileResponse> {
+  const accepted = await forgeCompileStart(req);
+  const timeoutMs = options?.timeoutMs ?? 0;
+  const deadline = timeoutMs > 0 ? Date.now() + timeoutMs : Number.POSITIVE_INFINITY;
+  const pollIntervalMs = options?.pollIntervalMs ?? accepted.poll_after_ms ?? 1500;
+
+  while (Date.now() < deadline) {
+    const job = await forgeCompileStatus(accepted.job_id);
+    options?.onProgress?.(job);
+
+    if (job.status === 'completed') {
+      if (!job.result) {
+        throw new Error('FORGE compile completed without a result payload.');
+      }
+      return job.result;
+    }
+
+    if (job.status === 'failed') {
+      throw new Error(job.error || job.message || 'FORGE compile failed.');
+    }
+
+    await sleep(pollIntervalMs);
+  }
+
+  throw new Error('FORGE compile timed out before completion.');
+}
+
+export interface ForgeBSMSQueryRequest {
+  query: string;
+  question_map: Record<string, unknown>;
+  database_url?: string;
+  bsms_pipeline: Record<string, unknown>;
+  authority_pack: Record<string, unknown>;
+  limit?: number;
+  require_llm?: boolean;
+  persist_lineage?: boolean;
+  lineage_dir?: string;
+}
+
+export interface ForgeBSMSQueryResponse {
+  status: string;
+  pipeline: string;
+  bouncer: Record<string, unknown>;
+  parsed_intent?: Record<string, unknown> | null;
+  rules?: Record<string, unknown> | null;
+  answer: string;
+  lineage: Record<string, unknown>;
+}
+
+export async function forgeBSMSQuery(req: ForgeBSMSQueryRequest): Promise<ForgeBSMSQueryResponse> {
+  const response = await fetch(`${API_BASE}/forge/bsms/query`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `BSMS query failed: ${response.statusText}`);
+  }
+
   return response.json();
 }
 

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, DragEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlaskConical, FileStack, Brain, ClipboardList, FolderTree, GripVertical, RotateCcw, Zap, Sparkles, Wind, LucideIcon } from 'lucide-react';
+import { FlaskConical, FileStack, Brain, ClipboardList, FolderTree, GripVertical, RotateCcw, Zap, Sparkles, Wind, Database, Search, LucideIcon } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { BoundStateLogo } from '@/components/BoundStateLogo';
 import { LanguageSelector } from '@/components/LanguageSelector';
@@ -38,6 +38,8 @@ const DEFAULT_NAV_ITEMS: NavItem[] = [
   { id: 'miul', title: 'MIUL Builder', navKey: 'miulBuilder', url: '/miul', icon: FileStack },
   { id: 'dt-editor', title: 'DT Editor', navKey: 'dtEditor', url: '/dt-editor', icon: FolderTree },
   { id: 'mua-v10', title: 'MUA Writer', navKey: 'muaV10', url: '/mua-v10', icon: Sparkles },
+  { id: 'forge', title: 'FORGE Build Console', navKey: 'forge', url: '/forge', icon: Database },
+  { id: 'forge-explorer', title: 'FORGE Explorer', navKey: 'forgeExplorer', url: '/forge-explorer', icon: Search },
   { id: 'knowledge-twins', title: 'Knowledge Twins', navKey: 'knowledgeTwins', url: '/', icon: Brain },
 ];
 
