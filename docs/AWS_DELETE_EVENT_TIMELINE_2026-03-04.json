@@ -1,0 +1,556 @@
+{
+  "generated_utc": "2026-03-04T21:43:09Z",
+  "account_id": "574823419003",
+  "region": "us-gov-west-1",
+  "start_utc": "2026-03-04T00:00:00Z",
+  "end_utc": "2026-03-05T00:00:00Z",
+  "events": [
+    {
+      "event_time": "2026-03-04T10:35:19-06:00",
+      "event_name": "UpdateService",
+      "event_source": "ecs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::ECS::TaskDefinition",
+          "name": "arn:aws-us-gov:ecs:us-gov-west-1:574823419003:task-definition/mira-prod-backend-task:25"
+        },
+        {
+          "type": "AWS::ECS::Cluster",
+          "name": "mira-prod-cluster"
+        },
+        {
+          "type": "AWS::ECS::Service",
+          "name": "mira-prod-backend"
+        }
+      ],
+      "event_id": "a89af50c-2850-4345-8c93-752deb38a6e9"
+    },
+    {
+      "event_time": "2026-03-04T10:35:21-06:00",
+      "event_name": "UpdateService",
+      "event_source": "ecs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::ECS::TaskDefinition",
+          "name": "arn:aws-us-gov:ecs:us-gov-west-1:574823419003:task-definition/mira-prod-frontend-task:16"
+        },
+        {
+          "type": "AWS::ECS::Cluster",
+          "name": "mira-prod-cluster"
+        },
+        {
+          "type": "AWS::ECS::Service",
+          "name": "mira-prod-frontend"
+        }
+      ],
+      "event_id": "052e0338-9477-4580-b403-144314372d33"
+    },
+    {
+      "event_time": "2026-03-04T10:41:57-06:00",
+      "event_name": "UpdateService",
+      "event_source": "ecs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::ECS::TaskDefinition",
+          "name": "arn:aws-us-gov:ecs:us-gov-west-1:574823419003:task-definition/mira-prod-backend-task:24"
+        },
+        {
+          "type": "AWS::ECS::Cluster",
+          "name": "mira-prod-cluster"
+        },
+        {
+          "type": "AWS::ECS::Service",
+          "name": "mira-prod-backend"
+        }
+      ],
+      "event_id": "eeb2d6e4-962f-46c0-86ca-5c29166edc30"
+    },
+    {
+      "event_time": "2026-03-04T10:52:34-06:00",
+      "event_name": "UpdateService",
+      "event_source": "ecs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::ECS::TaskDefinition",
+          "name": "arn:aws-us-gov:ecs:us-gov-west-1:574823419003:task-definition/mira-prod-backend-task:26"
+        },
+        {
+          "type": "AWS::ECS::Cluster",
+          "name": "mira-prod-cluster"
+        },
+        {
+          "type": "AWS::ECS::Service",
+          "name": "mira-prod-backend"
+        }
+      ],
+      "event_id": "c2c9a53b-183e-4994-b75e-d8eaeabf063b"
+    },
+    {
+      "event_time": "2026-03-04T14:47:30-06:00",
+      "event_name": "UpdateService",
+      "event_source": "ecs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::ECS::TaskDefinition",
+          "name": "arn:aws-us-gov:ecs:us-gov-west-1:574823419003:task-definition/mira-prod-backend-task:27"
+        },
+        {
+          "type": "AWS::ECS::Cluster",
+          "name": "mira-prod-cluster"
+        },
+        {
+          "type": "AWS::ECS::Service",
+          "name": "mira-prod-backend"
+        }
+      ],
+      "event_id": "4ea11ccd-975d-4562-b7f4-3ea0b3e4d0b5"
+    },
+    {
+      "event_time": "2026-03-04T14:50:58-06:00",
+      "event_name": "UpdateService",
+      "event_source": "ecs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::ECS::TaskDefinition",
+          "name": "arn:aws-us-gov:ecs:us-gov-west-1:574823419003:task-definition/mira-prod-backend-task:28"
+        },
+        {
+          "type": "AWS::ECS::Cluster",
+          "name": "mira-prod-cluster"
+        },
+        {
+          "type": "AWS::ECS::Service",
+          "name": "mira-prod-backend"
+        }
+      ],
+      "event_id": "a3e53c6e-95a7-4fd1-8089-b2974b34ee54"
+    },
+    {
+      "event_time": "2026-03-04T14:52:32-06:00",
+      "event_name": "UpdateService",
+      "event_source": "ecs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::ECS::TaskDefinition",
+          "name": "mira-prod-backend-task:26"
+        },
+        {
+          "type": "AWS::ECS::TaskDefinition",
+          "name": "arn:aws-us-gov:ecs:us-gov-west-1:574823419003:task-definition/mira-prod-backend-task:26"
+        },
+        {
+          "type": "AWS::ECS::Cluster",
+          "name": "mira-prod-cluster"
+        },
+        {
+          "type": "AWS::ECS::Service",
+          "name": "mira-prod-backend"
+        }
+      ],
+      "event_id": "e060bf78-b892-4e1c-80e3-98c88dfa6c32"
+    },
+    {
+      "event_time": "2026-03-04T14:52:47-06:00",
+      "event_name": "UpdateService",
+      "event_source": "ecs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::ECS::TaskDefinition",
+          "name": "arn:aws-us-gov:ecs:us-gov-west-1:574823419003:task-definition/mira-prod-backend-task:26"
+        },
+        {
+          "type": "AWS::ECS::Cluster",
+          "name": "mira-prod-cluster"
+        },
+        {
+          "type": "AWS::ECS::Service",
+          "name": "mira-prod-backend"
+        }
+      ],
+      "event_id": "f839785b-fd90-4ba4-bfc6-db08852dcd99"
+    },
+    {
+      "event_time": "2026-03-04T14:52:57-06:00",
+      "event_name": "UpdateService",
+      "event_source": "ecs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::ECS::TaskDefinition",
+          "name": "mira-prod-backend-task:28"
+        },
+        {
+          "type": "AWS::ECS::TaskDefinition",
+          "name": "arn:aws-us-gov:ecs:us-gov-west-1:574823419003:task-definition/mira-prod-backend-task:28"
+        },
+        {
+          "type": "AWS::ECS::Cluster",
+          "name": "mira-prod-cluster"
+        },
+        {
+          "type": "AWS::ECS::Service",
+          "name": "mira-prod-backend"
+        }
+      ],
+      "event_id": "de27bf20-356b-45b3-ac30-bf1bf4fa4ff5"
+    },
+    {
+      "event_time": "2026-03-04T15:18:57-06:00",
+      "event_name": "ModifyDBInstance",
+      "event_source": "rds.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::RDS::DBInstance",
+          "name": "mira-prod-postgres"
+        },
+        {
+          "type": "AWS::EC2::VPC",
+          "name": "vpc-0dfd1e543dc9cfeda"
+        },
+        {
+          "type": "AWS::RDS::DBSubnetGroup",
+          "name": "mira-prod-db-subnet-group"
+        },
+        {
+          "type": "AWS::EC2::SecurityGroup",
+          "name": "sg-09d1659b30ee688da"
+        },
+        {
+          "type": "AWS::RDS::DBOptionGroup",
+          "name": "default:postgres-17"
+        },
+        {
+          "type": "AWS::EC2::Subnet",
+          "name": "subnet-01df5b02d7d7f65e8"
+        },
+        {
+          "type": "AWS::EC2::Subnet",
+          "name": "subnet-0415246982e26c04f"
+        },
+        {
+          "type": "AWS::RDS::DBParameterGroup",
+          "name": "default.postgres17"
+        }
+      ],
+      "event_id": "f443c3ec-dc40-4fc6-9e2c-66dde239da31"
+    },
+    {
+      "event_time": "2026-03-04T15:18:58-06:00",
+      "event_name": "DeleteDBInstance",
+      "event_source": "rds.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::RDS::DBInstance",
+          "name": "mira-prod-postgres"
+        },
+        {
+          "type": "AWS::EC2::VPC",
+          "name": "vpc-0dfd1e543dc9cfeda"
+        },
+        {
+          "type": "AWS::RDS::DBSubnetGroup",
+          "name": "mira-prod-db-subnet-group"
+        },
+        {
+          "type": "AWS::EC2::SecurityGroup",
+          "name": "sg-09d1659b30ee688da"
+        },
+        {
+          "type": "AWS::RDS::DBOptionGroup",
+          "name": "default:postgres-17"
+        },
+        {
+          "type": "AWS::EC2::Subnet",
+          "name": "subnet-01df5b02d7d7f65e8"
+        },
+        {
+          "type": "AWS::EC2::Subnet",
+          "name": "subnet-0415246982e26c04f"
+        },
+        {
+          "type": "AWS::RDS::DBParameterGroup",
+          "name": "default.postgres17"
+        }
+      ],
+      "event_id": "2763fc29-50a2-4f78-80e2-f05a19bbc99e"
+    },
+    {
+      "event_time": "2026-03-04T15:25:57-06:00",
+      "event_name": "DeleteLogGroup",
+      "event_source": "logs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [],
+      "event_id": "7ce94a1e-0541-4e33-83f4-924f39a5ea61"
+    },
+    {
+      "event_time": "2026-03-04T15:25:59-06:00",
+      "event_name": "DeleteLogGroup",
+      "event_source": "logs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [],
+      "event_id": "e42ec44d-4e2f-42cb-9f42-64fb937c5c2c"
+    },
+    {
+      "event_time": "2026-03-04T15:26:01-06:00",
+      "event_name": "DeleteLogGroup",
+      "event_source": "logs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [],
+      "event_id": "07fbd521-d28c-4b76-884f-d012acc36187"
+    },
+    {
+      "event_time": "2026-03-04T15:26:03-06:00",
+      "event_name": "DeleteLogGroup",
+      "event_source": "logs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [],
+      "event_id": "85a4f946-fe13-421c-97bc-673b4eb7e3a7"
+    },
+    {
+      "event_time": "2026-03-04T15:29:20-06:00",
+      "event_name": "DeleteSecret",
+      "event_source": "secretsmanager.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::SecretsManager::Secret",
+          "name": "mira/prod/config"
+        }
+      ],
+      "event_id": "929116a4-68e7-4fcc-9a2e-60ee4c46c73d"
+    },
+    {
+      "event_time": "2026-03-04T15:29:20-06:00",
+      "event_name": "UpdateService",
+      "event_source": "ecs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::ECS::TaskDefinition",
+          "name": "arn:aws-us-gov:ecs:us-gov-west-1:574823419003:task-definition/mira-prod-backend-task:28"
+        },
+        {
+          "type": "AWS::ECS::Cluster",
+          "name": "mira-prod-cluster"
+        },
+        {
+          "type": "AWS::ECS::Service",
+          "name": "mira-prod-backend"
+        }
+      ],
+      "event_id": "ccbea61e-3db7-4114-937e-25dcdcb5263e"
+    },
+    {
+      "event_time": "2026-03-04T15:29:22-06:00",
+      "event_name": "DeleteSecret",
+      "event_source": "secretsmanager.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::SecretsManager::Secret",
+          "name": "mira/prod/postgres"
+        }
+      ],
+      "event_id": "01f7a2f3-74af-45a6-b343-65ddc7dd87ad"
+    },
+    {
+      "event_time": "2026-03-04T15:29:22-06:00",
+      "event_name": "UpdateService",
+      "event_source": "ecs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::ECS::TaskDefinition",
+          "name": "arn:aws-us-gov:ecs:us-gov-west-1:574823419003:task-definition/mira-prod-frontend-task:16"
+        },
+        {
+          "type": "AWS::ECS::Cluster",
+          "name": "mira-prod-cluster"
+        },
+        {
+          "type": "AWS::ECS::Service",
+          "name": "mira-prod-frontend"
+        }
+      ],
+      "event_id": "5fed63d1-4fb5-4607-b28e-fe95629c7780"
+    },
+    {
+      "event_time": "2026-03-04T15:31:07-06:00",
+      "event_name": "DeleteLogGroup",
+      "event_source": "logs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [],
+      "event_id": "8304874b-3345-4990-94b7-3a1ed8546ca4"
+    },
+    {
+      "event_time": "2026-03-04T15:31:08-06:00",
+      "event_name": "DeleteLogGroup",
+      "event_source": "logs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [],
+      "event_id": "ed79abd7-8dab-44eb-bf5e-809f3d73ee9b"
+    },
+    {
+      "event_time": "2026-03-04T15:33:47-06:00",
+      "event_name": "UpdateClusterSettings",
+      "event_source": "ecs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::ECS::Cluster",
+          "name": "mira-prod-cluster"
+        }
+      ],
+      "event_id": "8c0f3a29-0bab-40e1-91e3-ef39124ad61f"
+    },
+    {
+      "event_time": "2026-03-04T15:33:55-06:00",
+      "event_name": "DeleteFlowLogs",
+      "event_source": "ec2.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::EC2::FlowLog",
+          "name": "fl-04339bcaf3d140021"
+        }
+      ],
+      "event_id": "8ee711fe-e96e-4b4d-8086-e543431237e9"
+    },
+    {
+      "event_time": "2026-03-04T15:33:58-06:00",
+      "event_name": "DeleteLogGroup",
+      "event_source": "logs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [],
+      "event_id": "9a76f3b1-deb1-4e3c-83cd-69cba140b2f5"
+    },
+    {
+      "event_time": "2026-03-04T15:33:59-06:00",
+      "event_name": "DeleteLogGroup",
+      "event_source": "logs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [],
+      "event_id": "75f39fcd-846a-49d9-aecc-6c09296ebca0"
+    },
+    {
+      "event_time": "2026-03-04T15:37:14-06:00",
+      "event_name": "PutAccountSettingDefault",
+      "event_source": "ecs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [],
+      "event_id": "9b602afc-5838-4c3f-893e-9aa5e22be483"
+    },
+    {
+      "event_time": "2026-03-04T15:37:15-06:00",
+      "event_name": "DeleteService",
+      "event_source": "ecs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::ECS::Cluster",
+          "name": "mira-prod-cluster"
+        },
+        {
+          "type": "AWS::ECS::Service",
+          "name": "mira-prod-backend"
+        }
+      ],
+      "event_id": "7b84e14a-1d56-4b13-a7d6-9cae1af2ac19"
+    },
+    {
+      "event_time": "2026-03-04T15:37:17-06:00",
+      "event_name": "DeleteService",
+      "event_source": "ecs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::ECS::Cluster",
+          "name": "mira-prod-cluster"
+        },
+        {
+          "type": "AWS::ECS::Service",
+          "name": "mira-prod-frontend"
+        }
+      ],
+      "event_id": "06b438dc-6a3c-44f5-a2ee-ab89cd9cde89"
+    },
+    {
+      "event_time": "2026-03-04T15:37:20-06:00",
+      "event_name": "DeleteCluster",
+      "event_source": "ecs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::ECS::Cluster",
+          "name": "mira-prod-cluster"
+        }
+      ],
+      "event_id": "34d72a01-1e0d-48bb-b678-df4f8cbaf4e6"
+    },
+    {
+      "event_time": "2026-03-04T15:37:23-06:00",
+      "event_name": "DeleteLogGroup",
+      "event_source": "logs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [],
+      "event_id": "b85e6476-04a7-48a2-85f0-98c576ef79e2"
+    },
+    {
+      "event_time": "2026-03-04T15:37:25-06:00",
+      "event_name": "DeleteLogGroup",
+      "event_source": "logs.amazonaws.com",
+      "username": "Administrator",
+      "resources": [],
+      "event_id": "834a0b9d-5a00-4035-a455-bf038acffec7"
+    },
+    {
+      "event_time": "2026-03-04T15:39:42-06:00",
+      "event_name": "DeleteRepository",
+      "event_source": "ecr.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::ECR::Repository",
+          "name": "mira"
+        }
+      ],
+      "event_id": "06d52e79-59db-49d7-bec5-9264fcc3006c"
+    },
+    {
+      "event_time": "2026-03-04T15:39:43-06:00",
+      "event_name": "DeleteRepository",
+      "event_source": "ecr.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::ECR::Repository",
+          "name": "mira-backend"
+        }
+      ],
+      "event_id": "2de52572-0fc1-416d-9bbd-0aab5a125838"
+    },
+    {
+      "event_time": "2026-03-04T15:39:45-06:00",
+      "event_name": "DeleteRepository",
+      "event_source": "ecr.amazonaws.com",
+      "username": "Administrator",
+      "resources": [
+        {
+          "type": "AWS::ECR::Repository",
+          "name": "mira-frontend"
+        }
+      ],
+      "event_id": "7ea44043-801a-46c9-be5c-9ef6d9f6a336"
+    }
+  ]
+}
