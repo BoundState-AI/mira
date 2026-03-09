@@ -1,0 +1,155 @@
+{
+  "module": "galvanic",
+  "dataset": "nasa_table1_groups",
+  "version": "0.1.0",
+  "source": {
+    "document": "NASA-STD-6012A Corrosion Protection for Space Flight Hardware",
+    "section": "Table 1, Compatible Couples in Seawater",
+    "path": "D:\\BoundState\\docs\\Galvanic\\NASA-STD-6012A  corrsion protection for spacecraft.pdf"
+  },
+  "notes": [
+    "EMF values are in volts.",
+    "Anodic index units are 0.01 V increments.",
+    "All corrosion-resistant steels in this table are passivated.",
+    "Table 1 is guidance for coupling dissimilar metals and supports Tier A screening."
+  ],
+  "footnotes": [
+    "Footnote 1: circle markers indicate relative anodic/cathodic direction within the guidance matrix.",
+    "Footnote 2: Group 0 includes all conductive carbon forms, including carbon composites, graphite, pitch carbons, carbon black, vitreous carbons, carbon/carbon, graphene, and PICA."
+  ],
+  "groups": [
+    {
+      "group_number": 0,
+      "emf_v": 0.3,
+      "anodic_index": 0,
+      "metallurgical_category": "Inorganic carbon (carbon fibers, graphite, graphene, etc.)",
+      "source_status": "confirmed"
+    },
+    {
+      "group_number": 1,
+      "emf_v": 0.15,
+      "anodic_index": 15,
+      "metallurgical_category": "Gold, solid or plated; gold-platinum alloys; wrought platinum",
+      "source_status": "confirmed"
+    },
+    {
+      "group_number": 2,
+      "emf_v": 0.05,
+      "anodic_index": 25,
+      "metallurgical_category": "Rhodium plated on silver-plated copper",
+      "source_status": "confirmed"
+    },
+    {
+      "group_number": 3,
+      "emf_v": 0.0,
+      "anodic_index": 30,
+      "metallurgical_category": "Silver, solid or plated; high silver alloys",
+      "source_status": "confirmed"
+    },
+    {
+      "group_number": 4,
+      "emf_v": -0.15,
+      "anodic_index": 45,
+      "metallurgical_category": "Nickel, solid or plated; Monel metal; high nickel-copper alloys; titanium and titanium alloys; Inconel alloys; Hastelloy C276",
+      "source_status": "confirmed"
+    },
+    {
+      "group_number": 5,
+      "emf_v": -0.2,
+      "anodic_index": 50,
+      "metallurgical_category": "Copper, solid or plated; low brasses or bronzes; silver solder; high copper-nickel alloys; nickel-chromium alloys; austenitic corrosion-resistant steels",
+      "source_status": "confirmed"
+    },
+    {
+      "group_number": 6,
+      "emf_v": -0.25,
+      "anodic_index": 55,
+      "metallurgical_category": "Commercial yellow brasses and bronzes",
+      "source_status": "confirmed"
+    },
+    {
+      "group_number": 7,
+      "emf_v": -0.3,
+      "anodic_index": 60,
+      "metallurgical_category": "High brasses and bronzes; naval brass; Muntz metal",
+      "source_status": "confirmed"
+    },
+    {
+      "group_number": 8,
+      "emf_v": -0.35,
+      "anodic_index": 65,
+      "metallurgical_category": "18 percent chromium type corrosion-resistant steels",
+      "source_status": "confirmed"
+    },
+    {
+      "group_number": 9,
+      "emf_v": -0.45,
+      "anodic_index": 75,
+      "metallurgical_category": "Chromium plated; tin plated; 12 percent chromium-type corrosion-resistant steels",
+      "source_status": "confirmed"
+    },
+    {
+      "group_number": 10,
+      "emf_v": -0.5,
+      "anodic_index": 80,
+      "metallurgical_category": "Tin plate; terneplate; tin-lead solder",
+      "source_status": "confirmed"
+    },
+    {
+      "group_number": 11,
+      "emf_v": -0.55,
+      "anodic_index": 85,
+      "metallurgical_category": "Lead, solid or plated; high lead alloys",
+      "source_status": "confirmed"
+    },
+    {
+      "group_number": 12,
+      "emf_v": -0.6,
+      "anodic_index": 90,
+      "metallurgical_category": "Aluminum; wrought alloys of the 2000 series",
+      "source_status": "confirmed"
+    },
+    {
+      "group_number": 13,
+      "emf_v": -0.7,
+      "anodic_index": 100,
+      "metallurgical_category": "Iron, wrought, gray, or malleable; plain carbon and low-alloy steels; Armco iron",
+      "source_status": "confirmed"
+    },
+    {
+      "group_number": 14,
+      "emf_v": -0.75,
+      "anodic_index": 105,
+      "metallurgical_category": "Aluminum, wrought alloys other than 2000 series aluminum; cast alloys of the silicon type",
+      "source_status": "confirmed"
+    },
+    {
+      "group_number": 15,
+      "emf_v": -0.8,
+      "anodic_index": 110,
+      "metallurgical_category": "Aluminum, cast alloys other than silicon type; cadmium, plated and chromated",
+      "source_status": "confirmed"
+    },
+    {
+      "group_number": 16,
+      "emf_v": -1.05,
+      "anodic_index": 135,
+      "metallurgical_category": "Hot-dip zinc plate; galvanized steel",
+      "source_status": "confirmed"
+    },
+    {
+      "group_number": 17,
+      "emf_v": -1.1,
+      "anodic_index": 140,
+      "metallurgical_category": "Zinc, wrought; zinc-base die-casting alloys; zinc, plated",
+      "source_status": "confirmed"
+    },
+    {
+      "group_number": 18,
+      "emf_v": -1.6,
+      "anodic_index": 190,
+      "metallurgical_category": "Magnesium and magnesium-base alloys, cast or wrought",
+      "source_status": "confirmed"
+    }
+  ]
+}

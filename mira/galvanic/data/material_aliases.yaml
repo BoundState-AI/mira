@@ -1,0 +1,4 @@
+# Placeholder alias map for Phase 1.
+# Atlas should populate this after deciding whether Phase 1 uses
+# family-level aliases or full MAPTIS alias coverage.
+aliases: {}

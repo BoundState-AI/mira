@@ -1,0 +1,49 @@
+{
+  "module": "galvanic",
+  "dataset": "surface_condition_modifiers",
+  "version": "0.1.0",
+  "notes": [
+    "These are Phase 1 rendering and rule tags, not kinetics-calibrated corrosion-rate models.",
+    "Anodize is explicitly a kinetics modifier, not an EMF shift."
+  ],
+  "conditions": [
+    {
+      "surface_condition": "bare",
+      "mitigation_class": null,
+      "effect": "baseline",
+      "notes": []
+    },
+    {
+      "surface_condition": "passivated",
+      "mitigation_class": "KINETICS_MODIFIER",
+      "effect": "improved_surface_stability",
+      "notes": [
+        "Do not suppress active/passive dual-state display for stainless or titanium solely because passivation is selected."
+      ]
+    },
+    {
+      "surface_condition": "anodized",
+      "mitigation_class": "KINETICS_MODIFIER",
+      "effect": "rate_reduced",
+      "notes": [
+        "Render as a rate modifier without moving the intrinsic EMF position."
+      ]
+    },
+    {
+      "surface_condition": "plated",
+      "mitigation_class": "SURFACE_STATE_SUBSTITUTION",
+      "effect": "surface_material_substituted",
+      "notes": [
+        "Use the exposed plating material potential, not the substrate potential."
+      ]
+    },
+    {
+      "surface_condition": "fully_coated",
+      "mitigation_class": "CIRCUIT_BREAK",
+      "effect": "circuit_open_if_coverage_is_intact",
+      "notes": [
+        "Partial coating damage does not qualify as circuit open."
+      ]
+    }
+  ]
+}
