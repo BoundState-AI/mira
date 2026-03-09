@@ -1,8 +1,14 @@
 const API_BASE = '/api/mua/v10';
 
 function getApiBases(): string[] {
+  // In local development, always use the Vite proxy path to avoid stale
+  // cross-origin targets (for example, old 8010 overrides) and CORS drift.
+  if (import.meta.env.DEV) {
+    return [API_BASE];
+  }
+
   const envBase = import.meta.env.VITE_MUA_V10_API_BASE as string | undefined;
-  const configured = (envBase || '').trim();
+  const configured = (envBase || '').trim().replace(/\/+$/, '');
   const candidates = configured ? [configured, API_BASE] : [API_BASE];
 
   return [...new Set(candidates)];

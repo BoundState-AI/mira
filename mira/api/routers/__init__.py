@@ -39,6 +39,7 @@ from .matchmaker import router as matchmaker_router
 from .bsmh import router as bsmh_router
 from .query import router as query_router
 from .forge import router as forge_router
+from .galvanic import router as galvanic_router
 
 __all__ = [
     "search_router",
@@ -62,6 +63,7 @@ __all__ = [
     "bsmh_router",
     "query_router",
     "forge_router",
+    "galvanic_router",
 ]
 
 

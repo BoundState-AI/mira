@@ -24,6 +24,15 @@ def test_ping(client):
     assert data["domain"] == "mp_plan_v2_codex"
 
 
+def test_vehicle_presets(client):
+    response = client.get("/mp-plan/v2/vehicle-presets")
+    assert response.status_code == 200
+    payload = response.json()
+    assert "presets" in payload
+    assert payload["presets"]
+    assert all("preset_id" in preset for preset in payload["presets"])
+
+
 def test_compute_and_questions(client):
     create = client.post(
         "/mp-plan/v2/sessions",

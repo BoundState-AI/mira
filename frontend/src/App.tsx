@@ -17,6 +17,7 @@ import MiraV4Query from "./pages/MiraV4Query";
 import BSMHQuery from "./pages/BSMHQuery";
 import MUAV10 from "./pages/MUAV10";
 import GasCompatibility from "./pages/GasCompatibility";
+import GalvanicCompatibility from "./pages/GalvanicCompatibility";
 import NotFound from "./pages/NotFound";
 import FORGE from "./pages/FORGE";
 import FORGEExplorer from "./pages/FORGEExplorer";
@@ -44,6 +45,7 @@ const App = () => (
                   )}
                 />
                 <Route path="/gas-compatibility" element={<GasCompatibility />} />
+                <Route path="/galvanic-compatibility" element={<GalvanicCompatibility />} />
                 <Route path="/test-classes" element={<TestClasses />} />
                 <Route path="/test-classes/:testType" element={<TestClassDetail />} />
                 <Route

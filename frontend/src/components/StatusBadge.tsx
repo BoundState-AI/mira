@@ -11,11 +11,13 @@ const statusStyles: Record<string, string> = {
   OK: 'status-ok',
   APPROVED: 'status-ok',
   PASS: 'status-ok',
+  COMPATIBLE: 'status-ok',
   CAUTION: 'status-caution',
   'PENDING REVIEW': 'status-caution',
   CONDITIONAL: 'status-caution',
   CLARIFY: 'status-caution',
   PROHIBITED: 'status-prohibited',
+  INCOMPATIBLE: 'status-prohibited',
   REFUSE: 'status-prohibited',
   UNKNOWN: 'status-unknown',
 };

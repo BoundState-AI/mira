@@ -45,13 +45,32 @@ router = APIRouter()
 
 # Thread pool for blocking Bedrock calls
 _executor = ThreadPoolExecutor(max_workers=4)
+_heritage_table_checked = False
 
-# Ensure heritage_failures table exists on import
-try:
-    from mira.api.models.heritage_db import ensure_table as _ensure_heritage_table
-    _ensure_heritage_table()
-except Exception as _exc:
-    LOGGER.warning("[MIRA_V4] Could not ensure heritage_failures table: %s", _exc)
+
+def _ensure_heritage_table_ready() -> bool:
+    """Best-effort heritage DB initialization.
+
+    The public site must stay bootable even when the heritage database has been
+    intentionally purged. We therefore avoid import-time DB access and only
+    attempt table creation on heritage-specific flows.
+    """
+    global _heritage_table_checked
+    if _heritage_table_checked:
+        return True
+    if os.getenv("MIRA_DISABLE_HERITAGE_DB", "").strip().lower() in {"1", "true", "yes"}:
+        LOGGER.info("[MIRA_V4] Heritage DB disabled; skipping table ensure.")
+        return False
+
+    try:
+        from mira.api.models.heritage_db import ensure_table as _ensure_heritage_table
+
+        _ensure_heritage_table()
+        _heritage_table_checked = True
+        return True
+    except Exception as exc:
+        LOGGER.warning("[MIRA_V4] Heritage DB unavailable; override flow disabled: %s", exc)
+        return False
 
 
 # =============================================================================
@@ -1981,6 +2000,12 @@ async def heritage_override(request: V4HeritageOverrideRequest) -> V4HeritageOve
     Compliance: SWE-013, SWE-033, NASA-STD-6016 S4.2.1
     """
     try:
+        if not _ensure_heritage_table_ready():
+            raise HTTPException(
+                status_code=503,
+                detail="Heritage override unavailable in no-data runtime",
+            )
+
         from mira_v4.heritage_veto import HeritageVetoEngine
         from mira_v4.models import EnvironmentSpec
 
@@ -2021,6 +2046,8 @@ async def heritage_override(request: V4HeritageOverrideRequest) -> V4HeritageOve
     except ValueError as exc:
         LOGGER.error("[MIRA_V4] Invalid override request: %s", exc)
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except HTTPException:
+        raise
     except Exception as exc:
         LOGGER.error("[MIRA_V4] Heritage override error: %s", exc, exc_info=True)
         raise HTTPException(

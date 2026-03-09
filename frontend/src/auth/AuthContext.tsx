@@ -87,10 +87,11 @@ const CLIENT_ID_PATTERN = /^[A-Za-z0-9]+$/;
 const IS_VALID_USER_POOL_ID = USER_POOL_ID_PATTERN.test(USER_POOL_ID);
 const IS_VALID_CLIENT_ID = CLIENT_ID_PATTERN.test(CLIENT_ID);
 const HAS_VALID_COGNITO_CONFIG = IS_VALID_USER_POOL_ID && IS_VALID_CLIENT_ID;
+// Default to bypassing Cognito in local Vite dev unless explicitly disabled.
 const AUTH_BYPASS_LOCAL =
   import.meta.env.DEV &&
-  ["1", "true", "yes"].includes(
-    String(import.meta.env.VITE_AUTH_BYPASS_LOCAL || "")
+  !["0", "false", "no"].includes(
+    String(import.meta.env.VITE_AUTH_BYPASS_LOCAL ?? "true")
       .trim()
       .toLowerCase(),
   );

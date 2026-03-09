@@ -18,6 +18,9 @@ Safety Critical: True
 
 from __future__ import annotations
 
+import logging
+import os
+
 from fastapi import APIRouter, HTTPException, Query
 
 from mira.o2.models import (
@@ -43,7 +46,14 @@ from mira.h2.condition_resolver import clear_condition_resolution_cache, normali
 import uuid
 
 
+LOGGER = logging.getLogger(__name__)
+
+
 router = APIRouter()
+
+
+def _no_data_runtime_enabled() -> bool:
+    return os.getenv("MIRA_NO_DATA_RUNTIME", "").strip().lower() in {"1", "true", "yes"}
 
 
 @router.get("/ping")
@@ -179,6 +189,17 @@ async def h2_condition_aliases(
             aliases=aliases,
         )
     except Exception as exc:  # pragma: no cover
+        if _no_data_runtime_enabled():
+            LOGGER.warning(
+                "[MIRA/H2] Condition alias review unavailable in no-data runtime: %s",
+                exc,
+            )
+            return H2ConditionAliasListResponse(
+                material_key=material_key,
+                unresolved_only=unresolved_only,
+                count=0,
+                aliases=[],
+            )
         raise HTTPException(
             status_code=500,
             detail="Internal H2 condition alias listing error",
@@ -190,6 +211,12 @@ async def h2_condition_alias_verify(
     request: H2ConditionAliasVerifyRequest,
 ) -> H2ConditionAliasVerifyResponse:
     """Human-verify/override a condition alias mapping."""
+    if _no_data_runtime_enabled():
+        raise HTTPException(
+            status_code=503,
+            detail="H2 condition alias verification unavailable in no-data runtime",
+        )
+
     raw_for_key = request.raw_key or request.raw_text or request.display_label
     raw_key = normalize_condition_key(raw_for_key)
     if not raw_key:

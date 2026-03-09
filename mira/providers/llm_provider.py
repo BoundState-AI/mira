@@ -92,6 +92,7 @@ class LLMProvider(Protocol):
         max_tokens: int = 4096,
         temperature: float = 0.0,
         response_format: str | None = None,
+        timeout_s: int | float | None = None,
     ) -> LLMResponse: ...
 
 
@@ -127,6 +128,7 @@ class BedrockConverseProvider:
         max_tokens: int = 4096,
         temperature: float = 0.0,
         response_format: str | None = None,
+        timeout_s: int | float | None = None,
     ) -> LLMResponse:
         model_id = self._default_model
 
@@ -219,6 +221,7 @@ class AnthropicProvider:
         max_tokens: int = 4096,
         temperature: float = 0.0,
         response_format: str | None = None,
+        timeout_s: int | float | None = None,
     ) -> LLMResponse:
         model_id = self._default_model
 
@@ -230,6 +233,7 @@ class AnthropicProvider:
             temperature=temperature,
             system=system,
             messages=messages,
+            timeout=timeout_s,
         )
         latency_ms = (time.monotonic() - t0) * 1000
 
@@ -283,6 +287,7 @@ class OpenAICompatProvider:
         max_tokens: int = 4096,
         temperature: float = 0.0,
         response_format: str | None = None,
+        timeout_s: int | float | None = None,
     ) -> LLMResponse:
         model_id = self._default_model
 
@@ -312,7 +317,7 @@ class OpenAICompatProvider:
 
         t0 = time.monotonic()
         try:
-            with urllib.request.urlopen(req, timeout=120) as resp:
+            with urllib.request.urlopen(req, timeout=timeout_s or 120) as resp:
                 payload = json.loads(resp.read().decode("utf-8"))
         except urllib.error.HTTPError as exc:
             details = exc.read().decode("utf-8", errors="replace")
@@ -440,6 +445,7 @@ def complete(
         messages=[{"role": "user", "content": user}],
         max_tokens=max_tokens,
         temperature=temperature,
+        timeout_s=timeout_s,
     )
 
 
@@ -468,4 +474,5 @@ def complete_with_sdk(
         messages=[{"role": "user", "content": user}],
         max_tokens=max_tokens,
         temperature=temperature,
+        timeout_s=timeout_s,
     )

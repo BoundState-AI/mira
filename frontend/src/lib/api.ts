@@ -1788,3 +1788,176 @@ export async function bsmhQuery(req: BSMHQueryRequest): Promise<BSMHQueryRespons
 
   return response.json();
 }
+
+export interface GalvanicMaterialStateBand {
+  state: string;
+  representative_potential_mv_sce: number;
+}
+
+export interface GalvanicResolvedMaterial {
+  query: string;
+  canonical_name: string;
+  family: string;
+  chosen_state: string;
+  representative_potential_mv_sce: number;
+  potential_range_mv_sce: [number, number];
+  possible_states: GalvanicMaterialStateBand[];
+  source_type: string;
+}
+
+export interface GalvanicMitigationRecommendation {
+  mitigation_id: string;
+  name: string;
+  mechanism: string;
+  mitigation_class: string;
+  boundstate_priority: number;
+  description: string;
+  source_clauses: string[];
+  standards: string[];
+  restrictions: string[];
+  notes: string[];
+  coat_cathode_warning: boolean;
+  trigger_reason: string;
+}
+
+export interface GalvanicAssessmentRequest {
+  material_a: string;
+  material_b: string;
+  environment:
+    | 'seawater_proxy'
+    | 'coastal_condensing'
+    | 'industrial_atm'
+    | 'rural_atm'
+    | 'crew_condensing'
+    | 'dry_indoor'
+    | 'cryogenic_ops'
+    | 'space_vacuum';
+  application_type:
+    | 'FLIGHT_HARDWARE'
+    | 'SPACECRAFT_STRUCTURE'
+    | 'GROUND_SUPPORT_EQUIPMENT'
+    | 'LAUNCH_STRUCTURE'
+    | 'FIXED_INSTALLATION';
+  surface_condition_a?: string | null;
+  surface_condition_b?: string | null;
+  couple_context?: {
+    electrical_contact?: 'YES' | 'NO' | 'UNKNOWN';
+    electrolyte_pooling?: boolean;
+    joint_type?: 'FAYING_SURFACE' | 'FASTENER' | 'LAP_JOINT' | 'CREVICE_PRONE' | 'IMMERSED' | 'GENERAL';
+    cathode_to_anode_area_ratio?: number | null;
+  };
+}
+
+export interface GalvanicAssessmentResponse {
+  severity: 'COMPATIBLE' | 'CAUTION' | 'INCOMPATIBLE';
+  raw_delta_mv: number;
+  effective_delta_mv: number;
+  decision_basis: 'NASA_STD_6012A_CPR39' | 'BOUNDSTATE_SYNTHESIZED' | 'NO_ELECTRICAL_CONTACT' | 'NO_ELECTROLYTE';
+  screening_disclaimer: string;
+  environment: string;
+  environment_modifier: number;
+  application_type: string;
+  anode: string;
+  cathode: string;
+  material_a: GalvanicResolvedMaterial;
+  material_b: GalvanicResolvedMaterial;
+  warnings: string[];
+  mitigations: GalvanicMitigationRecommendation[];
+  source_manifest_version: string;
+}
+
+export interface GalvanicEnvironmentDescriptor {
+  key: string;
+  label: string;
+  modifier: number;
+  notes: string;
+}
+
+export interface GalvanicMaterialSearchResult {
+  canonical_name: string;
+  family: string;
+  aliases: string[];
+}
+
+export interface GalvanicSeriesRecord {
+  id: string;
+  variant_group: string;
+  canonical_name: string;
+  name: string;
+  primary: boolean;
+  family: string;
+  state: string;
+  aliases: string[];
+  potential_range_mv_sce: [number, number];
+  representative_potential_mv_sce: number;
+  source_type: string;
+  source_documents: string[];
+}
+
+export interface GalvanicSeriesPayload {
+  module: string;
+  dataset: string;
+  version: string;
+  extraction_status: string;
+  minimum_expected_records: number;
+  reference_environment: {
+    label: string;
+    conditions: string;
+    reference_electrode: string;
+  };
+  source_priority: Array<{
+    priority: string;
+    source: string;
+    path: string;
+  }>;
+  records: GalvanicSeriesRecord[];
+}
+
+export async function galvanicEvaluate(
+  req: GalvanicAssessmentRequest,
+): Promise<GalvanicAssessmentResponse> {
+  const response = await fetch(`${API_BASE}/mira/galvanic/evaluate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Galvanic assessment failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function galvanicListEnvironments(): Promise<GalvanicEnvironmentDescriptor[]> {
+  const response = await fetch(`${API_BASE}/mira/galvanic/environments`);
+
+  if (!response.ok) {
+    throw new Error(`Failed to load galvanic environments: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function galvanicSearchMaterials(q: string): Promise<GalvanicMaterialSearchResult[]> {
+  const params = new URLSearchParams({ q });
+  const response = await fetch(`${API_BASE}/mira/galvanic/materials/search?${params.toString()}`);
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Galvanic material search failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function galvanicGetSeries(): Promise<GalvanicSeriesPayload> {
+  const response = await fetch(`${API_BASE}/mira/galvanic/series`);
+
+  if (!response.ok) {
+    throw new Error(`Failed to load galvanic source dataset: ${response.statusText}`);
+  }
+
+  return response.json();
+}
