@@ -1,0 +1,79 @@
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+export default function ResultsTable({
+  columns = [],
+  rows = [],
+  onRowClick,
+  page = 1,
+  totalPages = 1,
+  onPageChange,
+}) {
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-gray-50 border-b border-gray-200">
+              {columns.map((col) => (
+                <th
+                  key={col.key}
+                  className="px-4 py-3 text-left font-medium text-gray-600"
+                >
+                  {col.label}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, idx) => (
+              <tr
+                key={idx}
+                onClick={() => onRowClick && onRowClick(row)}
+                className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
+              >
+                {columns.map((col) => (
+                  <td key={col.key} className="px-4 py-3 text-gray-800">
+                    {row[col.key] ?? "—"}
+                  </td>
+                ))}
+              </tr>
+            ))}
+            {rows.length === 0 && (
+              <tr>
+                <td
+                  colSpan={columns.length}
+                  className="px-4 py-8 text-center text-gray-500"
+                >
+                  No results found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
+          <span className="text-sm text-gray-600">
+            Page {page} of {totalPages}
+          </span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => onPageChange(page - 1)}
+              disabled={page <= 1}
+              className="p-1 rounded hover:bg-gray-100 disabled:opacity-40"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => onPageChange(page + 1)}
+              disabled={page >= totalPages}
+              className="p-1 rounded hover:bg-gray-100 disabled:opacity-40"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,26 @@
+import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import DetailPanel from "../components/DetailPanel";
+
+// TODO: Replace with API calls from lib/api.js
+const MOCK_DETAIL = {{ mock_detail | tojson }};
+
+export default function Detail() {
+  const { table, id } = useParams();
+  const navigate = useNavigate();
+  const [data, setData] = useState(MOCK_DETAIL);
+
+  useEffect(() => {
+    // TODO: Fetch detail from API using table and id params
+  }, [table, id]);
+
+  return (
+    <div className="space-y-6">
+      <DetailPanel
+        data={data}
+        title={`${table} #${id}`}
+        onBack={() => navigate(-1)}
+      />
+    </div>
+  );
+}

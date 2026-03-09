@@ -1,0 +1,44 @@
+import { useState, useEffect } from "react";
+{% for comp in components %}
+import {{ comp }} from "../components/{{ comp }}";
+{% endfor %}
+
+// TODO: Replace with API calls from lib/api.js
+const MOCK_STATS = {{ mock_stats | tojson }};
+
+export default function Analysis() {
+  return (
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold text-gray-900">Analysis</h1>
+{% if 'StatsBar' in components %}
+      <StatsBar stats={MOCK_STATS} />
+{% endif %}
+{% if 'ComparisonView' in components %}
+      <ComparisonView
+        data={[
+          { x: 10, y: 20 },
+          { x: 30, y: 40 },
+          { x: 50, y: 60 },
+          { x: 70, y: 35 },
+          { x: 90, y: 80 },
+        ]}
+        xKey="x"
+        yKey="y"
+        title="Value Comparison"
+      />
+{% endif %}
+{% if 'TimelineView' in components %}
+      <TimelineView
+        data={[
+          { date: "2025-01", value: 10 },
+          { date: "2025-02", value: 25 },
+          { date: "2025-03", value: 18 },
+          { date: "2025-04", value: 42 },
+          { date: "2025-05", value: 35 },
+        ]}
+        title="Trends Over Time"
+      />
+{% endif %}
+    </div>
+  );
+}

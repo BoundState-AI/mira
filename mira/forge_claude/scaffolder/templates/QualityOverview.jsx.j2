@@ -1,0 +1,100 @@
+import { AlertTriangle, CheckCircle, Info } from "lucide-react";
+
+export default function QualityOverview({ capabilityMap, totalReliable, totalCaveated, qualitySummary }) {
+  const reliablePercent = capabilityMap.length > 0
+    ? Math.round((totalReliable / capabilityMap.length) * 100)
+    : 100;
+
+  return (
+    <div className="space-y-6">
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center gap-2 text-green-600 mb-2">
+            <CheckCircle size={20} />
+            <span className="font-medium">Reliable</span>
+          </div>
+          <p className="text-3xl font-bold text-gray-900">{totalReliable}</p>
+          <p className="text-sm text-gray-500">questions fully supported by data</p>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center gap-2 text-amber-600 mb-2">
+            <AlertTriangle size={20} />
+            <span className="font-medium">Caveated</span>
+          </div>
+          <p className="text-3xl font-bold text-gray-900">{totalCaveated}</p>
+          <p className="text-sm text-gray-500">questions with data quality warnings</p>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center gap-2 text-blue-600 mb-2">
+            <Info size={20} />
+            <span className="font-medium">Coverage</span>
+          </div>
+          <p className="text-3xl font-bold text-gray-900">{reliablePercent}%</p>
+          <p className="text-sm text-gray-500">data reliability score</p>
+        </div>
+      </div>
+
+      {/* Capability Table */}
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h3 className="text-lg font-medium text-gray-900">Capability Map</h3>
+          <p className="text-sm text-gray-500">Which questions this database can reliably answer</p>
+        </div>
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Question</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Score</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Limiting Factors</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {capabilityMap.map((entry, idx) => (
+              <tr key={idx} className={entry.reliable ? "" : "bg-amber-50"}>
+                <td className="px-6 py-4 text-sm text-gray-900">{entry.question_id}</td>
+                <td className="px-6 py-4 text-sm">
+                  {entry.reliable ? (
+                    <span className="inline-flex items-center gap-1 text-green-700">
+                      <CheckCircle size={14} /> Reliable
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-amber-700">
+                      <AlertTriangle size={14} /> Caveated
+                    </span>
+                  )}
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-700">
+                  {(entry.reliability_score * 100).toFixed(0)}%
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-500">
+                  {entry.limiting_factors.length > 0
+                    ? entry.limiting_factors.join("; ")
+                    : "—"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Quality Summary */}
+      {qualitySummary && (
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Data Quality Summary</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {Object.entries(qualitySummary).map(([key, value]) => (
+              <div key={key} className="text-center">
+                <p className="text-2xl font-bold text-gray-900">{value}</p>
+                <p className="text-sm text-gray-500">{key.replace(/_/g, " ")}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

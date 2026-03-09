@@ -1,0 +1,21 @@
+import QualityOverview from "../components/QualityOverview";
+
+const CAPABILITY_MAP = {{ capability_map | tojson }};
+const QUALITY_SUMMARY = {{ quality_summary | tojson }};
+const TOTAL_RELIABLE = {{ total_reliable }};
+const TOTAL_CAVEATED = {{ total_caveated }};
+
+export default function DataQuality() {
+  return (
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold text-gray-900">Data Quality</h1>
+      <p className="text-gray-600">{{ domain_summary }}</p>
+      <QualityOverview
+        capabilityMap={CAPABILITY_MAP}
+        totalReliable={TOTAL_RELIABLE}
+        totalCaveated={TOTAL_CAVEATED}
+        qualitySummary={QUALITY_SUMMARY}
+      />
+    </div>
+  );
+}
