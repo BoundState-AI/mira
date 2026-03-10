@@ -31,6 +31,6 @@ test('fracture control can show indeterminate fallback for unresolved inputs', a
 
   await expect(page.getByText('INDETERMINATE').first()).toBeVisible();
   await expect(page.getByText('Treat as FC pending review')).toBeVisible();
-  await expect(page.getByText('hazard_consequence')).toBeVisible();
-  await expect(page.getByText('load_path_type')).toBeVisible();
+  await expect(page.getByText('hazard_consequence', { exact: true })).toBeVisible();
+  await expect(page.getByText('load_path_type', { exact: true })).toBeVisible();
 });

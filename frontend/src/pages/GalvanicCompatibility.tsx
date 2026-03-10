@@ -35,6 +35,7 @@ import {
   type GalvanicMitigationRecommendation,
   type GalvanicSeriesPayload,
 } from '@/lib/api';
+import { useAuth } from '@/auth/AuthContext';
 
 const APPLICATION_OPTIONS = [
   { value: 'FLIGHT_HARDWARE', label: 'Flight Hardware' },
@@ -222,6 +223,7 @@ function MaterialSuggestions({
 }
 
 export default function GalvanicCompatibility() {
+  const { authHeaders, loading: authLoading } = useAuth();
   const [materialA, setMaterialA] = useState('Al 6061-T6');
   const [materialB, setMaterialB] = useState('316SS');
   const [environment, setEnvironment] = useState('seawater_proxy');
@@ -246,14 +248,16 @@ export default function GalvanicCompatibility() {
   const deferredMaterialB = useDeferredValue(materialB);
 
   useEffect(() => {
+    if (authLoading) return;
+
     let cancelled = false;
 
     async function loadReferenceData() {
       setBootLoading(true);
       try {
         const [environmentList, series] = await Promise.all([
-          galvanicListEnvironments(),
-          galvanicGetSeries(),
+          galvanicListEnvironments(authHeaders),
+          galvanicGetSeries(authHeaders),
         ]);
         if (cancelled) return;
         setEnvironments(environmentList);
@@ -273,9 +277,11 @@ export default function GalvanicCompatibility() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [authLoading]);
 
   useEffect(() => {
+    if (authLoading) return;
+
     let cancelled = false;
 
     async function search() {
@@ -285,7 +291,7 @@ export default function GalvanicCompatibility() {
         return;
       }
       try {
-        const matches = await galvanicSearchMaterials(query);
+        const matches = await galvanicSearchMaterials(query, authHeaders);
         if (!cancelled) setSearchA(matches);
       } catch {
         if (!cancelled) setSearchA([]);
@@ -297,9 +303,11 @@ export default function GalvanicCompatibility() {
     return () => {
       cancelled = true;
     };
-  }, [deferredMaterialA]);
+  }, [authHeaders, authLoading, deferredMaterialA]);
 
   useEffect(() => {
+    if (authLoading) return;
+
     let cancelled = false;
 
     async function search() {
@@ -309,7 +317,7 @@ export default function GalvanicCompatibility() {
         return;
       }
       try {
-        const matches = await galvanicSearchMaterials(query);
+        const matches = await galvanicSearchMaterials(query, authHeaders);
         if (!cancelled) setSearchB(matches);
       } catch {
         if (!cancelled) setSearchB([]);
@@ -321,7 +329,7 @@ export default function GalvanicCompatibility() {
     return () => {
       cancelled = true;
     };
-  }, [deferredMaterialB]);
+  }, [authHeaders, authLoading, deferredMaterialB]);
 
   async function runAssessment(showError = true) {
     if (!materialA.trim() || !materialB.trim()) {
@@ -346,7 +354,7 @@ export default function GalvanicCompatibility() {
           joint_type: jointType as never,
           cathode_to_anode_area_ratio: areaRatio ? Number(areaRatio) : null,
         },
-      });
+      }, authHeaders);
       setResult(assessment);
     } catch (assessmentError) {
       if (showError) {
@@ -359,7 +367,7 @@ export default function GalvanicCompatibility() {
   }
 
   useEffect(() => {
-    if (bootLoading) return;
+    if (authLoading || bootLoading) return;
     if (!materialA.trim() || !materialB.trim()) {
       setResult(null);
       return;
@@ -373,6 +381,7 @@ export default function GalvanicCompatibility() {
       window.clearTimeout(timer);
     };
   }, [
+    authLoading,
     bootLoading,
     deferredMaterialA,
     deferredMaterialB,
@@ -677,7 +686,7 @@ export default function GalvanicCompatibility() {
                   <div className="relative mt-6 h-24">
                     <div className="absolute inset-x-0 top-9 h-4 rounded-full bg-gradient-to-r from-emerald-500 via-amber-400 to-rose-500" />
                     <div
-                      className="absolute top-1 -translate-x-1/2"
+                      className="pointer-events-none absolute top-1 -translate-x-1/2"
                       style={{ left: `${currentMarkerPosition}%` }}
                     >
                       <div className="rounded-lg border border-white/15 bg-slate-800 px-3 py-2 text-center shadow-lg">
@@ -692,11 +701,11 @@ export default function GalvanicCompatibility() {
                       max={targetScaleMax}
                       value={targetDeltaMv}
                       onChange={(event) => setTargetDeltaMv(Number(event.target.value))}
-                      className="absolute inset-x-0 top-5 h-14 cursor-ew-resize opacity-0"
+                      className="absolute inset-x-0 top-5 hidden h-14 cursor-ew-resize opacity-0 md:block"
                     />
 
                     <div
-                      className="absolute top-11 h-0.5 bg-white/40"
+                      className="pointer-events-none absolute top-11 h-0.5 bg-white/40"
                       style={{
                         left: `${Math.min(currentMarkerPosition, targetMarkerPosition)}%`,
                         width: `${Math.abs(currentMarkerPosition - targetMarkerPosition)}%`,
@@ -704,7 +713,7 @@ export default function GalvanicCompatibility() {
                     />
 
                     <div
-                      className="absolute top-10 -translate-x-1/2"
+                      className="pointer-events-none absolute top-10 -translate-x-1/2"
                       style={{ left: `${targetMarkerPosition}%` }}
                     >
                       <div className={`rounded-xl border px-3 py-2 text-center shadow-lg ${
@@ -724,6 +733,21 @@ export default function GalvanicCompatibility() {
                     <span>Green &lt;250 mV</span>
                     <span>Yellow 250-500 mV</span>
                     <span>Red &gt;500 mV</span>
+                  </div>
+
+                  <div className="mt-4 md:hidden">
+                    <Label htmlFor="mobile-target-delta" className="text-xs uppercase tracking-[0.18em] text-slate-400">
+                      Mobile target control
+                    </Label>
+                    <input
+                      id="mobile-target-delta"
+                      type="range"
+                      min={0}
+                      max={targetScaleMax}
+                      value={targetDeltaMv}
+                      onChange={(event) => setTargetDeltaMv(Number(event.target.value))}
+                      className="mt-3 h-10 w-full accent-white"
+                    />
                   </div>
                 </div>
 
@@ -770,6 +794,18 @@ export default function GalvanicCompatibility() {
                         <p className="mt-2 text-sm">
                           <span className="font-medium">Why it ranked:</span> {step.mitigation.trigger_reason}
                         </p>
+
+                        {step.mitigation.coat_cathode_warning && (
+                          <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">
+                            <div className="flex items-start gap-2">
+                              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                              <div>
+                                <span className="font-semibold">Coat the cathodic member.</span>{' '}
+                                Coating the anodic member without controlling the cathode can intensify galvanic attack if the coating is damaged.
+                              </div>
+                            </div>
+                          </div>
+                        )}
 
                         <div className="mt-4 flex flex-wrap gap-2">
                           {step.mitigation.standards.map((standard) => (

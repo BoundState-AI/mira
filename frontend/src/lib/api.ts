@@ -2222,10 +2222,11 @@ export interface GalvanicSeriesPayload {
 
 export async function galvanicEvaluate(
   req: GalvanicAssessmentRequest,
+  headers?: HeadersInit,
 ): Promise<GalvanicAssessmentResponse> {
   const response = await fetch(`${API_BASE}/mira/galvanic/evaluate`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...(headers || {}) },
     body: JSON.stringify(req),
   });
 
@@ -2237,8 +2238,10 @@ export async function galvanicEvaluate(
   return response.json();
 }
 
-export async function galvanicListEnvironments(): Promise<GalvanicEnvironmentDescriptor[]> {
-  const response = await fetch(`${API_BASE}/mira/galvanic/environments`);
+export async function galvanicListEnvironments(
+  headers?: HeadersInit,
+): Promise<GalvanicEnvironmentDescriptor[]> {
+  const response = await fetch(`${API_BASE}/mira/galvanic/environments`, { headers });
 
   if (!response.ok) {
     throw new Error(`Failed to load galvanic environments: ${response.statusText}`);
@@ -2247,9 +2250,14 @@ export async function galvanicListEnvironments(): Promise<GalvanicEnvironmentDes
   return response.json();
 }
 
-export async function galvanicSearchMaterials(q: string): Promise<GalvanicMaterialSearchResult[]> {
+export async function galvanicSearchMaterials(
+  q: string,
+  headers?: HeadersInit,
+): Promise<GalvanicMaterialSearchResult[]> {
   const params = new URLSearchParams({ q });
-  const response = await fetch(`${API_BASE}/mira/galvanic/materials/search?${params.toString()}`);
+  const response = await fetch(`${API_BASE}/mira/galvanic/materials/search?${params.toString()}`, {
+    headers,
+  });
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
@@ -2259,8 +2267,8 @@ export async function galvanicSearchMaterials(q: string): Promise<GalvanicMateri
   return response.json();
 }
 
-export async function galvanicGetSeries(): Promise<GalvanicSeriesPayload> {
-  const response = await fetch(`${API_BASE}/mira/galvanic/series`);
+export async function galvanicGetSeries(headers?: HeadersInit): Promise<GalvanicSeriesPayload> {
+  const response = await fetch(`${API_BASE}/mira/galvanic/series`, { headers });
 
   if (!response.ok) {
     throw new Error(`Failed to load galvanic source dataset: ${response.statusText}`);
@@ -2311,6 +2319,7 @@ export interface FractureMaterialFinding {
 
 export interface FractureMaterialContext {
   low_risk_candidate?: boolean;
+  additive_manufactured?: boolean;
   kic_fty_ratio?: number | null;
   ftu_ksi?: number | null;
   short_transverse_dimension_in?: number | null;
@@ -2327,6 +2336,7 @@ export interface FractureAssessmentRequest {
   hazard_consequence: 'CATASTROPHIC' | 'CRITICAL' | 'MARGINAL' | 'NEGLIGIBLE' | 'UNKNOWN';
   load_path_type: 'SINGLE' | 'REDUNDANT' | 'UNKNOWN';
   pressure_boundary: boolean;
+  lifecycle_phase?: 'NEW_BUILD' | 'REFLIGHT';
   structural_role: 'PRIMARY' | 'SECONDARY' | 'NON_STRUCTURAL';
   material_system: 'METALLIC' | 'COMPOSITE' | 'BONDED' | 'CERAMIC' | 'OTHER';
   specific_hardware_type:

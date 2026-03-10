@@ -12,6 +12,7 @@ HazardConsequence = Literal["CATASTROPHIC", "CRITICAL", "MARGINAL", "NEGLIGIBLE"
 LoadPathType = Literal["SINGLE", "REDUNDANT", "UNKNOWN"]
 StructuralRole = Literal["PRIMARY", "SECONDARY", "NON_STRUCTURAL"]
 MaterialSystem = Literal["METALLIC", "COMPOSITE", "BONDED", "CERAMIC", "OTHER"]
+LifecyclePhase = Literal["NEW_BUILD", "REFLIGHT"]
 SpecificHardwareType = Literal[
     "GENERAL",
     "FASTENER",
@@ -39,6 +40,7 @@ FindingStatus = Literal["PASS", "CAUTION", "FAIL", "INFO", "DATA_GAP"]
 
 class FractureMaterialContext(BaseModel):
     low_risk_candidate: bool = False
+    additive_manufactured: bool = False
     kic_fty_ratio: float | None = Field(default=None, gt=0)
     ftu_ksi: float | None = Field(default=None, gt=0)
     short_transverse_dimension_in: float | None = Field(default=None, ge=0)
@@ -55,6 +57,7 @@ class FractureAssessmentRequest(BaseModel):
     hazard_consequence: HazardConsequence = "UNKNOWN"
     load_path_type: LoadPathType = "UNKNOWN"
     pressure_boundary: bool = False
+    lifecycle_phase: LifecyclePhase = "NEW_BUILD"
     structural_role: StructuralRole = "PRIMARY"
     material_system: MaterialSystem = "METALLIC"
     specific_hardware_type: SpecificHardwareType = "GENERAL"
@@ -70,6 +73,7 @@ class FractureAssessmentRequest(BaseModel):
 class FractureMaterialScreenRequest(BaseModel):
     material_name: str = Field(..., min_length=1)
     material_system: MaterialSystem = "METALLIC"
+    lifecycle_phase: LifecyclePhase = "NEW_BUILD"
     classification: FractureClassification | None = None
     specific_hardware_type: SpecificHardwareType = "GENERAL"
     material_context: FractureMaterialContext = Field(default_factory=FractureMaterialContext)
@@ -147,4 +151,3 @@ class FractureAuthorityManifest(BaseModel):
     conditional_extension_count: int
     special_rule_count: int
     sources: list[dict[str, str]]
-

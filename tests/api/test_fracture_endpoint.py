@@ -57,3 +57,88 @@ def test_fracture_material_search_endpoint_returns_known_material():
     assert response.status_code == 200
     payload = response.json()
     assert any(item["canonical_name"] == "Aluminum 6061-T6" for item in payload)
+
+
+def test_fracture_material_search_endpoint_resolves_real_aliases():
+    response = client.get("/mira/fracture/materials/search", params={"q": "Ti64"})
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert any(item["canonical_name"] == "Ti-6Al-4V" for item in payload)
+
+
+def test_fracture_fcrs_endpoint_returns_26_entries():
+    response = client.get("/mira/fracture/fcrs")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert len(payload["fcrs"]) == 26
+
+
+def test_fracture_materials_screen_endpoint_standalone():
+    response = client.post(
+        "/mira/fracture/materials/screen",
+        json={
+            "material_name": "Ti-6Al-4V",
+            "material_system": "METALLIC",
+            "classification": "FC",
+            "specific_hardware_type": "GENERAL",
+            "material_context": {
+                "nasa_std_6016_qualified": False,
+                "mua_present": False,
+            },
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    finding_ids = {item["finding_id"]: item for item in payload["findings"]}
+    assert finding_ids["mua_required"]["status"] == "FAIL"
+
+
+def test_fracture_materials_screen_flags_am_low_risk_disqualification():
+    response = client.post(
+        "/mira/fracture/materials/screen",
+        json={
+            "material_name": "Ti64",
+            "material_system": "METALLIC",
+            "classification": "NFC_METALLIC",
+            "specific_hardware_type": "GENERAL",
+            "material_context": {
+                "low_risk_candidate": True,
+                "additive_manufactured": True,
+                "kic_fty_ratio": 0.5,
+            },
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    finding_ids = {item["finding_id"]: item for item in payload["findings"]}
+    assert finding_ids["am_low_risk_disallowed"]["status"] == "FAIL"
+
+
+def test_fracture_api_missing_required_fields_returns_422():
+    response = client.post("/mira/fracture/classify", json={"mission_class": "HUMAN_RATED"})
+    assert response.status_code == 422
+
+
+def test_fracture_api_rejects_zero_kic_ratio_with_422():
+    response = client.post(
+        "/mira/fracture/classify",
+        json={
+            "part_name": "Low-risk clip",
+            "mission_class": "HUMAN_RATED",
+            "hazard_consequence": "CRITICAL",
+            "load_path_type": "REDUNDANT",
+            "structural_role": "PRIMARY",
+            "material_system": "METALLIC",
+            "material_name": "Al 6061-T6",
+            "material_context": {
+                "low_risk_candidate": True,
+                "kic_fty_ratio": 0.0,
+            },
+        },
+    )
+
+    assert response.status_code == 422

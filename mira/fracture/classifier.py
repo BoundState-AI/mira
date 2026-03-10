@@ -137,12 +137,6 @@ def classify_request(request: FractureAssessmentRequest) -> dict[str, object]:
     else:
         baseline_key = "FC_METALLIC_GENERAL"
 
-    if request.corrosion_iccp_recommended:
-        warnings.append(
-            "Cross-module alert: corrosion module indicates ICCP is being considered. "
-            "Treat this as a BoundState product alert and review fracture implications before use."
-        )
-
     return {
         "classification": classification,
         "baseline_key": baseline_key,

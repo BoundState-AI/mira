@@ -31,6 +31,10 @@ DATA_DIR = Path(__file__).resolve().parent / "data"
 MANIFEST_VERSION = "2026.03.09-phase1"
 SOURCE_DOC = "NASA-STD-5019A w/Change 4"
 SOURCE_PATH = "/mnt/d/BoundState/BoundState_other/BoundState/docs/NASA-STD-5019A.pdf"
+CROSS_MODULE_ALERT = (
+    "CrossModuleAlert: corrosion indicates ICCP consideration while this part is fracture-critical. "
+    "This is a BoundState product alert, not an FCR."
+)
 
 
 def _load_json(name: str) -> dict[str, Any]:
@@ -94,6 +98,12 @@ def _requirement_summary(fcr: int) -> FractureRequirementSummary:
 def _resolve_baseline_fcrs(baseline_key: str) -> list[int]:
     baselines = _applicability_payload()["classification_baselines"]
     return list(baselines.get(baseline_key, {}).get("required_fcrs", []))
+
+
+def _conservative_fallback_baseline(request: FractureAssessmentRequest) -> str:
+    if request.material_system in {"COMPOSITE", "BONDED"}:
+        return "FC_COMPOSITE_BONDED_GENERAL"
+    return "FC_METALLIC_GENERAL"
 
 
 def _conditional_fcrs(request: FractureAssessmentRequest, baseline_key: str) -> list[int]:
@@ -172,31 +182,42 @@ def _resolved_material_response(query: str | None, resolved: dict[str, Any] | No
 def evaluate_fracture_assessment(request: FractureAssessmentRequest) -> FractureAssessmentResponse:
     classification_packet = classify_request(request)
     baseline_key = str(classification_packet["baseline_key"])
+    effective_baseline_key = baseline_key
+
+    if classification_packet["classification"] == "INDETERMINATE" and classification_packet.get("conservative_fallback"):
+        effective_baseline_key = _conservative_fallback_baseline(request)
+
     applicable_fcrs = sorted(
         set(
-            _resolve_baseline_fcrs(baseline_key)
-            + _conditional_fcrs(request, baseline_key)
+            _resolve_baseline_fcrs(effective_baseline_key)
+            + _conditional_fcrs(request, effective_baseline_key)
         )
     )
 
     requirements = [_requirement_summary(fcr) for fcr in applicable_fcrs]
-    resolved_material, material_findings_raw = screen_material_for_assessment(request, baseline_key)
+    resolved_material, material_findings_raw = screen_material_for_assessment(request, effective_baseline_key)
     material_findings = _convert_material_findings(material_findings_raw)
 
     warnings = list(classification_packet["warnings"])
-    if request.corrosion_iccp_recommended and classification_packet["classification"] == "FC":
+    if request.lifecycle_phase == "REFLIGHT":
         warnings.append(
-            "CrossModuleAlert: corrosion indicates ICCP consideration while this part is fracture-critical. "
-            "This is a BoundState product alert, not an FCR."
+            "Reflight hardware selected. Review prior flight history, inspection evidence, and traceability before reuse."
         )
+    if request.corrosion_iccp_recommended and classification_packet["classification"] == "FC":
+        warnings.append(CROSS_MODULE_ALERT)
 
     return FractureAssessmentResponse(
         classification=classification_packet["classification"],
-        baseline_key=baseline_key,
-        confidence_state=classification_packet["confidence_state"],
+        baseline_key=effective_baseline_key,
+        confidence_state=(
+            "CONSERVATIVE_FALLBACK"
+            if classification_packet["classification"] == "INDETERMINATE" and classification_packet.get("conservative_fallback")
+            else classification_packet["confidence_state"]
+        ),
         screening_basis=(
-            "Deterministic NASA-STD-5019A classification with explicit applicability mapping "
-            "from verified FCR authority JSON."
+            "Conservative fracture-critical fallback from verified FCR authority JSON because required classification inputs remain unresolved."
+            if classification_packet["classification"] == "INDETERMINATE" and classification_packet.get("conservative_fallback")
+            else "Deterministic NASA-STD-5019A classification with explicit applicability mapping from verified FCR authority JSON."
         ),
         applicable_fcrs=applicable_fcrs,
         requirements=requirements,
@@ -261,4 +282,3 @@ def get_authority_manifest() -> FractureAuthorityManifest:
             },
         ],
     )
-

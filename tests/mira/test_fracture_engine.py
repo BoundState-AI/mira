@@ -1,3 +1,5 @@
+from pydantic import ValidationError
+
 from mira.fracture.engine import evaluate_fracture_assessment, get_authority_manifest, search_materials
 from mira.fracture.models import FractureAssessmentRequest, FractureMaterialContext
 
@@ -79,6 +81,9 @@ def test_indeterminate_inputs_trigger_conservative_fallback():
     )
 
     assert result.classification == "INDETERMINATE"
+    assert result.baseline_key == "FC_METALLIC_GENERAL"
+    assert result.confidence_state == "CONSERVATIVE_FALLBACK"
+    assert result.applicable_fcrs == [10, 12, 15, 16, 21, 22, 23, 24, 25]
     assert set(result.unresolved_inputs) == {"hazard_consequence", "load_path_type"}
     assert result.conservative_fallback == "Treat as FC pending review"
 
@@ -91,3 +96,53 @@ def test_authority_manifest_and_material_search_are_populated():
     assert authority.baseline_count >= 10
     assert materials
     assert materials[0].canonical_name == "Aluminum 6061-T6"
+
+
+def test_kic_fty_threshold_exactly_033_passes():
+    result = evaluate_fracture_assessment(
+        FractureAssessmentRequest(
+            part_name="Low-risk clip",
+            mission_class="HUMAN_RATED",
+            hazard_consequence="CRITICAL",
+            load_path_type="REDUNDANT",
+            structural_role="PRIMARY",
+            material_system="METALLIC",
+            material_name="Al 6061-T6",
+            material_context=FractureMaterialContext(
+                low_risk_candidate=True,
+                kic_fty_ratio=0.33,
+            ),
+        )
+    )
+
+    finding_ids = {item.finding_id: item for item in result.material_findings}
+    assert finding_ids["kic_fty_ratio_check"].status == "PASS"
+
+
+def test_kic_fty_threshold_below_033_fails():
+    result = evaluate_fracture_assessment(
+        FractureAssessmentRequest(
+            part_name="Low-risk clip",
+            mission_class="HUMAN_RATED",
+            hazard_consequence="CRITICAL",
+            load_path_type="REDUNDANT",
+            structural_role="PRIMARY",
+            material_system="METALLIC",
+            material_name="Al 6061-T6",
+            material_context=FractureMaterialContext(
+                low_risk_candidate=True,
+                kic_fty_ratio=0.329,
+            ),
+        )
+    )
+
+    finding_ids = {item.finding_id: item for item in result.material_findings}
+    assert finding_ids["kic_fty_ratio_check"].status == "FAIL"
+
+
+def test_kic_fty_zero_is_rejected_by_validation():
+    try:
+        FractureMaterialContext(low_risk_candidate=True, kic_fty_ratio=0.0)
+    except ValidationError:
+        return
+    raise AssertionError("Expected zero KIc/Fty ratio to fail validation")

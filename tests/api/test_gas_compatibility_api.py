@@ -176,8 +176,8 @@ class TestH2CompatibilityAPI:
         )
         assert data.get("embrittlement_risk") in ["low", "very_low", None]
 
-    def test_h2_inconel_625_approved(self):
-        """Inconel 625 in high-pressure H2 should return OK via API."""
+    def test_h2_inconel_625_caution(self):
+        """Inconel 625 in high-pressure H2 should return CAUTION via API."""
         response = client.post(
             "/mira/h2/compatibility",
             json={
@@ -191,10 +191,10 @@ class TestH2CompatibilityAPI:
         assert response.status_code == 200
         data = response.json()
 
-        assert data["classification"] == "ok", (
-            f"Inconel 625 should be APPROVED for H2, got {data['classification']}"
+        assert data["classification"] == "caution", (
+            f"Inconel 625 should be CAUTION for H2, got {data['classification']}"
         )
-        assert data.get("embrittlement_risk") == "very_low"
+        assert data.get("embrittlement_risk") == "medium"
 
     def test_h2_high_strength_steel_prohibited(self):
         """High-strength steel (>150 ksi) should return PROHIBITED via API."""

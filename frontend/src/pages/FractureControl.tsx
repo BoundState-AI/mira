@@ -47,6 +47,11 @@ const LOAD_PATH_OPTIONS = [
   { value: 'UNKNOWN', label: 'Unknown' },
 ] as const;
 
+const LIFECYCLE_OPTIONS = [
+  { value: 'NEW_BUILD', label: 'New Build' },
+  { value: 'REFLIGHT', label: 'Reflight' },
+] as const;
+
 const STRUCTURAL_ROLE_OPTIONS = [
   { value: 'PRIMARY', label: 'Primary' },
   { value: 'SECONDARY', label: 'Secondary' },
@@ -133,6 +138,7 @@ export default function FractureControl() {
   const [missionClass, setMissionClass] = useState('HUMAN_RATED');
   const [hazardConsequence, setHazardConsequence] = useState('CATASTROPHIC');
   const [loadPathType, setLoadPathType] = useState('SINGLE');
+  const [lifecyclePhase, setLifecyclePhase] = useState('NEW_BUILD');
   const [structuralRole, setStructuralRole] = useState('PRIMARY');
   const [materialSystem, setMaterialSystem] = useState('METALLIC');
   const [specificHardwareType, setSpecificHardwareType] = useState('GENERAL');
@@ -143,6 +149,7 @@ export default function FractureControl() {
   const [detectedFlawAcceptedForFlight, setDetectedFlawAcceptedForFlight] = useState(false);
   const [corrosionIccpRecommended, setCorrosionIccpRecommended] = useState(false);
   const [lowRiskCandidate, setLowRiskCandidate] = useState(false);
+  const [additiveManufactured, setAdditiveManufactured] = useState(false);
   const [chlorideExposure, setChlorideExposure] = useState(false);
   const [sustainedLoadExpected, setSustainedLoadExpected] = useState(false);
   const [approvedSourceDataAttached, setApprovedSourceDataAttached] = useState(false);
@@ -220,6 +227,7 @@ export default function FractureControl() {
         hazard_consequence: hazardConsequence as 'CATASTROPHIC' | 'CRITICAL' | 'MARGINAL' | 'NEGLIGIBLE' | 'UNKNOWN',
         load_path_type: loadPathType as 'SINGLE' | 'REDUNDANT' | 'UNKNOWN',
         pressure_boundary: pressureBoundary,
+        lifecycle_phase: lifecyclePhase as 'NEW_BUILD' | 'REFLIGHT',
         structural_role: structuralRole as 'PRIMARY' | 'SECONDARY' | 'NON_STRUCTURAL',
         material_system: materialSystem as 'METALLIC' | 'COMPOSITE' | 'BONDED' | 'CERAMIC' | 'OTHER',
         specific_hardware_type: specificHardwareType as
@@ -243,6 +251,7 @@ export default function FractureControl() {
         corrosion_iccp_recommended: corrosionIccpRecommended,
         material_context: {
           low_risk_candidate: lowRiskCandidate,
+          additive_manufactured: additiveManufactured,
           chloride_exposure: chlorideExposure,
           sustained_load_expected: sustainedLoadExpected,
           approved_source_data_attached: approvedSourceDataAttached,
@@ -274,6 +283,7 @@ export default function FractureControl() {
     { checked: detectedFlawAcceptedForFlight, setChecked: setDetectedFlawAcceptedForFlight, label: 'Detected flaw accepted for flight' },
     { checked: corrosionIccpRecommended, setChecked: setCorrosionIccpRecommended, label: 'Corrosion module recommends ICCP' },
     { checked: lowRiskCandidate, setChecked: setLowRiskCandidate, label: 'Evaluate metallic low-risk path' },
+    { checked: additiveManufactured, setChecked: setAdditiveManufactured, label: 'Additively manufactured metallic part' },
     { checked: chlorideExposure, setChecked: setChlorideExposure, label: 'Wet chloride / salt exposure expected' },
     { checked: sustainedLoadExpected, setChecked: setSustainedLoadExpected, label: 'Sustained load expected' },
     { checked: approvedSourceDataAttached, setChecked: setApprovedSourceDataAttached, label: 'Approved source data attached' },
@@ -314,7 +324,7 @@ export default function FractureControl() {
               </div>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
               <div>
                 <Label>Mission Class</Label>
                 <Select value={missionClass} onValueChange={setMissionClass}>
@@ -334,6 +344,13 @@ export default function FractureControl() {
                 <Select value={loadPathType} onValueChange={setLoadPathType}>
                   <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
                   <SelectContent>{LOAD_PATH_OPTIONS.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Lifecycle Phase</Label>
+                <Select value={lifecyclePhase} onValueChange={setLifecyclePhase}>
+                  <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
+                  <SelectContent>{LIFECYCLE_OPTIONS.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div>

@@ -552,6 +552,8 @@ class HydrogenCompatibilityEngine:
 # =============================================================================
 
 from core.models.answer import AnswerSeverity, EvidenceItem
+from mira.maptis import H2_HIGH_STRENGTH_THRESHOLD_KSI, MaterialFamily
+from mira.maptis.repository import _infer_family_from_key
 from .models import (
     H2CompatibilityRequest,
     H2CompatibilityResponse,
@@ -562,6 +564,7 @@ from .models import (
 
 # H2 Knowledge Twin v3.0 - Simplified Engine
 _H2_SIMPLE_ENGINE = None
+_TITANIUM_HYDRIDE_LIMIT_K = 422.039
 
 
 def _get_h2_simple_engine():
@@ -585,6 +588,64 @@ def _get_h2_simple_engine():
         return None
 
 
+def _infer_request_family(material_key: str) -> MaterialFamily:
+    """Use the shared MAPTIS fallback family heuristic in no-DB runtime."""
+    return _infer_family_from_key(material_key or "")
+
+
+def _deterministic_guardrail_response(
+    request: H2CompatibilityRequest,
+) -> H2CompatibilityResponse | None:
+    """Apply safety guardrails that must not depend on evidence lookup success."""
+    family = _infer_request_family(request.material_key)
+
+    if (
+        request.yield_strength_ksi is not None
+        and request.yield_strength_ksi > H2_HIGH_STRENGTH_THRESHOLD_KSI
+    ):
+        return H2CompatibilityResponse(
+            classification=AnswerSeverity.PROHIBITED,
+            rationale=(
+                f"Yield strength {request.yield_strength_ksi:.1f} ksi exceeds the "
+                f"{H2_HIGH_STRENGTH_THRESHOLD_KSI:.0f} ksi hydrogen embrittlement threshold."
+            ),
+            evidence=[
+                EvidenceItem(
+                    source_id="NSS 1740.16 §4.3.2",
+                    location="Hydrogen high-strength steel limit",
+                    summary="Materials above 150 ksi are treated as hydrogen-embrittlement susceptible.",
+                )
+            ],
+            embrittlement_risk="severe",
+            h2_score=0.0,
+            notes="Deterministic safety guardrail applied before evidence-twin assessment.",
+        )
+
+    if (
+        family == MaterialFamily.TITANIUM
+        and request.phase == HydrogenPhase.GAS
+        and request.temperature_k > _TITANIUM_HYDRIDE_LIMIT_K
+    ):
+        return H2CompatibilityResponse(
+            classification=AnswerSeverity.PROHIBITED,
+            rationale=(
+                "Titanium in gaseous hydrogen above 300°F can absorb hydrogen and form brittle hydrides."
+            ),
+            evidence=[
+                EvidenceItem(
+                    source_id="NSS 1740.16 §4.5",
+                    location="Titanium hydride formation limit",
+                    summary="Titanium is not allowed for elevated-temperature GH2 service above 300°F.",
+                )
+            ],
+            embrittlement_risk="severe",
+            h2_score=0.0,
+            notes="Deterministic safety guardrail applied before evidence-twin assessment.",
+        )
+
+    return None
+
+
 def evaluate_h2_compatibility(request: H2CompatibilityRequest) -> H2CompatibilityResponse:
     """Evaluate hydrogen compatibility using H2 Knowledge Twin v3.0 (Simplified).
 
@@ -599,6 +660,10 @@ def evaluate_h2_compatibility(request: H2CompatibilityRequest) -> H2Compatibilit
     Returns:
         H2CompatibilityResponse with classification, rationale, evidence
     """
+    guardrail_response = _deterministic_guardrail_response(request)
+    if guardrail_response is not None:
+        return guardrail_response
+
     engine = _get_h2_simple_engine()
 
     if engine is None:

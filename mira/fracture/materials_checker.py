@@ -54,6 +54,7 @@ def resolve_material(query: str | None) -> dict[str, Any] | None:
 def _data_fields(material_context: dict[str, Any]) -> list[str]:
     fields: list[str] = []
     for key in [
+        "additive_manufactured",
         "kic_fty_ratio",
         "ftu_ksi",
         "short_transverse_dimension_in",
@@ -197,6 +198,22 @@ def _screen_material_common(
             }
         )
 
+        if material_context.get("additive_manufactured"):
+            findings.append(
+                {
+                    "finding_id": "am_low_risk_disallowed",
+                    "status": "FAIL",
+                    "title": "Additively manufactured metallic parts do not qualify for NFC low-risk",
+                    "detail": (
+                        "This part is marked as additively manufactured. Do not use the metallic NFC low-risk path "
+                        "for AM metallic hardware."
+                    ),
+                    "governing_fcrs": [8],
+                    "source_clauses": ["NASA-STD-6030 AMR15"],
+                    "data_provided": data_provided,
+                }
+            )
+
         ratio = material_context.get("kic_fty_ratio")
         if ratio is None:
             findings.append(
@@ -328,4 +345,3 @@ def screen_material_request(request: FractureMaterialScreenRequest) -> tuple[dic
         specific_hardware_type=request.specific_hardware_type,
         material_context=request.material_context.model_dump(mode="python"),
     )
-

@@ -123,12 +123,19 @@ def _search_index() -> dict[str, set[str]]:
 def _find_groups(query: str) -> list[str]:
     normalized = _normalize(query)
     index = _search_index()
-    if normalized in index:
-        return sorted(index[normalized])
+    candidate_queries = [normalized]
+    if normalized.endswith("ss") and len(normalized) > 2:
+        candidate_queries.append(normalized[:-2])
+
+    for candidate in candidate_queries:
+        if candidate in index:
+            return sorted(index[candidate])
 
     matches: list[str] = []
     for key, groups in index.items():
-        if normalized in key or key in normalized:
+        if any(candidate in key for candidate in candidate_queries) or (
+            len(key) >= 4 and any(key in candidate for candidate in candidate_queries)
+        ):
             matches.extend(groups)
     unique = list(dict.fromkeys(matches))
     return unique
