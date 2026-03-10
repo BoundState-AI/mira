@@ -38,6 +38,7 @@ from .mua_v7 import router as mua_v7_router
 from .matchmaker import router as matchmaker_router
 from .bsmh import router as bsmh_router
 from .query import router as query_router
+from .oca import router as oca_router
 
 __all__ = [
     "search_router",
@@ -60,6 +61,7 @@ __all__ = [
     "matchmaker_router",
     "bsmh_router",
     "query_router",
+    "oca_router",
 ]
 
 

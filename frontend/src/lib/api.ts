@@ -1230,6 +1230,313 @@ export async function o2GetFamilies(): Promise<O2FamiliesResponse> {
 }
 
 // ============================================================================
+// OCA (Oxygen Compatibility Assessment) Workbench API
+// ============================================================================
+
+export type OCAOxidizerType = 'lox' | 'gox' | 'enriched_air' | 'compressed_air';
+export type OCAPhase = 'liquid' | 'gas';
+export type OCAFlowRegime = 'static' | 'laminar' | 'turbulent';
+export type OCAMissionPhase = 'ground_test' | 'ascent' | 'on_orbit' | 'servicing';
+export type OCAComponentClass = 'valve' | 'regulator' | 'line' | 'vessel' | 'seal' | 'filter' | 'sensor' | 'fitting' | 'flex_hose' | 'other';
+export type OCAGeometryClass = 'bulk' | 'thin_wall' | 'mesh' | 'porous' | 'sintered' | 'seal' | 'other';
+export type OCAFlammabilityRating = 'A' | 'B' | 'C' | 'D' | 'X' | 'unknown';
+export type OCACredibleStatus = 'credible' | 'not_credible' | 'indeterminate';
+export type OCAReactionEffect = 'A' | 'B' | 'C' | 'D';
+export type OCADisposition = 'compatible_as_configured' | 'compatible_with_controls' | 'requires_mua' | 'requires_acceptance_test' | 'requires_supplemental_testing' | 'insufficient_evidence';
+export type OCARuleTier = 'A' | 'B' | 'C' | 'D';
+
+export interface OCAServiceContext {
+  case_id?: string;
+  oxidizer_type: OCAOxidizerType;
+  o2_fraction: number;
+  total_pressure_min_psia: number;
+  total_pressure_max_psia: number;
+  oxygen_partial_pressure_psia?: number | null;
+  phase: OCAPhase;
+  temp_min_c?: number | null;
+  temp_max_c?: number | null;
+  flow_regime: OCAFlowRegime;
+  velocity_m_s?: number | null;
+  cleanliness_verified: boolean;
+  contamination_notes?: string | null;
+  mission_phase: OCAMissionPhase;
+}
+
+export interface OCAComponent {
+  component_id?: string;
+  component_class: OCAComponentClass;
+  geometry_class: OCAGeometryClass;
+  dynamic_contact_flag: boolean;
+  is_rigid_metallic_tubing: boolean;
+  is_metallic_flex_hose: boolean;
+  is_all_metal_seal: boolean;
+  is_metallic_pressure_vessel: boolean;
+  seal_type?: 'metal' | 'polymer' | 'composite' | null;
+  pressure_boundary_material?: string | null;
+}
+
+export interface OCAMaterial {
+  material_instance_id?: string;
+  material_name: string;
+  canonical_name?: string | null;
+  spec?: string | null;
+  grade?: string | null;
+  temper?: string | null;
+  product_form?: string | null;
+  coating?: string | null;
+  role_in_component?: string | null;
+  identity_confidence: number;
+  flammability_rating: OCAFlammabilityRating;
+  is_titanium: boolean;
+  is_nonmetal: boolean;
+}
+
+export interface OCABlockedState {
+  state_type: string;
+  description: string;
+  missing_fields: string[];
+  resolution_hint: string;
+}
+
+export interface OCATriggeredRequirement {
+  requirement_id: string;
+  source_standard: string;
+  section: string;
+  title: string;
+  tier: OCARuleTier;
+  satisfied: boolean;
+  satisfaction_basis: string;
+  is_prohibition: boolean;
+  prohibition_detail?: string | null;
+}
+
+export interface OCAMechanismTrace {
+  mechanism_name: string;
+  source_ref: string;
+  credible_status: OCACredibleStatus;
+  rating: number;
+  required_elements: string[];
+  observed_elements: string[];
+  missing_elements: string[];
+  linked_evidence_ids: string[];
+  controls_required: string[];
+  reviewer_comments: string[];
+}
+
+export interface OCAKindlingChain {
+  kindling_chain_present: boolean;
+  propagation_path: string[];
+  reaction_effect: OCAReactionEffect;
+  rationale: string;
+}
+
+export interface OCAHazardControl {
+  component_ref: string;
+  ignition_hazard: string;
+  probability_rating: number;
+  reaction_effect: OCAReactionEffect;
+  recommendation: string;
+  recommendation_class: string;
+  affected_mechanisms: string[];
+  confidence: string;
+  status: string;
+}
+
+export interface OCAMUASeed {
+  material_identity: string;
+  service_conditions: string;
+  trigger_reason: string;
+  mechanism_summary: string;
+  gaps: string[];
+  rationale_draft: string;
+  assumptions: string[];
+}
+
+export interface OCADecisionPacket {
+  case_id: string;
+  final_disposition: OCADisposition;
+  triggered_requirements: OCATriggeredRequirement[];
+  blocked_states: OCABlockedState[];
+  unresolved_gaps: string[];
+  kindling_chain_present: boolean;
+  reaction_effect: OCAReactionEffect;
+  history_of_use: string;
+  mua_seed?: OCAMUASeed | null;
+  acceptance_test_required: boolean;
+  reviewer_required: boolean;
+  summary_rationale: string;
+  mechanism_assessments: OCAMechanismTrace[];
+  hazard_controls: OCAHazardControl[];
+  kindling_chain?: OCAKindlingChain | null;
+}
+
+export interface OCACreateCaseRequest {
+  service_context: OCAServiceContext;
+  component: OCAComponent;
+  materials: OCAMaterial[];
+}
+
+export interface OCACreateCaseResponse {
+  case_id: string;
+  blocked_states: OCABlockedState[];
+  precheck_warnings: string[];
+  normalized_context: OCAServiceContext;
+  normalized_materials: OCAMaterial[];
+}
+
+export interface OCAPrecheckResponse {
+  case_id: string;
+  triggered_requirements: OCATriggeredRequirement[];
+  prohibitions: OCATriggeredRequirement[];
+  acceptance_test_required: boolean;
+  acceptance_test_exempt: boolean;
+  exemption_reason?: string | null;
+}
+
+export interface OCAMechanismResponse {
+  case_id: string;
+  mechanism_assessments: OCAMechanismTrace[];
+  credible_count: number;
+  indeterminate_count: number;
+}
+
+export interface OCADecisionResponse {
+  case_id: string;
+  decision: OCADecisionPacket;
+}
+
+export interface OCAAdiabaticResult {
+  ti_k: number;
+  pi_psia: number;
+  pf_psia: number;
+  gamma: number;
+  tf_k: number;
+  tf_c: number;
+  tf_f: number;
+}
+
+/**
+ * OCA health check.
+ */
+export async function ocaPing(): Promise<{ status: string; domain: string; version: string }> {
+  const response = await fetch(`${API_BASE}/oca/ping`);
+  if (!response.ok) throw new Error(`OCA ping failed: ${response.statusText}`);
+  return response.json();
+}
+
+/**
+ * Create a new OCA case.
+ */
+export async function ocaCreateCase(req: OCACreateCaseRequest): Promise<OCACreateCaseResponse> {
+  const response = await fetch(`${API_BASE}/oca/cases`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `OCA case creation failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+/**
+ * Run full OCA assessment and get decision.
+ */
+export async function ocaRunDecision(caseId: string): Promise<OCADecisionResponse> {
+  const response = await fetch(`${API_BASE}/oca/cases/${caseId}/decision`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `OCA decision failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+/**
+ * Get OCA precheck (requirement triggers).
+ */
+export async function ocaPrecheck(caseId: string): Promise<OCAPrecheckResponse> {
+  const response = await fetch(`${API_BASE}/oca/cases/${caseId}/precheck`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `OCA precheck failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+/**
+ * Assess ignition mechanisms.
+ */
+export async function ocaAssessMechanisms(caseId: string): Promise<OCAMechanismResponse> {
+  const response = await fetch(`${API_BASE}/oca/cases/${caseId}/mechanisms`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `OCA mechanism assessment failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+/**
+ * Adiabatic compression calculator.
+ */
+export async function ocaAdiabaticCalc(
+  ti_k: number, pi_psia: number, pf_psia: number, gamma?: number
+): Promise<OCAAdiabaticResult> {
+  const params = new URLSearchParams({
+    ti_k: String(ti_k),
+    pi_psia: String(pi_psia),
+    pf_psia: String(pf_psia),
+  });
+  if (gamma) params.set('gamma', String(gamma));
+  const response = await fetch(`${API_BASE}/oca/adiabatic-calc?${params}`, { method: 'POST' });
+  if (!response.ok) throw new Error(`Adiabatic calc failed: ${response.statusText}`);
+  return response.json();
+}
+
+/**
+ * List available ignition mechanisms.
+ */
+export async function ocaListMechanisms(): Promise<{
+  mechanisms: Array<{
+    name: string;
+    display_name: string;
+    source_ref: string;
+    description: string;
+    characteristic_elements: string[];
+  }>;
+  total: number;
+}> {
+  const response = await fetch(`${API_BASE}/oca/mechanisms`);
+  if (!response.ok) throw new Error(`Failed to list mechanisms: ${response.statusText}`);
+  return response.json();
+}
+
+/**
+ * Export OCA artifacts.
+ */
+export async function ocaExport(caseId: string): Promise<Record<string, unknown>> {
+  const response = await fetch(`${API_BASE}/oca/cases/${caseId}/export`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ case_id: caseId }),
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `OCA export failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+// ============================================================================
 // MIRA v4 Decision Lineage API
 // ============================================================================
 

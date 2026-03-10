@@ -84,6 +84,9 @@ def create_app() -> FastAPI:
     # O2 Knowledge Twin router (oxygen compatibility)
     include_with_api_alias(routers.o2_router, prefix="/o2", tags=["o2"])
 
+    # OCA Workbench router (Oxygen Compatibility Assessment per TM-2007-213740)
+    include_with_api_alias(routers.oca_router, prefix="/oca", tags=["oca"])
+
     # Hybrid query router (evidence-first query engine)
     # Note: hybrid_query router has its own /api/query prefix
     app.include_router(routers.hybrid_query_router, tags=["hybrid-query"])

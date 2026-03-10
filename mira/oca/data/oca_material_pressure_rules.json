@@ -1,0 +1,63 @@
+{
+  "_meta": {
+    "description": "Material-pressure rules with strict tier separation. Tier A = governing. Tier D = expert overlay.",
+    "version": "1.0.0",
+    "ingest_date": "2026-03-10"
+  },
+  "tier_a_rules": [
+    {
+      "rule_id": "MPR67-TITANIUM",
+      "material_family": "titanium",
+      "tier": "A",
+      "source": "NASA-STD-6016C §4.2.1.3c (MPR 67)",
+      "rule": "Titanium alloys SHALL NOT be used with LOX or GOX at any pressure, or with air above 5 psia O2 partial pressure.",
+      "is_prohibition": true,
+      "pressure_threshold_psia": null,
+      "o2_partial_pressure_threshold_psia": 5.0,
+      "applies_to_phases": ["lox", "gox", "enriched_air", "compressed_air"],
+      "note": "This is a governing prohibition. The commonly cited 100 psia threshold is Tier D center practice that is LESS restrictive."
+    }
+  ],
+  "tier_d_heuristics": [
+    {
+      "rule_id": "JSC-AL-PRESSURE",
+      "material_family": "aluminum",
+      "tier": "D",
+      "source": "JSC-27301 Rev J (center practice)",
+      "rule": "Aluminum alloys: exercise caution above 200 psia in GOX service. Use Monel or copper alloy above 1000 psia.",
+      "is_prohibition": false,
+      "pressure_threshold_psia": 200,
+      "note": "Tier D — center practice, not governing standard. Display with Tier D label."
+    },
+    {
+      "rule_id": "JSC-SS-PRESSURE",
+      "material_family": "stainless_steel",
+      "tier": "D",
+      "source": "JSC-27301 Rev J (center practice)",
+      "rule": "Austenitic stainless steels: generally acceptable for GOX. Review promoted combustion data above 1500 psia.",
+      "is_prohibition": false,
+      "pressure_threshold_psia": 1500,
+      "note": "Tier D — center practice. Stainless steels vary by alloy and form."
+    },
+    {
+      "rule_id": "JSC-MONEL-PREFERRED",
+      "material_family": "monel",
+      "tier": "D",
+      "source": "JSC-27301 Rev J (center practice)",
+      "rule": "Monel 400/K-500: preferred for high-pressure oxygen service. Nonflammable in most configurations.",
+      "is_prohibition": false,
+      "pressure_threshold_psia": null,
+      "note": "Tier D — widely used and supported by test data, but the preference is center practice."
+    },
+    {
+      "rule_id": "TITANIUM-100PSIA-MYTH",
+      "material_family": "titanium",
+      "tier": "D",
+      "source": "Various center practices (commonly misattributed)",
+      "rule": "Some center practices cite a 100 psia threshold for titanium. This is LESS restrictive than the governing MPR 67 (5 psia O2 partial pressure) and SHALL NOT override the Tier A prohibition.",
+      "is_prohibition": false,
+      "pressure_threshold_psia": 100,
+      "note": "CAUTION: This Tier D heuristic is LESS restrictive than Tier A. MPR 67 governs."
+    }
+  ]
+}
