@@ -1,0 +1,65 @@
+{
+  "version": "0.1.0",
+  "entries": [
+    {
+      "canonical_name": "Aluminum 2024-T3",
+      "material_system": "METALLIC",
+      "family": "aluminum",
+      "aliases": ["2024-T3", "Al 2024-T3", "2024"]
+    },
+    {
+      "canonical_name": "Aluminum 6061-T6",
+      "material_system": "METALLIC",
+      "family": "aluminum",
+      "aliases": ["6061-T6", "Al 6061-T6", "6061"]
+    },
+    {
+      "canonical_name": "Aluminum 7075-T651",
+      "material_system": "METALLIC",
+      "family": "aluminum",
+      "aliases": ["7075-T651", "7075", "Al 7075-T651"]
+    },
+    {
+      "canonical_name": "Ti-6Al-4V",
+      "material_system": "METALLIC",
+      "family": "titanium",
+      "aliases": ["Titanium 6-4", "Ti64", "Ti 6Al-4V"]
+    },
+    {
+      "canonical_name": "300M Steel",
+      "material_system": "METALLIC",
+      "family": "steel",
+      "aliases": ["300M", "300M alloy steel"]
+    },
+    {
+      "canonical_name": "17-4PH Stainless",
+      "material_system": "METALLIC",
+      "family": "steel",
+      "aliases": ["17-4PH", "17-4 PH", "17-4 precipitation hardening stainless"]
+    },
+    {
+      "canonical_name": "A286",
+      "material_system": "METALLIC",
+      "family": "steel",
+      "aliases": ["A-286", "A 286"]
+    },
+    {
+      "canonical_name": "CFRP / Epoxy Laminate",
+      "material_system": "COMPOSITE",
+      "family": "composite",
+      "aliases": ["CFRP", "Carbon Fiber Reinforced Polymer", "Carbon Epoxy", "Composite Laminate"]
+    },
+    {
+      "canonical_name": "Bonded Composite Assembly",
+      "material_system": "BONDED",
+      "family": "bonded",
+      "aliases": ["Bonded Composite", "Bonded Panel", "Bonded Structure"]
+    },
+    {
+      "canonical_name": "COPV Metallic Liner",
+      "material_system": "METALLIC",
+      "family": "pressure_hardware",
+      "aliases": ["COPV Liner", "Composite Overwrapped Pressure Vessel Liner"]
+    }
+  ]
+}

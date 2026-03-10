@@ -40,6 +40,7 @@ from .bsmh import router as bsmh_router
 from .query import router as query_router
 from .forge import router as forge_router
 from .galvanic import router as galvanic_router
+from .fracture import router as fracture_router
 
 __all__ = [
     "search_router",
@@ -64,6 +65,7 @@ __all__ = [
     "query_router",
     "forge_router",
     "galvanic_router",
+    "fracture_router",
 ]
 
 

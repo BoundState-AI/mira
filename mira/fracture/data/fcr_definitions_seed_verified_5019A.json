@@ -1,0 +1,326 @@
+{
+  "seed_name": "fcr_definitions_seed_verified_5019A",
+  "seed_purpose": "Verified taxonomy seed for rebuilding fracture FCR definitions from NASA-STD-5019A w/Change 4. Descriptions are paraphrased summaries, not verbatim requirement text.",
+  "source_document": "NASA-STD-5019A w/Change 4",
+  "source_path": "/mnt/d/BoundState/BoundState_other/BoundState/docs/NASA-STD-5019A.pdf",
+  "verified_on": "2026-03-09",
+  "verified_from_pages": [
+    11,
+    12,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116,
+    117
+  ],
+  "notes": [
+    "Use this as a clean seed for rebuilding fcr_definitions.json and fcr_applicability.json.",
+    "FCR 21 and FCR 22 apply to fracture-critical parts and NFC composite/bonded parts, not to all NFC parts.",
+    "The KIc/Fty >= 0.33 sqrt(in) rule belongs to FCR 8 section 6.2.5.a(2) for metallic NFC low-risk parts, not to general FCR 22."
+  ],
+  "fcrs": [
+    {
+      "id": 1,
+      "category": "general",
+      "title": "FCP development and maintenance",
+      "section": "4.1",
+      "summary": "Requires a fracture control plan for human-rated spaceflight hardware.",
+      "source_pages": [
+        11,
+        102
+      ]
+    },
+    {
+      "id": 2,
+      "category": "general",
+      "title": "NASA implementation",
+      "section": "4.2.1",
+      "summary": "Requires NASA center implementation through the responsible fracture control board.",
+      "source_pages": [
+        11,
+        102
+      ]
+    },
+    {
+      "id": 3,
+      "category": "general",
+      "title": "Program implementation",
+      "section": "4.2.2",
+      "summary": "Requires human-rated programs to impose fracture control on their projects.",
+      "source_pages": [
+        11,
+        102
+      ]
+    },
+    {
+      "id": 4,
+      "category": "general",
+      "title": "RFCB involvement",
+      "section": "4.2.3",
+      "summary": "Requires fracture control implementation with RFCB oversight, advice, and approval.",
+      "source_pages": [
+        11,
+        102
+      ]
+    },
+    {
+      "id": 5,
+      "category": "general",
+      "title": "Evaluate all parts for classification",
+      "section": "4.3",
+      "summary": "Requires all parts to be evaluated as exempt, NFC, or fracture critical.",
+      "source_pages": [
+        11,
+        102
+      ]
+    },
+    {
+      "id": 6,
+      "category": "exempt",
+      "title": "Exempt classification criteria",
+      "section": "5",
+      "summary": "Defines the conditions under which a part may be classified as exempt.",
+      "source_pages": [
+        11,
+        103
+      ]
+    },
+    {
+      "id": 7,
+      "category": "nfc",
+      "title": "Established approaches for specific NFC hardware types",
+      "section": "6.1",
+      "summary": "Defines NFC qualification paths for specific hardware types such as fasteners, shatterable parts, rotating hardware, sealed containers, tools, and batteries.",
+      "source_pages": [
+        11,
+        104
+      ]
+    },
+    {
+      "id": 8,
+      "category": "nfc",
+      "title": "General NFC approaches",
+      "section": "6.2",
+      "summary": "Defines general NFC categories including low-released mass, contained, fail-safe, NHLBB, low-risk, and documented non-hazardous failure modes.",
+      "source_pages": [
+        11,
+        104,
+        105
+      ]
+    },
+    {
+      "id": 9,
+      "category": "nfc",
+      "title": "Additional activities for NFC composite or bonded hardware",
+      "section": "6.3",
+      "summary": "Adds composite or bonded NFC activities such as DTA, IDMP, RTD, NDE, traceability, and material requirements.",
+      "source_pages": [
+        11,
+        105,
+        106
+      ]
+    },
+    {
+      "id": 10,
+      "category": "fc",
+      "title": "Fracture-critical classification criteria",
+      "section": "7.1",
+      "summary": "Defines when a part must be classified as fracture critical.",
+      "source_pages": [
+        11,
+        107
+      ]
+    },
+    {
+      "id": 11,
+      "category": "fc",
+      "title": "Established approaches for specific fracture-critical hardware types",
+      "section": "7.2",
+      "summary": "Defines required approaches for specific fracture-critical hardware categories such as pressure vessels, COPVs, lines and fittings, structures, rotating hardware, fasteners, shatterable hardware, tools, and batteries.",
+      "source_pages": [
+        11,
+        107,
+        108
+      ]
+    },
+    {
+      "id": 12,
+      "category": "fc",
+      "title": "General approach for metallic fracture-critical parts",
+      "section": "7.3",
+      "summary": "Defines loading spectra and assessment by analysis and/or test for metallic fracture-critical parts not covered by established or optional approaches.",
+      "source_pages": [
+        11,
+        108
+      ]
+    },
+    {
+      "id": 13,
+      "category": "fc",
+      "title": "General approach for composite or bonded fracture-critical parts",
+      "section": "7.4",
+      "summary": "Defines DTA, IDMP, RTD, loading, test, and assessment requirements for composite or bonded fracture-critical parts not covered elsewhere.",
+      "source_pages": [
+        11,
+        109
+      ]
+    },
+    {
+      "id": 14,
+      "category": "fc",
+      "title": "Optional fracture-critical approaches",
+      "section": "7.5",
+      "summary": "Defines optional approved approaches for special fracture-critical cases not covered by section 7.2.",
+      "source_pages": [
+        11,
+        110
+      ]
+    },
+    {
+      "id": 15,
+      "category": "flaw_nde",
+      "title": "Flaw screen requirement",
+      "section": "8",
+      "summary": "Requires all fracture-critical parts to be screened for flaws with methods identified in the fracture control plan.",
+      "source_pages": [
+        11,
+        111
+      ]
+    },
+    {
+      "id": 16,
+      "category": "flaw_nde",
+      "title": "NDE for metallic parts",
+      "section": "8.1.1",
+      "summary": "Defines metallic-part NDE requirements for flaw screening and post-proof-test inspections.",
+      "source_pages": [
+        11,
+        111
+      ]
+    },
+    {
+      "id": 17,
+      "category": "flaw_nde",
+      "title": "NDE for composite or bonded parts",
+      "section": "8.1.2",
+      "summary": "Defines NDE methodology and screening requirements for composite or bonded hardware, including NFC exceptions.",
+      "source_pages": [
+        11,
+        111
+      ]
+    },
+    {
+      "id": 18,
+      "category": "flaw_nde",
+      "title": "Optional proof test",
+      "section": "8.1.3",
+      "summary": "Defines the conditions under which proof testing may be used as the flaw-screening technique.",
+      "source_pages": [
+        11,
+        112
+      ]
+    },
+    {
+      "id": 19,
+      "category": "flaw_nde",
+      "title": "Optional process controls",
+      "section": "8.1.4",
+      "summary": "Defines when process controls may be used to bound flaw sizes in fracture-critical parts.",
+      "source_pages": [
+        11,
+        112
+      ]
+    },
+    {
+      "id": 20,
+      "category": "flaw_nde",
+      "title": "Detected flaw assessment",
+      "section": "8.1.5",
+      "summary": "Defines assessment requirements for hardware with detected flaws that will be flown without repair or replacement.",
+      "source_pages": [
+        11,
+        112,
+        113
+      ]
+    },
+    {
+      "id": 21,
+      "category": "traceability",
+      "title": "Traceability requirement",
+      "section": "8.2",
+      "summary": "Requires traceability for fracture-critical parts and NFC composite or bonded parts.",
+      "source_pages": [
+        12,
+        113
+      ]
+    },
+    {
+      "id": 22,
+      "category": "materials",
+      "title": "Materials selection and usage requirement",
+      "section": "8.3",
+      "summary": "Defines material selection, processing, property, and MUA requirements for fracture-critical parts and NFC composite or bonded parts.",
+      "source_pages": [
+        12,
+        113,
+        114
+      ]
+    },
+    {
+      "id": 23,
+      "category": "documentation",
+      "title": "Engineering drawing identification requirement",
+      "section": "9.1.2",
+      "summary": "Requires fracture-critical parts to be identified on engineering drawings with inspection, serialization, and other traceability information.",
+      "source_pages": [
+        12,
+        115
+      ]
+    },
+    {
+      "id": 24,
+      "category": "documentation",
+      "title": "Fracture Control Summary Report requirement",
+      "section": "9.1.3",
+      "summary": "Requires an FCSR documenting the basis for acceptance, results, records, and disposition of flight hardware parts.",
+      "source_pages": [
+        12,
+        115
+      ]
+    },
+    {
+      "id": 25,
+      "category": "verification",
+      "title": "Verification requirement",
+      "section": "9.2",
+      "summary": "Requires written verification that fracture control requirements were met, including RFCB approval and conflict-resolution process.",
+      "source_pages": [
+        12,
+        115,
+        116
+      ]
+    },
+    {
+      "id": 26,
+      "category": "alternative",
+      "title": "Alternative approaches requirement",
+      "section": "10",
+      "summary": "Defines the conditions and exclusions for proposing alternative approaches to the standard requirements.",
+      "source_pages": [
+        12,
+        117
+      ]
+    }
+  ]
+}

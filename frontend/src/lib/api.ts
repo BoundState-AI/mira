@@ -1961,3 +1961,162 @@ export async function galvanicGetSeries(): Promise<GalvanicSeriesPayload> {
 
   return response.json();
 }
+
+export interface FractureCitation {
+  fcr?: number | null;
+  title: string;
+  section: string;
+  source_document: string;
+  source_path: string;
+  source_pages: number[];
+  summary: string;
+}
+
+export interface FractureRequirementSummary {
+  fcr: number;
+  category: string;
+  title: string;
+  section: string;
+  description: string;
+  phase_1_relevant: boolean;
+  notes?: string | null;
+  citation: FractureCitation;
+}
+
+export interface FractureResolvedMaterial {
+  query: string;
+  canonical_name: string;
+  material_system: 'METALLIC' | 'COMPOSITE' | 'BONDED' | 'CERAMIC' | 'OTHER';
+  family: string;
+  aliases: string[];
+}
+
+export interface FractureMaterialFinding {
+  finding_id: string;
+  status: 'PASS' | 'CAUTION' | 'FAIL' | 'INFO' | 'DATA_GAP';
+  title: string;
+  detail: string;
+  governing_fcrs: number[];
+  source_clauses: string[];
+  data_provided: string[];
+  citations: FractureCitation[];
+}
+
+export interface FractureMaterialContext {
+  low_risk_candidate?: boolean;
+  kic_fty_ratio?: number | null;
+  ftu_ksi?: number | null;
+  short_transverse_dimension_in?: number | null;
+  chloride_exposure?: boolean;
+  sustained_load_expected?: boolean;
+  nasa_std_6016_qualified?: boolean | null;
+  mua_present?: boolean;
+  approved_source_data_attached?: boolean;
+}
+
+export interface FractureAssessmentRequest {
+  part_name: string;
+  mission_class: 'HUMAN_RATED' | 'CARGO' | 'EXPERIMENTAL' | 'GSE' | 'GROUND_SUPPORT';
+  hazard_consequence: 'CATASTROPHIC' | 'CRITICAL' | 'MARGINAL' | 'NEGLIGIBLE' | 'UNKNOWN';
+  load_path_type: 'SINGLE' | 'REDUNDANT' | 'UNKNOWN';
+  pressure_boundary: boolean;
+  structural_role: 'PRIMARY' | 'SECONDARY' | 'NON_STRUCTURAL';
+  material_system: 'METALLIC' | 'COMPOSITE' | 'BONDED' | 'CERAMIC' | 'OTHER';
+  specific_hardware_type:
+    | 'GENERAL'
+    | 'FASTENER'
+    | 'SHATTERABLE'
+    | 'ROTATING_HARDWARE'
+    | 'SEALED_CONTAINER'
+    | 'TOOLS_TETHERS'
+    | 'BATTERY'
+    | 'PRESSURE_VESSEL'
+    | 'COPV'
+    | 'PRESSURIZED_COMPONENT'
+    | 'HABITABLE_STRUCTURE'
+    | 'PRESSURIZED_STRUCTURE';
+  material_name?: string | null;
+  optional_approach_requested?: boolean;
+  proof_test_used?: boolean;
+  process_controls_used?: boolean;
+  detected_flaw_accepted_for_flight?: boolean;
+  corrosion_iccp_recommended?: boolean;
+  material_context?: FractureMaterialContext;
+}
+
+export interface FractureAssessmentResponse {
+  classification: 'EXEMPT' | 'NFC_METALLIC' | 'NFC_COMPOSITE_BONDED' | 'FC' | 'INDETERMINATE';
+  baseline_key: string;
+  confidence_state: 'CONFIDENT' | 'INDETERMINATE' | 'CONSERVATIVE_FALLBACK';
+  screening_basis: string;
+  applicable_fcrs: number[];
+  requirements: FractureRequirementSummary[];
+  required_actions: string[];
+  required_documents: string[];
+  resolved_material?: FractureResolvedMaterial | null;
+  material_findings: FractureMaterialFinding[];
+  warnings: string[];
+  unresolved_inputs: string[];
+  conservative_fallback?: string | null;
+  citations: FractureCitation[];
+  source_manifest_version: string;
+}
+
+export interface FractureAuthorityManifest {
+  version: string;
+  total_fcrs: number;
+  baseline_count: number;
+  conditional_extension_count: number;
+  special_rule_count: number;
+  sources: Array<{
+    document: string;
+    path: string;
+  }>;
+}
+
+export interface FractureMaterialSearchResult {
+  canonical_name: string;
+  material_system: 'METALLIC' | 'COMPOSITE' | 'BONDED' | 'CERAMIC' | 'OTHER';
+  family: string;
+  aliases: string[];
+}
+
+export async function fractureClassify(
+  req: FractureAssessmentRequest,
+): Promise<FractureAssessmentResponse> {
+  const response = await fetch(`${API_BASE}/mira/fracture/classify`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Fracture assessment failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function fractureGetAuthority(): Promise<FractureAuthorityManifest> {
+  const response = await fetch(`${API_BASE}/mira/fracture/authority`);
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Fracture authority lookup failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function fractureSearchMaterials(q: string): Promise<FractureMaterialSearchResult[]> {
+  const params = new URLSearchParams({ q });
+  const response = await fetch(`${API_BASE}/mira/fracture/materials/search?${params.toString()}`);
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Fracture material search failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
