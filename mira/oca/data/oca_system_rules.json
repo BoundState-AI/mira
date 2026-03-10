@@ -1,0 +1,122 @@
+{
+  "_meta": {
+    "description": "System-level connectivity rules for the OCA visual builder per BS-SPEC-OCA-002-REV0 §6.3",
+    "source": "BS-SPEC-OCA-002-REV0",
+    "version": "1.0.0",
+    "ingest_date": "2026-03-10"
+  },
+  "interaction_rules": [
+    {
+      "rule_id": "SYS-001",
+      "name": "filter_upstream_particle_mitigation",
+      "display_name": "Filter Upstream — Particle Pathway Removal",
+      "tier": "D",
+      "description": "Adding an upstream filter removes the unfiltered-particle pathway for downstream components, subject to bypass/integrity assumptions. Particle impact assessments update accordingly.",
+      "trigger": "Filter added upstream of component with particle_impact credible or indeterminate",
+      "effect": "suppresses",
+      "target_mechanism": "particle_impact",
+      "target_element": "particles_entrainable",
+      "assumptions": ["Filter intact", "No bypass path", "Filter micron rating appropriate"],
+      "confidence": "high",
+      "provenance": "TM §4.3.1 — particle impact requires particles in flow"
+    },
+    {
+      "rule_id": "SYS-002",
+      "name": "dead_end_rapid_pressurization",
+      "display_name": "Dead-End Triggers Rapid Pressurization",
+      "tier": "B",
+      "description": "Dead-end volume downstream of fast-opening valve creates rapid pressurization hazard when nonmetal is present at dead end.",
+      "trigger": "Topology detects dead-end volume AND upstream valve with fast opening profile",
+      "effect": "creates_pathway",
+      "target_mechanism": "rapid_pressurization",
+      "target_element": "dead_end_or_restricted_volume",
+      "assumptions": ["Dead-end correctly identified from topology", "Pressurization rate dependent on valve opening profile"],
+      "confidence": "high",
+      "provenance": "TM §4.3.1 — rapid pressurization characteristic elements"
+    },
+    {
+      "rule_id": "SYS-003",
+      "name": "sonic_orifice_resonance",
+      "display_name": "Sonic Orifice Triggers Resonance",
+      "tier": "B",
+      "description": "Orifice at sonic conditions with downstream cavity creates resonance hazard.",
+      "trigger": "Orifice with pressure ratio > 1.89 AND downstream cavity or branch tube detected",
+      "effect": "creates_pathway",
+      "target_mechanism": "resonance",
+      "target_element": "sonic_jet_present",
+      "assumptions": ["Ideal gas behavior", "Cavity geometry supports resonant frequency"],
+      "confidence": "medium",
+      "provenance": "TM §4.3.1 — resonance requires sonic jet into cavity"
+    },
+    {
+      "rule_id": "SYS-004",
+      "name": "nonflammable_body_breaks_chain",
+      "display_name": "Nonflammable Body Breaks Kindling Chain",
+      "tier": "B",
+      "description": "Changing body material to a nonflammable alloy (e.g., Monel 400) can break the kindling chain if the body was the propagation path.",
+      "trigger": "Component body material changed to flammability_rating A or B",
+      "effect": "blocks_pathway",
+      "target_mechanism": null,
+      "target_element": "kindling_chain_propagation",
+      "assumptions": ["Body is the primary propagation barrier", "Material verified nonflammable at service conditions"],
+      "confidence": "high",
+      "provenance": "TM §4.4 — kindling chain requires continuous flammable path"
+    },
+    {
+      "rule_id": "SYS-005",
+      "name": "velocity_reduction_particle_impact",
+      "display_name": "Velocity Reduction Below Threshold",
+      "tier": "B",
+      "description": "Increasing line diameter reduces estimated velocity. If velocity drops below 30 m/s threshold, particle impact characteristic element is no longer satisfied.",
+      "trigger": "Line inner_diameter_mm increased such that calculated velocity < 30 m/s",
+      "effect": "removes_characteristic_element",
+      "target_mechanism": "particle_impact",
+      "target_element": "velocity_above_30_m_s",
+      "assumptions": ["Flow rate unchanged", "Calculation from system input v = Q/A"],
+      "confidence": "high",
+      "provenance": "TM §4.3.1, ASTM STP 986 — 30 m/s (100 ft/s) particle impact threshold"
+    },
+    {
+      "rule_id": "SYS-006",
+      "name": "slow_actuator_pressurization",
+      "display_name": "Slow Actuator Reduces Rapid Pressurization",
+      "tier": "B",
+      "description": "Adding a slow-opening actuator (>1 second pressurization time) reduces rapid pressurization credibility by removing the 'rapid' characteristic element.",
+      "trigger": "Valve opening_profile changed from fast to slow",
+      "effect": "removes_characteristic_element",
+      "target_mechanism": "rapid_pressurization",
+      "target_element": "pressurization_time_under_1s",
+      "assumptions": ["Actuator profile as specified", "No other rapid pressurization source upstream"],
+      "confidence": "high",
+      "provenance": "TM §4.3.1 — rapid pressurization requires <1s pressurization"
+    },
+    {
+      "rule_id": "SYS-007",
+      "name": "mpr53_pressure_boundary",
+      "display_name": "MPR 53 Pressure Boundary",
+      "tier": "A",
+      "description": "Moving relief valve set pressure below 265 psia removes MPR 53 acceptance test requirement for that component. This is a Tier A requirement boundary, not a heuristic.",
+      "trigger": "System max pressure <= 265 psia OR component is exempt per MPR 53",
+      "effect": "removes_requirement",
+      "target_mechanism": null,
+      "target_element": "mpr53_acceptance_test",
+      "assumptions": ["Pressure accurately represents worst case"],
+      "confidence": "high",
+      "provenance": "NASA-STD-6016C §4.2.1.4.1 — 265 psia (1.83 MPa) threshold"
+    },
+    {
+      "rule_id": "SYS-008",
+      "name": "cleanliness_particle_credit",
+      "display_name": "Cleanliness Specification Credit",
+      "tier": "D",
+      "description": "Applying a high-standard cleaning specification provides particle impact mitigation credit for short-duration missions by reducing contamination baseline.",
+      "trigger": "cleanliness_spec set to high standard (e.g., IEST-STD-CC1246E Level 100)",
+      "effect": "reduces_likelihood",
+      "target_mechanism": "particle_impact",
+      "target_element": "particles_entrainable",
+      "assumptions": ["Cleaning verified", "Mission duration within credit window", "Recontamination controlled"],
+      "confidence": "medium",
+      "provenance": "NASA-STD-6016C cleanliness requirements, engineering practice"
+    }
+  ]
+}

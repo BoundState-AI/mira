@@ -87,6 +87,9 @@ def create_app() -> FastAPI:
     # OCA Workbench router (Oxygen Compatibility Assessment per TM-2007-213740)
     include_with_api_alias(routers.oca_router, prefix="/oca", tags=["oca"])
 
+    # OCA System Builder router (Phase 2 — Visual System Builder per BS-SPEC-OCA-002-REV0)
+    include_with_api_alias(routers.oca_systems_router, prefix="/oca/systems", tags=["oca-systems"])
+
     # Hybrid query router (evidence-first query engine)
     # Note: hybrid_query router has its own /api/query prefix
     app.include_router(routers.hybrid_query_router, tags=["hybrid-query"])

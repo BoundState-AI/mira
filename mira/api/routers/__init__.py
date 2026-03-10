@@ -39,6 +39,7 @@ from .matchmaker import router as matchmaker_router
 from .bsmh import router as bsmh_router
 from .query import router as query_router
 from .oca import router as oca_router
+from .oca_systems import router as oca_systems_router
 
 __all__ = [
     "search_router",
@@ -62,6 +63,7 @@ __all__ = [
     "bsmh_router",
     "query_router",
     "oca_router",
+    "oca_systems_router",
 ]
 
 

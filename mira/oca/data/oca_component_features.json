@@ -1,0 +1,115 @@
+{
+  "_meta": {
+    "description": "Normalized feature flag definitions with derived attribute rules per BS-SPEC-OCA-002-REV0 §4.2",
+    "source": "BS-SPEC-OCA-002-REV0 (Fran review)",
+    "version": "1.0.0",
+    "ingest_date": "2026-03-10"
+  },
+  "feature_definitions": [
+    {
+      "feature_id": "has_moving_contact",
+      "display_name": "Moving Contact Surfaces",
+      "description": "Metal-to-metal or metal-to-polymer moving surfaces present",
+      "derivation_rule": "Set true if archetype has stem, poppet, diaphragm, or braid in contact. Override per instance.",
+      "mechanisms_triggered": ["galling_friction", "mechanical_impact", "fresh_metal_exposure"]
+    },
+    {
+      "feature_id": "has_polymer_seal",
+      "display_name": "Polymer Seal Present",
+      "description": "Polymer material in sealing role",
+      "derivation_rule": "Set true if any material slot contains a nonmetal in sealing role (packing, seat, diaphragm, gasket).",
+      "mechanisms_triggered": ["rapid_pressurization", "flow_friction"]
+    },
+    {
+      "feature_id": "has_dead_volume",
+      "display_name": "Dead-End Volume",
+      "description": "Dead-end volume downstream when closed or isolated",
+      "derivation_rule": "Set true if topology shows single-connected port, or valve in closed position creates trapped volume.",
+      "mechanisms_triggered": ["rapid_pressurization", "resonance"]
+    },
+    {
+      "feature_id": "creates_particles",
+      "display_name": "Particle Generation",
+      "description": "Component generates or entrains particles during operation",
+      "derivation_rule": "Set true for orifices (erosion), flex hoses (braid wear), components upstream of filter.",
+      "mechanisms_triggered": ["particle_impact"]
+    },
+    {
+      "feature_id": "has_cavity_downstream",
+      "display_name": "Downstream Cavity",
+      "description": "Cavity or closed-end tube downstream of restriction",
+      "derivation_rule": "Set true if orifice or restriction feeds into enclosed volume — inferred from topology.",
+      "mechanisms_triggered": ["resonance"]
+    },
+    {
+      "feature_id": "wetted_surface_flag",
+      "display_name": "Oxygen-Wetted Surface",
+      "description": "Material directly contacts oxygen",
+      "derivation_rule": "True for all components in flow path. False only for external structural elements.",
+      "mechanisms_triggered": ["particle_impact", "flow_friction", "thermal_runaway", "chemical_reaction"]
+    },
+    {
+      "feature_id": "porous_media_flag",
+      "display_name": "Porous Media Present",
+      "description": "Sintered, mesh, or foam material present",
+      "derivation_rule": "True for filter elements (sintered, mesh), porous bearings, foam insulation.",
+      "mechanisms_triggered": ["thermal_runaway"]
+    },
+    {
+      "feature_id": "electrical_energy_present",
+      "display_name": "Electrical Energy",
+      "description": "Electrical power source at or near component",
+      "derivation_rule": "True for solenoid-actuated valves, sensors, heaters, ignition sources.",
+      "mechanisms_triggered": ["electrical_arc", "static_discharge"]
+    },
+    {
+      "feature_id": "dynamic_contact_flag",
+      "display_name": "Dynamic Contact",
+      "description": "Moving parts present (chatter/impact risk)",
+      "derivation_rule": "True for valves, regulators, check valves, relief valves, any component with actuated or spring-loaded parts.",
+      "mechanisms_triggered": ["mechanical_impact", "galling_friction"]
+    },
+    {
+      "feature_id": "contamination_trap_flag",
+      "display_name": "Contamination Trap",
+      "description": "Geometry likely to trap particulate",
+      "derivation_rule": "True for filters (by design), dead-end fittings, low-flow zones.",
+      "mechanisms_triggered": ["particle_impact", "thermal_runaway"]
+    },
+    {
+      "feature_id": "filter_integrity_assumed",
+      "display_name": "Filter Integrity Assumed",
+      "description": "Upstream filter present and assumed intact (no bypass)",
+      "derivation_rule": "Inferred from topology: true for components downstream of a filter where bypass_path_exists is false.",
+      "mechanisms_triggered": []
+    },
+    {
+      "feature_id": "metal_pair_contact",
+      "display_name": "Metal Pair Contact",
+      "description": "Two different metals in rubbing contact",
+      "derivation_rule": "True when stem and body, or poppet and seat, are different metal alloys in moving contact.",
+      "mechanisms_triggered": ["galling_friction", "fresh_metal_exposure"]
+    },
+    {
+      "feature_id": "reactive_metal_present",
+      "display_name": "Reactive Metal Present",
+      "description": "Al, Ti, Mg, or Li-based alloy present",
+      "derivation_rule": "Detected from material name/spec. Auto-set by material normalization engine.",
+      "mechanisms_triggered": ["fresh_metal_exposure", "particle_impact"]
+    },
+    {
+      "feature_id": "seat_contact_mode",
+      "display_name": "Seat Contact Mode",
+      "description": "Metal-to-metal / metal-to-polymer / polymer-to-polymer sealing interface",
+      "derivation_rule": "Derived from seat and body/stem material types. Affects galling and mechanical impact assessment.",
+      "mechanisms_triggered": ["galling_friction", "mechanical_impact"]
+    },
+    {
+      "feature_id": "sa_to_volume_ratio",
+      "display_name": "Surface Area to Volume Ratio",
+      "description": "Surface-area-to-volume category: high/med/low",
+      "derivation_rule": "High for filters, heat exchangers, mesh, thin-wall tubing. Low for bulk vessels, fittings.",
+      "mechanisms_triggered": ["thermal_runaway"]
+    }
+  ]
+}

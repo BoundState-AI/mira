@@ -68,6 +68,42 @@
       "description": "Material-pressure rules with Tier A/D separation",
       "primary_source": "NASA-STD-6016C / JSC-27301",
       "version": "1.0.0"
+    },
+    {
+      "filename": "oca_component_library.json",
+      "description": "Feature-based component archetypes for visual system builder",
+      "primary_source": "BS-SPEC-OCA-002-REV0",
+      "version": "1.0.0"
+    },
+    {
+      "filename": "oca_component_features.json",
+      "description": "Normalized feature flag definitions with mechanism mappings",
+      "primary_source": "BS-SPEC-OCA-002-REV0",
+      "version": "1.0.0"
+    },
+    {
+      "filename": "oca_topology_inference_rules.json",
+      "description": "Topology inference rules for dead-end detection, filter protection, zones",
+      "primary_source": "BS-SPEC-OCA-002-REV0",
+      "version": "1.0.0"
+    },
+    {
+      "filename": "oca_mechanism_trace_rules.json",
+      "description": "Mechanism-to-feature mapping with provenance and controls",
+      "primary_source": "BS-SPEC-OCA-002-REV0 / NASA-TM-2007-213740",
+      "version": "1.0.0"
+    },
+    {
+      "filename": "oca_system_rules.json",
+      "description": "System-level connectivity and interaction rules",
+      "primary_source": "BS-SPEC-OCA-002-REV0",
+      "version": "1.0.0"
+    },
+    {
+      "filename": "oca_velocity_thresholds.json",
+      "description": "Flow velocity calculation parameters and ignition thresholds",
+      "primary_source": "NASA-TM-2007-213740 / ASTM STP 986",
+      "version": "1.0.0"
     }
   ]
 }

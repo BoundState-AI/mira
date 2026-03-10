@@ -23,5 +23,9 @@ Governing Standards:
 - JSC-27301 Rev J §5.1.4 (center overlay)
 """
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 __safety_critical__ = True
+
+# Phase 2 modules
+# from .system_models import *  # noqa: F401, F403
+# from .system_engine import *  # noqa: F401, F403
