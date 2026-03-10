@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, DragEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlaskConical, FileStack, Brain, ClipboardList, FolderTree, GripVertical, RotateCcw, Zap, Sparkles, Wind, Database, Search, ShieldAlert, ShieldCheck, LucideIcon } from 'lucide-react';
+import { FlaskConical, FileStack, Brain, ClipboardList, FolderTree, GripVertical, RotateCcw, Zap, Sparkles, Wind, Database, Search, ShieldAlert, ShieldCheck, Shield, LayoutGrid, LucideIcon } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { BoundStateLogo } from '@/components/BoundStateLogo';
 import { LanguageSelector } from '@/components/LanguageSelector';
@@ -36,6 +36,8 @@ const DEFAULT_NAV_ITEMS: NavItem[] = [
   { id: 'gas-compatibility', title: 'Gas Compatibility', navKey: 'gasCompatibility', url: '/gas-compatibility', icon: Wind },
   { id: 'galvanic-compatibility', title: 'Galvanic Compatibility', navKey: 'galvanicCompatibility', url: '/galvanic-compatibility', icon: ShieldAlert },
   { id: 'fracture-control', title: 'Fracture Control', navKey: 'fractureControl', url: '/fracture-control', icon: ShieldCheck },
+  { id: 'oca', title: 'OCA Workbench', navKey: 'ocaWorkbench', url: '/oca', icon: Shield },
+  { id: 'oca-system', title: 'OCA System Builder', navKey: 'ocaSystemBuilder', url: '/oca/system-builder', icon: LayoutGrid },
   { id: 'test-classes', title: 'MAPTIS Search', navKey: 'testClasses', url: '/test-classes', icon: FlaskConical },
   { id: 'miul', title: 'MIUL Builder', navKey: 'miulBuilder', url: '/miul', icon: FileStack },
   { id: 'dt-editor', title: 'DT Editor', navKey: 'dtEditor', url: '/dt-editor', icon: FolderTree },

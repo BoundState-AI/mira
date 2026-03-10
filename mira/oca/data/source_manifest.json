@@ -1,0 +1,109 @@
+{
+  "_meta": {
+    "description": "Provenance manifest for all OCA data files per Spec §15",
+    "version": "1.0.0"
+  },
+  "sources": [
+    {
+      "source_id": "NASA-STD-6001B",
+      "title": "Flammability, Offgassing, and Compatibility Requirements and Test Procedures",
+      "edition": "B",
+      "change_number": "Change 3",
+      "publication_date": "2016-08-26",
+      "authority_level": "governing",
+      "tier": "A"
+    },
+    {
+      "source_id": "NASA-STD-6016C",
+      "title": "Standard Materials and Processes Requirements for Spacecraft",
+      "edition": "C",
+      "change_number": "Change 2",
+      "publication_date": "2021-04-22",
+      "authority_level": "governing",
+      "tier": "A"
+    },
+    {
+      "source_id": "NASA-TM-2007-213740",
+      "title": "Guide for Oxygen Compatibility Assessments on Oxygen Components and Systems",
+      "edition": "Original",
+      "change_number": null,
+      "publication_date": "2007-01-01",
+      "authority_level": "assessment_method",
+      "tier": "B"
+    },
+    {
+      "source_id": "JSC-27301",
+      "title": "JSC Design and Procedural Standards",
+      "edition": "Rev J",
+      "change_number": null,
+      "publication_date": null,
+      "authority_level": "center_overlay",
+      "tier": "D"
+    },
+    {
+      "source_id": "KSC-KTI-5210C",
+      "title": "Kennedy Space Center Pre-Approved Materials List",
+      "edition": "C",
+      "change_number": null,
+      "publication_date": null,
+      "authority_level": "reference_aid",
+      "tier": "D"
+    }
+  ],
+  "data_files": [
+    {
+      "filename": "oca_ignition_mechanisms.json",
+      "description": "12 ignition mechanisms per TM-2007-213740",
+      "primary_source": "NASA-TM-2007-213740",
+      "version": "1.0.0"
+    },
+    {
+      "filename": "oca_requirement_binding.json",
+      "description": "Governing requirement triggers (MPRs 51-53, 67; FOCRs 29-39)",
+      "primary_source": "NASA-STD-6016C",
+      "version": "1.0.0"
+    },
+    {
+      "filename": "oca_material_pressure_rules.json",
+      "description": "Material-pressure rules with Tier A/D separation",
+      "primary_source": "NASA-STD-6016C / JSC-27301",
+      "version": "1.0.0"
+    },
+    {
+      "filename": "oca_component_library.json",
+      "description": "Feature-based component archetypes for visual system builder",
+      "primary_source": "BS-SPEC-OCA-002-REV0",
+      "version": "1.0.0"
+    },
+    {
+      "filename": "oca_component_features.json",
+      "description": "Normalized feature flag definitions with mechanism mappings",
+      "primary_source": "BS-SPEC-OCA-002-REV0",
+      "version": "1.0.0"
+    },
+    {
+      "filename": "oca_topology_inference_rules.json",
+      "description": "Topology inference rules for dead-end detection, filter protection, zones",
+      "primary_source": "BS-SPEC-OCA-002-REV0",
+      "version": "1.0.0"
+    },
+    {
+      "filename": "oca_mechanism_trace_rules.json",
+      "description": "Mechanism-to-feature mapping with provenance and controls",
+      "primary_source": "BS-SPEC-OCA-002-REV0 / NASA-TM-2007-213740",
+      "version": "1.0.0"
+    },
+    {
+      "filename": "oca_system_rules.json",
+      "description": "System-level connectivity and interaction rules",
+      "primary_source": "BS-SPEC-OCA-002-REV0",
+      "version": "1.0.0"
+    },
+    {
+      "filename": "oca_velocity_thresholds.json",
+      "description": "Flow velocity calculation parameters and ignition thresholds",
+      "primary_source": "NASA-TM-2007-213740 / ASTM STP 986",
+      "version": "1.0.0"
+    }
+  ]
+}

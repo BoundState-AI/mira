@@ -1,0 +1,313 @@
+{
+  "_meta": {
+    "description": "12 ignition mechanisms per NASA/TM-2007-213740 Section 4.3.1",
+    "source": "NASA/TM-2007-213740",
+    "version": "1.0.0",
+    "ingest_date": "2026-03-10"
+  },
+  "mechanisms": [
+    {
+      "name": "particle_impact",
+      "display_name": "Particle Impact",
+      "source_ref": "TM-2007-213740 §4.3.1, p.5",
+      "description": "Particles entrained in flow impact surfaces at velocity, transferring kinetic energy sufficient for ignition.",
+      "characteristic_elements": [
+        "particles_entrainable",
+        "velocity_above_30_m_s",
+        "impact_angle_45_to_perpendicular",
+        "flammable_target_material",
+        "oxygen_enriched_environment"
+      ],
+      "rating_criteria": {
+        "0": "No particles possible AND velocity < 30 m/s",
+        "1": "Particles unlikely OR velocity well below threshold",
+        "2": "Particles possible, velocity moderate, unfavorable impact angle",
+        "3": "Particles likely, velocity near threshold, favorable geometry",
+        "4": "Particles confirmed, velocity > 30 m/s (100 ft/s), perpendicular impact on flammable target"
+      },
+      "typical_mitigations": [
+        "Install sintered filter upstream (5-10 µm)",
+        "Limit flow velocity below 30 m/s",
+        "Use nonflammable target material at impact site",
+        "Ensure cleanliness per NASA-STD-6016C"
+      ]
+    },
+    {
+      "name": "rapid_pressurization",
+      "display_name": "Rapid Pressurization (Adiabatic Compression)",
+      "source_ref": "TM-2007-213740 §4.3.1, p.6",
+      "description": "Rapid compression of oxygen gas heats trapped gas pockets above autoignition temperature of exposed nonmetals.",
+      "characteristic_elements": [
+        "pressurization_time_under_1s",
+        "exposed_nonmetal_near_dead_end",
+        "pressure_ratio_exceeds_ait_threshold",
+        "dead_end_or_restricted_volume",
+        "oxygen_enriched_environment"
+      ],
+      "rating_criteria": {
+        "0": "No rapid pressurization possible AND no nonmetals exposed",
+        "1": "Slow pressurization (>1s) with minimal nonmetal exposure",
+        "2": "Moderate pressurization rate, some nonmetal exposure",
+        "3": "Fast pressurization, nonmetal near dead-end, pressure ratio approaching AIT",
+        "4": "Pressurization <1s, exposed nonmetal at dead-end, Tf > AIT (computed via adiabatic formula)"
+      },
+      "adiabatic_formula": "Tf = Ti * (Pf/Pi)^((gamma-1)/gamma), gamma=1.4 for O2",
+      "typical_mitigations": [
+        "Install flow restrictor to slow pressurization rate",
+        "Eliminate dead-end configurations",
+        "Replace nonmetal seals with metal seals at dead-ends",
+        "Verify AIT margin via calculation"
+      ]
+    },
+    {
+      "name": "flow_friction",
+      "display_name": "Flow Friction",
+      "source_ref": "TM-2007-213740 §4.3.1, p.7",
+      "description": "Nonmetal material exposed to high-velocity flow with vibration or erosion generates frictional heating.",
+      "characteristic_elements": [
+        "nonmetal_in_flow_path",
+        "high_velocity_flow",
+        "vibration_or_chatter",
+        "erosion_potential",
+        "oxygen_enriched_environment"
+      ],
+      "rating_criteria": {
+        "0": "No nonmetals in flow path",
+        "1": "Nonmetal present but low velocity and no vibration",
+        "2": "Moderate flow with some vibration potential",
+        "3": "High-velocity flow over nonmetal with vibration",
+        "4": "Documented conditions matching real-world fire scenarios"
+      },
+      "typical_mitigations": [
+        "Eliminate nonmetals from high-velocity flow paths",
+        "Reduce vibration through design changes",
+        "Use flow-friction resistant materials"
+      ]
+    },
+    {
+      "name": "resonance",
+      "display_name": "Resonance (Acoustic)",
+      "source_ref": "TM-2007-213740 §4.3.1, p.7",
+      "description": "Sonic jet into a cavity creates acoustic resonance heating flammable material at closed end.",
+      "characteristic_elements": [
+        "sonic_jet_present",
+        "cavity_or_branch_tube",
+        "flammable_material_at_closed_end",
+        "resonant_frequency_conditions",
+        "oxygen_enriched_environment"
+      ],
+      "rating_criteria": {
+        "0": "No sonic flow possible AND no cavities",
+        "1": "Subsonic flow or no enclosed cavities",
+        "2": "Sonic flow possible but no flammable material at resonant point",
+        "3": "Sonic flow into cavity with nonmetal present",
+        "4": "Confirmed resonance conditions with flammable material at closed end"
+      },
+      "typical_mitigations": [
+        "Eliminate branch tubes and cavities",
+        "Use nonflammable materials at cavity ends",
+        "Design to avoid sonic flow conditions"
+      ]
+    },
+    {
+      "name": "mechanical_impact",
+      "display_name": "Mechanical Impact",
+      "source_ref": "TM-2007-213740 §4.3.1, p.7-8",
+      "description": "Single or repeated impact on nonmetal or reactive metal in oxygen. LOX increases sensitivity.",
+      "characteristic_elements": [
+        "impact_energy_source",
+        "nonmetal_or_reactive_metal_target",
+        "single_or_repeated_impact",
+        "lox_sensitivity_multiplier",
+        "oxygen_enriched_environment"
+      ],
+      "rating_criteria": {
+        "0": "No impact mechanism possible",
+        "1": "Low-energy impact on nonflammable material",
+        "2": "Moderate impact, material has some sensitivity",
+        "3": "Repeated impact on sensitive material in GOX",
+        "4": "High-energy impact on LOX-sensitive material"
+      },
+      "typical_mitigations": [
+        "Eliminate impact sources (valve slam, water hammer)",
+        "Use impact-resistant materials per NASA-STD-6001B Test 13",
+        "Add damping to reduce impact energy"
+      ]
+    },
+    {
+      "name": "galling_friction",
+      "display_name": "Galling & Friction",
+      "source_ref": "TM-2007-213740 §4.3.1, p.9",
+      "description": "Metal-to-metal rubbing with rapid motion and high loads generates heat sufficient for ignition.",
+      "characteristic_elements": [
+        "metal_to_metal_contact",
+        "rapid_relative_motion",
+        "high_contact_loads",
+        "chatter_in_valves_regulators",
+        "oxygen_enriched_environment"
+      ],
+      "rating_criteria": {
+        "0": "No metal-to-metal rubbing contacts",
+        "1": "Minimal relative motion, low loads",
+        "2": "Some relative motion under moderate loads",
+        "3": "Rapid motion, high loads, chatter possible",
+        "4": "Confirmed galling conditions (valve chatter, high-speed rubbing)"
+      },
+      "typical_mitigations": [
+        "Use dissimilar metals to resist galling",
+        "Apply oxygen-compatible lubricants",
+        "Design to prevent valve chatter",
+        "Reduce contact loads"
+      ]
+    },
+    {
+      "name": "fresh_metal_exposure",
+      "display_name": "Fresh Metal Exposure",
+      "source_ref": "TM-2007-213740 §4.3.1, p.10",
+      "description": "Quick-oxidizing metal (Al, Ti) has protective oxide removed, exposing fresh surface that reacts exothermically.",
+      "characteristic_elements": [
+        "quick_oxidizing_metal_present",
+        "oxide_layer_removal_mechanism",
+        "configuration_minimizes_heat_loss",
+        "aluminum_or_titanium",
+        "oxygen_enriched_environment"
+      ],
+      "rating_criteria": {
+        "0": "No reactive metals present",
+        "1": "Reactive metal in bulk form with no oxide removal mechanism",
+        "2": "Reactive metal with possible oxide damage",
+        "3": "Thin-section reactive metal with oxide removal mechanism",
+        "4": "Fresh Al/Ti surface exposed in favorable ignition configuration"
+      },
+      "typical_mitigations": [
+        "Avoid aluminum and titanium in oxygen-wetted paths",
+        "Use bulk configurations to maximize heat dissipation",
+        "Protect oxide layer from mechanical damage"
+      ]
+    },
+    {
+      "name": "static_discharge",
+      "display_name": "Static Discharge",
+      "source_ref": "TM-2007-213740 §4.3.1, p.10",
+      "description": "Electrostatic charge buildup on isolated surface discharges through flammable material.",
+      "characteristic_elements": [
+        "charge_buildup_on_isolated_surface",
+        "discharge_point_present",
+        "flammable_material_at_discharge",
+        "dry_gas_environment",
+        "oxygen_enriched_environment"
+      ],
+      "rating_criteria": {
+        "0": "All surfaces grounded, no charge buildup possible",
+        "1": "Minimal charge buildup, grounding adequate",
+        "2": "Some isolation possible but discharge energy low",
+        "3": "Isolated surface with discharge potential near nonmetal",
+        "4": "Confirmed charge accumulation with discharge into flammable material"
+      },
+      "typical_mitigations": [
+        "Ground all conductive surfaces",
+        "Eliminate isolated conductors",
+        "Use static-dissipative materials"
+      ]
+    },
+    {
+      "name": "electrical_arc",
+      "display_name": "Electrical Arc",
+      "source_ref": "TM-2007-213740 §4.3.1, p.10",
+      "description": "Electrical power source creates arc with sufficient energy to ignite nearby flammable material.",
+      "characteristic_elements": [
+        "power_source_present",
+        "arc_generation_possible",
+        "sufficient_arc_energy",
+        "flammable_material_exposed",
+        "oxygen_enriched_environment"
+      ],
+      "rating_criteria": {
+        "0": "No electrical power in oxygen-wetted zone",
+        "1": "Power present but well-isolated from oxygen",
+        "2": "Power near oxygen path with moderate isolation",
+        "3": "Arc possible near flammable material in oxygen",
+        "4": "Confirmed electrical source with arc potential contacting flammable material"
+      },
+      "typical_mitigations": [
+        "Isolate electrical circuits from oxygen-wetted surfaces",
+        "Use hermetically sealed electrical components",
+        "Minimize stored electrical energy"
+      ]
+    },
+    {
+      "name": "chemical_reaction",
+      "display_name": "Chemical Reaction",
+      "source_ref": "TM-2007-213740 §4.3.1, p.10",
+      "description": "Reactant-specific chemical reactions (e.g., H2 leak near O2, Al + PCTFE) produce ignition energy.",
+      "characteristic_elements": [
+        "reactive_chemical_pair_present",
+        "mixing_or_contact_possible",
+        "exothermic_reaction_known",
+        "oxygen_enriched_environment"
+      ],
+      "rating_criteria": {
+        "0": "No reactive chemical pairs present",
+        "1": "Reactive pair unlikely to mix",
+        "2": "Possible contact under fault conditions",
+        "3": "Reactive pair in proximity with credible mixing path",
+        "4": "Known reactive pair with confirmed contact potential"
+      },
+      "typical_mitigations": [
+        "Separate incompatible chemicals by design",
+        "Eliminate reactive chemical pairs from system",
+        "Add barriers between reactive materials"
+      ]
+    },
+    {
+      "name": "thermal_runaway",
+      "display_name": "Thermal Runaway",
+      "source_ref": "TM-2007-213740 §4.3.1, p.10-11",
+      "description": "High SA/V ratio material (fines, porous) with poor heat dissipation slowly oxidizes to ignition (hours to months).",
+      "characteristic_elements": [
+        "high_surface_area_to_volume",
+        "porous_or_fines_material",
+        "poor_heat_dissipation",
+        "long_exposure_to_oxygen",
+        "oxygen_enriched_environment"
+      ],
+      "rating_criteria": {
+        "0": "No high SA/V materials, good heat dissipation",
+        "1": "Low SA/V materials with adequate cooling",
+        "2": "Moderate SA/V with some heat dissipation concerns",
+        "3": "High SA/V porous material with limited cooling",
+        "4": "Fines/porous material with poor heat dissipation in prolonged O2 exposure"
+      },
+      "typical_mitigations": [
+        "Avoid porous and high SA/V materials in oxygen service",
+        "Ensure adequate heat dissipation path",
+        "Limit exposure time for susceptible materials"
+      ]
+    },
+    {
+      "name": "other",
+      "display_name": "Other Ignition Sources",
+      "source_ref": "TM-2007-213740 Table 1",
+      "description": "Lightning, explosive charges, personnel smoking, open flames, fragments from bursting vessels, welding, engine exhaust.",
+      "characteristic_elements": [
+        "external_ignition_source_present",
+        "lightning_exposure",
+        "personnel_access_during_operation",
+        "welding_nearby",
+        "engine_exhaust_impingement"
+      ],
+      "rating_criteria": {
+        "0": "No external ignition sources possible",
+        "1": "External sources unlikely",
+        "2": "Some external source exposure possible",
+        "3": "External source credible during some operations",
+        "4": "Confirmed external ignition source exposure"
+      },
+      "typical_mitigations": [
+        "Implement operational controls for personnel",
+        "Install lightning protection",
+        "Enforce hot work permits near oxygen systems"
+      ]
+    }
+  ]
+}

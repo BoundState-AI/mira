@@ -1,0 +1,435 @@
+#!/usr/bin/env python3
+"""
+Module: OCA Systems Router (Phase 2)
+Purpose: Visual System Builder API endpoints per BS-SPEC-OCA-002-REV0 §14.
+
+BoundState AI 2026
+Version: 1.0.0
+Classification: BoundState Proprietary
+
+Co-Authored-By: Claude "Beth" <noreply@anthropic.com>
+Co-Authored-By: Dr. Joseph Wilde, BoundState AI
+
+Compliance: NASA-STD-6001B, NASA-STD-6016C, SWE-013, SWE-032
+Safety Critical: True
+"""
+
+from __future__ import annotations
+
+import logging
+from datetime import datetime
+from typing import Any, Optional
+
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+
+from mira.oca.system_models import (
+    AddComponentRequest,
+    AddComponentResponse,
+    AddConnectionRequest,
+    AddConnectionResponse,
+    CreateSystemRequest,
+    CreateSystemResponse,
+    OCASystemAssembly,
+    SystemAssessmentResponse,
+    SystemComponent,
+    SystemConnection,
+    SystemExportResponse,
+    SystemKindlingChainResponse,
+    TopologyResponse,
+)
+
+LOGGER = logging.getLogger(__name__)
+
+router = APIRouter()
+
+# In-memory system store (production: PostgreSQL)
+_systems: dict[str, OCASystemAssembly] = {}
+
+
+def _get_system(system_id: str) -> OCASystemAssembly:
+    if system_id not in _systems:
+        raise HTTPException(status_code=404, detail=f"System {system_id} not found")
+    return _systems[system_id]
+
+
+# =============================================================================
+# ENDPOINTS (per Spec §14)
+# =============================================================================
+
+
+@router.get("/ping")
+async def ping() -> dict[str, str]:
+    """Health check for OCA Systems endpoint."""
+    return {"status": "ok", "domain": "oca-systems", "version": "1.0.0"}
+
+
+@router.post("", response_model=CreateSystemResponse)
+async def create_system(request: CreateSystemRequest) -> CreateSystemResponse:
+    """Create a new system assembly."""
+    try:
+        system = OCASystemAssembly(
+            name=request.name,
+            description=request.description,
+            inputs=request.inputs,
+        )
+        _systems[system.system_id] = system
+
+        LOGGER.info(f"[OCA Systems] Created system: {system.system_id} '{system.name}'")
+
+        return CreateSystemResponse(
+            system_id=system.system_id,
+            name=system.name,
+            blocked_states=system.system_blocked_states,
+        )
+    except Exception as exc:
+        LOGGER.error(f"[OCA Systems] Create error: {exc}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@router.get("/{system_id}")
+async def get_system(system_id: str) -> dict[str, Any]:
+    """Get full system state."""
+    system = _get_system(system_id)
+    return system.model_dump()
+
+
+@router.put("/{system_id}/inputs")
+async def update_inputs(system_id: str, inputs: dict[str, Any]) -> dict[str, str]:
+    """Update system-level inputs."""
+    system = _get_system(system_id)
+    if system.locked:
+        raise HTTPException(status_code=409, detail="System is locked")
+
+    from mira.oca.system_models import SystemInputs
+    system.inputs = SystemInputs(**{**system.inputs.model_dump(), **inputs})
+    system.updated_at = datetime.utcnow()
+    system.audit_log.append({
+        "action": "update_inputs",
+        "changes": inputs,
+        "timestamp": datetime.utcnow().isoformat(),
+    })
+    return {"status": "updated"}
+
+
+@router.post("/{system_id}/components", response_model=AddComponentResponse)
+async def add_component(system_id: str, request: AddComponentRequest) -> AddComponentResponse:
+    """Add a component to the canvas."""
+    try:
+        system = _get_system(system_id)
+        if system.locked:
+            raise HTTPException(status_code=409, detail="System is locked")
+
+        from mira.oca.system_engine import derive_features
+
+        # Create component
+        comp = SystemComponent(
+            archetype=request.archetype,
+            label=request.label or request.archetype.value,
+            position_x=request.position_x,
+            position_y=request.position_y,
+            materials=request.materials,
+            config=request.config,
+        )
+
+        # Derive features
+        comp.features = derive_features(request.archetype, request.config, request.materials)
+
+        system.components.append(comp)
+        system.updated_at = datetime.utcnow()
+        system.audit_log.append({
+            "action": "add_component",
+            "component_id": comp.component_id,
+            "archetype": request.archetype.value,
+            "label": comp.label,
+            "timestamp": datetime.utcnow().isoformat(),
+        })
+
+        LOGGER.info(f"[OCA Systems] Added {request.archetype.value} to {system_id}")
+
+        return AddComponentResponse(
+            component_id=comp.component_id,
+            features=comp.features,
+            zones=comp.zones,
+            inferred_facts=comp.inferred_facts,
+        )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        LOGGER.error(f"[OCA Systems] Add component error: {exc}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@router.put("/{system_id}/components/{component_id}")
+async def update_component(
+    system_id: str,
+    component_id: str,
+    updates: dict[str, Any],
+) -> dict[str, str]:
+    """Update a component's properties."""
+    system = _get_system(system_id)
+    if system.locked:
+        raise HTTPException(status_code=409, detail="System is locked")
+
+    comp = None
+    for c in system.components:
+        if c.component_id == component_id:
+            comp = c
+            break
+
+    if not comp:
+        raise HTTPException(status_code=404, detail=f"Component {component_id} not found")
+
+    # Apply updates
+    for key, value in updates.items():
+        if hasattr(comp, key) and key not in ("component_id", "archetype"):
+            setattr(comp, key, value)
+
+    # Re-derive features if materials or config changed
+    if "materials" in updates or "config" in updates:
+        from mira.oca.system_engine import derive_features
+        comp.features = derive_features(comp.archetype, comp.config, comp.materials)
+
+    system.updated_at = datetime.utcnow()
+    system.audit_log.append({
+        "action": "update_component",
+        "component_id": component_id,
+        "changes": list(updates.keys()),
+        "timestamp": datetime.utcnow().isoformat(),
+    })
+
+    return {"status": "updated"}
+
+
+@router.delete("/{system_id}/components/{component_id}")
+async def remove_component(system_id: str, component_id: str) -> dict[str, str]:
+    """Remove a component from the canvas."""
+    system = _get_system(system_id)
+    if system.locked:
+        raise HTTPException(status_code=409, detail="System is locked")
+
+    system.components = [c for c in system.components if c.component_id != component_id]
+    system.connections = [
+        conn for conn in system.connections
+        if conn.source_component_id != component_id and conn.target_component_id != component_id
+    ]
+    system.updated_at = datetime.utcnow()
+    system.audit_log.append({
+        "action": "remove_component",
+        "component_id": component_id,
+        "timestamp": datetime.utcnow().isoformat(),
+    })
+
+    return {"status": "removed"}
+
+
+@router.post("/{system_id}/connections", response_model=AddConnectionResponse)
+async def add_connection(system_id: str, request: AddConnectionRequest) -> AddConnectionResponse:
+    """Connect two components."""
+    try:
+        system = _get_system(system_id)
+        if system.locked:
+            raise HTTPException(status_code=409, detail="System is locked")
+
+        # Validate components exist
+        comp_ids = {c.component_id for c in system.components}
+        if request.source_component_id not in comp_ids:
+            raise HTTPException(status_code=404, detail=f"Source component {request.source_component_id} not found")
+        if request.target_component_id not in comp_ids:
+            raise HTTPException(status_code=404, detail=f"Target component {request.target_component_id} not found")
+
+        conn = SystemConnection(
+            source_component_id=request.source_component_id,
+            source_port=request.source_port,
+            target_component_id=request.target_component_id,
+            target_port=request.target_port,
+        )
+        system.connections.append(conn)
+        system.updated_at = datetime.utcnow()
+        system.audit_log.append({
+            "action": "add_connection",
+            "connection_id": conn.connection_id,
+            "source": request.source_component_id,
+            "target": request.target_component_id,
+            "timestamp": datetime.utcnow().isoformat(),
+        })
+
+        # Determine affected components
+        from mira.oca.system_engine import build_adjacency, get_downstream_ids
+        forward, _ = build_adjacency(system.components, system.connections)
+        affected = get_downstream_ids(request.source_component_id, forward)
+        affected.add(request.source_component_id)
+        affected.add(request.target_component_id)
+
+        return AddConnectionResponse(
+            connection_id=conn.connection_id,
+            topology_changed=True,
+            affected_component_ids=list(affected),
+        )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        LOGGER.error(f"[OCA Systems] Connection error: {exc}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@router.delete("/{system_id}/connections/{connection_id}")
+async def remove_connection(system_id: str, connection_id: str) -> dict[str, str]:
+    """Remove a connection."""
+    system = _get_system(system_id)
+    if system.locked:
+        raise HTTPException(status_code=409, detail="System is locked")
+
+    system.connections = [c for c in system.connections if c.connection_id != connection_id]
+    system.updated_at = datetime.utcnow()
+    system.audit_log.append({
+        "action": "remove_connection",
+        "connection_id": connection_id,
+        "timestamp": datetime.utcnow().isoformat(),
+    })
+    return {"status": "removed"}
+
+
+@router.post("/{system_id}/assess", response_model=SystemAssessmentResponse)
+async def assess_system(system_id: str) -> SystemAssessmentResponse:
+    """Run full system OCA assessment."""
+    try:
+        system = _get_system(system_id)
+
+        from mira.oca.system_engine import run_system_assessment
+        run_system_assessment(system)
+
+        return SystemAssessmentResponse(
+            system_id=system_id,
+            system_disposition=system.system_disposition or "insufficient_evidence",
+            system_reaction_effect=system.system_reaction_effect or "A",
+            components=system.components,
+            kindling_chains=system.kindling_chains,
+            triggered_requirements=system.system_triggered_requirements,
+            blocked_states=system.system_blocked_states,
+            hazard_controls=system.system_hazard_controls,
+            has_titanium=system.has_titanium,
+            mpr67_active=system.mpr67_active,
+        )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        LOGGER.error(f"[OCA Systems] Assessment error: {exc}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@router.get("/{system_id}/topology", response_model=TopologyResponse)
+async def get_topology(system_id: str) -> TopologyResponse:
+    """Return inferred topology with zones and assumptions."""
+    try:
+        system = _get_system(system_id)
+
+        from mira.oca.system_engine import run_topology_inference
+        topology = run_topology_inference(system)
+        system.topology = topology
+
+        return TopologyResponse(
+            system_id=system_id,
+            topology=topology,
+            zones=topology.zone_assignments,
+        )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        LOGGER.error(f"[OCA Systems] Topology error: {exc}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@router.get("/{system_id}/kindling-chain", response_model=SystemKindlingChainResponse)
+async def get_kindling_chain(system_id: str) -> SystemKindlingChainResponse:
+    """Return system propagation map."""
+    try:
+        system = _get_system(system_id)
+
+        if not system.kindling_chains:
+            from mira.oca.system_engine import run_system_assessment
+            run_system_assessment(system)
+
+        from mira.oca.models import ReactionEffect
+        worst = ReactionEffect.A
+        effect_order = [ReactionEffect.A, ReactionEffect.B, ReactionEffect.C, ReactionEffect.D]
+        for chain in system.kindling_chains:
+            if effect_order.index(chain.reaction_effect) > effect_order.index(worst):
+                worst = chain.reaction_effect
+
+        return SystemKindlingChainResponse(
+            system_id=system_id,
+            chains=system.kindling_chains,
+            worst_case_effect=worst,
+        )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        LOGGER.error(f"[OCA Systems] Kindling chain error: {exc}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@router.get("/{system_id}/path/{component_id}")
+async def get_path_inspector(system_id: str, component_id: str) -> dict[str, Any]:
+    """Path inspector for specific component."""
+    try:
+        system = _get_system(system_id)
+
+        from mira.oca.system_engine import inspect_component_path
+        result = inspect_component_path(system, component_id)
+
+        return result.model_dump()
+    except HTTPException:
+        raise
+    except Exception as exc:
+        LOGGER.error(f"[OCA Systems] Path inspector error: {exc}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@router.post("/{system_id}/export")
+async def export_system(system_id: str) -> dict[str, Any]:
+    """System-level report, BOM, MIUL seed, zone map export."""
+    try:
+        system = _get_system(system_id)
+
+        # Ensure assessment has been run
+        if not system.system_disposition:
+            from mira.oca.system_engine import run_system_assessment
+            run_system_assessment(system)
+
+        from mira.oca.system_engine import generate_system_export
+        return generate_system_export(system)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        LOGGER.error(f"[OCA Systems] Export error: {exc}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@router.get("/{system_id}/library")
+async def get_component_library() -> dict[str, Any]:
+    """Return the component archetype library."""
+    import json
+    from pathlib import Path
+
+    lib_path = Path(__file__).parent.parent.parent / "oca" / "data" / "oca_component_library.json"
+    if not lib_path.exists():
+        raise HTTPException(status_code=500, detail="Component library not found")
+
+    with open(lib_path) as f:
+        return json.load(f)
+
+
+@router.post("/{system_id}/lock")
+async def lock_system(system_id: str) -> dict[str, Any]:
+    """Lock system for export."""
+    system = _get_system(system_id)
+    system.locked = True
+    system.audit_log.append({
+        "action": "lock_system",
+        "timestamp": datetime.utcnow().isoformat(),
+    })
+    return {"system_id": system_id, "locked": True, "locked_at": datetime.utcnow().isoformat()}
+
+
+__safety_critical__ = True

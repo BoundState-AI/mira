@@ -41,6 +41,8 @@ from .query import router as query_router
 from .forge import router as forge_router
 from .galvanic import router as galvanic_router
 from .fracture import router as fracture_router
+from .oca import router as oca_router
+from .oca_systems import router as oca_systems_router
 
 __all__ = [
     "search_router",
@@ -66,6 +68,8 @@ __all__ = [
     "forge_router",
     "galvanic_router",
     "fracture_router",
+    "oca_router",
+    "oca_systems_router",
 ]
 
 

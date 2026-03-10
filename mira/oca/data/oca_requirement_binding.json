@@ -1,0 +1,111 @@
+{
+  "_meta": {
+    "description": "Governing requirement triggers for OCA per NASA-STD-6016C and NASA-STD-6001B",
+    "version": "1.0.0",
+    "ingest_date": "2026-03-10"
+  },
+  "requirements": [
+    {
+      "requirement_id": "MPR-51",
+      "source_standard": "NASA-STD-6016C",
+      "section": "§4.2.1.4a",
+      "title": "Oxygen Compatibility Evaluation Required",
+      "tier": "A",
+      "description": "All LOX/GOX/compressed-air/enriched-oxygen materials, components, and systems shall be evaluated for oxygen compatibility per NASA-STD-6001B.",
+      "trigger_conditions": [
+        "oxidizer_type in [lox, gox, enriched_air, compressed_air]"
+      ],
+      "exempt_conditions": [],
+      "required_artifacts": ["oca_evaluation"],
+      "downstream_workflow_actions": ["create_oca_case"]
+    },
+    {
+      "requirement_id": "MPR-52",
+      "source_standard": "NASA-STD-6016C",
+      "section": "§4.2.1.4b",
+      "title": "OCA + MUA for Flammable Materials",
+      "tier": "A",
+      "description": "When materials are flammable, an OCA shall be conducted per NASA-STD-6001B and the safety rationale documented in an MUA.",
+      "trigger_conditions": [
+        "oxidizer_type in [lox, gox, enriched_air, compressed_air]",
+        "flammability_rating in [C, D, X, unknown]"
+      ],
+      "exempt_conditions": [],
+      "required_artifacts": ["oca_evaluation", "mua_document"],
+      "downstream_workflow_actions": ["create_oca_case", "generate_mua_seed"]
+    },
+    {
+      "requirement_id": "MPR-53",
+      "source_standard": "NASA-STD-6016C",
+      "section": "§4.2.1.4.1",
+      "title": "Oxygen Component Acceptance Testing",
+      "tier": "A",
+      "description": "GOX/enriched-air components above 1.83 MPa (265 psia) shall undergo oxygen component acceptance testing — minimum 10 cycles from ambient to MDP within 100 ms.",
+      "trigger_conditions": [
+        "oxidizer_type in [gox, enriched_air]",
+        "total_pressure_max_psia > 265"
+      ],
+      "exempt_conditions": [
+        "is_rigid_metallic_tubing == true",
+        "is_metallic_flex_hose == true",
+        "is_all_metal_seal == true",
+        "is_metallic_pressure_vessel == true"
+      ],
+      "required_artifacts": ["acceptance_test_protocol", "acceptance_test_results"],
+      "downstream_workflow_actions": ["generate_acceptance_test_protocol"]
+    },
+    {
+      "requirement_id": "MPR-67",
+      "source_standard": "NASA-STD-6016C",
+      "section": "§4.2.1.3c",
+      "title": "Titanium Prohibition in Oxygen Service",
+      "tier": "A",
+      "is_prohibition": true,
+      "description": "Titanium alloys shall not be used with LOX or GOX at any pressure, or with air above 5 psia oxygen partial pressure. This is a GOVERNING PROHIBITION (Tier A).",
+      "trigger_conditions": [
+        "material.is_titanium == true",
+        "oxidizer_type in [lox, gox] OR oxygen_partial_pressure_psia > 5"
+      ],
+      "exempt_conditions": [],
+      "required_artifacts": [],
+      "downstream_workflow_actions": ["block_assessment", "require_material_change"]
+    }
+  ],
+  "focrs": [
+    {
+      "focr_id": "FOCR-29",
+      "source_standard": "NASA-STD-6001B",
+      "section": "Change 3",
+      "title": "OCA Applicability",
+      "tier": "A"
+    },
+    {
+      "focr_id": "FOCR-33",
+      "source_standard": "NASA-STD-6001B",
+      "section": "Change 3",
+      "title": "Flammability Assessment",
+      "tier": "A"
+    },
+    {
+      "focr_id": "FOCR-34",
+      "source_standard": "NASA-STD-6001B",
+      "section": "Change 3",
+      "title": "Test Data Requirements",
+      "tier": "A"
+    },
+    {
+      "focr_id": "FOCR-37",
+      "source_standard": "NASA-STD-6001B",
+      "section": "Change 3",
+      "title": "M&P Organization Concurrence",
+      "tier": "A"
+    },
+    {
+      "focr_id": "FOCR-39",
+      "source_standard": "NASA-STD-6001B",
+      "section": "Change 3",
+      "title": "As-Built Verification",
+      "tier": "A"
+    }
+  ]
+}

@@ -95,6 +95,9 @@ def create_app_codex() -> FastAPI:
     app.include_router(routers.mira_v4_router, prefix="/mira/v4", tags=["mira-v4"])
     app.include_router(routers.mira_v4_router, prefix="/api/mira/v4", tags=["mira-v4"])
     app.include_router(routers.bsmh_router, prefix="/mira/bsmh", tags=["bsmh-temp"])
+    app.include_router(routers.oca_router, prefix="/oca", tags=["oca"])
+    app.include_router(routers.oca_systems_router, prefix="/oca/systems", tags=["oca-systems"])
+    app.include_router(routers.oca_systems_router, prefix="/api/oca/systems", tags=["oca-systems"])
     app.include_router(routers.ui_router, tags=["ui"])
     app.include_router(routers.test_classes_router, tags=["test-classes"])
 

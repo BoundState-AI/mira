@@ -1,0 +1,158 @@
+{
+  "_meta": {
+    "description": "Topology inference rules for the OCA visual system builder per BS-SPEC-OCA-002-REV0 §5.2",
+    "source": "BS-SPEC-OCA-002-REV0 (Fran review)",
+    "version": "1.0.0",
+    "ingest_date": "2026-03-10"
+  },
+  "inference_rules": [
+    {
+      "rule_id": "TOPO-001",
+      "name": "dead_end_detection",
+      "display_name": "Dead-End Detection",
+      "description": "Component connected on one side only, or downstream valve closed, creates trapped volume susceptible to rapid pressurization.",
+      "source": "inferred",
+      "trigger": "Component has exactly one connected port, OR downstream component is a closed valve with no further connections.",
+      "affected_features": ["has_dead_volume"],
+      "affected_mechanisms": ["rapid_pressurization", "resonance"],
+      "confidence": "high",
+      "tier": "B",
+      "assumptions": ["Topology accurately represents physical connections", "No undocumented bypass paths"]
+    },
+    {
+      "rule_id": "TOPO-002",
+      "name": "flow_direction",
+      "display_name": "Flow Direction Inference",
+      "description": "Inferred from pressure differential and connection order. Source → highest pressure → lowest pressure → use point.",
+      "source": "inferred",
+      "trigger": "System pressure range defined. Components connected in series.",
+      "affected_features": [],
+      "affected_mechanisms": [],
+      "confidence": "high",
+      "tier": "B",
+      "assumptions": ["Single flow direction unless bi_directional_flow_risk flagged", "No backflow without check valve failure"]
+    },
+    {
+      "rule_id": "TOPO-003",
+      "name": "velocity_estimate",
+      "display_name": "Velocity Estimation",
+      "description": "Calculated from line inner diameter + system flow rate. v = Q/A where A = pi*r^2. Requires flow rate system input.",
+      "source": "calculated",
+      "trigger": "Line/tube component with inner_diameter_mm set AND system design_flow_rate provided.",
+      "affected_features": [],
+      "affected_mechanisms": ["particle_impact", "flow_friction"],
+      "confidence": "medium",
+      "tier": "B",
+      "assumptions": ["Incompressible flow assumption for velocity calc", "Flow rate is design worst-case", "Uniform cross-section"]
+    },
+    {
+      "rule_id": "TOPO-004",
+      "name": "sonic_flow_points",
+      "display_name": "Sonic Flow Point Detection",
+      "description": "Orifice with sufficient pressure ratio to produce sonic jet downstream.",
+      "source": "calculated",
+      "trigger": "Orifice/restrictor component with upstream pressure > 1.89x downstream pressure (critical ratio for O2, gamma=1.4).",
+      "affected_features": ["has_cavity_downstream"],
+      "affected_mechanisms": ["resonance"],
+      "confidence": "medium",
+      "tier": "B",
+      "assumptions": ["Ideal gas behavior", "No significant heat transfer at orifice", "Gamma = 1.4 for O2"]
+    },
+    {
+      "rule_id": "TOPO-005",
+      "name": "filter_protection_regions",
+      "display_name": "Filter Protection Region",
+      "description": "All components downstream of a filter with no bypass path receive reduced particle impact risk.",
+      "source": "inferred",
+      "trigger": "Filter component present with bypass_path_exists = false. All downstream components in directed graph receive filter_integrity_assumed = true.",
+      "affected_features": ["filter_integrity_assumed"],
+      "affected_mechanisms": ["particle_impact"],
+      "confidence": "high",
+      "tier": "D",
+      "assumptions": ["Filter element intact", "No bypass path exists", "Filter micron rating appropriate for particle sizes of concern", "Filter properly installed and verified"]
+    },
+    {
+      "rule_id": "TOPO-006",
+      "name": "chatter_candidates",
+      "display_name": "Chatter Candidate Detection",
+      "description": "Regulators, check valves, relief valves with dynamic_contact_flag flagged as chatter candidates.",
+      "source": "inferred",
+      "trigger": "Component archetype is regulator, check_valve, or relief_valve AND chatter_susceptible config is true.",
+      "affected_features": ["dynamic_contact_flag"],
+      "affected_mechanisms": ["mechanical_impact", "galling_friction"],
+      "confidence": "medium",
+      "tier": "D",
+      "assumptions": ["Default chatter susceptibility from library", "Actual chatter depends on system dynamics not modeled here"]
+    },
+    {
+      "rule_id": "TOPO-007",
+      "name": "upstream_volume",
+      "display_name": "Upstream Volume Calculation",
+      "description": "Volume of gas upstream of fast-opening valve. Affects adiabatic compression severity.",
+      "source": "calculated",
+      "trigger": "Valve with opening_profile = fast. Upstream connected components (vessels, lines) contribute volume.",
+      "affected_features": ["has_dead_volume"],
+      "affected_mechanisms": ["rapid_pressurization"],
+      "confidence": "medium",
+      "tier": "B",
+      "assumptions": ["Upstream volume accurately represented", "No additional flow restrictions between source and valve"]
+    },
+    {
+      "rule_id": "TOPO-008",
+      "name": "bi_directional_flow_risk",
+      "display_name": "Bi-Directional Flow Risk",
+      "description": "GSE systems where venting may reverse flow direction, bypassing filter protection.",
+      "source": "user",
+      "trigger": "User sets bi_directional_flow_risk flag on system. Filter protection regions become invalid for reverse flow.",
+      "affected_features": ["filter_integrity_assumed"],
+      "affected_mechanisms": ["particle_impact"],
+      "confidence": "low",
+      "tier": "D",
+      "assumptions": ["User has identified reverse flow potential", "System design allows backflow"]
+    }
+  ],
+  "zone_definitions": [
+    {
+      "zone_id": "unfiltered",
+      "display_name": "Unfiltered Zone",
+      "color": "#ef4444",
+      "description": "Upstream of any filter — particle entrainment possible",
+      "rule": "Components not downstream of any filter, or downstream of filter with bypass"
+    },
+    {
+      "zone_id": "filtered",
+      "display_name": "Filtered Zone",
+      "color": "#22c55e",
+      "description": "Downstream of filter with no bypass — reduced particle risk",
+      "rule": "Components downstream of filter where bypass_path_exists = false"
+    },
+    {
+      "zone_id": "dead_leg",
+      "display_name": "Dead-Leg Zone",
+      "color": "#f97316",
+      "description": "Dead-end volumes — rapid pressurization candidates",
+      "rule": "Components with has_dead_volume = true from topology inference"
+    },
+    {
+      "zone_id": "dynamic",
+      "display_name": "Dynamic Component Zone",
+      "color": "#a855f7",
+      "description": "Valves, regulators, check valves with moving parts",
+      "rule": "Components with dynamic_contact_flag = true"
+    },
+    {
+      "zone_id": "cavity_resonance",
+      "display_name": "Cavity / Resonance Zone",
+      "color": "#ec4899",
+      "description": "Downstream of sonic orifices into closed-end geometries",
+      "rule": "Components downstream of sonic_flow_points with has_cavity_downstream = true"
+    },
+    {
+      "zone_id": "acceptance_test",
+      "display_name": "Acceptance-Test Zone",
+      "color": "#3b82f6",
+      "description": "Components triggering MPR 53 (>265 psia, non-exempt)",
+      "rule": "System pressure > 265 psia AND GOX/enriched-air AND component is non-exempt per MPR 53"
+    }
+  ]
+}
