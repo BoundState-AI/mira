@@ -17,6 +17,7 @@ import MiraV4Query from "./pages/MiraV4Query";
 import BSMHQuery from "./pages/BSMHQuery";
 import MUAV10 from "./pages/MUAV10";
 import GasCompatibility from "./pages/GasCompatibility";
+import OCAWorkbench from "./pages/OCAWorkbench";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
                   )}
                 />
                 <Route path="/gas-compatibility" element={<GasCompatibility />} />
+                <Route path="/oca" element={<OCAWorkbench />} />
                 <Route path="/test-classes" element={<TestClasses />} />
                 <Route path="/test-classes/:testType" element={<TestClassDetail />} />
                 <Route
