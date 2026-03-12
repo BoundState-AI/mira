@@ -9,7 +9,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Slider } from '@/components/ui/slider';
 import type { SystemInputs } from '@/lib/oca-system-api';
 
 interface SystemInputBarProps {
@@ -21,12 +20,16 @@ export default function SystemInputBar({ inputs, onChange }: SystemInputBarProps
   return (
     <div className="flex flex-wrap items-end gap-3 p-3 bg-card rounded-lg border">
       {/* O2 Fraction */}
-      <div className="space-y-1 w-28">
-        <Label className="text-[10px] text-muted-foreground">O2 ({(inputs.o2_fraction * 100).toFixed(0)}%)</Label>
-        <Slider
-          min={21} max={100} step={1}
-          value={[inputs.o2_fraction * 100]}
-          onValueChange={([v]) => onChange({ o2_fraction: v / 100 })}
+      <div className="space-y-1 w-24">
+        <Label className="text-[10px] text-muted-foreground">O2 %</Label>
+        <Input
+          type="number" min={21} max={100} step={1}
+          value={Math.round(inputs.o2_fraction * 100)}
+          onChange={(e) => {
+            const v = Math.min(100, Math.max(21, Number(e.target.value)));
+            onChange({ o2_fraction: v / 100 });
+          }}
+          className="h-7 text-xs"
         />
       </div>
 
