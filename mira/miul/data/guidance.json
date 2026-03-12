@@ -1,0 +1,253 @@
+{
+  "version": 1,
+  "inputs": [
+    {
+      "field_id": "detail_drawing",
+      "label": "Detail Drawing",
+      "what": "The part or drawing number that identifies the hardware item in the MIUL.",
+      "why": "Every material entry in the MIUL must trace back to a drawing. This is how reviewers verify that the as-built hardware matches the materials list.",
+      "guidance": "Use the drawing number exactly as it appears on the engineering drawing or BOM. If the part has a dash number or revision letter, include it. The MIUL tree structure uses this to build the assembly hierarchy.",
+      "source": "JSC 27301F §4.2.1 Field 1"
+    },
+    {
+      "field_id": "next_assembly",
+      "label": "Next Assembly",
+      "what": "The next higher assembly drawing that this part belongs to.",
+      "why": "The MIUL is a tree structure showing how parts nest into assemblies. This field builds the parent-child relationships needed for rollup evaluations.",
+      "guidance": "Enter the drawing number of the assembly that contains this part. For top-level assemblies, leave blank or enter the system-level drawing. The engine validates that parent references form a valid tree with no circular references.",
+      "source": "JSC 27301F §4.2.1 Field 2"
+    },
+    {
+      "field_id": "designation",
+      "label": "Designation",
+      "what": "The material name or alloy designation, such as Inconel 718, PTFE, or Stainless Steel 316L.",
+      "why": "The designation is used to look up the material code in MAPTIS and to fetch ratings. If the designation cannot be resolved to a MAPTIS code, the material cannot be evaluated.",
+      "guidance": "Use the material callout from the drawing or specification. Common designations include alloy names (Inconel 718), polymer names (PTFE, Kapton), and generic types (Stainless Steel 316L). The engine uses UNS-based deterministic matching to resolve designations to MAPTIS material codes.",
+      "source": "JSC 27301F §4.2.1 Field 7"
+    },
+    {
+      "field_id": "material_specification",
+      "label": "Material Specification",
+      "what": "The procurement or material specification controlling this material, such as AMS 5596, ASTM A240, or MIL-P-46183.",
+      "why": "The specification separates look-alike materials that may have different ratings. Two materials with the same alloy name but different specifications can have different test results in MAPTIS.",
+      "guidance": "Enter the specification from the drawing callout or purchase order. Include the revision if known. This is especially important for polymers where the same trade name can cover multiple formulations.",
+      "source": "JSC 27301F §4.2.1 Field 8"
+    },
+    {
+      "field_id": "material_code",
+      "label": "Material Code",
+      "what": "The MAPTIS material code — the authoritative identifier that links to all test data and ratings in the MAPTIS database.",
+      "why": "The material code is the primary key for fetching flammability, toxicity, outgassing, fluid compatibility, corrosion, and stress-corrosion cracking ratings. Without it, the MIUL entry cannot be evaluated.",
+      "guidance": "If you know the MAPTIS code, enter it directly. If not, the engine will attempt to resolve it from the designation and specification. If automatic resolution fails, you will be prompted to provide or confirm the correct code. Placeholder values like N/A, NONE, or dashes are treated as missing.",
+      "source": "JSC 27301F §4.2.1 Field 12; MAPTIS database"
+    },
+    {
+      "field_id": "material_form",
+      "label": "Material Form",
+      "what": "The physical form of the material in the actual part — BAR, SHEET, PLATE, WIRE, TUBE, SEAL, ADHESIVE, etc.",
+      "why": "Form affects test applicability. A material tested as thick bar may behave differently as thin film or wire. The form also helps identify which rating categories are most relevant.",
+      "guidance": "Use the form that describes the material as it will be used in the hardware. For non-metallic materials, the form can significantly affect flammability and outgassing test results.",
+      "source": "JSC 27301F §4.2.1 Field 5"
+    },
+    {
+      "field_id": "criticality",
+      "label": "Criticality",
+      "what": "The criticality code per SSP 30234, indicating how critical the failure of this item would be. Codes include 1, 1R, 1S, 2, 2R, 3, and others.",
+      "why": "Criticality determines whether a rating gap requires a formal MUA. Critical items (1, 1S, 2) with rating gaps must have Material Usage Agreements. Non-critical items (1R, 2R, 3) with gaps are documented but do not require formal MUAs.",
+      "guidance": "Use the criticality code from the FMEA or safety assessment. Criticality 1 means loss of life or vehicle. Criticality 1S means could cause loss but has safeguards. Criticality 2 means loss of mission. Criticality 3 means all other items. The R suffix means redundant — the system can tolerate this failure.",
+      "source": "SSP 30234 Table 5.13.1-1; JSC 27301F"
+    },
+    {
+      "field_id": "environment",
+      "label": "Environment",
+      "what": "The operating environment the material will be exposed to, such as habitable cabin, vacuum, oxygen-enriched atmosphere, or propellant contact.",
+      "why": "The environment determines which rating categories are relevant. Flammability matters in oxygen-enriched environments. Fluid compatibility matters only for propellant-wetted materials. Toxicity matters only in habitable volumes.",
+      "guidance": "Specify the actual service environment. If the material sees multiple environments during its lifecycle (such as ground processing and on-orbit), evaluate against the worst-case environment for each rating category.",
+      "source": "JSC 27301F §4.2.1 Field 10; NASA-STD-6016C"
+    },
+    {
+      "field_id": "max_temperature",
+      "label": "Max Temperature",
+      "what": "The maximum operating temperature the material will see in service.",
+      "why": "Temperature affects material ratings and test applicability. Ratings obtained at room temperature may not apply at elevated temperatures.",
+      "guidance": "Enter the highest credible operating temperature at the material. Include worst-case thermal environments from hot-case analysis.",
+      "source": "JSC 27301F §4.2.1 Field 17"
+    },
+    {
+      "field_id": "max_pressure",
+      "label": "Max Pressure (psia)",
+      "what": "The maximum operating pressure the material will see in service.",
+      "why": "Pressure affects oxygen compatibility ratings and can change which MPR requirements apply. High-pressure oxygen service triggers additional evaluation paths.",
+      "guidance": "Enter the maximum service pressure at the material location. For flammability, this determines whether high-pressure GOX rules apply.",
+      "source": "JSC 27301F §4.2.1 Field 28"
+    }
+  ],
+  "ratings": [
+    {
+      "rating_id": "FLAM",
+      "label": "Flammability Rating",
+      "what": "The flammability test result from MAPTIS, rated A through X. A means acceptable (burned 6 inches or less in 5+ samples). C means it failed (burned more than 6 inches). I means insufficient data (less than 5 samples but favorable results). U means untested.",
+      "why": "Flammability is the most scrutinized rating for materials in oxygen-enriched environments. A material that burns in the crew cabin's atmosphere is a serious hazard.",
+      "guidance": "Rating A is the target. Rating I means the material showed favorable results but needs more test samples — this is an administrative gap, not a true failure. Rating C is a real failure that requires either a change of material or a formal MUA with engineering justification. Rating U means the material has never been tested for flammability and needs testing or MUA coverage.",
+      "source": "NASA-STD-6016C; MAPTIS Test 1 (Upward Flammability)"
+    },
+    {
+      "rating_id": "SCC",
+      "label": "Stress-Corrosion Cracking Rating",
+      "what": "The stress-corrosion cracking resistance rating from MAPTIS. A means acceptable. B means batch/lot dependent. C means susceptible. U means untested.",
+      "why": "Stress-corrosion cracking can cause sudden structural failure without visible warning. Materials in corrosive environments under sustained stress must demonstrate SCC resistance.",
+      "guidance": "Rating A is the target. Rating B means the material's SCC resistance varies by manufacturing lot — each lot must be verified. Rating C means the material is susceptible and should not be used in SCC-prone environments without engineering justification. Rating U means untested.",
+      "source": "MSFC-STD-3029; MAPTIS SCC database"
+    },
+    {
+      "rating_id": "CORR",
+      "label": "Corrosion Resistance Rating",
+      "what": "The corrosion resistance rating from MAPTIS for the material in its intended environment.",
+      "why": "Corrosion can degrade structural integrity, cause contamination, and affect system performance over the mission lifetime.",
+      "guidance": "Rating A means acceptable corrosion resistance for the environment. Non-A ratings require evaluation of the corrosion mode, rate, and impact on the hardware's intended service life.",
+      "source": "NASA-STD-6012A; MAPTIS corrosion database"
+    },
+    {
+      "rating_id": "TVS",
+      "label": "Total Volatile Solids (Outgassing) Rating",
+      "what": "The outgassing test result from MAPTIS per ASTM E595. A means the material passes (TML less than or equal to 1.0%, CVCM less than or equal to 0.1%). C means it failed. U means untested.",
+      "why": "Outgassing materials contaminate optical surfaces, solar cells, and sensitive instruments. In vacuum, volatile materials condense on cold surfaces and degrade system performance.",
+      "guidance": "Rating A is the target for all nonmetallic materials in vacuum or near sensitive surfaces. Metals are generally exempt from outgassing concerns. Rating C means the material outgasses excessively and needs replacement or a formal justification for use. Rating U needs testing.",
+      "source": "ASTM E595; NASA-STD-6016C; MAPTIS Test 7"
+    },
+    {
+      "rating_id": "TOX",
+      "label": "Toxicity Rating",
+      "what": "The toxicity rating for materials in habitable volumes, based on off-gas testing per NHB 8060.1.",
+      "why": "Materials in crew-occupied spaces can release toxic gases that accumulate in the closed atmosphere. The toxicity rating determines whether a material is safe for habitable use.",
+      "guidance": "Rating A means the material meets habitable-volume toxicity requirements. Only relevant for materials inside crew-breathable volumes — materials outside habitable areas do not need toxicity ratings. Rating U means untested for toxicity and needs testing or coverage if used in habitable space.",
+      "source": "NHB 8060.1; JSC 20584; MAPTIS Test 6"
+    },
+    {
+      "rating_id": "FS",
+      "label": "Fluid Compatibility Rating",
+      "what": "The fluid compatibility test result for the material in contact with specific propellants or fluids (hydrazine, MMH, N2O4). A means compatible. U means untested.",
+      "why": "Materials in contact with hypergolic propellants or other aggressive fluids must demonstrate compatibility. An incompatible material can degrade, contaminate the fluid, or cause a safety hazard.",
+      "guidance": "Rating A means the material passes the 48-hour screening test in the specified fluid. Only relevant for materials actually wetted by the test fluid — materials not in fluid contact do not need this rating. Rating U means untested and needs testing if the material contacts propellants.",
+      "source": "NASA-STD-6016C; MAPTIS Test 15"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict_id": "pass",
+      "label": "Pass (All Ratings A)",
+      "what": "All applicable ratings for this material are A — the material is fully qualified for its intended use.",
+      "why": "No rating gaps exist, so no MUA or additional justification is needed. The material can proceed through the design process without further materials certification action.",
+      "guidance": "This is the cleanest outcome. Normal configuration control, procurement, and handling requirements still apply. If the environment or application changes later, re-evaluate the ratings for the new conditions.",
+      "source": "JSC 27301F; NASA-STD-6016C §4.1"
+    },
+    {
+      "verdict_id": "rating_gap_noncritical",
+      "label": "Rating Gap — Non-Critical Item",
+      "what": "One or more ratings are not A, but the item's criticality (1R, 2R, 3) does not require a formal MUA.",
+      "why": "Non-critical items with rating gaps are documented in the MIUL remarks but do not require the formal MUA process. The risk is accepted at a lower documentation threshold.",
+      "guidance": "Document the gap and rationale in the Remarks column. No formal MUA is needed, but good practice is to note why the gap is acceptable for this application.",
+      "source": "SSP 30234 Table 5.13.1-1; JSC 27301F"
+    },
+    {
+      "verdict_id": "rating_gap_critical_mua_required",
+      "label": "Rating Gap — MUA Required",
+      "what": "One or more ratings are not A, and the item's criticality (1, 1S, or 2) requires a formal Material Usage Agreement.",
+      "why": "Critical items with rating gaps must have formal engineering justification documented in an MUA. This is the connection point between the MIUL and the MUA Writer module.",
+      "guidance": "Generate an MUA through the MIRA MUA Writer module. The MUA must address each non-A rating with engineering rationale. Common paths include prior-use precedent, similarity to tested materials, minor quantity exemption, or additional testing. The MUA Rationale column in the MIUL will reference the MUA document.",
+      "source": "NASA-STD-6016C §4.1.6.1; JSC 27301F"
+    },
+    {
+      "verdict_id": "material_unresolved",
+      "label": "Material Not Resolved",
+      "what": "The material designation could not be resolved to a MAPTIS material code, so no ratings are available.",
+      "why": "Without a MAPTIS code, the system cannot look up any test data or ratings. The MIUL entry is incomplete and cannot be evaluated.",
+      "guidance": "Provide the correct MAPTIS material code manually, or verify that the material designation is spelled correctly. If the material is not in MAPTIS, it may need to be added through the M&P lab. Until the code is resolved, the entry is flagged as a data gap.",
+      "source": "MAPTIS database; JSC 27301F §4.2.1 Field 12"
+    }
+  ],
+  "concepts": [
+    {
+      "concept_id": "what_is_a_miul",
+      "label": "What a MIUL Is",
+      "what": "A Material Identification and Usage List (MIUL) proves that every material on your hardware has been evaluated for compatibility with its service environment. It is the master list of all materials, their test ratings, and their disposition status.",
+      "why": "The MIUL is the central deliverable for materials certification. It connects drawings to materials, materials to test data, and test data to pass/fail dispositions. Without a complete MIUL, the hardware cannot be certified for flight.",
+      "guidance": "Every material that touches the service environment needs an entry. This includes metals, polymers, adhesives, coatings, lubricants, sealants, and even thread-locking compounds. If it is on the hardware and it was not evaluated, it is a gap.",
+      "source": "JSC 27301F §4.2.1; NASA-STD-6016C Table 4-1"
+    },
+    {
+      "concept_id": "rating_gap_values",
+      "label": "What Counts as a Rating Gap",
+      "what": "A rating gap is any non-A rating value: B (batch dependent), C (failed), I (insufficient data), U (untested), X (prohibited), N (not recommended), or blank/missing.",
+      "why": "Any of these values means the material has not fully demonstrated acceptability for that test category. The gap may be administrative (insufficient samples), substantive (actual failure), or unknown (never tested).",
+      "guidance": "Not all gaps are equal. Rating I is an administrative gap — the material showed favorable results but needs more samples. Rating C is a real failure. Rating U means no data exists. The MUA strategy for each gap type is different: I may need additional testing, C needs engineering justification or material change, U needs first-time testing.",
+      "source": "MAPTIS rating definitions; JSC 27301F"
+    },
+    {
+      "concept_id": "criticality_codes",
+      "label": "Criticality Codes (SSP 30234)",
+      "what": "Criticality codes classify how bad it would be if this item fails. Category 1 means loss of life or vehicle. Category 2 means loss of mission. Category 3 means everything else. The R suffix means redundant — there is a backup.",
+      "why": "The criticality code determines the documentation threshold for rating gaps. Critical items (1, 1S, 2) with gaps require formal MUAs. Non-critical items (1R, 2R, 3) with gaps are documented but do not need full MUAs.",
+      "guidance": "Get the criticality code from the FMEA or safety assessment. If the criticality changes during the design process, re-evaluate whether existing MUAs are still sufficient or if new ones are needed.",
+      "source": "SSP 30234 Table 5.13.1-1"
+    },
+    {
+      "concept_id": "mua_routing",
+      "label": "When and Why an MUA Is Needed",
+      "what": "A Material Usage Agreement is needed when a critical item (criticality 1, 1S, or 2) has a non-A rating in any applicable test category. The MUA provides formal engineering justification for using the material despite the gap.",
+      "why": "The MUA is the bridge between 'this material failed a test' and 'we have engineering evidence it is still safe for this specific application.' Without it, the material cannot fly on critical hardware.",
+      "guidance": "Route to the MIRA MUA Writer module when an MUA is needed. The MUA must address the specific gap — a flammability MUA is different from a toxicity MUA. Common justification strategies include prior-use precedent, similarity analysis, minor quantity exemption, configuration analysis, and additional testing.",
+      "source": "NASA-STD-6016C §4.1.6.1; §4.3"
+    },
+    {
+      "concept_id": "drawing_cross_reference",
+      "label": "Drawing Cross-Reference",
+      "what": "Every MIUL entry must trace back to an engineering drawing that shows the material in its installed location and configuration.",
+      "why": "The as-built hardware must match the MIUL. If a drawing changes and introduces a new material, the MIUL must be updated. If the MIUL shows a material that is not on the drawing, it is a discrepancy.",
+      "guidance": "Verify that every MIUL entry has a valid drawing reference and that the drawing shows the material in the correct form, location, and application. Drawing changes require MIUL review. MIUL entries without drawing support are audit findings.",
+      "source": "JSC 27301F §4.2.1 Field 1; NASA-STD-6016C"
+    },
+    {
+      "concept_id": "tree_structure",
+      "label": "MIUL Tree Structure",
+      "what": "The MIUL organizes materials in a tree hierarchy that mirrors the assembly structure — system to subsystem to component to material.",
+      "why": "The tree structure shows which materials belong to which assemblies, enabling rollup evaluations and making it easy to find all materials in a given subsystem.",
+      "guidance": "Each row has an Index and a Parent pointer. Parent=0 means the row is a root assembly. The tree must be valid — no circular references, no orphan nodes, and no missing parents. The engine validates tree integrity automatically.",
+      "source": "JSC 27301F §4.2.1; MIUL workflow practice"
+    }
+  ],
+  "flags": [
+    {
+      "flag_id": "missing_material_code",
+      "label": "Missing MAPTIS Code",
+      "what": "The material designation could not be resolved to a MAPTIS material code.",
+      "why": "Without a material code, no ratings can be fetched and the entry cannot be evaluated.",
+      "guidance": "Check the designation spelling. Try searching MAPTIS with alternative names or the specification number. If the material is truly not in MAPTIS, contact the M&P lab to have it added. Until the code is resolved, treat the entry as having all gaps.",
+      "source": "MAPTIS database; JSC 27301F"
+    },
+    {
+      "flag_id": "missing_specification",
+      "label": "Missing Specification",
+      "what": "No material specification was provided for this entry.",
+      "why": "Without a specification, the engine may resolve to the wrong MAPTIS entry. Two materials with the same alloy name but different specifications can have very different ratings.",
+      "guidance": "Add the specification from the drawing callout or procurement document. This is especially important for polymers and composites where trade names can cover multiple formulations with different test results.",
+      "source": "JSC 27301F §4.2.1 Field 8"
+    },
+    {
+      "flag_id": "environment_mismatch",
+      "label": "Environment Mismatch",
+      "what": "The material's test data was obtained in a different environment than the one specified for this entry.",
+      "why": "Ratings are environment-specific. A material rated A for flammability in air may not be A in enriched oxygen. Using ratings from the wrong environment is unconservative.",
+      "guidance": "Verify that the ratings in MAPTIS were obtained under conditions that envelope the actual service environment. If the test environment is less severe than service, additional testing or MUA coverage may be needed.",
+      "source": "NASA-STD-6016C; MAPTIS test conditions"
+    },
+    {
+      "flag_id": "flammability_unknown",
+      "label": "Flammability Rating Unknown",
+      "what": "The material has no flammability test data (rating U) and operates in an oxygen-containing environment.",
+      "why": "An untested material in an oxygen environment is the most concerning gap. The material could be a fire hazard with no data to evaluate the risk.",
+      "guidance": "Prioritize getting flammability testing done. If testing is not possible before the design milestone, generate an MUA with a test-pending commitment and use conservative assumptions (assume the material burns) for interim risk assessment.",
+      "source": "NASA-STD-6016C; MAPTIS Test 1"
+    }
+  ]
+}
