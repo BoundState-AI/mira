@@ -1,0 +1,435 @@
+{
+  "version": 1,
+  "inputs": [
+    {
+      "field_id": "material_key",
+      "label": "MAPTIS Code",
+      "what": "The unique numeric code assigned to this material in the MAPTIS database.",
+      "why": "MAPTIS codes link a material to its official test history — ratings, test reports, and specifications all hang off this code.",
+      "guidance": "Use the exact MAPTIS code from MAPTIS Direct or the MIUL. If the material has no MAPTIS entry, the classifier will flag it as MISSING_DATA and route it to an engineer.",
+      "source": "NASA MAPTIS database; NASA-STD-6016C §4.1"
+    },
+    {
+      "field_id": "material_name",
+      "label": "Material Designation",
+      "what": "The common or trade name of the material being evaluated.",
+      "why": "The name drives automatic material-class inference (metal vs. nonmetallic), which determines which screening columns apply.",
+      "guidance": "Use the official designation from the specification or MAPTIS. Include the alloy temper or grade if known (e.g., 'Inconel 718' not just 'Inconel'). The classifier uses keyword matching on this field to determine material class.",
+      "source": "NASA-STD-6016C §4.1; MAPTIS database"
+    },
+    {
+      "field_id": "specification",
+      "label": "Material Specification",
+      "what": "The procurement or industry specification the material was purchased to.",
+      "why": "Specifications define the exact chemistry and processing — two materials with the same name but different specs can have different test histories.",
+      "guidance": "Enter the AMS, ASTM, or MIL spec number (e.g., 'AMS 5643'). This appears on the Form 551 output and helps reviewers verify the correct MAPTIS entry was used.",
+      "source": "MSFC Form 551 field requirements"
+    },
+    {
+      "field_id": "program",
+      "label": "Program Name",
+      "what": "The NASA program this MUA will be filed under (e.g., Gateway, Orion, HLS).",
+      "why": "The program determines which policy pack applies, which affects reviewer routing and any program-specific tailoring of NASA-STD-6016C requirements.",
+      "guidance": "Select from the available program list. This sets the governing document header on the Form 551 and may adjust screening thresholds for program-specific environments.",
+      "source": "NASA-STD-6016C §1.2; program-specific policy packs"
+    },
+    {
+      "field_id": "material_class",
+      "label": "Material Class",
+      "what": "Whether the material is a metal or nonmetallic — the first branch point in MUA screening.",
+      "why": "Material class determines which of the six screening columns apply. Metals get SCC and CORR checks. Nonmetallics get TOX and TVS checks. Flammability and fluid sensitivity apply to both.",
+      "guidance": "If left blank, the system infers class from the material name using keyword matching. Metals include steels, aluminum alloys, titanium, nickel superalloys. Nonmetallics include polymers, elastomers, adhesives, composites, foams, and films. When in doubt, set it explicitly — a wrong inference can skip required screening.",
+      "source": "NASA-STD-6016C §4.2; classifier keyword lists in screening.py"
+    },
+    {
+      "field_id": "known_ratings",
+      "label": "MAPTIS Ratings",
+      "what": "The test ratings from MAPTIS for each screening column — the raw data the classifier evaluates.",
+      "why": "Ratings are the starting point for every MUA decision. An 'A' means the material passed testing. Anything else triggers the classifier pipeline.",
+      "guidance": "Each rating has a test_class (FLAM, SCC, CORR, TVS, TOX, FS) and a rating value (A, B, C, X, U, etc.). Include the test report reference and date if available — these strengthen the evidence bundle. Missing ratings are treated as NO_DATA flags.",
+      "source": "NASA-STD-6016C §4.2.1; MAPTIS rating schema"
+    },
+    {
+      "field_id": "environment.oxygen_pct",
+      "label": "Oxygen Concentration (%)",
+      "what": "The volume percentage of oxygen in the service environment.",
+      "why": "Oxygen concentration above 23.5% triggers flammability screening (MPR 44). Below that threshold, flammability failures become ANTI_RULE — the material failed the test, but the hazard does not apply.",
+      "guidance": "Enter the worst-case oxygen percentage the hardware will see. For ambient air, use 21%. For enriched-oxygen environments (EVA suits, crew cabin during depressurization), use the actual percentage. LOX and GOX environments should be flagged separately in the fluid medium field.",
+      "source": "NASA-STD-6016C §4.2.1.1 [MPR 44]; 23.5% threshold from ASTM D2863"
+    },
+    {
+      "field_id": "environment.pressure_kpa",
+      "label": "Service Pressure (kPa)",
+      "what": "The operating pressure of the service environment in kilopascals.",
+      "why": "Pressure affects flammability behavior — higher pressures increase ignition risk. It also appears on the Form 551 and is used by reviewers to validate test applicability.",
+      "guidance": "Use the maximum expected operating pressure (MEOP). Standard atmospheric is 101.3 kPa. For vacuum applications, enter 0. The value is included in the MUA record for traceability.",
+      "source": "NASA-STD-6016C §4.2.1.1; MSFC Form 551 pressure field"
+    },
+    {
+      "field_id": "environment.fluid_medium",
+      "label": "Service Fluid/Medium",
+      "what": "The fluid the material contacts in service — drives hazard applicability decisions.",
+      "why": "The fluid medium is the second-most-important input after ratings. It determines whether specific screening columns apply: hydrazine/MMH/NTO trigger fluid-sensitivity (FS) screening; GH2/LH2 suppress SCC/CORR concerns; GOX/LOX activate flammability regardless of O2 percentage.",
+      "guidance": "Select from the recognized media list. Key media: LOX, GOX, GH2, LH2, N2H4 (hydrazine), MMH, N2O4, enriched air. If the material sees multiple media, evaluate the worst case or create separate MUA entries.",
+      "source": "NASA-STD-6016C §4.2.1.3 [MPR 47]; media sets in classifier.py"
+    },
+    {
+      "field_id": "environment.habitable_volume",
+      "label": "Habitable Volume",
+      "what": "Whether the hardware is inside a crewed volume where the crew breathes the air.",
+      "why": "Habitable volume triggers toxicity (TOX) and total volatile substances (TVS) screening for nonmetallic materials. Materials in non-habitable volumes skip these checks.",
+      "guidance": "Set to true for anything inside pressurized crew spaces (cabins, airlocks during pressurized ops, stowage in crew areas). Set to false for external hardware, unpressurized cargo bays, or permanently sealed compartments.",
+      "source": "NASA-STD-6016C §4.2.1.2 [MPR 45]; §4.2.3.6 (outgassing)"
+    },
+    {
+      "field_id": "application_context",
+      "label": "Application Context",
+      "what": "Free-text description of how and where the material is used on the hardware.",
+      "why": "Context helps the classifier make better hazard-applicability decisions and provides reviewers with the operational picture they need to evaluate the MUA rationale.",
+      "guidance": "Describe the part, its function, and its exposure conditions. Example: 'O-ring seal on LOX feedline flange, exposed to LOX at 6.9 MPa, non-habitable engine section.' This text appears in the Form 551 application field.",
+      "source": "MSFC Form 551 application field; NASA-STD-6016C §4.1.6.1"
+    }
+  ],
+  "flag_types": [
+    {
+      "field_id": "NO_FLAG",
+      "label": "No Flag (Pass)",
+      "what": "The material has a passing rating (A or N) for this screening column — no MUA needed.",
+      "why": "Rating A means the material passed testing with adequate sample size. Rating N means the screening column does not apply to this material class.",
+      "guidance": "No action required. The material meets requirements for this screening column.",
+      "source": "NASA-STD-6016C §4.2.1; MAPTIS rating definitions"
+    },
+    {
+      "field_id": "REAL_FAIL",
+      "label": "Real Failure",
+      "what": "The material was tested and failed — it does not meet the pass criteria for this screening column.",
+      "why": "A real failure means test data exists showing the material does not perform adequately. Whether this requires an MUA depends on whether the failure mode applies in the actual service environment.",
+      "guidance": "If the hazard applies in service, this becomes a REAL_PROBLEM (Category I MUA, engineer required). If the hazard does not apply, it becomes an ANTI_RULE (Category II, automatable). Example: FLAM rating C (burn >6 inches) in a non-oxygen environment is an ANTI_RULE — the material failed the test, but it cannot burn in service.",
+      "source": "NASA-STD-6016C §4.1.6.1; FLAM C definition per NASA-STD-6001"
+    },
+    {
+      "field_id": "ADMIN_GAP",
+      "label": "Administrative Gap",
+      "what": "The material has favorable test data, but the test count or documentation is administratively insufficient.",
+      "why": "Administrative gaps mean the material likely performs fine — the data just does not meet the formal sample count requirement. These are the most straightforward MUAs to write.",
+      "guidance": "Always routes to INCOMPLETE_PASS (Category II). Typical example: FLAM rating I means fewer than 5 samples were tested, but all samples passed. The MUA rationale cites the favorable data and notes the administrative shortfall. Confidence is 0.95 — very high.",
+      "source": "NASA-STD-6016C §4.1.6.1; FLAM I definition per NASA-STD-6001"
+    },
+    {
+      "field_id": "NO_DATA",
+      "label": "No Test Data",
+      "what": "No test data exists for this material in this screening column.",
+      "why": "Missing data means we cannot determine compliance. Whether this is a problem depends on whether the hazard exists in the actual service environment.",
+      "guidance": "If the hazard applies in service, this becomes a REAL_GAP (Category II by default, but engineer can elevate to Category I). If the hazard does not apply, it becomes a THIN_SCREENING — the test was never needed. Rating U (untested) is the most common trigger.",
+      "source": "NASA-STD-6016C §4.1.6.1; MAPTIS rating U definition"
+    },
+    {
+      "field_id": "BATCH_REQUIRED",
+      "label": "Batch Verification Required",
+      "what": "The material has a B rating — acceptable but requires batch or lot-specific verification before use.",
+      "why": "B ratings mean the base material is acceptable, but each production batch must be verified because properties can vary between lots.",
+      "guidance": "Ensure batch testing is planned or completed before hardware acceptance. This flag does not generate a traditional MUA but does require documented batch verification in the M&P records.",
+      "source": "NASA-STD-6016C §4.2; SCC/CORR B rating definitions"
+    },
+    {
+      "field_id": "BAD_DATA",
+      "label": "Bad or Corrupt Data",
+      "what": "The rating value is undocumented, corrupt, or an artifact (e.g., TOX rating K).",
+      "why": "Some MAPTIS entries contain legacy rating codes that have no defined meaning in current standards. These cannot be classified automatically.",
+      "guidance": "Routes to FLAG_FOR_HUMAN. Contact the MAPTIS data custodian to resolve the rating. Do not assume a meaning for undocumented rating codes. Example: TOX=K is a legacy artifact with no current definition.",
+      "source": "MAPTIS database legacy entries; rating semantics lookup"
+    },
+    {
+      "field_id": "NEEDS_REVIEW",
+      "label": "Needs Manual Review",
+      "what": "The rating requires context-dependent interpretation that the classifier cannot automate.",
+      "why": "Some ratings have meanings that depend on test conditions or special circumstances. Examples: FLAM=S (special test) and FLAM=N (not applicable, but should it be?).",
+      "guidance": "Routes to FLAG_FOR_HUMAN. An engineer must review the test report and determine whether the rating represents a pass, fail, or not-applicable condition.",
+      "source": "NASA-STD-6016C §4.2.1; FLAM S/N rating definitions"
+    },
+    {
+      "field_id": "MISSING_DATA",
+      "label": "No MAPTIS Entry",
+      "what": "The material has no entry at all in MAPTIS — not even an untested placeholder.",
+      "why": "If a material is not in MAPTIS, no ratings exist to evaluate. This is different from U (untested) — there is no record at all.",
+      "guidance": "The material must be added to MAPTIS before formal MUA processing. Contact the MAPTIS program office to request a material code assignment and test planning.",
+      "source": "NASA-STD-6016C §4.1; MAPTIS program requirements"
+    }
+  ],
+  "mua_types": [
+    {
+      "field_id": "THIN_SCREENING",
+      "label": "Thin Screening (Automatable)",
+      "what": "No test data exists, but the screening column does not apply to the actual service environment — the test was never needed.",
+      "why": "This is the cleanest type of MUA. The material has no data, but the hazard mode being tested for cannot occur in the application. Example: no SCC data for a material only used in cryogenic hydrogen (SCC is suppressed by H2).",
+      "guidance": "Category II. Confidence 0.90. No precedents needed. The rationale states the screening test is inapplicable to the service medium. Fully automatable — the classifier can draft and route this without engineer review.",
+      "source": "NASA-STD-6016C §4.1.6.1; classifier decision matrix"
+    },
+    {
+      "field_id": "ANTI_RULE",
+      "label": "Anti-Rule (Automatable)",
+      "what": "The material failed the screening test, but the failure mode is not credible in the actual service environment.",
+      "why": "Anti-rules are counterintuitive but common: a material can fail a flammability test in enriched oxygen and still be perfectly safe in an environment with no ignition source or oxygen enrichment.",
+      "guidance": "Category II. Confidence 0.70. Requires 5 precedents for full automation. The rationale must explain why the failure mode does not apply — not just that the material failed. Example: FLAM=C in ambient air (21% O2) — the material burns in the test but the test runs in enriched O2 which is not the service condition.",
+      "source": "NASA-STD-6016C §4.1.6.1; classifier decision matrix"
+    },
+    {
+      "field_id": "INCOMPLETE_PASS",
+      "label": "Incomplete Pass (Automatable)",
+      "what": "Favorable test data exists, but the documentation has an administrative shortfall — typically insufficient sample count.",
+      "why": "The material's test results are good; the paperwork is not. These MUAs have the highest confidence because actual data supports the favorable conclusion.",
+      "guidance": "Category II. Confidence 0.95. No precedents needed. The rationale cites the favorable test results and acknowledges the administrative gap. Example: FLAM=I means all samples passed but fewer than 5 were tested.",
+      "source": "NASA-STD-6016C §4.1.6.1; classifier decision matrix"
+    },
+    {
+      "field_id": "REAL_PROBLEM",
+      "label": "Real Problem (Engineer Required)",
+      "what": "The material failed the screening test AND the failure mode is credible in the actual service environment.",
+      "why": "This is the most serious MUA type. The material has a demonstrated weakness in a property that matters for the application. An engineer must evaluate whether mitigations exist or the material must be replaced.",
+      "guidance": "Category I. Confidence 0.00 (cannot be automated). The classifier identifies the issue but cannot write the rationale — an engineer must evaluate mitigations, usage constraints, or replacement options. The MUA must document why the material is still acceptable despite the failure.",
+      "source": "NASA-STD-6016C §4.1.6.1; Category I definition"
+    },
+    {
+      "field_id": "REAL_GAP",
+      "label": "Real Gap (Engineer Review)",
+      "what": "No test data exists AND the hazard is credible in the actual service environment — there is a genuine knowledge gap.",
+      "why": "Unlike THIN_SCREENING, the untested property actually matters here. The material may or may not be acceptable, and there is no data to say either way.",
+      "guidance": "Category II by default (engineer can elevate to Category I). Confidence 0.40 — low. Requires 3 precedents for automation. The rationale must address the gap: either cite similarity data from related materials, recommend testing, or justify acceptance based on service conditions.",
+      "source": "NASA-STD-6016C §4.1.6.1; classifier decision matrix"
+    },
+    {
+      "field_id": "STANDARD",
+      "label": "Standard (No MUA Needed)",
+      "what": "The material passes all applicable screening checks — no Material Usage Agreement is required.",
+      "why": "Rating A or verified batch compliance means the material meets requirements through the normal screening process.",
+      "guidance": "No action needed. The material is compliant. Confidence 1.00.",
+      "source": "NASA-STD-6016C §4.2.1"
+    },
+    {
+      "field_id": "FLAG_FOR_HUMAN",
+      "label": "Flag for Human (Unresolvable)",
+      "what": "The classifier cannot determine the correct routing — an engineer must review manually.",
+      "why": "Some combinations of ratings, material classes, or environments fall outside the automated decision matrix. BAD_DATA and NEEDS_REVIEW flags route here.",
+      "guidance": "Do not attempt to force-classify. Forward to the M&P engineer with the full decision trace (all classifier steps) so they can see exactly where automation stopped and why.",
+      "source": "Classifier pipeline fallback; NASA-STD-6016C §4.1.6.1"
+    }
+  ],
+  "screening_columns": [
+    {
+      "field_id": "FLAM",
+      "label": "Flammability (MPR 44)",
+      "what": "Tests whether the material will sustain combustion in an oxygen-enriched atmosphere.",
+      "why": "Fire in a spacecraft is catastrophic. Flammability screening is the most common trigger for MUAs because many materials fail in enriched oxygen but are safe at ambient.",
+      "guidance": "Applies to ALL material classes. Rating A = pass (burn ≤6.0 inches, ≥5 samples). Rating C = fail (burn >6.0 inches). Rating I = admin gap (<5 samples, all pass). Hazard requires O2 ≥23.5% or GOX/LOX service medium. Below 23.5%, a FLAM failure becomes ANTI_RULE.",
+      "source": "NASA-STD-6016C §4.2.1.1 [MPR 44]; NASA-STD-6001 Test 1"
+    },
+    {
+      "field_id": "FS",
+      "label": "Fluid Sensitivity (MPR 47)",
+      "what": "Tests whether the material degrades when exposed to specific propellants or fluids.",
+      "why": "Materials that swell, crack, or dissolve in propellants can cause seal failures, leaks, or contamination. FS screening is mandatory for hardware contacting hypergolic propellants.",
+      "guidance": "Applies to ALL material classes. Only triggers when service medium is a reactive fluid: hydrazine (N2H4), MMH, NTO (N2O4), or UDMH. Rating A = 48-hour screening pass. Rating U = untested. If the material never contacts these fluids, FS failures become THIN_SCREENING.",
+      "source": "NASA-STD-6016C §4.2.1.3 [MPR 47]; fluid compatibility testing per NASA-STD-6001 Test 15"
+    },
+    {
+      "field_id": "TOX",
+      "label": "Toxicity (MPR 45)",
+      "what": "Tests whether the material releases toxic offgassing products that could harm the crew.",
+      "why": "In a sealed spacecraft cabin, even small amounts of toxic outgassing can accumulate to dangerous levels. Toxicity screening protects crew health.",
+      "guidance": "Applies to NONMETALLIC materials only. Only triggers in habitable volumes. Rating A = TML ≤1.0%, CVCM ≤0.1%. Rating U = untested for offgassing. Rating K = legacy artifact (BAD_DATA, route to engineer). If the material is in a non-habitable volume, TOX failures become THIN_SCREENING.",
+      "source": "NASA-STD-6016C §4.2.1.2 [MPR 45]; ASTM E595"
+    },
+    {
+      "field_id": "TVS",
+      "label": "Total Volatile Substances",
+      "what": "Tests mass loss from outgassing in vacuum — measures whether a material sheds volatiles that could contaminate optics or electronics.",
+      "why": "Outgassed volatiles condense on cold surfaces like telescope mirrors, solar cells, and optical sensors. TVS screening prevents contamination failures.",
+      "guidance": "Applies to NONMETALLIC materials only. Triggers in vacuum-exposed or habitable environments. Rating A = passes ASTM E595. Rating C = fails. Rating U = untested. If the material is neither vacuum-exposed nor in a habitable volume, TVS failures become THIN_SCREENING.",
+      "source": "NASA-STD-6016C §4.2.3.6; ASTM E595"
+    },
+    {
+      "field_id": "SCC",
+      "label": "Stress Corrosion Cracking",
+      "what": "Tests whether a metal cracks under combined sustained stress and corrosive environment.",
+      "why": "SCC failures are sudden and catastrophic — parts can crack with no visible warning while sitting on a shelf or in service. SCC screening catches metals prone to this failure mode.",
+      "guidance": "Applies to METALS only. Rating A = resistant. Rating B = acceptable with batch verification. Rating C = susceptible (REAL_FAIL). Rating U = untested. Cryogenic hydrogen (GH2/LH2) suppresses SCC — if the metal only sees H2 service, SCC failures become ANTI_RULE because hydrogen actually inhibits crack growth in most alloys.",
+      "source": "NASA-STD-6016C §4.2.6.3; MSFC-STD-3029"
+    },
+    {
+      "field_id": "CORR",
+      "label": "Corrosion Resistance",
+      "what": "Tests whether a metal corrodes unacceptably in its service environment.",
+      "why": "Corrosion degrades structural integrity, contaminates fluid systems, and can cause electrical failures. Corrosion screening catches materials that will degrade in service.",
+      "guidance": "Applies to METALS only. Rating A = acceptable resistance. Rating B = acceptable with batch verification. Rating U = untested. Like SCC, cryogenic hydrogen suppresses corrosion concerns. If the metal only sees H2 service, CORR gaps become ANTI_RULE.",
+      "source": "NASA-STD-6016C §4.2.6.2"
+    }
+  ],
+  "classifier_steps": [
+    {
+      "field_id": "step1_identify_flags",
+      "label": "Step 1: Identify Flags",
+      "what": "Scans the MAPTIS ratings and filters out all passing (A) and not-applicable (N) results, leaving only ratings that need MUA evaluation.",
+      "why": "This step reduces the problem space — most materials pass most screening columns. Only the exceptions need MUA processing.",
+      "guidance": "Produces a list of (column, rating) pairs. If the list is empty, no MUA is needed. Each pair feeds into Step 2.",
+      "source": "Classifier pipeline Step 1; NASA-STD-6016C §4.2.1"
+    },
+    {
+      "field_id": "step2_decode_flag",
+      "label": "Step 2: Decode Flag Type",
+      "what": "Converts each (column, rating) pair into a FlagType using the column-specific flag dictionary.",
+      "why": "Different ratings in the same column have different meanings. FLAM=C is a real failure, but FLAM=I is just an admin gap. This step normalizes ratings into the seven flag types the classifier can reason about.",
+      "guidance": "Check the decoded meaning carefully. If the flag type is BAD_DATA or NEEDS_REVIEW, the classifier will route to FLAG_FOR_HUMAN and stop. All other flag types continue to Step 3.",
+      "source": "Column flag dictionaries (COLUMN_FLAG_DICT); rating semantics lookup"
+    },
+    {
+      "field_id": "step3_screening_applicability",
+      "label": "Step 3: Screening Applicability Check",
+      "what": "Determines whether the screening column actually applies to this material class and environment combination.",
+      "why": "Not all tests apply to all materials. SCC and CORR only apply to metals. TOX only applies to nonmetallics in habitable volumes. If the screening does not apply, no MUA is needed regardless of the rating.",
+      "guidance": "If the screening does not apply, the classifier returns STANDARD (no MUA). Key gates: material class (metal vs. nonmetallic) and environment (habitable, vacuum, fluid medium). A misidentified material class will produce wrong results here — verify the class if outputs look wrong.",
+      "source": "SCREENING_APPLICABILITY and ENVIRONMENT_APPLICABILITY dictionaries; NASA-STD-6016C §4.2"
+    },
+    {
+      "field_id": "step4_hazard_applies",
+      "label": "Step 4: Hazard Applicability",
+      "what": "Determines whether the hazard being tested for actually exists in the service environment.",
+      "why": "This is the critical decision point. A material can fail a test (Step 2) for a screening that applies (Step 3) but still not need a serious MUA if the hazard does not exist in service. This step separates ANTI_RULE from REAL_PROBLEM.",
+      "guidance": "Column-specific logic: FLAM requires O2 ≥23.5% or GOX/LOX medium. FS requires hypergolic propellant contact. TOX is auto-true if Step 3 passed. SCC/CORR are suppressed by cryogenic H2. If hazard does not apply, the worst outcome is ANTI_RULE (Category II, automatable).",
+      "source": "Hazard applicability rules in classifier.py; media sets (_FS_RELEVANT_MEDIA, _H2_MEDIA, _O2_ENRICHED_MEDIA)"
+    },
+    {
+      "field_id": "step5_classify_type",
+      "label": "Step 5: Classify MUA Type",
+      "what": "Combines the flag type (Step 2) and hazard applicability (Step 4) into the final MUA type using a 2×3 decision matrix.",
+      "why": "The MUA type determines everything downstream — category, confidence, automation eligibility, precedent requirements, and rationale template.",
+      "guidance": "The matrix: REAL_FAIL + hazard=true → REAL_PROBLEM. REAL_FAIL + hazard=false → ANTI_RULE. NO_DATA + hazard=true → REAL_GAP. NO_DATA + hazard=false → THIN_SCREENING. ADMIN_GAP + any → INCOMPLETE_PASS. Understand this matrix and you understand the entire classifier.",
+      "source": "Decision matrix in classifier.py step5_classify_type(); NASA-STD-6016C §4.1.6.1"
+    },
+    {
+      "field_id": "step6_assign_category",
+      "label": "Step 6: Assign MUA Category",
+      "what": "Maps the MUA type to a NASA-STD-6016C category (I or II) using the category map.",
+      "why": "Category I MUAs require senior engineer review and affect safety-critical decisions. Category II MUAs are administrative and can be processed faster. The category drives the approval workflow.",
+      "guidance": "REAL_PROBLEM → Category I (safety concern). THIN_SCREENING, ANTI_RULE, INCOMPLETE_PASS, REAL_GAP → Category II (administrative). Engineers can elevate REAL_GAP from II to I if warranted. STANDARD and FLAG_FOR_HUMAN do not get a category.",
+      "source": "NASA-STD-6016C §4.1.6.1; _CATEGORY_MAP in classifier.py"
+    }
+  ],
+  "confidence": [
+    {
+      "field_id": "confidence_score",
+      "label": "Confidence Score",
+      "what": "A 0.0–1.0 score indicating how confident the classifier is in the MUA type assignment and rationale.",
+      "why": "Confidence tells you how much human review is needed. High confidence (>0.90) means the classifier has strong basis. Low confidence (<0.50) means an engineer should validate the classification.",
+      "guidance": "Base scores by type: STANDARD=1.00, INCOMPLETE_PASS=0.95, THIN_SCREENING=0.90, ANTI_RULE=0.70, REAL_GAP=0.40, REAL_PROBLEM=0.00, FLAG_FOR_HUMAN=0.00. Precedent data can boost confidence by up to 0.10 (scaled by precedent count and approval rate). Maximum adjusted confidence is 0.99.",
+      "source": "_TYPE_CONFIDENCE and confidence adjustment formula in classifier.py"
+    },
+    {
+      "field_id": "precedent_count",
+      "label": "Precedent Count Required",
+      "what": "The number of approved historic MUAs needed before a given MUA type can be fully automated.",
+      "why": "Precedents provide evidence that the classifier's rationale pattern has been reviewed and approved by engineers in similar cases. More precedents mean higher confidence in automation.",
+      "guidance": "ANTI_RULE requires 5 precedents. REAL_GAP requires 3 precedents. All other types require 0. Precedents are matched by ring: exact match (same material + column + medium), family match (same alloy family), or broad match (same MUA type). Exact matches carry the most weight.",
+      "source": "_TYPE_PRECEDENTS_NEEDED in classifier.py; precedent ring matching"
+    }
+  ],
+  "workflow": [
+    {
+      "field_id": "ai_drafted",
+      "label": "AI Drafted",
+      "what": "The classifier has generated a draft MUA section — it is awaiting engineer review.",
+      "why": "AI drafts handle the 80% of MUA writing that is formulaic. The engineer reviews, accepts, edits, or overrides each section.",
+      "guidance": "Review the draft against the decision trace. Check that the rationale correctly cites the screening column, rating, and service environment. Accept if correct, edit for minor adjustments, or override to replace entirely.",
+      "source": "MUA workflow states; SectionStatus enum"
+    },
+    {
+      "field_id": "engineer_accepted",
+      "label": "Engineer Accepted",
+      "what": "The engineer reviewed the AI-drafted section and accepted it without changes.",
+      "why": "Acceptance means the engineer agrees the classifier's rationale is accurate and complete for this section.",
+      "guidance": "No further action. The section is locked for finalization.",
+      "source": "MUA workflow states; ReviewAction.ACCEPT"
+    },
+    {
+      "field_id": "engineer_modified",
+      "label": "Engineer Modified",
+      "what": "The engineer reviewed the AI-drafted section and made edits to improve accuracy or add detail.",
+      "why": "Modifications capture the engineer's domain expertise where the classifier's template was close but not perfect.",
+      "guidance": "The original AI draft is preserved alongside the engineer's edit for traceability. Both versions are stored in the MUA record.",
+      "source": "MUA workflow states; ReviewAction.EDIT"
+    },
+    {
+      "field_id": "engineer_override",
+      "label": "Engineer Override",
+      "what": "The engineer replaced the AI-drafted section entirely with their own content.",
+      "why": "Overrides happen when the classifier's template does not fit the situation — typically for REAL_PROBLEM or unusual REAL_GAP cases where the rationale requires custom engineering judgment.",
+      "guidance": "The override is flagged in the record. This feedback should inform future classifier improvements for similar cases.",
+      "source": "MUA workflow states; ReviewAction.OVERRIDE"
+    },
+    {
+      "field_id": "needs_input",
+      "label": "Needs Engineer Input",
+      "what": "The classifier could not generate content for this section — an engineer must write it from scratch.",
+      "why": "Some MUA sections require judgment that cannot be automated: custom mitigations, usage constraints, or safety justifications for REAL_PROBLEM MUAs.",
+      "guidance": "This is the '20%' that requires human expertise. The classifier provides all available context (decision trace, precedents, evidence bundle) to help the engineer write the section.",
+      "source": "MUA workflow states; SectionStatus.NEEDS_INPUT"
+    },
+    {
+      "field_id": "form_551",
+      "label": "MSFC Form 551 Output",
+      "what": "The final structured output document for each MUA — the official form filed with the M&P organization.",
+      "why": "Form 551 is the standard NASA format for Material Usage Agreements. Every MUA must be documented on this form for traceability and review.",
+      "guidance": "Fields populated automatically: MUA number, category, date, governing standard, project, material designation, MAPTIS code, specification, material class, screening issue, rating, part numbers, media, pressure, temperature, location, application, rationale, disposition, approval signatures. Review all auto-populated fields before finalizing.",
+      "source": "MSFC Form 551; NASA-STD-6016C §4.1.6.1"
+    }
+  ],
+  "concepts": [
+    {
+      "field_id": "category_I",
+      "label": "Category I MUA",
+      "what": "A Material Usage Agreement for a material that could affect safety AND must be used for functional reasons despite failing screening.",
+      "why": "Category I MUAs receive the highest scrutiny because the material has a real weakness in a property that matters. Approval requires senior M&P engineer sign-off.",
+      "guidance": "Only REAL_PROBLEM classifications route to Category I. The MUA must document: (1) why the material must be used (no acceptable alternative), (2) what mitigations reduce the risk, and (3) what operational constraints apply. Category I MUAs cannot be automated.",
+      "source": "NASA-STD-6016C §4.1.6.1 Category I definition"
+    },
+    {
+      "field_id": "category_II",
+      "label": "Category II MUA",
+      "what": "A Material Usage Agreement for a material that fails screening but does not pose a safety concern in the actual application.",
+      "why": "Category II MUAs are administrative — the material is acceptable in service, but the screening process flagged it. Most MUAs (THIN_SCREENING, ANTI_RULE, INCOMPLETE_PASS) are Category II.",
+      "guidance": "Category II MUAs can be processed faster and many can be automated by the classifier. They still require documentation on Form 551 but do not need the same level of engineering justification as Category I.",
+      "source": "NASA-STD-6016C §4.1.6.1 Category II definition"
+    },
+    {
+      "field_id": "screening_applicability",
+      "label": "Screening Applicability",
+      "what": "The first gate in MUA classification — does this screening column even apply to the given material class and environment?",
+      "why": "Screening applicability eliminates unnecessary MUAs. Metals do not need toxicity testing. Nonmetallics do not need SCC testing. Checking applicability first prevents wasted effort.",
+      "guidance": "Applicability rules: FLAM/FS → all materials. TOX/TVS → nonmetallics only (TOX also requires habitable volume). SCC/CORR → metals only. If the screening does not apply, no MUA is needed regardless of the rating.",
+      "source": "SCREENING_APPLICABILITY dictionary; NASA-STD-6016C §4.2"
+    },
+    {
+      "field_id": "hazard_applicability",
+      "label": "Hazard Applicability",
+      "what": "The second gate — does the specific hazard (fire, corrosion, toxicity, etc.) actually exist in the service environment?",
+      "why": "Hazard applicability is what separates a REAL_PROBLEM from an ANTI_RULE. A material can fail a test without the failure mode being relevant to its application.",
+      "guidance": "Key thresholds: FLAM hazard requires O2 ≥23.5% or GOX/LOX. FS hazard requires contact with hydrazine/MMH/NTO/UDMH. SCC/CORR hazard is suppressed by cryogenic hydrogen. TOX/TVS hazard auto-applies if screening applies (nonmetallic + habitable/vacuum).",
+      "source": "Step 4 hazard rules in classifier.py; media sets"
+    },
+    {
+      "field_id": "decision_trace",
+      "label": "Decision Trace",
+      "what": "The complete record of every classifier step and decision for a single flag — the audit trail showing why the classifier reached its conclusion.",
+      "why": "Decision traces provide full transparency. If a reviewer disagrees with the classification, they can trace exactly where the logic diverged from their judgment.",
+      "guidance": "Every ClassifierResult includes: input echo (material, rating, class, media, environment), Step 2 output (flag type), Step 4 output (hazard applies), Step 5-6 output (MUA type, category, confidence, automatable). The trace also records screening_applicable, screening_reason, and classification_reason as human-readable strings.",
+      "source": "ClassifierResult model in classifier/models.py"
+    },
+    {
+      "field_id": "precedent_matching",
+      "label": "Precedent Matching",
+      "what": "The system searches historic approved MUAs for similar cases to strengthen confidence and provide rationale templates.",
+      "why": "Precedents are the strongest evidence that a classification pattern produces acceptable MUAs. More approved precedents = higher automation confidence.",
+      "guidance": "Precedents are matched in three rings: (1) exact — same material, same column, same medium; (2) family — same alloy family or polymer class; (3) broad — same MUA type regardless of material. Exact matches carry the most weight. The confidence adjustment formula is: base + (min(count/20, 1.0) × 0.10 × approval_rate).",
+      "source": "Precedent matching in classifier.py; _TYPE_PRECEDENTS_NEEDED"
+    }
+  ]
+}
