@@ -14,36 +14,31 @@ import {
   ReactFlow, addEdge, useNodesState, useEdgesState,
   Controls, MiniMap, Background, BackgroundVariant,
   type Connection, type Edge, type Node, type OnConnect,
-  ConnectionLineType,
-  MarkerType,
   type ReactFlowInstance,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  Loader2, AlertTriangle, XCircle, Flame, Download, Zap, Info,
-  ChevronRight, LayoutGrid, Clock3,
+  Loader2, AlertTriangle, XCircle, Shield, Flame, Download, Zap, Info,
+  ChevronRight, LayoutGrid,
 } from 'lucide-react';
 
 import ComponentNode, { type ComponentNodeData } from '@/components/oca-system/ComponentNode';
-import ComponentEditorSheet from '@/components/oca-system/ComponentEditorSheet';
 import ComponentPalette from '@/components/oca-system/ComponentPalette';
 import SystemInputBar from '@/components/oca-system/SystemInputBar';
 import PathInspectorPanel from '@/components/oca-system/PathInspectorPanel';
 
 import {
   ocaCreateSystem, ocaAddComponent, ocaAddConnection,
-  ocaUpdateInputs, ocaUpdateComponent,
   ocaRemoveComponent, ocaRemoveConnection,
   ocaAssessSystem, ocaGetPathInspector, ocaExportSystem,
-  type ComponentConfig,
-  type ComponentUpdateRequest,
   type SystemInputs, type SystemComponent, type SystemAssessmentResult,
-  type PathInspectorResult, type ComponentArchetype, type MaterialSlotValue,
+  type PathInspectorResult, type ComponentArchetype, type SystemKindlingChain,
   ZONE_COLORS, ZONE_LABELS,
 } from '@/lib/oca-system-api';
 
@@ -69,9 +64,6 @@ const REACTION_COLORS: Record<string, string> = {
 };
 
 const nodeTypes = { component: ComponentNode };
-const DRAFT_STORAGE_KEY = 'boundstate:oca-system-builder:draft:v1';
-const EDGE_STROKE = '#5d738a';
-const KINDLING_EDGE_STROKE = '#ef4444';
 
 // Default system inputs
 const DEFAULT_INPUTS: SystemInputs = {
@@ -91,67 +83,6 @@ const DEFAULT_INPUTS: SystemInputs = {
   bi_directional_flow_risk: false,
 };
 
-interface BuilderDraftComponent {
-  component_id: string;
-  archetype: ComponentArchetype;
-  label: string;
-  position_x: number;
-  position_y: number;
-  materials: MaterialSlotValue[];
-  config: Partial<ComponentConfig>;
-  is_rigid_metallic_tubing?: boolean;
-  is_metallic_flex_hose?: boolean;
-  is_all_metal_seal?: boolean;
-  is_metallic_pressure_vessel?: boolean;
-}
-
-interface BuilderDraft {
-  version: 1;
-  saved_at: string;
-  inputs: SystemInputs;
-  components: BuilderDraftComponent[];
-  connections: Array<{
-    source_component_id: string;
-    target_component_id: string;
-  }>;
-}
-
-function readDraft(): BuilderDraft | null {
-  if (typeof window === 'undefined') return null;
-
-  try {
-    const raw = window.localStorage.getItem(DRAFT_STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as BuilderDraft;
-    if (parsed?.version !== 1) return null;
-    return parsed;
-  } catch {
-    return null;
-  }
-}
-
-function buildEdgeAppearance(isKindling: boolean) {
-  const stroke = isKindling ? KINDLING_EDGE_STROKE : EDGE_STROKE;
-  return {
-    type: 'smoothstep' as const,
-    animated: isKindling,
-    markerEnd: {
-      type: MarkerType.ArrowClosed,
-      width: 18,
-      height: 18,
-      color: stroke,
-    },
-    style: {
-      stroke,
-      strokeWidth: isKindling ? 3.25 : 2.5,
-    },
-    pathOptions: {
-      borderRadius: 18,
-      offset: 18,
-    },
-  };
-}
-
 // ---------------------------------------------------------------------------
 // Main Component
 // ---------------------------------------------------------------------------
@@ -168,10 +99,6 @@ export default function OCASystemBuilder() {
   const [error, setError] = useState<string | null>(null);
   const [showKindling, setShowKindling] = useState(false);
   const [activeTab, setActiveTab] = useState('canvas');
-  const [selectedComponentId, setSelectedComponentId] = useState<string | null>(null);
-  const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
-  const [restoreNotice, setRestoreNotice] = useState<string | null>(null);
-  const [isDirty, setIsDirty] = useState(false);
 
   // React Flow
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -185,298 +112,28 @@ export default function OCASystemBuilder() {
   const nodeToComponentId = useRef<Map<string, string>>(new Map());
   // Edge ID → server connection ID
   const edgeToConnectionId = useRef<Map<string, string>>(new Map());
-  const selectedComponent = useMemo(
-    () => (selectedComponentId ? componentMap.current.get(selectedComponentId) ?? null : null),
-    [selectedComponentId, nodes, assessment],
-  );
-
-  const handleOpenEditor = useCallback((componentId: string) => {
-    setSelectedComponentId(componentId);
-  }, []);
-
-  const handleInspect = useCallback(async (componentId: string) => {
-    if (!systemId) return;
-    try {
-      const result = await ocaGetPathInspector(systemId, componentId);
-      setPathResult(result);
-    } catch {
-      // ignore
-    }
-  }, [systemId]);
-
-  const buildNode = useCallback((component: SystemComponent): Node => ({
-    id: `node-${component.component_id}`,
-    type: 'component',
-    position: { x: component.position_x, y: component.position_y },
-    data: {
-      component,
-      onInspect: handleInspect,
-      onEdit: handleOpenEditor,
-    } as ComponentNodeData,
-  }), [handleInspect, handleOpenEditor]);
-
-  const syncComponentLocal = useCallback((componentId: string, nextComponent: SystemComponent) => {
-    componentMap.current.set(componentId, nextComponent);
-    setNodes((currentNodes) => currentNodes.map((node) => {
-      if (nodeToComponentId.current.get(node.id) !== componentId) return node;
-      return {
-        ...node,
-        data: {
-          ...(node.data as ComponentNodeData),
-          component: nextComponent,
-          onInspect: handleInspect,
-          onEdit: handleOpenEditor,
-        },
-      };
-    }));
-    setAssessment((currentAssessment) => {
-      if (!currentAssessment) return currentAssessment;
-      return {
-        ...currentAssessment,
-        components: currentAssessment.components.map((component) => (
-          component.component_id === componentId ? nextComponent : component
-        )),
-      };
-    });
-  }, [handleInspect, handleOpenEditor, setNodes]);
-
-  const buildDraftSnapshot = useCallback((): BuilderDraft => {
-    const nodePositionByComponentId = new Map<string, { x: number; y: number }>();
-    for (const node of nodes) {
-      const componentId = nodeToComponentId.current.get(node.id);
-      if (componentId) {
-        nodePositionByComponentId.set(componentId, node.position);
-      }
-    }
-
-    const components: BuilderDraftComponent[] = Array.from(componentMap.current.values()).map((component) => {
-      const position = nodePositionByComponentId.get(component.component_id);
-      return {
-        component_id: component.component_id,
-        archetype: component.archetype,
-        label: component.label,
-        position_x: position?.x ?? component.position_x,
-        position_y: position?.y ?? component.position_y,
-        materials: component.materials,
-        config: component.config,
-        is_rigid_metallic_tubing: component.is_rigid_metallic_tubing,
-        is_metallic_flex_hose: component.is_metallic_flex_hose,
-        is_all_metal_seal: component.is_all_metal_seal,
-        is_metallic_pressure_vessel: component.is_metallic_pressure_vessel,
-      };
-    });
-
-    const connections = edges.flatMap((edge) => {
-      const sourceComponentId = nodeToComponentId.current.get(edge.source ?? '');
-      const targetComponentId = nodeToComponentId.current.get(edge.target ?? '');
-      if (!sourceComponentId || !targetComponentId) return [];
-      return [{
-        source_component_id: sourceComponentId,
-        target_component_id: targetComponentId,
-      }];
-    });
-
-    return {
-      version: 1,
-      saved_at: new Date().toISOString(),
-      inputs,
-      components,
-      connections,
-    };
-  }, [edges, inputs, nodes]);
-
-  const restoreDraft = useCallback(async (nextSystemId: string, draft: BuilderDraft) => {
-    const componentIdMap = new Map<string, string>();
-    const restoredNodes: Node[] = [];
-    const restoredEdges: Edge[] = [];
-
-    for (const component of draft.components) {
-      const addResult = await ocaAddComponent(
-        nextSystemId,
-        component.archetype,
-        component.label,
-        component.position_x,
-        component.position_y,
-        component.materials,
-        component.config,
-      );
-
-      const restoredComponent: SystemComponent = {
-        component_id: addResult.component_id,
-        archetype: component.archetype,
-        label: component.label,
-        position_x: component.position_x,
-        position_y: component.position_y,
-        materials: component.materials,
-        config: component.config,
-        features: addResult.features,
-        inferred_facts: addResult.inferred_facts,
-        zones: addResult.zones,
-        mechanism_assessments: [],
-        overall_status: 'pending',
-        highest_rating: 0,
-        credible_mechanisms: [],
-        connected: false,
-        is_rigid_metallic_tubing: component.is_rigid_metallic_tubing,
-        is_metallic_flex_hose: component.is_metallic_flex_hose,
-        is_all_metal_seal: component.is_all_metal_seal,
-        is_metallic_pressure_vessel: component.is_metallic_pressure_vessel,
-      };
-
-      if (
-        component.is_rigid_metallic_tubing
-        || component.is_metallic_flex_hose
-        || component.is_all_metal_seal
-        || component.is_metallic_pressure_vessel
-      ) {
-        await ocaUpdateComponent(nextSystemId, addResult.component_id, {
-          is_rigid_metallic_tubing: component.is_rigid_metallic_tubing,
-          is_metallic_flex_hose: component.is_metallic_flex_hose,
-          is_all_metal_seal: component.is_all_metal_seal,
-          is_metallic_pressure_vessel: component.is_metallic_pressure_vessel,
-        });
-      }
-
-      componentIdMap.set(component.component_id, addResult.component_id);
-      componentMap.current.set(addResult.component_id, restoredComponent);
-      nodeToComponentId.current.set(`node-${addResult.component_id}`, addResult.component_id);
-      restoredNodes.push(buildNode(restoredComponent));
-    }
-
-    for (const connection of draft.connections) {
-      const sourceComponentId = componentIdMap.get(connection.source_component_id);
-      const targetComponentId = componentIdMap.get(connection.target_component_id);
-      if (!sourceComponentId || !targetComponentId) continue;
-
-      const addResult = await ocaAddConnection(nextSystemId, sourceComponentId, targetComponentId);
-      const edgeId = `edge-${addResult.connection_id}`;
-      edgeToConnectionId.current.set(edgeId, addResult.connection_id);
-      restoredEdges.push({
-        id: edgeId,
-        source: `node-${sourceComponentId}`,
-        target: `node-${targetComponentId}`,
-        ...buildEdgeAppearance(false),
-      });
-    }
-
-    setNodes(restoredNodes);
-    setEdges(restoredEdges);
-    setDraftSavedAt(draft.saved_at);
-    if (draft.components.length > 0 || draft.connections.length > 0) {
-      setRestoreNotice(
-        `Restored local draft with ${draft.components.length} component${draft.components.length === 1 ? '' : 's'}.`,
-      );
-      setIsDirty(true);
-    }
-  }, [buildNode, setEdges, setNodes]);
 
   // ---------------------------------------------------------------------------
   // Initialize system on mount
   // ---------------------------------------------------------------------------
   useEffect(() => {
-    let cancelled = false;
-
     async function init() {
-      const draft = readDraft();
-      const seedInputs = draft?.inputs ?? DEFAULT_INPUTS;
-      setInputs(seedInputs);
-
       try {
-        const res = await ocaCreateSystem('New O2 System', seedInputs);
-        if (cancelled) return;
+        const res = await ocaCreateSystem('New O2 System', inputs);
         setSystemId(res.system_id);
-
-        if (draft) {
-          await restoreDraft(res.system_id, draft);
-        }
       } catch (err) {
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Failed to create system');
-        }
+        setError(err instanceof Error ? err.message : 'Failed to create system');
       }
     }
-
     init();
-    return () => {
-      cancelled = true;
-    };
-  }, [restoreDraft]);
-
-  // ---------------------------------------------------------------------------
-  // Sync system inputs to backend
-  // ---------------------------------------------------------------------------
-  useEffect(() => {
-    if (!systemId) return undefined;
-
-    const timeoutId = window.setTimeout(async () => {
-      try {
-        await ocaUpdateInputs(systemId, inputs);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to update system inputs');
-      }
-    }, 250);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [inputs, systemId]);
-
-  // ---------------------------------------------------------------------------
-  // Persist local draft
-  // ---------------------------------------------------------------------------
-  useEffect(() => {
-    if (!systemId || typeof window === 'undefined') return undefined;
-
-    const timeoutId = window.setTimeout(() => {
-      try {
-        const draft = buildDraftSnapshot();
-        window.localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft));
-        setDraftSavedAt(draft.saved_at);
-      } catch {
-        // ignore local draft persistence errors
-      }
-    }, 300);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [buildDraftSnapshot, systemId]);
-
-  useEffect(() => {
-    if (!restoreNotice) return undefined;
-    const timeoutId = window.setTimeout(() => setRestoreNotice(null), 5000);
-    return () => window.clearTimeout(timeoutId);
-  }, [restoreNotice]);
-
-  useEffect(() => {
-    const chainLinks = new Set<string>();
-    if (assessment && showKindling) {
-      for (const chain of assessment.kindling_chains) {
-        for (let index = 0; index < chain.propagation_path.length - 1; index += 1) {
-          const current = chain.propagation_path[index];
-          const next = chain.propagation_path[index + 1];
-          chainLinks.add(`${current}->${next}`);
-        }
-      }
-    }
-
-    setEdges((currentEdges) => currentEdges.map((edge) => {
-      const sourceComponentId = nodeToComponentId.current.get(edge.source ?? '');
-      const targetComponentId = nodeToComponentId.current.get(edge.target ?? '');
-      const isKindling = Boolean(
-        sourceComponentId
-        && targetComponentId
-        && chainLinks.has(`${sourceComponentId}->${targetComponentId}`),
-      );
-      return {
-        ...edge,
-        ...buildEdgeAppearance(isKindling),
-      };
-    }));
-  }, [assessment, setEdges, showKindling]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ---------------------------------------------------------------------------
   // Update inputs
   // ---------------------------------------------------------------------------
   const handleInputChange = useCallback((updates: Partial<SystemInputs>) => {
-    setInputs((current) => ({ ...current, ...updates }));
-    setIsDirty(true);
+    setInputs(prev => ({ ...prev, ...updates }));
   }, []);
 
   // ---------------------------------------------------------------------------
@@ -524,13 +181,25 @@ export default function OCASystemBuilder() {
       };
 
       componentMap.current.set(res.component_id, serverComp);
-      nodeToComponentId.current.set(`node-${res.component_id}`, res.component_id);
-      setNodes((currentNodes) => [...currentNodes, buildNode(serverComp)]);
-      setIsDirty(true);
+
+      const nodeId = `node-${res.component_id}`;
+      nodeToComponentId.current.set(nodeId, res.component_id);
+
+      const newNode: Node = {
+        id: nodeId,
+        type: 'component',
+        position: { x: position.x, y: position.y },
+        data: {
+          component: serverComp,
+          onInspect: handleInspect,
+        } as ComponentNodeData,
+      };
+
+      setNodes(nds => [...nds, newNode]);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add component');
     }
-  }, [buildNode, rfInstance, setNodes, systemId]);
+  }, [systemId, rfInstance, setNodes]);
 
   // ---------------------------------------------------------------------------
   // Handle connections
@@ -549,16 +218,16 @@ export default function OCASystemBuilder() {
       const edgeId = `edge-${res.connection_id}`;
       edgeToConnectionId.current.set(edgeId, res.connection_id);
 
-      setEdges((currentEdges) => addEdge({
+      setEdges(eds => addEdge({
         ...connection,
         id: edgeId,
-        ...buildEdgeAppearance(false),
-      }, currentEdges));
-      setIsDirty(true);
+        animated: true,
+        style: { stroke: '#3b82f6', strokeWidth: 2 },
+      }, eds));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to connect');
     }
-  }, [setEdges, systemId]);
+  }, [systemId, setEdges]);
 
   // ---------------------------------------------------------------------------
   // Handle node deletion
@@ -572,16 +241,12 @@ export default function OCASystemBuilder() {
           await ocaRemoveComponent(systemId, compId);
           componentMap.current.delete(compId);
           nodeToComponentId.current.delete(node.id);
-          if (selectedComponentId === compId) {
-            setSelectedComponentId(null);
-          }
-          setIsDirty(true);
         } catch {
           // ignore
         }
       }
     }
-  }, [selectedComponentId, systemId]);
+  }, [systemId]);
 
   // ---------------------------------------------------------------------------
   // Handle edge deletion
@@ -594,62 +259,12 @@ export default function OCASystemBuilder() {
         try {
           await ocaRemoveConnection(systemId, connId);
           edgeToConnectionId.current.delete(edge.id);
-          setIsDirty(true);
         } catch {
           // ignore
         }
       }
     }
   }, [systemId]);
-
-  const onNodeDragStop = useCallback((_: unknown, node: Node) => {
-    const componentId = nodeToComponentId.current.get(node.id);
-    if (!componentId) return;
-    const currentComponent = componentMap.current.get(componentId);
-    if (!currentComponent) return;
-
-    const nextComponent = {
-      ...currentComponent,
-      position_x: node.position.x,
-      position_y: node.position.y,
-    };
-    componentMap.current.set(componentId, nextComponent);
-    setAssessment((currentAssessment) => {
-      if (!currentAssessment) return currentAssessment;
-      return {
-        ...currentAssessment,
-        components: currentAssessment.components.map((component) => (
-          component.component_id === componentId ? nextComponent : component
-        )),
-      };
-    });
-  }, []);
-
-  const handleSaveComponent = useCallback(async (componentId: string, updates: ComponentUpdateRequest) => {
-    if (!systemId) return;
-    await ocaUpdateComponent(systemId, componentId, updates);
-
-    const currentComponent = componentMap.current.get(componentId);
-    if (!currentComponent) return;
-
-    const nextComponent: SystemComponent = {
-      ...currentComponent,
-      ...updates,
-      label: updates.label ?? currentComponent.label,
-      materials: updates.materials ?? currentComponent.materials,
-      config: {
-        ...currentComponent.config,
-        ...(updates.config ?? {}),
-      },
-      is_rigid_metallic_tubing: updates.is_rigid_metallic_tubing ?? currentComponent.is_rigid_metallic_tubing,
-      is_metallic_flex_hose: updates.is_metallic_flex_hose ?? currentComponent.is_metallic_flex_hose,
-      is_all_metal_seal: updates.is_all_metal_seal ?? currentComponent.is_all_metal_seal,
-      is_metallic_pressure_vessel: updates.is_metallic_pressure_vessel ?? currentComponent.is_metallic_pressure_vessel,
-    };
-
-    syncComponentLocal(componentId, nextComponent);
-    setIsDirty(true);
-  }, [syncComponentLocal, systemId]);
 
   // ---------------------------------------------------------------------------
   // Run Assessment
@@ -661,14 +276,13 @@ export default function OCASystemBuilder() {
     try {
       const result = await ocaAssessSystem(systemId);
       setAssessment(result);
-      setIsDirty(false);
 
       // Update node data with assessment results
-      setNodes((currentNodes) => currentNodes.map((node) => {
+      setNodes(nds => nds.map(node => {
         const compId = nodeToComponentId.current.get(node.id);
         if (!compId) return node;
 
-        const updatedComp = result.components.find((component) => component.component_id === compId);
+        const updatedComp = result.components.find(c => c.component_id === compId);
         if (!updatedComp) return node;
 
         componentMap.current.set(compId, updatedComp);
@@ -676,19 +290,55 @@ export default function OCASystemBuilder() {
         return {
           ...node,
           data: {
-            ...(node.data as ComponentNodeData),
+            ...node.data,
             component: updatedComp,
             onInspect: handleInspect,
-            onEdit: handleOpenEditor,
           },
         };
       }));
+
+      // Update edges — highlight kindling chain paths
+      if (result.kindling_chains.length > 0) {
+        const chainComponentIds = new Set<string>();
+        for (const chain of result.kindling_chains) {
+          chain.propagation_path.forEach(id => chainComponentIds.add(id));
+        }
+
+        setEdges(eds => eds.map(edge => {
+          const sourceCompId = nodeToComponentId.current.get(edge.source || '');
+          const targetCompId = nodeToComponentId.current.get(edge.target || '');
+          const isInChain = sourceCompId && targetCompId &&
+            chainComponentIds.has(sourceCompId) && chainComponentIds.has(targetCompId);
+
+          return {
+            ...edge,
+            style: {
+              stroke: isInChain ? '#ef4444' : '#3b82f6',
+              strokeWidth: isInChain ? 3 : 2,
+            },
+            animated: true,
+          };
+        }));
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Assessment failed');
     } finally {
       setLoading(false);
     }
-  }, [handleInspect, handleOpenEditor, setNodes, systemId]);
+  }, [systemId, setNodes, setEdges]);
+
+  // ---------------------------------------------------------------------------
+  // Path Inspector
+  // ---------------------------------------------------------------------------
+  const handleInspect = useCallback(async (componentId: string) => {
+    if (!systemId) return;
+    try {
+      const result = await ocaGetPathInspector(systemId, componentId);
+      setPathResult(result);
+    } catch {
+      // ignore
+    }
+  }, [systemId]);
 
   // ---------------------------------------------------------------------------
   // Export
@@ -709,19 +359,11 @@ export default function OCASystemBuilder() {
     }
   }, [systemId]);
 
-  const draftSavedLabel = useMemo(() => {
-    if (!draftSavedAt) return null;
-    return new Date(draftSavedAt).toLocaleTimeString([], {
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-  }, [draftSavedAt]);
-
   // ---------------------------------------------------------------------------
   // Render
   // ---------------------------------------------------------------------------
   return (
-    <div className="flex flex-col h-[calc(100vh-60px)]" data-testid="oca-system-builder">
+    <div className="flex flex-col h-[calc(100vh-60px)]">
       {/* Page Header */}
       <div className="flex items-center justify-between px-4 py-2 border-b">
         <div>
@@ -767,15 +409,6 @@ export default function OCASystemBuilder() {
         </Alert>
       </div>
 
-      {restoreNotice && (
-        <div className="px-4 pt-2">
-          <Alert className="border-sky-200 bg-sky-50 text-sky-900">
-            <Clock3 className="h-4 w-4" />
-            <AlertDescription className="text-xs">{restoreNotice}</AlertDescription>
-          </Alert>
-        </div>
-      )}
-
       {/* System Input Bar */}
       <div className="px-4 py-2">
         <SystemInputBar inputs={inputs} onChange={handleInputChange} />
@@ -800,38 +433,27 @@ export default function OCASystemBuilder() {
 
       {/* Action bar */}
       <div className="flex items-center gap-2 px-4 py-1.5 border-b">
-        <Button size="sm" onClick={runAssessment} disabled={loading || !systemId} className="gap-1.5" data-testid="oca-system-assess">
+        <Button size="sm" onClick={runAssessment} disabled={loading || !systemId} className="gap-1.5">
           {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Zap className="h-3 w-3" />}
           Assess System
         </Button>
-        <Button size="sm" variant="outline" onClick={handleExport} disabled={!assessment} className="gap-1.5" data-testid="oca-system-export">
+        <Button size="sm" variant="outline" onClick={handleExport} disabled={!assessment} className="gap-1.5">
           <Download className="h-3 w-3" />
           Export
         </Button>
         {assessment && assessment.kindling_chains.length > 0 && (
-          <Button size="sm" variant={showKindling ? 'default' : 'outline'} onClick={() => setShowKindling(!showKindling)} className="gap-1.5" data-testid="oca-system-kindling-toggle">
+          <Button size="sm" variant={showKindling ? 'default' : 'outline'} onClick={() => setShowKindling(!showKindling)} className="gap-1.5">
             <Flame className="h-3 w-3" />
             Kindling Chains ({assessment.kindling_chains.length})
           </Button>
         )}
-        {isDirty && (
-          <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-900">
-            Needs reassessment
-          </Badge>
-        )}
-        {draftSavedLabel && (
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Clock3 className="h-3.5 w-3.5" />
-            Draft saved {draftSavedLabel}
-          </div>
-        )}
 
         {/* Zone legend */}
-        <div className="flex items-center gap-4 ml-auto">
+        <div className="flex items-center gap-2 ml-auto">
           {(Object.entries(ZONE_COLORS) as [string, string][]).map(([zone, color]) => (
-            <div key={zone} className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }} />
-              <span className="text-xs font-medium text-muted-foreground">{(ZONE_LABELS as Record<string, string>)[zone]}</span>
+            <div key={zone} className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
+              <span className="text-[9px] text-muted-foreground">{(ZONE_LABELS as Record<string, string>)[zone]?.split(' ')[0]}</span>
             </div>
           ))}
         </div>
@@ -855,7 +477,7 @@ export default function OCASystemBuilder() {
         </div>
 
         {/* React Flow Canvas */}
-        <div className="flex-1" ref={reactFlowWrapper} data-testid="oca-system-canvas">
+        <div className="flex-1" ref={reactFlowWrapper}>
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -864,23 +486,13 @@ export default function OCASystemBuilder() {
             onConnect={onConnect}
             onNodesDelete={onNodesDelete}
             onEdgesDelete={onEdgesDelete}
-            onNodeClick={(_, node) => {
-              const componentId = nodeToComponentId.current.get(node.id);
-              if (componentId) {
-                handleOpenEditor(componentId);
-              }
-            }}
-            onNodeDragStop={onNodeDragStop}
             onDragOver={onDragOver}
             onDrop={onDrop}
             onInit={setRfInstance}
             nodeTypes={nodeTypes}
             fitView
-            connectionLineType={ConnectionLineType.SmoothStep}
-            connectionLineStyle={{ stroke: '#5b8cff', strokeWidth: 2.5 }}
-            defaultEdgeOptions={buildEdgeAppearance(false)}
             deleteKeyCode="Delete"
-            className="bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.08),_transparent_32%),linear-gradient(180deg,_rgba(248,250,252,1),_rgba(241,245,249,1))]"
+            className="bg-background"
           >
             <Controls />
             <MiniMap
@@ -896,7 +508,7 @@ export default function OCASystemBuilder() {
                 }
               }}
             />
-            <Background variant={BackgroundVariant.Dots} gap={20} size={1.1} color="#94a3b8" />
+            <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
           </ReactFlow>
         </div>
 
@@ -1050,18 +662,6 @@ export default function OCASystemBuilder() {
           </Tabs>
         </div>
       )}
-
-      <ComponentEditorSheet
-        component={selectedComponent}
-        open={Boolean(selectedComponent)}
-        onOpenChange={(open) => {
-          if (!open) {
-            setSelectedComponentId(null);
-          }
-        }}
-        onInspect={handleInspect}
-        onSave={handleSaveComponent}
-      />
     </div>
   );
 }
