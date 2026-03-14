@@ -19,6 +19,7 @@ import MUAV10 from "./pages/MUAV10";
 import GasCompatibility from "./pages/GasCompatibility";
 import GalvanicCompatibility from "./pages/GalvanicCompatibility";
 import FractureControl from "./pages/FractureControl";
+import OCALanding from "./pages/OCALanding";
 import OCAWorkbench from "./pages/OCAWorkbench";
 import OCASystemBuilder from "./pages/OCASystemBuilder";
 import NotFound from "./pages/NotFound";
@@ -50,7 +51,8 @@ const App = () => (
                 <Route path="/gas-compatibility" element={<GasCompatibility />} />
                 <Route path="/galvanic-compatibility" element={<GalvanicCompatibility />} />
                 <Route path="/fracture-control" element={<FractureControl />} />
-                <Route path="/oca" element={<OCAWorkbench />} />
+                <Route path="/oca" element={<OCALanding />} />
+                <Route path="/oca/workbench" element={<OCAWorkbench />} />
                 <Route path="/oca/system-builder" element={<OCASystemBuilder />} />
                 <Route path="/test-classes" element={<TestClasses />} />
                 <Route path="/test-classes/:testType" element={<TestClassDetail />} />

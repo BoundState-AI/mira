@@ -9,7 +9,7 @@
  * Co-Authored-By: Claude "Beth" <noreply@anthropic.com>
  */
 
-import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import {
   ReactFlow, addEdge, useNodesState, useEdgesState,
   Controls, MiniMap, Background, BackgroundVariant,
@@ -18,13 +18,14 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
+import { OCAInlineHelp } from '@/components/oca/OCAInlineHelp';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  Loader2, AlertTriangle, XCircle, Shield, Flame, Download, Zap, Info,
+  Loader2, AlertTriangle, XCircle, Flame, Download, Zap, Info,
   ChevronRight, LayoutGrid,
 } from 'lucide-react';
 
@@ -38,9 +39,10 @@ import {
   ocaRemoveComponent, ocaRemoveConnection,
   ocaAssessSystem, ocaGetPathInspector, ocaExportSystem,
   type SystemInputs, type SystemComponent, type SystemAssessmentResult,
-  type PathInspectorResult, type ComponentArchetype, type SystemKindlingChain,
+  type PathInspectorResult, type ComponentArchetype,
   ZONE_COLORS, ZONE_LABELS,
 } from '@/lib/oca-system-api';
+import { getDispositionGuidance, getMprGuidance } from '@/lib/oca-guidance';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -87,7 +89,42 @@ const DEFAULT_INPUTS: SystemInputs = {
 // Main Component
 // ---------------------------------------------------------------------------
 
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' ? window.innerWidth < breakpoint : false,
+  );
+
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < breakpoint);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, [breakpoint]);
+
+  return isMobile;
+}
+
 export default function OCASystemBuilder() {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-6 text-center">
+        <LayoutGrid className="h-12 w-12 text-slate-400" />
+        <h2 className="text-lg font-semibold text-slate-800">Desktop Required</h2>
+        <p className="max-w-sm text-sm text-slate-500">
+          The System Builder requires a desktop browser for the drag-and-drop canvas.
+          Please open this page on a laptop or desktop computer.
+        </p>
+        <a
+          href="/oca/workbench"
+          className="mt-2 rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
+        >
+          Go to Workbench instead
+        </a>
+      </div>
+    );
+  }
+
   // System state
   const [systemId, setSystemId] = useState<string | null>(null);
   const [inputs, setInputs] = useState<SystemInputs>(DEFAULT_INPUTS);
@@ -377,9 +414,12 @@ export default function OCASystemBuilder() {
         </div>
         <div className="flex items-center gap-2">
           {assessment && (
-            <Badge className={DISPOSITION_LABELS[assessment.system_disposition]?.color || 'bg-gray-600 text-white'}>
-              {DISPOSITION_LABELS[assessment.system_disposition]?.label || assessment.system_disposition}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge className={DISPOSITION_LABELS[assessment.system_disposition]?.color || 'bg-gray-600 text-white'}>
+                {DISPOSITION_LABELS[assessment.system_disposition]?.label || assessment.system_disposition}
+              </Badge>
+              <OCAInlineHelp entry={getDispositionGuidance(assessment.system_disposition)} />
+            </div>
           )}
           <Badge variant="outline" className="text-xs">Phase 2</Badge>
         </div>
@@ -389,8 +429,9 @@ export default function OCASystemBuilder() {
       {assessment?.mpr67_active && (
         <Alert variant="destructive" className="mx-4 mt-2 border-red-700 bg-red-950">
           <XCircle className="h-4 w-4" />
-          <AlertTitle className="text-sm font-bold">
-            MPR 67 GOVERNING PROHIBITION — Titanium forbidden in LOX/GOX at any pressure
+          <AlertTitle className="flex items-center gap-2 text-sm font-bold">
+            <span>MPR 67 GOVERNING PROHIBITION — Titanium forbidden in LOX/GOX at any pressure</span>
+            <OCAInlineHelp entry={getMprGuidance('MPR_67')} className="h-4 w-4 text-red-100" iconClassName="h-3.5 w-3.5" />
           </AlertTitle>
           <AlertDescription className="text-xs">
             One or more components contain titanium alloys. Per NASA-STD-6016C §4.2.1.3c,
@@ -552,9 +593,12 @@ export default function OCASystemBuilder() {
                 <div className="grid grid-cols-5 gap-2">
                   <div className="p-2 rounded bg-muted text-center">
                     <div className="text-[10px] text-muted-foreground uppercase">Disposition</div>
-                    <Badge className={`mt-1 text-[10px] ${DISPOSITION_LABELS[assessment.system_disposition]?.color || ''}`}>
-                      {DISPOSITION_LABELS[assessment.system_disposition]?.label || assessment.system_disposition}
-                    </Badge>
+                    <div className="mt-1 flex items-center justify-center gap-1.5">
+                      <Badge className={`text-[10px] ${DISPOSITION_LABELS[assessment.system_disposition]?.color || ''}`}>
+                        {DISPOSITION_LABELS[assessment.system_disposition]?.label || assessment.system_disposition}
+                      </Badge>
+                      <OCAInlineHelp entry={getDispositionGuidance(assessment.system_disposition)} />
+                    </div>
                   </div>
                   <div className="p-2 rounded bg-muted text-center">
                     <div className="text-[10px] text-muted-foreground uppercase">Reaction Effect</div>
@@ -582,14 +626,16 @@ export default function OCASystemBuilder() {
                 {assessment.triggered_requirements.length > 0 && (
                   <div className="flex flex-wrap gap-1">
                     {assessment.triggered_requirements.map((r, i) => (
-                      <Badge
-                        key={i}
-                        variant={r.is_prohibition ? 'destructive' : r.satisfied ? 'default' : 'secondary'}
-                        className="text-[9px] gap-1"
-                      >
-                        {r.requirement_id}
-                        {r.is_prohibition && ' — PROHIBITION'}
-                      </Badge>
+                      <div key={`${r.requirement_id}-${i}`} className="inline-flex items-center gap-1">
+                        <Badge
+                          variant={r.is_prohibition ? 'destructive' : r.satisfied ? 'default' : 'secondary'}
+                          className="text-[9px] gap-1"
+                        >
+                          {r.requirement_id}
+                          {r.is_prohibition && ' — PROHIBITION'}
+                        </Badge>
+                        <OCAInlineHelp entry={getMprGuidance(r.requirement_id)} className="h-3.5 w-3.5" iconClassName="h-3 w-3" />
+                      </div>
                     ))}
                   </div>
                 )}

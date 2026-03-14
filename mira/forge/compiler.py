@@ -5,6 +5,7 @@ Deterministic FORGE database compiler.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import os
@@ -14,7 +15,7 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
 from pathlib import Path
-from typing import Any, Iterable, Optional
+from typing import Any, Callable, Iterable, Optional
 from uuid import UUID
 
 from sqlalchemy import MetaData, Table, create_engine, func, inspect, select
@@ -119,22 +120,42 @@ class ForgeCompiler:
     def __init__(self) -> None:
         self._bundle_generator = ForgeBundleGenerator()
 
-    def compile_database(self, request: ForgeCompileRequest) -> ForgeCompileResponse:
+    def compile_database(
+        self,
+        request: ForgeCompileRequest,
+        *,
+        progress_callback: Callable[[str, str, float], None] | None = None,
+    ) -> ForgeCompileResponse:
+        def _progress(stage: str, message: str, progress: float) -> None:
+            if progress_callback is not None:
+                progress_callback(stage, message, progress)
+
         url = self._validate_database_url(request.database_url)
         engine = self._create_engine(url)
+        max_questions = request.max_generated_questions
+        max_per_table = request.max_questions_per_table
 
         try:
+            _progress("introspection", "Introspecting database schema.", 5.0)
             table_profiles, warnings = self._introspect_database(
                 engine=engine,
                 sample_rows_per_table=request.sample_rows_per_table,
             )
 
+            if request.require_llm_refinement:
+                warnings.append(
+                    "LLM refinement requested but not yet implemented. "
+                    "Questions were generated using deterministic rules only."
+                )
+
+            _progress("schema_manifest", "Building schema manifest.", 15.0)
             schema_manifest = self._build_schema_manifest(
                 app_name=request.app_name,
                 engine=engine,
                 table_profiles=table_profiles,
             )
             semantic_map = self._build_semantic_map(table_profiles)
+            _progress("relationship_discovery", "Discovering relationships.", 25.0)
             statistical_relationships = self._discover_statistical_relationships(table_profiles)
             latent_relationships = self._discover_latent_relationships(table_profiles)
             relationship_graph = self._build_relationship_graph(
@@ -142,14 +163,19 @@ class ForgeCompiler:
                 statistical_relationships=statistical_relationships,
                 latent_relationships=latent_relationships,
             )
+            _progress("data_quality", "Analyzing data quality.", 40.0)
             data_quality_report = self._build_data_quality_report(table_profiles)
             capabilities = self._build_capabilities(table_profiles, relationship_graph)
+            _progress("question_generation", "Generating curated questions.", 55.0)
             question_map = self._build_question_map(
                 table_profiles,
                 capabilities,
                 data_quality_report,
                 relationship_graph,
+                max_questions=max_questions,
+                max_per_table=max_per_table,
             )
+            _progress("scaffold", "Building scaffold and pipeline.", 75.0)
             scaffold_plan = self._build_scaffold_plan(request.app_name, question_map)
             bsms_pipeline = self._build_bsms_pipeline(capabilities, question_map, semantic_map)
             authority_pack = self._build_authority_pack(
@@ -163,6 +189,7 @@ class ForgeCompiler:
             output_dir = None
             generated_bundle: ForgeGeneratedBundle | None = None
             should_write_output = request.persist_artifacts or request.generate_bundle
+            _progress("bundle_generation", "Generating application bundle.", 85.0)
             if should_write_output:
                 output_root = self._resolve_output_root(request)
                 output_dir = str(output_root.resolve())
@@ -1294,6 +1321,9 @@ class ForgeCompiler:
         capabilities: dict[str, Any],
         data_quality_report: dict[str, Any],
         relationship_graph: dict[str, Any],
+        *,
+        max_questions: int = _MAX_QUESTION_COUNT,
+        max_per_table: int = 0,
     ) -> dict[str, Any]:
         all_candidates: list[dict[str, Any]] = []
         by_table: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -1438,7 +1468,9 @@ class ForgeCompiler:
             seen.add(dedupe_key)
             deduped.append(question)
 
-        selected, allocation_demoted = self._allocate_question_budgets(deduped)
+        selected, allocation_demoted = self._allocate_question_budgets(
+            deduped, max_questions=max_questions, max_per_table=max_per_table,
+        )
         demoted.extend(allocation_demoted)
         selected_lookup = {question["id"] for question in selected}
 
@@ -1459,7 +1491,12 @@ class ForgeCompiler:
     def _allocate_question_budgets(
         self,
         questions: list[dict[str, Any]],
+        *,
+        max_questions: int = _MAX_QUESTION_COUNT,
+        max_per_table: int = 0,
     ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+        cap = max_questions if max_questions > 0 else _MAX_QUESTION_COUNT
+
         grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for question in questions:
             grouped[question["question_type"]].append(question)
@@ -1470,14 +1507,25 @@ class ForgeCompiler:
         selected: list[dict[str, Any]] = []
         selected_ids: set[str] = set()
         demoted: list[dict[str, Any]] = []
+        table_counts: dict[str, int] = Counter()
 
         for question_type, budget in _QUESTION_TYPE_BUDGETS.items():
             bucket = grouped.get(question_type, [])
             for question in bucket[:budget]:
                 if question["id"] in selected_ids:
                     continue
+                if max_per_table > 0 and table_counts[question["table"]] >= max_per_table:
+                    demoted.append(
+                        {
+                            "table": question["table"],
+                            "question": question["question"],
+                            "reason": "per_table_cap",
+                        }
+                    )
+                    continue
                 selected.append(question)
                 selected_ids.add(question["id"])
+                table_counts[question["table"]] += 1
             for question in bucket[budget:]:
                 demoted.append(
                     {
@@ -1493,7 +1541,7 @@ class ForgeCompiler:
             if question["id"] not in selected_ids
         ]
         for question in leftovers:
-            if len(selected) >= _MAX_QUESTION_COUNT:
+            if len(selected) >= cap:
                 demoted.append(
                     {
                         "table": question["table"],
@@ -1502,11 +1550,21 @@ class ForgeCompiler:
                     }
                 )
                 continue
+            if max_per_table > 0 and table_counts[question["table"]] >= max_per_table:
+                demoted.append(
+                    {
+                        "table": question["table"],
+                        "question": question["question"],
+                        "reason": "per_table_cap",
+                    }
+                )
+                continue
             selected.append(question)
             selected_ids.add(question["id"])
+            table_counts[question["table"]] += 1
 
         selected.sort(key=lambda item: item["utility_score"], reverse=True)
-        return selected[:_MAX_QUESTION_COUNT], demoted
+        return selected[:cap], demoted
 
     def _build_scaffold_plan(self, app_name: str, question_map: dict[str, Any]) -> dict[str, Any]:
         question_types = sorted({question["question_type"] for question in question_map["questions"]})
@@ -1604,7 +1662,7 @@ class ForgeCompiler:
                 "enabled_env": "FORGE_BSMS_ENABLE_LLM",
                 "api_key_env": "ANTHROPIC_API_KEY",
                 "model_env": "FORGE_BSMS_MODEL",
-                "default_model": "claude-sonnet-4-5-20250929",
+                "default_model": "claude-sonnet-4-6",
             },
         }
 
@@ -1986,7 +2044,10 @@ class ForgeCompiler:
 
     def _question_id(self, table_name: str, question_type: str, question: str) -> str:
         base = self._slugify(f"{table_name}-{question_type}-{question}")
-        return base[:96] or "question"
+        if len(base) <= 96:
+            return base or "question"
+        digest = hashlib.sha256(base.encode()).hexdigest()[:8]
+        return f"{base[:87]}-{digest}"
 
     def _normalized_token(self, value: Any) -> str:
         text = str(value).strip().lower()

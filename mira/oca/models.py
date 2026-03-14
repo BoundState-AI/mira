@@ -1,39 +1,33 @@
-#!/usr/bin/env python3
-"""
-Module: OCA Models
-Purpose: Pydantic data models for the OCA engine per BS-SPEC-OCA-001-REV1.
-
-BoundState AI 2026
-Version: 1.0.0
-Classification: BoundState Proprietary
-
-Co-Authored-By: Claude "Beth" <noreply@anthropic.com>
-Co-Authored-By: Dr. Joseph Wilde, BoundState AI
-
-Compliance: NASA-STD-6001B, NASA-STD-6016C, SWE-013
-Safety Critical: True
-"""
+"""Pydantic models for the OCA workbench."""
 
 from __future__ import annotations
 
-import uuid
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+import re
+from typing import Any, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
-# ---------------------------------------------------------------------------
-# Enumerations
-# ---------------------------------------------------------------------------
+class OcaTier(str, Enum):
+    TIER_A = "tier_a"
+    TIER_B = "tier_b"
+    TIER_C = "tier_c"
+    TIER_D = "tier_d"
 
-class RuleTier(str, Enum):
-    """Four-tier rule architecture. Tiers never blend."""
-    A = "A"  # Governing requirements (MPRs, FOCRs)
-    B = "B"  # Assessment method (TM-2007-213740)
-    C = "C"  # Evidence layer (test data, MAPTIS)
-    D = "D"  # Expert overlay (center practice, heuristics)
+
+class RequirementStatus(str, Enum):
+    NOT_TRIGGERED = "not_triggered"
+    SATISFIED = "satisfied"
+    ACTION_REQUIRED = "action_required"
+    PROHIBITED = "prohibited"
+
+
+class BlockedStateCode(str, Enum):
+    MATERIAL_IDENTITY_UNRESOLVED = "MATERIAL_IDENTITY_UNRESOLVED"
+    SERVICE_ENVELOPE_INCOMPLETE = "SERVICE_ENVELOPE_INCOMPLETE"
+    DESIGN_FUNCTION_UNKNOWN = "DESIGN_FUNCTION_UNKNOWN"
 
 
 class OxidizerType(str, Enum):
@@ -43,22 +37,9 @@ class OxidizerType(str, Enum):
     COMPRESSED_AIR = "compressed_air"
 
 
-class OxygenPhase(str, Enum):
+class ServicePhase(str, Enum):
     LIQUID = "liquid"
     GAS = "gas"
-
-
-class FlowRegime(str, Enum):
-    STATIC = "static"
-    LAMINAR = "laminar"
-    TURBULENT = "turbulent"
-
-
-class MissionPhase(str, Enum):
-    GROUND_TEST = "ground_test"
-    ASCENT = "ascent"
-    ON_ORBIT = "on_orbit"
-    SERVICING = "servicing"
 
 
 class ComponentClass(str, Enum):
@@ -84,24 +65,23 @@ class GeometryClass(str, Enum):
     OTHER = "other"
 
 
-class SealType(str, Enum):
-    METAL = "metal"
-    POLYMER = "polymer"
-    COMPOSITE = "composite"
+class FlowRegime(str, Enum):
+    STATIC = "static"
+    LAMINAR = "laminar"
+    TURBULENT = "turbulent"
 
 
 class FlammabilityRating(str, Enum):
-    """NASA-STD-6001B flammability rating."""
-    A = "A"  # Nonflammable in configuration
-    B = "B"  # Self-extinguishing
-    C = "C"  # Flammable, burns slowly
-    D = "D"  # Flammable, burns rapidly
-    X = "X"  # Not tested / unknown
+    A = "A"
+    B = "B"
+    C = "C"
+    D = "D"
+    X = "X"
+    U = "U"
     UNKNOWN = "unknown"
 
 
 class IgnitionMechanismName(str, Enum):
-    """12 ignition mechanisms per TM-2007-213740 Section 4.3.1."""
     PARTICLE_IMPACT = "particle_impact"
     RAPID_PRESSURIZATION = "rapid_pressurization"
     FLOW_FRICTION = "flow_friction"
@@ -113,104 +93,162 @@ class IgnitionMechanismName(str, Enum):
     ELECTRICAL_ARC = "electrical_arc"
     CHEMICAL_REACTION = "chemical_reaction"
     THERMAL_RUNAWAY = "thermal_runaway"
+    LIGHTNING = "lightning"
+    EXPLOSIVE_CHARGES = "explosive_charges"
+    PERSONNEL_SMOKING_OPEN_FLAMES = "personnel_smoking_open_flames"
+    FRAGMENTS_FROM_BURSTING_VESSELS = "fragments_from_bursting_vessels"
+    WELDING = "welding"
+    ENGINE_EXHAUST = "engine_exhaust"
     OTHER = "other"
 
 
+class EvidenceApplicabilityClass(str, Enum):
+    DIRECT = "DIRECT"
+    PARTIAL = "PARTIAL"
+    WEAK_ANALOG = "WEAK_ANALOG"
+    NOT_APPLICABLE = "NOT_APPLICABLE"
+
+
 class CredibleStatus(str, Enum):
-    CREDIBLE = "credible"
-    NOT_CREDIBLE = "not_credible"
-    INDETERMINATE = "indeterminate"
+    CREDIBLE = "CREDIBLE"
+    NOT_CREDIBLE = "NOT_CREDIBLE"
+    INDETERMINATE = "INDETERMINATE"
 
 
-class ReactionEffect(str, Enum):
-    """TM Table 3 reaction effect severity."""
-    A = "A"  # Negligible
-    B = "B"  # Marginal
-    C = "C"  # Critical
-    D = "D"  # Catastrophic
-
-
-class HistoryOfUse(str, Enum):
-    POSITIVE = "+"
-    NEGATIVE = "-"
-    UNKNOWN = "?"
-
-
-class ApplicabilityClass(str, Enum):
-    DIRECT = "directly_applicable"
-    PARTIAL = "partially_applicable"
-    WEAK_ANALOG = "weak_analog"
-    NOT_APPLICABLE = "not_applicable"
-
-
-class BlockedStateType(str, Enum):
-    MATERIAL_IDENTITY_UNRESOLVED = "material_identity_unresolved"
-    SERVICE_ENVELOPE_INCOMPLETE = "service_envelope_incomplete"
-    DESIGN_FUNCTION_UNKNOWN = "design_function_unknown"
-
-
-class OCADisposition(str, Enum):
+class FinalDisposition(str, Enum):
     COMPATIBLE_AS_CONFIGURED = "compatible_as_configured"
     COMPATIBLE_WITH_CONTROLS = "compatible_with_controls"
     REQUIRES_MUA = "requires_mua"
     REQUIRES_ACCEPTANCE_TEST = "requires_acceptance_test"
     REQUIRES_SUPPLEMENTAL_TESTING = "requires_supplemental_testing"
     INSUFFICIENT_EVIDENCE = "insufficient_evidence"
+    PROHIBITED = "prohibited"
 
 
-class RecommendationClass(str, Enum):
-    STANDARDS_DERIVED = "standards_derived"
-    PRECEDENT_DERIVED = "precedent_derived"
-    HEURISTIC = "heuristic"
-    REVIEWER_ENTERED = "reviewer_entered"
+class ReactionEffect(str, Enum):
+    A = "A"
+    B = "B"
+    C = "C"
+    D = "D"
 
 
-# ---------------------------------------------------------------------------
-# Domain Models — per Spec §9
-# ---------------------------------------------------------------------------
+class MissionPhase(str, Enum):
+    GROUND_TEST = "ground_test"
+    FLIGHT = "flight"
+    LAUNCH = "launch"
+    OPERATIONS = "operations"
 
-class OxygenServiceContext(BaseModel):
-    """Service context for the OCA case (Spec §9)."""
-    case_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+
+BlockedStateType = BlockedStateCode
+OxygenPhase = ServicePhase
+RuleTier = OcaTier
+OCADisposition = FinalDisposition
+
+
+def _default_blocked_state_resolution_hint(code: Optional[BlockedStateCode]) -> str:
+    if code == BlockedStateCode.MATERIAL_IDENTITY_UNRESOLVED:
+        return "Confirm canonical material identity before final disposition."
+    if code == BlockedStateCode.SERVICE_ENVELOPE_INCOMPLETE:
+        return "Populate all required service-envelope fields before assessment."
+    if code == BlockedStateCode.DESIGN_FUNCTION_UNKNOWN:
+        return "Provide component class, geometry, and design function for each assessed part."
+    return "Resolve the blocked state before releasing the assessment."
+
+
+def _default_blocked_state_severity(code: Optional[BlockedStateCode]) -> str:
+    if code == BlockedStateCode.SERVICE_ENVELOPE_INCOMPLETE:
+        return "red"
+    return "amber"
+
+
+def _normalize_ignition_mechanism_name(value: Any) -> Any:
+    if isinstance(value, IgnitionMechanismName):
+        return value
+    if isinstance(value, str):
+        normalized = re.sub(r"[^a-z0-9]+", "_", value.strip().lower()).strip("_")
+        try:
+            return IgnitionMechanismName(normalized)
+        except ValueError:
+            return IgnitionMechanismName.OTHER
+    return value
+
+
+class AuthoritySource(BaseModel):
+    source_id: str
+    title: str
+    edition: str
+    change_number: Optional[str] = None
+    publication_date: str
+    checksum: str
+    ingest_date: str
+
+
+class OcaAuthorityManifest(BaseModel):
+    spec_id: str
+    approved_on: str
+    sources: list[AuthoritySource]
+
+
+class OxygenServiceContextInput(BaseModel):
     oxidizer_type: OxidizerType = OxidizerType.GOX
-    o2_fraction: float = Field(default=1.0, ge=0.21, le=1.0)
-    total_pressure_min_psia: float = Field(default=14.7, ge=0)
-    total_pressure_max_psia: float = Field(default=14.7, ge=0)
-    oxygen_partial_pressure_psia: Optional[float] = None
-    phase: OxygenPhase = OxygenPhase.GAS
+    o2_fraction: Optional[float] = Field(default=None, ge=0.21, le=1.0)
+    total_pressure_min_psia: Optional[float] = Field(default=None, ge=0.0)
+    total_pressure_max_psia: Optional[float] = Field(default=None, ge=0.0)
+    oxygen_partial_pressure_psia: Optional[float] = Field(default=None, ge=0.0)
+    phase: Optional[ServicePhase] = None
     temp_min_c: Optional[float] = None
     temp_max_c: Optional[float] = None
     flow_regime: FlowRegime = FlowRegime.STATIC
-    velocity_m_s: Optional[float] = None
-    cleanliness_verified: bool = False
+    velocity_m_s: Optional[float] = Field(default=None, ge=0.0)
+    cleanliness_verified: Optional[bool] = None
     contamination_notes: Optional[str] = None
-    mission_phase: MissionPhase = MissionPhase.GROUND_TEST
+    mission_phase: Optional[str] = None
+    application: Optional[str] = None
 
-    def compute_o2_partial_pressure(self) -> float:
-        """Auto-compute O2 partial pressure from max total pressure * fraction."""
-        return self.total_pressure_max_psia * self.o2_fraction
+    model_config = {"extra": "forbid"}
 
 
-class ComponentInfo(BaseModel):
-    """Component descriptor with MPR 53 exemption fields (Spec §9)."""
-    component_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    component_class: ComponentClass = ComponentClass.OTHER
-    geometry_class: GeometryClass = GeometryClass.BULK
+class OxygenServiceContext(OxygenServiceContextInput):
+    case_id: str = ""
+
+
+class ComponentInput(BaseModel):
+    component_id: Optional[str] = None
+    component_class: Optional[str] = None
+    geometry_class: Optional[str] = None
+    design_function: Optional[str] = None
     dynamic_contact_flag: bool = False
     is_rigid_metallic_tubing: bool = False
     is_metallic_flex_hose: bool = False
     is_all_metal_seal: bool = False
     is_metallic_pressure_vessel: bool = False
-    seal_type: Optional[SealType] = None
+    seal_type: Optional[str] = None
     pressure_boundary_material: Optional[str] = None
-    acceptance_test_exemption_class: Optional[str] = None
+
+    model_config = {"extra": "forbid"}
+
+
+class ComponentInfo(ComponentInput):
+    pass
+
+
+class MaterialInput(BaseModel):
+    material_name: str = Field(min_length=1)
+    spec: Optional[str] = None
+    grade: Optional[str] = None
+    temper: Optional[str] = None
+    product_form: Optional[str] = None
+    coating: Optional[str] = None
+    surface_condition: Optional[str] = None
+    role_in_component: Optional[str] = None
+
+    model_config = {"extra": "forbid"}
 
 
 class MaterialInstance(BaseModel):
-    """Material identity with alias resolution (Spec §9)."""
-    material_instance_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    material_name: str
+    material_name: str = Field(min_length=1)
     canonical_name: Optional[str] = None
+    family: Optional[str] = None
     spec: Optional[str] = None
     grade: Optional[str] = None
     temper: Optional[str] = None
@@ -219,209 +257,329 @@ class MaterialInstance(BaseModel):
     surface_condition: Optional[str] = None
     role_in_component: Optional[str] = None
     identity_confidence: float = Field(default=1.0, ge=0.0, le=1.0)
-    synonym_list: list[str] = Field(default_factory=list)
     flammability_rating: FlammabilityRating = FlammabilityRating.UNKNOWN
     is_titanium: bool = False
     is_nonmetal: bool = False
+    o2_test_count: int = 0
+    max_tested_pressure_psia: Optional[float] = None
+    data_source: str = "legacy_phase2_input"
 
 
-class EvidenceApplicabilityScore(BaseModel):
-    """Applicability scoring for a single evidence object (Spec §7)."""
-    evidence_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    exact_material_match: bool = False
-    spec_match: bool = False
-    form_match: bool = False
-    geometry_match: bool = False
-    pressure_match: bool = False
-    o2_match: bool = False
-    phase_match: bool = False
-    temperature_match: bool = False
-    coating_match: bool = False
-    method_relevance: bool = False
-    aggregate_score: float = 0.0
-    applicability_class: ApplicabilityClass = ApplicabilityClass.NOT_APPLICABLE
+class IgnitionContextInput(BaseModel):
+    entrainable_particles_present: Optional[bool] = None
+    rapid_pressurization_time_ms: Optional[float] = Field(default=None, ge=0.0)
+    dead_end_configuration: Optional[bool] = None
+    nonmetal_exposed_to_flow: Optional[bool] = None
+    vibration_or_erosion_present: Optional[bool] = None
+    acoustic_cavity_present: Optional[bool] = None
+    mechanical_impact_risk: Optional[bool] = None
+    isolated_surface_present: Optional[bool] = None
+    dry_gas_environment: Optional[bool] = None
+    electrical_power_present: Optional[bool] = None
+    reactive_chemical_pair_present: Optional[bool] = None
+    porous_media_present: Optional[bool] = None
+    open_flame_or_hot_work_present: Optional[bool] = None
+
+    model_config = {"extra": "forbid"}
 
 
-class TestEvidence(BaseModel):
-    """A piece of test evidence from the evidence database."""
-    evidence_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    test_method: str = ""
-    specimen_description: str = ""
-    test_conditions: str = ""
-    result_summary: str = ""
-    citation: str = ""
-    source_document: str = ""
-    applicability: Optional[EvidenceApplicabilityScore] = None
+class CreateOcaCaseRequest(BaseModel):
+    case_name: Optional[str] = None
+    free_text_intake: Optional[str] = None
+    service_context: OxygenServiceContextInput
+    materials: list[MaterialInput] = Field(min_length=1)
+    components: list[ComponentInput] = Field(default_factory=list)
+    ignition_context: IgnitionContextInput = Field(default_factory=IgnitionContextInput)
+
+    model_config = {"extra": "forbid"}
 
 
-class MechanismTrace(BaseModel):
-    """Structured trace for one ignition mechanism (Spec §6 Step 3)."""
-    mechanism_name: IgnitionMechanismName
-    source_ref: str = ""
-    credible_status: CredibleStatus = CredibleStatus.INDETERMINATE
-    rating: int = Field(default=0, ge=0, le=4)
-    required_elements: list[str] = Field(default_factory=list)
-    observed_elements: list[str] = Field(default_factory=list)
-    missing_elements: list[str] = Field(default_factory=list)
-    rating_formula_version: str = "TM-2007-213740-Table2-v1"
-    linked_evidence_ids: list[str] = Field(default_factory=list)
-    controls_required: list[str] = Field(default_factory=list)
-    reviewer_override: Optional[str] = None
-    reviewer_comments: list[str] = Field(default_factory=list)
-
-
-class KindlingChainResult(BaseModel):
-    """Kindling chain and reaction effect (Spec §6 Steps 4-5)."""
-    kindling_chain_present: bool = False
-    propagation_path: list[str] = Field(default_factory=list)
-    reaction_effect: ReactionEffect = ReactionEffect.A
-    rationale: str = ""
-
-
-class HazardControlEntry(BaseModel):
-    """One row in the Hazard Control Table per TM Table 4."""
-    component_ref: str = ""
-    schematic_ref: Optional[str] = None
-    ignition_hazard: str = ""
-    probability_rating: int = Field(default=0, ge=0, le=4)
-    reaction_effect: ReactionEffect = ReactionEffect.A
-    recommendation: str = ""
-    recommendation_class: RecommendationClass = RecommendationClass.HEURISTIC
-    mitigated_reaction_effect: Optional[ReactionEffect] = None
-    status: str = "open"
-    affected_mechanisms: list[IgnitionMechanismName] = Field(default_factory=list)
-    evidence_basis: str = ""
-    confidence: str = "medium"
-
-
-class TriggeredRequirement(BaseModel):
-    """A governing requirement triggered by the assessment."""
-    requirement_id: str
-    source_standard: str
-    section: str
-    title: str
-    tier: RuleTier = RuleTier.A
-    satisfied: bool = False
-    satisfaction_basis: str = ""
-    is_prohibition: bool = False
-    prohibition_detail: Optional[str] = None
+class ResolvedMaterial(BaseModel):
+    material_name: str
+    canonical_name: str
+    family: str
+    spec: Optional[str] = None
+    grade: Optional[str] = None
+    temper: Optional[str] = None
+    product_form: Optional[str] = None
+    coating: Optional[str] = None
+    surface_condition: Optional[str] = None
+    role_in_component: Optional[str] = None
+    identity_confidence: float = Field(ge=0.0, le=1.0)
+    synonym_list: list[str] = Field(default_factory=list)
+    rating_flam: Optional[str] = None
+    auto_ignition_temp_c: Optional[float] = None
+    o2_test_count: int = 0
+    max_tested_pressure_psia: Optional[float] = None
+    data_source: str
+    provenance_tier: str = "not_available"
 
 
 class BlockedState(BaseModel):
-    """A blocked state preventing full assessment."""
-    state_type: BlockedStateType
-    description: str
+    code: Optional[BlockedStateCode] = None
+    detail: Optional[str] = None
+    resolution_hint: Optional[str] = None
+    severity: Optional[str] = None
+    state_type: Optional[BlockedStateCode] = None
+    description: Optional[str] = None
     missing_fields: list[str] = Field(default_factory=list)
-    resolution_hint: str = ""
+
+    @model_validator(mode="after")
+    def _sync_legacy_fields(self) -> "BlockedState":
+        code = self.code or self.state_type
+        detail = self.detail or self.description
+        if code is None:
+            raise ValueError("BlockedState requires code or state_type")
+        if not detail:
+            raise ValueError("BlockedState requires detail or description")
+        self.code = code
+        self.state_type = code
+        self.detail = detail
+        self.description = detail
+        self.resolution_hint = self.resolution_hint or _default_blocked_state_resolution_hint(code)
+        self.severity = self.severity or _default_blocked_state_severity(code)
+        return self
+
+
+class PrecheckWarning(BaseModel):
+    code: str
+    message: str
+
+
+class NormalizedInput(BaseModel):
+    service_context: OxygenServiceContextInput
+    materials: list[ResolvedMaterial]
+    components: list[ComponentInput]
+    ignition_context: IgnitionContextInput
+
+
+class TriggeredRequirement(BaseModel):
+    requirement_id: str
+    title: str
+    citation: str
+    tier: OcaTier
+    triggered: bool
+    status: RequirementStatus
+    reasoning: str
+    evidence_links: list[str] = Field(default_factory=list)
+    downstream_actions: list[str] = Field(default_factory=list)
+    satisfied: bool = False
+    is_prohibition: bool = False
+    prohibition_detail: Optional[str] = None
+
+    @model_validator(mode="after")
+    def _sync_legacy_flags(self) -> "TriggeredRequirement":
+        self.satisfied = self.status == RequirementStatus.SATISFIED
+        self.is_prohibition = self.status == RequirementStatus.PROHIBITED
+        self.prohibition_detail = self.reasoning if self.is_prohibition else None
+        return self
+
+
+class EvidenceApplicabilityScore(BaseModel):
+    exact_material_match: bool
+    spec_match: bool
+    form_match: bool
+    geometry_match: bool
+    pressure_match: bool
+    o2_fraction_match: bool
+    phase_match: bool
+    temperature_match: bool
+    coating_match: bool
+    method_relevance: bool
+    aggregate_score: float = Field(ge=0.0, le=1.0)
+    applicability_class: EvidenceApplicabilityClass
+
+
+class EvidenceCard(BaseModel):
+    evidence_id: str
+    material_name: str
+    source_id: str
+    title: str
+    citation: str
+    tier: OcaTier
+    summary: str
+    test_method: Optional[str] = None
+    specimen_description: Optional[str] = None
+    test_conditions: Optional[str] = None
+    result: Optional[str] = None
+    applicability: EvidenceApplicabilityScore
+    gaps: list[str] = Field(default_factory=list)
+
+
+class MechanismTrace(BaseModel):
+    mechanism_name: IgnitionMechanismName
+    source_ref: str
+    required_elements: list[str]
+    observed_elements: list[str]
+    missing_elements: list[str]
+    rating_formula_version: str
+    rating_result: int = Field(ge=0, le=4)
+    reviewer_comments: list[str] = Field(default_factory=list)
+
+    @field_validator("mechanism_name", mode="before")
+    @classmethod
+    def _validate_mechanism_name(cls, value: Any) -> Any:
+        return _normalize_ignition_mechanism_name(value)
+
+
+class MechanismAssessment(BaseModel):
+    mechanism_name: IgnitionMechanismName
+    credible_status: CredibleStatus
+    rating: int = Field(ge=0, le=4)
+    source_ref: str
+    required_elements: list[str]
+    observed_elements: list[str]
+    missing_elements: list[str]
+    linked_evidence_ids: list[str] = Field(default_factory=list)
+    gaps_identified: list[str] = Field(default_factory=list)
+    reviewer_comments: list[str] = Field(default_factory=list)
+    mechanism_trace: MechanismTrace
+
+    @field_validator("mechanism_name", mode="before")
+    @classmethod
+    def _validate_mechanism_name(cls, value: Any) -> Any:
+        return _normalize_ignition_mechanism_name(value)
+
+
+class HazardControlEntry(BaseModel):
+    component_ref: str = ""
+    ignition_hazard: str
+    probability_rating: int = Field(default=1, ge=1, le=4)
+    recommendation: str
+    confidence: str = "medium"
+
+
+class KindlingChainResult(BaseModel):
+    kindling_chain_present: bool = False
+    reaction_effect: ReactionEffect = ReactionEffect.A
+    history_of_use: str = "unknown"
+    propagation_notes: list[str] = Field(default_factory=list)
 
 
 class MUASeed(BaseModel):
-    """Structured MUA pre-population packet (Spec §13)."""
-    material_identity: str = ""
-    service_conditions: str = ""
-    trigger_reason: str = ""
-    mechanism_summary: str = ""
-    applicable_evidence: list[str] = Field(default_factory=list)
-    gaps: list[str] = Field(default_factory=list)
-    rationale_draft: str = ""
-    assumptions: list[str] = Field(default_factory=list)
+    material_names: list[str] = Field(default_factory=list)
+    service_conditions: dict[str, Any] = Field(default_factory=dict)
+    mechanism_summary: list[dict[str, Any]] = Field(default_factory=list)
+    evidence_gaps: list[str] = Field(default_factory=list)
+    recommended_disposition: Optional[OCADisposition] = None
+    notes: list[str] = Field(default_factory=list)
 
 
-class OCADecisionPacket(BaseModel):
-    """Final OCA decision packet (Spec §9)."""
+class DecisionAction(BaseModel):
+    action_id: str
+    label: str
+    rationale: str
+
+
+class OcaDecisionPacket(BaseModel):
     case_id: str
-    final_disposition: OCADisposition = OCADisposition.INSUFFICIENT_EVIDENCE
-    triggered_requirements: list[TriggeredRequirement] = Field(default_factory=list)
-    blocked_states: list[BlockedState] = Field(default_factory=list)
-    unresolved_gaps: list[str] = Field(default_factory=list)
+    final_disposition: FinalDisposition
+    triggered_requirements: list[TriggeredRequirement]
+    blocked_states: list[BlockedState]
+    unresolved_gaps: list[str]
     kindling_chain_present: bool = False
-    reaction_effect: ReactionEffect = ReactionEffect.A
-    history_of_use: HistoryOfUse = HistoryOfUse.UNKNOWN
-    mua_seed: Optional[MUASeed] = None
+    reaction_effect: Optional[str] = None
+    history_of_use: str = "?"
+    mua_seed: dict[str, Any] = Field(default_factory=dict)
     acceptance_test_required: bool = False
     reviewer_required: bool = False
-    summary_rationale: str = ""
-    mechanism_assessments: list[MechanismTrace] = Field(default_factory=list)
-    evidence: list[TestEvidence] = Field(default_factory=list)
-    hazard_controls: list[HazardControlEntry] = Field(default_factory=list)
-    kindling_chain: Optional[KindlingChainResult] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    overall_confidence: str
+    authority_level: OcaTier
+    governing_prohibition: Optional[str] = None
+    summary_rationale: str
+    actions: list[DecisionAction] = Field(default_factory=list)
+    provenance_warning: Optional[str] = None
 
 
-# ---------------------------------------------------------------------------
-# API Request/Response Models
-# ---------------------------------------------------------------------------
-
-class OCACreateCaseRequest(BaseModel):
-    """Request to create a new OCA case."""
-    service_context: OxygenServiceContext
-    component: ComponentInfo
-    materials: list[MaterialInstance]
+OCADecisionPacket = OcaDecisionPacket
 
 
-class OCACreateCaseResponse(BaseModel):
-    """Response after creating a case."""
+class RuleTraceEvent(BaseModel):
+    stage: str
+    rule_id: str
+    tier: OcaTier
+    outcome: str
+    detail: str
+    recorded_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class OcaRevision(BaseModel):
+    revision: int
+    created_at: datetime
+    note: str
+
+
+class AssessmentSnapshot(BaseModel):
     case_id: str
-    blocked_states: list[BlockedState] = Field(default_factory=list)
-    precheck_warnings: list[str] = Field(default_factory=list)
-    normalized_context: OxygenServiceContext
-    normalized_materials: list[MaterialInstance] = Field(default_factory=list)
+    revision: int
+    created_at: datetime
+    normalized_input: NormalizedInput
+    blocked_states: list[BlockedState]
+    precheck_warnings: list[PrecheckWarning]
+    requirements: list[TriggeredRequirement]
+    evidence: list[EvidenceCard]
+    mechanisms: list[MechanismAssessment]
+    decision: OcaDecisionPacket
+    decision_lineage: list[RuleTraceEvent]
+    revisions: list[OcaRevision]
 
 
-class OCAPrecheckResponse(BaseModel):
-    """Requirement trigger precheck result."""
+class CreateOcaCaseResponse(BaseModel):
     case_id: str
-    triggered_requirements: list[TriggeredRequirement] = Field(default_factory=list)
-    prohibitions: list[TriggeredRequirement] = Field(default_factory=list)
-    acceptance_test_required: bool = False
-    acceptance_test_exempt: bool = False
-    exemption_reason: Optional[str] = None
+    revision: int
+    normalized_input: NormalizedInput
+    blocked_states: list[BlockedState]
+    precheck_warnings: list[PrecheckWarning]
 
 
-class OCAEvidenceResponse(BaseModel):
-    """Evidence retrieval and scoring result."""
+class OcaPrecheckResponse(BaseModel):
     case_id: str
-    evidence: list[TestEvidence] = Field(default_factory=list)
-    gaps: list[str] = Field(default_factory=list)
-    total_evidence: int = 0
+    revision: int
+    blocked_states: list[BlockedState]
+    triggered_requirements: list[TriggeredRequirement]
+    precheck_warnings: list[PrecheckWarning]
 
 
-class OCAMechanismResponse(BaseModel):
-    """Mechanism assessment result."""
+class OcaEvidenceResponse(BaseModel):
     case_id: str
-    mechanism_assessments: list[MechanismTrace] = Field(default_factory=list)
-    credible_count: int = 0
-    indeterminate_count: int = 0
+    revision: int
+    evidence: list[EvidenceCard]
+    gaps: list[str]
 
 
-class OCAKindlingResponse(BaseModel):
-    """Kindling chain and reaction effect result."""
+class OcaMechanismsResponse(BaseModel):
     case_id: str
-    kindling_chain: KindlingChainResult
+    revision: int
+    mechanisms: list[MechanismAssessment]
 
 
-class OCADecisionResponse(BaseModel):
-    """Final disposition response."""
+class OcaDecisionResponse(BaseModel):
     case_id: str
-    decision: OCADecisionPacket
+    revision: int
+    decision: OcaDecisionPacket
 
 
-class OCAExportRequest(BaseModel):
-    """Export artifact request."""
+class OcaRequirementsResponse(BaseModel):
     case_id: str
-    format: str = "json"  # json, summary
-    include_evidence: bool = True
-    include_mua_seed: bool = True
+    revision: int
+    requirements: list[TriggeredRequirement]
 
 
-class OCAReviewActionRequest(BaseModel):
-    """Reviewer action request."""
+class OcaLineageResponse(BaseModel):
     case_id: str
-    action: str  # approve, override, comment, request-info
-    mechanism_name: Optional[IgnitionMechanismName] = None
-    comment: str = ""
-    reviewer_name: str = ""
+    revision: int
+    revisions: list[OcaRevision]
+    decision_lineage: list[RuleTraceEvent]
 
 
-__safety_critical__ = True
+class OcaExportArtifact(BaseModel):
+    artifact_type: str
+    filename: str
+    content_type: str
+    generated_text: str
+
+
+class OcaExportResponse(BaseModel):
+    case_id: str
+    revision: int
+    artifacts: list[OcaExportArtifact]

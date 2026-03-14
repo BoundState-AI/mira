@@ -6,7 +6,7 @@
  * Co-Authored-By: Claude "Beth" <noreply@anthropic.com>
  */
 
-const API_BASE = import.meta.env.VITE_API_URL || '';
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -117,6 +117,10 @@ export interface SystemComponent {
   highest_rating: number;
   credible_mechanisms: string[];
   connected: boolean;
+  is_rigid_metallic_tubing?: boolean;
+  is_metallic_flex_hose?: boolean;
+  is_all_metal_seal?: boolean;
+  is_metallic_pressure_vessel?: boolean;
 }
 
 export interface SystemConnection {
@@ -173,6 +177,16 @@ export interface SystemAssessmentResult {
   hazard_controls: { component_ref: string; ignition_hazard: string; probability_rating: number; recommendation: string; confidence: string }[];
   has_titanium: boolean;
   mpr67_active: boolean;
+}
+
+export interface ComponentUpdateRequest {
+  label?: string;
+  materials?: MaterialSlotValue[];
+  config?: Partial<ComponentConfig>;
+  is_rigid_metallic_tubing?: boolean;
+  is_metallic_flex_hose?: boolean;
+  is_all_metal_seal?: boolean;
+  is_metallic_pressure_vessel?: boolean;
 }
 
 // Component library archetype definition
@@ -242,6 +256,18 @@ export async function ocaAddComponent(
 
 export async function ocaRemoveComponent(systemId: string, componentId: string): Promise<{ status: string }> {
   return fetchJSON(`${API_BASE}/oca/systems/${systemId}/components/${componentId}`, { method: 'DELETE' });
+}
+
+export async function ocaUpdateComponent(
+  systemId: string,
+  componentId: string,
+  updates: ComponentUpdateRequest,
+): Promise<{ status: string }> {
+  return fetchJSON(`${API_BASE}/oca/systems/${systemId}/components/${componentId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updates),
+  });
 }
 
 export async function ocaAddConnection(

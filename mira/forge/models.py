@@ -39,8 +39,8 @@ class ForgeCompileRequest(BaseModel):
         description="When true, emit a generated application bundle on disk.",
     )
     require_llm_refinement: bool = Field(
-        True,
-        description="When true, Sonnet refinement is mandatory and compile fails closed if unavailable.",
+        False,
+        description="When true, Sonnet refinement is requested. Currently unimplemented — a warning is emitted.",
     )
     max_generated_questions: int = Field(
         240,

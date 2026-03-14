@@ -1330,14 +1330,21 @@ export type OCAFlowRegime = 'static' | 'laminar' | 'turbulent';
 export type OCAMissionPhase = 'ground_test' | 'ascent' | 'on_orbit' | 'servicing';
 export type OCAComponentClass = 'valve' | 'regulator' | 'line' | 'vessel' | 'seal' | 'filter' | 'sensor' | 'fitting' | 'flex_hose' | 'other';
 export type OCAGeometryClass = 'bulk' | 'thin_wall' | 'mesh' | 'porous' | 'sintered' | 'seal' | 'other';
-export type OCAFlammabilityRating = 'A' | 'B' | 'C' | 'D' | 'X' | 'unknown';
-export type OCACredibleStatus = 'credible' | 'not_credible' | 'indeterminate';
-export type OCAReactionEffect = 'A' | 'B' | 'C' | 'D';
-export type OCADisposition = 'compatible_as_configured' | 'compatible_with_controls' | 'requires_mua' | 'requires_acceptance_test' | 'requires_supplemental_testing' | 'insufficient_evidence';
-export type OCARuleTier = 'A' | 'B' | 'C' | 'D';
+export type OCAFlammabilityRating = 'A' | 'B' | 'C' | 'D' | 'X' | 'U' | 'unknown';
+export type OCACredibleStatus = 'CREDIBLE' | 'NOT_CREDIBLE' | 'INDETERMINATE';
+export type OCADisposition =
+  | 'compatible_as_configured'
+  | 'compatible_with_controls'
+  | 'requires_mua'
+  | 'requires_acceptance_test'
+  | 'requires_supplemental_testing'
+  | 'insufficient_evidence'
+  | 'prohibited';
+export type OCARuleTier = 'tier_a' | 'tier_b' | 'tier_c' | 'tier_d';
+export type OCARequirementStatus = 'not_triggered' | 'satisfied' | 'action_required' | 'prohibited';
+export type OCAApplicabilityClass = 'DIRECT' | 'PARTIAL' | 'WEAK_ANALOG' | 'NOT_APPLICABLE';
 
 export interface OCAServiceContext {
-  case_id?: string;
   oxidizer_type: OCAOxidizerType;
   o2_fraction: number;
   total_pressure_min_psia: number;
@@ -1348,15 +1355,17 @@ export interface OCAServiceContext {
   temp_max_c?: number | null;
   flow_regime: OCAFlowRegime;
   velocity_m_s?: number | null;
-  cleanliness_verified: boolean;
+  cleanliness_verified?: boolean | null;
   contamination_notes?: string | null;
-  mission_phase: OCAMissionPhase;
+  mission_phase?: OCAMissionPhase | null;
+  application?: string | null;
 }
 
 export interface OCAComponent {
   component_id?: string;
   component_class: OCAComponentClass;
   geometry_class: OCAGeometryClass;
+  design_function: string;
   dynamic_contact_flag: boolean;
   is_rigid_metallic_tubing: boolean;
   is_metallic_flex_hose: boolean;
@@ -1367,80 +1376,126 @@ export interface OCAComponent {
 }
 
 export interface OCAMaterial {
-  material_instance_id?: string;
   material_name: string;
-  canonical_name?: string | null;
   spec?: string | null;
   grade?: string | null;
   temper?: string | null;
   product_form?: string | null;
   coating?: string | null;
+  surface_condition?: string | null;
   role_in_component?: string | null;
+}
+
+export interface OCAIgnitionContext {
+  entrainable_particles_present?: boolean | null;
+  rapid_pressurization_time_ms?: number | null;
+  dead_end_configuration?: boolean | null;
+  nonmetal_exposed_to_flow?: boolean | null;
+  vibration_or_erosion_present?: boolean | null;
+  acoustic_cavity_present?: boolean | null;
+  mechanical_impact_risk?: boolean | null;
+  isolated_surface_present?: boolean | null;
+  dry_gas_environment?: boolean | null;
+  electrical_power_present?: boolean | null;
+  reactive_chemical_pair_present?: boolean | null;
+  porous_media_present?: boolean | null;
+  open_flame_or_hot_work_present?: boolean | null;
+}
+
+export interface OCAResolvedMaterial extends OCAMaterial {
+  canonical_name: string;
+  family: string;
   identity_confidence: number;
-  flammability_rating: OCAFlammabilityRating;
-  is_titanium: boolean;
-  is_nonmetal: boolean;
+  synonym_list: string[];
+  rating_flam?: string | null;
+  o2_test_count: number;
+  max_tested_pressure_psia?: number | null;
+  data_source: string;
 }
 
 export interface OCABlockedState {
-  state_type: string;
-  description: string;
-  missing_fields: string[];
+  code: string;
+  detail: string;
   resolution_hint: string;
+  severity: string;
+}
+
+export interface OCAPrecheckWarning {
+  code: string;
+  message: string;
 }
 
 export interface OCATriggeredRequirement {
   requirement_id: string;
-  source_standard: string;
-  section: string;
   title: string;
+  citation: string;
   tier: OCARuleTier;
-  satisfied: boolean;
-  satisfaction_basis: string;
-  is_prohibition: boolean;
-  prohibition_detail?: string | null;
+  triggered: boolean;
+  status: OCARequirementStatus;
+  reasoning: string;
+  evidence_links: string[];
+  downstream_actions: string[];
+}
+
+export interface OCAEvidenceApplicability {
+  exact_material_match: boolean;
+  spec_match: boolean;
+  form_match: boolean;
+  geometry_match: boolean;
+  pressure_match: boolean;
+  o2_fraction_match: boolean;
+  phase_match: boolean;
+  temperature_match: boolean;
+  coating_match: boolean;
+  method_relevance: boolean;
+  aggregate_score: number;
+  applicability_class: OCAApplicabilityClass;
+}
+
+export interface OCAEvidenceCard {
+  evidence_id: string;
+  material_name: string;
+  source_id: string;
+  title: string;
+  citation: string;
+  tier: OCARuleTier;
+  summary: string;
+  test_method?: string | null;
+  specimen_description?: string | null;
+  test_conditions?: string | null;
+  result?: string | null;
+  applicability: OCAEvidenceApplicability;
+  gaps: string[];
 }
 
 export interface OCAMechanismTrace {
   mechanism_name: string;
   source_ref: string;
+  required_elements: string[];
+  observed_elements: string[];
+  missing_elements: string[];
+  rating_formula_version: string;
+  rating_result: number;
+  reviewer_comments: string[];
+}
+
+export interface OCAMechanismAssessment {
+  mechanism_name: string;
   credible_status: OCACredibleStatus;
   rating: number;
+  source_ref: string;
   required_elements: string[];
   observed_elements: string[];
   missing_elements: string[];
   linked_evidence_ids: string[];
-  controls_required: string[];
-  reviewer_comments: string[];
+  gaps_identified: string[];
+  mechanism_trace: OCAMechanismTrace;
 }
 
-export interface OCAKindlingChain {
-  kindling_chain_present: boolean;
-  propagation_path: string[];
-  reaction_effect: OCAReactionEffect;
+export interface OCADecisionAction {
+  action_id: string;
+  label: string;
   rationale: string;
-}
-
-export interface OCAHazardControl {
-  component_ref: string;
-  ignition_hazard: string;
-  probability_rating: number;
-  reaction_effect: OCAReactionEffect;
-  recommendation: string;
-  recommendation_class: string;
-  affected_mechanisms: string[];
-  confidence: string;
-  status: string;
-}
-
-export interface OCAMUASeed {
-  material_identity: string;
-  service_conditions: string;
-  trigger_reason: string;
-  mechanism_summary: string;
-  gaps: string[];
-  rationale_draft: string;
-  assumptions: string[];
 }
 
 export interface OCADecisionPacket {
@@ -1450,74 +1505,141 @@ export interface OCADecisionPacket {
   blocked_states: OCABlockedState[];
   unresolved_gaps: string[];
   kindling_chain_present: boolean;
-  reaction_effect: OCAReactionEffect;
+  reaction_effect?: string | null;
   history_of_use: string;
-  mua_seed?: OCAMUASeed | null;
+  mua_seed: Record<string, unknown>;
   acceptance_test_required: boolean;
   reviewer_required: boolean;
+  overall_confidence: string;
+  authority_level: OCARuleTier;
+  governing_prohibition?: string | null;
   summary_rationale: string;
-  mechanism_assessments: OCAMechanismTrace[];
-  hazard_controls: OCAHazardControl[];
-  kindling_chain?: OCAKindlingChain | null;
+  actions: OCADecisionAction[];
 }
 
 export interface OCACreateCaseRequest {
+  case_name?: string | null;
+  free_text_intake?: string | null;
   service_context: OCAServiceContext;
-  component: OCAComponent;
   materials: OCAMaterial[];
+  components: OCAComponent[];
+  ignition_context?: OCAIgnitionContext;
+}
+
+export interface OCANormalizedInput {
+  service_context: OCAServiceContext;
+  materials: OCAResolvedMaterial[];
+  components: OCAComponent[];
+  ignition_context: OCAIgnitionContext;
 }
 
 export interface OCACreateCaseResponse {
   case_id: string;
+  revision: number;
+  normalized_input: OCANormalizedInput;
   blocked_states: OCABlockedState[];
-  precheck_warnings: string[];
-  normalized_context: OCAServiceContext;
-  normalized_materials: OCAMaterial[];
+  precheck_warnings: OCAPrecheckWarning[];
 }
 
 export interface OCAPrecheckResponse {
   case_id: string;
+  revision: number;
+  blocked_states: OCABlockedState[];
   triggered_requirements: OCATriggeredRequirement[];
-  prohibitions: OCATriggeredRequirement[];
-  acceptance_test_required: boolean;
-  acceptance_test_exempt: boolean;
-  exemption_reason?: string | null;
+  precheck_warnings: OCAPrecheckWarning[];
+}
+
+export interface OCAEvidenceResponse {
+  case_id: string;
+  revision: number;
+  evidence: OCAEvidenceCard[];
+  gaps: string[];
 }
 
 export interface OCAMechanismResponse {
   case_id: string;
-  mechanism_assessments: OCAMechanismTrace[];
-  credible_count: number;
-  indeterminate_count: number;
+  revision: number;
+  mechanisms: OCAMechanismAssessment[];
 }
 
 export interface OCADecisionResponse {
   case_id: string;
+  revision: number;
   decision: OCADecisionPacket;
 }
 
-export interface OCAAdiabaticResult {
-  ti_k: number;
-  pi_psia: number;
-  pf_psia: number;
-  gamma: number;
-  tf_k: number;
-  tf_c: number;
-  tf_f: number;
+export interface OCARevision {
+  revision: number;
+  created_at: string;
+  note: string;
 }
 
-/**
- * OCA health check.
- */
-export async function ocaPing(): Promise<{ status: string; domain: string; version: string }> {
+export interface OCARuleTraceEvent {
+  stage: string;
+  rule_id: string;
+  tier: OCARuleTier;
+  outcome: string;
+  detail: string;
+  recorded_at: string;
+}
+
+export interface OCARequirementsResponse {
+  case_id: string;
+  revision: number;
+  requirements: OCATriggeredRequirement[];
+}
+
+export interface OCALineageResponse {
+  case_id: string;
+  revision: number;
+  revisions: OCARevision[];
+  decision_lineage: OCARuleTraceEvent[];
+}
+
+export interface OCAAuthoritySource {
+  source_id: string;
+  title: string;
+  edition: string;
+  change_number?: string | null;
+  publication_date: string;
+  checksum: string;
+  ingest_date: string;
+}
+
+export interface OCAAuthorityManifest {
+  spec_id: string;
+  approved_on: string;
+  sources: OCAAuthoritySource[];
+}
+
+export interface OCAExportArtifact {
+  artifact_type: string;
+  filename: string;
+  content_type: string;
+  generated_text: string;
+}
+
+export interface OCAExportResponse {
+  case_id: string;
+  revision: number;
+  artifacts: OCAExportArtifact[];
+}
+
+export async function ocaPing(): Promise<{ status: string; domain: string }> {
   const response = await fetch(`${API_BASE}/oca/ping`);
   if (!response.ok) throw new Error(`OCA ping failed: ${response.statusText}`);
   return response.json();
 }
 
-/**
- * Create a new OCA case.
- */
+export async function ocaGetAuthority(): Promise<OCAAuthorityManifest> {
+  const response = await fetch(`${API_BASE}/oca/authority`);
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `OCA authority lookup failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
 export async function ocaCreateCase(req: OCACreateCaseRequest): Promise<OCACreateCaseResponse> {
   const response = await fetch(`${API_BASE}/oca/cases`, {
     method: 'POST',
@@ -1531,24 +1653,6 @@ export async function ocaCreateCase(req: OCACreateCaseRequest): Promise<OCACreat
   return response.json();
 }
 
-/**
- * Run full OCA assessment and get decision.
- */
-export async function ocaRunDecision(caseId: string): Promise<OCADecisionResponse> {
-  const response = await fetch(`${API_BASE}/oca/cases/${caseId}/decision`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.detail || `OCA decision failed: ${response.statusText}`);
-  }
-  return response.json();
-}
-
-/**
- * Get OCA precheck (requirement triggers).
- */
 export async function ocaPrecheck(caseId: string): Promise<OCAPrecheckResponse> {
   const response = await fetch(`${API_BASE}/oca/cases/${caseId}/precheck`, {
     method: 'POST',
@@ -1561,9 +1665,18 @@ export async function ocaPrecheck(caseId: string): Promise<OCAPrecheckResponse> 
   return response.json();
 }
 
-/**
- * Assess ignition mechanisms.
- */
+export async function ocaGetEvidence(caseId: string): Promise<OCAEvidenceResponse> {
+  const response = await fetch(`${API_BASE}/oca/cases/${caseId}/evidence`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `OCA evidence lookup failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
 export async function ocaAssessMechanisms(caseId: string): Promise<OCAMechanismResponse> {
   const response = await fetch(`${API_BASE}/oca/cases/${caseId}/mechanisms`, {
     method: 'POST',
@@ -1576,49 +1689,40 @@ export async function ocaAssessMechanisms(caseId: string): Promise<OCAMechanismR
   return response.json();
 }
 
-/**
- * Adiabatic compression calculator.
- */
-export async function ocaAdiabaticCalc(
-  ti_k: number, pi_psia: number, pf_psia: number, gamma?: number
-): Promise<OCAAdiabaticResult> {
-  const params = new URLSearchParams({
-    ti_k: String(ti_k),
-    pi_psia: String(pi_psia),
-    pf_psia: String(pf_psia),
+export async function ocaRunDecision(caseId: string): Promise<OCADecisionResponse> {
+  const response = await fetch(`${API_BASE}/oca/cases/${caseId}/decision`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
   });
-  if (gamma) params.set('gamma', String(gamma));
-  const response = await fetch(`${API_BASE}/oca/adiabatic-calc?${params}`, { method: 'POST' });
-  if (!response.ok) throw new Error(`Adiabatic calc failed: ${response.statusText}`);
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `OCA decision failed: ${response.statusText}`);
+  }
   return response.json();
 }
 
-/**
- * List available ignition mechanisms.
- */
-export async function ocaListMechanisms(): Promise<{
-  mechanisms: Array<{
-    name: string;
-    display_name: string;
-    source_ref: string;
-    description: string;
-    characteristic_elements: string[];
-  }>;
-  total: number;
-}> {
-  const response = await fetch(`${API_BASE}/oca/mechanisms`);
-  if (!response.ok) throw new Error(`Failed to list mechanisms: ${response.statusText}`);
+export async function ocaGetRequirements(caseId: string): Promise<OCARequirementsResponse> {
+  const response = await fetch(`${API_BASE}/oca/cases/${caseId}/requirements`);
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `OCA requirements lookup failed: ${response.statusText}`);
+  }
   return response.json();
 }
 
-/**
- * Export OCA artifacts.
- */
-export async function ocaExport(caseId: string): Promise<Record<string, unknown>> {
+export async function ocaGetLineage(caseId: string): Promise<OCALineageResponse> {
+  const response = await fetch(`${API_BASE}/oca/cases/${caseId}/lineage`);
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `OCA lineage lookup failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+export async function ocaExport(caseId: string): Promise<OCAExportResponse> {
   const response = await fetch(`${API_BASE}/oca/cases/${caseId}/export`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ case_id: caseId }),
   });
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));

@@ -18,6 +18,9 @@ temp/
 uploads/
 logs/
 C:/
+!frontend/src/data/
+!frontend/src/data/mira-guidance/
+!frontend/src/data/mira-guidance/*.json
 
 # --- FAISS INDEXES (binary, rebuild from DB) ---
 mira/databases/
@@ -49,6 +52,11 @@ _forge_test.py
 frontend/node_modules/
 frontend/dist/
 frontend/.vite/
+
+# --- PYTHON VIRTUAL ENVIRONMENTS ---
+.venv/
+venv/
+env/
 
 # --- PYTHON ARTIFACTS ---
 __pycache__/

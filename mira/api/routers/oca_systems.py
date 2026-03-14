@@ -28,8 +28,10 @@ from mira.oca.system_models import (
     AddComponentResponse,
     AddConnectionRequest,
     AddConnectionResponse,
+    ComponentConfig,
     CreateSystemRequest,
     CreateSystemResponse,
+    MaterialSlotValue,
     OCASystemAssembly,
     SystemAssessmentResponse,
     SystemComponent,
@@ -180,9 +182,21 @@ async def update_component(
     if not comp:
         raise HTTPException(status_code=404, detail=f"Component {component_id} not found")
 
-    # Apply updates
+    if "config" in updates:
+        base_config = comp.config.model_dump() if hasattr(comp.config, "model_dump") else dict(comp.config)
+        comp.config = ComponentConfig(**{**base_config, **updates["config"]})
+
+    if "materials" in updates:
+        comp.materials = [
+            item if isinstance(item, MaterialSlotValue) else MaterialSlotValue(**item)
+            for item in updates["materials"]
+        ]
+
+    # Apply scalar updates after nested-model coercion.
     for key, value in updates.items():
-        if hasattr(comp, key) and key not in ("component_id", "archetype"):
+        if key in {"component_id", "archetype", "config", "materials"}:
+            continue
+        if hasattr(comp, key):
             setattr(comp, key, value)
 
     # Re-derive features if materials or config changed

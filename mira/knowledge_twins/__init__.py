@@ -167,9 +167,9 @@ from .types import (
 )
 from .scoring import EnvelopeMatchScorer
 from .matching import CandidateFinder
+# Legacy H2 decision engine types — kept for test compatibility
 from .h2.query import H2Query, H2Response
 from .h2.rules import RuleGate, RuleEngine
-from .h2.engine import H2DecisionEngine
 
 
 __all__ = [
@@ -300,7 +300,6 @@ __all__ = [
     "H2Response",
     "RuleGate",
     "RuleEngine",
-    "H2DecisionEngine",
 ]
 
 __version__ = "0.4.0"

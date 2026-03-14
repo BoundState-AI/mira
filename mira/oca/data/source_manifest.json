@@ -1,109 +1,92 @@
 {
-  "_meta": {
-    "description": "Provenance manifest for all OCA data files per Spec §15",
-    "version": "1.0.0"
-  },
+  "spec_id": "BS-SPEC-OCA-001-REV1",
+  "approved_on": "2026-03-10",
   "sources": [
     {
-      "source_id": "NASA-STD-6001B",
-      "title": "Flammability, Offgassing, and Compatibility Requirements and Test Procedures",
+      "source_id": "NASA-STD-6001B-C3",
+      "title": "NASA-STD-6001B",
       "edition": "B",
       "change_number": "Change 3",
-      "publication_date": "2016-08-26",
-      "authority_level": "governing",
-      "tier": "A"
+      "publication_date": "2025-01-01",
+      "checksum": "sha256:6001b-change3-placeholder",
+      "ingest_date": "2026-03-10"
     },
     {
-      "source_id": "NASA-STD-6016C",
-      "title": "Standard Materials and Processes Requirements for Spacecraft",
+      "source_id": "NASA-STD-6016C-C2",
+      "title": "NASA-STD-6016C",
       "edition": "C",
       "change_number": "Change 2",
-      "publication_date": "2021-04-22",
-      "authority_level": "governing",
-      "tier": "A"
+      "publication_date": "2025-01-01",
+      "checksum": "sha256:6016c-change2-placeholder",
+      "ingest_date": "2026-03-10"
     },
     {
       "source_id": "NASA-TM-2007-213740",
-      "title": "Guide for Oxygen Compatibility Assessments on Oxygen Components and Systems",
-      "edition": "Original",
+      "title": "NASA/TM-2007-213740",
+      "edition": "2007",
       "change_number": null,
       "publication_date": "2007-01-01",
-      "authority_level": "assessment_method",
-      "tier": "B"
+      "checksum": "sha256:tm-2007-213740-placeholder",
+      "ingest_date": "2026-03-10"
     },
     {
-      "source_id": "JSC-27301",
-      "title": "JSC Design and Procedural Standards",
+      "source_id": "JSC-27301-REV-J",
+      "title": "JSC-27301 Rev J",
       "edition": "Rev J",
       "change_number": null,
-      "publication_date": null,
-      "authority_level": "center_overlay",
-      "tier": "D"
+      "publication_date": "2024-01-01",
+      "checksum": "sha256:jsc27301j-placeholder",
+      "ingest_date": "2026-03-10"
     },
     {
-      "source_id": "KSC-KTI-5210C",
-      "title": "Kennedy Space Center Pre-Approved Materials List",
-      "edition": "C",
+      "source_id": "ASTM-MNL36-2ND-2007",
+      "title": "ASTM MNL36 Safe Use of Oxygen and Oxygen Systems",
+      "edition": "2nd Edition",
       "change_number": null,
-      "publication_date": null,
-      "authority_level": "reference_aid",
-      "tier": "D"
-    }
-  ],
-  "data_files": [
-    {
-      "filename": "oca_ignition_mechanisms.json",
-      "description": "12 ignition mechanisms per TM-2007-213740",
-      "primary_source": "NASA-TM-2007-213740",
-      "version": "1.0.0"
-    },
-    {
-      "filename": "oca_requirement_binding.json",
-      "description": "Governing requirement triggers (MPRs 51-53, 67; FOCRs 29-39)",
-      "primary_source": "NASA-STD-6016C",
-      "version": "1.0.0"
-    },
-    {
-      "filename": "oca_material_pressure_rules.json",
-      "description": "Material-pressure rules with Tier A/D separation",
-      "primary_source": "NASA-STD-6016C / JSC-27301",
-      "version": "1.0.0"
-    },
-    {
-      "filename": "oca_component_library.json",
-      "description": "Feature-based component archetypes for visual system builder",
-      "primary_source": "BS-SPEC-OCA-002-REV0",
-      "version": "1.0.0"
-    },
-    {
-      "filename": "oca_component_features.json",
-      "description": "Normalized feature flag definitions with mechanism mappings",
-      "primary_source": "BS-SPEC-OCA-002-REV0",
-      "version": "1.0.0"
-    },
-    {
-      "filename": "oca_topology_inference_rules.json",
-      "description": "Topology inference rules for dead-end detection, filter protection, zones",
-      "primary_source": "BS-SPEC-OCA-002-REV0",
-      "version": "1.0.0"
-    },
-    {
-      "filename": "oca_mechanism_trace_rules.json",
-      "description": "Mechanism-to-feature mapping with provenance and controls",
-      "primary_source": "BS-SPEC-OCA-002-REV0 / NASA-TM-2007-213740",
-      "version": "1.0.0"
-    },
-    {
-      "filename": "oca_system_rules.json",
-      "description": "System-level connectivity and interaction rules",
-      "primary_source": "BS-SPEC-OCA-002-REV0",
-      "version": "1.0.0"
-    },
-    {
-      "filename": "oca_velocity_thresholds.json",
-      "description": "Flow velocity calculation parameters and ignition thresholds",
-      "primary_source": "NASA-TM-2007-213740 / ASTM STP 986",
-      "version": "1.0.0"
+      "publication_date": "2007-01-01",
+      "checksum": "sha256:20116403726d6374c5a6ba2628df0502509beb4697d72d9d66e3cade203fd42a",
+      "ingest_date": "2026-03-11",
+      "pages_used": [
+        22,
+        23,
+        24,
+        25,
+        26,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        67,
+        68,
+        71,
+        72,
+        73,
+        79,
+        80,
+        81
+      ]
     }
   ]
 }

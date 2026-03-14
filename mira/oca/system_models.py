@@ -31,6 +31,7 @@ from .models import (
     IgnitionMechanismName,
     KindlingChainResult,
     MaterialInstance,
+    MechanismAssessment,
     MechanismTrace,
     MissionPhase,
     MUASeed,
@@ -212,7 +213,7 @@ class SystemComponent(BaseModel):
     zones: list[SystemZoneType] = Field(default_factory=list)
 
     # Assessment results (per-component)
-    mechanism_assessments: list[MechanismTrace] = Field(default_factory=list)
+    mechanism_assessments: list[MechanismAssessment] = Field(default_factory=list)
     overall_status: str = "pending"  # green / yellow / red / pending
     highest_rating: int = 0
     credible_mechanisms: list[str] = Field(default_factory=list)

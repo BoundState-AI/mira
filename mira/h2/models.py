@@ -135,6 +135,14 @@ class H2CompatibilityResponse(EngineAnswer):
         default=None,
         description="Distribution of HEE bands across all evidence (e.g., {'extreme': 2, 'severe': 1}).",
     )
+    envelope_context: Optional[dict] = Field(
+        default=None,
+        description=(
+            "Pressure/temperature envelope comparison between query conditions and "
+            "evidence test conditions. Includes evidence ranges, match quality, "
+            "and extrapolation warnings."
+        ),
+    )
 
 
 class H2ConditionLookupResponse(BaseModel):

@@ -55,6 +55,7 @@ export default function ComponentPalette() {
             {PALETTE_ITEMS.map((item) => (
               <div
                 key={item.archetype}
+                data-testid={`palette-${item.archetype}`}
                 className="flex items-center gap-2 px-2 py-1.5 rounded cursor-grab hover:bg-accent/50 active:cursor-grabbing transition-colors"
                 draggable
                 onDragStart={(e) => onDragStart(e, item.archetype, item.label)}

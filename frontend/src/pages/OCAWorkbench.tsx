@@ -1,810 +1,1103 @@
-import { useState, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Slider } from '@/components/ui/slider';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { useEffect, useState, type FormEvent } from 'react';
 import {
-  Loader2, AlertTriangle, CheckCircle, XCircle, Shield, Flame,
-  FileText, Download, ChevronRight, Info, Zap,
+  AlertTriangle,
+  CheckCircle2,
+  FileStack,
+  Flame,
+  Loader2,
+  ScrollText,
+  ShieldAlert,
+  ShieldCheck,
+  ShieldX,
 } from 'lucide-react';
+
+import { MaterialCombobox } from '@/components/oca/MaterialCombobox';
+import { OCAHelpLabel, OCAInlineHelp } from '@/components/oca/OCAInlineHelp';
+import { PageHeader } from '@/components/PageHeader';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
-  ocaCreateCase, ocaRunDecision, ocaAdiabaticCalc,
-  type OCACreateCaseRequest, type OCADecisionResponse, type OCADecisionPacket,
-  type OCAMechanismTrace, type OCATriggeredRequirement, type OCABlockedState,
-  type OCAHazardControl, type OCAAdiabaticResult,
-  type OCAOxidizerType, type OCAPhase, type OCAFlowRegime, type OCAMissionPhase,
-  type OCAComponentClass, type OCAGeometryClass, type OCAFlammabilityRating,
-  type OCACredibleStatus, type OCAReactionEffect, type OCADisposition, type OCARuleTier,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  ocaAssessMechanisms,
+  ocaCreateCase,
+  ocaExport,
+  ocaGetAuthority,
+  ocaGetEvidence,
+  ocaGetLineage,
+  ocaGetRequirements,
+  ocaPrecheck,
+  ocaRunDecision,
+  type OCAApplicabilityClass,
+  type OCAAuthorityManifest,
+  type OCACreateCaseRequest,
+  type OCACreateCaseResponse,
+  type OCADecisionPacket,
+  type OCAEvidenceResponse,
+  type OCAExportArtifact,
+  type OCALineageResponse,
+  type OCAMechanismAssessment,
+  type OCAMissionPhase,
+  type OCAOxidizerType,
+  type OCAPhase,
+  type OCAFlowRegime,
+  type OCARequirementsResponse,
 } from '@/lib/api';
+import {
+  getDispositionGuidance,
+  getInputGuidance,
+  getMechanismGuidance,
+  getMprGuidance,
+} from '@/lib/oca-guidance';
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 
-const TIER_COLORS: Record<OCARuleTier, string> = {
-  A: 'bg-red-700 text-white',
-  B: 'bg-blue-700 text-white',
-  C: 'bg-emerald-700 text-white',
-  D: 'bg-amber-600 text-white',
+const OXIDIZER_OPTIONS: Array<{ value: OCAOxidizerType; label: string }> = [
+  { value: 'gox', label: 'GOX' },
+  { value: 'lox', label: 'LOX' },
+  { value: 'enriched_air', label: 'Enriched Air' },
+  { value: 'compressed_air', label: 'Compressed Air' },
+];
+
+const PHASE_OPTIONS: Array<{ value: OCAPhase; label: string }> = [
+  { value: 'gas', label: 'Gas' },
+  { value: 'liquid', label: 'Liquid' },
+];
+
+const FLOW_OPTIONS: Array<{ value: OCAFlowRegime; label: string }> = [
+  { value: 'static', label: 'Static' },
+  { value: 'laminar', label: 'Laminar' },
+  { value: 'turbulent', label: 'Turbulent' },
+];
+
+const MISSION_OPTIONS: Array<{ value: OCAMissionPhase; label: string }> = [
+  { value: 'ground_test', label: 'Ground Test' },
+  { value: 'ascent', label: 'Ascent' },
+  { value: 'on_orbit', label: 'On-Orbit' },
+  { value: 'servicing', label: 'Servicing' },
+];
+
+const COMPONENT_OPTIONS = [
+  'valve',
+  'regulator',
+  'line',
+  'vessel',
+  'seal',
+  'filter',
+  'sensor',
+  'fitting',
+  'flex_hose',
+  'other',
+] as const;
+
+const GEOMETRY_OPTIONS = [
+  'bulk',
+  'thin_wall',
+  'mesh',
+  'porous',
+  'sintered',
+  'seal',
+  'other',
+] as const;
+
+const EVIDENCE_ORDER: OCAApplicabilityClass[] = ['DIRECT', 'PARTIAL', 'WEAK_ANALOG', 'NOT_APPLICABLE'];
+
+const DISPOSITION_META: Record<string, { label: string; className: string }> = {
+  compatible_as_configured: { label: 'Compatible As Configured', className: 'bg-emerald-600 text-white' },
+  compatible_with_controls: { label: 'Compatible With Controls', className: 'bg-amber-500 text-slate-950' },
+  requires_mua: { label: 'Requires MUA', className: 'bg-orange-600 text-white' },
+  requires_acceptance_test: { label: 'Requires Acceptance Test', className: 'bg-orange-700 text-white' },
+  requires_supplemental_testing: { label: 'Requires Supplemental Testing', className: 'bg-rose-700 text-white' },
+  insufficient_evidence: { label: 'Insufficient Evidence', className: 'bg-slate-700 text-white' },
+  prohibited: { label: 'Prohibited', className: 'bg-rose-800 text-white' },
 };
 
-const DISPOSITION_LABELS: Record<OCADisposition, { label: string; color: string }> = {
-  compatible_as_configured: { label: 'Compatible As Configured', color: 'bg-emerald-600 text-white' },
-  compatible_with_controls: { label: 'Compatible With Controls', color: 'bg-amber-500 text-black' },
-  requires_mua: { label: 'Requires MUA', color: 'bg-orange-600 text-white' },
-  requires_acceptance_test: { label: 'Requires Acceptance Test', color: 'bg-orange-600 text-white' },
-  requires_supplemental_testing: { label: 'Requires Supplemental Testing', color: 'bg-red-600 text-white' },
-  insufficient_evidence: { label: 'Insufficient Evidence', color: 'bg-red-800 text-white' },
-};
-
-const REACTION_COLORS: Record<OCAReactionEffect, string> = {
-  A: 'bg-emerald-600 text-white',
-  B: 'bg-amber-500 text-black',
-  C: 'bg-orange-600 text-white',
-  D: 'bg-red-700 text-white',
-};
-
-const REACTION_LABELS: Record<OCAReactionEffect, string> = {
-  A: 'A — Negligible',
-  B: 'B — Marginal',
-  C: 'C — Critical',
-  D: 'D — Catastrophic',
-};
-
-function credibleBadge(status: OCACredibleStatus) {
-  if (status === 'credible') return <Badge className="bg-red-600 text-white text-[10px]">CREDIBLE</Badge>;
-  if (status === 'indeterminate') return <Badge className="bg-amber-500 text-black text-[10px]">INDETERMINATE</Badge>;
-  return <Badge variant="outline" className="text-[10px]">NOT CREDIBLE</Badge>;
+function tierClass(tier: string): string {
+  if (tier === 'tier_a') return 'bg-rose-700 text-white';
+  if (tier === 'tier_b') return 'bg-sky-700 text-white';
+  if (tier === 'tier_c') return 'bg-emerald-700 text-white';
+  return 'bg-amber-600 text-slate-950';
 }
 
-function ratingBar(rating: number) {
-  const segments = Array.from({ length: 5 }, (_, i) => (
-    <div
-      key={i}
-      className={`h-2 w-5 rounded-sm ${
-        i < rating
-          ? rating >= 4 ? 'bg-red-600' : rating >= 3 ? 'bg-orange-500' : 'bg-amber-400'
-          : 'bg-gray-700'
-      }`}
-    />
-  ));
-  return <div className="flex gap-0.5 items-center">{segments}<span className="ml-1 text-xs text-muted-foreground">{rating}/4</span></div>;
+function statusClass(status: string): string {
+  if (status === 'prohibited') return 'bg-rose-700 text-white';
+  if (status === 'action_required') return 'bg-amber-500 text-slate-950';
+  if (status === 'satisfied') return 'bg-emerald-600 text-white';
+  return 'bg-slate-200 text-slate-700';
 }
 
-// ---------------------------------------------------------------------------
-// Main Component
-// ---------------------------------------------------------------------------
+function applicabilityClassName(applicability: OCAApplicabilityClass): string {
+  if (applicability === 'DIRECT') return 'bg-emerald-50 border-emerald-200';
+  if (applicability === 'PARTIAL') return 'bg-sky-50 border-sky-200';
+  if (applicability === 'WEAK_ANALOG') return 'bg-amber-50 border-amber-200';
+  return 'bg-slate-50 border-slate-200';
+}
+
+function mechanismIcon(status: string) {
+  if (status === 'CREDIBLE') return <ShieldAlert className="h-4 w-4 text-amber-600" />;
+  if (status === 'INDETERMINATE') return <AlertTriangle className="h-4 w-4 text-rose-600" />;
+  return <ShieldCheck className="h-4 w-4 text-emerald-600" />;
+}
+
+function calculateAdiabaticTf(tiK: number, piPsia: number, pfPsia: number, gamma: number = 1.4) {
+  if (!piPsia || !pfPsia || piPsia <= 0 || pfPsia <= 0) return null;
+  const tfK = tiK * Math.pow(pfPsia / piPsia, (gamma - 1) / gamma);
+  const tfC = tfK - 273.15;
+  const tfF = tfC * (9 / 5) + 32;
+  return { tfK, tfC, tfF };
+}
+
+function downloadArtifact(artifact: OCAExportArtifact) {
+  const blob = new Blob([artifact.generated_text], { type: artifact.content_type || 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = artifact.filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+  URL.revokeObjectURL(url);
+}
+
+function workbenchHelp(fieldId: string) {
+  return getInputGuidance(`workbench.${fieldId}`);
+}
+
+function dispositionPlainEnglish(disposition: string, decision: OCADecisionPacket): string {
+  const materialNames = decision.mua_seed?.materials?.join(', ') || 'this material';
+  switch (disposition) {
+    case 'compatible_as_configured':
+      return `Good news — ${materialNames} passes the oxygen compatibility screening for your service conditions. No additional testing or documentation is required. Your M&P engineer can sign off on this configuration.`;
+    case 'compatible_with_controls':
+      return `${materialNames} can be used, but some ignition mechanisms need engineering controls before sign-off. Review the "Next Actions" below — these are specific steps your M&P engineer needs to address, such as particle cleanliness or flow velocity limits.`;
+    case 'requires_mua':
+      return `${materialNames} needs a formal Material Usage Agreement (MUA) before your project can proceed. This means your M&P engineer needs to write a short document explaining why this material is acceptable for your specific application. The export pack below gives them a head start.`;
+    case 'requires_acceptance_test':
+      return 'Your hardware exceeds the 265 psia threshold for high-pressure GOX/enriched air. Before acceptance, the actual hardware must pass a pressurization acceptance test (10 cycles, ambient to max design pressure within 100 ms). Talk to your test lab.';
+    case 'requires_supplemental_testing':
+      return `There is not enough published test data for ${materialNames} in your exact service conditions. Additional testing (promoted ignition, mechanical impact, or other) is needed before the material can be approved. Your M&P engineer can specify which tests.`;
+    case 'insufficient_evidence':
+      return 'The assessment cannot be completed because some required information is missing. Check the warnings above — fill in the missing fields (material identity, pressure, temperature) and re-run the assessment.';
+    case 'prohibited':
+      return `${materialNames} cannot be used in this oxygen service environment. This is a hard stop from the governing standard (NASA-STD-6016C). The material must be replaced — there is no waiver path for this prohibition. See "Next Actions" for alternatives.`;
+    default:
+      return decision.summary_rationale;
+  }
+}
 
 export default function OCAWorkbench() {
-  // --- Form state ---
-  const [materialName, setMaterialName] = useState('');
-  const [materialSpec, setMaterialSpec] = useState('');
-  const [flammabilityRating, setFlammabilityRating] = useState<OCAFlammabilityRating>('unknown');
-  const [isTitanium, setIsTitanium] = useState(false);
-  const [isNonmetal, setIsNonmetal] = useState(false);
-  const [oxidizerType, setOxidizerType] = useState<OCAOxidizerType>('gox');
-  const [o2Fraction, setO2Fraction] = useState(1.0);
-  const [pressureMin, setPressureMin] = useState(14.7);
-  const [pressureMax, setPressureMax] = useState(3000);
-  const [phase, setPhase] = useState<OCAPhase>('gas');
-  const [flowRegime, setFlowRegime] = useState<OCAFlowRegime>('static');
-  const [velocity, setVelocity] = useState<number | null>(null);
-  const [missionPhase, setMissionPhase] = useState<OCAMissionPhase>('ground_test');
-  const [cleanlinessVerified, setCleanlinessVerified] = useState(false);
-  const [componentClass, setComponentClass] = useState<OCAComponentClass>('other');
-  const [geometryClass, setGeometryClass] = useState<OCAGeometryClass>('bulk');
-  const [dynamicContact, setDynamicContact] = useState(false);
-  const [isRigidTubing, setIsRigidTubing] = useState(false);
-  const [isFlexHose, setIsFlexHose] = useState(false);
-  const [isAllMetalSeal, setIsAllMetalSeal] = useState(false);
-  const [isPressureVessel, setIsPressureVessel] = useState(false);
-
-  // --- Assessment state ---
+  const [authority, setAuthority] = useState<OCAAuthorityManifest | null>(null);
   const [loading, setLoading] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [materialName, setMaterialName] = useState('316L');
+  const [spec, setSpec] = useState('');
+  const [grade, setGrade] = useState('');
+  const [temper, setTemper] = useState('');
+  const [productForm, setProductForm] = useState('bar');
+  const [coating, setCoating] = useState('');
+  const [surfaceCondition, setSurfaceCondition] = useState('');
+  const [roleInComponent, setRoleInComponent] = useState('body');
+  const [componentClass, setComponentClass] = useState<(typeof COMPONENT_OPTIONS)[number]>('valve');
+  const [geometryClass, setGeometryClass] = useState<(typeof GEOMETRY_OPTIONS)[number]>('bulk');
+  const [designFunction, setDesignFunction] = useState('pressure control');
+  const [sealType, setSealType] = useState<'metal' | 'polymer' | 'composite'>('polymer');
+  const [pressureBoundaryMaterial, setPressureBoundaryMaterial] = useState('316L');
+  const [oxidizerType, setOxidizerType] = useState<OCAOxidizerType>('gox');
+  const [phase, setPhase] = useState<OCAPhase>('gas');
+  const [o2Fraction, setO2Fraction] = useState('1.0');
+  const [pressureMin, setPressureMin] = useState('14.7');
+  const [pressureMax, setPressureMax] = useState('500');
+  const [tempMin, setTempMin] = useState('20');
+  const [tempMax, setTempMax] = useState('25');
+  const [velocity, setVelocity] = useState('12');
+  const [flowRegime, setFlowRegime] = useState<OCAFlowRegime>('laminar');
+  const [missionPhase, setMissionPhase] = useState<OCAMissionPhase>('ground_test');
+  const [cleanlinessVerified, setCleanlinessVerified] = useState(true);
+  const [contaminationNotes, setContaminationNotes] = useState('');
+  const [dynamicContact, setDynamicContact] = useState(false);
+  const [rigidTubing, setRigidTubing] = useState(false);
+  const [metallicFlexHose, setMetallicFlexHose] = useState(false);
+  const [allMetalSeal, setAllMetalSeal] = useState(false);
+  const [metallicPressureVessel, setMetallicPressureVessel] = useState(false);
+  const [entrainableParticles, setEntrainableParticles] = useState(false);
+  const [deadEndConfiguration, setDeadEndConfiguration] = useState(false);
+  const [nonmetalInFlow, setNonmetalInFlow] = useState(true);
+  const [rapidPressurizationMs, setRapidPressurizationMs] = useState('250');
+  const [vibrationPresent, setVibrationPresent] = useState(false);
+  const [acousticCavity, setAcousticCavity] = useState(false);
+  const [mechanicalImpactRisk, setMechanicalImpactRisk] = useState(false);
+  const [isolatedSurface, setIsolatedSurface] = useState(false);
+  const [dryGas, setDryGas] = useState(true);
+  const [electricalPower, setElectricalPower] = useState(false);
+  const [reactiveChemicalPair, setReactiveChemicalPair] = useState(false);
+  const [porousMedia, setPorousMedia] = useState(false);
+  const [openFlame, setOpenFlame] = useState(false);
+
+  const [createdCase, setCreatedCase] = useState<OCACreateCaseResponse | null>(null);
+  const [precheck, setPrecheck] = useState<Awaited<ReturnType<typeof ocaPrecheck>> | null>(null);
+  const [evidence, setEvidence] = useState<OCAEvidenceResponse | null>(null);
+  const [mechanisms, setMechanisms] = useState<Awaited<ReturnType<typeof ocaAssessMechanisms>> | null>(null);
+  const [requirements, setRequirements] = useState<OCARequirementsResponse | null>(null);
   const [decision, setDecision] = useState<OCADecisionPacket | null>(null);
-  const [caseId, setCaseId] = useState<string | null>(null);
+  const [lineage, setLineage] = useState<OCALineageResponse | null>(null);
+  const [exports, setExports] = useState<OCAExportArtifact[]>([]);
 
-  // --- Adiabatic calc state ---
-  const [adiabaticResult, setAdiabaticResult] = useState<OCAAdiabaticResult | null>(null);
-  const [adiabaticLoading, setAdiabaticLoading] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
 
-  // ---------------------------------------------------------------------------
-  // Run Assessment
-  // ---------------------------------------------------------------------------
-
-  const runAssessment = useCallback(async () => {
-    if (!materialName.trim()) {
-      setError('Material name is required.');
-      return;
+    async function loadAuthority() {
+      try {
+        const response = await ocaGetAuthority();
+        if (!cancelled) setAuthority(response);
+      } catch {
+        if (!cancelled) setAuthority(null);
+      }
     }
 
+    void loadAuthority();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault();
     setLoading(true);
     setError(null);
-    setDecision(null);
+    setExports([]);
 
     try {
-      const req: OCACreateCaseRequest = {
+      const request: OCACreateCaseRequest = {
+        case_name: `${materialName} ${componentClass}`.trim(),
         service_context: {
           oxidizer_type: oxidizerType,
-          o2_fraction: o2Fraction,
-          total_pressure_min_psia: pressureMin,
-          total_pressure_max_psia: pressureMax,
+          o2_fraction: Number(o2Fraction),
+          total_pressure_min_psia: Number(pressureMin),
+          total_pressure_max_psia: Number(pressureMax),
           phase,
+          temp_min_c: tempMin ? Number(tempMin) : null,
+          temp_max_c: tempMax ? Number(tempMax) : null,
           flow_regime: flowRegime,
-          velocity_m_s: velocity,
+          velocity_m_s: velocity ? Number(velocity) : null,
           cleanliness_verified: cleanlinessVerified,
+          contamination_notes: contaminationNotes || null,
           mission_phase: missionPhase,
-        },
-        component: {
-          component_class: componentClass,
-          geometry_class: geometryClass,
-          dynamic_contact_flag: dynamicContact,
-          is_rigid_metallic_tubing: isRigidTubing,
-          is_metallic_flex_hose: isFlexHose,
-          is_all_metal_seal: isAllMetalSeal,
-          is_metallic_pressure_vessel: isPressureVessel,
+          application: designFunction,
         },
         materials: [
           {
-            material_name: materialName,
-            spec: materialSpec || null,
-            identity_confidence: 0.9,
-            flammability_rating: flammabilityRating,
-            is_titanium: isTitanium,
-            is_nonmetal: isNonmetal,
+            material_name: materialName.trim(),
+            spec: spec || null,
+            grade: grade || null,
+            temper: temper || null,
+            product_form: productForm || null,
+            coating: coating || null,
+            surface_condition: surfaceCondition || null,
+            role_in_component: roleInComponent || null,
           },
         ],
+        components: [
+          {
+            component_id: 'cmp-1',
+            component_class: componentClass,
+            geometry_class: geometryClass,
+            design_function: designFunction,
+            dynamic_contact_flag: dynamicContact,
+            is_rigid_metallic_tubing: rigidTubing,
+            is_metallic_flex_hose: metallicFlexHose,
+            is_all_metal_seal: allMetalSeal,
+            is_metallic_pressure_vessel: metallicPressureVessel,
+            seal_type: sealType,
+            pressure_boundary_material: pressureBoundaryMaterial || null,
+          },
+        ],
+        ignition_context: {
+          entrainable_particles_present: entrainableParticles,
+          rapid_pressurization_time_ms: rapidPressurizationMs ? Number(rapidPressurizationMs) : null,
+          dead_end_configuration: deadEndConfiguration,
+          nonmetal_exposed_to_flow: nonmetalInFlow,
+          vibration_or_erosion_present: vibrationPresent,
+          acoustic_cavity_present: acousticCavity,
+          mechanical_impact_risk: mechanicalImpactRisk,
+          isolated_surface_present: isolatedSurface,
+          dry_gas_environment: dryGas,
+          electrical_power_present: electricalPower,
+          reactive_chemical_pair_present: reactiveChemicalPair,
+          porous_media_present: porousMedia,
+          open_flame_or_hot_work_present: openFlame,
+        },
       };
 
-      // Step 1: Create case
-      const caseResp = await ocaCreateCase(req);
-      setCaseId(caseResp.case_id);
+      const created = await ocaCreateCase(request);
+      setCreatedCase(created);
 
-      // Step 2: Run full decision
-      const decisionResp = await ocaRunDecision(caseResp.case_id);
-      setDecision(decisionResp.decision);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Assessment failed');
+      const caseId = created.case_id;
+      const [precheckResponse, evidenceResponse, mechanismResponse, decisionResponse, requirementsResponse, lineageResponse] =
+        await Promise.all([
+          ocaPrecheck(caseId),
+          ocaGetEvidence(caseId),
+          ocaAssessMechanisms(caseId),
+          ocaRunDecision(caseId),
+          ocaGetRequirements(caseId),
+          ocaGetLineage(caseId),
+        ]);
+
+      setPrecheck(precheckResponse);
+      setEvidence(evidenceResponse);
+      setMechanisms(mechanismResponse);
+      setDecision(decisionResponse.decision);
+      setRequirements(requirementsResponse);
+      setLineage(lineageResponse);
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : 'OCA assessment failed.');
     } finally {
       setLoading(false);
     }
-  }, [
-    materialName, materialSpec, flammabilityRating, isTitanium, isNonmetal,
-    oxidizerType, o2Fraction, pressureMin, pressureMax, phase,
-    flowRegime, velocity, missionPhase, cleanlinessVerified,
-    componentClass, geometryClass, dynamicContact,
-    isRigidTubing, isFlexHose, isAllMetalSeal, isPressureVessel,
-  ]);
+  }
 
-  // ---------------------------------------------------------------------------
-  // Adiabatic Calc
-  // ---------------------------------------------------------------------------
-
-  const runAdiabaticCalc = useCallback(async () => {
-    setAdiabaticLoading(true);
+  async function handleExport() {
+    if (!createdCase?.case_id) return;
+    setExportLoading(true);
     try {
-      const result = await ocaAdiabaticCalc(293.15, 14.7, pressureMax);
-      setAdiabaticResult(result);
-    } catch {
-      // ignore
+      const response = await ocaExport(createdCase.case_id);
+      setExports(response.artifacts);
+    } catch (exportError) {
+      setError(exportError instanceof Error ? exportError.message : 'Export failed.');
     } finally {
-      setAdiabaticLoading(false);
+      setExportLoading(false);
     }
-  }, [pressureMax]);
+  }
 
-  // ---------------------------------------------------------------------------
-  // Render
-  // ---------------------------------------------------------------------------
+  const adiabatic = calculateAdiabaticTf(293.15, Number(pressureMin) || 14.7, Number(pressureMax) || 14.7);
+  const evidenceBuckets = EVIDENCE_ORDER.map((bucket) => ({
+    bucket,
+    items: evidence?.evidence.filter((item) => item.applicability.applicability_class === bucket) ?? [],
+  })).filter((entry) => entry.items.length > 0);
+  const displayedRequirements = requirements?.requirements ?? precheck?.triggered_requirements ?? [];
+  const displayedMechanisms = mechanisms?.mechanisms ?? [];
 
   return (
-    <div className="max-w-5xl mx-auto space-y-4 p-4">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight">OCA Workbench</h1>
-          <p className="text-sm text-muted-foreground">
-            Oxygen Compatibility Assessment per NASA/TM-2007-213740
-          </p>
-        </div>
-        <Badge variant="outline" className="text-xs">BS-SPEC-OCA-001-REV1</Badge>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title="OCA Workbench"
+        description="Deterministic oxygen compatibility screening and case routing per BS-SPEC-OCA-001-REV1."
+      />
 
-      {/* Disclaimer */}
-      <Alert>
-        <Info className="h-4 w-4" />
-        <AlertDescription className="text-xs">
-          Screening aid only. Formal OCA requires M&P organization concurrence per FOCR 37.
-          This tool does not constitute an approved OCA.
-        </AlertDescription>
-      </Alert>
-
-      {/* ================================================================= */}
-      {/* TILE 1: Assessment Input */}
-      {/* ================================================================= */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">Assessment Input</CardTitle>
-          <CardDescription>Define service context, component, and materials (Step 1: Worst-Case Conditions)</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="material" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="material">Material</TabsTrigger>
-              <TabsTrigger value="environment">Environment</TabsTrigger>
-              <TabsTrigger value="component">Component</TabsTrigger>
-            </TabsList>
-
-            {/* --- Material Tab --- */}
-            <TabsContent value="material" className="space-y-3 mt-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <Label className="text-xs">Material Name</Label>
-                  <Input
-                    placeholder="e.g., INCONEL 718, PTFE, Ti-6Al-4V"
-                    value={materialName}
-                    onChange={e => setMaterialName(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Specification</Label>
-                  <Input
-                    placeholder="e.g., AMS 5666"
-                    value={materialSpec}
-                    onChange={e => setMaterialSpec(e.target.value)}
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="space-y-1">
-                  <Label className="text-xs">Flammability Rating</Label>
-                  <Select value={flammabilityRating} onValueChange={v => setFlammabilityRating(v as OCAFlammabilityRating)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="A">A — Nonflammable</SelectItem>
-                      <SelectItem value="B">B — Self-extinguishing</SelectItem>
-                      <SelectItem value="C">C — Flammable (slow)</SelectItem>
-                      <SelectItem value="D">D — Flammable (rapid)</SelectItem>
-                      <SelectItem value="X">X — Not tested</SelectItem>
-                      <SelectItem value="unknown">Unknown</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex items-end gap-4 col-span-2">
-                  <div className="flex items-center gap-2">
-                    <Switch checked={isTitanium} onCheckedChange={setIsTitanium} id="titanium" />
-                    <Label htmlFor="titanium" className="text-xs">Titanium Alloy</Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Switch checked={isNonmetal} onCheckedChange={setIsNonmetal} id="nonmetal" />
-                    <Label htmlFor="nonmetal" className="text-xs">Nonmetal</Label>
-                  </div>
-                </div>
-              </div>
-              {isTitanium && (
-                <Alert variant="destructive">
-                  <XCircle className="h-4 w-4" />
-                  <AlertTitle className="text-sm font-semibold">MPR 67 — Titanium Prohibition (Tier A)</AlertTitle>
-                  <AlertDescription className="text-xs">
-                    Titanium alloys SHALL NOT be used with LOX or GOX at any pressure, or with air
-                    above 5 psia O2 partial pressure. Per NASA-STD-6016C §4.2.1.3c.
-                  </AlertDescription>
-                </Alert>
-              )}
-            </TabsContent>
-
-            {/* --- Environment Tab --- */}
-            <TabsContent value="environment" className="space-y-3 mt-3">
-              <div className="grid grid-cols-3 gap-3">
-                <div className="space-y-1">
-                  <Label className="text-xs">Oxidizer Type</Label>
-                  <Select value={oxidizerType} onValueChange={v => setOxidizerType(v as OCAOxidizerType)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="gox">GOX (Gaseous O2)</SelectItem>
-                      <SelectItem value="lox">LOX (Liquid O2)</SelectItem>
-                      <SelectItem value="enriched_air">Enriched Air</SelectItem>
-                      <SelectItem value="compressed_air">Compressed Air</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Phase</Label>
-                  <Select value={phase} onValueChange={v => setPhase(v as OCAPhase)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="gas">Gas</SelectItem>
-                      <SelectItem value="liquid">Liquid</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Mission Phase</Label>
-                  <Select value={missionPhase} onValueChange={v => setMissionPhase(v as OCAMissionPhase)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ground_test">Ground Test</SelectItem>
-                      <SelectItem value="ascent">Ascent</SelectItem>
-                      <SelectItem value="on_orbit">On-Orbit</SelectItem>
-                      <SelectItem value="servicing">Servicing</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <Label className="text-xs">O2 Fraction ({(o2Fraction * 100).toFixed(0)}%)</Label>
-                  <Slider
-                    min={21} max={100} step={1}
-                    value={[o2Fraction * 100]}
-                    onValueChange={([v]) => setO2Fraction(v / 100)}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Max Pressure (psia)</Label>
-                  <Input
-                    type="number" min={0}
-                    value={pressureMax}
-                    onChange={e => setPressureMax(Number(e.target.value))}
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="space-y-1">
-                  <Label className="text-xs">Flow Regime</Label>
-                  <Select value={flowRegime} onValueChange={v => setFlowRegime(v as OCAFlowRegime)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="static">Static</SelectItem>
-                      <SelectItem value="laminar">Laminar</SelectItem>
-                      <SelectItem value="turbulent">Turbulent</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Flow Velocity (m/s)</Label>
-                  <Input
-                    type="number" min={0}
-                    placeholder="Optional"
-                    value={velocity ?? ''}
-                    onChange={e => setVelocity(e.target.value ? Number(e.target.value) : null)}
-                  />
-                </div>
-                <div className="flex items-end">
-                  <div className="flex items-center gap-2">
-                    <Switch checked={cleanlinessVerified} onCheckedChange={setCleanlinessVerified} id="clean" />
-                    <Label htmlFor="clean" className="text-xs">Cleanliness Verified</Label>
-                  </div>
-                </div>
-              </div>
-              {pressureMax > 265 && (oxidizerType === 'gox' || oxidizerType === 'enriched_air') && (
-                <Alert>
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription className="text-xs">
-                    <strong>MPR 53:</strong> GOX/enriched-air above 265 psia triggers acceptance testing
-                    requirement (10 cycles, ambient to MDP within 100 ms) unless component is exempt.
-                  </AlertDescription>
-                </Alert>
-              )}
-            </TabsContent>
-
-            {/* --- Component Tab --- */}
-            <TabsContent value="component" className="space-y-3 mt-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <Label className="text-xs">Component Class</Label>
-                  <Select value={componentClass} onValueChange={v => setComponentClass(v as OCAComponentClass)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="valve">Valve</SelectItem>
-                      <SelectItem value="regulator">Regulator</SelectItem>
-                      <SelectItem value="line">Line/Tube</SelectItem>
-                      <SelectItem value="vessel">Vessel</SelectItem>
-                      <SelectItem value="seal">Seal</SelectItem>
-                      <SelectItem value="filter">Filter</SelectItem>
-                      <SelectItem value="sensor">Sensor</SelectItem>
-                      <SelectItem value="fitting">Fitting</SelectItem>
-                      <SelectItem value="flex_hose">Flex Hose</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Geometry Class</Label>
-                  <Select value={geometryClass} onValueChange={v => setGeometryClass(v as OCAGeometryClass)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="bulk">Bulk</SelectItem>
-                      <SelectItem value="thin_wall">Thin Wall</SelectItem>
-                      <SelectItem value="mesh">Mesh</SelectItem>
-                      <SelectItem value="porous">Porous</SelectItem>
-                      <SelectItem value="sintered">Sintered</SelectItem>
-                      <SelectItem value="seal">Seal</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-4">
-                <div className="flex items-center gap-2">
-                  <Switch checked={dynamicContact} onCheckedChange={setDynamicContact} id="dynamic" />
-                  <Label htmlFor="dynamic" className="text-xs">Moving Parts</Label>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Switch checked={isRigidTubing} onCheckedChange={setIsRigidTubing} id="rigid" />
-                  <Label htmlFor="rigid" className="text-xs">Rigid Metallic Tubing</Label>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Switch checked={isFlexHose} onCheckedChange={setIsFlexHose} id="flex" />
-                  <Label htmlFor="flex" className="text-xs">Metallic Flex Hose</Label>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Switch checked={isAllMetalSeal} onCheckedChange={setIsAllMetalSeal} id="metalseal" />
-                  <Label htmlFor="metalseal" className="text-xs">All-Metal Seal</Label>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Switch checked={isPressureVessel} onCheckedChange={setIsPressureVessel} id="vessel" />
-                  <Label htmlFor="vessel" className="text-xs">Metallic Pressure Vessel</Label>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-
-          {/* Run Button */}
-          <div className="mt-4 flex items-center gap-3">
-            <Button onClick={runAssessment} disabled={loading} className="gap-2">
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
-              Run OCA Assessment
-            </Button>
-            <Button variant="outline" size="sm" onClick={runAdiabaticCalc} disabled={adiabaticLoading}>
-              {adiabaticLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Flame className="h-3 w-3" />}
-              <span className="ml-1 text-xs">Adiabatic Calc</span>
-            </Button>
+      <section className="rounded-3xl border border-slate-900/15 bg-[linear-gradient(135deg,_rgba(88,58,22,0.97)_0%,_rgba(47,55,69,0.97)_38%,_rgba(8,27,42,1)_100%)] px-6 py-6 text-slate-50 shadow-[0_18px_50px_rgba(15,23,42,0.18)]">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="max-w-2xl space-y-2">
+            <p className="text-xs uppercase tracking-[0.22em] text-amber-100/90">Oxygen Compatibility Assessment</p>
+            <h2 className="text-2xl font-semibold tracking-tight text-white">Evidence-first, tier-separated, case-oriented.</h2>
+            <p className="text-sm text-slate-100/90">
+              Tier A requirements, Tier B TM mechanism logic, Tier C evidence scoring, and a locked lineage trail in one workbench.
+            </p>
           </div>
-
-          {adiabaticResult && (
-            <div className="mt-2 p-2 rounded bg-muted text-xs font-mono">
-              Tf = {adiabaticResult.tf_k.toFixed(1)} K ({adiabaticResult.tf_c.toFixed(1)}°C / {adiabaticResult.tf_f.toFixed(1)}°F)
-              &nbsp;| Pi={adiabaticResult.pi_psia} → Pf={adiabaticResult.pf_psia} psia
+          <div className="rounded-2xl border border-white/15 bg-slate-950/20 px-4 py-3 text-sm backdrop-blur-sm">
+            <div className="text-xs uppercase tracking-[0.2em] text-amber-100/85">Screening Notice</div>
+            <div className="mt-1 max-w-xs text-slate-100/90">
+              Screening aid only. Formal OCA still requires M&P concurrence and reviewer signoff before release.
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </div>
+        </div>
+      </section>
 
-      {/* Error */}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <Card className="overflow-hidden border-slate-200">
+          <CardHeader className="border-b border-slate-200 bg-slate-50/70">
+            <CardTitle>Assessment Input</CardTitle>
+            <CardDescription>Capture the worst-case service envelope, component configuration, and mechanism context.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-6 p-6 lg:grid-cols-[1.15fr_0.85fr]">
+            <div className="space-y-6">
+              <div>
+                <div className="mb-3 flex items-center gap-2">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold text-white">1</span>
+                  <span className="text-sm font-semibold text-slate-800">What material?</span>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2 md:col-span-2">
+                    <OCAHelpLabel htmlFor="material-name" entry={workbenchHelp('material_name')}>
+                      Material Name
+                    </OCAHelpLabel>
+                    <MaterialCombobox id="material-name" value={materialName} onChange={setMaterialName} />
+                    <p className="text-[11px] text-slate-400">
+                      Start typing to see known materials with their flammability class. Unknown materials are still accepted.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <OCAHelpLabel htmlFor="product-form" entry={workbenchHelp('product_form')}>
+                      Product Form
+                    </OCAHelpLabel>
+                    <Input id="product-form" value={productForm} onChange={(e) => setProductForm(e.target.value)} placeholder="bar / tube / mesh" />
+                  </div>
+                  <div className="space-y-2">
+                    <OCAHelpLabel htmlFor="role" entry={workbenchHelp('role_in_component')}>
+                      Role in Component
+                    </OCAHelpLabel>
+                    <Input id="role" value={roleInComponent} onChange={(e) => setRoleInComponent(e.target.value)} placeholder="body / seat / seal" />
+                  </div>
+                </div>
+                <details className="mt-3">
+                  <summary className="cursor-pointer text-xs font-medium text-slate-500 hover:text-slate-700">
+                    More material details (spec, grade, temper, coating)
+                  </summary>
+                  <div className="mt-3 grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <OCAHelpLabel htmlFor="spec" entry={workbenchHelp('spec')}>
+                        Specification
+                      </OCAHelpLabel>
+                      <Input id="spec" value={spec} onChange={(e) => setSpec(e.target.value)} placeholder="AMS 5666" />
+                    </div>
+                    <div className="space-y-2">
+                      <OCAHelpLabel htmlFor="grade" entry={workbenchHelp('grade')}>
+                        Grade
+                      </OCAHelpLabel>
+                      <Input id="grade" value={grade} onChange={(e) => setGrade(e.target.value)} placeholder="718" />
+                    </div>
+                    <div className="space-y-2">
+                      <OCAHelpLabel htmlFor="temper" entry={workbenchHelp('temper')}>
+                        Temper
+                      </OCAHelpLabel>
+                      <Input id="temper" value={temper} onChange={(e) => setTemper(e.target.value)} placeholder="T6 / annealed" />
+                    </div>
+                    <div className="space-y-2">
+                      <OCAHelpLabel htmlFor="coating" entry={workbenchHelp('coating')}>
+                        Coating
+                      </OCAHelpLabel>
+                      <Input id="coating" value={coating} onChange={(e) => setCoating(e.target.value)} placeholder="passivated / none" />
+                    </div>
+                    <div className="space-y-2">
+                      <OCAHelpLabel htmlFor="surface-condition" entry={workbenchHelp('surface_condition')}>
+                        Surface Condition
+                      </OCAHelpLabel>
+                      <Input id="surface-condition" value={surfaceCondition} onChange={(e) => setSurfaceCondition(e.target.value)} placeholder="cleaned / machined" />
+                    </div>
+                  </div>
+                </details>
+              </div>
+
+              <div>
+                <div className="mb-3 flex items-center gap-2">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold text-white">2</span>
+                  <span className="text-sm font-semibold text-slate-800">What hardware?</span>
+                </div>
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <OCAHelpLabel entry={workbenchHelp('component_class')}>
+                    Component Class
+                  </OCAHelpLabel>
+                  <Select value={componentClass} onValueChange={(value) => setComponentClass(value as (typeof COMPONENT_OPTIONS)[number])}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {COMPONENT_OPTIONS.map((option) => (
+                        <SelectItem key={option} value={option}>{option.replace('_', ' ')}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <OCAHelpLabel entry={workbenchHelp('geometry_class')}>
+                    Geometry Class
+                  </OCAHelpLabel>
+                  <Select value={geometryClass} onValueChange={(value) => setGeometryClass(value as (typeof GEOMETRY_OPTIONS)[number])}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {GEOMETRY_OPTIONS.map((option) => (
+                        <SelectItem key={option} value={option}>{option.replace('_', ' ')}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <OCAHelpLabel htmlFor="design-function" entry={workbenchHelp('design_function')}>
+                    Design Function
+                  </OCAHelpLabel>
+                  <Input id="design-function" value={designFunction} onChange={(e) => setDesignFunction(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <OCAHelpLabel htmlFor="boundary-material" entry={workbenchHelp('pressure_boundary_material')}>
+                    Pressure Boundary Material
+                  </OCAHelpLabel>
+                  <Input id="boundary-material" value={pressureBoundaryMaterial} onChange={(e) => setPressureBoundaryMaterial(e.target.value)} />
+                </div>
+              </div>
+
+              <details className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+                <summary className="cursor-pointer text-sm font-medium">
+                  Ignition Context <span className="ml-1 text-xs font-normal text-slate-400">(optional — defaults are conservative)</span>
+                </summary>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {[
+                    { fieldId: 'dynamic_contact_flag', label: 'Dynamic Contact', value: dynamicContact, setter: setDynamicContact },
+                    { fieldId: 'entrainable_particles_present', label: 'Entrainable Particles', value: entrainableParticles, setter: setEntrainableParticles },
+                    { fieldId: 'dead_end_configuration', label: 'Dead-End Configuration', value: deadEndConfiguration, setter: setDeadEndConfiguration },
+                    { fieldId: 'nonmetal_exposed_to_flow', label: 'Nonmetal in Flow', value: nonmetalInFlow, setter: setNonmetalInFlow },
+                    { fieldId: 'vibration_or_erosion_present', label: 'Vibration / Erosion', value: vibrationPresent, setter: setVibrationPresent },
+                    { fieldId: 'acoustic_cavity_present', label: 'Acoustic Cavity', value: acousticCavity, setter: setAcousticCavity },
+                    { fieldId: 'mechanical_impact_risk', label: 'Mechanical Impact Risk', value: mechanicalImpactRisk, setter: setMechanicalImpactRisk },
+                    { fieldId: 'isolated_surface_present', label: 'Isolated Surface', value: isolatedSurface, setter: setIsolatedSurface },
+                    { fieldId: 'dry_gas_environment', label: 'Dry Gas', value: dryGas, setter: setDryGas },
+                    { fieldId: 'electrical_power_present', label: 'Electrical Power', value: electricalPower, setter: setElectricalPower },
+                    { fieldId: 'reactive_chemical_pair_present', label: 'Reactive Chemical Pair', value: reactiveChemicalPair, setter: setReactiveChemicalPair },
+                    { fieldId: 'porous_media_present', label: 'Porous Media', value: porousMedia, setter: setPorousMedia },
+                    { fieldId: 'open_flame_or_hot_work_present', label: 'Open Flame / Hot Work', value: openFlame, setter: setOpenFlame },
+                  ].map(({ fieldId, label, value, setter }) => (
+                    <label key={fieldId} className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm">
+                      <span className="flex items-center gap-1.5">
+                        <span>{label}</span>
+                        <OCAInlineHelp entry={workbenchHelp(fieldId)} />
+                      </span>
+                      <Switch checked={Boolean(value)} onCheckedChange={setter as (value: boolean) => void} />
+                    </label>
+                  ))}
+                </div>
+                <div className="mt-4 space-y-2">
+                  <OCAHelpLabel htmlFor="rapid-press" entry={workbenchHelp('rapid_pressurization_time_ms')}>
+                    Rapid Pressurization Time (ms)
+                  </OCAHelpLabel>
+                  <Input id="rapid-press" type="number" value={rapidPressurizationMs} onChange={(e) => setRapidPressurizationMs(e.target.value)} />
+                </div>
+              </details>
+            </div>
+
+            <div className="space-y-6">
+              <div className="mb-3 flex items-center gap-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold text-white">3</span>
+                <span className="text-sm font-semibold text-slate-800">Service conditions</span>
+              </div>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                <div className="space-y-2">
+                  <OCAHelpLabel entry={workbenchHelp('oxidizer_type')}>
+                    Oxidizer Type
+                  </OCAHelpLabel>
+                  <Select value={oxidizerType} onValueChange={(value) => setOxidizerType(value as OCAOxidizerType)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {OXIDIZER_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <OCAHelpLabel entry={workbenchHelp('phase')}>
+                    Phase
+                  </OCAHelpLabel>
+                  <Select value={phase} onValueChange={(value) => setPhase(value as OCAPhase)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {PHASE_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <OCAHelpLabel htmlFor="o2-fraction" entry={workbenchHelp('o2_fraction')}>
+                    O2 Fraction
+                  </OCAHelpLabel>
+                  <Input id="o2-fraction" type="number" step="0.01" value={o2Fraction} onChange={(e) => setO2Fraction(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <OCAHelpLabel htmlFor="velocity" entry={workbenchHelp('velocity_m_s')}>
+                    Velocity (m/s)
+                  </OCAHelpLabel>
+                  <Input id="velocity" type="number" step="0.1" value={velocity} onChange={(e) => setVelocity(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <OCAHelpLabel htmlFor="pressure-min" entry={workbenchHelp('total_pressure_min_psia')}>
+                    Pressure Min (psia)
+                  </OCAHelpLabel>
+                  <Input id="pressure-min" type="number" step="0.1" value={pressureMin} onChange={(e) => setPressureMin(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <OCAHelpLabel htmlFor="pressure-max" entry={workbenchHelp('total_pressure_max_psia')}>
+                    Pressure Max (psia)
+                  </OCAHelpLabel>
+                  <Input id="pressure-max" type="number" step="0.1" value={pressureMax} onChange={(e) => setPressureMax(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <OCAHelpLabel htmlFor="temp-min" entry={workbenchHelp('temp_min_c')}>
+                    Temp Min (°C)
+                  </OCAHelpLabel>
+                  <Input id="temp-min" type="number" step="0.1" value={tempMin} onChange={(e) => setTempMin(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <OCAHelpLabel htmlFor="temp-max" entry={workbenchHelp('temp_max_c')}>
+                    Temp Max (°C)
+                  </OCAHelpLabel>
+                  <Input id="temp-max" type="number" step="0.1" value={tempMax} onChange={(e) => setTempMax(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <OCAHelpLabel entry={workbenchHelp('flow_regime')}>
+                    Flow Regime
+                  </OCAHelpLabel>
+                  <Select value={flowRegime} onValueChange={(value) => setFlowRegime(value as OCAFlowRegime)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {FLOW_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <OCAHelpLabel entry={workbenchHelp('mission_phase')}>
+                    Mission Phase
+                  </OCAHelpLabel>
+                  <Select value={missionPhase} onValueChange={(value) => setMissionPhase(value as OCAMissionPhase)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {MISSION_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 space-y-4">
+                <div className="text-sm font-medium">MPR 53 Exemption Flags</div>
+                {[
+                  { fieldId: 'is_rigid_metallic_tubing', label: 'Rigid Metallic Tubing', value: rigidTubing, setter: setRigidTubing },
+                  { fieldId: 'is_metallic_flex_hose', label: 'Metallic Flex Hose', value: metallicFlexHose, setter: setMetallicFlexHose },
+                  { fieldId: 'is_all_metal_seal', label: 'All-Metal Seal', value: allMetalSeal, setter: setAllMetalSeal },
+                  { fieldId: 'is_metallic_pressure_vessel', label: 'Metallic Pressure Vessel', value: metallicPressureVessel, setter: setMetallicPressureVessel },
+                ].map(({ fieldId, label, value, setter }) => (
+                  <label key={fieldId} className="flex items-center justify-between gap-3 text-sm">
+                    <span className="flex items-center gap-1.5">
+                      <span>{label}</span>
+                      <OCAInlineHelp entry={workbenchHelp(fieldId)} />
+                    </span>
+                    <Switch checked={Boolean(value)} onCheckedChange={setter as (value: boolean) => void} />
+                  </label>
+                ))}
+                <label className="flex items-center justify-between gap-3 text-sm">
+                  <span className="flex items-center gap-1.5">
+                    <span>Cleanliness Verified</span>
+                    <OCAInlineHelp entry={workbenchHelp('cleanliness_verified')} />
+                  </span>
+                  <Switch checked={cleanlinessVerified} onCheckedChange={setCleanlinessVerified} />
+                </label>
+                <div className="space-y-2">
+                  <OCAHelpLabel htmlFor="contamination-notes" entry={workbenchHelp('contamination_notes')}>
+                    Contamination Notes
+                  </OCAHelpLabel>
+                  <Textarea
+                    id="contamination-notes"
+                    value={contaminationNotes}
+                    onChange={(e) => setContaminationNotes(e.target.value)}
+                    placeholder="Known debris sources, cleaning assumptions, or unresolved contamination concerns."
+                  />
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-medium">Adiabatic Compression Check</div>
+                    <div className="text-xs text-muted-foreground">Local calculator for rapid-pressurization what-if review.</div>
+                  </div>
+                  <Flame className="h-4 w-4 text-orange-500" />
+                </div>
+                {adiabatic ? (
+                  <div className="mt-3 grid grid-cols-3 gap-3 text-sm">
+                    <div className="rounded-xl bg-slate-50 p-3">
+                      <div className="text-xs uppercase tracking-wide text-muted-foreground">Tf (K)</div>
+                      <div className="mt-1 font-semibold">{adiabatic.tfK.toFixed(1)}</div>
+                    </div>
+                    <div className="rounded-xl bg-slate-50 p-3">
+                      <div className="text-xs uppercase tracking-wide text-muted-foreground">Tf (°C)</div>
+                      <div className="mt-1 font-semibold">{adiabatic.tfC.toFixed(1)}</div>
+                    </div>
+                    <div className="rounded-xl bg-slate-50 p-3">
+                      <div className="text-xs uppercase tracking-wide text-muted-foreground">Tf (°F)</div>
+                      <div className="mt-1 font-semibold">{adiabatic.tfF.toFixed(1)}</div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-3 text-sm text-muted-foreground">Enter valid pressures to compute the compression endpoint temperature.</div>
+                )}
+              </div>
+
+              <Button type="submit" disabled={loading} className="w-full gap-2">
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ScrollText className="h-4 w-4" />}
+                Run OCA Case
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </form>
+
       {error && (
-        <Alert variant="destructive">
-          <XCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      {/* Loading */}
-      {loading && (
-        <Card>
-          <CardContent className="flex items-center gap-3 py-8 justify-center">
-            <Loader2 className="h-5 w-5 animate-spin" />
-            <span className="text-sm text-muted-foreground">Running 7-step OCA pipeline...</span>
+        <Card className="border-rose-200 bg-rose-50">
+          <CardContent className="flex items-start gap-3 p-4 text-rose-900">
+            <ShieldX className="mt-0.5 h-4 w-4" />
+            <div className="text-sm">{error}</div>
           </CardContent>
         </Card>
       )}
 
-      {/* ================================================================= */}
-      {/* RESULTS TILES (only shown after assessment) */}
-      {/* ================================================================= */}
-      {decision && (
-        <>
-          {/* TILE 2: Blocked States */}
-          {decision.blocked_states.length > 0 && (
-            <Alert variant="destructive">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>Blocked States</AlertTitle>
-              <AlertDescription>
-                {decision.blocked_states.map((b, i) => (
-                  <div key={i} className="mt-1">
-                    <strong className="uppercase text-xs">{b.state_type.replace(/_/g, ' ')}</strong>
-                    <p className="text-xs">{b.description}</p>
-                    <p className="text-xs text-muted-foreground">{b.resolution_hint}</p>
-                  </div>
-                ))}
-              </AlertDescription>
-            </Alert>
-          )}
+      {precheck?.blocked_states.length ? (
+        <Card className="border-amber-300 bg-amber-50">
+          <CardHeader>
+            <CardTitle className="text-base">Blocked States</CardTitle>
+            <CardDescription>Assessment remains partial until the following blockers are resolved.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {precheck.blocked_states.map((state) => (
+              <div key={state.code} className="rounded-2xl border border-amber-200 bg-white p-4">
+                <div className="flex items-center gap-2 text-sm font-medium text-amber-900">
+                  <AlertTriangle className="h-4 w-4" />
+                  {state.code.replaceAll('_', ' ')}
+                </div>
+                <p className="mt-2 text-sm text-slate-700">{state.detail}</p>
+                <p className="mt-1 text-xs text-slate-500">{state.resolution_hint}</p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      ) : null}
 
-          {/* TILE 3: Assessment Result */}
-          <Card>
-            <CardHeader className="pb-2 bg-card border-b">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Shield className="h-4 w-4" />
-                  Assessment Result
-                </CardTitle>
-                <Badge className={DISPOSITION_LABELS[decision.final_disposition]?.color || 'bg-gray-600 text-white'}>
-                  {DISPOSITION_LABELS[decision.final_disposition]?.label || decision.final_disposition}
-                </Badge>
+      {createdCase && decision && (
+        <>
+          <Card className="overflow-hidden border-slate-200">
+            <CardHeader className="border-b border-slate-200 bg-slate-50/70">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <CardTitle>Case Summary</CardTitle>
+                  <CardDescription>{createdCase.case_id} · revision {createdCase.revision}</CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge className={DISPOSITION_META[decision.final_disposition]?.className || 'bg-slate-700 text-white'}>
+                    {DISPOSITION_META[decision.final_disposition]?.label || decision.final_disposition}
+                  </Badge>
+                  <OCAInlineHelp entry={getDispositionGuidance(decision.final_disposition)} />
+                </div>
               </div>
             </CardHeader>
-            <CardContent className="pt-3 space-y-3">
-              <p className="text-sm">{decision.summary_rationale}</p>
-
-              {/* Triggered Requirements */}
-              <div className="space-y-1">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Triggered Requirements</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {decision.triggered_requirements.map((r, i) => (
-                    <Badge
-                      key={i}
-                      variant={r.is_prohibition ? 'destructive' : r.satisfied ? 'default' : 'secondary'}
-                      className="text-[10px] gap-1"
-                    >
-                      <span className={`inline-block w-4 text-center rounded text-[8px] font-bold ${TIER_COLORS[r.tier]}`}>
-                        {r.tier}
-                      </span>
-                      {r.requirement_id}
-                      {r.is_prohibition && ' — PROHIBITION'}
-                      {r.satisfied && <CheckCircle className="h-3 w-3" />}
-                    </Badge>
+            <CardContent className="grid gap-6 p-6 lg:grid-cols-[1.2fr_0.8fr]">
+              <div className="space-y-4">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">What this means</div>
+                  <p className="mt-1.5 text-sm leading-relaxed text-slate-700">
+                    {dispositionPlainEnglish(decision.final_disposition, decision)}
+                  </p>
+                </div>
+                {decision.governing_prohibition ? (
+                  <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-900">
+                    Governing prohibition: {decision.governing_prohibition}
+                  </div>
+                ) : null}
+                <div className="flex flex-wrap gap-2">
+                  {displayedRequirements.filter((item) => item.triggered).map((item) => (
+                    <span key={item.requirement_id} className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium ${statusClass(item.status)}`}>
+                      <span className={`rounded-full px-2 py-0.5 text-[10px] ${tierClass(item.tier)}`}>{item.tier.replace('tier_', 'T').toUpperCase()}</span>
+                      {item.requirement_id}
+                    </span>
                   ))}
-                  {decision.triggered_requirements.length === 0 && (
-                    <span className="text-xs text-muted-foreground">None</span>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-2xl bg-slate-50 p-4">
+                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Overall Confidence</div>
+                    <div className="mt-1 text-lg font-semibold capitalize">{decision.overall_confidence}</div>
+                  </div>
+                  <div className="rounded-2xl bg-slate-50 p-4">
+                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Authority Tier</div>
+                    <div className="mt-1 text-lg font-semibold">{decision.authority_level.replace('tier_', 'Tier ').toUpperCase()}</div>
+                  </div>
+                  <div className="rounded-2xl bg-slate-50 p-4">
+                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Open Gaps</div>
+                    <div className="mt-1 text-lg font-semibold">{decision.unresolved_gaps.length}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="text-sm font-medium">Next Actions</div>
+                <div className="mt-4 space-y-3">
+                  {decision.actions.length ? decision.actions.map((action) => (
+                    <div key={action.action_id} className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                      <div className="text-sm font-medium text-slate-900">{action.label}</div>
+                      <div className="mt-1 text-xs text-slate-600">{action.rationale}</div>
+                    </div>
+                  )) : (
+                    <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900">
+                      No additional routing actions were required for the current screening pass.
+                    </div>
                   )}
                 </div>
               </div>
+            </CardContent>
+          </Card>
 
-              {/* Reaction Effect + Stats */}
-              <div className="grid grid-cols-4 gap-2">
-                <div className="p-2 rounded bg-muted text-center">
-                  <p className="text-[10px] text-muted-foreground uppercase">Reaction Effect</p>
-                  <Badge className={`mt-1 ${REACTION_COLORS[decision.reaction_effect]}`}>
-                    {REACTION_LABELS[decision.reaction_effect]}
-                  </Badge>
+          <Card className="border-slate-200">
+            <CardHeader>
+              <CardTitle>Requirement Backbone</CardTitle>
+              <CardDescription>Tier A requirement state with rationale and downstream actions.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-3 md:grid-cols-2">
+              {displayedRequirements.map((item) => (
+                <div key={item.requirement_id} className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className={`rounded-full px-2 py-1 text-[10px] font-semibold ${tierClass(item.tier)}`}>
+                        {item.tier.replace('tier_', 'T').toUpperCase()}
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <span className="text-sm font-medium">{item.requirement_id}</span>
+                        <OCAInlineHelp entry={getMprGuidance(item.requirement_id)} />
+                      </span>
+                    </div>
+                    <Badge className={statusClass(item.status)}>{item.status.replaceAll('_', ' ')}</Badge>
+                  </div>
+                  <p className="mt-3 text-sm text-slate-800">{item.title}</p>
+                  <p className="mt-1 text-xs text-slate-500">{item.citation}</p>
+                  <p className="mt-3 text-sm text-slate-600">{item.reasoning}</p>
+                  {item.downstream_actions.length ? (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {item.downstream_actions.map((action) => (
+                        <Badge key={action} variant="outline" className="text-[11px]">{action}</Badge>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
-                <div className="p-2 rounded bg-muted text-center">
-                  <p className="text-[10px] text-muted-foreground uppercase">Kindling Chain</p>
-                  <p className="text-sm font-semibold mt-1">{decision.kindling_chain_present ? 'Present' : 'No'}</p>
-                </div>
-                <div className="p-2 rounded bg-muted text-center">
-                  <p className="text-[10px] text-muted-foreground uppercase">Accept. Test</p>
-                  <p className="text-sm font-semibold mt-1">{decision.acceptance_test_required ? 'Required' : 'No'}</p>
-                </div>
-                <div className="p-2 rounded bg-muted text-center">
-                  <p className="text-[10px] text-muted-foreground uppercase">Gaps</p>
-                  <p className="text-sm font-semibold mt-1">{decision.unresolved_gaps.length}</p>
-                </div>
-              </div>
-
-              {/* Prohibition details */}
-              {decision.triggered_requirements.filter(r => r.is_prohibition).map((r, i) => (
-                <Alert key={i} variant="destructive">
-                  <XCircle className="h-4 w-4" />
-                  <AlertTitle className="text-sm">{r.requirement_id}: {r.title}</AlertTitle>
-                  <AlertDescription className="text-xs">{r.prohibition_detail}</AlertDescription>
-                </Alert>
               ))}
             </CardContent>
           </Card>
 
-          {/* TILE 4: Ignition Mechanisms */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Flame className="h-4 w-4" />
-                Ignition Mechanisms (12 per TM-2007-213740)
-              </CardTitle>
-              <CardDescription>
-                {decision.mechanism_assessments.filter(m => m.credible_status === 'credible').length} credible,{' '}
-                {decision.mechanism_assessments.filter(m => m.credible_status === 'indeterminate').length} indeterminate,{' '}
-                {decision.mechanism_assessments.filter(m => m.credible_status === 'not_credible').length} not credible
-              </CardDescription>
+          <Card className="border-slate-200">
+            <CardHeader>
+              <CardTitle>Evidence Applicability</CardTitle>
+              <CardDescription>Evidence is grouped by directness before it influences the case disposition.</CardDescription>
             </CardHeader>
-            <CardContent>
-              <Accordion type="multiple" className="w-full">
-                {decision.mechanism_assessments.map((m, i) => (
-                  <AccordionItem key={i} value={m.mechanism_name}>
-                    <AccordionTrigger className="py-2 hover:no-underline">
-                      <div className="flex items-center gap-3 w-full pr-4">
-                        <span className="text-sm font-medium capitalize w-44 text-left">
-                          {m.mechanism_name.replace(/_/g, ' ')}
-                        </span>
-                        {credibleBadge(m.credible_status)}
-                        {ratingBar(m.rating)}
-                        <span className="text-[10px] text-muted-foreground ml-auto">{m.source_ref}</span>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="pb-3">
-                      <div className="grid grid-cols-2 gap-3 text-xs">
-                        <div>
-                          <p className="font-medium text-muted-foreground mb-1">Required Elements</p>
-                          <ul className="space-y-0.5">
-                            {m.required_elements.map((el, j) => (
-                              <li key={j} className="flex items-center gap-1">
-                                {m.observed_elements.includes(el)
-                                  ? <CheckCircle className="h-3 w-3 text-emerald-500" />
-                                  : <XCircle className="h-3 w-3 text-muted-foreground" />
-                                }
-                                <span className={m.observed_elements.includes(el) ? '' : 'text-muted-foreground'}>
-                                  {el.replace(/_/g, ' ')}
-                                </span>
-                              </li>
+            <CardContent className="space-y-4">
+              {evidenceBuckets.map(({ bucket, items }) => (
+                <div key={bucket} className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm font-medium">{bucket.replace('_', ' ')}</div>
+                    <Badge variant="outline">{items.length}</Badge>
+                  </div>
+                  <div className="grid gap-3 lg:grid-cols-2">
+                    {items.map((item) => (
+                      <div key={item.evidence_id} className={`rounded-2xl border p-4 ${applicabilityClassName(item.applicability.applicability_class)}`}>
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <div className="text-sm font-medium text-slate-900">{item.title}</div>
+                            <div className="mt-1 text-xs text-slate-500">{item.citation}</div>
+                          </div>
+                          <Badge variant="outline">{item.applicability.aggregate_score.toFixed(2)}</Badge>
+                        </div>
+                        <p className="mt-3 text-sm text-slate-700">{item.summary}</p>
+                        <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-slate-600">
+                          <div>Material: {item.material_name}</div>
+                          <div>Method: {item.test_method || 'n/a'}</div>
+                          <div>Result: {item.result || 'n/a'}</div>
+                          <div>Applicability: {item.applicability.applicability_class}</div>
+                        </div>
+                        {item.gaps.length ? (
+                          <div className="mt-3 space-y-1 text-xs text-amber-800">
+                            {item.gaps.map((gap) => (
+                              <div key={gap}>• {gap}</div>
                             ))}
-                          </ul>
-                        </div>
-                        <div>
-                          <p className="font-medium text-muted-foreground mb-1">Missing Elements</p>
-                          {m.missing_elements.length > 0 ? (
-                            <ul className="space-y-0.5">
-                              {m.missing_elements.map((el, j) => (
-                                <li key={j} className="text-amber-500">{el.replace(/_/g, ' ')}</li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <p className="text-muted-foreground">All elements observed</p>
-                          )}
-                        </div>
+                          </div>
+                        ) : null}
                       </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </CardContent>
           </Card>
 
-          {/* TILE 5: Kindling Chain & Reaction Effect */}
-          {decision.kindling_chain && (
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">Kindling Chain & Reaction Effect</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Badge className={decision.kindling_chain.kindling_chain_present ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'}>
-                    {decision.kindling_chain.kindling_chain_present ? 'Kindling Chain Present' : 'No Kindling Chain'}
-                  </Badge>
-                  <Badge className={REACTION_COLORS[decision.kindling_chain.reaction_effect]}>
-                    {REACTION_LABELS[decision.kindling_chain.reaction_effect]}
-                  </Badge>
-                </div>
-                <p className="text-sm">{decision.kindling_chain.rationale}</p>
-                {decision.kindling_chain.propagation_path.length > 0 && (
-                  <div className="flex items-center gap-1 flex-wrap">
-                    {decision.kindling_chain.propagation_path.map((p, i) => (
-                      <span key={i} className="flex items-center gap-1">
-                        {i > 0 && <ChevronRight className="h-3 w-3 text-muted-foreground" />}
-                        <Badge variant="outline" className="text-[10px]">{p}</Badge>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* TILE 6: Hazard Controls */}
-          {decision.hazard_controls.length > 0 && (
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">Hazard Control Table (TM Table 4)</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-xs">
-                    <thead>
-                      <tr className="border-b text-muted-foreground">
-                        <th className="text-left py-1 pr-2">Hazard</th>
-                        <th className="text-left py-1 pr-2">Rating</th>
-                        <th className="text-left py-1 pr-2">Recommendation</th>
-                        <th className="text-left py-1 pr-2">Class</th>
-                        <th className="text-left py-1">Confidence</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {decision.hazard_controls.map((hc, i) => (
-                        <tr key={i} className="border-b border-border/50">
-                          <td className="py-1.5 pr-2 capitalize">{hc.ignition_hazard.replace(/_/g, ' ')}</td>
-                          <td className="py-1.5 pr-2">{ratingBar(hc.probability_rating)}</td>
-                          <td className="py-1.5 pr-2">{hc.recommendation}</td>
-                          <td className="py-1.5 pr-2">
-                            <Badge variant="outline" className="text-[9px]">{hc.recommendation_class.replace(/_/g, ' ')}</Badge>
-                          </td>
-                          <td className="py-1.5">{hc.confidence}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* TILE 7: Evidence Gaps */}
-          {decision.unresolved_gaps.length > 0 && (
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-amber-500" />
-                  Evidence Gaps
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-1">
-                  {decision.unresolved_gaps.map((g, i) => (
-                    <li key={i} className="text-sm text-amber-200 flex items-start gap-2">
-                      <AlertTriangle className="h-3 w-3 mt-0.5 flex-shrink-0" />
-                      {g}
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* TILE 8: MUA Seed */}
-          {decision.mua_seed && (
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <FileText className="h-4 w-4" />
-                  MUA Seed (Pre-Population Packet)
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Material Identity</p>
-                    <p>{decision.mua_seed.material_identity}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Service Conditions</p>
-                    <p>{decision.mua_seed.service_conditions}</p>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Trigger Reason</p>
-                  <p>{decision.mua_seed.trigger_reason}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Rationale Draft</p>
-                  <p className="text-xs">{decision.mua_seed.rationale_draft}</p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* TILE 9: Export */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Disposition & Export</CardTitle>
+          <Card className="border-slate-200">
+            <CardHeader>
+              <CardTitle>Ignition Mechanisms</CardTitle>
+              <CardDescription>
+                {(() => {
+                  const credible = displayedMechanisms.filter((item: OCAMechanismAssessment) => item.credible_status === 'CREDIBLE');
+                  const indeterminate = displayedMechanisms.filter((item: OCAMechanismAssessment) => item.credible_status === 'INDETERMINATE');
+                  const notCredible = displayedMechanisms.filter((item: OCAMechanismAssessment) => item.credible_status === 'NOT_CREDIBLE');
+                  return `${displayedMechanisms.length} mechanisms evaluated: ${credible.length} credible, ${indeterminate.length} need review, ${notCredible.length} not credible.`;
+                })()}
+              </CardDescription>
             </CardHeader>
-            <CardContent className="flex items-center gap-3">
-              <Badge className={DISPOSITION_LABELS[decision.final_disposition]?.color || ''}>
-                {DISPOSITION_LABELS[decision.final_disposition]?.label}
-              </Badge>
-              <span className="text-xs text-muted-foreground">Case: {decision.case_id.slice(0, 8)}...</span>
-              <div className="ml-auto flex gap-2">
-                <Button variant="outline" size="sm" className="gap-1 text-xs" onClick={() => {
-                  const blob = new Blob([JSON.stringify(decision, null, 2)], { type: 'application/json' });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement('a');
-                  a.href = url;
-                  a.download = `oca-${decision.case_id.slice(0, 8)}.json`;
-                  a.click();
-                  URL.revokeObjectURL(url);
-                }}>
-                  <Download className="h-3 w-3" />
-                  Export JSON
-                </Button>
+            {(() => {
+              const credible = displayedMechanisms.filter((item: OCAMechanismAssessment) => item.credible_status === 'CREDIBLE');
+              const indeterminate = displayedMechanisms.filter((item: OCAMechanismAssessment) => item.credible_status === 'INDETERMINATE');
+              if (credible.length === 0 && indeterminate.length === 0) {
+                return (
+                  <div className="mx-6 mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
+                    <CheckCircle2 className="mb-1 inline h-4 w-4" /> No ignition mechanisms are credible for this configuration. All required elements were absent or the material is nonflammable in this envelope.
+                  </div>
+                );
+              }
+              return (
+                <div className="mx-6 mb-4 space-y-2">
+                  {credible.length ? (
+                    <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                      <div className="text-xs font-semibold uppercase tracking-wider text-amber-700">Credible Mechanisms ({credible.length})</div>
+                      <div className="mt-2 space-y-1">
+                        {credible
+                          .sort((left: OCAMechanismAssessment, right: OCAMechanismAssessment) => right.rating - left.rating)
+                          .map((item: OCAMechanismAssessment) => (
+                            <div key={item.mechanism_name} className="flex items-center justify-between text-sm">
+                              <span className="text-slate-800">{item.mechanism_name.replace(/_/g, ' ')}</span>
+                              <span className="font-semibold text-amber-800">Rating {item.rating}/4</span>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  ) : null}
+                  {indeterminate.length ? (
+                    <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4">
+                      <div className="text-xs font-semibold uppercase tracking-wider text-rose-700">Need More Information ({indeterminate.length})</div>
+                      <div className="mt-2 space-y-1">
+                        {indeterminate.map((item: OCAMechanismAssessment) => (
+                          <div key={item.mechanism_name} className="text-sm text-slate-700">
+                            {item.mechanism_name.replace(/_/g, ' ')} — {item.missing_elements.length ? `missing: ${item.missing_elements.join(', ')}` : 'additional context needed'}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })()}
+            <CardContent>
+              <div className="overflow-x-auto pb-2">
+                <div className="flex gap-4 min-w-max">
+                  {displayedMechanisms.map((mechanism: OCAMechanismAssessment) => (
+                    <div key={mechanism.mechanism_name} className="w-[320px] rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <div className="text-sm font-medium">{mechanism.mechanism_name}</div>
+                            <OCAInlineHelp entry={getMechanismGuidance(mechanism.mechanism_name)} />
+                          </div>
+                          <div className="mt-1 text-xs text-slate-500">{mechanism.source_ref}</div>
+                        </div>
+                        {mechanismIcon(mechanism.credible_status)}
+                      </div>
+                      <div className="mt-4 flex items-center justify-between">
+                        <Badge className={statusClass(mechanism.credible_status === 'NOT_CREDIBLE' ? 'satisfied' : mechanism.credible_status === 'CREDIBLE' ? 'action_required' : 'prohibited')}>
+                          {mechanism.credible_status.replace('_', ' ')}
+                        </Badge>
+                        <div className="text-sm font-semibold">Rating {mechanism.rating}/4</div>
+                      </div>
+                      <div className="mt-4 space-y-3 text-sm">
+                        <div>
+                          <div className="text-xs uppercase tracking-wide text-muted-foreground">Observed</div>
+                          <div className="mt-1 text-slate-700">{mechanism.observed_elements.join(', ') || 'None captured'}</div>
+                        </div>
+                        <div>
+                          <div className="text-xs uppercase tracking-wide text-muted-foreground">Missing</div>
+                          <div className="mt-1 text-slate-700">{mechanism.missing_elements.join(', ') || 'No missing elements'}</div>
+                        </div>
+                        {mechanism.gaps_identified.length ? (
+                          <div className="rounded-2xl bg-amber-50 p-3 text-xs text-amber-900">
+                            {mechanism.gaps_identified.join(' ')}
+                          </div>
+                        ) : null}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </CardContent>
           </Card>
+
+          <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+            <Card className="border-slate-200">
+              <CardHeader>
+                <CardTitle>Decision Lineage</CardTitle>
+                <CardDescription>Every rule execution is recorded with tier, stage, and outcome.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {lineage?.decision_lineage.slice(0, 12).map((entry) => (
+                  <div key={`${entry.stage}-${entry.rule_id}-${entry.recorded_at}`} className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <Badge className={tierClass(entry.tier)}>{entry.tier.replace('tier_', 'T').toUpperCase()}</Badge>
+                        <span className="text-sm font-medium">{entry.rule_id}</span>
+                      </div>
+                      <span className="text-xs text-slate-500">{entry.stage}</span>
+                    </div>
+                    <div className="mt-2 text-xs text-slate-600">{entry.detail}</div>
+                  </div>
+                )) || <div className="text-sm text-muted-foreground">No lineage available yet.</div>}
+              </CardContent>
+            </Card>
+
+            <Card className="border-slate-200">
+              <CardHeader>
+                <CardTitle>Export & Authority</CardTitle>
+                <CardDescription>Review the locked source manifest and generate case artifacts.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <div className="text-sm font-medium">Authority Pack</div>
+                  <div className="mt-3 space-y-2 text-sm text-slate-700">
+                    {authority?.sources.slice(0, 4).map((source) => (
+                      <div key={source.source_id} className="flex items-center justify-between gap-3">
+                        <span>{source.title}</span>
+                        <span className="text-xs text-slate-500">{source.edition}{source.change_number ? ` / ${source.change_number}` : ''}</span>
+                      </div>
+                    )) || <div className="text-muted-foreground">Authority manifest unavailable.</div>}
+                  </div>
+                </div>
+
+                <Button onClick={handleExport} disabled={exportLoading || !createdCase?.case_id} className="w-full gap-2">
+                  {exportLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileStack className="h-4 w-4" />}
+                  Generate Export Pack
+                </Button>
+
+                {exports.length ? (
+                  <div className="space-y-3">
+                    {exports.map((artifact) => (
+                      <div key={artifact.filename} className="rounded-2xl border border-slate-200 bg-white p-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <div className="text-sm font-medium">{artifact.artifact_type.replace('_', ' ')}</div>
+                            <div className="mt-1 text-xs text-slate-500">{artifact.filename}</div>
+                          </div>
+                          <Button variant="outline" size="sm" onClick={() => downloadArtifact(artifact)}>
+                            Download
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </CardContent>
+            </Card>
+          </div>
         </>
       )}
+
+      {loading ? (
+        <Card className="border-slate-200">
+          <CardContent className="flex items-center justify-center gap-3 py-10 text-sm text-slate-600">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Building deterministic OCA case, evidence map, mechanism traces, and decision lineage.
+          </CardContent>
+        </Card>
+      ) : null}
     </div>
   );
 }

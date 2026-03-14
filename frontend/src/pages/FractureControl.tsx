@@ -3,6 +3,7 @@ import { AlertTriangle, CheckCircle2, Loader2, ShieldAlert, ShieldCheck, ShieldX
 
 import { PageHeader } from '@/components/PageHeader';
 import { StatusBadge } from '@/components/StatusBadge';
+import { MiraHelpLabel, MiraInlineHelp } from '@/components/mira/MiraInlineHelp';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,6 +25,7 @@ import {
   type FractureAuthorityManifest,
   type FractureMaterialSearchResult,
 } from '@/lib/api';
+import { getMiraGuidanceEntry, getMiraInputGuidance } from '@/lib/mira-guidance';
 
 const MISSION_OPTIONS = [
   { value: 'HUMAN_RATED', label: 'Human-Rated' },
@@ -133,6 +135,7 @@ function classificationIcon(classification: string) {
 }
 
 export default function FractureControl() {
+  const fractureHelp = (fieldId: string) => getMiraInputGuidance('fracture', fieldId);
   const [partName, setPartName] = useState('Primary Bracket');
   const [materialName, setMaterialName] = useState('Al 6061-T6');
   const [missionClass, setMissionClass] = useState('HUMAN_RATED');
@@ -276,17 +279,17 @@ export default function FractureControl() {
   }
 
   const checkboxes = [
-    { checked: pressureBoundary, setChecked: setPressureBoundary, label: 'Pressure boundary' },
-    { checked: optionalApproachRequested, setChecked: setOptionalApproachRequested, label: 'Optional approach requested' },
-    { checked: proofTestUsed, setChecked: setProofTestUsed, label: 'Proof test used' },
-    { checked: processControlsUsed, setChecked: setProcessControlsUsed, label: 'Process controls used' },
-    { checked: detectedFlawAcceptedForFlight, setChecked: setDetectedFlawAcceptedForFlight, label: 'Detected flaw accepted for flight' },
+    { checked: pressureBoundary, setChecked: setPressureBoundary, label: 'Pressure boundary', fieldId: 'pressure_boundary' },
+    { checked: optionalApproachRequested, setChecked: setOptionalApproachRequested, label: 'Optional approach requested', fieldId: 'optional_approach_requested' },
+    { checked: proofTestUsed, setChecked: setProofTestUsed, label: 'Proof test used', fieldId: 'proof_test_used' },
+    { checked: processControlsUsed, setChecked: setProcessControlsUsed, label: 'Process controls used', fieldId: 'process_controls_used' },
+    { checked: detectedFlawAcceptedForFlight, setChecked: setDetectedFlawAcceptedForFlight, label: 'Detected flaw accepted for flight', fieldId: 'detected_flaw_accepted_for_flight' },
     { checked: corrosionIccpRecommended, setChecked: setCorrosionIccpRecommended, label: 'Corrosion module recommends ICCP' },
-    { checked: lowRiskCandidate, setChecked: setLowRiskCandidate, label: 'Evaluate metallic low-risk path' },
-    { checked: additiveManufactured, setChecked: setAdditiveManufactured, label: 'Additively manufactured metallic part' },
-    { checked: chlorideExposure, setChecked: setChlorideExposure, label: 'Wet chloride / salt exposure expected' },
-    { checked: sustainedLoadExpected, setChecked: setSustainedLoadExpected, label: 'Sustained load expected' },
-    { checked: approvedSourceDataAttached, setChecked: setApprovedSourceDataAttached, label: 'Approved source data attached' },
+    { checked: lowRiskCandidate, setChecked: setLowRiskCandidate, label: 'Evaluate metallic low-risk path', fieldId: 'low_risk_candidate' },
+    { checked: additiveManufactured, setChecked: setAdditiveManufactured, label: 'Additively manufactured metallic part', fieldId: 'additive_manufactured' },
+    { checked: chlorideExposure, setChecked: setChlorideExposure, label: 'Wet chloride / salt exposure expected', fieldId: 'chloride_exposure' },
+    { checked: sustainedLoadExpected, setChecked: setSustainedLoadExpected, label: 'Sustained load expected', fieldId: 'sustained_load_expected' },
+    { checked: approvedSourceDataAttached, setChecked: setApprovedSourceDataAttached, label: 'Approved source data attached', fieldId: 'approved_source_data_attached' },
     { checked: muaPresent, setChecked: setMuaPresent, label: 'MUA already present' },
   ];
 
@@ -308,11 +311,15 @@ export default function FractureControl() {
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <Label htmlFor="part-name">Part Name</Label>
+                <MiraHelpLabel htmlFor="part-name" entry={fractureHelp('part_name')}>
+                  Part Name
+                </MiraHelpLabel>
                 <Input id="part-name" value={partName} onChange={(event) => setPartName(event.target.value)} className="mt-2" />
               </div>
               <div>
-                <Label htmlFor="material-name">Material</Label>
+                <MiraHelpLabel htmlFor="material-name" entry={fractureHelp('material_name')}>
+                  Material
+                </MiraHelpLabel>
                 <Input
                   id="material-name"
                   value={materialName}
@@ -326,35 +333,35 @@ export default function FractureControl() {
 
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
               <div>
-                <Label>Mission Class</Label>
+                <MiraHelpLabel entry={fractureHelp('mission_class')}>Mission Class</MiraHelpLabel>
                 <Select value={missionClass} onValueChange={setMissionClass}>
                   <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
                   <SelectContent>{MISSION_OPTIONS.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div>
-                <Label>Hazard Consequence</Label>
+                <MiraHelpLabel entry={fractureHelp('hazard_consequence')}>Hazard Consequence</MiraHelpLabel>
                 <Select value={hazardConsequence} onValueChange={setHazardConsequence}>
                   <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
                   <SelectContent>{HAZARD_OPTIONS.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div>
-                <Label>Load Path</Label>
+                <MiraHelpLabel entry={fractureHelp('load_path_type')}>Load Path</MiraHelpLabel>
                 <Select value={loadPathType} onValueChange={setLoadPathType}>
                   <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
                   <SelectContent>{LOAD_PATH_OPTIONS.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div>
-                <Label>Lifecycle Phase</Label>
+                <MiraHelpLabel entry={fractureHelp('lifecycle_phase')}>Lifecycle Phase</MiraHelpLabel>
                 <Select value={lifecyclePhase} onValueChange={setLifecyclePhase}>
                   <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
                   <SelectContent>{LIFECYCLE_OPTIONS.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div>
-                <Label>Structural Role</Label>
+                <MiraHelpLabel entry={fractureHelp('structural_role')}>Structural Role</MiraHelpLabel>
                 <Select value={structuralRole} onValueChange={setStructuralRole}>
                   <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
                   <SelectContent>{STRUCTURAL_ROLE_OPTIONS.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}</SelectContent>
@@ -364,21 +371,23 @@ export default function FractureControl() {
 
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               <div>
-                <Label>Material System</Label>
+                <MiraHelpLabel entry={fractureHelp('material_system')}>Material System</MiraHelpLabel>
                 <Select value={materialSystem} onValueChange={setMaterialSystem}>
                   <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
                   <SelectContent>{MATERIAL_SYSTEM_OPTIONS.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div>
-                <Label>Specific Hardware Type</Label>
+                <MiraHelpLabel entry={fractureHelp('specific_hardware_type')}>Specific Hardware Type</MiraHelpLabel>
                 <Select value={specificHardwareType} onValueChange={setSpecificHardwareType}>
                   <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
                   <SelectContent>{HARDWARE_TYPE_OPTIONS.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div>
-                <Label>NASA-STD-6016 Qualification</Label>
+                <MiraHelpLabel entry={fractureHelp('nasa_std_6016_qualified')}>
+                  NASA-STD-6016 Qualification
+                </MiraHelpLabel>
                 <Select value={qualificationState} onValueChange={setQualificationState}>
                   <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
                   <SelectContent>{QUALIFICATION_OPTIONS.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}</SelectContent>
@@ -388,15 +397,21 @@ export default function FractureControl() {
 
             <div className="grid gap-4 md:grid-cols-3">
               <div>
-                <Label htmlFor="kic-fty">KIc/Fty ratio</Label>
+                <MiraHelpLabel htmlFor="kic-fty" entry={fractureHelp('kic_fty_ratio')}>
+                  KIc/Fty ratio
+                </MiraHelpLabel>
                 <Input id="kic-fty" value={kicFtyRatio} onChange={(event) => setKicFtyRatio(event.target.value)} placeholder="Example: 0.41" className="mt-2" />
               </div>
               <div>
-                <Label htmlFor="ftu-ksi">FTU (ksi)</Label>
+                <MiraHelpLabel htmlFor="ftu-ksi" entry={fractureHelp('ftu_ksi')}>
+                  FTU (ksi)
+                </MiraHelpLabel>
                 <Input id="ftu-ksi" value={ftuKsi} onChange={(event) => setFtuKsi(event.target.value)} placeholder="Example: 190" className="mt-2" />
               </div>
               <div>
-                <Label htmlFor="short-transverse">Short-Transverse Dimension (in)</Label>
+                <MiraHelpLabel htmlFor="short-transverse" entry={fractureHelp('short_transverse_dimension_in')}>
+                  Short-Transverse Dimension (in)
+                </MiraHelpLabel>
                 <Input id="short-transverse" value={shortTransverseDimension} onChange={(event) => setShortTransverseDimension(event.target.value)} placeholder="Example: 3.5" className="mt-2" />
               </div>
             </div>
@@ -405,7 +420,10 @@ export default function FractureControl() {
               {checkboxes.map((item) => (
                 <label key={item.label} className="flex items-center gap-3 rounded-lg border border-dashed border-border px-4 py-3">
                   <Checkbox checked={item.checked} onCheckedChange={(checked) => item.setChecked(Boolean(checked))} />
-                  <div className="text-sm font-medium">{item.label}</div>
+                  <div className="flex items-center gap-1.5 text-sm font-medium">
+                    <span>{item.label}</span>
+                    <MiraInlineHelp entry={fractureHelp(item.fieldId)} title={item.label} />
+                  </div>
                 </label>
               ))}
             </div>
@@ -449,7 +467,10 @@ export default function FractureControl() {
                     Baseline path: <span className="font-medium text-slate-50">{result.baseline_key}</span>
                   </div>
                 </div>
-                <StatusBadge status={classificationBadge(result.classification)} />
+                <div className="flex items-center gap-2">
+                  <StatusBadge status={classificationBadge(result.classification)} />
+                  <MiraInlineHelp entry={getMiraGuidanceEntry('fracture', 'classifications', result.classification)} />
+                </div>
               </div>
             </div>
             <CardContent className="pt-6">

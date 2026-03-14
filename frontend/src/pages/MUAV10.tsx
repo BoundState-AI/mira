@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 
 import { PageHeader } from '@/components/PageHeader';
+import { MiraHelpLabel, MiraInlineHelp } from '@/components/mira/MiraInlineHelp';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,6 +27,7 @@ import {
   type MuaV10PipelineResult,
   type ProcessMiulResponse,
 } from '@/lib/mua-v10-api';
+import { getMiraGuidanceEntry, getMiraInputGuidance } from '@/lib/mira-guidance';
 
 const ISSUE_COLUMNS = ['FLAM', 'FS', 'TOX', 'TVS', 'SCC', 'CORR'] as const;
 
@@ -107,6 +109,8 @@ function normalizeRating(value: string): string {
 }
 
 export default function MUAV10() {
+  const muaHelp = (fieldId: string) => getMiraInputGuidance('mua', fieldId);
+  const muaEntry = (section: string, id: string) => getMiraGuidanceEntry('mua', section, id);
   // Step 1
   const [maptisCode, setMaptisCode] = useState('');
   const [materialDesignation, setMaterialDesignation] = useState('');
@@ -537,7 +541,10 @@ export default function MUAV10() {
         {step === 1 ? (
           <>
             <CardHeader>
-              <CardTitle>Step 1: Who / What / Where</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                Step 1: Who / What / Where
+                <MiraInlineHelp entry={muaEntry('workflow', 'needs_input')} title="MUA workflow" />
+              </CardTitle>
               <CardDescription>Identify the material, MAPTIS code, and service environment.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -627,7 +634,9 @@ export default function MUAV10() {
 
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
-                  <Label htmlFor="maptis-code">MAPTIS Code (optional)</Label>
+                  <MiraHelpLabel htmlFor="maptis-code" entry={muaHelp('material_key')}>
+                    MAPTIS Code (optional)
+                  </MiraHelpLabel>
                   <Input
                     id="maptis-code"
                     value={maptisCode}
@@ -636,7 +645,9 @@ export default function MUAV10() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="material-designation">Material Designation</Label>
+                  <MiraHelpLabel htmlFor="material-designation" entry={muaHelp('material_name')}>
+                    Material Designation
+                  </MiraHelpLabel>
                   <Input
                     id="material-designation"
                     value={materialDesignation}
@@ -645,7 +656,9 @@ export default function MUAV10() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="material-class">Material Class</Label>
+                  <MiraHelpLabel htmlFor="material-class" entry={muaHelp('material_class')}>
+                    Material Class
+                  </MiraHelpLabel>
                   <select
                     id="material-class"
                     value={materialClass}
@@ -660,7 +673,9 @@ export default function MUAV10() {
 
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
-                  <Label htmlFor="media">Media</Label>
+                  <MiraHelpLabel htmlFor="media" entry={muaHelp('environment.fluid_medium')} title="Media">
+                    Media
+                  </MiraHelpLabel>
                   <Input
                     id="media"
                     value={media}
@@ -669,7 +684,9 @@ export default function MUAV10() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="environment">Environment</Label>
+                  <MiraHelpLabel htmlFor="environment" entry={muaHelp('environment.habitable_volume')} title="Environment">
+                    Environment
+                  </MiraHelpLabel>
                   <select
                     id="environment"
                     value={environment}
@@ -681,7 +698,9 @@ export default function MUAV10() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="o2-percent">O2 Percent</Label>
+                  <MiraHelpLabel htmlFor="o2-percent" entry={muaHelp('environment.oxygen_pct')} title="O2 Percent">
+                    O2 Percent
+                  </MiraHelpLabel>
                   <Input
                     id="o2-percent"
                     type="number"
@@ -694,7 +713,9 @@ export default function MUAV10() {
 
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
-                  <Label htmlFor="project">Project</Label>
+                  <MiraHelpLabel htmlFor="project" entry={muaHelp('program')} title="Project">
+                    Project
+                  </MiraHelpLabel>
                   <Input id="project" value={project} onChange={(event) => setProject(event.target.value)} />
                 </div>
                 <div className="space-y-2">
@@ -702,7 +723,9 @@ export default function MUAV10() {
                   <Input id="system" value={system} onChange={(event) => setSystem(event.target.value)} />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="pressure">Pressure</Label>
+                  <MiraHelpLabel htmlFor="pressure" entry={muaHelp('environment.pressure_kpa')} title="Pressure">
+                    Pressure
+                  </MiraHelpLabel>
                   <Input id="pressure" value={pressure} onChange={(event) => setPressure(event.target.value)} />
                 </div>
               </div>
@@ -761,7 +784,10 @@ export default function MUAV10() {
           {step === 2 ? (
             <>
               <CardHeader>
-                <CardTitle>Step 2: Why is MAPTIS flagging?</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  Step 2: Why is MAPTIS flagging?
+                  <MiraInlineHelp entry={muaEntry('classifier_steps', 'step1_identify_flags')} title="Flag classification" />
+                </CardTitle>
                 <CardDescription>Enter the MAPTIS ratings. Each rating is decoded as you type.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -771,7 +797,12 @@ export default function MUAV10() {
                     const hint = RATING_HINTS[column][value];
                     return (
                       <div key={column} className="space-y-2">
-                        <Label htmlFor={`rating-${column}`}>{column}</Label>
+                        <MiraHelpLabel
+                          htmlFor={`rating-${column}`}
+                          entry={muaEntry('screening_columns', column)}
+                        >
+                          {column}
+                        </MiraHelpLabel>
                         <Input
                           id={`rating-${column}`}
                           value={ratings[column]}

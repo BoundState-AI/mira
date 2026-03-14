@@ -11,6 +11,7 @@ import {
 
 import { PageHeader } from '@/components/PageHeader';
 import { StatusBadge } from '@/components/StatusBadge';
+import { MiraHelpLabel, MiraInlineHelp } from '@/components/mira/MiraInlineHelp';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,6 +36,7 @@ import {
   type GalvanicMitigationRecommendation,
   type GalvanicSeriesPayload,
 } from '@/lib/api';
+import { getMiraGuidanceEntry, getMiraInputGuidance } from '@/lib/mira-guidance';
 import { useAuth } from '@/auth/AuthContext';
 
 const APPLICATION_OPTIONS = [
@@ -224,6 +226,7 @@ function MaterialSuggestions({
 
 export default function GalvanicCompatibility() {
   const { authHeaders, loading: authLoading } = useAuth();
+  const galvanicHelp = (fieldId: string) => getMiraInputGuidance('galvanic', fieldId);
   const [materialA, setMaterialA] = useState('Al 6061-T6');
   const [materialB, setMaterialB] = useState('316SS');
   const [environment, setEnvironment] = useState('seawater_proxy');
@@ -435,7 +438,9 @@ export default function GalvanicCompatibility() {
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                  <Label htmlFor="material-a">Material A</Label>
+                  <MiraHelpLabel htmlFor="material-a" entry={galvanicHelp('material_a')}>
+                    Material A
+                  </MiraHelpLabel>
                   <Input
                     id="material-a"
                     value={materialA}
@@ -446,7 +451,9 @@ export default function GalvanicCompatibility() {
                   <MaterialSuggestions results={searchA} onPick={setMaterialA} />
                 </div>
                 <div>
-                  <Label htmlFor="material-b">Material B</Label>
+                  <MiraHelpLabel htmlFor="material-b" entry={galvanicHelp('material_b')}>
+                    Material B
+                  </MiraHelpLabel>
                   <Input
                     id="material-b"
                     value={materialB}
@@ -460,7 +467,7 @@ export default function GalvanicCompatibility() {
 
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 <div>
-                  <Label>Environment</Label>
+                  <MiraHelpLabel entry={galvanicHelp('environment')}>Environment</MiraHelpLabel>
                   <Select value={environment} onValueChange={setEnvironment}>
                     <SelectTrigger className="mt-2">
                       <SelectValue placeholder="Select environment" />
@@ -475,7 +482,7 @@ export default function GalvanicCompatibility() {
                   </Select>
                 </div>
                 <div>
-                  <Label>Application</Label>
+                  <MiraHelpLabel entry={galvanicHelp('application_type')}>Application</MiraHelpLabel>
                   <Select value={applicationType} onValueChange={setApplicationType}>
                     <SelectTrigger className="mt-2">
                       <SelectValue placeholder="Select application" />
@@ -490,7 +497,7 @@ export default function GalvanicCompatibility() {
                   </Select>
                 </div>
                 <div>
-                  <Label>Joint Type</Label>
+                  <MiraHelpLabel entry={galvanicHelp('joint_type')}>Joint Type</MiraHelpLabel>
                   <Select value={jointType} onValueChange={setJointType}>
                     <SelectTrigger className="mt-2">
                       <SelectValue placeholder="Select joint type" />
@@ -505,7 +512,7 @@ export default function GalvanicCompatibility() {
                   </Select>
                 </div>
                 <div>
-                  <Label>Electrical Contact</Label>
+                  <MiraHelpLabel entry={galvanicHelp('electrical_contact')}>Electrical Contact</MiraHelpLabel>
                   <Select value={electricalContact} onValueChange={setElectricalContact}>
                     <SelectTrigger className="mt-2">
                       <SelectValue placeholder="Select contact state" />
@@ -523,7 +530,7 @@ export default function GalvanicCompatibility() {
 
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 <div>
-                  <Label>Surface Condition A</Label>
+                  <MiraHelpLabel entry={galvanicHelp('surface_condition_a')}>Surface Condition A</MiraHelpLabel>
                   <Select value={surfaceConditionA} onValueChange={setSurfaceConditionA}>
                     <SelectTrigger className="mt-2">
                       <SelectValue placeholder="Select surface condition" />
@@ -538,7 +545,7 @@ export default function GalvanicCompatibility() {
                   </Select>
                 </div>
                 <div>
-                  <Label>Surface Condition B</Label>
+                  <MiraHelpLabel entry={galvanicHelp('surface_condition_b')}>Surface Condition B</MiraHelpLabel>
                   <Select value={surfaceConditionB} onValueChange={setSurfaceConditionB}>
                     <SelectTrigger className="mt-2">
                       <SelectValue placeholder="Select surface condition" />
@@ -553,7 +560,9 @@ export default function GalvanicCompatibility() {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="area-ratio">Cathode:Anode Area Ratio</Label>
+                  <MiraHelpLabel htmlFor="area-ratio" entry={galvanicHelp('cathode_to_anode_area_ratio')}>
+                    Cathode:Anode Area Ratio
+                  </MiraHelpLabel>
                   <Input
                     id="area-ratio"
                     type="number"
@@ -573,7 +582,13 @@ export default function GalvanicCompatibility() {
                   onCheckedChange={(checked) => setElectrolytePooling(Boolean(checked))}
                 />
                 <div>
-                  <div className="text-sm font-medium">Persistent electrolyte pooling expected</div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="text-sm font-medium">Persistent electrolyte pooling expected</div>
+                    <MiraInlineHelp
+                      entry={galvanicHelp('electrolyte_pooling')}
+                      title="Persistent electrolyte pooling expected"
+                    />
+                  </div>
                   <div className="text-xs text-muted-foreground">
                     Use this when the joint retains condensed moisture, trapped wash water, or standing fluid.
                   </div>
@@ -619,7 +634,10 @@ export default function GalvanicCompatibility() {
                     </div>
                   </div>
                 </div>
-                <StatusBadge status={result.severity} />
+                <div className="flex items-center gap-2">
+                  <StatusBadge status={result.severity} />
+                  <MiraInlineHelp entry={getMiraGuidanceEntry('galvanic', 'verdicts', result.severity)} />
+                </div>
               </div>
             </div>
 

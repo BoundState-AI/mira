@@ -11,6 +11,12 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 DOCKER_BIN="${DOCKER_BIN:-/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe}"
 DATE_TAG="$(date +%Y%m%d-%H%M%S)"
 IMAGE_TAG="${IMAGE_TAG:-runtime-${DATE_TAG}}"
+ALLOW_DIRTY_DEPLOY="${ALLOW_DIRTY_DEPLOY:-0}"
+DEPLOY_GIT_REF="${DEPLOY_GIT_REF:-}"
+BUILD_ROOT="${ROOT_DIR}"
+STAGING_DIR=""
+BACKEND_TASK_JSON=""
+FRONTEND_TASK_JSON=""
 
 ACCOUNT_ID="${ACCOUNT_ID:-574823419003}"
 REGISTRY="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
@@ -60,10 +66,25 @@ require_bin() {
 require_bin aws
 require_bin curl
 require_bin rg
+require_bin git
 [ -x "${DOCKER_BIN}" ] || {
   echo "Docker binary not found: ${DOCKER_BIN}" >&2
   exit 1
 }
+
+cleanup() {
+  if [ -n "${STAGING_DIR}" ] && [ -d "${STAGING_DIR}" ]; then
+    rm -rf "${STAGING_DIR}"
+  fi
+  if [ -n "${BACKEND_TASK_JSON}" ] && [ -f "${BACKEND_TASK_JSON}" ]; then
+    rm -f "${BACKEND_TASK_JSON}"
+  fi
+  if [ -n "${FRONTEND_TASK_JSON}" ] && [ -f "${FRONTEND_TASK_JSON}" ]; then
+    rm -f "${FRONTEND_TASK_JSON}"
+  fi
+}
+
+trap cleanup EXIT
 
 json_array_from_csv() {
   local csv="$1"
@@ -92,6 +113,33 @@ ensure_service() {
     --query 'services[0].status' --output text 2>/dev/null | rg -q 'ACTIVE'
 }
 
+prepare_build_root() {
+  if [ -n "${DEPLOY_GIT_REF}" ]; then
+    STAGING_DIR="$(mktemp -d)"
+    echo "== Build source =="
+    echo "Preparing clean snapshot from git ref: ${DEPLOY_GIT_REF}"
+    git -C "${ROOT_DIR}" archive "${DEPLOY_GIT_REF}" | tar -xf - -C "${STAGING_DIR}"
+    BUILD_ROOT="${STAGING_DIR}"
+    return
+  fi
+
+  local dirty_files
+  dirty_files="$(git -C "${ROOT_DIR}" status --porcelain)"
+  if [ -n "${dirty_files}" ] && [ "${ALLOW_DIRTY_DEPLOY}" != "1" ]; then
+    echo "Refusing to deploy from a dirty worktree." >&2
+    echo "Use one of the following:" >&2
+    echo "  1. Commit/stash unrelated changes and rerun" >&2
+    echo "  2. Set DEPLOY_GIT_REF=<commit-or-tag> to deploy a clean git revision" >&2
+    echo "  3. Set ALLOW_DIRTY_DEPLOY=1 only when you intentionally want the current local worktree" >&2
+    echo >&2
+    echo "First 20 dirty paths:" >&2
+    printf '%s\n' "${dirty_files}" | sed -n '1,20p' >&2
+    exit 1
+  fi
+}
+
+prepare_build_root
+
 echo "== ECR login =="
 ensure_repo "${BACKEND_REPO}"
 ensure_repo "${FRONTEND_REPO}"
@@ -99,7 +147,7 @@ aws ecr get-login-password | "${DOCKER_BIN}" login --username AWS --password-std
 
 echo
 echo "== Build backend =="
-pushd "${ROOT_DIR}" >/dev/null
+pushd "${BUILD_ROOT}" >/dev/null
 "${DOCKER_BIN}" build -t "mira-backend:${IMAGE_TAG}" -f Dockerfile .
 popd >/dev/null
 "${DOCKER_BIN}" tag "mira-backend:${IMAGE_TAG}" "${BACKEND_IMAGE}"
@@ -107,7 +155,7 @@ popd >/dev/null
 
 echo
 echo "== Build frontend =="
-pushd "${ROOT_DIR}/frontend" >/dev/null
+pushd "${BUILD_ROOT}/frontend" >/dev/null
 "${DOCKER_BIN}" build \
   --build-arg "VITE_COGNITO_USER_POOL_ID=${COGNITO_USER_POOL_ID}" \
   --build-arg "VITE_COGNITO_CLIENT_ID=${COGNITO_CLIENT_ID}" \
@@ -130,7 +178,6 @@ aws logs put-retention-policy --log-group-name /ecs/mira-prod-frontend --retenti
 
 BACKEND_TASK_JSON="$(mktemp)"
 FRONTEND_TASK_JSON="$(mktemp)"
-trap 'rm -f "${BACKEND_TASK_JSON}" "${FRONTEND_TASK_JSON}"' EXIT
 
 cat > "${BACKEND_TASK_JSON}" <<JSON
 {

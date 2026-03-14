@@ -5,10 +5,12 @@
  * BS-SPEC-OCA-002-REV0 §7.2
  */
 
+import { OCAInlineHelp } from '@/components/oca/OCAInlineHelp';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { getMechanismGuidance } from '@/lib/oca-guidance';
 import { X, ArrowUp, Target, ArrowDown, Wrench } from 'lucide-react';
 import type { PathInspectorResult } from '@/lib/oca-system-api';
 
@@ -19,6 +21,11 @@ interface PathInspectorPanelProps {
 
 export default function PathInspectorPanel({ result, onClose }: PathInspectorPanelProps) {
   if (!result) return null;
+
+  const statusTone = (status: string) => {
+    const normalized = status.toLowerCase();
+    return normalized === 'credible' ? 'bg-red-600 text-white' : 'bg-amber-500 text-black';
+  };
 
   return (
     <Card className="w-72 flex-shrink-0">
@@ -71,11 +78,16 @@ export default function PathInspectorPanel({ result, onClose }: PathInspectorPan
                         <Badge variant="outline" className="text-[8px] px-1 py-0 font-mono">
                           {mt.abbreviation}
                         </Badge>
-                        <span className="capitalize">{mt.mechanism.replace(/_/g, ' ')}</span>
+                        <span className="flex items-center gap-1">
+                          <span className="capitalize">{mt.mechanism.replace(/_/g, ' ')}</span>
+                          <OCAInlineHelp
+                            entry={getMechanismGuidance(mt.mechanism)}
+                            className="h-3.5 w-3.5"
+                            iconClassName="h-3 w-3"
+                          />
+                        </span>
                         <Badge
-                          className={`text-[7px] px-1 py-0 ${
-                            mt.status === 'credible' ? 'bg-red-600 text-white' : 'bg-amber-500 text-black'
-                          }`}
+                          className={`text-[7px] px-1 py-0 ${statusTone(mt.status)}`}
                         >
                           {mt.rating}/4
                         </Badge>

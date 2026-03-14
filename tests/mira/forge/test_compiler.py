@@ -6,6 +6,8 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 
+import pytest
+
 from mira.forge.compiler import ForgeCompiler
 from mira.forge.differ import diff_schema_manifests
 from mira.forge.models import ForgeCompileRequest
@@ -202,3 +204,135 @@ def test_forge_schema_diff_reports_changes() -> None:
     assert any(change["change_type"] == "table_added" and change["table"] == "orders" for change in diff["changes"])
     assert any(change["change_type"] == "column_added" and change["column"] == "email" for change in diff["changes"])
     assert "def upgrade():" in diff["alembic_stub"]
+
+
+# ---------------------------------------------------------------------------
+# Bug-fix coverage: issues found in FORGE audit (2026-03-14)
+# ---------------------------------------------------------------------------
+
+
+def test_unsupported_dialect_raises_value_error() -> None:
+    compiler = ForgeCompiler()
+    with pytest.raises(ValueError, match="Unsupported database dialect"):
+        compiler.compile_database(
+            ForgeCompileRequest(
+                database_url="mssql://localhost/testdb",
+                app_name="Dialect Test",
+            )
+        )
+
+
+def test_remote_database_blocked_by_default() -> None:
+    compiler = ForgeCompiler()
+    with pytest.raises(ValueError, match="Remote database URLs are disabled"):
+        compiler.compile_database(
+            ForgeCompileRequest(
+                database_url="postgresql://some-cloud-host.rds.amazonaws.com/prod",
+                app_name="Remote Test",
+            )
+        )
+
+
+def test_empty_database_compiles_with_warning(tmp_path: Path) -> None:
+    db_path = tmp_path / "empty.sqlite"
+    sqlite3.connect(db_path).close()
+    db_url = f"sqlite:///{db_path}"
+    compiler = ForgeCompiler()
+
+    response = compiler.compile_database(
+        ForgeCompileRequest(
+            database_url=db_url,
+            app_name="Empty DB",
+        )
+    )
+
+    assert response.status == "ok"
+    assert response.summary.table_count == 0
+    assert any("no user tables" in w.lower() for w in response.warnings)
+
+
+def test_max_generated_questions_cap_is_respected(tmp_path: Path) -> None:
+    db_url = _build_fixture_db(tmp_path / "cap_fixture.sqlite")
+    compiler = ForgeCompiler()
+
+    response = compiler.compile_database(
+        ForgeCompileRequest(
+            database_url=db_url,
+            app_name="Cap Test",
+            sample_rows_per_table=10,
+            max_generated_questions=5,
+        )
+    )
+
+    assert response.status == "ok"
+    assert len(response.question_map["questions"]) <= 5
+
+
+def test_max_questions_per_table_cap_is_respected(tmp_path: Path) -> None:
+    db_url = _build_fixture_db(tmp_path / "per_table_fixture.sqlite")
+    compiler = ForgeCompiler()
+
+    response = compiler.compile_database(
+        ForgeCompileRequest(
+            database_url=db_url,
+            app_name="Per Table Cap Test",
+            sample_rows_per_table=10,
+            max_questions_per_table=2,
+        )
+    )
+
+    assert response.status == "ok"
+    from collections import Counter
+    table_counts = Counter(q["table"] for q in response.question_map["questions"])
+    for table, count in table_counts.items():
+        assert count <= 2, f"Table {table} has {count} questions, expected <= 2"
+
+
+def test_progress_callback_fires_during_real_compile(tmp_path: Path) -> None:
+    db_url = _build_fixture_db(tmp_path / "progress_fixture.sqlite")
+    compiler = ForgeCompiler()
+    events: list[tuple[str, str, float]] = []
+
+    response = compiler.compile_database(
+        ForgeCompileRequest(
+            database_url=db_url,
+            app_name="Progress Test",
+            sample_rows_per_table=10,
+        ),
+        progress_callback=lambda stage, message, progress: events.append((stage, message, progress)),
+    )
+
+    assert response.status == "ok"
+    assert len(events) >= 4, f"Expected at least 4 progress events, got {len(events)}"
+    stages = [e[0] for e in events]
+    assert "introspection" in stages
+    assert "question_generation" in stages
+    assert all(0.0 <= e[2] <= 100.0 for e in events)
+
+
+def test_question_id_collision_resistance() -> None:
+    compiler = ForgeCompiler()
+    # Two questions that differ only after character 96 in their slugified form
+    prefix = "a" * 90
+    id_a = compiler._question_id("table", "filter", prefix + "_suffix_alpha")
+    id_b = compiler._question_id("table", "filter", prefix + "_suffix_bravo")
+    assert id_a != id_b, (
+        f"Question IDs collided despite different inputs: {id_a!r}"
+    )
+
+
+def test_require_llm_refinement_emits_warning(tmp_path: Path) -> None:
+    db_url = _build_fixture_db(tmp_path / "llm_warn_fixture.sqlite")
+    compiler = ForgeCompiler()
+
+    response = compiler.compile_database(
+        ForgeCompileRequest(
+            database_url=db_url,
+            app_name="LLM Warn Test",
+            sample_rows_per_table=10,
+            require_llm_refinement=True,
+        )
+    )
+
+    assert response.status == "ok"
+    assert any("llm refinement" in w.lower() for w in response.warnings)

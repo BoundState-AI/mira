@@ -1,0 +1,99 @@
+{
+  "spec_id": "BS-SPEC-OCA-002-REV0",
+  "version": "1.0.0",
+  "mechanisms": [
+    {
+      "code": "PI",
+      "name": "Particle Impact",
+      "required_elements": ["particle_pathway", "wetted_surface_flag", "velocity_above_threshold"],
+      "controls": ["upstream_filter", "cleanliness_spec_high", "reduce_velocity"],
+      "tier": "Tier D",
+      "explanation_template": "Particle pathway {state} for {component}. Velocity criterion {velocity_state}."
+    },
+    {
+      "code": "RP",
+      "name": "Rapid Pressurization",
+      "required_elements": ["dead_end_volume", "rapid_opening_event", "compressible_gas"],
+      "controls": ["slow_opening_profile", "pre-pressurization", "volume_relief"],
+      "tier": "Tier D",
+      "explanation_template": "Rapid pressurization remains {state} due to {trigger} with assumptions {assumptions}."
+    },
+    {
+      "code": "FF",
+      "name": "Flow Friction",
+      "required_elements": ["polymer_exposed_to_flow", "high_velocity_local"],
+      "controls": ["shielded_seal", "lower_velocity"],
+      "tier": "Tier D",
+      "explanation_template": "Flow friction {state} because exposed polymer seal={polymer_exposure}."
+    },
+    {
+      "code": "RS",
+      "name": "Resonance",
+      "required_elements": ["sonic_source", "downstream_cavity"],
+      "controls": ["change_orifice", "add_damping_volume"],
+      "tier": "Tier D",
+      "explanation_template": "Resonance risk {state}; sonic source={sonic_source}, cavity={cavity_state}."
+    },
+    {
+      "code": "MI",
+      "name": "Mechanical Impact",
+      "required_elements": ["dynamic_contact_flag", "impact_energy_source"],
+      "controls": ["chatter_mitigation", "actuation_damping"],
+      "tier": "Tier D",
+      "explanation_template": "Mechanical impact is {state} with chatter candidate={candidate}."
+    },
+    {
+      "code": "GF",
+      "name": "Galling/Friction",
+      "required_elements": ["metal_pair_contact", "has_moving_contact"],
+      "controls": ["material_pair_change", "surface_finish_control"],
+      "tier": "Tier D",
+      "explanation_template": "Galling risk {state} for pair {metal_pair}."
+    },
+    {
+      "code": "FM",
+      "name": "Fresh Metal",
+      "required_elements": ["reactive_metal_present", "abrasive_generation"],
+      "controls": ["nonreactive_alloy_swap", "particle_control"],
+      "tier": "Tier D",
+      "explanation_template": "Fresh metal ignition element {state}; reactive metal={reactive}."
+    },
+    {
+      "code": "SD",
+      "name": "Static Discharge",
+      "required_elements": ["charge_separation_potential", "discharge_path"],
+      "controls": ["bonding_grounding", "humidity_control"],
+      "tier": "Tier D",
+      "explanation_template": "Static discharge {state}; discharge path={path_state}."
+    },
+    {
+      "code": "EA",
+      "name": "Electrical Arc",
+      "required_elements": ["electrical_energy_present", "arc_gap_potential", "oxygen_environment"],
+      "controls": ["isolation", "arc-rated_components"],
+      "tier": "Tier D",
+      "explanation_template": "Electrical arc {state}; energized component={energized_component}."
+    },
+    {
+      "code": "CR",
+      "name": "Chemical Reaction",
+      "required_elements": ["incompatible_material_pair", "oxygen_exposure"],
+      "controls": ["compatible_material_substitution", "barrier_coating"],
+      "tier": "Tier D",
+      "explanation_template": "Chemical reaction potential {state} with pair {pair}."
+    },
+    {
+      "code": "TR",
+      "name": "Thermal Runaway",
+      "required_elements": ["high_sa_to_volume", "propagation_path", "oxygen_rich_environment"],
+      "controls": ["material_swap_nonflammable", "thermal_break"],
+      "tier": "Tier D",
+      "explanation_template": "Thermal runaway chain {state}; SA/V={sa_to_volume}."
+    }
+  ],
+  "assumption_fields": ["source", "confidence", "rule_id", "missing_assumptions"],
+  "provenance": {
+    "source": "BS-SPEC-OCA-002-REV0 §5.3, §6.2, §7.1",
+    "confidence": "high"
+  }
+}
