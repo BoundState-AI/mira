@@ -133,14 +133,23 @@ def _add_part_numbers(doc: Document, form: Form551Fields) -> None:
         _add_run(paragraph, "- [TBD]", italic=True)
 
 
-def _add_approvals(doc: Document) -> None:
+def _add_approvals(doc: Document, category: str = "") -> None:
     _add_section_header(doc, "APPROVALS")
 
-    lines = [
-        "Prepared by (Materials Engineer): ____________________  Date: ____________",
-        "Reviewed by (Hardware Manager):  ____________________  Date: ____________",
-        "Approved by (M&P Branch Chief):  ____________________  Date: ____________",
-    ]
+    if category == "I":
+        # Cat I: 3 signatures per NASA-STD-6016C §4.1.6.1.1
+        lines = [
+            "Prepared by (Materials Engineer):       ____________________  Date: ____________",
+            "Reviewed by (NASA M&P):                 ____________________  Date: ____________",
+            "Approved by (Program/Project Office):   ____________________  Date: ____________",
+        ]
+    else:
+        # Cat II: 2 signatures per NASA-STD-6016C §4.1.6.1.2
+        lines = [
+            "Prepared by (Materials Engineer):       ____________________  Date: ____________",
+            "Approved by (NASA M&P):                 ____________________  Date: ____________",
+        ]
+
     for line in lines:
         paragraph = doc.add_paragraph()
         paragraph.paragraph_format.space_before = Pt(16)
@@ -243,7 +252,7 @@ def render_form551_docx(form: Form551Fields) -> bytes:
     disposition_value = _normalized_value(form.disposition)
     _add_run(disposition_paragraph, disposition_value, italic=(disposition_value == "[TBD]"))
 
-    _add_approvals(doc)
+    _add_approvals(doc, category=form.category)
 
     footer = section.footer.paragraphs[0]
     footer.alignment = WD_ALIGN_PARAGRAPH.CENTER

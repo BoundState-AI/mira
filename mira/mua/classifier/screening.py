@@ -36,6 +36,8 @@ SCREENING_APPLICABILITY: dict[str, list[str]] = {
     "SCC": ["metal"],         # Stress corrosion cracking — metals only
     "CORR": ["metal"],        # Corrosion — metals only
     "H2COMPAT": ["metal"],    # MPR 192/193: metallic materials in H2 systems
+    "LEGACY_OC": ["all"],     # Legacy oxygen compatibility — all materials
+    "LEGACY_COMPAT": ["all"], # Legacy compatibility — all materials
 }
 
 ENVIRONMENT_APPLICABILITY: dict[str, dict[str, bool]] = {
@@ -177,3 +179,45 @@ def material_class_from_miul(
             return MaterialClassEnum.NONMETALLIC
 
     return None
+
+
+# ---------------------------------------------------------------------------
+# Rating coverage sanity check — catches material class mismatches
+# ---------------------------------------------------------------------------
+
+# Columns that should NOT have ratings for each material class
+_UNEXPECTED_RATINGS: dict[str, list[str]] = {
+    "metal": ["TOX", "TVS"],        # TOX/TVS are nonmetallic-only screenings
+    "nonmetallic": ["SCC", "CORR"],  # SCC/CORR are metal-only screenings
+}
+
+
+def validate_rating_coverage(
+    ratings: dict[str, str | None],
+    material_class: MaterialClassEnum | str,
+) -> list[str]:
+    """Flag anomalous rating combinations that suggest wrong material class.
+
+    A metal with TOX=A is suspicious (TOX shouldn't apply to metals).
+    A nonmetallic with SCC=A suggests wrong material class inference.
+
+    Returns list of warning strings (empty = no anomalies).
+    """
+    if isinstance(material_class, str):
+        mc = material_class.lower().strip()
+    else:
+        mc = material_class.value
+
+    unexpected = _UNEXPECTED_RATINGS.get(mc, [])
+    warnings: list[str] = []
+
+    for col in unexpected:
+        rating = ratings.get(col)
+        if rating is not None and str(rating).strip():
+            warnings.append(
+                f"Anomaly: {col} rating '{rating}' present for {mc} material. "
+                f"{col} screening applies to {'nonmetallic' if mc == 'metal' else 'metal'} "
+                f"materials only. Verify material class."
+            )
+
+    return warnings

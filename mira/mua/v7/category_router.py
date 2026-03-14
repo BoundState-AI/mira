@@ -323,13 +323,18 @@ def evaluate_appendix_b(
 ) -> AppendixBEvaluation:
     """Check if material qualifies for an Appendix B rationale code.
 
-    Codes checked (in order of specificity):
+    Code numbering per NASA-STD-6016C MIUL rationale codes (100 series
+    for flammability). Cross-referenced with mira/miul/rationale_codes.py:
         105 -- Minor quantity (< 45g AND < 13 cm2)
-        104 -- Sandwiched/encapsulated between non-flammable materials
-        106 -- Hermetically sealed container
-        103 -- Tested in actual use configuration
-        108 -- Off-the-shelf equipment in configuration
-        107 -- Non-propagating (configuration prevents spread)
+        103 -- Sandwiched/bonded to nonflammable materials
+        104 -- Enclosed in sealed nonflammable container
+        110 -- Configuration meets tested requirements
+        108 -- Electrical, meets NASA-STD-6001 Test 1
+        106 -- Self-extinguishing in applicable environment
+
+    NOTE: Prior to this fix (Finding #16), code 103 was labeled "tested
+    in configuration" and 104 as "sandwiched". The MIUL rationale codes
+    in rationale_codes.py are the ground truth for code numbering.
 
     Returns the FIRST qualifying code found.
     """
@@ -394,9 +399,9 @@ def evaluate_appendix_b(
     if any(kw in notes_lower for kw in sandwich_keywords):
         return AppendixBEvaluation(
             eligible=True,
-            code="104",
-            code_description="Sandwiched between non-flammable materials",
-            citation="NASA-STD-6016C Appendix B, Code 104",
+            code="103",
+            code_description="Sandwiched/bonded to nonflammable materials",
+            citation="NASA-STD-6016C Appendix B, Code 103",
             rationale_template=(
                 f"The subject material ({material.resolved_name or material.input_text}) "
                 f"is acceptable because:\n"
@@ -417,9 +422,9 @@ def evaluate_appendix_b(
     if any(kw in notes_lower for kw in sealed_keywords):
         return AppendixBEvaluation(
             eligible=True,
-            code="106",
-            code_description="Hermetically sealed container",
-            citation="NASA-STD-6016C Appendix B, Code 106",
+            code="104",
+            code_description="Enclosed in sealed nonflammable container",
+            citation="NASA-STD-6016C Appendix B, Code 104",
             rationale_template=(
                 f"The subject material ({material.resolved_name or material.input_text}) "
                 f"is contained within hermetically sealed enclosure:\n"
@@ -440,9 +445,9 @@ def evaluate_appendix_b(
     if any(kw in notes_lower for kw in tested_keywords):
         return AppendixBEvaluation(
             eligible=True,
-            code="103",
-            code_description="Tested/passes when tested in actual use configuration",
-            citation="NASA-STD-6016C Appendix B, Code 103",
+            code="110",
+            code_description="Configuration meets flammability requirements as tested",
+            citation="NASA-STD-6016C Appendix B, Code 110",
             rationale_template=(
                 f"The subject material ({material.resolved_name or material.input_text}) "
                 f"passes when tested in the actual use configuration:\n"

@@ -38,7 +38,7 @@ from .models import (
     PipelineResult,
 )
 from .rationale import render_disposition, render_rationale, verify_claims
-from .screening import material_class_from_miul
+from .screening import material_class_from_miul, validate_rating_coverage
 from mira.mua.evidence.retriever import retrieve_evidence_bundle
 from mira.mua.precedent.lookup import lookup_precedent_with_ring
 from mira.mua.synthesis.synthesizer import synthesize_rationale
@@ -75,6 +75,37 @@ def _fill_form_551(
     rationale = render_rationale(result, material_name=material_designation)
     disposition = render_disposition(result)
 
+    # Auto-generate MUA number if not provided
+    if not mua_number:
+        from datetime import date as date_mod
+        mua_number = f"MUA-{result.issue_key}-{result.maptis_code}-{date_mod.today().strftime('%Y%m%d')}"
+
+    # Link to MIUL rationale code (e.g., FLAM Cat II → "102")
+    rationale_code = ""
+    if result.category:
+        try:
+            from mira.miul.rationale_codes import get_mua_reference_code
+            rationale_code = get_mua_reference_code(result.issue_key, result.category.value)
+        except Exception:
+            pass
+
+    # Auto-generate application field from available data
+    application_parts = []
+    if material_designation:
+        application_parts.append(f"{material_designation} in {result.media} service")
+    if result.environment:
+        application_parts.append(result.environment)
+    if pressure:
+        application_parts.append(pressure)
+    if temperature:
+        application_parts.append(temperature)
+    if part_numbers:
+        part_summary = ", ".join(part_numbers[:5])
+        if len(part_numbers) > 5:
+            part_summary += f" (+{len(part_numbers) - 5} more)"
+        application_parts.append(f"Part(s): {part_summary}")
+    application = ". ".join(application_parts) + "." if application_parts else ""
+
     return Form551Fields(
         mua_number=mua_number,
         category=result.category.value if result.category else "",
@@ -94,9 +125,10 @@ def _fill_form_551(
         pressure=pressure,
         temperature=temperature,
         location=result.environment,
-        application="",
+        application=application,
         rationale=rationale,
         disposition=disposition,
+        rationale_code=rationale_code,
     )
 
 
@@ -129,6 +161,54 @@ def _infer_alloy_family(material_designation: str) -> str:
     if re.search(r"\b17[\-\s]*4\s*PH\b", text):
         return "martensitic_ss"
     return ""
+
+
+def _parse_pressure_psia(pressure_str: str) -> float | None:
+    """Best-effort numeric extraction of pressure in psia from free-text."""
+    if not pressure_str:
+        return None
+    text = pressure_str.upper().strip()
+    # Try to extract a number — handles "300 psia", "300", "300 PSI", etc.
+    m = re.search(r"([\d.]+)\s*(?:PSIA|PSI|LB)", text)
+    if m:
+        try:
+            return float(m.group(1))
+        except ValueError:
+            pass
+    # Try bare number
+    m = re.search(r"([\d.]+)", text)
+    if m:
+        try:
+            val = float(m.group(1))
+            # If "KPA" or "MPA" in text, convert
+            if "MPA" in text:
+                return val * 145.038  # MPa to psia
+            if "KPA" in text:
+                return val * 0.145038  # kPa to psia
+            return val  # assume psia
+        except ValueError:
+            pass
+    return None
+
+
+def _parse_temp_min_f(temperature_str: str) -> float | None:
+    """Best-effort numeric extraction of minimum temperature in °F from free-text."""
+    if not temperature_str:
+        return None
+    text = temperature_str.upper().strip()
+    # Look for negative numbers first (cryogenic temps)
+    numbers = re.findall(r"-?[\d.]+", text)
+    if not numbers:
+        return None
+    try:
+        values = [float(n) for n in numbers]
+    except ValueError:
+        return None
+    min_val = min(values)
+    # If Celsius indicator, convert
+    if "°C" in text or "DEG C" in text or "CELSIUS" in text:
+        min_val = min_val * 9.0 / 5.0 + 32.0
+    return min_val
 
 
 def adjust_confidence(base: float, precedent: Optional["PrecedentSummary"]) -> float:
@@ -165,6 +245,7 @@ def process_single_flag(
     temperature: str = "",
     mua_number: str = "",
     date: str = "",
+    alloy_family: str = "",
 ) -> tuple[ClassifierResult, Form551Fields | None]:
     """Run the full pipeline for a single flag.
 
@@ -180,6 +261,9 @@ def process_single_flag(
         environment=environment,
         o2_percent=o2_percent,
         batch_verified=batch_verified,
+        pressure_psia=_parse_pressure_psia(pressure),
+        temp_min_f=_parse_temp_min_f(temperature),
+        material_family=alloy_family,
     )
 
     form = None
@@ -284,6 +368,9 @@ def process_miul_row(
     elif isinstance(material_class, str):
         material_class = MaterialClassEnum(material_class.lower().strip())
 
+    # Validate rating coverage against material class
+    coverage_warnings = validate_rating_coverage(ratings, material_class)
+
     # Step 1: Identify all non-passing flags
     flags = step1_identify_flags(ratings)
 
@@ -319,6 +406,7 @@ def process_miul_row(
             system=system,
             pressure=pressure,
             temperature=temperature,
+            alloy_family=inferred_alloy_family,
         )
 
         try:
@@ -418,6 +506,7 @@ def process_miul_row(
         automatable_count=automatable_count,
         human_required_count=human_count,
         no_mua_needed_count=no_mua_count,
+        coverage_warnings=coverage_warnings,
     )
 
 

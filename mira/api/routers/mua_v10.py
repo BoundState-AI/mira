@@ -98,6 +98,7 @@ class FinalizeAction(BaseModel):
     action: str = "approve"  # approve | edit | reject
     rationale: Optional[str] = None
     disposition: Optional[str] = None
+    category: Optional[str] = None  # Engineer can elevate Cat II → Cat I (Finding #6)
     comment: str = ""
 
 
@@ -806,6 +807,11 @@ async def process_miul_workbook(
         "CORR": _match_column(column_lookup, "CORR", "CORR Rating"),
     }
 
+    o2_col = _match_column(
+        column_lookup,
+        "O2%", "O2 Percent", "Oxygen Percent", "o2_percent", "Oxygen %",
+    )
+
     if maptis_col is None:
         raise HTTPException(
             status_code=400,
@@ -840,6 +846,16 @@ async def process_miul_workbook(
             _skip("missing_media")
             continue
 
+        # Extract O2% from MIUL workbook if column exists
+        row_o2_percent: Optional[float] = None
+        if o2_col:
+            o2_text = _cell_to_text(row.get(o2_col))
+            if o2_text:
+                try:
+                    row_o2_percent = float(re.sub(r"[^\d.]", "", o2_text))
+                except (ValueError, TypeError):
+                    pass
+
         all_ratings: dict[str, str] = {}
         for issue_key, col_name in rating_cols.items():
             if not col_name:
@@ -848,7 +864,7 @@ async def process_miul_workbook(
             if value:
                 all_ratings[issue_key] = value
 
-        # Mirror the v8 helper intent: queue only rows with actionable (non-A) triggers.
+        # Skip rows with ONLY A ratings (no MUAs needed).
         trigger_ratings = {k: v for k, v in all_ratings.items() if v != "A"}
         if not trigger_ratings:
             _skip("no_non_a_ratings")
@@ -865,14 +881,16 @@ async def process_miul_workbook(
             material_class_value = inferred.value if inferred else "metal"
 
         try:
+            # Pass ALL ratings (not just triggers) so Step 3 can
+            # sanity-check material class against rating coverage.
             pipeline_result = process_miul_row(
-                ratings=trigger_ratings,
+                ratings=all_ratings,
                 maptis_code=maptis_code,
                 material_designation=designation,
                 material_class=material_class_value,
                 media=media,
                 environment=environment,
-                o2_percent=None,
+                o2_percent=row_o2_percent,
                 batch_verified=False,
                 part_numbers=[part_number] if part_number else None,
                 part_count=1,
@@ -1101,6 +1119,10 @@ async def finalize_mua(request: FinalizeRequest) -> dict:
             form.rationale = action.rationale.strip()
         if action.disposition is not None and action.disposition.strip():
             form.disposition = action.disposition.strip()
+        # Engineer category override — per spec, REAL_GAP is "I or II,
+        # engineer determines". Only allow elevation (II→I), never demotion.
+        if action.category is not None and action.category.strip() in ("I", "II"):
+            form.category = action.category.strip()
 
     final_forms = list(forms_by_issue.values())
 
