@@ -13,6 +13,8 @@ credentials.json
 data/
 !mira/data/
 !mira/data/h2_evidence_merged.json
+!sentinel/tocr/data/
+!sentinel/tocr/data/*.json
 raw/
 EM32/
 sandbox/
