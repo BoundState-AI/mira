@@ -36,7 +36,6 @@ const DEFAULT_NAV_ITEMS: NavItem[] = [
   { id: 'gas-compatibility', title: 'Gas Compatibility', navKey: 'gasCompatibility', url: '/gas-compatibility', icon: Wind },
   { id: 'galvanic-compatibility', title: 'Galvanic Compatibility', navKey: 'galvanicCompatibility', url: '/galvanic-compatibility', icon: ShieldAlert },
   { id: 'fracture-control', title: 'Fracture Control', navKey: 'fractureControl', url: '/fracture-control', icon: ShieldCheck },
-  { id: 'oca', title: 'OCA', navKey: 'oca', url: '/oca', icon: Shield },
   { id: 'oca-workbench', title: 'OCA Workbench', navKey: 'ocaWorkbench', url: '/oca/workbench', icon: Shield },
   { id: 'oca-system', title: 'OCA System Builder', navKey: 'ocaSystemBuilder', url: '/oca/system-builder', icon: LayoutGrid },
   { id: 'test-classes', title: 'MAPTIS Search', navKey: 'testClasses', url: '/test-classes', icon: FlaskConical },
