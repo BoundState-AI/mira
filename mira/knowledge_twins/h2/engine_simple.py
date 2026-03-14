@@ -419,11 +419,44 @@ class H2Engine:
 
         return result
 
+    # Known condition suffix patterns — ordered longest-first to avoid partial matches.
+    # Each entry: (regex_pattern, canonical_condition_label)
+    _CONDITION_SUFFIXES: list[tuple[str, str]] = [
+        # Multi-word
+        (r"\bsolution\s+treated?\s*\+?\s*aged\b", "solution_treated_aged"),
+        (r"\bsolution\s+treated?\s+and\s+aged\b", "solution_treated_aged"),
+        (r"\bst\s*\+?\s*aged?\b", "solution_treated_aged"),
+        (r"\bsolution\s+treated?\b", "solution_treated"),
+        (r"\bcold\s+worked\b", "cold_worked"),
+        (r"\bcold\s+drawn\b", "cold_drawn"),
+        (r"\bhot\s+rolled\b", "hot_rolled"),
+        (r"\bhot\s+finished\b", "hot_finished"),
+        (r"\bas\s+received\b", "as_received"),
+        (r"\bmill\s+annealed?\b", "mill_annealed"),
+        (r"\bpeak\s+aged?\b", "peak_aged"),
+        # Abbreviations (must come after multi-word to avoid partial matches)
+        (r"\bSTA\b", "solution_treated_aged"),
+        (r"\bST\s+(\d{3,4}\s*°?\s*F)\b", "solution_treated"),  # ST 1900F — keep temp in material
+        (r"\bST\b", "solution_treated"),
+        (r"\bCW\b", "cold_worked"),
+        # Single-word conditions
+        (r"\bannealed?\b", "annealed"),
+        (r"\baged?\b", "aged"),
+        (r"\bnormalized\b", "normalized"),
+        (r"\bquenched\b", "quenched"),
+        (r"\btempered\b", "tempered"),
+        (r"\bwrought\b", "wrought"),
+        (r"\bcast\b", "cast"),
+        (r"\bforged\b", "forged"),
+        (r"\bsintered\b", "sintered"),
+    ]
+
     def _parse_query(self, query: str) -> tuple[str, Optional[str]]:
         """Extract material name and condition from query string.
 
-        Parses condition suffixes from the query to enable natural queries like
-        "Inconel 718 ST" or "Ti-6Al-4V annealed".
+        Deterministic suffix matching — no LLM calls. Patterns are tried
+        longest-first against the tail of the query. Only matches at a word
+        boundary are accepted to avoid false positives.
 
         Args:
             query: Raw query string, possibly with condition suffix
@@ -437,9 +470,42 @@ class H2Engine:
             "Ti-6Al-4V annealed" → ("Ti-6Al-4V", "annealed")
             "K-Monel aged" → ("K-Monel", "aged")
             "316L" → ("316L", None)
+            "316L at 5000 psi" → ("316L", None)  # pressure not a condition
         """
-        # Condition parsing is delegated to explicit condition input + the
-        # resolver pipeline. Avoid ad-hoc suffix parsing here.
+        import re
+
+        text = query.strip()
+        if not text:
+            return query, None
+
+        # Strip trailing pressure/temperature phrases before condition parsing
+        # e.g., "Inconel 718 ST at 5000 psi" → "Inconel 718 ST"
+        text = re.sub(
+            r"\s+(?:at|@)\s+\d[\d,]*\.?\d*\s*(?:psi|psia|mpa|ksi|°?[FCK])\s*$",
+            "", text, flags=re.IGNORECASE,
+        ).strip()
+
+        for pattern, canonical in self._CONDITION_SUFFIXES:
+            # Only match at the end of the string (with optional trailing whitespace)
+            full_pattern = pattern + r"\s*$"
+            m = re.search(full_pattern, text, re.IGNORECASE)
+            if m:
+                # Special case: "ST 1900F" — the temperature is part of the condition
+                # label but we want to keep it in the condition, not the material
+                material = text[:m.start()].strip()
+                if not material:
+                    # The entire query was a condition — don't split
+                    return query, None
+
+                # Build display condition from matched text
+                matched_text = m.group(0).strip()
+
+                LOGGER.debug(
+                    "Parsed query '%s' → material='%s', condition='%s' (matched '%s')",
+                    query, material, canonical, matched_text,
+                )
+                return material, canonical
+
         return query, None
 
     def _find_matches(self, query: str) -> list[MatchedEvidence]:

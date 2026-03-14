@@ -29,6 +29,7 @@ from mira.h2 import evaluate_h2_compatibility
 from mira.h2.engine import lookup_h2_conditions
 from mira.h2.ft_temp import evaluate_h2_temp_compatibility
 from mira.h2.dual_service import assess_dual_service, DualServiceRequest, DualServiceResponse
+from mira.h2.mua_rationale import generate_h2_mua_rationale, H2MUARationaleRequest, H2MUARationaleResponse
 from mira.h2.runtime_db import list_condition_aliases, verify_condition_alias
 from mira.h2.condition_resolver import clear_condition_resolution_cache, normalize_condition_key
 from mira.h2.models import (
@@ -117,6 +118,24 @@ async def dual_service(request: DualServiceRequest) -> DualServiceResponse:
         raise HTTPException(status_code=500, detail="Internal dual-service engine error") from exc
 
 
+# ─── MUA Rationale Export ─────────────────────────────────────────────────────
+
+@router.post("/mua-rationale", response_model=H2MUARationaleResponse)
+async def mua_rationale(request: H2MUARationaleRequest) -> H2MUARationaleResponse:
+    """Generate NASA-STD-6016C §4.2.6.4 hydrogen embrittlement MUA rationale.
+
+    Runs the H2 engine and renders the verdict as Form 551-ready rationale
+    text suitable for the hydrogen embrittlement section of a Material Usage
+    Agreement.  Includes disposition recommendation and standard citations.
+    """
+    try:
+        return generate_h2_mua_rationale(request)
+    except NotImplementedError as exc:
+        raise HTTPException(status_code=501, detail=str(exc)) from exc
+    except Exception as exc:  # pragma: no cover
+        raise HTTPException(status_code=500, detail="Internal MUA rationale error") from exc
+
+
 # ─── Condition Lookup & Alias Management ──────────────────────────────────────
 
 @router.get("/conditions", response_model=H2ConditionLookupResponse)
@@ -128,6 +147,34 @@ async def conditions(
         return lookup_h2_conditions(material_key)
     except Exception as exc:  # pragma: no cover
         raise HTTPException(status_code=500, detail="Internal H2 condition lookup error") from exc
+
+
+@router.get("/conditions/suggest")
+async def conditions_suggest(
+    material_key: str = Query(..., min_length=1),
+) -> dict:
+    """Lightweight condition auto-suggest for UI dropdowns.
+
+    Returns just the condition names and their HEE bands — designed for
+    typeahead/select components that don't need the full lookup payload.
+    """
+    try:
+        response = lookup_h2_conditions(material_key)
+        return {
+            "material": response.canonical_material or material_key,
+            "conditions": [
+                {
+                    "label": opt.condition_name,
+                    "hee_band": opt.hee_band,
+                    "verdict": opt.verdict_if_selected,
+                    "count": opt.evidence_count,
+                }
+                for opt in response.available_conditions
+            ],
+            "requires_selection": response.requires_clarification,
+        }
+    except Exception as exc:  # pragma: no cover
+        raise HTTPException(status_code=500, detail="Internal H2 condition suggest error") from exc
 
 
 @router.get("/condition-aliases", response_model=H2ConditionAliasListResponse)
