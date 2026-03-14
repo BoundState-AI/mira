@@ -83,6 +83,7 @@ def create_app() -> FastAPI:
 
     # O2 Knowledge Twin router (oxygen compatibility)
     include_with_api_alias(routers.o2_router, prefix="/o2", tags=["o2"])
+    include_with_api_alias(routers.h2_router, prefix="/mira", tags=["h2"])
     include_with_api_alias(routers.galvanic_router, prefix="/mira", tags=["galvanic"])
     include_with_api_alias(routers.fracture_router, prefix="/mira", tags=["fracture"])
 

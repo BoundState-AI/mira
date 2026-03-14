@@ -11,6 +11,8 @@ credentials.json
 
 # --- LARGE DATA DIRECTORIES ---
 data/
+!mira/data/
+!mira/data/h2_evidence_merged.json
 raw/
 EM32/
 sandbox/
