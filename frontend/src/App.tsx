@@ -25,6 +25,7 @@ import OCASystemBuilder from "./pages/OCASystemBuilder";
 import NotFound from "./pages/NotFound";
 import FORGE from "./pages/FORGE";
 import FORGEExplorer from "./pages/FORGEExplorer";
+import TOCR from "./pages/TOCR";
 
 const queryClient = new QueryClient();
 
@@ -87,6 +88,7 @@ const App = () => (
                 <Route path="/mua-v10" element={<MUAV10 />} />
                 <Route path="/forge" element={<FORGE />} />
                 <Route path="/forge-explorer" element={<FORGEExplorer />} />
+                <Route path="/tocr" element={<TOCR />} />
                 <Route path="/knowledge-twins" element={<Navigate to="/" replace />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

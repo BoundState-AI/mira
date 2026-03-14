@@ -93,6 +93,9 @@ def create_app() -> FastAPI:
     # OCA System Builder router (Phase 2 — Visual System Builder per BS-SPEC-OCA-002-REV0)
     include_with_api_alias(routers.oca_systems_router, prefix="/oca/systems", tags=["oca-systems"])
 
+    # SENTINEL-TOCR router (task order compliance review)
+    include_with_api_alias(routers.tocr_router, prefix="/tocr", tags=["tocr"])
+
     # Hybrid query router (evidence-first query engine)
     # Note: hybrid_query router has its own /api/query prefix
     app.include_router(routers.hybrid_query_router, tags=["hybrid-query"])

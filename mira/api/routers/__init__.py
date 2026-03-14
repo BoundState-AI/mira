@@ -44,6 +44,7 @@ from .fracture import router as fracture_router
 from .h2 import router as h2_router
 from .oca import router as oca_router
 from .oca_systems import router as oca_systems_router
+from .tocr import router as tocr_router
 
 __all__ = [
     "search_router",
@@ -72,6 +73,7 @@ __all__ = [
     "h2_router",
     "oca_router",
     "oca_systems_router",
+    "tocr_router",
 ]
 
 
