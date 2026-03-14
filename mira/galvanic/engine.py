@@ -164,10 +164,42 @@ def _resolve_material_family(query: str) -> tuple[str, list[dict[str, Any]]]:
 def _choose_variant_pair(
     material_a_records: list[dict[str, Any]],
     material_b_records: list[dict[str, Any]],
+    *,
+    family_a: str = "",
+    family_b: str = "",
+    force_active_a: bool = False,
+    force_active_b: bool = False,
 ) -> tuple[dict[str, Any], dict[str, Any], float]:
+    # When crevice-prone joint forces active-state evaluation, filter to
+    # active records if available.
+    effective_a = material_a_records
+    effective_b = material_b_records
+    if force_active_a:
+        active_only = [r for r in material_a_records if r.get("state") == "active"]
+        if active_only:
+            effective_a = active_only
+    if force_active_b:
+        active_only = [r for r in material_b_records if r.get("state") == "active"]
+        if active_only:
+            effective_b = active_only
+
+    # State-coherence: when both materials share the same family AND both
+    # have active/passive variants, restrict to same-state pairs.  Mixed
+    # active/passive within the same family in the same electrolyte is
+    # physically implausible.
+    same_family = family_a and family_b and family_a == family_b
+    a_has_states = any(r.get("state") in ("active", "passive") for r in effective_a)
+    b_has_states = any(r.get("state") in ("active", "passive") for r in effective_b)
+    coherent_only = same_family and a_has_states and b_has_states
+
     best_pair: tuple[dict[str, Any], dict[str, Any], float] | None = None
-    for record_a in material_a_records:
-        for record_b in material_b_records:
+    for record_a in effective_a:
+        for record_b in effective_b:
+            if coherent_only:
+                state_a = record_a.get("state", "single")
+                state_b = record_b.get("state", "single")
+                if state_a != state_b and state_a != "single" and state_b != "single":
+                    continue
             delta = abs(
                 float(record_a["representative_potential_mv_sce"])
                 - float(record_b["representative_potential_mv_sce"])
@@ -260,10 +292,32 @@ def evaluate_galvanic_assessment(
 
     material_a_group, material_a_records = _resolve_material_family(request.material_a)
     material_b_group, material_b_records = _resolve_material_family(request.material_b)
-    chosen_a, chosen_b, raw_delta_mv = _choose_variant_pair(material_a_records, material_b_records)
+    family_a = material_a_records[0].get("family", "") if material_a_records else ""
+    family_b = material_b_records[0].get("family", "") if material_b_records else ""
+    crevice = request.couple_context.joint_type == "CREVICE_PRONE"
+    chosen_a, chosen_b, raw_delta_mv = _choose_variant_pair(
+        material_a_records,
+        material_b_records,
+        family_a=family_a,
+        family_b=family_b,
+        force_active_a=crevice,
+        force_active_b=crevice,
+    )
 
     material_a = _resolved_material_response(request.material_a, material_a_records, chosen_a)
     material_b = _resolved_material_response(request.material_b, material_b_records, chosen_b)
+
+    if crevice:
+        warnings.append(
+            "Crevice-prone joint geometry can depassivate stainless steels and titanium alloys. "
+            "Active-state potentials used for screening where available."
+        )
+
+    if request.couple_context.electrical_contact == "UNKNOWN":
+        warnings.append(
+            "Electrical contact is unknown — assuming contact exists. "
+            "Verify electrical continuity to confirm galvanic circuit."
+        )
 
     if request.environment == "space_vacuum":
         warnings.append("Galvanic corrosion is not active in hard vacuum because no electrolyte is present.")
@@ -304,6 +358,36 @@ def evaluate_galvanic_assessment(
         warnings.append("Large cathode-to-anode area ratio intensifies attack on the anodic member.")
     if request.couple_context.joint_type == "FASTENER" and severity != "COMPATIBLE":
         warnings.append("For dissimilar fastener joints, the fastener should be the cathodic member per CPR 34.")
+
+    # CPR 36: SCC interaction — high-strength aluminum or steel under galvanic load
+    scc_families = {"aluminum"}
+    scc_alloys = {"aluminum_7075", "aluminum_2024"}
+    hs_steel_groups = {"low_alloy_steel"}
+    involved_groups = {material_a_group, material_b_group}
+    if severity != "COMPATIBLE" and (
+        scc_alloys & involved_groups or hs_steel_groups & involved_groups
+    ):
+        warnings.append(
+            "CPR 36: This couple involves an alloy susceptible to stress corrosion cracking. "
+            "Galvanic loading can accelerate SCC in sustained-tension applications. "
+            "Evaluate SCC risk per NASA-STD-6012A §4.3.1."
+        )
+
+    # CPR 37: Hydrogen embrittlement interaction — cathodic steel fasteners
+    if severity != "COMPATIBLE" and "steel" in families:
+        if request.couple_context.joint_type == "FASTENER":
+            warnings.append(
+                "CPR 37: High-strength steel fasteners in a cathodic galvanic couple "
+                "may be susceptible to hydrogen embrittlement. "
+                "Evaluate HE risk per NASA-STD-6012A §4.3.2."
+            )
+
+    # CPR 41: Dissimilar aluminum alloys
+    if family_a == "aluminum" and family_b == "aluminum" and material_a_group != material_b_group:
+        warnings.append(
+            "CPR 41: Dissimilar aluminum alloys (e.g., 2xxx vs 7xxx) can form "
+            "galvanic couples. Evaluate potential difference and SCC susceptibility."
+        )
 
     mitigations = recommend_mitigations(
         request,

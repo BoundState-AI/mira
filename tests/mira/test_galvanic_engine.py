@@ -130,8 +130,17 @@ def test_real_250_mv_boundary_is_caution():
     assert result.decision_basis == "BOUNDSTATE_SYNTHESIZED"
 
 
-def test_real_500_mv_boundary_is_caution():
+def test_ph_steel_active_state_vs_graphite_is_incompatible():
+    # PH 13-8 now has active-state variant (-500 mV). Graphite (+250) vs
+    # PH 13-8 active (-500) = 750 mV → INCOMPATIBLE (conservative, correct).
     result = _evaluate(material_a="Graphite", material_b="PH 13-8")
+    assert result.raw_delta_mv == 750
+    assert result.severity == "INCOMPATIBLE"
+
+
+def test_real_500_mv_boundary_is_caution():
+    # Use nickel-aluminum bronze (-300) vs Al 6061 (-800) = 500 mV boundary
+    result = _evaluate(material_a="nickel aluminum bronze", material_b="Al 6061-T6")
     assert result.effective_delta_mv == 500
     assert result.severity == "CAUTION"
     assert result.decision_basis == "BOUNDSTATE_SYNTHESIZED"
@@ -162,3 +171,73 @@ def test_environment_modifier_reduces_effective_delta_in_dry_service():
     dry = _evaluate(material_b="Copper", environment="dry_indoor")
     assert dry.effective_delta_mv < wet.effective_delta_mv
     assert dry.decision_basis == "NASA_STD_6012A_CPR39"
+
+
+def test_same_family_state_coherence_prevents_implausible_pair():
+    # 316SS vs 304SS are both stainless family with active/passive states.
+    # State-coherence should constrain to same-state pairs only.
+    # Passive-passive: abs(-125 - (-135)) = 10 mV
+    # Active-active: abs(-525 - (-525)) = 0 mV
+    # Worst coherent case = 10 mV → COMPATIBLE
+    # Without coherence would pick passive-vs-active = 400 mV → CAUTION
+    result = _evaluate(material_a="316SS", material_b="304SS")
+    assert result.severity == "COMPATIBLE"
+    assert result.raw_delta_mv == 10
+
+
+def test_cross_family_allows_mixed_states():
+    # 316SS (stainless) vs Graphite (conductive_carbon) — different families.
+    # Should still pick worst-case 316-active (-525) vs Graphite (+250) = 775
+    result = _evaluate(material_a="316SS", material_b="Graphite")
+    assert result.severity == "INCOMPATIBLE"
+    assert result.raw_delta_mv == 775
+
+
+def test_crevice_prone_forces_active_state():
+    # 316SS vs Copper with crevice-prone joint should force 316 to active
+    # state if available. 316-active (-525) vs Copper (-385) = 140 mV
+    result = _evaluate(
+        material_a="316SS",
+        material_b="Copper",
+        couple_context=CoupleContext(joint_type="CREVICE_PRONE"),
+    )
+    assert result.material_a.chosen_state == "active"
+    assert any("Crevice-prone" in w for w in result.warnings)
+
+
+def test_crevice_prone_with_ph_steel_uses_active():
+    # PH 17-4 vs Graphite in crevice → force PH active (-500) vs Graphite (+250) = 750
+    result = _evaluate(
+        material_a="PH 17-4",
+        material_b="Graphite",
+        couple_context=CoupleContext(joint_type="CREVICE_PRONE"),
+    )
+    assert result.material_a.chosen_state == "active"
+    assert result.raw_delta_mv == 750
+    assert result.severity == "INCOMPATIBLE"
+
+
+def test_unknown_electrical_contact_warns():
+    result = _evaluate(
+        couple_context=CoupleContext(electrical_contact="UNKNOWN"),
+    )
+    assert any("Electrical contact is unknown" in w for w in result.warnings)
+
+
+def test_cpr36_scc_warning_for_7075_aluminum():
+    result = _evaluate(material_a="7075", material_b="316SS")
+    assert any("CPR 36" in w for w in result.warnings)
+
+
+def test_cpr37_he_warning_for_steel_fastener():
+    result = _evaluate(
+        material_a="low-alloy steel",
+        material_b="316SS",
+        couple_context=CoupleContext(joint_type="FASTENER"),
+    )
+    assert any("CPR 37" in w for w in result.warnings)
+
+
+def test_cpr41_dissimilar_aluminum_warning():
+    result = _evaluate(material_a="2024", material_b="7075")
+    assert any("CPR 41" in w for w in result.warnings)
