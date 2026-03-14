@@ -255,6 +255,37 @@ class TestH2CompatibilityAPI:
         assert len(data["evidence"]) > 0
         assert "source_id" in data["evidence"][0]
 
+    def test_h2_conditions_suggest_endpoint(self):
+        """The lightweight H2 condition suggest endpoint should be reachable."""
+        response = client.get(
+            "/mira/h2/conditions/suggest",
+            params={"material_key": "SS 316"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+
+        assert data["material"]
+        assert isinstance(data["conditions"], list)
+        assert "requires_selection" in data
+
+    def test_h2_mua_rationale_endpoint(self):
+        """The H2 MUA rationale endpoint should return Form 551-ready text."""
+        response = client.post(
+            "/mira/h2/mua-rationale",
+            json={
+                "material_key": "SS 316",
+                "pressure_psia": 5000,
+                "temperature_k": 300,
+                "phase": "gh2",
+            },
+        )
+        assert response.status_code == 200
+        data = response.json()
+
+        assert data["classification"] == "ok"
+        assert "NASA-STD-6016C" in data["section"]
+        assert "hydrogen embrittlement" in data["rationale_text"].lower()
+
 
 # =============================================================================
 # PING / HEALTH CHECK
