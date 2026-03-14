@@ -87,7 +87,7 @@
       "what": "Whether an RFCB-approved optional fracture control approach is being used instead of the standard safe-life or damage-tolerance path.",
       "why": "Optional approaches are alternative fracture control methods approved by the Responsible Fracture Control Board for cases where the standard paths do not fit cleanly.",
       "guidance": "Only turn this on when you have RFCB approval for an alternative approach. This changes the applicable FCR baseline. If you are using standard safe-life or damage tolerance, leave this off.",
-      "source": "NASA-STD-5019A §6.2.4; §7.2.4"
+      "source": "NASA-STD-5019A §7.5"
     },
     {
       "field_id": "proof_test_used",
@@ -95,7 +95,7 @@
       "what": "Whether a proof test is being used as part of the fracture control verification strategy.",
       "why": "Proof testing adds FCR 18 requirements — the proof test must be designed to screen for the critical flaw size and must not itself introduce damage.",
       "guidance": "Turn this on when a proof test is part of your verification approach. The engine will add FCR 18 to the applicable requirements. Proof testing is common for pressure vessels and high-value fracture-critical hardware.",
-      "source": "NASA-STD-5019A §7.3.1.b"
+      "source": "NASA-STD-5019A §8.1.3"
     },
     {
       "field_id": "process_controls_used",
@@ -103,7 +103,7 @@
       "what": "Whether process controls are being credited as part of fracture control — for example, controlled machining, inspection, or material lot traceability.",
       "why": "Crediting process controls adds FCR 19 requirements. The controls must be documented, auditable, and maintained throughout production.",
       "guidance": "Turn this on when specific manufacturing process controls are being used to limit initial flaw sizes or ensure material quality as part of the fracture control argument.",
-      "source": "NASA-STD-5019A §8.2"
+      "source": "NASA-STD-5019A §8.1.4"
     },
     {
       "field_id": "detected_flaw_accepted_for_flight",
@@ -111,7 +111,7 @@
       "what": "Whether a detected flaw in the hardware is being accepted for flight based on engineering analysis rather than rejection.",
       "why": "Accepting a detected flaw for flight is a formal disposition that adds FCR 20 requirements. The flaw must be characterized, the remaining life demonstrated, and the disposition documented.",
       "guidance": "Turn this on only when a real detected flaw has been dispositioned as acceptable for flight. This is not a hypothetical — it means an actual flaw was found during inspection and is being accepted with engineering justification.",
-      "source": "NASA-STD-5019A §8.4"
+      "source": "NASA-STD-5019A §8.1.5"
     },
     {
       "field_id": "low_risk_candidate",
@@ -126,7 +126,7 @@
       "label": "KIc / Fty Ratio",
       "what": "The ratio of plane-strain fracture toughness (KIc) to tensile yield strength (Fty), expressed in units of sqrt(inches).",
       "why": "This ratio is the primary screening criterion for the metallic NFC low-risk path. KIc is a measure of how resistant the material is to crack growth — higher is tougher. Fty is the yield strength. A ratio of at least 0.33 sqrt(in) means the material is tough enough relative to its strength to qualify for simplified screening.",
-      "guidance": "KIc is the plane-strain fracture toughness in ksi*sqrt(in). Fty is the yield strength in ksi. Divide KIc by Fty to get the ratio. Values below 0.33 mean the material is too brittle relative to its strength for the low-risk path. If you do not have KIc data, flag it as a data gap and get the value from MMPDS or testing.",
+      "guidance": "KIc is the plane-strain fracture toughness in ksi*sqrt(in). Fty is the yield strength in ksi. Divide KIc by Fty to get the ratio in sqrt(in). Values below 0.33 mean the material is too brittle relative to its strength for the low-risk path. If you do not have KIc data, flag it as a data gap and get the value from MMPDS or testing. WARNING: If your source data is in SI units (KIc in MPa*sqrt(m), Fty in MPa), the ratio will be in sqrt(m), not sqrt(in). Multiply the SI ratio by 1.0988 to convert to sqrt(in), or convert KIc first (1 MPa*sqrt(m) = 0.9099 ksi*sqrt(in)). Entering an unconverted SI ratio will underestimate toughness and may incorrectly fail the 0.33 criterion.",
       "source": "NASA-STD-5019A §6.2.5.a(2)"
     },
     {
@@ -168,6 +168,22 @@
       "why": "FCR 22 requires that fracture-critical and NFC composite/bonded parts have representative material property data from approved sources or with conservative bounds. Without this data, the assessment cannot be closed.",
       "guidance": "Turn this on only when you have actual material property data attached — from MMPDS, NASGRO, program-specific testing, or other NASA-approved sources. If the data is not yet available, leave it off and the engine will flag it as a caution to remind you to close this item before the assessment is complete.",
       "source": "NASA-STD-5019A §8.3.d-e"
+    },
+    {
+      "field_id": "short_transverse_dimension_in",
+      "label": "Short-Transverse Dimension (in)",
+      "what": "The maximum dimension of the part in the short-transverse grain direction, in inches.",
+      "why": "Aluminum parts loaded in the short-transverse direction with a dimension above 3 inches do not qualify for the metallic NFC low-risk path. This is because thick aluminum sections are more susceptible to stress corrosion cracking and have lower fracture toughness in the short-transverse orientation.",
+      "guidance": "Enter the dimension in inches. This check only applies to aluminum alloys being evaluated for the NFC low-risk path. If the part is not loaded in the short-transverse direction, this field is not relevant. If the dimension exceeds 3 inches and the loading is in the short-transverse direction, the part cannot use the low-risk path.",
+      "source": "NASA-STD-5019A §6.2.5.a(3)"
+    },
+    {
+      "field_id": "nasa_std_6016_qualified",
+      "label": "NASA-STD-6016 Qualification Status",
+      "what": "Whether the material is qualified under NASA-STD-6016, the standard for materials and processes.",
+      "why": "Materials not qualified under NASA-STD-6016 require a Material Usage Agreement (MUA) before they can be used in fracture-critical or NFC composite/bonded hardware. The MUA must be documented in the Fracture Control Summary Report.",
+      "guidance": "Select Qualified if the material appears in a NASA-approved materials specification or has been qualified per NASA-STD-6016. Select Not Qualified if the material lacks qualification — the engine will check whether an MUA is present and flag it if missing. Select Unknown if you have not yet verified the qualification status — the engine will flag this as a data gap.",
+      "source": "NASA-STD-5019A §8.3.f-g"
     }
   ],
   "classifications": [

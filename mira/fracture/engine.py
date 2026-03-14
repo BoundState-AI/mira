@@ -119,12 +119,13 @@ def _conditional_fcrs(request: FractureAssessmentRequest, baseline_key: str) -> 
         elif request.material_system in {"COMPOSITE", "BONDED"}:
             extras.append(17)
 
-    if request.proof_test_used:
-        extras.append(18)
-    if request.process_controls_used:
-        extras.append(19)
-    if request.detected_flaw_accepted_for_flight:
-        extras.append(20)
+    if baseline_key.startswith("FC_"):
+        if request.proof_test_used:
+            extras.append(18)
+        if request.process_controls_used:
+            extras.append(19)
+        if request.detected_flaw_accepted_for_flight:
+            extras.append(20)
     return extras
 
 

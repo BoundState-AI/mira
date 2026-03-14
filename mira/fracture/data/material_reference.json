@@ -96,6 +96,72 @@
       "material_system": "METALLIC",
       "family": "pressure_hardware",
       "aliases": ["COPV Liner", "Composite Overwrapped Pressure Vessel Liner"]
+    },
+    {
+      "canonical_name": "Inconel 625",
+      "material_system": "METALLIC",
+      "family": "nickel",
+      "aliases": ["625", "Alloy 625", "IN625"]
+    },
+    {
+      "canonical_name": "Ti-3Al-2.5V",
+      "material_system": "METALLIC",
+      "family": "titanium",
+      "aliases": ["Ti-3-2.5", "Ti 3Al-2.5V", "3Al-2.5V", "Grade 9 titanium"]
+    },
+    {
+      "canonical_name": "15-5PH Stainless",
+      "material_system": "METALLIC",
+      "family": "steel",
+      "aliases": ["15-5PH", "15-5 PH", "15-5 precipitation hardening stainless"]
+    },
+    {
+      "canonical_name": "13-8PH Stainless",
+      "material_system": "METALLIC",
+      "family": "steel",
+      "aliases": ["13-8PH", "13-8 PH", "13-8Mo"]
+    },
+    {
+      "canonical_name": "Aluminum 2195-T8",
+      "material_system": "METALLIC",
+      "family": "aluminum",
+      "aliases": ["2195-T8", "2195", "Al 2195-T8", "Al-Li 2195"]
+    },
+    {
+      "canonical_name": "Aluminum 2014-T6",
+      "material_system": "METALLIC",
+      "family": "aluminum",
+      "aliases": ["2014-T6", "2014", "Al 2014-T6"]
+    },
+    {
+      "canonical_name": "Maraging 250",
+      "material_system": "METALLIC",
+      "family": "steel",
+      "aliases": ["Maraging 250", "18Ni-250", "Maraging steel 250"]
+    },
+    {
+      "canonical_name": "Maraging 300",
+      "material_system": "METALLIC",
+      "family": "steel",
+      "aliases": ["Maraging 300", "18Ni-300", "Maraging steel 300"]
+    },
+    {
+      "canonical_name": "C-103",
+      "material_system": "METALLIC",
+      "family": "refractory",
+      "aliases": ["C103", "Nb C-103", "Niobium C-103", "Columbium C-103"]
+    },
+    {
+      "canonical_name": "MP35N",
+      "material_system": "METALLIC",
+      "family": "cobalt",
+      "aliases": ["MP35N", "Multiphase 35N"]
+    },
+    {
+      "canonical_name": "Haynes 230",
+      "material_system": "METALLIC",
+      "family": "nickel",
+      "aliases": ["230", "Alloy 230", "HA230"]
     }
   ]
 }

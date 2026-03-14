@@ -46,6 +46,16 @@ def classify_request(request: FractureAssessmentRequest) -> dict[str, object]:
             "For this mission class, MIRA is providing best-practice fracture guidance."
         )
 
+    if request.specific_hardware_type in ALWAYS_FC_HARDWARE_TYPES:
+        return {
+            "classification": "FC",
+            "baseline_key": "FC_SPECIFIC_HARDWARE",
+            "confidence_state": "CONFIDENT",
+            "warnings": warnings,
+            "unresolved_inputs": [],
+            "conservative_fallback": None,
+        }
+
     if request.structural_role != "NON_STRUCTURAL":
         if request.hazard_consequence == "UNKNOWN":
             unresolved_inputs.append("hazard_consequence")
@@ -60,16 +70,6 @@ def classify_request(request: FractureAssessmentRequest) -> dict[str, object]:
             "warnings": warnings,
             "unresolved_inputs": unresolved_inputs,
             "conservative_fallback": "Treat as FC pending review",
-        }
-
-    if request.specific_hardware_type in ALWAYS_FC_HARDWARE_TYPES:
-        return {
-            "classification": "FC",
-            "baseline_key": "FC_SPECIFIC_HARDWARE",
-            "confidence_state": "CONFIDENT",
-            "warnings": warnings,
-            "unresolved_inputs": [],
-            "conservative_fallback": None,
         }
 
     if (

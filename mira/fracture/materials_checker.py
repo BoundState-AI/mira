@@ -83,6 +83,23 @@ def _screen_material_common(
     applies_fcr22 = baseline_key.startswith("FC_") or baseline_key.startswith("NFC_COMPOSITE_BONDED")
     low_risk_requested = bool(material_context.get("low_risk_candidate"))
 
+    if material_name and not resolved:
+        findings.append(
+            {
+                "finding_id": "material_not_resolved",
+                "status": "DATA_GAP",
+                "title": "Material not in reference database",
+                "detail": (
+                    f"'{material_name}' did not match any entry in the MIRA material reference. "
+                    "Family-specific checks (titanium SLC, steel toughness, aluminum short-transverse) "
+                    "are skipped. Verify material identity and provide properties manually."
+                ),
+                "governing_fcrs": [22],
+                "source_clauses": ["8.3"],
+                "data_provided": data_provided,
+            }
+        )
+
     if not material_name:
         if applies_fcr22 or low_risk_requested:
             findings.append(
