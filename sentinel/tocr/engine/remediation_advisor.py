@@ -221,7 +221,11 @@ class RemediationAdvisor:
         parts: list[str] = []
 
         # Context based on rule type
-        if rule_id in ("TOCR-001", "TOCR-012", "SCAN-012"):
+        if rule_id == "TOCR-002":
+            # Out-of-scope work type — show what was inserted vs authorized scope
+            parts.append(self._context_out_of_scope(evidence, task_order))
+
+        elif rule_id in ("TOCR-001", "TOCR-012", "SCAN-012"):
             # Undisclosed change — tell them exactly what field changed
             parts.append(self._context_undisclosed(evidence))
 
@@ -262,6 +266,47 @@ class RemediationAdvisor:
             parts.append(self._context_missing_description(evidence, task_order))
 
         return " ".join(p for p in parts if p)
+
+    def _context_out_of_scope(self, evidence, task_order: Optional[TaskOrder]) -> str:
+        """Context for out-of-scope work type findings."""
+        parts = []
+
+        # Show the diff — what was added
+        diff_summary = self._summarize_text_diff(
+            evidence.prior_text or "", evidence.proposed_text or ""
+        )
+        if diff_summary:
+            parts.append(f"Scope change: {diff_summary}")
+
+        # Identify violated regulations
+        parts.append(
+            "Regulations violated: "
+            "FAR 16.505(a)(2) — orders must be within contract scope. "
+            "FAR 43.102(a) — only COs may execute contract modifications. "
+            "FAR 43.102(a)(3) — other personnel shall not direct work that "
+            "should be a contract modification. "
+            "NFS 1816.506-70 — task orders must align with the contract SOW."
+        )
+
+        # Compare against task order metadata if available
+        if task_order:
+            # Check raw_fields for Skill field from ESSCA format
+            raw = getattr(task_order, "raw_fields", None) or {}
+            skill_field = raw.get("skill", "")
+            if not skill_field:
+                # Search sub-task skills for the authorized domain
+                all_skills = set()
+                for st in task_order.sub_tasks:
+                    all_skills.update(st.skills)
+                skill_field = ", ".join(sorted(all_skills)[:5]) if all_skills else "not specified"
+
+            parts.append(
+                f"Authorized Skill field: \"{skill_field}\". "
+                f"The inserted work type must fall within this authorized scope. "
+                f"If it does not, remove it from this TO and initiate separate procurement."
+            )
+
+        return " ".join(parts)
 
     def _context_undisclosed(self, evidence) -> str:
         """Context for undisclosed change findings.

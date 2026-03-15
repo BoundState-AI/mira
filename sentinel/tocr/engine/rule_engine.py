@@ -14,6 +14,7 @@ __version__ = "1.0.0"
 
 import hashlib
 import json
+import re
 from pathlib import Path
 from typing import Optional
 
@@ -96,6 +97,17 @@ class ChangeContext:
         if c.classification == ChangeClassification.SCOPE_LANGUAGE and c.change_type == ChangeType.INSERTION:
             self.signals.add("scope_addition_detected")
 
+        # Scope modification that introduces a new work domain.
+        # A MODIFICATION to scope text that adds keywords from a domain
+        # not present in the prior text is functionally equivalent to a
+        # scope addition — it introduces new work that needs funding,
+        # deliverables, TOCR documentation, and CO review.
+        if (
+            c.classification == ChangeClassification.SCOPE_LANGUAGE
+            and c.change_type == ChangeType.MODIFICATION
+        ):
+            self._check_new_domain_in_modification()
+
         # Work type analysis
         proposed_lower = c.proposed_text.lower()
         if any(kw in proposed_lower for kw in ["software", "ai", "machine learn", "algorithm"]):
@@ -137,6 +149,78 @@ class ChangeContext:
             "work already done", "prior performance",
         ]):
             self.signals.add("retroactive_scope_language")
+
+    # Domain keyword patterns — each represents a distinct work domain.
+    # Compiled regexes with word boundaries to avoid substring false positives
+    # (e.g., "ai" matching inside "sustaining").
+    # Case-insensitive EXCEPT for "AI" which is checked case-sensitive
+    # (it's always uppercase as an acronym).
+    _DOMAIN_PATTERNS: dict[str, list["re.Pattern"]] = {}
+
+    @classmethod
+    def _get_domain_patterns(cls) -> dict[str, list["re.Pattern"]]:
+        if cls._DOMAIN_PATTERNS:
+            return cls._DOMAIN_PATTERNS
+        import re
+        _raw = {
+            "software_ai": {
+                # Case-insensitive patterns
+                "ci": [
+                    r"\bsoftware\b", r"\bartificial.?intelligence\b",
+                    r"\bmachine.?learn", r"\bneural.?network",
+                    r"\bdeep.?learn", r"\balgorithm\b", r"\bdata.?pipeline",
+                    r"\bnatural.?language", r"\bintelligence.?layer",
+                    r"\bsoftware.?tool", r"\bcode.?develop",
+                    r"\bweb.?service", r"\bapi.?develop", r"\bmodel.?train",
+                ],
+                # Case-SENSITIVE patterns (AI is always uppercase)
+                "cs": [r"\bAI\b"],
+            },
+            "manufacturing": {
+                "ci": [
+                    r"\bmanufactur", r"\bfabricat", r"\bmachining\b",
+                    r"\bwelding\b", r"\bcasting\b", r"\bforging\b",
+                    r"\badditive.?manufactur", r"\b3d.?print",
+                ],
+                "cs": [],
+            },
+        }
+        for domain, groups in _raw.items():
+            patterns = []
+            for pat in groups.get("ci", []):
+                patterns.append(re.compile(pat, re.IGNORECASE))
+            for pat in groups.get("cs", []):
+                patterns.append(re.compile(pat))
+            cls._DOMAIN_PATTERNS[domain] = patterns
+        return cls._DOMAIN_PATTERNS
+
+    def _check_new_domain_in_modification(self) -> None:
+        """Detect when a scope MODIFICATION introduces a fundamentally new work domain.
+
+        Example: inserting "development of Software Tools for integration of
+        AI solutions" into a materials engineering paragraph.  The prior text
+        has zero software/AI keywords; the proposed text has several.  This is
+        functionally a scope addition hiding inside a text edit.
+        """
+        c = self.change
+        prior_text = c.prior_text
+        proposed_text = c.proposed_text
+
+        for domain_name, patterns in self._get_domain_patterns().items():
+            prior_hits = sum(1 for p in patterns if p.search(prior_text))
+            proposed_hits = sum(1 for p in patterns if p.search(proposed_text))
+
+            # New domain: zero keywords in prior, 2+ in proposed
+            if prior_hits == 0 and proposed_hits >= 2:
+                self.signals.add("scope_addition_detected")
+                self.signals.add("new_work_type_detected")
+                self.signals.add(f"new_domain_{domain_name}")
+
+                # Also check if this new domain has a sub-task
+                if not self.diff.new_sub_tasks:
+                    self.signals.add("scope_addition_no_sub_task")
+
+                return
 
     def _compute_funding_signals(self) -> None:
         """Compute funding-related trigger signals.

@@ -11,16 +11,16 @@
       "who_needs_to_act": "The revision author (task lead) needs to update the Summary of Changes before submitting."
     },
     "TOCR-002": {
-      "what_it_means": "The revision adds a type of work that might not be allowed under this task order. For example, adding software development to a task order that was only for engineering analysis.",
-      "why_it_matters": "Task orders can only include work types that the parent IDIQ contract allows. Adding new work types may require a completely different procurement action.",
-      "what_to_do": "Check the IDIQ contract scope to see if this work type is allowed. If it's not, you'll need a separate task order or contract modification.",
-      "who_needs_to_act": "The Contracting Officer needs to determine if the work is within scope."
+      "what_it_means": "A fundamentally new work domain was inserted into the task order scope — for example, AI software development added to a materials engineering task order. The new work type does not match the task order's authorized Skill field or the IDIQ contract statement of work.",
+      "why_it_matters": "FAR 16.505(a)(2) requires task orders to stay within the scope of the parent IDIQ contract. FAR 43.102(a) restricts contract modifications to Contracting Officers — if the person who inserted the scope is not a CO, the modification is unauthorized. FAR 43.102(a)(3) prohibits other Government personnel from directing work that should be a contract modification. Out-of-scope work cannot be authorized through a task order description edit. It requires a separate procurement action.",
+      "what_to_do": "Compare the inserted work type against the task order Skill field (unchanged across revisions) and the IDIQ contract statement of work. If the new domain falls outside the authorized scope, remove it from this task order. Initiate a separate procurement: either a new task order under an appropriate contract vehicle, or a contract amendment to expand the IDIQ scope. Do not attempt to force out-of-scope work into an existing TO.",
+      "who_needs_to_act": "The CO must determine if the work is within scope. Legal should review if the scope change constitutes an unauthorized commitment. The task lead must remove out-of-scope language until proper procurement is initiated."
     },
     "TOCR-003": {
-      "what_it_means": "New scope was added but there's no formal Task Order Change Request on file to authorize it.",
-      "why_it_matters": "Adding scope without proper documentation creates audit risk and may not be properly tracked in the contract management system.",
-      "what_to_do": "File the required TOCR documentation through the standard ordering process before submitting the revision.",
-      "who_needs_to_act": "The task lead needs to file the TOCR. The CO needs to approve it."
+      "what_it_means": "Scope was added to the task order but no formal Task Order Change Request (TOCR) was filed through ATOMS. The standard review flow — Branch Chief → Technical Monitor → COR → CO — was bypassed.",
+      "why_it_matters": "NFS 1816.506-70 and ESSCA/MSFC ordering procedures require TOCR documentation for all scope changes. Without a TOCR, the change is invisible to the approval chain. The Technical Monitor, COR, and CO cannot review what they do not know exists. FAR 43.102(b) requires modifications to be priced before execution.",
+      "what_to_do": "File TOCR documentation through ATOMS before submitting the revision. The TOCR must include: rationale for the scope addition, a corresponding sub-task in ATOMS, WBS codes and funding allocation, defined deliverables and acceptance criteria. Route through the standard review flow.",
+      "who_needs_to_act": "The task lead must file the TOCR and create the ATOMS sub-task. The CO must approve it through the standard review flow."
     },
     "TOCR-004": {
       "what_it_means": "New work was added to the task order, but no money was allocated to pay for it. There's no funding, no WBS code, and no charge code.",

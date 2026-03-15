@@ -33,7 +33,7 @@ from sentinel.tocr.models.task_order import TaskOrder
 
 # Software/AI scope patterns
 _SOFTWARE_PATTERNS = re.compile(
-    r"\b(software|code|programming|application|database|web.?service|api.?develop"
+    r"\b(software|code|programming|software.?application|database|web.?service|api.?develop"
     r"|artificial.?intelligence|AI|machine.?learn|neural.?network|deep.?learn"
     r"|algorithm|model.?train|data.?pipeline)\b",
     re.IGNORECASE,

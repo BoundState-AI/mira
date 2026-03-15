@@ -119,6 +119,12 @@ class ESSCAParser:
             agency_comments="",
             parser_confidence=ParserConfidence.HIGH,
             source_format="docx-essca",
+            raw_fields={
+                "skill": meta.get("skill", ""),
+                "contract": meta.get("contract", ""),
+                "team_lead": meta.get("team_lead", ""),
+                "task_initiator": meta.get("task_initiator", ""),
+            },
         )
 
     def _extract_metadata(self, paragraphs: list[tuple[str, str]]) -> dict:
@@ -139,6 +145,11 @@ class ESSCAParser:
             m = re.match(r"Contract\s+Number:\s*(\S+)", text)
             if m:
                 meta["contract"] = m.group(1)
+                continue
+
+            m = re.match(r"Skill:\s*(.+)", text)
+            if m:
+                meta["skill"] = m.group(1).strip()
                 continue
 
             m = re.match(r"Emergency:\s*(\S+)", text)

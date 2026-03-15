@@ -28,7 +28,7 @@
       "rule_id": "TOCR-002",
       "title": "Out-of-Scope Work Type",
       "basis_type": "regulatory",
-      "authority_basis": ["FAR 16.505(b)(2)", "NFS 1816.506-70"],
+      "authority_basis": ["FAR 16.505(a)(2)", "FAR 16.505(b)(2)", "NFS 1816.506-70", "FAR 43.102(a)", "FAR 43.102(a)(3)"],
       "applicability": {
         "contract_type": ["IDIQ", "Task Order"],
         "agency": ["NASA"],
@@ -37,18 +37,18 @@
       "trigger": {
         "all": ["scope_change_detected", "new_work_type_detected"]
       },
-      "finding": "New work type detected that may not match the task order scope category.",
+      "finding": "A fundamentally new work domain was introduced into an existing scope description. FAR 16.505(a)(2) requires orders to be within the scope of the contract. FAR 43.102(a) restricts contract modifications to Contracting Officers. FAR 43.102(a)(3) prohibits other Government personnel from directing or encouraging work that should be the subject of a contract modification. If the new work type does not match the task order's Skill field or the IDIQ contract statement of work, it requires a separate task order or contract amendment — not insertion into an existing description.",
       "severity": "CRITICAL",
-      "review_priority": "CO",
+      "review_priority": "LEGAL",
       "confidence_method": "high",
-      "guidance": "FAR 16.505(b)(2) requires task orders to be within the scope of the underlying IDIQ contract. New work types may require a separate task order or contract modification.",
-      "remediation": "Verify new work type is within IDIQ scope. If not, initiate separate procurement action."
+      "guidance": "FAR 16.505(a)(2): 'Orders must be within the scope, issued within the period of performance, and be within the maximum value of the contract.' NFS 1816.506-70: Task orders must align with the contract statement of work. FAR 43.102(a): 'Only contracting officers acting within the scope of their authority are empowered to execute contract modifications on behalf of the Government.' If the person who modified the TO is not a CO, and the modification constitutes a material scope change, FAR 43.102(a)(3) applies.",
+      "remediation": "Compare the new work type against the task order Skill field and the IDIQ contract statement of work. If the new domain (e.g., software/AI development) does not fall within the authorized skill category (e.g., 'Materials Research, Analysis, Testing, Process, and Hardware Development'), the scope change is out-of-scope. Remove the out-of-scope language and initiate a separate procurement action: either a new task order under an appropriate contract vehicle, or a contract amendment if the IDIQ scope needs to be expanded. Do not attempt to authorize out-of-scope work through a task order revision."
     },
     {
       "rule_id": "TOCR-003",
       "title": "Missing TOCR Documentation",
       "basis_type": "contractual",
-      "authority_basis": ["NFS 1816.506-70", "Local ordering guide"],
+      "authority_basis": ["NFS 1816.506-70", "FAR 43.102(b)", "ESSCA/MSFC ATOMS procedures"],
       "applicability": {
         "contract_type": ["IDIQ", "Task Order"],
         "agency": ["NASA"],
@@ -57,12 +57,12 @@
       "trigger": {
         "all": ["scope_addition_detected"]
       },
-      "finding": "Scope addition detected. Verify that a Task Order Change Request (TOCR) has been filed.",
+      "finding": "Scope addition detected without corresponding TOCR documentation. NFS 1816.506-70 requires a Task Order Change Request with rationale, filed through ATOMS with sub-tasks, WBS codes, and justification. FAR 43.102(b) requires contract modifications to be priced before execution. The TOCR review flow requires: Branch Chief/Task Initiator creates TOCR, Technical Monitor verifies, COR reviews/approves, CO finalizes.",
       "severity": "HIGH",
       "review_priority": "CO",
       "confidence_method": "deterministic",
-      "guidance": "NFS 1816.506-70 and local ordering procedures require formal documentation for scope additions to task orders.",
-      "remediation": "File TOCR documentation per local ordering guide before submitting revision."
+      "guidance": "NFS 1816.506-70 and ESSCA/MSFC ordering procedures require formal TOCR documentation for all scope additions. The ATOMS system tracks sub-tasks, requirements, funding WBS codes, and rationale. Without a TOCR, the change bypasses the standard review flow (Technical Monitor → COR → CO) and is not visible to the approval chain.",
+      "remediation": "File TOCR documentation through ATOMS before submitting the revision. The TOCR must include: (1) rationale for the scope addition, (2) a corresponding sub-task in ATOMS, (3) WBS codes and funding allocation, (4) defined deliverables and acceptance criteria. Route through the standard review flow: Branch Chief → Technical Monitor → COR → CO."
     },
     {
       "rule_id": "TOCR-004",
