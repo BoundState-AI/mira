@@ -44,7 +44,10 @@ from .fracture import router as fracture_router
 from .h2 import router as h2_router
 from .oca import router as oca_router
 from .oca_systems import router as oca_systems_router
-from .tocr import router as tocr_router
+try:
+    from .tocr import router as tocr_router
+except ImportError:
+    tocr_router = None
 
 __all__ = [
     "search_router",
