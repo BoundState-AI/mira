@@ -19,12 +19,12 @@ import MUAV10 from "./pages/MUAV10";
 import GasCompatibility from "./pages/GasCompatibility";
 import GalvanicCompatibility from "./pages/GalvanicCompatibility";
 import FractureControl from "./pages/FractureControl";
-import OCALanding from "./pages/OCALanding";
 import OCAWorkbench from "./pages/OCAWorkbench";
 import OCASystemBuilder from "./pages/OCASystemBuilder";
 import NotFound from "./pages/NotFound";
 import FORGE from "./pages/FORGE";
 import FORGEExplorer from "./pages/FORGEExplorer";
+import TOCR from "./pages/TOCR";
 
 const queryClient = new QueryClient();
 
@@ -51,7 +51,7 @@ const App = () => (
                 <Route path="/gas-compatibility" element={<GasCompatibility />} />
                 <Route path="/galvanic-compatibility" element={<GalvanicCompatibility />} />
                 <Route path="/fracture-control" element={<FractureControl />} />
-                <Route path="/oca" element={<OCALanding />} />
+                <Route path="/oca" element={<Navigate to="/oca/workbench" replace />} />
                 <Route path="/oca/workbench" element={<OCAWorkbench />} />
                 <Route path="/oca/system-builder" element={<OCASystemBuilder />} />
                 <Route path="/test-classes" element={<TestClasses />} />
@@ -87,6 +87,7 @@ const App = () => (
                 <Route path="/mua-v10" element={<MUAV10 />} />
                 <Route path="/forge" element={<FORGE />} />
                 <Route path="/forge-explorer" element={<FORGEExplorer />} />
+                <Route path="/tocr" element={<TOCR />} />
                 <Route path="/knowledge-twins" element={<Navigate to="/" replace />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

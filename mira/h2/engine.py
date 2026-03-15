@@ -27,7 +27,11 @@ from pathlib import Path
 from typing import Optional
 
 from core.models.answer import AnswerSeverity, EvidenceItem
-from mira.maptis import H2_HIGH_STRENGTH_THRESHOLD_KSI, MaterialFamily
+from mira.maptis import (
+    H2_HIGH_STRENGTH_THRESHOLD_KSI,
+    MaterialFamily,
+    get_h2_family_rule,
+)
 from mira.maptis.repository import _infer_family_from_key
 from .models import (
     H2CompatibilityRequest,
@@ -72,6 +76,49 @@ def _get_h2_simple_engine():
 def _infer_request_family(material_key: str) -> MaterialFamily:
     """Use the shared MAPTIS fallback family heuristic in no-DB runtime."""
     return _infer_family_from_key(material_key or "")
+
+
+def _classification_from_family_rule(rule: dict) -> AnswerSeverity:
+    """Map a family-rule classification string to AnswerSeverity."""
+    classification = (rule.get("classification") or "unknown").lower()
+    return {
+        "approved": AnswerSeverity.OK,
+        "approved_with_caution": AnswerSeverity.CAUTION,
+        "caution": AnswerSeverity.CAUTION,
+        "prohibited": AnswerSeverity.PROHIBITED,
+    }.get(classification, AnswerSeverity.UNKNOWN)
+
+
+def _family_rule_evidence(rule: dict) -> EvidenceItem:
+    """Render a compact evidence item for a deterministic family rule."""
+    return EvidenceItem(
+        source_id=rule.get("bok_ref", "NSS 1740.16"),
+        location="Family-level hydrogen compatibility rule",
+        summary=rule.get("reason", "Family-level hydrogen compatibility guidance."),
+    )
+
+
+def _render_family_rule_response(
+    request: H2CompatibilityRequest,
+    *,
+    rule: dict,
+    rationale: str,
+    notes: str,
+    evidence: list[EvidenceItem] | None = None,
+    band_distribution: Optional[dict] = None,
+    envelope_context: Optional[dict] = None,
+) -> H2CompatibilityResponse:
+    """Build a response from a deterministic family rule fallback."""
+    return H2CompatibilityResponse(
+        classification=_classification_from_family_rule(rule),
+        rationale=rationale,
+        evidence=evidence or [_family_rule_evidence(rule)],
+        embrittlement_risk=rule.get("embrittlement_risk"),
+        h2_score=0.55,
+        notes=notes,
+        band_distribution=band_distribution,
+        envelope_context=envelope_context,
+    )
 
 
 def _deterministic_guardrail_response(
@@ -145,6 +192,8 @@ def evaluate_h2_compatibility(request: H2CompatibilityRequest) -> H2Compatibilit
     if guardrail_response is not None:
         return guardrail_response
 
+    family = _infer_request_family(request.material_key)
+    family_rule = get_h2_family_rule(family)
     engine = _get_h2_simple_engine()
 
     if engine is None:
@@ -177,6 +226,50 @@ def evaluate_h2_compatibility(request: H2CompatibilityRequest) -> H2Compatibilit
 
         # Handle CLARIFICATION_NEEDED verdict specially
         if result.verdict == Verdict.CLARIFICATION_NEEDED:
+            if (
+                result.match_type == "family"
+                and _classification_from_family_rule(family_rule) != AnswerSeverity.UNKNOWN
+            ):
+                return _render_family_rule_response(
+                    request,
+                    rule=family_rule,
+                    rationale=(
+                        f"{request.material_key}: No material-specific H2 evidence was found. "
+                        f"Applying the {family.value.replace('_', ' ')} family rule. "
+                        f"{family_rule.get('reason', '')}"
+                    ),
+                    notes=(
+                        "Direct material-specific H2 evidence was not found; "
+                        "family-level compatibility guidance was applied."
+                    ),
+                    evidence=evidence_items[:2] or None,
+                    band_distribution=result.band_distribution if len(result.band_distribution) > 1 else None,
+                    envelope_context=result.envelope_context,
+                )
+
+            if (
+                family == MaterialFamily.TITANIUM
+                and request.phase == HydrogenPhase.LIQUID
+                and request.temperature_k <= _TITANIUM_HYDRIDE_LIMIT_K
+            ):
+                fallback_evidence = evidence_items[:2]
+                fallback_evidence.append(_family_rule_evidence(family_rule))
+                return _render_family_rule_response(
+                    request,
+                    rule=family_rule,
+                    rationale=(
+                        f"{request.material_key}: Cryogenic LH2 service is treated with caution. "
+                        f"{family_rule.get('reason', '')}"
+                    ),
+                    notes=(
+                        "Condition-specific ambient GH2 evidence is mixed; "
+                        "cryogenic LH2 fallback follows the titanium family rule."
+                    ),
+                    evidence=fallback_evidence,
+                    band_distribution=result.band_distribution if len(result.band_distribution) > 1 else None,
+                    envelope_context=result.envelope_context,
+                )
+
             # Convert ConditionOption dataclasses to ConditionOptionResponse Pydantic models
             available_conditions = [
                 ConditionOptionResponse(
@@ -223,6 +316,13 @@ def evaluate_h2_compatibility(request: H2CompatibilityRequest) -> H2Compatibilit
                 "extreme": "severe",
             }
             embrittlement_risk = risk_map.get(result.hee_band, "unknown")
+
+        if (
+            classification == AnswerSeverity.OK
+            and family_rule.get("classification") == "approved"
+            and family_rule.get("embrittlement_risk") in {"none", "very_low", "low"}
+        ):
+            embrittlement_risk = family_rule["embrittlement_risk"]
 
         # Combine warnings into notes
         notes = None
