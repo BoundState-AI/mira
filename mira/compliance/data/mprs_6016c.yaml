@@ -1,0 +1,2909 @@
+# NASA-STD-6016C Material and Process Requirements Index
+# Version: C w/CHANGE 2
+# Source: NASA-STD-6016C "Standard Materials and Processes Requirements for Spacecraft"
+#
+# This is the authoritative source for MPR definitions used by the M&P Plan
+# compliance evaluation engine (codex path).
+#
+# Structure:
+#   Section 4.1  - Programmatic Controls (MPR 7-32)
+#   Section 4.1.8 - Design Values (MPR 33-42)
+#   Section 4.2.1 - Flammability, Offgassing, Compatibility (MPR 43-56)
+#   Section 4.2.2 - Metals (MPR 57-88)
+#   Section 4.2.3 - Nonmetals (MPR 89-101)
+#   Section 4.2.4 - Processes (MPR 102-174)
+#   Section 4.2.5 - NDE (MPR 175-180)
+#   Section 4.2.6 - Structural/Corrosion/Contamination (MPR 182-209)
+#   Section 4.2.1.4 - Oxidizer Compatibility (MPR 210-212)
+#
+# Entries with empty related_failure_modes produce STATUS_UNKNOWN determinations
+# that require human citation. This is intentional — the engine should surface
+# every applicable requirement, not silently skip non-deterministic ones.
+#
+# Prohibition entries carry a "prohibition" key with material_keywords and
+# environment_condition for deterministic NONCOMPLIANT evaluation.
+
+standard_version: "C"
+source_document: "NASA-STD-6016C"
+source_document_version: "Rev C w/CHANGE 2"
+last_updated: "2026-03-14"
+
+mprs:
+
+  # ===========================================================================
+  # SECTION 4 - GENERAL REQUIREMENTS (MPR 7-8)
+  # ===========================================================================
+  - mpr_number: 7
+    mpr_id: "MPR-007"
+    section: "4"
+    title: "Useful Life Requirements"
+    shall_text: "Materials shall meet the worst-case useful-life requirements for the particular application."
+    verification_method: "Analysis/Test"
+    applicability_triggers:
+      - "always"
+    related_failure_modes:
+      - "missing_input"
+    priority: 10
+
+  - mpr_number: 8
+    mpr_id: "MPR-008"
+    section: "4"
+    title: "GSE/Test Equipment M&P Controls"
+    shall_text: "M&P used in interfacing GSE, test equipment, hardware packaging, and hardware shipment shall be controlled to prevent damage to or contamination of spaceflight hardware."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 45
+
+  # ===========================================================================
+  # SECTION 4.1.1 - M&P PLAN CONTENT (MPR 9-14)
+  # ===========================================================================
+  - mpr_number: 9
+    mpr_id: "MPR-009"
+    section: "4.1.1"
+    title: "M&P Plan Requirement"
+    shall_text: "Each organization responsible for design and fabrication of spaceflight hardware shall provide a Materials and Processes Selection, Control, and Implementation Plan."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 5
+
+  - mpr_number: 10
+    mpr_id: "MPR-010"
+    section: "4.1.1"
+    title: "Subcontractor Compliance"
+    shall_text: "The M&P Plan shall also describe the methods used to control compliance by subcontractors and vendors."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 10
+
+  - mpr_number: 11
+    mpr_id: "MPR-011"
+    section: "4.1.1"
+    title: "M&P Plan as Implementation Document"
+    shall_text: "Upon approval by the procuring activity, the M&P Plan shall become the M&P implementation document used for verification."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 10
+
+  - mpr_number: 12
+    mpr_id: "MPR-012"
+    section: "4.1.1.1"
+    title: "Drawing Coordination"
+    shall_text: "The M&P Plan shall identify the method of coordinating, approving, and tracking all engineering drawings."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 15
+
+  - mpr_number: 13
+    mpr_id: "MPR-013"
+    section: "4.1.1.2"
+    title: "M&P Drawing Approval"
+    shall_text: "The M&P Plan shall include a requirement that all hardware design drawings and revisions for spaceflight hardware have M&P approval signature."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 15
+
+  - mpr_number: 14
+    mpr_id: "MPR-014"
+    section: "4.1.1.3"
+    title: "Manufacturing Participation"
+    shall_text: "The M&P Plan shall identify how the responsible M&P organization participates in manufacturing and processing."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 15
+
+  # ===========================================================================
+  # SECTION 4.1.2 - SPECIFICATIONS & DRAWINGS (MPR 15-21)
+  # ===========================================================================
+  - mpr_number: 15
+    mpr_id: "MPR-015"
+    section: "4.1.2"
+    title: "M&P Defined by Standards"
+    shall_text: "All M&P for spaceflight hardware providing mission-critical functions shall be defined by standards and specifications."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 20
+
+  - mpr_number: 16
+    mpr_id: "MPR-016"
+    section: "4.1.2"
+    title: "Drawing Identification"
+    shall_text: "All M&P for spaceflight hardware providing mission-critical functions shall be identified directly on the appropriate engineering drawing."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 20
+
+  - mpr_number: 17
+    mpr_id: "MPR-017"
+    section: "4.1.2"
+    title: "Company Specs in Plan"
+    shall_text: "Company M&P specifications shall be identified by document number in the M&P Plan."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 25
+
+  - mpr_number: 18
+    mpr_id: "MPR-018"
+    section: "4.1.2"
+    title: "Specs Available to NASA"
+    shall_text: "All M&P specifications used to produce spaceflight hardware providing mission-critical functions shall be made available to NASA."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 25
+
+  - mpr_number: 19
+    mpr_id: "MPR-019"
+    section: "4.1.2"
+    title: "Process Specification Detail"
+    shall_text: "Process specifications for spaceflight hardware providing mission-critical functions shall define process steps at a level ensuring repeatable/controlled process."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 25
+
+  - mpr_number: 20
+    mpr_id: "MPR-020"
+    section: "4.1.2"
+    title: "Process Qualification"
+    shall_text: "Process qualification shall be conducted to demonstrate the repeatability of all processes for spaceflight hardware providing mission-critical functions."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 25
+
+  - mpr_number: 21
+    mpr_id: "MPR-021"
+    section: "4.1.2.1"
+    title: "Standards Update Evaluation"
+    shall_text: "A process shall be established for ensuring that updated, alternate, or new material or process standards are evaluated."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 30
+
+  # ===========================================================================
+  # SECTION 4.1.3-4.1.5 - COTS, PANEL, MIUL (MPR 22-27)
+  # ===========================================================================
+  - mpr_number: 22
+    mpr_id: "MPR-022"
+    section: "4.1.3"
+    title: "Vendor/COTS M&P Coverage"
+    shall_text: "A procedure shall be established to ensure that all vendor-designed, off-the-shelf, and vendor-furnished items are covered by M&P requirements."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "cots"
+    related_failure_modes: []
+    priority: 25
+
+  - mpr_number: 23
+    mpr_id: "MPR-023"
+    section: "4.1.4"
+    title: "M&P Control Panel"
+    shall_text: "An M&P control panel shall be established by each contractor hardware provider."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 20
+
+  - mpr_number: 24
+    mpr_id: "MPR-024"
+    section: "4.1.4"
+    title: "Panel Scope in Plan"
+    shall_text: "The M&P control panel scope and membership shall be described in the M&P Plan."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 20
+
+  - mpr_number: 25
+    mpr_id: "MPR-025"
+    section: "4.1.5"
+    title: "MIUL Documentation"
+    shall_text: "M&P usage shall be documented in an electronic, searchable parts list or separate MIUL."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 15
+
+  - mpr_number: 26
+    mpr_id: "MPR-026"
+    section: "4.1.5"
+    title: "Final Design Coverage"
+    shall_text: "The documentation of M&P usage shall cover the final design as delivered."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 20
+
+  - mpr_number: 27
+    mpr_id: "MPR-027"
+    section: "4.1.5"
+    title: "Documentation Approach in Plan"
+    shall_text: "The documentation approach shall be defined in the M&P Plan."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 20
+
+  # ===========================================================================
+  # SECTION 4.1.6-4.1.7 - MUA & CERTIFICATION (MPR 28-32)
+  # ===========================================================================
+  - mpr_number: 28
+    mpr_id: "MPR-028"
+    section: "4.1.6"
+    title: "MUA Submittal"
+    shall_text: "MUAs containing sufficient information to demonstrate acceptability shall be submitted by the responsible M&P organization."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "nonconforming"
+    related_failure_modes:
+      - "flam"
+      - "hee"
+      - "o2_prohibited"
+      - "o2_restricted"
+    priority: 10
+
+  - mpr_number: 29
+    mpr_id: "MPR-029"
+    section: "4.1.6"
+    title: "MUA Prohibition for Nonconforming Product"
+    shall_text: "MUAs shall not be used to change the M&P requirements for a nonconforming product."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "nonconforming"
+    related_failure_modes: []
+    priority: 5
+
+  - mpr_number: 30
+    mpr_id: "MPR-030"
+    section: "4.1.7"
+    title: "Material Certification"
+    shall_text: "All parts or materials for spaceflight hardware providing mission-critical functions shall be certified as to composition, properties, and requirements."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "always"
+    related_failure_modes:
+      - "missing_input"
+    priority: 20
+
+  - mpr_number: 31
+    mpr_id: "MPR-031"
+    section: "4.1.7"
+    title: "Material Traceability"
+    shall_text: "With the exception of off-the-shelf parts, parts and materials used in critical applications shall be traceable."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "always"
+    related_failure_modes:
+      - "missing_input"
+    priority: 25
+
+  - mpr_number: 32
+    mpr_id: "MPR-032"
+    section: "4.1.7"
+    title: "Distributor Heat Treatment Prohibition"
+    shall_text: "Distributors or other processors shall not heat treat, hot work, or cold work metal stock unless they take responsibilities as the producer."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "metallic_material"
+      - "heat_treated"
+    related_failure_modes:
+      - "scc"
+      - "hee"
+    priority: 20
+
+  # ===========================================================================
+  # SECTION 4.1.8 - DESIGN VALUES (MPR 33-42)
+  # ===========================================================================
+  - mpr_number: 33
+    mpr_id: "MPR-033"
+    section: "4.1.8"
+    title: "Statistical Design Values"
+    shall_text: "A, B, or S-basis statistical values for mechanical properties shall be utilized for design and analysis."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "metallic_material"
+    related_failure_modes:
+      - "fs"
+    priority: 20
+
+  - mpr_number: 35
+    mpr_id: "MPR-035"
+    section: "4.1.8.1"
+    title: "MMPDS Values"
+    shall_text: "A, B, or S-basis statistical methods shall be defined by, and values taken from MMPDS."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "metallic_material"
+    related_failure_modes:
+      - "fs"
+    priority: 20
+
+  - mpr_number: 39
+    mpr_id: "MPR-039"
+    section: "4.1.8.2"
+    title: "Property Data Availability"
+    shall_text: "All contractor-developed mechanical and physical property data shall be made available to the responsible NASA M&P organization."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 30
+
+  - mpr_number: 40
+    mpr_id: "MPR-040"
+    section: "4.1.8.2"
+    title: "B-Value Redundant Structure Only"
+    shall_text: "Material B design values shall not be used except in redundant structure."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "metallic_material"
+    related_failure_modes:
+      - "fs"
+    priority: 15
+
+  - mpr_number: 42
+    mpr_id: "MPR-042"
+    section: "4.1.8.3"
+    title: "Structural Fastener Design Values"
+    shall_text: "Structural fastener design values shall be defined by minimum load test requirements."
+    verification_method: "Test"
+    applicability_triggers:
+      - "fastener"
+    related_failure_modes:
+      - "fs"
+    priority: 20
+
+  # ===========================================================================
+  # SECTION 4.2.1 - FLAMMABILITY, OFFGASSING, COMPATIBILITY (MPR 43-56)
+  # ===========================================================================
+  - mpr_number: 43
+    mpr_id: "MPR-043"
+    section: "4.2.1"
+    title: "Flammability/Offgassing/Compatibility - General"
+    shall_text: "Materials shall meet the requirements of NASA-STD-6001B, Flammability, Offgassing, and Compatibility."
+    verification_method: "Test"
+    applicability_triggers:
+      - "habitable"
+      - "oxygen_service"
+    related_failure_modes:
+      - "flam"
+      - "offgas"
+      - "tox"
+    priority: 5
+
+  - mpr_number: 44
+    mpr_id: "MPR-044"
+    section: "4.2.4.3"
+    title: "Flammability - Use Limitations"
+    shall_text: "Materials not meeting flammability requirements shall be controlled through approved closure paths."
+    verification_method: "Analysis/Documentation"
+    applicability_triggers:
+      - "habitable"
+      - "oxygen_service"
+    related_failure_modes:
+      - "flam"
+      - "o2_prohibited"
+      - "o2_restricted"
+    exceptions:
+      - path: "MINOR_QUANTITY"
+        citation: "4.2.4.3(c)"
+        description: "Materials may be used if total mass <45g AND surface area <13cm² in aggregated zone"
+      - path: "CONFIGURATION_ANALYSIS"
+        citation: "4.2.4.3(h)"
+        description: "Materials may be used if configuration analysis demonstrates self-extinguishing behavior"
+      - path: "HEAT_SINK"
+        citation: "4.2.4.3(g)"
+        description: "Materials may be used if bonded to metal heat sink meeting mass ratio requirements"
+      - path: "SUBSTITUTION"
+        citation: "4.2.4.3(a)"
+        description: "Alternative A-rated material available and acceptable"
+      - path: "TEST_PROGRAM"
+        citation: "4.2.4.3(i)"
+        description: "Additional testing at use conditions demonstrates compliance"
+      - path: "FULL_MUA"
+        citation: "4.2.4.3(j)"
+        description: "Material Usage Agreement with full engineering rationale"
+    priority: 5
+
+  - mpr_number: 45
+    mpr_id: "MPR-045"
+    section: "4.2.4.4"
+    title: "Flammability - Oxygen Service"
+    shall_text: "Materials in oxygen service shall be evaluated for ignition and combustion in the maximum expected oxygen concentration."
+    verification_method: "Test/Analysis"
+    applicability_triggers:
+      - "oxygen_service"
+    related_failure_modes:
+      - "flam"
+      - "o2_prohibited"
+    priority: 10
+
+  - mpr_number: 46
+    mpr_id: "MPR-046"
+    section: "4.2.1.2"
+    title: "SMAC Values"
+    shall_text: "Spacecraft maximum allowable concentration (SMAC) values shall be obtained from JSC 20584."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "habitable"
+    related_failure_modes:
+      - "tox"
+    priority: 20
+
+  - mpr_number: 47
+    mpr_id: "MPR-047"
+    section: "4.2.1.3"
+    title: "Fluid Compatibility MUA"
+    shall_text: "An MUA shall be written rationalizing the selection of materials for fluid compatibility."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "fluid_contact"
+    related_failure_modes:
+      - "corr"
+    priority: 20
+
+  - mpr_number: 49
+    mpr_id: "MPR-049"
+    section: "4.2.1.3"
+    title: "Long-Term Degradation"
+    shall_text: "Materials degradation in long-term tests shall be characterized by post-test analyses."
+    verification_method: "Test"
+    applicability_triggers:
+      - "fluid_contact"
+    related_failure_modes:
+      - "corr"
+    priority: 30
+
+  - mpr_number: 50
+    mpr_id: "MPR-050"
+    section: "4.2.1.3"
+    title: "Weld/HAZ Compatibility"
+    shall_text: "The effect of material condition (parent vs. weld metal or HAZ) shall be addressed in compatibility determination."
+    verification_method: "Test/Analysis"
+    applicability_triggers:
+      - "welded"
+      - "fluid_contact"
+    related_failure_modes:
+      - "corr"
+    priority: 30
+
+  - mpr_number: 51
+    mpr_id: "MPR-051"
+    section: "4.2.1.4"
+    title: "Oxygen Compatibility Evaluation"
+    shall_text: "Materials and components in oxygen systems shall be evaluated for oxygen compatibility."
+    verification_method: "Test/Analysis"
+    applicability_triggers:
+      - "oxygen_service"
+    related_failure_modes:
+      - "flam"
+      - "o2_prohibited"
+    priority: 10
+
+  - mpr_number: 52
+    mpr_id: "MPR-052"
+    section: "4.2.1.4"
+    title: "Oxygen Compatibility Assessment"
+    shall_text: "When materials are determined flammable, an oxygen compatibility assessment shall be conducted per NASA-STD-6001B."
+    verification_method: "Test/Analysis"
+    applicability_triggers:
+      - "oxygen_service"
+    related_failure_modes:
+      - "flam"
+      - "o2_prohibited"
+    priority: 10
+
+  - mpr_number: 54
+    mpr_id: "MPR-054"
+    section: "4.2.1.5"
+    title: "Wire Insulation Flammability"
+    shall_text: "Electrical wire insulation materials shall be evaluated for flammability per NASA-STD-6001B, Test 4 or Test 1."
+    verification_method: "Test"
+    applicability_triggers:
+      - "wiring"
+      - "cable"
+    related_failure_modes:
+      - "flam"
+    priority: 15
+
+  - mpr_number: 55
+    mpr_id: "MPR-055"
+    section: "4.2.1.5"
+    title: "Arc Tracking"
+    shall_text: "Arc tracking shall be evaluated per NASA-STD-6001B, Test 18."
+    verification_method: "Test"
+    applicability_triggers:
+      - "wiring"
+      - "cable"
+    related_failure_modes:
+      - "flam"
+    priority: 20
+
+  - mpr_number: 53
+    mpr_id: "MPR-053"
+    section: "4.2.5.2"
+    title: "Offgassing - Trace Contaminants"
+    shall_text: "Material offgassing shall not exceed spacecraft maximum allowable concentration (SMAC) limits for individual compounds."
+    verification_method: "Test/Analysis"
+    applicability_triggers:
+      - "habitable"
+    related_failure_modes:
+      - "offgas"
+      - "tox"
+    priority: 20
+
+  - mpr_number: 56
+    mpr_id: "MPR-056"
+    section: "4.2.5.5"
+    title: "Odor"
+    shall_text: "Materials in habitable volumes shall not produce objectionable odors."
+    verification_method: "Test"
+    applicability_triggers:
+      - "habitable"
+    related_failure_modes:
+      - "odor"
+    priority: 40
+
+  # ===========================================================================
+  # SECTION 4.2.2 - METALS (MPR 57-88)
+  # Includes PROHIBITION entries for deterministic NONCOMPLIANT evaluation
+  # ===========================================================================
+
+  # --- Aluminum ---
+  - mpr_number: 57
+    mpr_id: "MPR-057"
+    section: "4.2.2.1"
+    title: "Aluminum 5xxx Magnesium Content Temperature Limit"
+    shall_text: "The 5000-series alloys containing more than 3% magnesium shall not be used where temperature exceeds 66°C (150°F)."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "aluminum_alloy"
+    related_failure_modes:
+      - "scc"
+      - "corr"
+    priority: 10
+    prohibition:
+      type: "material_temperature"
+      material_keywords: ["5052", "5056", "5083", "5086", "5154", "5356", "5454", "5456"]
+      max_temp_c: 66.0
+      rationale: "5xxx Al >3% Mg sensitizes above 66°C, leading to intergranular corrosion and SCC"
+
+  # --- Steel ---
+  - mpr_number: 59
+    mpr_id: "MPR-059"
+    section: "4.2.2.2.1"
+    title: "High-Strength Steel Machining Verification"
+    shall_text: "The absence of machining damage for high-strength steels shall be verified by microexamination."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "high_strength_alloy"
+    related_failure_modes:
+      - "fs"
+      - "scc"
+    priority: 20
+
+  - mpr_number: 60
+    mpr_id: "MPR-060"
+    section: "4.2.2.2.2"
+    title: "Unstabilized Austenitic Steel Temperature Limit"
+    shall_text: "Unstabilized, austenitic steels shall not be processed or used above 371°C (700°F)."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "metallic_material"
+    related_failure_modes:
+      - "scc"
+      - "corr"
+    priority: 10
+    prohibition:
+      type: "material_temperature"
+      material_keywords: ["304", "316", "304l", "316l", "321"]
+      exclude_keywords: ["321", "347", "stabilized"]
+      max_temp_c: 371.0
+      rationale: "Unstabilized austenitic steels sensitize above 371°C, causing intergranular corrosion"
+
+  - mpr_number: 62
+    mpr_id: "MPR-062"
+    section: "4.2.2.2.2"
+    title: "Free-Machining Steel Prohibition"
+    shall_text: "Free-machining alloys (such as 303) shall not be used in mission-critical functions where corrosion is a concern."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "metallic_material"
+    related_failure_modes:
+      - "corr"
+    priority: 15
+    prohibition:
+      type: "material_ban"
+      material_keywords: ["303", "free-machining", "free machining"]
+      rationale: "Free-machining steels contain sulfur/selenium inclusions that create corrosion initiation sites"
+
+  - mpr_number: 63
+    mpr_id: "MPR-063"
+    section: "4.2.2.2.3"
+    title: "Steel Ductile-Brittle Transition"
+    shall_text: "Steels shall not be used in tension below their ductile-brittle transition temperature."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "metallic_material"
+      - "cryogenic"
+    related_failure_modes:
+      - "fs"
+    priority: 10
+
+  # --- Titanium ---
+  - mpr_number: 65
+    mpr_id: "MPR-065"
+    section: "4.2.2.3.1"
+    title: "Titanium Surface Condition"
+    shall_text: "Surfaces of titanium mill products for mission-critical functions shall be 100% machined, chemically milled, or pickled."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "titanium"
+    related_failure_modes:
+      - "fs"
+      - "scc"
+    priority: 20
+
+  - mpr_number: 67
+    mpr_id: "MPR-067"
+    section: "4.2.2.3.3"
+    title: "Titanium LOX/GOX Prohibition"
+    shall_text: "Titanium alloys shall not be used with LOX or GOX at any pressure or with air at oxygen partial pressures above 35 kPa."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "titanium"
+    related_failure_modes:
+      - "flam"
+      - "o2_prohibited"
+    priority: 1
+    prohibition:
+      type: "material_environment"
+      material_keywords: ["titanium", "ti-6al-4v", "ti-", "ti 6al", "ti6al", "cp-ti", "imi"]
+      environment_condition: "oxygen_service"
+      rationale: "Titanium is impact-sensitive and can ignite in LOX/GOX environments at any pressure"
+
+  - mpr_number: 68
+    mpr_id: "MPR-068"
+    section: "4.2.2.3.3"
+    title: "Titanium Machining Prohibition in Spacecraft"
+    shall_text: "Titanium alloys shall not be machined inside spacecraft modules during ground processing or in flight."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "titanium"
+      - "habitable"
+    related_failure_modes:
+      - "flam"
+    priority: 5
+
+  # --- Magnesium ---
+  - mpr_number: 69
+    mpr_id: "MPR-069"
+    section: "4.2.2.4"
+    title: "Magnesium Primary Structure Prohibition"
+    shall_text: "Magnesium alloys shall not be used in primary structure or mission-critical functions subject to damage, abrasion, erosion, or moisture entrapment."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "magnesium"
+    related_failure_modes:
+      - "flam"
+      - "corr"
+    priority: 5
+    prohibition:
+      type: "material_ban"
+      material_keywords: ["magnesium", "az31", "az61", "az80", "ze41", "am60", "am50"]
+      rationale: "Magnesium is highly flammable and susceptible to galvanic corrosion in structural applications"
+
+  - mpr_number: 70
+    mpr_id: "MPR-070"
+    section: "4.2.2.4"
+    title: "Magnesium Machining Prohibition in Spacecraft"
+    shall_text: "Magnesium alloys shall not be machined inside spacecraft modules."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "magnesium"
+      - "habitable"
+    related_failure_modes:
+      - "flam"
+    priority: 5
+
+  # --- Beryllium ---
+  - mpr_number: 71
+    mpr_id: "MPR-071"
+    section: "4.2.2.5"
+    title: "Beryllium Structural Limitation"
+    shall_text: "Alloys containing more than 4% beryllium by weight shall not be used for primary structural applications."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "beryllium"
+    related_failure_modes:
+      - "fs"
+    priority: 10
+    prohibition:
+      type: "material_application"
+      material_keywords: ["beryllium", "becu", "be-cu"]
+      rationale: "Beryllium has low impact resistance and notch sensitivity unsuitable for primary structure"
+
+  - mpr_number: 72
+    mpr_id: "MPR-072"
+    section: "4.2.2.5"
+    title: "Beryllium Crew Compartment Restriction"
+    shall_text: "Alloys containing more than 4% beryllium shall not be used within spacecraft crew compartments unless suitably protected."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "beryllium"
+      - "habitable"
+    related_failure_modes:
+      - "tox"
+    priority: 5
+
+  - mpr_number: 75
+    mpr_id: "MPR-075"
+    section: "4.2.2.5"
+    title: "Beryllium Machining Prohibition"
+    shall_text: "Beryllium-containing alloys and oxides of beryllium shall not be machined inside spacecraft crew compartments."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "beryllium"
+      - "habitable"
+    related_failure_modes:
+      - "tox"
+    priority: 1
+
+  # --- Cadmium ---
+  - mpr_number: 77
+    mpr_id: "MPR-077"
+    section: "4.2.2.6"
+    title: "Cadmium Prohibition"
+    shall_text: "Cadmium shall not be used in crew or vacuum environments."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "always"
+    related_failure_modes:
+      - "tox"
+      - "corr"
+    priority: 1
+    prohibition:
+      type: "material_environment"
+      material_keywords: ["cadmium", "cd plat", "cd-plat", "cadmium plat"]
+      environment_condition: "habitable_or_vacuum"
+      rationale: "Cadmium sublimates in vacuum and is toxic in habitable volumes"
+
+  - mpr_number: 78
+    mpr_id: "MPR-078"
+    section: "4.2.2.6"
+    title: "Cadmium Tooling Prohibition"
+    shall_text: "Cadmium-plated tools and other hardware shall not be used in manufacture or testing of mission-critical spaceflight hardware."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "always"
+    related_failure_modes:
+      - "corr"
+    priority: 5
+
+  # --- Zinc ---
+  - mpr_number: 79
+    mpr_id: "MPR-079"
+    section: "4.2.2.7"
+    title: "Zinc Plating Prohibition"
+    shall_text: "Zinc plating other than black zinc-nickel plating shall not be used in mission-critical functions."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "zinc_plating"
+    related_failure_modes:
+      - "corr"
+    priority: 10
+    prohibition:
+      type: "material_ban"
+      material_keywords: ["zinc plat", "zn plat", "zinc coat"]
+      exclude_keywords: ["zinc-nickel", "zn-ni", "black zinc"]
+      rationale: "Zinc plating grows whiskers that cause electrical shorts"
+
+  # --- Mercury ---
+  - mpr_number: 80
+    mpr_id: "MPR-080"
+    section: "4.2.2.8"
+    title: "Mercury Equipment Prohibition"
+    shall_text: "Equipment containing mercury shall not be used where mercury could contact spaceflight equipment."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "always"
+    related_failure_modes:
+      - "corr"
+    priority: 1
+    prohibition:
+      type: "material_ban"
+      material_keywords: ["mercury", "hg"]
+      rationale: "Mercury causes liquid metal embrittlement in aluminum and other alloys"
+
+  - mpr_number: 81
+    mpr_id: "MPR-081"
+    section: "4.2.2.8"
+    title: "Mercury Containment"
+    shall_text: "Spaceflight hardware containing mercury shall have three levels of containment."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "mercury"
+    related_failure_modes:
+      - "corr"
+    priority: 5
+
+  # --- Tin ---
+  - mpr_number: 86
+    mpr_id: "MPR-086"
+    section: "4.2.2.11"
+    title: "Tin Whisker Mitigation"
+    shall_text: "Tin and tin plating shall be alloyed with at least 3% lead by weight to prevent tin whisker growth."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "tin_plating"
+    related_failure_modes:
+      - "corr"
+    priority: 15
+
+  - mpr_number: 88
+    mpr_id: "MPR-088"
+    section: "4.2.2.11"
+    title: "Tin Plating Electrical Contact Prohibition"
+    shall_text: "Tin plating shall not be used for contacts in electrical interconnects for mission-critical hardware."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "tin_plating"
+    related_failure_modes:
+      - "corr"
+    priority: 10
+    prohibition:
+      type: "material_ban"
+      material_keywords: ["tin plat", "sn plat", "tin coat"]
+      rationale: "Tin whisker growth risk on electrical contacts"
+
+  # ===========================================================================
+  # SECTION 4.2.2 - METALS: SCC & CORROSION (from existing + real standard)
+  # ===========================================================================
+  - mpr_number: 73
+    mpr_id: "MPR-073"
+    section: "4.2.2"
+    title: "SCC Resistance - General"
+    shall_text: "MSFC-STD-3029A shall be used to select metallic materials for stress corrosion cracking resistance."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "metallic_material"
+    related_failure_modes:
+      - "scc"
+    priority: 15
+
+  - mpr_number: 74
+    mpr_id: "MPR-074"
+    section: "4.2.2"
+    title: "SCC - High Strength Alloys"
+    shall_text: "High-strength alloys shall be limited to SCC-resistant heat treatments and stress levels."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "high_strength_alloy"
+    related_failure_modes:
+      - "scc"
+    priority: 15
+
+  # --- Dissimilar Metals / Galvanic ---
+  - mpr_number: 76
+    mpr_id: "MPR-076"
+    section: "4.2.6.3.2"
+    title: "Galvanic Corrosion"
+    shall_text: "Dissimilar metal combinations shall be evaluated for galvanic corrosion compatibility."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "dissimilar_metals"
+    related_failure_modes:
+      - "corr"
+    priority: 20
+
+  # --- HEE (Hydrogen Embrittlement) ---
+  - mpr_number: 82
+    mpr_id: "MPR-082"
+    section: "4.2.6.4"
+    title: "Hydrogen Embrittlement - General"
+    shall_text: "Materials in hydrogen service shall be evaluated for hydrogen environment embrittlement susceptibility."
+    verification_method: "Test/Analysis"
+    applicability_triggers:
+      - "hydrogen_service"
+    related_failure_modes:
+      - "hee"
+    priority: 10
+
+  - mpr_number: 83
+    mpr_id: "MPR-083"
+    section: "4.2.6.4"
+    title: "Hydrogen Embrittlement - Material Selection"
+    shall_text: "Materials shall be selected from HEE-resistant alloys per NASA/TM-2016-218602 or equivalent."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "hydrogen_service"
+    related_failure_modes:
+      - "hee"
+    priority: 10
+
+  - mpr_number: 84
+    mpr_id: "MPR-084"
+    section: "4.2.6.4"
+    title: "HEE Testing"
+    shall_text: "HEE testing shall be conducted at the maximum expected hydrogen pressure and minimum temperature."
+    verification_method: "Test"
+    applicability_triggers:
+      - "hydrogen_service"
+      - "high_pressure"
+    related_failure_modes:
+      - "hee"
+      - "test_condition_mismatch"
+    priority: 10
+
+  # ===========================================================================
+  # SECTION 4.2.3 - NONMETALS (MPR 89-101)
+  # ===========================================================================
+  - mpr_number: 89
+    mpr_id: "MPR-089"
+    section: "4.2.3"
+    title: "Elastomer Selection"
+    shall_text: "Elastomeric materials for mission-critical functions shall be selected to operate within design parameters for useful life."
+    verification_method: "Test/Analysis"
+    applicability_triggers:
+      - "elastomer"
+      - "seal"
+      - "gasket"
+    related_failure_modes:
+      - "offgas"
+      - "flam"
+    priority: 20
+
+  - mpr_number: 90
+    mpr_id: "MPR-090"
+    section: "4.2.3.1"
+    title: "Elastomer Cure Dating"
+    shall_text: "Elastomeric materials for mission-critical functions shall be cure-dated for tracking purposes."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "elastomer"
+    related_failure_modes:
+      - "missing_input"
+    priority: 30
+
+  - mpr_number: 91
+    mpr_id: "MPR-091"
+    section: "4.2.3.1"
+    title: "RTV Silicone Acetic Acid Prohibition"
+    shall_text: "RTV silicones that liberate acetic acid during cure shall not be used (they cause corrosion)."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "nonmetallic_material"
+    related_failure_modes:
+      - "corr"
+    priority: 10
+    prohibition:
+      type: "material_ban"
+      material_keywords: ["rtv", "silicone rtv", "acetoxy"]
+      exclude_keywords: ["neutral cure", "oxime", "alkoxy"]
+      rationale: "Acetic acid from acetoxy-cure RTV silicones corrodes metals and electronics"
+
+  - mpr_number: 93
+    mpr_id: "MPR-093"
+    section: "4.2.3.2"
+    title: "PVC Temperature Limit"
+    shall_text: "Use of polyvinyl chloride on spaceflight hardware shall be limited to pressurized areas where temps do not exceed 49°C (120°F)."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "nonmetallic_material"
+    related_failure_modes:
+      - "tox"
+      - "flam"
+    priority: 15
+    prohibition:
+      type: "material_temperature"
+      material_keywords: ["pvc", "polyvinyl chloride", "vinyl"]
+      max_temp_c: 49.0
+      rationale: "PVC decomposes above 49°C releasing HCl which is toxic and corrosive"
+
+  - mpr_number: 94
+    mpr_id: "MPR-094"
+    section: "4.2.3.5"
+    title: "Useful Life / Limited-Life Items"
+    shall_text: "All materials shall be selected to meet useful life with no maintenance or be identified as limited-life items."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "always"
+    related_failure_modes:
+      - "missing_input"
+    priority: 25
+
+  - mpr_number: 97
+    mpr_id: "MPR-097"
+    section: "4.2.3.7"
+    title: "External Environment Material Properties"
+    shall_text: "The critical properties of materials exposed in the spacecraft external environment shall meet operational requirements for intended life-cycle exposure."
+    verification_method: "Test/Analysis"
+    applicability_triggers:
+      - "external_environment"
+      - "vacuum"
+    related_failure_modes:
+      - "offgas"
+      - "corr"
+    priority: 20
+
+  - mpr_number: 100
+    mpr_id: "MPR-100"
+    section: "4.2.3.10"
+    title: "PTFE/PFA/FEP Etching"
+    shall_text: "Etching of PTFE, PFA, and FEP shall meet requirements of SAE AMS2491F."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "nonmetallic_material"
+    related_failure_modes:
+      - "fs"
+    priority: 35
+
+  # ===========================================================================
+  # SECTION 4.2.4 - PROCESSES (MPR 102-174) - Key entries only
+  # ===========================================================================
+  - mpr_number: 102
+    mpr_id: "MPR-102"
+    section: "4.2.4.1"
+    title: "Heat Treatment - Aluminum"
+    shall_text: "Heat treatment of aluminum alloys for mission-critical functions shall meet SAE AMS2772G requirements."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "aluminum_alloy"
+      - "heat_treated"
+    related_failure_modes:
+      - "scc"
+      - "fs"
+    priority: 25
+
+  - mpr_number: 104
+    mpr_id: "MPR-104"
+    section: "4.2.4.1"
+    title: "Heat Treatment - Titanium"
+    shall_text: "Heat treatment of titanium alloys for mission-critical functions shall meet SAE AMS-H-81200D requirements."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "titanium"
+      - "heat_treated"
+    related_failure_modes:
+      - "scc"
+      - "fs"
+    priority: 25
+
+  - mpr_number: 109
+    mpr_id: "MPR-109"
+    section: "4.2.4.1"
+    title: "Material Specification Limits"
+    shall_text: "Materials shall not be used outside limits of their procurement specification, heat treatment spec, or design values."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "always"
+    related_failure_modes:
+      - "fs"
+      - "scc"
+    priority: 15
+
+  - mpr_number: 130
+    mpr_id: "MPR-130"
+    section: "4.2.4.5"
+    title: "Structural Adhesive Bonding"
+    shall_text: "Structural adhesive bonding shall meet MSFC-SPEC-445A."
+    verification_method: "Inspection/Test"
+    applicability_triggers:
+      - "adhesive"
+      - "bonded"
+    related_failure_modes:
+      - "fs"
+    priority: 20
+
+  - mpr_number: 137
+    mpr_id: "MPR-137"
+    section: "4.2.4.6.1"
+    title: "Structural Welding - Class A"
+    shall_text: "Mission-critical structural welds shall comply with AWS D17.1/D17.1M, Class A requirements."
+    verification_method: "Inspection/Test"
+    applicability_triggers:
+      - "welded"
+    related_failure_modes:
+      - "fs"
+      - "corr"
+    priority: 15
+
+  - mpr_number: 144
+    mpr_id: "MPR-144"
+    section: "4.2.4.6.1"
+    title: "CP Titanium Filler Prohibition"
+    shall_text: "Commercially pure (CP) titanium filler shall not be used on Ti-6Al-4V or other alloyed base material."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "titanium"
+      - "welded"
+    related_failure_modes:
+      - "fs"
+    priority: 10
+    prohibition:
+      type: "process_ban"
+      material_keywords: ["cp titanium filler", "cp-ti filler", "commercially pure titanium filler"]
+      rationale: "CP Ti filler on alloyed Ti base creates weak joints with inadequate mechanical properties"
+
+  - mpr_number: 166
+    mpr_id: "MPR-166"
+    section: "4.2.4.8"
+    title: "Soldering Structural Prohibition"
+    shall_text: "Soldering shall not be used for structural applications."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "soldered"
+    related_failure_modes:
+      - "fs"
+    priority: 5
+    prohibition:
+      type: "process_ban"
+      material_keywords: ["solder", "soldered"]
+      rationale: "Soldered joints have insufficient strength for structural loading"
+
+  - mpr_number: 174
+    mpr_id: "MPR-174"
+    section: "4.2.4.11"
+    title: "Additive Manufacturing"
+    shall_text: "Spaceflight hardware by additive manufacturing shall be per NASA-STD-6030."
+    verification_method: "Test/Inspection"
+    applicability_triggers:
+      - "additive_manufacturing"
+    related_failure_modes:
+      - "fs"
+    priority: 15
+
+  # ===========================================================================
+  # SECTION 4.2.5 - NDE (MPR 175-180)
+  # ===========================================================================
+  - mpr_number: 175
+    mpr_id: "MPR-175"
+    section: "4.2.5.1"
+    title: "NDE Plan"
+    shall_text: "The NDE Plan shall address process for establishment, implementation, execution, and control of NDE."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 30
+
+  - mpr_number: 176
+    mpr_id: "MPR-176"
+    section: "4.2.5.1"
+    title: "NDE Plan Standard"
+    shall_text: "The NDE Plan shall meet the intent of MIL-HDBK-6870B."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 30
+
+  - mpr_number: 178
+    mpr_id: "MPR-178"
+    section: "4.2.5.1"
+    title: "NDE Personnel Certification"
+    shall_text: "Qualification/certification of NDE personnel shall comply with NAS 410."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 30
+
+  # ===========================================================================
+  # SECTION 4.2.6 - CORROSION/EMBRITTLEMENT/CONTAMINATION (MPR 191-209)
+  # ===========================================================================
+  - mpr_number: 191
+    mpr_id: "MPR-191"
+    section: "4.2.6.3.1"
+    title: "Corrosion-Resistant Steel Passivation"
+    shall_text: "Corrosion-resistant steels for mission-critical functions shall be passivated after machining."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "metallic_material"
+    related_failure_modes:
+      - "corr"
+    priority: 25
+
+  - mpr_number: 193
+    mpr_id: "MPR-193"
+    section: "4.2.6.4"
+    title: "Hydrogen Embrittlement MUA"
+    shall_text: "An MUA shall document hydrogen embrittlement assessment for hydrogen systems."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "hydrogen_service"
+    related_failure_modes:
+      - "hee"
+    priority: 15
+
+  - mpr_number: 195
+    mpr_id: "MPR-195"
+    section: "4.2.6.4"
+    title: "Electrochemical HEE Prevention"
+    shall_text: "Electrochemical processes during manufacturing shall be controlled to prevent hydrogen embrittlement."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "metallic_material"
+      - "plated"
+    related_failure_modes:
+      - "hee"
+    priority: 20
+
+  - mpr_number: 196
+    mpr_id: "MPR-196"
+    section: "4.2.6.5.1"
+    title: "Gold-Indium Contact Prohibition"
+    shall_text: "Gold shall not be used in contact with indium or indium alloy for mission-critical functions."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "gold_plating"
+    related_failure_modes:
+      - "corr"
+    priority: 5
+    prohibition:
+      type: "material_combination"
+      material_keywords: ["gold", "au"]
+      combination_keywords: ["indium", "in"]
+      rationale: "Gold-indium intermetallic compounds degrade joint integrity"
+
+  - mpr_number: 198
+    mpr_id: "MPR-198"
+    section: "4.2.6.5.2"
+    title: "Gold-Tin Contact Prohibition"
+    shall_text: "Gold-coated contacts shall not be mated with tin or tin alloy-coated contacts for separable interfaces in mission-critical hardware."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "gold_plating"
+      - "tin_plating"
+    related_failure_modes:
+      - "corr"
+    priority: 10
+    prohibition:
+      type: "material_combination"
+      material_keywords: ["gold", "au"]
+      combination_keywords: ["tin", "sn"]
+      rationale: "Gold-tin friction polymer formation causes increased contact resistance"
+
+  - mpr_number: 202
+    mpr_id: "MPR-202"
+    section: "4.2.6.6.2"
+    title: "Silver Atomic Oxygen Prohibition"
+    shall_text: "Silver-plated fasteners shall not be used in external applications exposed to atomic oxygen for more than 2 weeks."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "silver_plating"
+      - "external_environment"
+    related_failure_modes:
+      - "corr"
+    priority: 10
+    prohibition:
+      type: "material_environment"
+      material_keywords: ["silver plat", "ag plat", "silver coat"]
+      environment_condition: "external_environment"
+      rationale: "Atomic oxygen rapidly erodes silver plating"
+
+  # ===========================================================================
+  # SECTION 4.2.7 - CONTAMINATION & FOD (MPR 203-208)
+  # ===========================================================================
+  - mpr_number: 203
+    mpr_id: "MPR-203"
+    section: "4.2.7"
+    title: "Contamination Control Plan"
+    shall_text: "A Contamination Control Plan shall be generated per ASTM E1548."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 30
+
+  - mpr_number: 205
+    mpr_id: "MPR-205"
+    section: "4.2.7"
+    title: "FOD Prevention"
+    shall_text: "The FOD prevention program shall be established for all ground operations."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 35
+
+  - mpr_number: 206
+    mpr_id: "MPR-206"
+    section: "4.2.7"
+    title: "FOD Standard"
+    shall_text: "The FOD prevention program shall conform to NAS 412."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 35
+
+  - mpr_number: 207
+    mpr_id: "MPR-207"
+    section: "4.2.7"
+    title: "Cleanliness on Drawings"
+    shall_text: "Cleanliness levels for assembly- and subassembly-level hardware shall be identified on engineering drawings."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 35
+
+  - mpr_number: 208
+    mpr_id: "MPR-208"
+    section: "4.2.6.8"
+    title: "Packaging Protection"
+    shall_text: "Packaging shall protect spaceflight hardware from corrosion and contamination during shipping and storage."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "always"
+    related_failure_modes:
+      - "corr"
+    priority: 40
+
+  # ===========================================================================
+  # SECTION 4.3 - VERIFICATION (MPR 209)
+  # ===========================================================================
+  - mpr_number: 209
+    mpr_id: "MPR-209"
+    section: "4.3"
+    title: "Verification of Compliance"
+    shall_text: "Verification of compliance shall consist of specified steps, as a minimum."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 20
+
+  # ===========================================================================
+  # SECTION 4.2.1.4 - OXIDIZER COMPATIBILITY (MPR 210-212)
+  # ===========================================================================
+  - mpr_number: 210
+    mpr_id: "MPR-210"
+    section: "4.2.1.4"
+    title: "NTO Compatibility"
+    shall_text: "Materials used in nitrogen tetroxide systems shall be evaluated for compatibility."
+    verification_method: "Test"
+    applicability_triggers:
+      - "propellant_service"
+    related_failure_modes:
+      - "corr"
+      - "flam"
+    priority: 10
+
+  - mpr_number: 211
+    mpr_id: "MPR-211"
+    section: "4.2.1.4"
+    title: "NTO Flammability Assessment"
+    shall_text: "When materials are determined flammable, a nitrogen tetroxide compatibility assessment shall be conducted."
+    verification_method: "Test/Analysis"
+    applicability_triggers:
+      - "propellant_service"
+    related_failure_modes:
+      - "flam"
+    priority: 10
+
+  - mpr_number: 212
+    mpr_id: "MPR-212"
+    section: "4.2.1.4"
+    title: "Other Oxidizer Compatibility"
+    shall_text: "Materials used in other oxidizer systems shall be evaluated for potential ignition."
+    verification_method: "Test"
+    applicability_triggers:
+      - "oxidizer_service"
+    related_failure_modes:
+      - "flam"
+    priority: 10
+
+  # ===========================================================================
+  # SECTION 4.1.8 - DESIGN VALUES (MPR 34, 36-38) - No extraction data
+  # ===========================================================================
+  - mpr_number: 34
+    mpr_id: "MPR-034"
+    section: "4.1.8"
+    title: "Design Values - Additional Requirements"
+    shall_text: "See NASA-STD-6016C §4.1.8 for detailed requirements."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "metallic_material"
+    related_failure_modes: []
+    priority: 50
+
+  - mpr_number: 36
+    mpr_id: "MPR-036"
+    section: "4.1.8"
+    title: "Design Values - Supplemental"
+    shall_text: "See NASA-STD-6016C §4.1.8 for detailed requirements."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "metallic_material"
+    related_failure_modes: []
+    priority: 50
+
+  - mpr_number: 37
+    mpr_id: "MPR-037"
+    section: "4.1.8"
+    title: "Design Values - Testing"
+    shall_text: "See NASA-STD-6016C §4.1.8 for detailed requirements."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "metallic_material"
+    related_failure_modes: []
+    priority: 50
+
+  - mpr_number: 38
+    mpr_id: "MPR-038"
+    section: "4.1.8"
+    title: "Design Values - Documentation"
+    shall_text: "See NASA-STD-6016C §4.1.8 for detailed requirements."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "metallic_material"
+    related_failure_modes: []
+    priority: 50
+
+  # ===========================================================================
+  # SECTION 4.2.4 - FLAMMABILITY (MPR 41, 48)
+  # ===========================================================================
+  - mpr_number: 41
+    mpr_id: "MPR-041"
+    section: "4.2.4"
+    title: "Flammability - General Requirements"
+    shall_text: "Materials in habitable or oxygen-enriched environments shall meet flammability requirements."
+    verification_method: "Test"
+    applicability_triggers:
+      - "habitable"
+      - "oxygen_service"
+    related_failure_modes:
+      - "flam"
+    priority: 10
+
+  - mpr_number: 48
+    mpr_id: "MPR-048"
+    section: "4.2.4.7"
+    title: "Post-Fire Toxicity"
+    shall_text: "Materials in habitable volumes shall be evaluated for post-fire toxicity."
+    verification_method: "Test"
+    applicability_triggers:
+      - "habitable"
+    related_failure_modes:
+      - "flam"
+      - "tox"
+    priority: 15
+
+  # ===========================================================================
+  # SECTION 4.2.2 - METALS: ADDITIONAL (MPR 58, 61, 64, 66, 85, 87)
+  # ===========================================================================
+  - mpr_number: 58
+    mpr_id: "MPR-058"
+    section: "4.2.2.2.1"
+    title: "Steel Machining Procedures"
+    shall_text: "Machining procedures per referenced standards should be used for steel alloys in mission-critical functions."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "metallic_material"
+    related_failure_modes:
+      - "fs"
+    priority: 25
+
+  - mpr_number: 61
+    mpr_id: "MPR-061"
+    section: "4.2.2.2.2"
+    title: "Welded Assembly Solution Heat Treatment"
+    shall_text: "Welded assemblies in mission-critical functions shall be solution heat-treated."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "welded"
+      - "metallic_material"
+    related_failure_modes:
+      - "scc"
+      - "corr"
+    priority: 20
+
+  - mpr_number: 64
+    mpr_id: "MPR-064"
+    section: "4.2.6.3"
+    title: "Corrosion Protection - Metals"
+    shall_text: "See NASA-STD-6016C §4.2.6.3 for detailed requirements."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "metallic_material"
+    related_failure_modes: []
+    priority: 50
+
+  - mpr_number: 66
+    mpr_id: "MPR-066"
+    section: "4.2.6.5"
+    title: "Intermetallic Compatibility"
+    shall_text: "See NASA-STD-6016C §4.2.6.5 for detailed requirements."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "metallic_material"
+    related_failure_modes: []
+    priority: 50
+
+  - mpr_number: 85
+    mpr_id: "MPR-085"
+    section: "4.2.2.11"
+    title: "Tin Whisker Mitigation Requirements"
+    shall_text: "Tin whisker mitigation requirements shall be applied to all tin-plated surfaces."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "tin_plating"
+    related_failure_modes:
+      - "corr"
+    priority: 15
+
+  - mpr_number: 87
+    mpr_id: "MPR-087"
+    section: "4.2.2.11"
+    title: "Tin Pest Prevention"
+    shall_text: "Tin pest prevention measures shall be applied for tin-plated components in low-temperature environments."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "tin_plating"
+    related_failure_modes:
+      - "corr"
+    priority: 20
+
+  # ===========================================================================
+  # SECTION 4.2.3 - NONMETALS: ADDITIONAL (MPR 92, 95, 96, 98, 99, 101)
+  # ===========================================================================
+  - mpr_number: 92
+    mpr_id: "MPR-092"
+    section: "4.2.3.1"
+    title: "Elastomer Low-Temperature Verification"
+    shall_text: "When rubbers/elastomers are used at low temperatures, elastomeric properties shall be verified at the minimum use temperature."
+    verification_method: "Test"
+    applicability_triggers:
+      - "elastomer"
+      - "cryogenic"
+    related_failure_modes:
+      - "fs"
+    priority: 15
+
+  - mpr_number: 95
+    mpr_id: "MPR-095"
+    section: "4.2.3.6"
+    title: "Nonmetallic Material Outgassing"
+    shall_text: "See NASA-STD-6016C §4.2.3.6 for detailed requirements."
+    verification_method: "Test"
+    applicability_triggers:
+      - "nonmetallic_material"
+    related_failure_modes: []
+    priority: 50
+
+  - mpr_number: 96
+    mpr_id: "MPR-096"
+    section: "4.2.3.6"
+    title: "Cryogenic Optics Outgassing/WVR"
+    shall_text: "Outgassing and water vapor regained (WVR) requirements for cryogenic optics shall be evaluated."
+    verification_method: "Test"
+    applicability_triggers:
+      - "optical_surface"
+      - "cryogenic"
+    related_failure_modes:
+      - "offgas"
+    priority: 20
+
+  - mpr_number: 98
+    mpr_id: "MPR-098"
+    section: "4.2.3.8"
+    title: "Fungus Resistance"
+    shall_text: "Materials that are non-nutrient to fungus shall be used in spaceflight hardware."
+    verification_method: "Test"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 35
+
+  - mpr_number: 99
+    mpr_id: "MPR-099"
+    section: "4.2.3.9"
+    title: "Nonmetallic Material Aging"
+    shall_text: "See NASA-STD-6016C §4.2.3.9 for detailed requirements."
+    verification_method: "Test/Analysis"
+    applicability_triggers:
+      - "nonmetallic_material"
+    related_failure_modes: []
+    priority: 50
+
+  - mpr_number: 101
+    mpr_id: "MPR-101"
+    section: "4.2.3.10"
+    title: "Etched Surface Processing Window"
+    shall_text: "Etched surfaces shall be processed within 24 hours or within 1 year if packaged per applicable requirements."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "nonmetallic_material"
+    related_failure_modes:
+      - "fs"
+    priority: 30
+
+  # ===========================================================================
+  # SECTION 4.2.4.1 - HEAT TREATMENT (MPR 103, 105-108)
+  # ===========================================================================
+  - mpr_number: 103
+    mpr_id: "MPR-103"
+    section: "4.2.4.1"
+    title: "Heat Treatment - Steel Alloys"
+    shall_text: "Heat treatment of steel alloys shall meet SAE AMS-H-6875B requirements."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "metallic_material"
+      - "heat_treated"
+    related_failure_modes:
+      - "scc"
+      - "fs"
+    priority: 25
+
+  - mpr_number: 105
+    mpr_id: "MPR-105"
+    section: "4.2.4.1"
+    title: "Heat Treatment - Nickel/Cobalt Alloys"
+    shall_text: "Heat treatment of nickel and cobalt alloys shall meet SAE AMS2774E requirements."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "metallic_material"
+      - "heat_treated"
+    related_failure_modes:
+      - "scc"
+    priority: 25
+
+  - mpr_number: 106
+    mpr_id: "MPR-106"
+    section: "4.2.4.1"
+    title: "Process-Control Tensile-Test Coupons"
+    shall_text: "Process-control tensile-test coupons shall be taken from production part or from the same heat lot processed with the part."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "metallic_material"
+      - "heat_treated"
+    related_failure_modes:
+      - "fs"
+    priority: 30
+
+  - mpr_number: 107
+    mpr_id: "MPR-107"
+    section: "4.2.4.1"
+    title: "Tensile-Test Coupon Drawing Callout"
+    shall_text: "When process-control tensile-test coupons are required, the requirement shall be specified on the engineering drawing."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "metallic_material"
+    related_failure_modes:
+      - "fs"
+    priority: 30
+
+  - mpr_number: 108
+    mpr_id: "MPR-108"
+    section: "4.2.4.1"
+    title: "Non-MMPDS Tensile Acceptance Values"
+    shall_text: "If no tensile values are available in MMPDS, tensile-test acceptance values shall be specified on the engineering drawing."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "metallic_material"
+    related_failure_modes:
+      - "fs"
+    priority: 30
+
+  # ===========================================================================
+  # SECTION 4.2.4.2 - FORGINGS (MPR 110-117)
+  # ===========================================================================
+  - mpr_number: 110
+    mpr_id: "MPR-110"
+    section: "4.2.4.2"
+    title: "Forging Flow Lines"
+    shall_text: "Forging pattern should be essentially free from re-entrant and sharply folded flow lines."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "forged"
+    related_failure_modes:
+      - "fs"
+    priority: 25
+
+  - mpr_number: 111
+    mpr_id: "MPR-111"
+    section: "4.2.4.2"
+    title: "Forging First-Article Approval"
+    shall_text: "First-article approval and controls for production forgings shall be per SAE AMS2375D."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "forged"
+    related_failure_modes:
+      - "fs"
+    priority: 25
+
+  - mpr_number: 112
+    mpr_id: "MPR-112"
+    section: "4.2.4.2"
+    title: "Forging Mechanical Properties Testing"
+    shall_text: "Mechanical properties testing may include fracture, durability, or damage tolerance testing for forgings."
+    verification_method: "Test"
+    applicability_triggers:
+      - "forged"
+    related_failure_modes:
+      - "fs"
+    priority: 25
+
+  - mpr_number: 113
+    mpr_id: "MPR-113"
+    section: "4.2.4.2"
+    title: "Forging Prolongation Comparison"
+    shall_text: "Mechanical properties of prolongations for first article forgings shall be compared to control coupons."
+    verification_method: "Test"
+    applicability_triggers:
+      - "forged"
+    related_failure_modes:
+      - "fs"
+    priority: 25
+
+  - mpr_number: 114
+    mpr_id: "MPR-114"
+    section: "4.2.4.2"
+    title: "Forging First-Article Qualification"
+    shall_text: "First-article qualification for forgings shall include documented evidence of process capability."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "forged"
+    related_failure_modes:
+      - "fs"
+    priority: 25
+
+  - mpr_number: 115
+    mpr_id: "MPR-115"
+    section: "4.2.4.2"
+    title: "Forging Redesign Data Retention"
+    shall_text: "Data and results of tests on forging redesign shall be retained."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "forged"
+    related_failure_modes:
+      - "fs"
+      - "missing_input"
+    priority: 30
+
+  - mpr_number: 116
+    mpr_id: "MPR-116"
+    section: "4.2.4.2"
+    title: "Forging Production Prolongations"
+    shall_text: "Prolongations shall be obtained for each production forging in safety-critical applications."
+    verification_method: "Test"
+    applicability_triggers:
+      - "forged"
+      - "fracture_critical"
+    related_failure_modes:
+      - "fs"
+    priority: 15
+
+  - mpr_number: 117
+    mpr_id: "MPR-117"
+    section: "4.2.4.2"
+    title: "Forging Safety-Critical NDI"
+    shall_text: "Surface and volumetric NDI shall be performed on all safety-critical forgings."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "forged"
+      - "fracture_critical"
+    related_failure_modes:
+      - "fs"
+    priority: 15
+
+  # ===========================================================================
+  # SECTION 4.2.4.3 - CASTINGS (MPR 118-124)
+  # ===========================================================================
+  - mpr_number: 118
+    mpr_id: "MPR-118"
+    section: "4.2.4.3"
+    title: "Castings - SAE AMS2175A"
+    shall_text: "Castings for mission-critical functions shall meet SAE AMS2175A requirements."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "cast"
+    related_failure_modes:
+      - "fs"
+    priority: 20
+
+  - mpr_number: 119
+    mpr_id: "MPR-119"
+    section: "4.2.4.3"
+    title: "Casting First-Article Inspection"
+    shall_text: "Pre-production castings shall be subjected to first-article inspection."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "cast"
+    related_failure_modes:
+      - "fs"
+    priority: 25
+
+  - mpr_number: 120
+    mpr_id: "MPR-120"
+    section: "4.2.4.3"
+    title: "Casting Mechanical Property Comparison"
+    shall_text: "Mechanical properties in trim ring/protrusion of first article castings shall be compared to control coupons."
+    verification_method: "Test"
+    applicability_triggers:
+      - "cast"
+    related_failure_modes:
+      - "fs"
+    priority: 25
+
+  - mpr_number: 121
+    mpr_id: "MPR-121"
+    section: "4.2.4.3"
+    title: "Casting Production Consistency"
+    shall_text: "The same casting practice and heat-treating procedure shall be used for production as qualified in the first article."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "cast"
+    related_failure_modes:
+      - "fs"
+    priority: 20
+
+  - mpr_number: 122
+    mpr_id: "MPR-122"
+    section: "4.2.4.3"
+    title: "Castings - Additional Controls"
+    shall_text: "See NASA-STD-6016C §4.2.4.3 for detailed requirements."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "cast"
+    related_failure_modes: []
+    priority: 50
+
+  - mpr_number: 123
+    mpr_id: "MPR-123"
+    section: "4.2.4.3"
+    title: "Casting Periodic Cut-Ups"
+    shall_text: "Periodic cut-ups or functional testing shall be conducted for Class 1 and Class 2 castings."
+    verification_method: "Test"
+    applicability_triggers:
+      - "cast"
+    related_failure_modes:
+      - "fs"
+    priority: 25
+
+  - mpr_number: 124
+    mpr_id: "MPR-124"
+    section: "4.2.4.3"
+    title: "Casting Safety-Critical NDI"
+    shall_text: "Surface and volumetric NDI shall be performed on all safety-critical castings."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "cast"
+      - "fracture_critical"
+    related_failure_modes:
+      - "fs"
+    priority: 15
+
+  # ===========================================================================
+  # SECTION 4.2.4.4 - FORMED PANELS (MPR 125-129)
+  # ===========================================================================
+  - mpr_number: 125
+    mpr_id: "MPR-125"
+    section: "4.2.4.4"
+    title: "Formed Panel First-Article Inspection"
+    shall_text: "Pre-production panels shall undergo first-article inspection."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "formed_panel"
+    related_failure_modes:
+      - "fs"
+    priority: 25
+
+  - mpr_number: 126
+    mpr_id: "MPR-126"
+    section: "4.2.4.4"
+    title: "Formed Panel Property Comparison"
+    shall_text: "Mechanical properties of first production article formed panels shall be compared to qualification data."
+    verification_method: "Test"
+    applicability_triggers:
+      - "formed_panel"
+    related_failure_modes:
+      - "fs"
+    priority: 25
+
+  - mpr_number: 127
+    mpr_id: "MPR-127"
+    section: "4.2.4.4"
+    title: "Formed Panel Production Consistency"
+    shall_text: "Same forming practice and heat-treating procedure shall be used for production as qualified in the first article."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "formed_panel"
+    related_failure_modes:
+      - "fs"
+    priority: 20
+
+  - mpr_number: 128
+    mpr_id: "MPR-128"
+    section: "4.2.4.4"
+    title: "Formed Panel Change Requalification"
+    shall_text: "Sectioning to determine mechanical properties shall be repeated after any substantive change in forming or heat treatment."
+    verification_method: "Test"
+    applicability_triggers:
+      - "formed_panel"
+    related_failure_modes:
+      - "fs"
+    priority: 25
+
+  - mpr_number: 129
+    mpr_id: "MPR-129"
+    section: "4.2.4.4"
+    title: "Formed Panel Safety-Critical NDI"
+    shall_text: "Surface and volumetric NDI shall be performed on all safety-critical formed panels."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "formed_panel"
+      - "fracture_critical"
+    related_failure_modes:
+      - "fs"
+    priority: 15
+
+  # ===========================================================================
+  # SECTION 4.2.4.5 - ADHESIVE BONDING (MPR 131-133)
+  # ===========================================================================
+  - mpr_number: 131
+    mpr_id: "MPR-131"
+    section: "4.2.4.5"
+    title: "Adhesive Bonding Contamination Control"
+    shall_text: "Structural adhesive bonding processes shall be controlled to prevent contamination of bond surfaces."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "adhesive"
+      - "bonded"
+    related_failure_modes:
+      - "fs"
+    priority: 20
+
+  - mpr_number: 132
+    mpr_id: "MPR-132"
+    section: "4.2.4.5"
+    title: "Adhesive Bond Cohesive Failure Mode"
+    shall_text: "Bonded primary structural joints shall demonstrate cohesive failure modes in shear testing."
+    verification_method: "Test"
+    applicability_triggers:
+      - "adhesive"
+      - "bonded"
+    related_failure_modes:
+      - "fs"
+    priority: 15
+
+  - mpr_number: 133
+    mpr_id: "MPR-133"
+    section: "4.2.4.5"
+    title: "Adhesive Bonding - Additional Controls"
+    shall_text: "See NASA-STD-6016C §4.2.4.5 for detailed requirements."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "adhesive"
+      - "bonded"
+    related_failure_modes: []
+    priority: 50
+
+  # ===========================================================================
+  # SECTION 4.2.4.6 - WELDING (MPR 134-158)
+  # ===========================================================================
+  - mpr_number: 134
+    mpr_id: "MPR-134"
+    section: "4.2.4.6"
+    title: "Weld Repair MRB Disposition"
+    shall_text: "Material Review Board disposition shall be required for weld repair/rework not in accordance with approved procedures."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "welded"
+    related_failure_modes:
+      - "fs"
+    priority: 15
+
+  - mpr_number: 135
+    mpr_id: "MPR-135"
+    section: "4.2.4.6"
+    title: "Weld Development and Certification Plan"
+    shall_text: "A weld development and certification plan shall be developed for large structural welded components."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "welded"
+    related_failure_modes:
+      - "fs"
+    priority: 20
+
+  - mpr_number: 136
+    mpr_id: "MPR-136"
+    section: "4.2.4.6"
+    title: "Welding - Additional Controls"
+    shall_text: "See NASA-STD-6016C §4.2.4.6 for detailed requirements."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "welded"
+    related_failure_modes: []
+    priority: 50
+
+  - mpr_number: 138
+    mpr_id: "MPR-138"
+    section: "4.2.4.6.1"
+    title: "Structural Welds - Class A/B"
+    shall_text: "Other structural welds shall comply with AWS D17.1/D17.1M, Class A or Class B requirements."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "welded"
+    related_failure_modes:
+      - "fs"
+      - "corr"
+    priority: 15
+
+  - mpr_number: 139
+    mpr_id: "MPR-139"
+    section: "4.2.4.6.1"
+    title: "Non-Critical Welds - Class C"
+    shall_text: "Non-critical welds (including seal welds) shall comply with AWS D17.1/D17.1M, Class C requirements."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "welded"
+    related_failure_modes:
+      - "fs"
+    priority: 20
+
+  - mpr_number: 140
+    mpr_id: "MPR-140"
+    section: "4.2.4.6.1"
+    title: "Class C Weld Schedule Qualification"
+    shall_text: "All Class C weld schedules shall be qualified."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "welded"
+    related_failure_modes:
+      - "fs"
+    priority: 25
+
+  - mpr_number: 141
+    mpr_id: "MPR-141"
+    section: "4.2.4.6.1"
+    title: "Titanium Weld Color Acceptance"
+    shall_text: "Titanium welds shall be light/dark straw or better per AWS D17.1/D17.1M Table 7.1."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "titanium"
+      - "welded"
+    related_failure_modes:
+      - "corr"
+      - "scc"
+    priority: 15
+
+  - mpr_number: 142
+    mpr_id: "MPR-142"
+    section: "4.2.4.6.1"
+    title: "Titanium Weld Filler Compatibility"
+    shall_text: "Titanium and its alloys shall be welded with alloy-matching or metallurgically compatible filler metals."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "titanium"
+      - "welded"
+    related_failure_modes:
+      - "fs"
+    priority: 15
+
+  - mpr_number: 143
+    mpr_id: "MPR-143"
+    section: "4.2.4.6.1"
+    title: "Titanium Cryogenic Filler Wire"
+    shall_text: "Extra low interstitial (ELI) filler wires shall be used for titanium cryogenic applications."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "titanium"
+      - "welded"
+      - "cryogenic"
+    related_failure_modes:
+      - "fs"
+    priority: 15
+
+  - mpr_number: 145
+    mpr_id: "MPR-145"
+    section: "4.2.4.6.1"
+    title: "Titanium Welding Gas Prohibition"
+    shall_text: "Nitrogen, hydrogen, and carbon dioxide shall not be used as shielding or purge gas in welding titanium."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "titanium"
+      - "welded"
+    related_failure_modes:
+      - "corr"
+    priority: 10
+    prohibition:
+      type: "process_ban"
+      material_keywords: ["nitrogen", "hydrogen", "carbon dioxide"]
+      rationale: "Nitrogen, hydrogen, and carbon dioxide contaminate titanium welds causing embrittlement and corrosion"
+
+  - mpr_number: 146
+    mpr_id: "MPR-146"
+    section: "4.2.4.6.1"
+    title: "Welding Inert Gas Dew Point"
+    shall_text: "The inert gas used for welding shall have a dew point of -60°C or lower."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "welded"
+    related_failure_modes:
+      - "corr"
+    priority: 20
+
+  - mpr_number: 147
+    mpr_id: "MPR-147"
+    section: "4.2.4.6.1"
+    title: "Titanium Alpha/Alpha-Beta Weld Stress Relief"
+    shall_text: "Welded alpha and alpha plus beta titanium alloys shall be stress relieved."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "titanium"
+      - "welded"
+    related_failure_modes:
+      - "scc"
+    priority: 15
+
+  - mpr_number: 148
+    mpr_id: "MPR-148"
+    section: "4.2.4.6.1"
+    title: "Titanium Beta Alloy Weld Stress Relief"
+    shall_text: "Titanium beta alloys that are welded shall be evaluated on a case-by-case basis for stress relief."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "titanium"
+      - "welded"
+    related_failure_modes:
+      - "scc"
+    priority: 20
+
+  - mpr_number: 149
+    mpr_id: "MPR-149"
+    section: "4.2.4.6.1"
+    title: "Welding - Titanium Additional"
+    shall_text: "See NASA-STD-6016C §4.2.4.6.1 for detailed requirements."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "titanium"
+      - "welded"
+    related_failure_modes: []
+    priority: 50
+
+  - mpr_number: 150
+    mpr_id: "MPR-150"
+    section: "4.2.4.6.1"
+    title: "Electron Beam Welding"
+    shall_text: "Electron beam welding for mission-critical functions shall comply with AWS D17.1/D17.1M or SAE AMS2680C."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "welded"
+    related_failure_modes:
+      - "fs"
+    priority: 20
+
+  - mpr_number: 151
+    mpr_id: "MPR-151"
+    section: "4.2.4.6.1"
+    title: "Welding Practices Requiring MUA"
+    shall_text: "Certain welding practices shall not be used without an approved MUA."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "welded"
+    related_failure_modes:
+      - "fs"
+    priority: 15
+
+  - mpr_number: 152
+    mpr_id: "MPR-152"
+    section: "4.2.4.6.1"
+    title: "WPS Additional Content"
+    shall_text: "The Welding Procedure Specification (WPS) shall include additional content beyond AWS D17.1/D17.1M minimum requirements."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "welded"
+    related_failure_modes:
+      - "fs"
+      - "missing_input"
+    priority: 25
+
+  - mpr_number: 153
+    mpr_id: "MPR-153"
+    section: "4.2.4.6.1"
+    title: "Welding - Process Controls"
+    shall_text: "See NASA-STD-6016C §4.2.4.6.1 for detailed requirements."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "welded"
+    related_failure_modes: []
+    priority: 50
+
+  - mpr_number: 154
+    mpr_id: "MPR-154"
+    section: "4.2.4.6.1"
+    title: "Welding - Quality Assurance"
+    shall_text: "See NASA-STD-6016C §4.2.4.6.1 for detailed requirements."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "welded"
+    related_failure_modes: []
+    priority: 50
+
+  - mpr_number: 155
+    mpr_id: "MPR-155"
+    section: "4.2.4.6.1"
+    title: "Inertia Welding"
+    shall_text: "Inertia welding for mission-critical functions shall meet MIL-STD-1252 requirements."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "welded"
+    related_failure_modes:
+      - "fs"
+    priority: 20
+
+  - mpr_number: 156
+    mpr_id: "MPR-156"
+    section: "4.2.4.6.1"
+    title: "Welding - Specialized Processes"
+    shall_text: "See NASA-STD-6016C §4.2.4.6.1 for detailed requirements."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "welded"
+    related_failure_modes: []
+    priority: 50
+
+  - mpr_number: 157
+    mpr_id: "MPR-157"
+    section: "4.2.4.6.1"
+    title: "Weld Proof Testing"
+    shall_text: "All welds shall be proof tested."
+    verification_method: "Test"
+    applicability_triggers:
+      - "welded"
+    related_failure_modes:
+      - "fs"
+    priority: 15
+
+  - mpr_number: 158
+    mpr_id: "MPR-158"
+    section: "4.2.4.6.1"
+    title: "Inertia Weld Helium Leak Test"
+    shall_text: "Inertia welds used in fluid systems shall be helium leak tested."
+    verification_method: "Test"
+    applicability_triggers:
+      - "welded"
+      - "fluid_contact"
+    related_failure_modes:
+      - "fs"
+    priority: 15
+
+  # ===========================================================================
+  # SECTION 4.2.4.7 - BRAZING (MPR 159-165)
+  # ===========================================================================
+  - mpr_number: 159
+    mpr_id: "MPR-159"
+    section: "4.2.4.7"
+    title: "Brazing - General"
+    shall_text: "Brazing for mission-critical functions shall be per AWS C3.3."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "brazed"
+    related_failure_modes:
+      - "fs"
+    priority: 20
+
+  - mpr_number: 160
+    mpr_id: "MPR-160"
+    section: "4.2.4.7"
+    title: "Aluminum Alloy Brazing"
+    shall_text: "Brazing of aluminum alloys shall meet AWS C3.7M/C3.7 requirements."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "brazed"
+      - "aluminum_alloy"
+    related_failure_modes:
+      - "fs"
+    priority: 20
+
+  - mpr_number: 161
+    mpr_id: "MPR-161"
+    section: "4.2.4.7"
+    title: "Torch/Induction/Furnace Brazing"
+    shall_text: "Torch, induction, and furnace brazing shall meet AWS C3.4M/C3.4, C3.5M/C3.5, and C3.6M/C3.6 requirements."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "brazed"
+    related_failure_modes:
+      - "fs"
+    priority: 20
+
+  - mpr_number: 162
+    mpr_id: "MPR-162"
+    section: "4.2.4.7"
+    title: "Brazing - Additional Controls"
+    shall_text: "See NASA-STD-6016C §4.2.4.7 for detailed requirements."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "brazed"
+    related_failure_modes: []
+    priority: 50
+
+  - mpr_number: 163
+    mpr_id: "MPR-163"
+    section: "4.2.4.7"
+    title: "Brazed Joint Shear Loading Design"
+    shall_text: "Brazed joints shall be designed for shear loading."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "brazed"
+    related_failure_modes:
+      - "fs"
+    priority: 20
+
+  - mpr_number: 164
+    mpr_id: "MPR-164"
+    section: "4.2.4.7"
+    title: "Brazed Joint Shear Strength"
+    shall_text: "The shear strength of brazed joints shall meet design requirements."
+    verification_method: "Test"
+    applicability_triggers:
+      - "brazed"
+    related_failure_modes:
+      - "fs"
+    priority: 20
+
+  - mpr_number: 165
+    mpr_id: "MPR-165"
+    section: "4.2.4.7"
+    title: "Brazing - Quality Requirements"
+    shall_text: "See NASA-STD-6016C §4.2.4.7 for detailed requirements."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "brazed"
+    related_failure_modes: []
+    priority: 50
+
+  # ===========================================================================
+  # SECTION 4.2.4.9 - EDM/LM (MPR 167-170)
+  # ===========================================================================
+  - mpr_number: 167
+    mpr_id: "MPR-167"
+    section: "4.2.4.9"
+    title: "EDM/LM Process Control"
+    shall_text: "EDM and LM processes shall be controlled to limit oxide, recast, and heat-affected zone (HAZ) depth."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "machined"
+    related_failure_modes:
+      - "fs"
+    priority: 20
+
+  - mpr_number: 168
+    mpr_id: "MPR-168"
+    section: "4.2.4.9"
+    title: "EDM/LM Oxide Layer Removal"
+    shall_text: "The oxide layer shall be removed from the surface after EDM or LM processing."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "machined"
+    related_failure_modes:
+      - "fs"
+      - "corr"
+    priority: 20
+
+  - mpr_number: 169
+    mpr_id: "MPR-169"
+    section: "4.2.4.9"
+    title: "EDM/LM Recast/HAZ Removal"
+    shall_text: "The recast layer and HAZ shall be removed from bearing, wear, fatigue, or fracture-critical surfaces."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "machined"
+      - "fracture_critical"
+    related_failure_modes:
+      - "fs"
+    priority: 15
+
+  - mpr_number: 170
+    mpr_id: "MPR-170"
+    section: "4.2.4.9"
+    title: "EDM/LM Schedule Qualification"
+    shall_text: "EDM/LM schedules shall be qualified to determine maximum thickness of affected layers."
+    verification_method: "Test"
+    applicability_triggers:
+      - "machined"
+    related_failure_modes:
+      - "fs"
+    priority: 25
+
+  # ===========================================================================
+  # SECTION 4.2.4.10 - PLATING (MPR 171-173)
+  # ===========================================================================
+  - mpr_number: 171
+    mpr_id: "MPR-171"
+    section: "4.2.4.10"
+    title: "Electrodeposited Nickel Plating"
+    shall_text: "Electrodeposited nickel plating shall be per SAE AMS2403N."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "plated"
+    related_failure_modes:
+      - "corr"
+    priority: 25
+
+  - mpr_number: 172
+    mpr_id: "MPR-172"
+    section: "4.2.4.10"
+    title: "Electroless Nickel Plating"
+    shall_text: "Electroless nickel plate shall be per SAE AMS2404G or ASTM B733-15."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "plated"
+    related_failure_modes:
+      - "corr"
+    priority: 25
+
+  - mpr_number: 173
+    mpr_id: "MPR-173"
+    section: "4.2.4.10"
+    title: "Nickel-Plated Aluminum Interface Protection"
+    shall_text: "The nickel-aluminum interface in nickel-plated aluminum shall be protected from corrosive environments."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "plated"
+      - "aluminum_alloy"
+    related_failure_modes:
+      - "corr"
+    priority: 20
+
+  # ===========================================================================
+  # SECTION 4.2.5 - NDE: ADDITIONAL (MPR 177, 179, 180, 213)
+  # ===========================================================================
+  - mpr_number: 177
+    mpr_id: "MPR-177"
+    section: "4.2.5.1"
+    title: "NDE - Additional Requirements"
+    shall_text: "See NASA-STD-6016C §4.2.5.1 for detailed requirements."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 50
+
+  - mpr_number: 179
+    mpr_id: "MPR-179"
+    section: "4.2.5.1"
+    title: "NDE Etching Minimum Removal"
+    shall_text: "The etching procedure shall specify minimum material removal to ensure smeared metal does not mask cracks."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "always"
+    related_failure_modes:
+      - "fs"
+    priority: 25
+
+  - mpr_number: 180
+    mpr_id: "MPR-180"
+    section: "4.2.5.1"
+    title: "NDE Etching Feasibility"
+    shall_text: "If etching is not feasible, it shall be demonstrated that required flaw size can be reliably detected without etching."
+    verification_method: "Test"
+    applicability_triggers:
+      - "always"
+    related_failure_modes:
+      - "fs"
+    priority: 25
+
+  - mpr_number: 213
+    mpr_id: "MPR-213"
+    section: "4.2.5"
+    title: "NDE Acceptance Criteria Early Determination"
+    shall_text: "NDE acceptance criteria and requirements for qualification of NDE procedures shall be determined early in design."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 30
+
+  # ===========================================================================
+  # SECTION 4.2.6 - STRUCTURAL: ADDITIONAL (MPR 181-190)
+  # ===========================================================================
+  - mpr_number: 181
+    mpr_id: "MPR-181"
+    section: "4.2.6"
+    title: "Structural Requirements - General"
+    shall_text: "See NASA-STD-6016C §4.2.6 for detailed requirements."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "metallic_material"
+    related_failure_modes: []
+    priority: 50
+
+  - mpr_number: 182
+    mpr_id: "MPR-182"
+    section: "4.2.6"
+    title: "Warped Part Straightening Control"
+    shall_text: "The straightening of warped parts in structural hardware shall be controlled to prevent cracking or residual stress."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "metallic_material"
+    related_failure_modes:
+      - "fs"
+    priority: 25
+
+  - mpr_number: 183
+    mpr_id: "MPR-183"
+    section: "4.2.6"
+    title: "Vented Sandwich Differential Pressure"
+    shall_text: "For vented sandwich architectures, differential pressure on ascent shall be adequately relieved."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "composite_material"
+    related_failure_modes:
+      - "fs"
+    priority: 20
+
+  - mpr_number: 184
+    mpr_id: "MPR-184"
+    section: "4.2.6"
+    title: "Non-Vented Sandwich Pressure Capability"
+    shall_text: "Sandwich architectures that are not vented shall be capable of withstanding pressure buildup."
+    verification_method: "Analysis/Test"
+    applicability_triggers:
+      - "composite_material"
+    related_failure_modes:
+      - "fs"
+    priority: 20
+
+  - mpr_number: 185
+    mpr_id: "MPR-185"
+    section: "4.2.6"
+    title: "Sandwich Assembly Water Vapor Prevention"
+    shall_text: "Structural sandwich assemblies shall be designed to prevent entrance and entrapment of water vapor."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "composite_material"
+    related_failure_modes:
+      - "corr"
+    priority: 20
+
+  - mpr_number: 186
+    mpr_id: "MPR-186"
+    section: "4.2.6"
+    title: "Heated Sandwich Assembly Testing"
+    shall_text: "Structural honeycomb sandwich assemblies subject to heating shall be tested to demonstrate structural adequacy."
+    verification_method: "Test"
+    applicability_triggers:
+      - "composite_material"
+    related_failure_modes:
+      - "fs"
+    priority: 20
+
+  - mpr_number: 187
+    mpr_id: "MPR-187"
+    section: "4.2.6"
+    title: "Sandwich Assembly Combined Loading"
+    shall_text: "Sandwich assemblies using honeycomb core: acceptance/proof testing should address combined loading conditions."
+    verification_method: "Test"
+    applicability_triggers:
+      - "composite_material"
+    related_failure_modes:
+      - "fs"
+    priority: 25
+
+  - mpr_number: 188
+    mpr_id: "MPR-188"
+    section: "4.2.6"
+    title: "Sandwich Construction CMH-17 Compliance"
+    shall_text: "Structural sandwich constructions and core materials shall be per CMH-17 Volume 6."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "composite_material"
+    related_failure_modes:
+      - "fs"
+    priority: 20
+
+  - mpr_number: 189
+    mpr_id: "MPR-189"
+    section: "4.2.6"
+    title: "Structural Design - Additional A"
+    shall_text: "See NASA-STD-6016C §4.2.6 for detailed requirements."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 50
+
+  - mpr_number: 190
+    mpr_id: "MPR-190"
+    section: "4.2.6"
+    title: "Structural Design - Additional B"
+    shall_text: "See NASA-STD-6016C §4.2.6 for detailed requirements."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 50
+
+  # ===========================================================================
+  # SECTION 4.2.6 - CORROSION/EMBRITTLEMENT: ADDITIONAL (MPR 192, 194, 197, 199-201, 204)
+  # ===========================================================================
+  - mpr_number: 192
+    mpr_id: "MPR-192"
+    section: "4.2.6.3"
+    title: "Corrosion Protection - All Parts"
+    shall_text: "Corrosion protection shall be applied to all parts and assemblies."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "metallic_material"
+    related_failure_modes:
+      - "corr"
+    priority: 20
+
+  - mpr_number: 194
+    mpr_id: "MPR-194"
+    section: "4.2.6.4"
+    title: "HEE Simulated Environment Testing"
+    shall_text: "Test data may have to be generated in a simulated environment to support the rationale for hydrogen embrittlement assessment."
+    verification_method: "Test"
+    applicability_triggers:
+      - "hydrogen_service"
+    related_failure_modes:
+      - "hee"
+    priority: 20
+
+  - mpr_number: 197
+    mpr_id: "MPR-197"
+    section: "4.2.6.5"
+    title: "Intermetallic Compatibility - Additional"
+    shall_text: "See NASA-STD-6016C §4.2.6.5 for detailed requirements."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "metallic_material"
+    related_failure_modes: []
+    priority: 50
+
+  - mpr_number: 199
+    mpr_id: "MPR-199"
+    section: "4.2.6.5"
+    title: "Gold-Aluminum Brazing Purple Plague"
+    shall_text: "Gold-aluminum brazing processes shall be controlled to minimize Purple Plague intermetallic formation."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "brazed"
+    related_failure_modes:
+      - "corr"
+    priority: 15
+
+  - mpr_number: 200
+    mpr_id: "MPR-200"
+    section: "4.2.6.5"
+    title: "Gold-Aluminum Bonding Purple Plague"
+    shall_text: "Gold-aluminum bonding processes shall be controlled to prevent Purple Plague intermetallic formation."
+    verification_method: "Inspection"
+    applicability_triggers:
+      - "bonded"
+    related_failure_modes:
+      - "corr"
+    priority: 15
+
+  - mpr_number: 201
+    mpr_id: "MPR-201"
+    section: "4.2.6.5"
+    title: "Intermetallic Prevention - Additional"
+    shall_text: "See NASA-STD-6016C §4.2.6.5 for detailed requirements."
+    verification_method: "Analysis"
+    applicability_triggers:
+      - "metallic_material"
+    related_failure_modes: []
+    priority: 50
+
+  - mpr_number: 204
+    mpr_id: "MPR-204"
+    section: "4.2.7"
+    title: "Contamination-Sensitive Manufacturing Controls"
+    shall_text: "The Contamination Control Plan shall include controls on contamination-sensitive manufacturing processes."
+    verification_method: "Documentation"
+    applicability_triggers:
+      - "always"
+    related_failure_modes: []
+    priority: 30
+
+# =============================================================================
+# TRIGGER DEFINITIONS
+# =============================================================================
+trigger_definitions:
+  always:
+    description: "Applies to all materials"
+    condition: "true"
+  habitable:
+    description: "Material is in habitable volume"
+    condition: "environment.habitable == true"
+  oxygen_service:
+    description: "Material is in oxygen-enriched environment"
+    condition: "environment.o2_pct > 23.5"
+  hydrogen_service:
+    description: "Material is in hydrogen service"
+    condition: "environment.hydrogen_service == true"
+  cryogenic:
+    description: "Material is in cryogenic service (< -150°C)"
+    condition: "environment.temp_range_c[0] <= -150"
+  high_pressure:
+    description: "Material is in high pressure service (>= 300 psia)"
+    condition: "environment.pressure_psia >= 300"
+  fracture_critical:
+    description: "Part is classified as fracture critical"
+    condition: "hardware.fracture_critical == true"
+  crew_contact:
+    description: "Material has direct crew contact"
+    condition: "hardware.crew_contact == true"
+  metallic_material:
+    description: "Material is metallic"
+    condition: "Detected from material name/spec keywords"
+  nonmetallic_material:
+    description: "Material is nonmetallic"
+    condition: "Detected from material name/spec keywords"
+  composite_material:
+    description: "Material is composite"
+    condition: "Detected from material name/spec keywords"
+  aluminum_alloy:
+    description: "Material is aluminum alloy"
+    condition: "Detected from material name: 2xxx, 5xxx, 6xxx, 7xxx series, or 'aluminum'"
+  titanium:
+    description: "Material is titanium alloy"
+    condition: "Detected from material name: Ti-, titanium, Ti6Al4V, etc."
+  magnesium:
+    description: "Material is magnesium alloy"
+    condition: "Detected from material name: AZ31, magnesium, etc."
+  beryllium:
+    description: "Material is beryllium or beryllium-containing alloy"
+    condition: "Detected from material name: beryllium, BeCu, etc."
+  high_strength_alloy:
+    description: "Material has tensile strength > 180 ksi"
+    condition: "material.tensile_strength_ksi > 180 or known high-strength alloy"
+  dissimilar_metals:
+    description: "Dissimilar metal combination present"
+    condition: "hardware.dissimilar_metals == true"
+  fluid_contact:
+    description: "Material contacts process fluid"
+    condition: "hardware.fluid_contact == true or environment has fluid exposure"
+  propellant_service:
+    description: "Material contacts propellant"
+    condition: "environment.propellant_service == true"
+  oxidizer_service:
+    description: "Material contacts non-O2 oxidizer (NTO, etc.)"
+    condition: "environment.oxidizer_service == true"
+  external_environment:
+    description: "Material exposed to external space environment"
+    condition: "environment.vacuum_exposure == true or environment.lunar_dust == true"
+  vacuum:
+    description: "Material exposed to vacuum"
+    condition: "environment.vacuum_exposure == true"
+  nonconforming:
+    description: "Material has identified nonconformance"
+    condition: "material.has_nonconformance == true"
+  ignition_source_present:
+    description: "Ignition source present in zone"
+    condition: "hardware.ignition_sources is not empty"
+  elastomer:
+    description: "Material is elastomeric"
+    condition: "Detected from name: rubber, elastomer, silicone, EPDM, Viton, etc."
+  adhesive:
+    description: "Material is adhesive"
+    condition: "Detected from name: adhesive, bond, epoxy"
+  coating:
+    description: "Material is coating"
+    condition: "Detected from name: coating, paint, anodize, plating"
+  seal:
+    description: "Material is seal/gasket"
+    condition: "Detected from name: seal, gasket, o-ring"
+  wiring:
+    description: "Material is wiring/cable insulation"
+    condition: "Detected from name: wire, cable, harness, insulation"
+  cable:
+    description: "Same as wiring"
+    condition: "Detected from name: wire, cable, harness"
+  cots:
+    description: "Commercial off-the-shelf item"
+    condition: "Detected from name: COTS, off-the-shelf, commercial"
+  lubricant:
+    description: "Material is lubricant"
+    condition: "Detected from name: lubricant, grease, oil"
+  optical_surface:
+    description: "Material is optical surface"
+    condition: "Detected from name: optic, lens, window, mirror"
+  welded:
+    description: "Part involves welding"
+    condition: "Detected from application/process keywords"
+  bonded:
+    description: "Part involves adhesive bonding"
+    condition: "Detected from application/process keywords"
+  heat_treated:
+    description: "Part is heat treated"
+    condition: "Detected from application/process keywords"
+  plated:
+    description: "Part has plating"
+    condition: "Detected from application/process keywords"
+  soldered:
+    description: "Part involves soldering"
+    condition: "Detected from application/process keywords"
+  forged:
+    description: "Part is forged"
+    condition: "Detected from application/process keywords: forging, forged"
+  cast:
+    description: "Part is cast"
+    condition: "Detected from application/process keywords: casting, cast, investment cast"
+  formed_panel:
+    description: "Part is formed panel"
+    condition: "Detected from application/process keywords: formed panel, stretch formed, age formed"
+  brazed:
+    description: "Part involves brazing"
+    condition: "Detected from application/process keywords: braze, brazed, brazing"
+  machined:
+    description: "Part involves EDM or laser machining"
+    condition: "Detected from application/process keywords: EDM, laser machined, electrical discharge"
+  fastener:
+    description: "Part is structural fastener"
+    condition: "Detected from name: bolt, fastener, screw, nut"
+  additive_manufacturing:
+    description: "Part made by additive manufacturing"
+    condition: "Detected from name: 3d print, additive, AM, DMLS, SLM, EBM"
+  tin_plating:
+    description: "Part has tin plating"
+    condition: "Detected from name: tin plat, Sn plat"
+  zinc_plating:
+    description: "Part has zinc plating"
+    condition: "Detected from name: zinc plat, Zn plat"
+  gold_plating:
+    description: "Part has gold plating"
+    condition: "Detected from name: gold plat, Au plat, gold coat"
+  silver_plating:
+    description: "Part has silver plating"
+    condition: "Detected from name: silver plat, Ag plat"
+  mercury:
+    description: "Part contains mercury"
+    condition: "Detected from name: mercury, Hg"

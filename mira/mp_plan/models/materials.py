@@ -91,6 +91,13 @@ class MaterialResolutionResult(BaseModel):
     tox_rating: str
     """Toxicity rating."""
 
+    scc_rating: Optional[str] = None
+    """Stress corrosion cracking rating (1/2/3/U) per MSFC-STD-3029A.
+    1 = highly resistant, 2 = moderate, 3 = susceptible, U = unknown."""
+
+    corr_rating: Optional[str] = None
+    """Corrosion rating (A/B/C/U). A = resistant, C = susceptible."""
+
     # Test conditions
     test_o2_pct: float
     """O2 percentage in test conditions."""

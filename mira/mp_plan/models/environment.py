@@ -63,6 +63,15 @@ class EnvironmentDefinition(BaseModel):
     lunar_dust: bool = False
     """Whether exposed to lunar dust."""
 
+    hydrogen_service: bool = False
+    """Whether environment involves hydrogen gas exposure."""
+
+    propellant_service: bool = False
+    """Whether environment involves propellant contact (N2H4, MMH, NTO)."""
+
+    oxidizer_service: bool = False
+    """Whether environment involves non-O2 oxidizer contact."""
+
     # Phase/condition
     phase: str = "nominal"
     """Operational phase: 'nominal', 'contingency', 'ground_ops'."""

@@ -435,6 +435,305 @@ class ComplianceEvaluationEngineCodex:
             0.4,
         )
 
+    def _eval_scc(
+        self,
+        resolution: MaterialResolutionResult,
+    ) -> tuple[str, str, Optional[str], Optional[str], str, float]:
+        """Evaluate stress corrosion cracking using MSFC-STD-3029A SCC rating."""
+        rating = (getattr(resolution, "scc_rating", None) or "").strip().upper() or "U"
+
+        if rating == "1":
+            return (
+                STATUS_COMPLIANT,
+                "SCC rating 1 (highly resistant) meets requirement.",
+                rating,
+                "1",
+                "low",
+                0.95,
+            )
+        if rating == "2":
+            return (
+                STATUS_CONSTRAINED,
+                "SCC rating 2 (moderate). Acceptable with documented stress controls and temper verification.",
+                rating,
+                "1",
+                "medium",
+                0.8,
+            )
+        if rating == "3":
+            return (
+                STATUS_NONCOMPLIANT,
+                "SCC rating 3 (susceptible). Requires closure path or material substitution.",
+                rating,
+                "1",
+                "high",
+                0.9,
+            )
+        return (
+            STATUS_UNKNOWN,
+            f"SCC rating unavailable or unknown ({rating}). Requires MSFC-STD-3029A evaluation.",
+            rating,
+            "1",
+            "medium",
+            0.4,
+        )
+
+    def _eval_corr(
+        self,
+        resolution: MaterialResolutionResult,
+    ) -> tuple[str, str, Optional[str], Optional[str], str, float]:
+        """Evaluate corrosion resistance rating."""
+        rating = (getattr(resolution, "corr_rating", None) or "").strip().upper() or "U"
+
+        if rating == "A":
+            return (
+                STATUS_COMPLIANT,
+                "Corrosion rating A (resistant) meets requirement.",
+                rating,
+                "A",
+                "low",
+                0.95,
+            )
+        if rating == "B":
+            return (
+                STATUS_CONSTRAINED,
+                "Corrosion rating B. Acceptable with documented corrosion protection plan.",
+                rating,
+                "A",
+                "medium",
+                0.8,
+            )
+        if rating in {"C", "D", "X"}:
+            return (
+                STATUS_NONCOMPLIANT,
+                f"Corrosion rating {rating}. Requires corrosion protection closure or material change.",
+                rating,
+                "A",
+                "high",
+                0.9,
+            )
+        return (
+            STATUS_UNKNOWN,
+            f"Corrosion rating unavailable or unknown ({rating}). Requires corrosion assessment.",
+            rating,
+            "A",
+            "medium",
+            0.4,
+        )
+
+    def _eval_hee(
+        self,
+        resolution: MaterialResolutionResult,
+        material: MaterialEntry,
+        environment: Any,
+    ) -> tuple[str, str, Optional[str], Optional[str], str, float]:
+        """Evaluate hydrogen environment embrittlement using the H2 compatibility engine."""
+        # Gate: only evaluate if environment has hydrogen exposure
+        if not getattr(environment, "hydrogen_service", False):
+            return (
+                STATUS_UNKNOWN,
+                "Environment does not have hydrogen exposure (hydrogen_service=False); HEE check skipped.",
+                None,
+                None,
+                "low",
+                0.5,
+            )
+
+        try:
+            from mira.h2 import evaluate_h2_compatibility, H2CompatibilityRequest
+        except ImportError:
+            LOGGER.warning("mira.h2 not available for HEE evaluation")
+            return (
+                STATUS_UNKNOWN,
+                "H2 compatibility engine not available (import failed).",
+                None,
+                None,
+                "medium",
+                0.0,
+            )
+
+        try:
+            # Normalize material name to lowercase with underscores
+            material_key = (material.name or "").strip().lower().replace(" ", "_")
+            if not material_key:
+                return (
+                    STATUS_UNKNOWN,
+                    "Material name is empty; cannot evaluate HEE.",
+                    None,
+                    None,
+                    "medium",
+                    0.0,
+                )
+
+            # Extract environment parameters
+            pressure_psia = float(getattr(environment, "pressure_psia", 0.0) or 0.0)
+
+            # Temperature: use min temp (worst case) from temp_range_c, convert C→K
+            temp_range = getattr(environment, "temp_range_c", None)
+            if temp_range and len(temp_range) >= 1:
+                min_temp_c = float(temp_range[0])
+            else:
+                min_temp_c = 25.0  # default to room temp if not specified
+            temperature_k = min_temp_c + 273.15
+
+            # Phase: LH2 if temp < -253°C, else GH2
+            phase = "lh2" if min_temp_c < -253.0 else "gh2"
+
+            request = H2CompatibilityRequest(
+                material_key=material_key,
+                pressure_psia=pressure_psia,
+                temperature_k=temperature_k,
+                phase=phase,
+            )
+            response = evaluate_h2_compatibility(request)
+
+            # Map classification to compliance status
+            classification = str(response.classification.value).lower()
+            rationale = response.rationale or "No rationale provided."
+
+            if classification == "ok":
+                return (
+                    STATUS_COMPLIANT,
+                    f"HEE: {rationale}",
+                    None,
+                    "H2-compatible",
+                    "low",
+                    0.9,
+                )
+            if classification == "caution":
+                return (
+                    STATUS_CONSTRAINED,
+                    f"HEE: {rationale}",
+                    "caution",
+                    "H2-compatible",
+                    "medium",
+                    0.75,
+                )
+            if classification == "prohibited":
+                return (
+                    STATUS_NONCOMPLIANT,
+                    f"HEE: {rationale}",
+                    "prohibited",
+                    "H2-compatible",
+                    "critical",
+                    0.9,
+                )
+            # unknown or any other value
+            return (
+                STATUS_UNKNOWN,
+                f"HEE: {rationale}",
+                classification,
+                "H2-compatible",
+                "medium",
+                0.4,
+            )
+
+        except Exception as exc:
+            LOGGER.error("HEE evaluation failed for %s: %s", material.name, exc)
+            return (
+                STATUS_UNKNOWN,
+                f"HEE evaluation error: {exc}",
+                None,
+                None,
+                "medium",
+                0.0,
+            )
+
+    def _eval_prohibition(
+        self,
+        material: MaterialEntry,
+        environment: Any,
+        prohibition: dict,
+    ) -> tuple[str, str, Optional[str], Optional[str], str, float]:
+        """
+        Evaluate material-family-level prohibition MPRs.
+
+        These are binary checks that don't need MAPTIS ratings — they evaluate
+        material name/keywords against hard prohibitions from 6016C.
+        """
+        material_text = " ".join([
+            material.name or "",
+            material.application or "",
+            material.spec or "",
+            material.function or "",
+        ]).lower()
+
+        ptype = prohibition.get("type", "")
+        keywords = [k.lower() for k in prohibition.get("material_keywords", [])]
+        exclude = [k.lower() for k in prohibition.get("exclude_keywords", [])]
+        rationale = prohibition.get("rationale", "Prohibited by NASA-STD-6016C")
+
+        # Check if any keyword matches
+        keyword_match = any(kw in material_text for kw in keywords)
+        if not keyword_match:
+            return (
+                STATUS_COMPLIANT,
+                "Material does not match prohibition keywords.",
+                None,
+                None,
+                "low",
+                0.9,
+            )
+
+        # Check exclusions
+        if exclude and any(ex in material_text for ex in exclude):
+            return (
+                STATUS_COMPLIANT,
+                "Material matches prohibition keywords but is excluded by exception.",
+                None,
+                None,
+                "low",
+                0.85,
+            )
+
+        # Check environment condition for material_environment type
+        if ptype == "material_environment":
+            env_cond = prohibition.get("environment_condition", "")
+            env_triggered = False
+            if env_cond == "oxygen_service":
+                env_triggered = float(environment.o2_pct) > 23.5
+            elif env_cond == "habitable_or_vacuum":
+                env_triggered = bool(environment.habitable) or bool(environment.vacuum_exposure)
+            elif env_cond == "external_environment":
+                env_triggered = bool(environment.vacuum_exposure) or bool(getattr(environment, "lunar_dust", False))
+            elif env_cond == "habitable":
+                env_triggered = bool(environment.habitable)
+
+            if not env_triggered:
+                return (
+                    STATUS_COMPLIANT,
+                    "Material matches prohibition keywords but environment condition not met.",
+                    None,
+                    None,
+                    "low",
+                    0.85,
+                )
+
+        # Check temperature limit for material_temperature type
+        if ptype == "material_temperature":
+            max_temp = prohibition.get("max_temp_c")
+            if max_temp is not None:
+                env_max_temp = float(environment.temp_range_c[1])
+                if env_max_temp <= max_temp:
+                    return (
+                        STATUS_COMPLIANT,
+                        f"Environment max temp {env_max_temp:.0f}°C within limit {max_temp:.0f}°C.",
+                        None,
+                        None,
+                        "low",
+                        0.9,
+                    )
+
+        # Prohibition triggered
+        return (
+            STATUS_NONCOMPLIANT,
+            f"PROHIBITED: {rationale}",
+            "prohibited",
+            "not prohibited",
+            "critical",
+            0.98,
+        )
+
     def _evaluate_mode(
         self,
         mode: str,
@@ -458,6 +757,12 @@ class ComplianceEvaluationEngineCodex:
             return self._eval_tvs(resolution)
         if mode == "tox":
             return self._eval_tox(resolution, bool(environment.habitable))
+        if mode == "hee":
+            return self._eval_hee(resolution, material, environment)
+        if mode == "scc":
+            return self._eval_scc(resolution)
+        if mode == "corr":
+            return self._eval_corr(resolution)
 
         # Full-index fallback: keep requirement visible and route to human review.
         return (
@@ -584,6 +889,90 @@ class ComplianceEvaluationEngineCodex:
                             conservative_default_available=False,
                             source="compliance_eval_codex",
                         )
+
+                # Check prohibition before mode evaluation
+                prohibition = mpr_decision.get("prohibition")
+                if prohibition:
+                    prohibition_result = self._eval_prohibition(
+                        material=material,
+                        environment=environment,
+                        prohibition=prohibition,
+                    )
+                    if prohibition_result[0] == STATUS_NONCOMPLIANT:
+                        # Prohibition triggered — skip mode evaluation, this is a hard fail
+                        mode_results = [prohibition_result]
+                        related_modes = related_modes or ["missing_input"]
+                        # Jump directly to determination assembly below
+                        statuses = [prohibition_result[0]]
+                        final_status = STATUS_NONCOMPLIANT
+                        confidence = prohibition_result[5]
+                        rationale_parts = [prohibition_result[1]]
+                        failing_values = [prohibition_result[2]] if prohibition_result[2] else []
+                        required_values = [prohibition_result[3]] if prohibition_result[3] else []
+                        worst_severity = prohibition_result[4]
+
+                        needs_review = True
+                        review_reason = "Material is PROHIBITED by NASA-STD-6016C for this application/environment."
+                        human_action = "Remove this material or obtain a formal MUA with engineering justification."
+                        human_meaning = "This material violates a hard prohibition in the standard."
+                        citation_helper = build_citation_helper_codex(
+                            mpr_section=str(mpr_decision.get("mpr_section", "")),
+                            related_modes=related_modes,
+                            status=final_status,
+                            maptis_code=(resolution.maptis_code if resolution else None),
+                        )
+
+                        determinations.append(
+                            {
+                                "determination_id": determination_id,
+                                "generated_at": now_iso,
+                                "material_id": material.id,
+                                "material_name": material.name,
+                                "environment_id": environment.environment_id,
+                                "environment_name": environment.name,
+                                "mpr_id": mpr_id,
+                                "mpr_number": mpr_decision.get("mpr_number"),
+                                "mpr_title": mpr_decision.get("mpr_title"),
+                                "mpr_section": mpr_decision.get("mpr_section"),
+                                "applicability_status": applicability_status,
+                                "applicability_rationale": mpr_decision.get("rationale", ""),
+                                "status": final_status,
+                                "basis": "analysis",
+                                "confidence": round(confidence, 3),
+                                "rationale": " | ".join(rationale_parts),
+                                "failing_value": ", ".join(failing_values) if failing_values else None,
+                                "required_value": ", ".join(sorted(set(required_values))) if required_values else None,
+                                "related_failure_modes": related_modes,
+                                "citations": citations,
+                                "evidence_refs": [e.model_dump() for e in evidence_refs],
+                                "needs_review": needs_review,
+                                "review_reason": review_reason,
+                                "review_priority": 100,
+                                "human_action": human_action,
+                                "human_meaning": human_meaning,
+                                "quick_actions": citation_helper.get("quick_actions", []),
+                                "citation_helper": citation_helper,
+                                "prohibition_triggered": True,
+                            }
+                        )
+
+                        primary_mode = next((m for m in PRIMARY_MODE_ORDER if m in related_modes), related_modes[0] if related_modes else "missing_input")
+                        nc_id = _hash_id("nc", determination_id)
+                        nonconformances[nc_id] = NonconformanceSignal(
+                            nonconformance_id=nc_id,
+                            gap_type=_to_failure_mode(primary_mode),
+                            failing_requirement=f"{mpr_id} {mpr_decision.get('mpr_title', '')}".strip(),
+                            failing_value="prohibited",
+                            required_value="not prohibited",
+                            material_id=material.id,
+                            environment_id=environment.environment_id,
+                            affected_mprs=[mpr_id],
+                            severity=GapSeverity.CRITICAL,
+                            confidence=max(0.0, min(1.0, confidence)),
+                            evidence_refs=evidence_refs,
+                            source_adapter="compliance_eval_codex",
+                        )
+                        continue
 
                 if not related_modes:
                     related_modes = ["unknown"]

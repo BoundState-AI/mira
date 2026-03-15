@@ -50,6 +50,7 @@ class MPRCatalogEntryCodex:
     applicability_triggers: tuple[str, ...]
     related_failure_modes: tuple[str, ...]
     priority: int
+    prohibition: Optional[dict] = None
 
 
 def load_mpr_catalog_codex(path: Optional[Path] = None) -> list[MPRCatalogEntryCodex]:
@@ -80,6 +81,7 @@ def load_mpr_catalog_codex(path: Optional[Path] = None) -> list[MPRCatalogEntryC
                     str(t).strip().lower() for t in raw.get("related_failure_modes", [])
                 ),
                 priority=int(raw.get("priority", 100)),
+                prohibition=raw.get("prohibition"),
             )
         )
 
@@ -125,15 +127,59 @@ class ApplicabilityEngineCodex:
         text = ApplicabilityEngineCodex._material_text(material)
         tags: set[str] = set()
 
-        if any(k in text for k in ("steel", "inconel", "aluminum", "titanium", "metal")):
+        # --- Material class ---
+        if any(k in text for k in (
+            "steel", "inconel", "aluminum", "titanium", "metal", "alloy",
+            "nickel", "copper", "iron", "cobalt", "monel", "hastelloy",
+            "a286", "mp35n", "waspaloy", "rene", "invar",
+        )):
             tags.add("metallic_material")
-        if any(
-            k in text
-            for k in ("poly", "elastomer", "rubber", "epoxy", "adhesive", "composite", "paint", "coating")
-        ):
+        if any(k in text for k in (
+            "poly", "elastomer", "rubber", "epoxy", "adhesive", "composite",
+            "paint", "coating", "kapton", "teflon", "ptfe", "pfa", "fep",
+            "nylon", "delrin", "peek", "ultem", "vespel", "pvc", "vinyl",
+            "silicone", "viton", "epdm", "buna", "neoprene", "rtv",
+        )):
             tags.add("nonmetallic_material")
-        if "composite" in text or "carbon fiber" in text:
+        if "composite" in text or "carbon fiber" in text or "cfrp" in text:
             tags.add("composite_material")
+
+        # --- Specific alloy families ---
+        if any(k in text for k in (
+            "aluminum", "2024", "2219", "5052", "5083", "5086", "5456",
+            "6061", "7050", "7075", "2014", "2195", "2xxx", "5xxx",
+            "6xxx", "7xxx", "al ", "al-",
+        )):
+            tags.add("aluminum_alloy")
+            tags.add("metallic_material")
+        if any(k in text for k in (
+            "titanium", "ti-6al", "ti6al", "ti-", "cp-ti", "imi",
+            "ti 6al", "ti-6-4", "ti-5al", "ti-3al",
+        )):
+            tags.add("titanium")
+            tags.add("metallic_material")
+        if any(k in text for k in ("magnesium", "az31", "az61", "az80", "ze41", "am60")):
+            tags.add("magnesium")
+            tags.add("metallic_material")
+        if any(k in text for k in ("beryllium", "becu", "be-cu", "be cu")):
+            tags.add("beryllium")
+            tags.add("metallic_material")
+
+        # --- Surface treatments / plating ---
+        if any(k in text for k in ("cadmium", "cd plat", "cd-plat")):
+            tags.add("cadmium")
+        if any(k in text for k in ("tin plat", "sn plat", "tin coat")):
+            tags.add("tin_plating")
+        if any(k in text for k in ("zinc plat", "zn plat", "zinc coat")):
+            tags.add("zinc_plating")
+        if any(k in text for k in ("gold plat", "au plat", "gold coat")):
+            tags.add("gold_plating")
+        if any(k in text for k in ("silver plat", "ag plat", "silver coat")):
+            tags.add("silver_plating")
+        if any(k in text for k in ("mercury", " hg ")):
+            tags.add("mercury")
+
+        # --- Material subtypes ---
         if any(k in text for k in ("lubricant", "grease", "oil")):
             tags.add("lubricant")
         if any(k in text for k in ("adhesive", "bond", "epoxy")):
@@ -150,6 +196,34 @@ class ApplicabilityEngineCodex:
             tags.add("cots")
         if any(k in text for k in ("optic", "lens", "window", "mirror")):
             tags.add("optical_surface")
+        if any(k in text for k in (
+            "elastomer", "rubber", "silicone", "viton", "epdm",
+            "buna", "neoprene", "fluorocarbon",
+        )):
+            tags.add("elastomer")
+
+        # --- Process indicators ---
+        if any(k in text for k in ("weld", "welded", "welding")):
+            tags.add("welded")
+        if any(k in text for k in ("braze", "brazed", "brazing")):
+            tags.add("brazed")
+        if any(k in text for k in ("solder", "soldered", "soldering")):
+            tags.add("soldered")
+        if any(k in text for k in ("heat treat", "heat-treat", "temper", "aged", "aging")):
+            tags.add("heat_treated")
+        if any(k in text for k in ("plated", "plating", "anodize", "anodized", "passivat")):
+            tags.add("plated")
+            tags.add("surface_treated")
+        if any(k in text for k in ("bonded", "bonding", "potted", "potting")):
+            tags.add("bonded")
+        if any(k in text for k in ("3d print", "additive manuf", "dmls", "slm", "ebm", " am ")):
+            tags.add("additive_manufacturing")
+
+        # --- Hardware type indicators ---
+        if any(k in text for k in ("bolt", "fastener", "screw", "nut", "rivet")):
+            tags.add("fastener")
+            tags.add("metallic_material")
+
         return tags
 
     @staticmethod
@@ -172,6 +246,14 @@ class ApplicabilityEngineCodex:
             return env.pressure_psia <= 4.3
         if trigger in ("external_environment", "external"):
             return env.vacuum_exposure or env.lunar_dust
+        if trigger == "hydrogen_service":
+            return getattr(env, "hydrogen_service", False)
+        if trigger == "propellant_service":
+            return getattr(env, "propellant_service", False)
+        if trigger == "oxidizer_service":
+            return getattr(env, "oxidizer_service", False)
+        if trigger == "habitable_or_vacuum":
+            return env.habitable or env.vacuum_exposure
         return False
 
     @staticmethod
@@ -243,7 +325,7 @@ class ApplicabilityEngineCodex:
                 status = ApplicabilityStatus.NOT_APPLICABLE_BY_CONDITION.value
                 rationale = f"Triggers not met: {', '.join(triggers)}"
 
-            decisions[mpr.mpr_id] = {
+            decision: dict[str, Any] = {
                 "mpr_id": mpr.mpr_id,
                 "mpr_number": mpr.mpr_number,
                 "mpr_title": mpr.title,
@@ -257,6 +339,9 @@ class ApplicabilityEngineCodex:
                 "citation": f"NASA-STD-6016C w/CHANGE 2 §{mpr.section}",
                 "confidence": 1.0 if matched or not triggers else 0.95,
             }
+            if mpr.prohibition:
+                decision["prohibition"] = mpr.prohibition
+            decisions[mpr.mpr_id] = decision
 
         return decisions
 
