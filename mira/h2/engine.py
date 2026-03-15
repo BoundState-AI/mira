@@ -318,7 +318,8 @@ def evaluate_h2_compatibility(request: H2CompatibilityRequest) -> H2Compatibilit
             embrittlement_risk = risk_map.get(result.hee_band, "unknown")
 
         if (
-            classification == AnswerSeverity.OK
+            embrittlement_risk is None
+            and classification == AnswerSeverity.OK
             and family_rule.get("classification") == "approved"
             and family_rule.get("embrittlement_risk") in {"none", "very_low", "low"}
         ):
