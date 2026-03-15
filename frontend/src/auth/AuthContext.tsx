@@ -1,4 +1,13 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   AuthenticationDetails,
   CognitoUser,
@@ -237,6 +246,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [passwordResetUser, setPasswordResetUser] = useState<CognitoUser | null>(null);
   const [passwordResetDelivery, setPasswordResetDelivery] = useState("");
   const [newPasswordAttributes, setNewPasswordAttributes] = useState<Record<string, string>>({});
+  const tokenRef = useRef<string | null>(null);
+  const logoutRef = useRef<() => void>(() => {});
 
   const beginSession = useCallback((session: CognitoUserSession) => {
     const accessToken = session.getAccessToken().getJwtToken();
@@ -313,34 +324,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setNewPasswordAttributes({});
   }, []);
 
-  useEffect(() => {
+  tokenRef.current = token;
+  logoutRef.current = logout;
+
+  useLayoutEffect(() => {
     const originalFetch = window.fetch.bind(window);
 
     window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-      if (!token || !shouldAttachAuthHeader(input, token)) {
+      const currentToken = tokenRef.current;
+      if (!currentToken || !shouldAttachAuthHeader(input, currentToken)) {
         return originalFetch(input, init);
       }
 
       let response: Response;
       if (input instanceof Request) {
-        const headers = mergeAuthorizationHeader(input.headers, token);
+        const headers = mergeAuthorizationHeader(input.headers, currentToken);
         if (init?.headers) {
           const initHeaders = new Headers(init.headers);
           initHeaders.forEach((value, key) => headers.set(key, value));
           if (!headers.has("Authorization")) {
-            headers.set("Authorization", `Bearer ${token}`);
+            headers.set("Authorization", `Bearer ${currentToken}`);
           }
         }
         response = await originalFetch(new Request(input, { ...init, headers }));
       } else {
         response = await originalFetch(input, {
           ...init,
-          headers: mergeAuthorizationHeader(init?.headers, token),
+          headers: mergeAuthorizationHeader(init?.headers, currentToken),
         });
       }
 
       if (response.status === 401 && isApiRequest(input)) {
-        logout();
+        logoutRef.current();
       }
 
       return response;
@@ -349,7 +364,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       window.fetch = originalFetch;
     };
-  }, [logout, token]);
+  }, []);
 
   const login = useCallback(
     (username: string, password: string) => {
