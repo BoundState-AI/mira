@@ -1,0 +1,818 @@
+{
+  "materials": [
+    {
+      "material_name": "Nickel 200",
+      "family": "nickel_alloy",
+      "flammability_rating": "A",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 20,
+      "max_tested_pressure_psia": 10000,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "published_literature",
+      "o2_test_count_provenance": "published_literature",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1, p.30; MAPTIS 54195"
+    },
+    {
+      "material_name": "Monel 400",
+      "family": "nickel_alloy",
+      "flammability_rating": "A",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 13,
+      "max_tested_pressure_psia": 10000,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "published_literature",
+      "o2_test_count_provenance": "published_literature",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1, p.30; MAPTIS 55695"
+    },
+    {
+      "material_name": "Monel K-500",
+      "family": "nickel_alloy",
+      "flammability_rating": "A",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 5,
+      "max_tested_pressure_psia": 10000,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "published_literature",
+      "o2_test_count_provenance": "published_literature",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1, p.30; WSTF 89-22906"
+    },
+    {
+      "material_name": "Inconel 600",
+      "family": "nickel_alloy",
+      "flammability_rating": "A",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 15,
+      "max_tested_pressure_psia": 2500,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "published_literature",
+      "o2_test_count_provenance": "published_literature",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1, p.30; WSTF 95-29293, MAPTIS 10135/55441/55431"
+    },
+    {
+      "material_name": "Inconel 718",
+      "family": "nickel_alloy",
+      "flammability_rating": "A",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 10,
+      "max_tested_pressure_psia": 500,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "published_literature",
+      "o2_test_count_provenance": "published_literature",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1, p.31; MAPTIS 54263/55488/10106"
+    },
+    {
+      "material_name": "Inconel 625",
+      "family": "nickel_alloy",
+      "flammability_rating": "A",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 20,
+      "max_tested_pressure_psia": 1000,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "published_literature",
+      "o2_test_count_provenance": "published_literature",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1, p.31; MAPTIS 10404/10288/10727"
+    },
+    {
+      "material_name": "Hastelloy C276",
+      "family": "nickel_alloy",
+      "flammability_rating": "A",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 20,
+      "max_tested_pressure_psia": 3000,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "published_literature",
+      "o2_test_count_provenance": "published_literature",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1, p.30; MAPTIS 55874"
+    },
+    {
+      "material_name": "Waspaloy",
+      "family": "nickel_alloy",
+      "flammability_rating": "A",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 7,
+      "max_tested_pressure_psia": 1000,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "published_literature",
+      "o2_test_count_provenance": "published_literature",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1, p.30; MAPTIS 30125"
+    },
+    {
+      "material_name": "Copper (commercially pure)",
+      "family": "copper",
+      "flammability_rating": "A",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 2,
+      "max_tested_pressure_psia": 10000,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "published_literature",
+      "o2_test_count_provenance": "published_literature",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1, p.30; WSTF"
+    },
+    {
+      "material_name": "Copper 102",
+      "family": "copper",
+      "flammability_rating": "A",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 2,
+      "max_tested_pressure_psia": 8000,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "published_literature",
+      "o2_test_count_provenance": "published_literature",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1, p.30; ASTM STP910 p.145"
+    },
+    {
+      "material_name": "Aluminum-bronze",
+      "family": "copper",
+      "flammability_rating": "B",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 3,
+      "max_tested_pressure_psia": 250,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "published_literature",
+      "o2_test_count_provenance": "published_literature",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1, p.31; WSTF 92-26731"
+    },
+    {
+      "material_name": "300 Series stainless steel",
+      "family": "austenitic_steel",
+      "flammability_rating": "B",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 40,
+      "max_tested_pressure_psia": 200,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "published_literature",
+      "o2_test_count_provenance": "published_literature",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1, p.31; WSTF 97-31575/06-40375"
+    },
+    {
+      "material_name": "304 stainless steel",
+      "family": "austenitic_steel",
+      "flammability_rating": "B",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 40,
+      "max_tested_pressure_psia": 200,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "estimated",
+      "o2_test_count_provenance": "estimated",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1 (300 Series); Table 3-2 mesh data"
+    },
+    {
+      "material_name": "316 stainless steel",
+      "family": "austenitic_steel",
+      "flammability_rating": "B",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 40,
+      "max_tested_pressure_psia": 200,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "estimated",
+      "o2_test_count_provenance": "estimated",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1 (300 Series); Table 3-2 mesh data"
+    },
+    {
+      "material_name": "316L",
+      "family": "austenitic_steel",
+      "flammability_rating": "B",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 40,
+      "max_tested_pressure_psia": 200,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "estimated",
+      "o2_test_count_provenance": "estimated",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1 (300 Series); Table 3-2 mesh data"
+    },
+    {
+      "material_name": "440C stainless steel",
+      "family": "carbon_steel",
+      "flammability_rating": "C",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 20,
+      "max_tested_pressure_psia": 500,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "published_literature",
+      "o2_test_count_provenance": "published_literature",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1, p.31; MAPTIS 30008/10106/50822/53129"
+    },
+    {
+      "material_name": "17-4 PH stainless steel",
+      "family": "carbon_steel",
+      "flammability_rating": "C",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 6,
+      "max_tested_pressure_psia": 500,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "published_literature",
+      "o2_test_count_provenance": "published_literature",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1, p.31; MAPTIS 53654"
+    },
+    {
+      "material_name": "Aluminum 1100",
+      "family": "aluminum",
+      "flammability_rating": "C",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 9,
+      "max_tested_pressure_psia": 100,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "published_literature",
+      "o2_test_count_provenance": "published_literature",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1, p.31; WSTF 88-21971"
+    },
+    {
+      "material_name": "Aluminum 2219",
+      "family": "aluminum",
+      "flammability_rating": "C",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 5,
+      "max_tested_pressure_psia": 25,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "published_literature",
+      "o2_test_count_provenance": "published_literature",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1, p.32; WSTF 89-23149"
+    },
+    {
+      "material_name": "Aluminum 6061",
+      "family": "aluminum",
+      "flammability_rating": "C",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 9,
+      "max_tested_pressure_psia": 100,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "estimated",
+      "o2_test_count_provenance": "estimated",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1 (Aluminum 1100 analog); family-level estimate"
+    },
+    {
+      "material_name": "Aluminum 7075",
+      "family": "aluminum",
+      "flammability_rating": "C",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 9,
+      "max_tested_pressure_psia": 100,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "estimated",
+      "o2_test_count_provenance": "estimated",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1 (Aluminum 1100 analog); family-level estimate"
+    },
+    {
+      "material_name": "Titanium (commercially pure)",
+      "family": "titanium",
+      "flammability_rating": "X",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 5,
+      "max_tested_pressure_psia": 1,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "published_literature",
+      "o2_test_count_provenance": "published_literature",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1, p.32; WSTF 88-21969"
+    },
+    {
+      "material_name": "Ti-6Al-4V",
+      "family": "titanium",
+      "flammability_rating": "X",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 4,
+      "max_tested_pressure_psia": 1,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "published_literature",
+      "o2_test_count_provenance": "published_literature",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1, p.32; WSTF 88-21970"
+    },
+    {
+      "material_name": "Magnesium (commercially pure)",
+      "family": "magnesium",
+      "flammability_rating": "X",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 2,
+      "max_tested_pressure_psia": 12.4,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "published_literature",
+      "o2_test_count_provenance": "published_literature",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1, p.32; WSTF"
+    },
+    {
+      "material_name": "Carbon steel",
+      "family": "carbon_steel",
+      "flammability_rating": "C",
+      "auto_ignition_temp_c": null,
+      "o2_test_count": 3,
+      "max_tested_pressure_psia": 100,
+      "flammability_provenance": "published_literature",
+      "max_tested_pressure_provenance": "published_literature",
+      "o2_test_count_provenance": "published_literature",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-1, p.32; ASTM STP 1040 p.44"
+    },
+    {
+      "material_name": "PTFE",
+      "family": "fluoropolymer",
+      "flammability_rating": "D",
+      "auto_ignition_temp_c": 434,
+      "o2_test_count": 12,
+      "max_tested_pressure_psia": 500,
+      "flammability_provenance": "published_literature",
+      "auto_ignition_provenance": "published_literature",
+      "max_tested_pressure_provenance": "published_literature",
+      "o2_test_count_provenance": "published_literature",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-12 p.41; Table 3-15 p.51"
+    },
+    {
+      "material_name": "Kel-F 81",
+      "family": "fluoropolymer",
+      "flammability_rating": "C",
+      "auto_ignition_temp_c": 507,
+      "o2_test_count": 8,
+      "max_tested_pressure_psia": 500,
+      "flammability_provenance": "published_literature",
+      "auto_ignition_provenance": "published_literature",
+      "max_tested_pressure_provenance": "published_literature",
+      "o2_test_count_provenance": "published_literature",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-12 p.41"
+    },
+    {
+      "material_name": "FEP",
+      "family": "fluoropolymer",
+      "flammability_rating": "D",
+      "auto_ignition_temp_c": 480,
+      "o2_test_count": 6,
+      "max_tested_pressure_psia": 500,
+      "flammability_provenance": "published_literature",
+      "auto_ignition_provenance": "published_literature",
+      "max_tested_pressure_provenance": "estimated",
+      "o2_test_count_provenance": "estimated",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-12 p.41"
+    },
+    {
+      "material_name": "Viton A",
+      "family": "elastomer",
+      "flammability_rating": "D",
+      "auto_ignition_temp_c": 218,
+      "o2_test_count": 6,
+      "max_tested_pressure_psia": 500,
+      "flammability_provenance": "published_literature",
+      "auto_ignition_provenance": "published_literature",
+      "max_tested_pressure_provenance": "estimated",
+      "o2_test_count_provenance": "estimated",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-12 p.41"
+    },
+    {
+      "material_name": "Vespel SP-21",
+      "family": "polyimide",
+      "flammability_rating": "D",
+      "auto_ignition_temp_c": 349,
+      "o2_test_count": 6,
+      "max_tested_pressure_psia": 500,
+      "flammability_provenance": "published_literature",
+      "auto_ignition_provenance": "published_literature",
+      "max_tested_pressure_provenance": "estimated",
+      "o2_test_count_provenance": "estimated",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-12 p.41"
+    },
+    {
+      "material_name": "Nylon 6/6",
+      "family": "polymer_organic",
+      "flammability_rating": "D",
+      "auto_ignition_temp_c": 186,
+      "o2_test_count": 4,
+      "max_tested_pressure_psia": 500,
+      "flammability_provenance": "published_literature",
+      "auto_ignition_provenance": "published_literature",
+      "max_tested_pressure_provenance": "estimated",
+      "o2_test_count_provenance": "estimated",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-12 p.41"
+    },
+    {
+      "material_name": "EPDM",
+      "family": "elastomer",
+      "flammability_rating": "D",
+      "auto_ignition_temp_c": 190,
+      "o2_test_count": 4,
+      "max_tested_pressure_psia": 500,
+      "flammability_provenance": "published_literature",
+      "auto_ignition_provenance": "published_literature",
+      "max_tested_pressure_provenance": "estimated",
+      "o2_test_count_provenance": "estimated",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-12 p.41"
+    },
+    {
+      "material_name": "Silicone",
+      "family": "elastomer",
+      "flammability_rating": "D",
+      "auto_ignition_temp_c": 210,
+      "o2_test_count": 4,
+      "max_tested_pressure_psia": 500,
+      "flammability_provenance": "published_literature",
+      "auto_ignition_provenance": "estimated",
+      "max_tested_pressure_provenance": "estimated",
+      "o2_test_count_provenance": "estimated",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-12 p.41"
+    },
+    {
+      "material_name": "Buna-N",
+      "family": "elastomer",
+      "flammability_rating": "D",
+      "auto_ignition_temp_c": 183,
+      "o2_test_count": 4,
+      "max_tested_pressure_psia": 500,
+      "flammability_provenance": "published_literature",
+      "auto_ignition_provenance": "published_literature",
+      "max_tested_pressure_provenance": "estimated",
+      "o2_test_count_provenance": "estimated",
+      "promoted_ignition_provenance": "published_literature",
+      "source_ref": "ASTM MNL36 2nd Ed., Table 3-12 p.41"
+    }
+  ],
+  "families": [
+    {
+      "family": "nickel_alloy",
+      "compatibility_class": "A",
+      "general_recommendation": "Nickel and nickel-copper alloys are among the most oxygen-compatible bulk metals per ASTM MNL36 Table 3-1. No burn above 10,000 psia for Ni 200 and Monel 400. Porous and mesh configurations can collapse the margin.",
+      "screening_summary": "Nickel and nickel-copper alloys are among the most oxygen-compatible bulk metals in ASTM MNL36 rod data, but porous and mesh configurations can collapse the margin sharply.",
+      "representative_materials": [
+        "Nickel 200",
+        "Monel 400",
+        "Monel K-500",
+        "Inconel 600",
+        "Inconel 718"
+      ],
+      "key_findings": [
+        "Nickel 200 and Monel 400 showed no burn above 10,000 psia in standard 0.125 in. rod promoted-ignition testing.",
+        "Monel 400 burns at 100 psia in sintered-filter-like geometry and at or below 12.4 psia in 60 x 60 mesh geometry.",
+        "Monel 400 heat of combustion is about 3.64 kJ/g."
+      ],
+      "detailed_reference_file": "astm_mnl36_extracted_data.json",
+      "source": [
+        {
+          "source": "ASTM MNL36 2nd Ed.",
+          "page": 30,
+          "provenance": "published_handbook_compilation",
+          "table": "3-1",
+          "test_standard": "ASTM G124"
+        },
+        {
+          "source": "ASTM MNL36 2nd Ed.",
+          "page": 33,
+          "provenance": "published_handbook_compilation",
+          "table": "3-3",
+          "test_standard": "ASTM G124"
+        },
+        {
+          "source": "ASTM MNL36 2nd Ed.",
+          "page": 40,
+          "provenance": "published_handbook_compilation",
+          "table": "3-11",
+          "test_standard": "ASTM D4809"
+        }
+      ]
+    },
+    {
+      "family": "copper",
+      "compatibility_class": "A",
+      "general_recommendation": "Copper and most copper-base alloys are highly resistant in bulk GOX promoted-ignition testing per ASTM MNL36 Table 3-1. Aluminum-bronze transitions much earlier than pure copper (~250/200 psia).",
+      "screening_summary": "Copper and many copper-base alloys are highly resistant in bulk GOX promoted-ignition testing, but aluminum-bronze transitions much earlier than pure copper.",
+      "representative_materials": [
+        "Copper (commercially pure)",
+        "Copper 102",
+        "Aluminum-bronze",
+        "Tin-bronze"
+      ],
+      "key_findings": [
+        "Commercially pure copper showed no burn above 10,000 psia in standard rod testing.",
+        "Copper 102 showed no burn above 8,000 psia in standard rod testing.",
+        "Aluminum-bronze showed a measured burn/no-burn transition at about 250/200 psia in standard rod testing."
+      ],
+      "detailed_reference_file": "astm_mnl36_extracted_data.json",
+      "source": [
+        {
+          "source": "ASTM MNL36 2nd Ed.",
+          "page": 30,
+          "provenance": "published_handbook_compilation",
+          "table": "3-1",
+          "test_standard": "ASTM G124"
+        },
+        {
+          "source": "ASTM MNL36 2nd Ed.",
+          "page": 31,
+          "provenance": "published_handbook_compilation",
+          "table": "3-1",
+          "test_standard": "ASTM G124"
+        }
+      ]
+    },
+    {
+      "family": "austenitic_steel",
+      "compatibility_class": "B",
+      "general_recommendation": "Austenitic stainless steels are usable but not benign per ASTM MNL36 Table 3-1. Burn/no-burn transition ~200/111 psia in bulk rod. Wire mesh burns at or below 12.4 psia.",
+      "screening_summary": "Austenitic stainless steels are usable but not benign; promoted-ignition thresholds in bulk rod form are much lower than copper and nickel alloys, and high-surface-area geometries remain sensitive.",
+      "representative_materials": [
+        "300 Series stainless steel",
+        "304 stainless steel",
+        "316 stainless steel",
+        "440C stainless steel"
+      ],
+      "key_findings": [
+        "300 Series stainless steel showed a promoted-ignition burn/no-burn transition at about 200/111 psia in standard rod testing.",
+        "304 and 316 stainless wire mesh burned at or below 12.4 psia in the 60 x 60 mesh cylinder configuration.",
+        "Austenitic stainless steel heat of combustion is about 7.74 to 7.95 kJ/g."
+      ],
+      "detailed_reference_file": "astm_mnl36_extracted_data.json",
+      "source": [
+        {
+          "source": "ASTM MNL36 2nd Ed.",
+          "page": 31,
+          "provenance": "published_handbook_compilation",
+          "table": "3-1",
+          "test_standard": "ASTM G124"
+        },
+        {
+          "source": "ASTM MNL36 2nd Ed.",
+          "page": 33,
+          "provenance": "published_handbook_compilation",
+          "table": "3-2",
+          "test_standard": "ASTM G124"
+        },
+        {
+          "source": "ASTM MNL36 2nd Ed.",
+          "page": 40,
+          "provenance": "published_handbook_compilation",
+          "table": "3-11",
+          "test_standard": "ASTM D4809"
+        }
+      ]
+    },
+    {
+      "family": "aluminum",
+      "compatibility_class": "C",
+      "general_recommendation": "Aluminum alloys show low promoted-ignition thresholds in GOX per ASTM MNL36 Table 3-1. Al 1100 burns at ~100 psia, Al 2219 at ~25 psia. Treat as reactive oxygen-service targets.",
+      "screening_summary": "Aluminum alloys show low promoted-ignition thresholds in GOX and should be treated as reactive oxygen-service targets unless protected by configuration and system design.",
+      "representative_materials": [
+        "Aluminum 1100",
+        "Aluminum 2219",
+        "Aluminum 6061"
+      ],
+      "key_findings": [
+        "Aluminum 1100 showed a burn/no-burn transition at about 100/50 psia in standard rod testing.",
+        "Aluminum 2219 showed a burn/no-burn transition at about 25/15 psia in standard rod testing.",
+        "Commercially pure aluminum burned at about 12.4 psia in standard rod testing."
+      ],
+      "detailed_reference_file": "astm_mnl36_extracted_data.json",
+      "source": [
+        {
+          "source": "ASTM MNL36 2nd Ed.",
+          "page": 31,
+          "provenance": "published_handbook_compilation",
+          "table": "3-1",
+          "test_standard": "ASTM G124"
+        },
+        {
+          "source": "ASTM MNL36 2nd Ed.",
+          "page": 32,
+          "provenance": "published_handbook_compilation",
+          "table": "3-1",
+          "test_standard": "ASTM G124"
+        }
+      ]
+    },
+    {
+      "family": "titanium",
+      "compatibility_class": "X",
+      "general_recommendation": "Titanium and Ti-6Al-4V are extremely sensitive in GOX per ASTM MNL36 Table 3-1. Burns at or below 1 psia. Prohibited by MPR 67 in LOX/GOX service.",
+      "screening_summary": "Titanium and Ti-6Al-4V are extremely sensitive in GOX promoted-ignition testing and remain prohibited by governing requirement in the current OCA engine.",
+      "representative_materials": [
+        "Titanium (commercially pure)",
+        "Ti-6Al-4V"
+      ],
+      "key_findings": [
+        "Commercially pure titanium and Ti-6Al-4V burned at or below 1 psia in standard rod testing.",
+        "Titanium heat of combustion is about 19.71 kJ/g."
+      ],
+      "detailed_reference_file": "astm_mnl36_extracted_data.json",
+      "source": [
+        {
+          "source": "ASTM MNL36 2nd Ed.",
+          "page": 32,
+          "provenance": "published_handbook_compilation",
+          "table": "3-1",
+          "test_standard": "ASTM G124"
+        },
+        {
+          "source": "ASTM MNL36 2nd Ed.",
+          "page": 40,
+          "provenance": "published_handbook_compilation",
+          "table": "3-11",
+          "test_standard": "ASTM D4809"
+        }
+      ]
+    },
+    {
+      "family": "magnesium",
+      "compatibility_class": "X",
+      "general_recommendation": "Magnesium is highly reactive in oxygen service per ASTM MNL36 Table 3-1. Burns at or below 12.4 psia. Prohibited in oxygen systems.",
+      "screening_summary": "Magnesium is highly reactive in oxygen service and ignites at low GOX pressure in standard promoted-ignition testing.",
+      "representative_materials": [
+        "Magnesium (commercially pure)"
+      ],
+      "key_findings": [
+        "Commercially pure magnesium burned at or below 12.4 psia in standard rod testing.",
+        "Magnesium heat of combustion is about 24.69 kJ/g."
+      ],
+      "detailed_reference_file": "astm_mnl36_extracted_data.json",
+      "source": [
+        {
+          "source": "ASTM MNL36 2nd Ed.",
+          "page": 32,
+          "provenance": "published_handbook_compilation",
+          "table": "3-1",
+          "test_standard": "ASTM G124"
+        },
+        {
+          "source": "ASTM MNL36 2nd Ed.",
+          "page": 40,
+          "provenance": "published_handbook_compilation",
+          "table": "3-11",
+          "test_standard": "ASTM D4809"
+        }
+      ]
+    },
+    {
+      "family": "fluoropolymer",
+      "compatibility_class": "C",
+      "general_recommendation": "Fluoropolymers (PTFE, FEP, Kel-F) have the highest oxygen indices among nonmetals per ASTM MNL36 Table 3-12, but are still flammable in enriched oxygen. PTFE AIT is ~434 C. Pneumatic impact sensitivity varies.",
+      "screening_summary": "Fluoropolymers have the highest oxygen indices among nonmetals but remain flammable in enriched oxygen environments and require case-specific AIT, pneumatic impact, and mechanical impact assessment.",
+      "representative_materials": [
+        "PTFE/TFE",
+        "FEP",
+        "Kel-F 81",
+        "ETFE"
+      ],
+      "key_findings": [
+        "PTFE has oxygen index >99.5% and AIT of 434 C (lowest observed) per Table 3-12.",
+        "Kel-F 81 has oxygen index of 100% and AIT of 507 C per Table 3-12.",
+        "PTFE fails pneumatic impact at 3.4 MPa (500 psia) per Table 3-15."
+      ],
+      "detailed_reference_file": "astm_mnl36_extracted_data.json",
+      "source": [
+        {
+          "source": "ASTM MNL36 2nd Ed.",
+          "page": 41,
+          "provenance": "published_handbook_compilation",
+          "table": "3-12"
+        },
+        {
+          "source": "ASTM MNL36 2nd Ed.",
+          "page": 51,
+          "provenance": "published_handbook_compilation",
+          "table": "3-15",
+          "test_standard": "ASTM G74"
+        }
+      ]
+    },
+    {
+      "family": "polymer_organic",
+      "compatibility_class": "D",
+      "general_recommendation": "Most polymeric materials are flammable in 100% oxygen at ambient pressure per ASTM MNL36 Table 3-12. Require case-specific review of oxygen index, AIT, heat of combustion, pneumatic impact, and mechanical impact.",
+      "screening_summary": "Most polymeric materials are flammable in 100% oxygen at ambient pressure and require case-specific review of oxygen index, AIT, heat of combustion, pneumatic impact, and mechanical impact.",
+      "representative_materials": [
+        "Kel-F 81",
+        "PTFE/TFE",
+        "FEP",
+        "ETFE",
+        "Nylon 6/6",
+        "Vespel SP21",
+        "Viton A",
+        "EPDM",
+        "NBR"
+      ],
+      "key_findings": [
+        "Fluoropolymers such as Kel-F 81 and PTFE have the highest oxygen indices in the table and relatively low heats of combustion compared with hydrocarbon polymers.",
+        "Many engineering plastics and elastomers show low oxygen index values and AITs below 300 C at 10.3 MPa oxygen.",
+        "ASTM G74 and G86 data show wide variation in pneumatic- and mechanical-impact sensitivity across nonmetals."
+      ],
+      "detailed_reference_file": "astm_mnl36_extracted_data.json",
+      "source": [
+        {
+          "source": "ASTM MNL36 2nd Ed.",
+          "page": 41,
+          "provenance": "published_handbook_compilation",
+          "table": "3-12"
+        },
+        {
+          "source": "ASTM MNL36 2nd Ed.",
+          "page": 50,
+          "provenance": "published_handbook_compilation",
+          "table": "3-14",
+          "test_standard": "ASTM G72"
+        },
+        {
+          "source": "ASTM MNL36 2nd Ed.",
+          "page": 51,
+          "provenance": "published_handbook_compilation",
+          "table": "3-15",
+          "test_standard": "ASTM G74"
+        },
+        {
+          "source": "ASTM MNL36 2nd Ed.",
+          "page": 53,
+          "provenance": "published_handbook_compilation",
+          "table": "3-16",
+          "test_standard": "ASTM G86"
+        }
+      ]
+    },
+    {
+      "family": "composite",
+      "compatibility_class": "D",
+      "general_recommendation": "Composite thermosets are not intrinsically cleared by the handbook and require ignition-specific assessment per ASTM MNL36 Table 3-12.",
+      "screening_summary": "Composite thermosets are not intrinsically cleared by the handbook and still require ignition-specific assessment against actual configuration and oxygen exposure.",
+      "representative_materials": [
+        "Epoxy/fiberglass composite",
+        "Epoxy/graphite composite",
+        "Phenolic/fiberglass composite",
+        "Bismaleimide/graphite composite"
+      ],
+      "key_findings": [
+        "Composite AIT values are tabulated in Table 3-12 but oxygen index is often not reported.",
+        "Heat of combustion varies widely across thermoset composite systems."
+      ],
+      "detailed_reference_file": "astm_mnl36_extracted_data.json",
+      "source": [
+        {
+          "source": "ASTM MNL36 2nd Ed.",
+          "page": 47,
+          "provenance": "published_handbook_compilation",
+          "table": "3-12",
+          "test_standard": "ASTM G72"
+        }
+      ]
+    },
+    {
+      "family": "carbon_steel",
+      "compatibility_class": "C",
+      "general_recommendation": "Carbon steels burn at relatively low pressures (~100 psia) per ASTM MNL36 Table 3-1 and are generally not recommended for oxygen service without careful configuration controls.",
+      "screening_summary": "Carbon steels have low promoted-ignition thresholds and are generally restricted in oxygen service.",
+      "representative_materials": [
+        "Carbon steel",
+        "1018 steel",
+        "A36 steel"
+      ],
+      "key_findings": [
+        "Carbon steel burned at or below 100 psia in standard rod testing per ASTM STP 1040."
+      ],
+      "detailed_reference_file": "astm_mnl36_extracted_data.json",
+      "source": [
+        {
+          "source": "ASTM MNL36 2nd Ed.",
+          "page": 32,
+          "provenance": "published_handbook_compilation",
+          "table": "3-1",
+          "test_standard": "ASTM G124"
+        }
+      ]
+    },
+    {
+      "family": "unknown",
+      "compatibility_class": "U",
+      "general_recommendation": "Unknown materials remain indeterminate until mapped to a tested family, exact designation, or governing rule set.",
+      "screening_summary": "Unknown materials remain indeterminate until they can be mapped to a tested family, exact designation, or governing rule set.",
+      "representative_materials": [],
+      "key_findings": [],
+      "detailed_reference_file": "astm_mnl36_extracted_data.json",
+      "source": [
+        {
+          "source": "BoundState OCA reference pack",
+          "provenance": "internal_screening_logic"
+        }
+      ]
+    }
+  ]
+}

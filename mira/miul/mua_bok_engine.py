@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import json
 import logging
-import pickle
+from mira.core.safe_pickle import safe_pickle_load
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -31,7 +31,7 @@ import uuid
 logger = logging.getLogger(__name__)
 
 # Default paths - use BoundState location first, fall back to maptis-nlp
-DEFAULT_INDEX_PATH = Path(r"C:\BoundState\mira\databases\mua_bok_v2")
+DEFAULT_INDEX_PATH = Path(__file__).resolve().parents[2] / "databases" / "mua_bok_v2"
 
 # Rating priority (NASA-STD-6016)
 RATING_PRIORITY = ["FLAM", "TVS", "TOX", "SCC", "CORR", "FS"]
@@ -138,8 +138,7 @@ class MUABOKEngine:
             return
 
         if metadata_file.exists():
-            with open(metadata_file, "rb") as f:
-                self.metadata = pickle.load(f)
+            self.metadata = safe_pickle_load(metadata_file)
             logger.info(f"Loaded {len(self.metadata)} metadata records")
 
     def _load_embedder(self):

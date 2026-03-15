@@ -10,11 +10,23 @@
 credentials.json
 
 # --- LARGE DATA DIRECTORIES ---
-data/
+/data/
 # H2 evidence corpus is a runtime dependency — must ship with the build
 !mira/data/
 mira/data/*
 !mira/data/h2_evidence_merged.json
+!mira/compliance/
+!mira/compliance/data/
+!mira/compliance/data/mprs_6016c.yaml
+!mira/mp_plan/
+!mira/mp_plan/data/
+!mira/mp_plan/data/guidance.json
+!sentinel/tocr/
+!sentinel/tocr/data/
+!sentinel/tocr/data/guidance.json
+!sentinel/tocr/data/qms_triggers.json
+!sentinel/tocr/data/scan_rules.json
+!sentinel/tocr/data/tocr_rules.json
 raw/
 EM32/
 sandbox/
@@ -47,6 +59,7 @@ data_laundering/
 .forge/
 forge_output/
 forge_runtime/
+.deploy_receipts/
 .tmp_*/
 .tmp_*.py
 .tmp_*.sql

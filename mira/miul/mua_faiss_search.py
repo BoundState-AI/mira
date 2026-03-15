@@ -16,7 +16,7 @@ Compliance: SWE-013, NASA-STD-8739.8B
 Safety Critical: False
 """
 
-import pickle
+from mira.core.safe_pickle import safe_pickle_load
 import re
 from pathlib import Path
 from typing import List, Optional, Set
@@ -148,8 +148,7 @@ class MUAFAISSSearch:
             self.index = cpu_index
             self.using_gpu = False
 
-        with open(metadata_path, "rb") as f:
-            self.metadata = pickle.load(f)
+        self.metadata = safe_pickle_load(metadata_path)
 
         # Load model (uses GPU automatically if CUDA available)
         self.model = SentenceTransformer("all-mpnet-base-v2")

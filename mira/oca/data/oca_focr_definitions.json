@@ -1,0 +1,17 @@
+[
+  {
+    "focr_id": "FOCR_33",
+    "citation": "NASA-STD-6001B FOCR 33",
+    "summary": "Flammability assessment data shall be used when screening oxygen-service materials."
+  },
+  {
+    "focr_id": "FOCR_37",
+    "citation": "NASA-STD-6001B FOCR 37",
+    "summary": "Formal OCA requires documented M&P concurrence."
+  },
+  {
+    "focr_id": "FOCR_39",
+    "citation": "NASA-STD-6001B FOCR 39",
+    "summary": "As-built verification must be captured in final OCA output."
+  }
+]

@@ -17,6 +17,13 @@ BUILD_ROOT="${ROOT_DIR}"
 STAGING_DIR=""
 BACKEND_TASK_JSON=""
 FRONTEND_TASK_JSON=""
+RESOLVED_DEPLOY_REF=""
+IS_DIRTY_DEPLOY=0
+PREDEPLOY_CHECKS_JSON=""
+PUBLIC_SMOKE_JSON=""
+AUTH_SMOKE_JSON=""
+AUDIT_LOG_PATH=""
+RECEIPT_PATH=""
 
 ACCOUNT_ID="${ACCOUNT_ID:-574823419003}"
 REGISTRY="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
@@ -47,6 +54,8 @@ BASE_URL="${BASE_URL:-https://mira.boundstate.ai}"
 JWT_SECRET_KEY="${JWT_SECRET_KEY:-mira-runtime-${DATE_TAG}}"
 BEDROCK_MODEL_ID="${BEDROCK_MODEL_ID:-us.anthropic.claude-sonnet-4-5-20250929-v1:0}"
 NO_DATA_RUNTIME="${NO_DATA_RUNTIME:-1}"
+SKIP_AUTHENTICATED_SMOKE="${SKIP_AUTHENTICATED_SMOKE:-0}"
+RECEIPTS_DIR="${RECEIPTS_DIR:-${ROOT_DIR}/.deploy_receipts}"
 
 BACKEND_CPU="${BACKEND_CPU:-256}"
 BACKEND_MEMORY="${BACKEND_MEMORY:-512}"
@@ -65,6 +74,7 @@ require_bin() {
 
 require_bin aws
 require_bin curl
+require_bin python3
 require_bin rg
 require_bin git
 [ -x "${DOCKER_BIN}" ] || {
@@ -81,6 +91,15 @@ cleanup() {
   fi
   if [ -n "${FRONTEND_TASK_JSON}" ] && [ -f "${FRONTEND_TASK_JSON}" ]; then
     rm -f "${FRONTEND_TASK_JSON}"
+  fi
+  if [ -n "${PREDEPLOY_CHECKS_JSON}" ] && [ -f "${PREDEPLOY_CHECKS_JSON}" ]; then
+    rm -f "${PREDEPLOY_CHECKS_JSON}"
+  fi
+  if [ -n "${PUBLIC_SMOKE_JSON}" ] && [ -f "${PUBLIC_SMOKE_JSON}" ]; then
+    rm -f "${PUBLIC_SMOKE_JSON}"
+  fi
+  if [ -n "${AUTH_SMOKE_JSON}" ] && [ -f "${AUTH_SMOKE_JSON}" ]; then
+    rm -f "${AUTH_SMOKE_JSON}"
   fi
 }
 
@@ -113,13 +132,20 @@ ensure_service() {
     --query 'services[0].status' --output text 2>/dev/null | rg -q 'ACTIVE'
 }
 
+prepare_snapshot_from_ref() {
+  local source_ref="$1"
+  STAGING_DIR="$(mktemp -d)"
+  git -C "${ROOT_DIR}" archive "${source_ref}" | tar -xf - -C "${STAGING_DIR}"
+  BUILD_ROOT="${STAGING_DIR}"
+}
+
 prepare_build_root() {
   if [ -n "${DEPLOY_GIT_REF}" ]; then
-    STAGING_DIR="$(mktemp -d)"
+    RESOLVED_DEPLOY_REF="$(git -C "${ROOT_DIR}" rev-parse --verify "${DEPLOY_GIT_REF}^{commit}")"
     echo "== Build source =="
     echo "Preparing clean snapshot from git ref: ${DEPLOY_GIT_REF}"
-    git -C "${ROOT_DIR}" archive "${DEPLOY_GIT_REF}" | tar -xf - -C "${STAGING_DIR}"
-    BUILD_ROOT="${STAGING_DIR}"
+    echo "Resolved deploy ref: ${RESOLVED_DEPLOY_REF}"
+    prepare_snapshot_from_ref "${RESOLVED_DEPLOY_REF}"
     return
   fi
 
@@ -136,9 +162,115 @@ prepare_build_root() {
     printf '%s\n' "${dirty_files}" | sed -n '1,20p' >&2
     exit 1
   fi
+
+  if [ -n "${dirty_files}" ]; then
+    RESOLVED_DEPLOY_REF="$(git -C "${ROOT_DIR}" rev-parse --verify HEAD^{commit})-dirty"
+    IS_DIRTY_DEPLOY=1
+    echo "== Build source =="
+    echo "WARNING: deploying current dirty worktree from ${ROOT_DIR}"
+    echo "Resolved deploy ref: ${RESOLVED_DEPLOY_REF}"
+    BUILD_ROOT="${ROOT_DIR}"
+    return
+  fi
+
+  RESOLVED_DEPLOY_REF="$(git -C "${ROOT_DIR}" rev-parse --verify HEAD^{commit})"
+  echo "== Build source =="
+  echo "Preparing clean snapshot from HEAD"
+  echo "Resolved deploy ref: ${RESOLVED_DEPLOY_REF}"
+  prepare_snapshot_from_ref "${RESOLVED_DEPLOY_REF}"
+}
+
+run_preflight_checks() {
+  echo
+  echo "== Runtime asset preflight =="
+  PYTHONPATH="${BUILD_ROOT}" python3 "${BUILD_ROOT}/scripts/aws/preflight_runtime_assets.py" \
+    --repo-root "${BUILD_ROOT}"
+}
+
+run_selected_predeploy_checks() {
+  PREDEPLOY_CHECKS_JSON="$(mktemp)"
+  echo
+  echo "== Changed-path-aware predeploy checks =="
+  if [ "${IS_DIRTY_DEPLOY}" = "1" ]; then
+    PYTHONPATH="${BUILD_ROOT}" python3 "${BUILD_ROOT}/scripts/aws/run_predeploy_checks.py" \
+      --repo-root "${ROOT_DIR}" \
+      --build-root "${BUILD_ROOT}" \
+      --deploy-ref "${RESOLVED_DEPLOY_REF}" \
+      --dirty-worktree \
+      --json-out "${PREDEPLOY_CHECKS_JSON}"
+  else
+    PYTHONPATH="${BUILD_ROOT}" python3 "${BUILD_ROOT}/scripts/aws/run_predeploy_checks.py" \
+      --repo-root "${ROOT_DIR}" \
+      --build-root "${BUILD_ROOT}" \
+      --deploy-ref "${RESOLVED_DEPLOY_REF}" \
+      --json-out "${PREDEPLOY_CHECKS_JSON}"
+  fi
+}
+
+run_postdeploy_smoke() {
+  PUBLIC_SMOKE_JSON="$(mktemp)"
+  AUTH_SMOKE_JSON="$(mktemp)"
+  echo
+  echo "== Public route smoke =="
+  PYTHONPATH="${BUILD_ROOT}" python3 "${BUILD_ROOT}/scripts/aws/postdeploy_public_smoke.py" \
+    --base-url "${BASE_URL}" \
+    --json-out "${PUBLIC_SMOKE_JSON}"
+
+  echo
+  echo "== Authenticated protected-route smoke =="
+  if [ "${SKIP_AUTHENTICATED_SMOKE}" = "1" ]; then
+    cat > "${AUTH_SMOKE_JSON}" <<JSON
+{
+  "ok": false,
+  "skipped": true,
+  "reason": "SKIP_AUTHENTICATED_SMOKE=1"
+}
+JSON
+    echo "Skipping authenticated smoke because SKIP_AUTHENTICATED_SMOKE=1"
+    return
+  fi
+
+  PYTHONPATH="${BUILD_ROOT}" python3 "${BUILD_ROOT}/scripts/aws/authenticated_route_smoke.py" \
+    --base-url "${BASE_URL}" \
+    --region "${COGNITO_REGION}" \
+    --user-pool-id "${COGNITO_USER_POOL_ID}" \
+    --client-id "${COGNITO_CLIENT_ID}" \
+    --json-out "${AUTH_SMOKE_JSON}"
+}
+
+run_postdeploy_audit() {
+  echo
+  echo "== Runtime audit =="
+  mkdir -p "${RECEIPTS_DIR}"
+  AUDIT_LOG_PATH="${RECEIPTS_DIR}/audit-${IMAGE_TAG}.log"
+  bash "${BUILD_ROOT}/scripts/aws/audit_mira_runtime_govcloud.sh" | tee "${AUDIT_LOG_PATH}"
+}
+
+write_deploy_receipt() {
+  echo
+  echo "== Deploy receipt =="
+  RECEIPT_PATH="$(
+    PYTHONPATH="${BUILD_ROOT}" python3 "${BUILD_ROOT}/scripts/aws/write_deploy_receipt.py" \
+      --receipt-dir "${RECEIPTS_DIR}" \
+      --deploy-ref "${RESOLVED_DEPLOY_REF}" \
+      --image-tag "${IMAGE_TAG}" \
+      --base-url "${BASE_URL}" \
+      --backend-image "${BACKEND_IMAGE}" \
+      --frontend-image "${FRONTEND_IMAGE}" \
+      --backend-task-def "${BACKEND_TD_ARN}" \
+      --frontend-task-def "${FRONTEND_TD_ARN}" \
+      --preflight-passed true \
+      --predeploy-json "${PREDEPLOY_CHECKS_JSON}" \
+      --public-smoke-json "${PUBLIC_SMOKE_JSON}" \
+      --auth-smoke-json "${AUTH_SMOKE_JSON}" \
+      --audit-log "${AUDIT_LOG_PATH}"
+  )"
+  echo "Receipt written to ${RECEIPT_PATH}"
 }
 
 prepare_build_root
+run_preflight_checks
+run_selected_predeploy_checks
 
 echo "== ECR login =="
 ensure_repo "${BACKEND_REPO}"
@@ -329,8 +461,6 @@ echo
 echo "== Wait for steady state =="
 aws ecs wait services-stable --cluster "${CLUSTER}" --services "${BACKEND_SERVICE}" "${FRONTEND_SERVICE}"
 
-echo
-echo "== Public verification =="
-curl -I -L --max-redirs 3 --connect-timeout 10 --max-time 20 "${BASE_URL}"
-curl -sS --connect-timeout 10 --max-time 20 "${BASE_URL}/health"
-echo
+run_postdeploy_smoke
+run_postdeploy_audit
+write_deploy_receipt

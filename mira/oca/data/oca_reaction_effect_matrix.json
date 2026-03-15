@@ -1,0 +1,42 @@
+{
+  "_meta": {
+    "description": "Reaction effect rating logic from ASTM MNL36 Table 4-2.",
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 68,
+      "provenance": "published_handbook_compilation",
+      "table": "4-2"
+    },
+    "ingest_date": "2026-03-11"
+  },
+  "ratings": [
+    {
+      "code": "A",
+      "label": "Negligible",
+      "effect_on_personnel_safety": "No injury to personnel",
+      "system_objectives": "No unacceptable effect on production, storage, transportation, distribution, or use as applicable",
+      "functional_capability": "No unacceptable damage to the system"
+    },
+    {
+      "code": "B",
+      "label": "Marginal",
+      "effect_on_personnel_safety": "Personnel-injuring factors can be controlled by automatic devices, warning devices, or special operating procedures",
+      "system_objectives": "Production, storage, transportation, distribution, or use as applicable is possible by utilizing available redundant operational options",
+      "functional_capability": "No more than one component or subsystem damaged and repairable or replaceable within an acceptable time frame on site"
+    },
+    {
+      "code": "C",
+      "label": "Critical",
+      "effect_on_personnel_safety": "Personnel may be injured operating the system, maintaining the system, or by being in the vicinity of the system",
+      "system_objectives": "Production, storage, transportation, distribution, or use as applicable impaired seriously",
+      "functional_capability": "Two or more major subsystems are damaged and extensive maintenance is required"
+    },
+    {
+      "code": "D",
+      "label": "Catastrophic",
+      "effect_on_personnel_safety": "Personnel suffer death or multiple injuries",
+      "system_objectives": "Production, storage, transportation, distribution, or use as applicable rendered impossible; major unit is lost",
+      "functional_capability": "No portion of system can be salvaged; total loss"
+    }
+  ]
+}

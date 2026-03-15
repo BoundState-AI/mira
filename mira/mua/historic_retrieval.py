@@ -21,7 +21,7 @@ from __future__ import annotations
 import json
 import logging
 import os
-import pickle
+from mira.core.safe_pickle import safe_pickle_load
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
@@ -399,8 +399,7 @@ class HistoricMUARetriever:
         if not mapping_path.exists():
             raise FileNotFoundError(f"Historic MUA mapping not found: {mapping_path}")
 
-        with open(mapping_path, "rb") as f:
-            self.vector_mapping: List[Dict[str, Any]] = pickle.load(f)
+        self.vector_mapping: List[Dict[str, Any]] = safe_pickle_load(mapping_path)
         LOGGER.info(f"Loaded {len(self.vector_mapping)} vector mappings")
 
         # Load historic MUA records (JSONL)

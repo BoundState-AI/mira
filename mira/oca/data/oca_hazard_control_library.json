@@ -1,0 +1,259 @@
+[
+  {
+    "control_id": "prefer_high_ait_nonmetals",
+    "title": "Keep nonmetal AIT at least 100 K above use temperature",
+    "recommendation_class": "handbook_derived",
+    "affected_mechanisms": [
+      "Rapid Pressurization",
+      "Flow Friction",
+      "Mechanical Impact"
+    ],
+    "evidence_basis": "Prefer nonmetallic materials whose ASTM G72 autogenous ignition temperature exceeds maximum use temperature by at least 100 K.",
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 71,
+      "provenance": "published_handbook_compilation",
+      "section": "Materials",
+      "test_standard": "ASTM G72"
+    }
+  },
+  {
+    "control_id": "minimize_dead_ends_and_cavities",
+    "title": "Minimize dead-ends, cavities, and contaminant traps",
+    "recommendation_class": "handbook_derived",
+    "affected_mechanisms": [
+      "Rapid Pressurization",
+      "Particle Impact",
+      "Resonance"
+    ],
+    "evidence_basis": "Blind passages, drill points, and dead-end cavities accumulate debris and create ignition-prone geometries.",
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 72,
+      "provenance": "published_handbook_compilation",
+      "section": "Design for Cleanliness and Maintaining Cleanliness"
+    }
+  },
+  {
+    "control_id": "design_for_clean_disassembly",
+    "title": "Design for cleaning and clean maintenance",
+    "recommendation_class": "handbook_derived",
+    "affected_mechanisms": [
+      "Particle Impact",
+      "Rapid Pressurization"
+    ],
+    "evidence_basis": "Systems should be easy to disassemble, thoroughly clean, and maintain in a clean condition.",
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 72,
+      "provenance": "published_handbook_compilation",
+      "section": "Design for Cleanliness and Maintaining Cleanliness"
+    }
+  },
+  {
+    "control_id": "use_slow_equalization_bypass",
+    "title": "Use slow-opening bypass equalization",
+    "recommendation_class": "handbook_derived",
+    "affected_mechanisms": [
+      "Rapid Pressurization",
+      "Particle Impact"
+    ],
+    "evidence_basis": "Compatible bypass valves allow controlled pressure equalization and reduce particle-impact and heat-of-compression risk.",
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 72,
+      "provenance": "published_handbook_compilation",
+      "section": "Design for Cleanliness and Maintaining Cleanliness"
+    }
+  },
+  {
+    "control_id": "install_filters_at_entry_and_upstream",
+    "title": "Install filters at oxygen entry and upstream of high-velocity hardware",
+    "recommendation_class": "handbook_derived",
+    "affected_mechanisms": [
+      "Particle Impact"
+    ],
+    "evidence_basis": "Recommended filter locations include oxygen entry points, disconnect points, and upstream of valves, regulators, and other high-velocity-producing components.",
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 72,
+      "provenance": "published_handbook_compilation",
+      "section": "Design for Cleanliness and Maintaining Cleanliness"
+    }
+  },
+  {
+    "control_id": "use_finest_practical_filtration",
+    "title": "Use the finest practical filtration",
+    "recommendation_class": "handbook_derived",
+    "affected_mechanisms": [
+      "Particle Impact"
+    ],
+    "evidence_basis": "Use the smallest filtration that still meets flow requirements and cleanliness targets to reduce particle burden.",
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 72,
+      "provenance": "published_handbook_compilation",
+      "section": "Design for Cleanliness and Maintaining Cleanliness"
+    }
+  },
+  {
+    "control_id": "use_burn_resistant_filter_elements",
+    "title": "Use burn-resistant filter media",
+    "recommendation_class": "handbook_derived",
+    "affected_mechanisms": [
+      "Particle Impact",
+      "Thermal Runaway"
+    ],
+    "evidence_basis": "Filter elements have high surface-area-to-volume ratios and should be made from burn-resistant materials.",
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 73,
+      "provenance": "published_handbook_compilation",
+      "section": "Design for Cleanliness and Maintaining Cleanliness"
+    }
+  },
+  {
+    "control_id": "purge_with_filtered_inert_gas_after_assembly",
+    "title": "Purge with filtered dry inert gas after assembly",
+    "recommendation_class": "handbook_derived",
+    "affected_mechanisms": [
+      "Particle Impact",
+      "Rapid Pressurization"
+    ],
+    "evidence_basis": "After assembly, purge with clean, dry, oil-free filtered inert gas to remove assembly-generated contaminants.",
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 73,
+      "provenance": "published_handbook_compilation",
+      "section": "Design for Cleanliness and Maintaining Cleanliness"
+    }
+  },
+  {
+    "control_id": "minimize_particulate_generation",
+    "title": "Minimize particulate generation in operation and maintenance",
+    "recommendation_class": "handbook_derived",
+    "affected_mechanisms": [
+      "Particle Impact",
+      "Flow Friction",
+      "Mechanical Impact"
+    ],
+    "evidence_basis": "Use bearings, bushings, and configurations that keep generated particulate away from oxygen-wetted regions.",
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 73,
+      "provenance": "published_handbook_compilation",
+      "section": "Design for Cleanliness and Maintaining Cleanliness"
+    }
+  },
+  {
+    "control_id": "protect_vent_line_terminations",
+    "title": "Protect vent line terminations from contamination",
+    "recommendation_class": "handbook_derived",
+    "affected_mechanisms": [
+      "Particle Impact"
+    ],
+    "evidence_basis": "Vent terminations should be protected using tees, screens, or equivalent measures to prevent contaminants, insects, and animals from entering the system.",
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 73,
+      "provenance": "published_handbook_compilation",
+      "section": "Design for Cleanliness and Maintaining Cleanliness"
+    }
+  },
+  {
+    "control_id": "limit_gox_velocity_special_attention_above_30_5",
+    "title": "Keep GOX velocity below about 30.5 m/s where practical",
+    "recommendation_class": "standards_derived",
+    "affected_mechanisms": [
+      "Particle Impact",
+      "Flow Friction"
+    ],
+    "evidence_basis": "Gas velocities above approximately 30.5 m/s (100 ft/s) should receive special attention, especially at restrictions.",
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 73,
+      "provenance": "published_handbook_compilation",
+      "section": "Particle Impact"
+    }
+  },
+  {
+    "control_id": "use_burn_resistant_alloys_downstream_of_disturbances",
+    "title": "Use burn-resistant alloys downstream of high-velocity disturbances",
+    "recommendation_class": "handbook_derived",
+    "affected_mechanisms": [
+      "Particle Impact"
+    ],
+    "evidence_basis": "Traditional practice is to use burn-resistant alloys for at least eight to ten pipe diameters downstream of throttling disturbances.",
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 73,
+      "provenance": "published_handbook_compilation",
+      "section": "Particle Impact"
+    }
+  },
+  {
+    "control_id": "avoid_nonmetals_at_sonic_locations",
+    "title": "Avoid nonmetals where sonic velocity can occur",
+    "recommendation_class": "handbook_derived",
+    "affected_mechanisms": [
+      "Particle Impact",
+      "Resonance",
+      "Rapid Pressurization"
+    ],
+    "evidence_basis": "Where sonic velocity cannot be avoided, use ignition-resistant materials and keep nonmetals out of those locations.",
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 79,
+      "provenance": "published_handbook_compilation",
+      "section": "Piping, System Connections, and Joints"
+    }
+  },
+  {
+    "control_id": "perform_filtered_nitrogen_blowdown_before_oxygen",
+    "title": "Blow down with filtered dry nitrogen before oxygen service",
+    "recommendation_class": "handbook_derived",
+    "affected_mechanisms": [
+      "Particle Impact"
+    ],
+    "evidence_basis": "Maintain cleanliness and perform blowdown with filtered dry gaseous nitrogen at maximum anticipated pressure and flow before wetting with oxygen.",
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 79,
+      "provenance": "published_handbook_compilation",
+      "section": "Piping, System Connections, and Joints"
+    }
+  },
+  {
+    "control_id": "use_long_radius_bends",
+    "title": "Use long-radius bends instead of sharp bends",
+    "recommendation_class": "handbook_derived",
+    "affected_mechanisms": [
+      "Particle Impact"
+    ],
+    "evidence_basis": "Long-radius bends reduce the likelihood of particle impingement.",
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 79,
+      "provenance": "published_handbook_compilation",
+      "section": "Piping, System Connections, and Joints"
+    }
+  },
+  {
+    "control_id": "prefer_nonrotating_stems_and_manual_bypass",
+    "title": "Prefer nonrotating stems, grounded internals, and manual bypass valves",
+    "recommendation_class": "handbook_derived",
+    "affected_mechanisms": [
+      "Galling & Friction",
+      "Mechanical Impact",
+      "Static Discharge",
+      "Rapid Pressurization"
+    ],
+    "evidence_basis": "Nonrotating stems reduce particulate generation and galling; bypass valves reduce pressure-surge risk; electrical grounding reduces static accumulation.",
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 80,
+      "provenance": "published_handbook_compilation",
+      "section": "Valves"
+    }
+  }
+]

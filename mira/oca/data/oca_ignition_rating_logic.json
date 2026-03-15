@@ -1,0 +1,44 @@
+{
+  "_meta": {
+    "description": "Ignition mechanism probability rating logic from ASTM MNL36 Table 4-1.",
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 67,
+      "provenance": "published_handbook_compilation",
+      "table": "4-1"
+    },
+    "ingest_date": "2026-03-11"
+  },
+  "ratings": [
+    {
+      "code": 0,
+      "label": "Not possible",
+      "characteristic_elements": "Not all present",
+      "material_flammability": "Nonflammable or flammable"
+    },
+    {
+      "code": 1,
+      "label": "Remotely possible",
+      "characteristic_elements": "All present and some are weak",
+      "material_flammability": "Nonflammable or flammable"
+    },
+    {
+      "code": 2,
+      "label": "Possible",
+      "characteristic_elements": "All present",
+      "material_flammability": "Flammable"
+    },
+    {
+      "code": 3,
+      "label": "Probable",
+      "characteristic_elements": "All present and some are severe",
+      "material_flammability": "Flammable"
+    },
+    {
+      "code": 4,
+      "label": "Highly probable",
+      "characteristic_elements": "All are present and all are severe",
+      "material_flammability": "Flammable"
+    }
+  ]
+}

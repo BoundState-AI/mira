@@ -1,0 +1,179 @@
+{
+  "_meta": {
+    "description": "OCA test and evidence mapping with ASTM MNL36 provenance.",
+    "ingest_date": "2026-03-11"
+  },
+  "Test 1": {
+    "citation": "NASA-STD-6001B Test 1",
+    "focus": "Upward flame propagation",
+    "source": {
+      "source": "NASA-STD-6001B",
+      "provenance": "governing_standard"
+    }
+  },
+  "Test 17": {
+    "citation": "NASA-STD-6001B Test 17",
+    "focus": "Promoted ignition",
+    "source": {
+      "source": "NASA-STD-6001B",
+      "provenance": "governing_standard"
+    }
+  },
+  "ASTM G124": {
+    "citation": "ASTM G124",
+    "focus": "Promoted ignition / upward flammability of metals in oxygen-enriched atmospheres",
+    "category": "combustion",
+    "related_tables": [
+      "3-1",
+      "3-2",
+      "3-3"
+    ],
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 30,
+      "provenance": "published_handbook_compilation",
+      "table": "3-1",
+      "test_standard": "ASTM G124"
+    }
+  },
+  "ASTM D2863": {
+    "citation": "ASTM D2863",
+    "focus": "Oxygen index of nonmetals",
+    "category": "combustion",
+    "related_tables": [
+      "3-12"
+    ],
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 41,
+      "provenance": "published_handbook_compilation",
+      "table": "3-12",
+      "test_standard": "ASTM D2863"
+    }
+  },
+  "ASTM D4809": {
+    "citation": "ASTM D4809",
+    "focus": "Heat of combustion",
+    "category": "damage_potential",
+    "related_tables": [
+      "3-11",
+      "3-12"
+    ],
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 40,
+      "provenance": "published_handbook_compilation",
+      "table": "3-11",
+      "test_standard": "ASTM D4809"
+    }
+  },
+  "ASTM G72": {
+    "citation": "ASTM G72",
+    "focus": "Autogenous ignition temperature of solids and liquids in oxygen-enriched environments",
+    "category": "ignition",
+    "related_tables": [
+      "3-12",
+      "3-14"
+    ],
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 41,
+      "provenance": "published_handbook_compilation",
+      "table": "3-12",
+      "test_standard": "ASTM G72"
+    }
+  },
+  "ASTM G74": {
+    "citation": "ASTM G74",
+    "focus": "Pneumatic impact / rapid pressurization sensitivity of materials",
+    "category": "ignition",
+    "related_tables": [
+      "3-15"
+    ],
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 51,
+      "provenance": "published_handbook_compilation",
+      "table": "3-15",
+      "test_standard": "ASTM G74"
+    }
+  },
+  "ASTM G86": {
+    "citation": "ASTM G86",
+    "focus": "Mechanical impact sensitivity in LOX and GOX",
+    "category": "ignition",
+    "related_tables": [
+      "3-16"
+    ],
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 53,
+      "provenance": "published_handbook_compilation",
+      "table": "3-16",
+      "test_standard": "ASTM G86"
+    }
+  },
+  "ASTM G94": {
+    "citation": "ASTM G94",
+    "focus": "Guide for evaluating metals for oxygen service",
+    "category": "guide",
+    "source": {
+      "source": "ASTM G94",
+      "provenance": "guide_reference"
+    }
+  },
+  "ASTM G63": {
+    "citation": "ASTM G63",
+    "focus": "Guide for evaluating nonmetallic materials for oxygen service",
+    "category": "guide",
+    "source": {
+      "source": "ASTM G63",
+      "provenance": "guide_reference"
+    }
+  },
+  "Friction Heating Test": {
+    "citation": "ASTM MNL36 Tables 3-5 and 3-6",
+    "focus": "Friction ignition Pv product ranking for metal pairs in GOX",
+    "category": "ignition",
+    "related_tables": [
+      "3-5",
+      "3-6"
+    ],
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 35,
+      "provenance": "published_handbook_compilation",
+      "table": "3-5"
+    }
+  },
+  "Supersonic Particle Impact": {
+    "citation": "ASTM MNL36 Tables 3-7 and 3-8",
+    "focus": "Supersonic particle-impact ignition sensitivity of metals and nonmetals",
+    "category": "ignition",
+    "related_tables": [
+      "3-7",
+      "3-8"
+    ],
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 38,
+      "provenance": "published_handbook_compilation",
+      "table": "3-7"
+    }
+  },
+  "Subsonic Particle Impact": {
+    "citation": "ASTM MNL36 Tables 3-9 and 3-10",
+    "focus": "Subsonic particle-impact ignition sensitivity and particulate loading response",
+    "category": "ignition",
+    "related_tables": [
+      "3-9",
+      "3-10"
+    ],
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 39,
+      "provenance": "published_handbook_compilation",
+      "table": "3-9"
+    }
+  }
+}
