@@ -1,0 +1,101 @@
+{
+  "spec_id": "BS-SPEC-OCA-002-REV0",
+  "version": "1.0.0",
+  "system_inputs": [
+    "o2_fraction",
+    "system_pressure_range",
+    "phase",
+    "temperature_range",
+    "design_flow_rate",
+    "cleanliness_spec",
+    "mission_phase",
+    "project_info"
+  ],
+  "blocked_states": [
+    "MATERIAL_IDENTITY_UNRESOLVED",
+    "SERVICE_ENVELOPE_INCOMPLETE",
+    "HYDRAULIC_STATE_INCOMPLETE",
+    "DESIGN_FUNCTION_UNKNOWN"
+  ],
+  "interaction_rules": [
+    {
+      "rule_id": "SYS-001",
+      "if": "upstream_filter_added and bypass_path_exists=false",
+      "then": "suppresses unfiltered-particle pathway downstream",
+      "affects": ["PI"],
+      "assumptions": ["filter_integrity_assumed=true"],
+      "tier": "Tier D"
+    },
+    {
+      "rule_id": "SYS-002",
+      "if": "body_material_changed_to_nonflammable",
+      "then": "removes characteristic propagation element in kindling chain",
+      "affects": ["TR", "CR"],
+      "assumptions": ["body is primary propagation path"],
+      "tier": "Tier D"
+    },
+    {
+      "rule_id": "SYS-003",
+      "if": "line_inner_diameter_increased and design_flow_rate_constant",
+      "then": "reduces likelihood of PI by lowering velocity",
+      "affects": ["PI"],
+      "assumptions": ["flow_rate_unchanged"],
+      "tier": "Tier D"
+    },
+    {
+      "rule_id": "SYS-004",
+      "if": "opening_profile=slow and pressurization_time_s>1",
+      "then": "removes rapid characteristic element",
+      "affects": ["RP"],
+      "assumptions": ["actuator_profile_as_specified"],
+      "tier": "Tier D"
+    },
+    {
+      "rule_id": "SYS-005",
+      "if": "relief_valve_set_pressure_psia<265",
+      "then": "removes MPR 53 acceptance-test requirement",
+      "affects": ["acceptance_test_zone"],
+      "assumptions": [],
+      "tier": "Tier A"
+    },
+    {
+      "rule_id": "SYS-006",
+      "if": "cleanliness_spec_high and mission_phase_short_duration",
+      "then": "reduces contamination baseline",
+      "affects": ["PI"],
+      "assumptions": ["cleaning_verified"],
+      "tier": "Tier D"
+    },
+    {
+      "rule_id": "SYS-007",
+      "if": "any_component_contains_titanium and phase in [LOX, GOX]",
+      "then": "apply governing prohibition banner",
+      "affects": ["system_disposition"],
+      "banner": "MPR 67 GOVERNING PROHIBITION — Titanium forbidden in LOX/GOX at any pressure.",
+      "tier": "Tier A"
+    },
+    {
+      "rule_id": "SYS-008",
+      "if": "component_unconnected",
+      "then": "tag as isolated dead-end provisional assessment",
+      "affects": ["RP", "PI"],
+      "assumptions": ["no flow path"],
+      "tier": "Tier D"
+    }
+  ],
+  "api_extensions": [
+    "POST /oca/systems",
+    "POST /oca/systems/{id}/components",
+    "POST /oca/systems/{id}/connections",
+    "POST /oca/systems/{id}/assess",
+    "GET /oca/systems/{id}/topology",
+    "GET /oca/systems/{id}/kindling-chain",
+    "POST /oca/systems/{id}/upload-schematic",
+    "GET /oca/systems/{id}/path/{component_id}",
+    "POST /oca/systems/{id}/export"
+  ],
+  "provenance": {
+    "source": "BS-SPEC-OCA-002-REV0 §3, §6.3-6.5, §14",
+    "confidence": "high"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "version": "2026.03.09-phase1",
+  "sources": [
+    {
+      "document": "NASA-STD-5019A w/Change 4",
+      "path": "/mnt/d/BoundState/BoundState_other/BoundState/docs/NASA-STD-5019A.pdf",
+      "usage": "FCR taxonomy, applicability, and section/page citations"
+    },
+    {
+      "document": "fcr_definitions.json",
+      "path": "/mnt/d/BoundState/boundstate_mira/mira/fracture/data/fcr_definitions.json",
+      "usage": "Runtime FCR definitions"
+    },
+    {
+      "document": "fcr_applicability.json",
+      "path": "/mnt/d/BoundState/boundstate_mira/mira/fracture/data/fcr_applicability.json",
+      "usage": "Explicit applicability mapping"
+    },
+    {
+      "document": "material_reference.json",
+      "path": "/mnt/d/BoundState/boundstate_mira/mira/fracture/data/material_reference.json",
+      "usage": "Phase 1 searchable material aliases and family tags"
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "spec_id": "BS-SPEC-OCA-002-REV0",
+  "version": "1.0.0",
+  "normalized_feature_flags": [
+    "has_moving_contact",
+    "has_polymer_seal",
+    "has_dead_volume",
+    "creates_particles",
+    "has_cavity_downstream",
+    "wetted_surface_flag",
+    "porous_media_flag",
+    "electrical_energy_present",
+    "dynamic_contact_flag",
+    "contamination_trap_flag",
+    "filter_integrity_assumed",
+    "metal_pair_contact",
+    "reactive_metal_present",
+    "seat_contact_mode",
+    "sa_to_volume_ratio"
+  ],
+  "derived_attribute_rules": [
+    {
+      "rule_id": "FEAT-001",
+      "applies_to": ["valve", "regulator", "relief_valve", "check_valve"],
+      "sets": {"has_moving_contact": true, "dynamic_contact_flag": true},
+      "source": "library_default"
+    },
+    {
+      "rule_id": "FEAT-002",
+      "applies_to": ["filter"],
+      "when": {"default_properties.bypass_path_exists": false},
+      "sets": {"filter_integrity_assumed": true, "porous_media_flag": true},
+      "source": "inferred"
+    },
+    {
+      "rule_id": "FEAT-003",
+      "applies_to": ["gasket_oring"],
+      "sets": {"has_polymer_seal": true},
+      "source": "library_default"
+    },
+    {
+      "rule_id": "FEAT-004",
+      "applies_to": ["orifice_restrictor"],
+      "sets": {"has_cavity_downstream": true},
+      "source": "library_default"
+    },
+    {
+      "rule_id": "FEAT-005",
+      "applies_to": ["line_tube", "pressure_vessel", "heat_exchanger", "flex_hose", "fitting"],
+      "sets": {"wetted_surface_flag": true},
+      "source": "library_default"
+    },
+    {
+      "rule_id": "FEAT-006",
+      "applies_to": ["valve", "regulator", "relief_valve", "check_valve", "fitting"],
+      "when_any_material_in": ["aluminum", "titanium", "magnesium", "lithium"],
+      "sets": {"reactive_metal_present": true},
+      "source": "calculated"
+    }
+  ],
+  "feature_to_mechanism_elements": {
+    "particle_impact": ["creates_particles", "wetted_surface_flag"],
+    "rapid_pressurization": ["has_dead_volume", "has_polymer_seal"],
+    "flow_friction": ["has_polymer_seal", "dynamic_contact_flag"],
+    "resonance": ["has_cavity_downstream", "dynamic_contact_flag"],
+    "mechanical_impact": ["has_moving_contact", "dynamic_contact_flag"],
+    "galling_friction": ["metal_pair_contact", "has_moving_contact"],
+    "fresh_metal": ["reactive_metal_present", "creates_particles"],
+    "static_discharge": ["contamination_trap_flag", "wetted_surface_flag"],
+    "electrical_arc": ["electrical_energy_present", "wetted_surface_flag"],
+    "chemical_reaction": ["reactive_metal_present", "wetted_surface_flag"],
+    "thermal_runaway": ["sa_to_volume_ratio", "reactive_metal_present"]
+  },
+  "provenance": {
+    "source": "BS-SPEC-OCA-002-REV0 §4.2, §6.2",
+    "confidence": "high"
+  }
+}

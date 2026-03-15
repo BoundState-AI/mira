@@ -98,7 +98,7 @@ full = [
 mira = "mira.cli:app"
 
 [tool.hatch.build.targets.wheel]
-packages = ["mira", "core", "services", "data"]
+packages = ["mira", "core", "services", "data", "sentinel"]
 
 [tool.uv]
 dev-dependencies = [

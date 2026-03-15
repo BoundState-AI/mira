@@ -83,9 +83,18 @@ def create_app() -> FastAPI:
 
     # O2 Knowledge Twin router (oxygen compatibility)
     include_with_api_alias(routers.o2_router, prefix="/o2", tags=["o2"])
+    include_with_api_alias(routers.h2_router, prefix="/mira", tags=["h2"])
+    include_with_api_alias(routers.galvanic_router, prefix="/mira", tags=["galvanic"])
+    include_with_api_alias(routers.fracture_router, prefix="/mira", tags=["fracture"])
 
     # OCA Workbench router (Oxygen Compatibility Assessment per TM-2007-213740)
     include_with_api_alias(routers.oca_router, prefix="/oca", tags=["oca"])
+
+    # OCA System Builder router (Phase 2 — Visual System Builder per BS-SPEC-OCA-002-REV0)
+    include_with_api_alias(routers.oca_systems_router, prefix="/oca/systems", tags=["oca-systems"])
+
+    # SENTINEL-TOCR router (task order compliance review)
+    include_with_api_alias(routers.tocr_router, prefix="/tocr", tags=["tocr"])
 
     # Hybrid query router (evidence-first query engine)
     # Note: hybrid_query router has its own /api/query prefix
@@ -99,6 +108,7 @@ def create_app() -> FastAPI:
     include_with_api_alias(routers.mua_v7_router, prefix="/mua/v7", tags=["mua-v7"])
     include_with_api_alias(routers.mua_v10_router, prefix="/mua/v10", tags=["mua-v10"])
     include_with_api_alias(routers.matchmaker_router, prefix="/mua/matchmaker", tags=["mua-matchmaker-v8"])
+    include_with_api_alias(routers.forge_router, prefix="/forge", tags=["forge"])
 
     # M&P Plan Generator V1 + V2 (Codex)
     include_with_api_alias(routers.mp_plan_router, prefix="/mp-plan", tags=["mp-plan"])

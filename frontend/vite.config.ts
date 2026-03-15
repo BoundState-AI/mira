@@ -28,6 +28,10 @@ export default defineConfig(({ mode }) => ({
         proxyTimeout: 600000,
         selfHandleResponse: false, // Let proxy handle response normally
         configure: (proxy) => {
+          // Keep connections alive for long-running requests (FORGE compile)
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.setSocketKeepAlive(true, 30000);
+          });
           proxy.on('error', (err, req, res) => {
             console.error('Proxy error:', err.message);
             if (!res.headersSent) {
@@ -36,7 +40,6 @@ export default defineConfig(({ mode }) => ({
             }
           });
           proxy.on('proxyRes', (proxyRes, req) => {
-            // Log response info for debugging
             console.log(`[Proxy] ${req.method} ${req.url} -> ${proxyRes.statusCode}`);
           });
         },

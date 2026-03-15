@@ -17,12 +17,17 @@ Safety Critical: True
 """
 
 import pytest
+import os
 import sys
 from pathlib import Path
 
 # Add project root to path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
+
+os.environ["DEBUG"] = "false"
+os.environ["ENVIRONMENT"] = "test"
+os.environ["MIRA_AUTH_MODE"] = "none"
 
 
 @pytest.fixture(scope="session")

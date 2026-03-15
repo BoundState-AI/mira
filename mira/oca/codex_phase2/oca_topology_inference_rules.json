@@ -1,0 +1,99 @@
+{
+  "spec_id": "BS-SPEC-OCA-002-REV0",
+  "version": "1.0.0",
+  "graph_model": {
+    "type": "directed",
+    "nodes": "components",
+    "edges": "flow_connections"
+  },
+  "inference_rules": [
+    {
+      "rule_id": "TOPO-001",
+      "name": "dead_end_detection",
+      "logic": "node.degree_out == 0 OR downstream_valve_closed == true",
+      "output": "has_dead_volume",
+      "source": "inferred",
+      "confidence": "medium",
+      "missing_assumptions": ["valve state known"]
+    },
+    {
+      "rule_id": "TOPO-002",
+      "name": "flow_direction",
+      "logic": "pressure_high_to_low along ordered connections",
+      "output": "flow_direction",
+      "source": "inferred",
+      "confidence": "medium",
+      "missing_assumptions": ["local pressure nodes known"]
+    },
+    {
+      "rule_id": "TOPO-003",
+      "name": "velocity_estimate",
+      "logic": "v = Q/A ; A = pi * r^2",
+      "output": "velocity_m_per_s",
+      "source": "calculated",
+      "confidence": "high",
+      "requires": ["design_flow_rate", "line.inner_diameter_mm"]
+    },
+    {
+      "rule_id": "TOPO-004",
+      "name": "sonic_flow_points",
+      "logic": "orifice pressure ratio exceeds critical ratio",
+      "output": "sonic_flow_point",
+      "source": "calculated",
+      "confidence": "medium",
+      "requires": ["system_pressure_range", "orifice.bore_diameter_mm"]
+    },
+    {
+      "rule_id": "TOPO-005",
+      "name": "filter_protection_regions",
+      "logic": "all reachable downstream nodes from filter where bypass_path_exists=false",
+      "output": "filter_integrity_assumed",
+      "source": "inferred",
+      "confidence": "medium",
+      "missing_assumptions": ["filter integrity verified"]
+    },
+    {
+      "rule_id": "TOPO-006",
+      "name": "chatter_candidates",
+      "logic": "component in [regulator, check_valve, relief_valve] and dynamic_contact_flag=true",
+      "output": "chatter_candidate",
+      "source": "library_default",
+      "confidence": "high"
+    },
+    {
+      "rule_id": "TOPO-007",
+      "name": "upstream_volume",
+      "logic": "sum(volume of connected upstream vessels + line internal volumes)",
+      "output": "upstream_volume_l",
+      "source": "calculated",
+      "confidence": "medium",
+      "requires": ["vessel.volume_l", "line.length_mm", "line.inner_diameter_mm"]
+    },
+    {
+      "rule_id": "TOPO-008",
+      "name": "bi_directional_flow_risk",
+      "logic": "mission context venting flag true OR gse_reverse_flow_flag true",
+      "output": "bi_directional_flow_risk",
+      "source": "user-entered",
+      "confidence": "medium"
+    }
+  ],
+  "zones": [
+    "unfiltered_zone",
+    "filtered_zone",
+    "dead_leg_zone",
+    "dynamic_component_zone",
+    "cavity_resonance_zone",
+    "acceptance_test_zone"
+  ],
+  "staged_recompute": [
+    "topology_recompute",
+    "affected_subgraph",
+    "mechanism_delta",
+    "disposition_delta"
+  ],
+  "provenance": {
+    "source": "BS-SPEC-OCA-002-REV0 §5.2, §5.4, §6.1",
+    "confidence": "high"
+  }
+}

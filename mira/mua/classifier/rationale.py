@@ -347,6 +347,7 @@ def _render_incomplete_pass(
     rating: str,
     media: str,
     companion_ref: str | None = None,
+    hazard_applies: bool | None = None,
 ) -> str:
     meaning = _get_decoded_meaning(column, rating)
     col_upper = column.upper()
@@ -361,11 +362,24 @@ def _render_incomplete_pass(
     ]
 
     if col_upper == "FLAM":
-        lines.append(
-            f"Furthermore, promoted ignition is not applicable to the actual "
-            f"service environment. The material operates in {media} media "
-            f"with no oxygen-enriched atmosphere."
-        )
+        if hazard_applies:
+            # Hazard IS present — incompleteness is the point, don't deny O2.
+            # Per Beth's review: say "insufficient", not just "favorable".
+            lines.append(
+                f"Fewer than 5 standard samples have been tested per "
+                f"NHB 8060.1C. While all tested specimens met acceptance "
+                f"criteria, the sample count is insufficient to confirm "
+                f"oxygen compatibility per NASA-STD-6016C §4.2.1.4. M&P "
+                f"engineer review is required to determine whether "
+                f"additional promoted ignition testing is warranted for "
+                f"this oxygen-enriched application."
+            )
+        else:
+            lines.append(
+                f"Furthermore, promoted ignition is not applicable to the "
+                f"actual service environment. The material operates in "
+                f"{media} media with no oxygen-enriched atmosphere."
+            )
     else:
         lines.append(
             f"The screening condition assessed by this test is not the primary "
@@ -468,6 +482,7 @@ def render_rationale(
         mua_type = result.mua_type
         companion_ref = result.companion_mua_ref
         precedent = None
+        hazard_applies = None
     else:
         name = material_name or result.maptis_code
         maptis_code = result.maptis_code
@@ -477,13 +492,14 @@ def render_rationale(
         mua_type = result.mua_type
         companion_ref = result.companion_mua_ref
         precedent = result.precedent
+        hazard_applies = result.hazard_applies
 
     if mua_type == MUAType.THIN_SCREENING:
         rationale_text = _render_thin_screening(name, maptis_code, column, rating, media, companion_ref)
     elif mua_type == MUAType.ANTI_RULE:
         rationale_text = _render_anti_rule(name, maptis_code, column, rating, media, companion_ref)
     elif mua_type == MUAType.INCOMPLETE_PASS:
-        rationale_text = _render_incomplete_pass(name, maptis_code, column, rating, media, companion_ref)
+        rationale_text = _render_incomplete_pass(name, maptis_code, column, rating, media, companion_ref, hazard_applies)
     elif mua_type in (MUAType.REAL_PROBLEM, MUAType.REAL_GAP):
         rationale_text = _render_human_required(name, maptis_code, column, rating, media, mua_type)
     elif mua_type == MUAType.STANDARD:
@@ -517,19 +533,24 @@ def render_disposition(
         column = result.issue_key
         rating = result.rating
         media = result.media
+        companion_ref = result.companion_mua_ref
     else:
         mua_type = result.mua_type
         column = result.issue_key
         rating = result.rating
         media = result.media
+        companion_ref = result.companion_mua_ref
 
     if mua_type == MUAType.THIN_SCREENING:
-        return (
+        base = (
             f"Accepted. {column}={rating} reflects absence of screening data "
             f"for fluids not present in this application. Material is not in "
-            f"contact with those fluids. Actual service compatibility addressed "
-            f"under companion MUA. No additional testing required."
+            f"contact with those fluids."
         )
+        if companion_ref:
+            return f"{base} Actual service compatibility addressed under companion MUA. No additional testing required."
+        else:
+            return f"{base} No additional testing required."
     elif mua_type == MUAType.ANTI_RULE:
         return (
             f"Accepted. The screening failure does not constitute a hazard in "

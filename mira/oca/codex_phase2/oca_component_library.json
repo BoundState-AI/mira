@@ -1,0 +1,198 @@
+{
+  "spec_id": "BS-SPEC-OCA-002-REV0",
+  "version": "1.0.0",
+  "generated_at": "2026-03-10",
+  "description": "Phase 2 feature-based component archetypes for topology-aware OCA visual builder.",
+  "archetypes": [
+    {
+      "id": "valve",
+      "label": "Valve",
+      "ports": ["inlet", "outlet"],
+      "default_properties": {
+        "body_material": null,
+        "stem_material": null,
+        "seat_material": null,
+        "packing_material": null,
+        "type": "ball",
+        "actuation_type": "manual",
+        "opening_profile": "fast"
+      },
+      "defaults": {
+        "dynamic_contact_flag": true,
+        "creates_particles": true,
+        "wetted_surface_flag": true
+      }
+    },
+    {
+      "id": "regulator",
+      "label": "Regulator",
+      "ports": ["inlet", "outlet"],
+      "default_properties": {
+        "body_material": null,
+        "diaphragm_material": null,
+        "seat_material": null,
+        "type": "single-stage",
+        "chatter_susceptible": true,
+        "soft_seat_creep_flag": true
+      },
+      "defaults": {
+        "dynamic_contact_flag": true,
+        "creates_particles": true,
+        "wetted_surface_flag": true
+      }
+    },
+    {
+      "id": "line_tube",
+      "label": "Line/Tube",
+      "ports": ["inlet", "outlet"],
+      "default_properties": {
+        "material": null,
+        "wall_thickness_mm": null,
+        "inner_diameter_mm": null,
+        "length_mm": null,
+        "is_flex": false
+      },
+      "defaults": {
+        "wetted_surface_flag": true,
+        "contamination_trap_flag": false
+      }
+    },
+    {
+      "id": "filter",
+      "label": "Filter",
+      "ports": ["inlet", "outlet"],
+      "default_properties": {
+        "housing_material": null,
+        "element_material": null,
+        "micron_rating": null,
+        "element_type": "sintered",
+        "bypass_path_exists": false
+      },
+      "defaults": {
+        "porous_media_flag": true,
+        "wetted_surface_flag": true,
+        "contamination_trap_flag": true
+      }
+    },
+    {
+      "id": "fitting",
+      "label": "Fitting",
+      "ports": ["inlet", "outlet"],
+      "default_properties": {
+        "material": null,
+        "seal_type": "metal",
+        "connection_type": "threaded"
+      },
+      "defaults": {
+        "wetted_surface_flag": true
+      }
+    },
+    {
+      "id": "pressure_vessel",
+      "label": "Pressure Vessel",
+      "ports": ["inlet", "outlet"],
+      "default_properties": {
+        "material": null,
+        "liner_material": null,
+        "volume_l": null,
+        "mawp_psia": null
+      },
+      "defaults": {
+        "wetted_surface_flag": true,
+        "has_dead_volume": true
+      }
+    },
+    {
+      "id": "relief_valve",
+      "label": "Relief Valve",
+      "ports": ["inlet", "outlet"],
+      "default_properties": {
+        "body_material": null,
+        "seat_material": null,
+        "set_pressure_psia": null,
+        "chatter_susceptible": true
+      },
+      "defaults": {
+        "dynamic_contact_flag": true,
+        "creates_particles": true,
+        "wetted_surface_flag": true
+      }
+    },
+    {
+      "id": "check_valve",
+      "label": "Check Valve",
+      "ports": ["inlet", "outlet"],
+      "default_properties": {
+        "body_material": null,
+        "poppet_material": null,
+        "chatter_susceptible": true
+      },
+      "defaults": {
+        "dynamic_contact_flag": true,
+        "creates_particles": true,
+        "wetted_surface_flag": true
+      }
+    },
+    {
+      "id": "orifice_restrictor",
+      "label": "Orifice/Restrictor",
+      "ports": ["inlet", "outlet"],
+      "default_properties": {
+        "material": null,
+        "bore_diameter_mm": null
+      },
+      "defaults": {
+        "wetted_surface_flag": true,
+        "has_cavity_downstream": true
+      }
+    },
+    {
+      "id": "heat_exchanger",
+      "label": "Heat Exchanger",
+      "ports": ["inlet", "outlet"],
+      "default_properties": {
+        "material": null,
+        "tube_material": null,
+        "wall_thickness_mm": null,
+        "sa_to_volume_ratio": "high"
+      },
+      "defaults": {
+        "wetted_surface_flag": true,
+        "sa_to_volume_ratio": "high"
+      }
+    },
+    {
+      "id": "gasket_oring",
+      "label": "Gasket/O-Ring",
+      "ports": ["inlet", "outlet"],
+      "default_properties": {
+        "material": null,
+        "exposed_to_flow": true
+      },
+      "defaults": {
+        "has_polymer_seal": true,
+        "wetted_surface_flag": true
+      }
+    },
+    {
+      "id": "flex_hose",
+      "label": "Flex Hose",
+      "ports": ["inlet", "outlet"],
+      "default_properties": {
+        "material": null,
+        "braid_material": null,
+        "is_flex": true
+      },
+      "defaults": {
+        "wetted_surface_flag": true,
+        "creates_particles": true,
+        "dynamic_contact_flag": true
+      }
+    }
+  ],
+  "provenance": {
+    "tier": "meta",
+    "source": "BS-SPEC-OCA-002-REV0 §4.1",
+    "confidence": "high"
+  }
+}

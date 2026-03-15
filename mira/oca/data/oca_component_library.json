@@ -1,0 +1,394 @@
+{
+  "_meta": {
+    "description": "Feature-based component library for OCA System Builder per BS-SPEC-OCA-002-REV0 §4",
+    "source": "NASA/TM-2007-213740, BS-SPEC-OCA-002-REV0",
+    "version": "1.0.0",
+    "ingest_date": "2026-03-10"
+  },
+  "archetypes": [
+    {
+      "archetype_id": "valve",
+      "display_name": "Valve",
+      "description": "Flow control device with moving contact surfaces",
+      "material_slots": [
+        {"slot": "body_material", "required": true, "default": null},
+        {"slot": "stem_material", "required": false, "default": null},
+        {"slot": "seat_material", "required": true, "default": null},
+        {"slot": "packing_material", "required": false, "default": null}
+      ],
+      "config_fields": [
+        {"field": "valve_type", "type": "select", "options": ["ball", "gate", "globe", "needle"], "default": "ball"},
+        {"field": "actuation_type", "type": "select", "options": ["manual", "pneumatic", "solenoid"], "default": "manual"},
+        {"field": "opening_profile", "type": "select", "options": ["fast", "slow"], "default": "fast"}
+      ],
+      "default_features": {
+        "has_moving_contact": true,
+        "has_polymer_seal": false,
+        "has_dead_volume": true,
+        "creates_particles": false,
+        "has_cavity_downstream": false,
+        "wetted_surface_flag": true,
+        "porous_media_flag": false,
+        "electrical_energy_present": false,
+        "dynamic_contact_flag": true,
+        "contamination_trap_flag": false,
+        "filter_integrity_assumed": false,
+        "metal_pair_contact": false,
+        "reactive_metal_present": false,
+        "seat_contact_mode": "metal_to_polymer",
+        "sa_to_volume_ratio": "low"
+      },
+      "ports": {"input": 1, "output": 1},
+      "icon": "valve"
+    },
+    {
+      "archetype_id": "regulator",
+      "display_name": "Regulator",
+      "description": "Pressure regulation device with dynamic sealing elements",
+      "material_slots": [
+        {"slot": "body_material", "required": true, "default": null},
+        {"slot": "diaphragm_material", "required": true, "default": null},
+        {"slot": "seat_material", "required": true, "default": null}
+      ],
+      "config_fields": [
+        {"field": "regulator_type", "type": "select", "options": ["single", "two_stage"], "default": "single"},
+        {"field": "chatter_susceptible", "type": "boolean", "default": true},
+        {"field": "soft_seat_creep_flag", "type": "boolean", "default": false}
+      ],
+      "default_features": {
+        "has_moving_contact": true,
+        "has_polymer_seal": true,
+        "has_dead_volume": false,
+        "creates_particles": false,
+        "has_cavity_downstream": false,
+        "wetted_surface_flag": true,
+        "porous_media_flag": false,
+        "electrical_energy_present": false,
+        "dynamic_contact_flag": true,
+        "contamination_trap_flag": false,
+        "filter_integrity_assumed": false,
+        "metal_pair_contact": false,
+        "reactive_metal_present": false,
+        "seat_contact_mode": "metal_to_polymer",
+        "sa_to_volume_ratio": "low"
+      },
+      "ports": {"input": 1, "output": 1},
+      "icon": "regulator"
+    },
+    {
+      "archetype_id": "line",
+      "display_name": "Line / Tube",
+      "description": "Fluid conduit — velocity auto-calculated from ID and flow rate",
+      "material_slots": [
+        {"slot": "material", "required": true, "default": null}
+      ],
+      "config_fields": [
+        {"field": "wall_thickness_mm", "type": "number", "default": null},
+        {"field": "inner_diameter_mm", "type": "number", "default": null},
+        {"field": "length_m", "type": "number", "default": null},
+        {"field": "is_flex", "type": "boolean", "default": false}
+      ],
+      "default_features": {
+        "has_moving_contact": false,
+        "has_polymer_seal": false,
+        "has_dead_volume": false,
+        "creates_particles": false,
+        "has_cavity_downstream": false,
+        "wetted_surface_flag": true,
+        "porous_media_flag": false,
+        "electrical_energy_present": false,
+        "dynamic_contact_flag": false,
+        "contamination_trap_flag": false,
+        "filter_integrity_assumed": false,
+        "metal_pair_contact": false,
+        "reactive_metal_present": false,
+        "seat_contact_mode": null,
+        "sa_to_volume_ratio": "low"
+      },
+      "ports": {"input": 1, "output": 1},
+      "icon": "line"
+    },
+    {
+      "archetype_id": "filter",
+      "display_name": "Filter",
+      "description": "Particle filtration device — creates protected zone downstream",
+      "material_slots": [
+        {"slot": "housing_material", "required": true, "default": null},
+        {"slot": "element_material", "required": true, "default": null}
+      ],
+      "config_fields": [
+        {"field": "micron_rating", "type": "number", "default": 10},
+        {"field": "element_type", "type": "select", "options": ["sintered", "mesh", "membrane"], "default": "sintered"},
+        {"field": "bypass_path_exists", "type": "boolean", "default": false}
+      ],
+      "default_features": {
+        "has_moving_contact": false,
+        "has_polymer_seal": false,
+        "has_dead_volume": false,
+        "creates_particles": false,
+        "has_cavity_downstream": false,
+        "wetted_surface_flag": true,
+        "porous_media_flag": true,
+        "electrical_energy_present": false,
+        "dynamic_contact_flag": false,
+        "contamination_trap_flag": true,
+        "filter_integrity_assumed": true,
+        "metal_pair_contact": false,
+        "reactive_metal_present": false,
+        "seat_contact_mode": null,
+        "sa_to_volume_ratio": "high"
+      },
+      "ports": {"input": 1, "output": 1},
+      "icon": "filter"
+    },
+    {
+      "archetype_id": "fitting",
+      "display_name": "Fitting",
+      "description": "Mechanical connection between flow path elements",
+      "material_slots": [
+        {"slot": "material", "required": true, "default": null}
+      ],
+      "config_fields": [
+        {"field": "seal_type", "type": "select", "options": ["metal", "polymer"], "default": "metal"},
+        {"field": "connection_type", "type": "select", "options": ["threaded", "welded", "flared", "compression"], "default": "compression"}
+      ],
+      "default_features": {
+        "has_moving_contact": false,
+        "has_polymer_seal": false,
+        "has_dead_volume": false,
+        "creates_particles": false,
+        "has_cavity_downstream": false,
+        "wetted_surface_flag": true,
+        "porous_media_flag": false,
+        "electrical_energy_present": false,
+        "dynamic_contact_flag": false,
+        "contamination_trap_flag": false,
+        "filter_integrity_assumed": false,
+        "metal_pair_contact": false,
+        "reactive_metal_present": false,
+        "seat_contact_mode": null,
+        "sa_to_volume_ratio": "low"
+      },
+      "ports": {"input": 1, "output": 1},
+      "icon": "fitting"
+    },
+    {
+      "archetype_id": "pressure_vessel",
+      "display_name": "Pressure Vessel",
+      "description": "Pressurized storage container",
+      "material_slots": [
+        {"slot": "material", "required": true, "default": null},
+        {"slot": "liner_material", "required": false, "default": null}
+      ],
+      "config_fields": [
+        {"field": "volume_liters", "type": "number", "default": null},
+        {"field": "mawp_psia", "type": "number", "default": null}
+      ],
+      "default_features": {
+        "has_moving_contact": false,
+        "has_polymer_seal": false,
+        "has_dead_volume": true,
+        "creates_particles": false,
+        "has_cavity_downstream": false,
+        "wetted_surface_flag": true,
+        "porous_media_flag": false,
+        "electrical_energy_present": false,
+        "dynamic_contact_flag": false,
+        "contamination_trap_flag": false,
+        "filter_integrity_assumed": false,
+        "metal_pair_contact": false,
+        "reactive_metal_present": false,
+        "seat_contact_mode": null,
+        "sa_to_volume_ratio": "low"
+      },
+      "ports": {"input": 1, "output": 1},
+      "icon": "vessel"
+    },
+    {
+      "archetype_id": "relief_valve",
+      "display_name": "Relief Valve",
+      "description": "Overpressure protection device with chatter susceptibility",
+      "material_slots": [
+        {"slot": "body_material", "required": true, "default": null},
+        {"slot": "seat_material", "required": true, "default": null}
+      ],
+      "config_fields": [
+        {"field": "set_pressure_psia", "type": "number", "default": null},
+        {"field": "chatter_susceptible", "type": "boolean", "default": true}
+      ],
+      "default_features": {
+        "has_moving_contact": true,
+        "has_polymer_seal": false,
+        "has_dead_volume": false,
+        "creates_particles": false,
+        "has_cavity_downstream": false,
+        "wetted_surface_flag": true,
+        "porous_media_flag": false,
+        "electrical_energy_present": false,
+        "dynamic_contact_flag": true,
+        "contamination_trap_flag": false,
+        "filter_integrity_assumed": false,
+        "metal_pair_contact": true,
+        "reactive_metal_present": false,
+        "seat_contact_mode": "metal_to_metal",
+        "sa_to_volume_ratio": "low"
+      },
+      "ports": {"input": 1, "output": 1},
+      "icon": "relief_valve"
+    },
+    {
+      "archetype_id": "check_valve",
+      "display_name": "Check Valve",
+      "description": "One-way flow device with chatter susceptibility",
+      "material_slots": [
+        {"slot": "body_material", "required": true, "default": null},
+        {"slot": "poppet_material", "required": true, "default": null}
+      ],
+      "config_fields": [
+        {"field": "chatter_susceptible", "type": "boolean", "default": true}
+      ],
+      "default_features": {
+        "has_moving_contact": true,
+        "has_polymer_seal": false,
+        "has_dead_volume": false,
+        "creates_particles": false,
+        "has_cavity_downstream": false,
+        "wetted_surface_flag": true,
+        "porous_media_flag": false,
+        "electrical_energy_present": false,
+        "dynamic_contact_flag": true,
+        "contamination_trap_flag": false,
+        "filter_integrity_assumed": false,
+        "metal_pair_contact": true,
+        "reactive_metal_present": false,
+        "seat_contact_mode": "metal_to_metal",
+        "sa_to_volume_ratio": "low"
+      },
+      "ports": {"input": 1, "output": 1},
+      "icon": "check_valve"
+    },
+    {
+      "archetype_id": "orifice",
+      "display_name": "Orifice / Restrictor",
+      "description": "Flow restriction that may create sonic flow downstream",
+      "material_slots": [
+        {"slot": "material", "required": true, "default": null}
+      ],
+      "config_fields": [
+        {"field": "bore_diameter_mm", "type": "number", "default": null}
+      ],
+      "default_features": {
+        "has_moving_contact": false,
+        "has_polymer_seal": false,
+        "has_dead_volume": false,
+        "creates_particles": true,
+        "has_cavity_downstream": true,
+        "wetted_surface_flag": true,
+        "porous_media_flag": false,
+        "electrical_energy_present": false,
+        "dynamic_contact_flag": false,
+        "contamination_trap_flag": false,
+        "filter_integrity_assumed": false,
+        "metal_pair_contact": false,
+        "reactive_metal_present": false,
+        "seat_contact_mode": null,
+        "sa_to_volume_ratio": "low"
+      },
+      "ports": {"input": 1, "output": 1},
+      "icon": "orifice"
+    },
+    {
+      "archetype_id": "heat_exchanger",
+      "display_name": "Heat Exchanger",
+      "description": "Thermal management device — high SA/V ratio boosts kindling chain",
+      "material_slots": [
+        {"slot": "material", "required": true, "default": null},
+        {"slot": "tube_material", "required": false, "default": null}
+      ],
+      "config_fields": [
+        {"field": "wall_thickness_mm", "type": "number", "default": null}
+      ],
+      "default_features": {
+        "has_moving_contact": false,
+        "has_polymer_seal": false,
+        "has_dead_volume": false,
+        "creates_particles": false,
+        "has_cavity_downstream": false,
+        "wetted_surface_flag": true,
+        "porous_media_flag": false,
+        "electrical_energy_present": false,
+        "dynamic_contact_flag": false,
+        "contamination_trap_flag": false,
+        "filter_integrity_assumed": false,
+        "metal_pair_contact": false,
+        "reactive_metal_present": false,
+        "seat_contact_mode": null,
+        "sa_to_volume_ratio": "high"
+      },
+      "ports": {"input": 1, "output": 1},
+      "icon": "heat_exchanger"
+    },
+    {
+      "archetype_id": "gasket",
+      "display_name": "Gasket / O-Ring",
+      "description": "Sealing element — triggers flow friction when exposed to flow",
+      "material_slots": [
+        {"slot": "material", "required": true, "default": null}
+      ],
+      "config_fields": [
+        {"field": "exposed_to_flow", "type": "boolean", "default": false}
+      ],
+      "default_features": {
+        "has_moving_contact": false,
+        "has_polymer_seal": true,
+        "has_dead_volume": false,
+        "creates_particles": false,
+        "has_cavity_downstream": false,
+        "wetted_surface_flag": true,
+        "porous_media_flag": false,
+        "electrical_energy_present": false,
+        "dynamic_contact_flag": false,
+        "contamination_trap_flag": false,
+        "filter_integrity_assumed": false,
+        "metal_pair_contact": false,
+        "reactive_metal_present": false,
+        "seat_contact_mode": null,
+        "sa_to_volume_ratio": "low"
+      },
+      "ports": {"input": 0, "output": 0},
+      "icon": "gasket"
+    },
+    {
+      "archetype_id": "flex_hose",
+      "display_name": "Flex Hose",
+      "description": "Flexible conduit — internal wire braid rub triggers friction",
+      "material_slots": [
+        {"slot": "material", "required": true, "default": null},
+        {"slot": "braid_material", "required": false, "default": null}
+      ],
+      "config_fields": [
+        {"field": "inner_diameter_mm", "type": "number", "default": null},
+        {"field": "length_m", "type": "number", "default": null}
+      ],
+      "default_features": {
+        "has_moving_contact": true,
+        "has_polymer_seal": false,
+        "has_dead_volume": false,
+        "creates_particles": true,
+        "has_cavity_downstream": false,
+        "wetted_surface_flag": true,
+        "porous_media_flag": false,
+        "electrical_energy_present": false,
+        "dynamic_contact_flag": true,
+        "contamination_trap_flag": false,
+        "filter_integrity_assumed": false,
+        "metal_pair_contact": true,
+        "reactive_metal_present": false,
+        "seat_contact_mode": null,
+        "sa_to_volume_ratio": "low"
+      },
+      "ports": {"input": 1, "output": 1},
+      "icon": "flex_hose"
+    }
+  ]
+}

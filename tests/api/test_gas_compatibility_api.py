@@ -176,8 +176,8 @@ class TestH2CompatibilityAPI:
         )
         assert data.get("embrittlement_risk") in ["low", "very_low", None]
 
-    def test_h2_inconel_625_approved(self):
-        """Inconel 625 in high-pressure H2 should return OK via API."""
+    def test_h2_inconel_625_caution(self):
+        """Inconel 625 in high-pressure H2 should return CAUTION via API."""
         response = client.post(
             "/mira/h2/compatibility",
             json={
@@ -191,10 +191,10 @@ class TestH2CompatibilityAPI:
         assert response.status_code == 200
         data = response.json()
 
-        assert data["classification"] == "ok", (
-            f"Inconel 625 should be APPROVED for H2, got {data['classification']}"
+        assert data["classification"] == "caution", (
+            f"Inconel 625 should be CAUTION for H2, got {data['classification']}"
         )
-        assert data.get("embrittlement_risk") == "very_low"
+        assert data.get("embrittlement_risk") == "medium"
 
     def test_h2_high_strength_steel_prohibited(self):
         """High-strength steel (>150 ksi) should return PROHIBITED via API."""
@@ -254,6 +254,37 @@ class TestH2CompatibilityAPI:
         assert "evidence" in data
         assert len(data["evidence"]) > 0
         assert "source_id" in data["evidence"][0]
+
+    def test_h2_conditions_suggest_endpoint(self):
+        """The lightweight H2 condition suggest endpoint should be reachable."""
+        response = client.get(
+            "/mira/h2/conditions/suggest",
+            params={"material_key": "SS 316"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+
+        assert data["material"]
+        assert isinstance(data["conditions"], list)
+        assert "requires_selection" in data
+
+    def test_h2_mua_rationale_endpoint(self):
+        """The H2 MUA rationale endpoint should return Form 551-ready text."""
+        response = client.post(
+            "/mira/h2/mua-rationale",
+            json={
+                "material_key": "SS 316",
+                "pressure_psia": 5000,
+                "temperature_k": 300,
+                "phase": "gh2",
+            },
+        )
+        assert response.status_code == 200
+        data = response.json()
+
+        assert data["classification"] == "ok"
+        assert "NASA-STD-6016C" in data["section"]
+        assert "hydrogen embrittlement" in data["rationale_text"].lower()
 
 
 # =============================================================================

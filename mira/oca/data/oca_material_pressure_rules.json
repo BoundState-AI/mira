@@ -1,63 +1,686 @@
 {
-  "_meta": {
-    "description": "Material-pressure rules with strict tier separation. Tier A = governing. Tier D = expert overlay.",
-    "version": "1.0.0",
-    "ingest_date": "2026-03-10"
-  },
-  "tier_a_rules": [
+  "tier_a": [
     {
-      "rule_id": "MPR67-TITANIUM",
+      "rule_id": "MPR_67_TITANIUM_PROHIBITION",
       "material_family": "titanium",
-      "tier": "A",
-      "source": "NASA-STD-6016C §4.2.1.3c (MPR 67)",
-      "rule": "Titanium alloys SHALL NOT be used with LOX or GOX at any pressure, or with air above 5 psia O2 partial pressure.",
-      "is_prohibition": true,
-      "pressure_threshold_psia": null,
-      "o2_partial_pressure_threshold_psia": 5.0,
-      "applies_to_phases": ["lox", "gox", "enriched_air", "compressed_air"],
-      "note": "This is a governing prohibition. The commonly cited 100 psia threshold is Tier D center practice that is LESS restrictive."
+      "citation": "NASA-STD-6016C Section 4.2.1.3c (MPR 67)",
+      "description": "Titanium alloys shall not be used with LOX or GOX at any pressure, or air above 5 psia oxygen partial pressure.",
+      "source": {
+        "source": "NASA-STD-6016C",
+        "provenance": "governing_standard"
+      }
     }
   ],
-  "tier_d_heuristics": [
+  "tier_d": [
     {
-      "rule_id": "JSC-AL-PRESSURE",
+      "rule_id": "CENTER_PRACTICE_ALUMINUM_GOX",
       "material_family": "aluminum",
-      "tier": "D",
-      "source": "JSC-27301 Rev J (center practice)",
-      "rule": "Aluminum alloys: exercise caution above 200 psia in GOX service. Use Monel or copper alloy above 1000 psia.",
-      "is_prohibition": false,
-      "pressure_threshold_psia": 200,
-      "note": "Tier D — center practice, not governing standard. Display with Tier D label."
+      "citation": "Center practice overlay",
+      "description": "Aluminum GOX limits remain screening-level overlays until pinned to governing authority or exact configuration test data.",
+      "source": {
+        "source": "BoundState OCA screening overlay",
+        "provenance": "internal_screening_logic"
+      }
     },
     {
-      "rule_id": "JSC-SS-PRESSURE",
-      "material_family": "stainless_steel",
-      "tier": "D",
-      "source": "JSC-27301 Rev J (center practice)",
-      "rule": "Austenitic stainless steels: generally acceptable for GOX. Review promoted combustion data above 1500 psia.",
-      "is_prohibition": false,
-      "pressure_threshold_psia": 1500,
-      "note": "Tier D — center practice. Stainless steels vary by alloy and form."
+      "rule_id": "CENTER_PRACTICE_STAINLESS_PRECLEAN",
+      "material_family": "austenitic_steel",
+      "citation": "Center practice overlay",
+      "description": "Precision cleaning emphasis for stainless at elevated pressure remains an overlay until pinned to governing authority or exact configuration test data.",
+      "source": {
+        "source": "BoundState OCA screening overlay",
+        "provenance": "internal_screening_logic"
+      }
+    }
+  ],
+  "adiabatic_compression_reference": {
+    "description": "Theoretical maximum temperatures for oxygen compressed isentropically from 14.7 psia and 68 F.",
+    "source": {
+      "source": "ASTM MNL36 2nd Ed.",
+      "page": 24,
+      "provenance": "published_handbook_compilation",
+      "table": "2-3"
     },
+    "rows": [
+      {
+        "final_pressure_kpa": 345,
+        "final_pressure_psia": 50,
+        "pressure_ratio": 3.4,
+        "final_temperature_c": 143,
+        "final_temperature_f": 289
+      },
+      {
+        "final_pressure_kpa": 690,
+        "final_pressure_psia": 100,
+        "pressure_ratio": 6.8,
+        "final_temperature_c": 234,
+        "final_temperature_f": 453
+      },
+      {
+        "final_pressure_kpa": 1000,
+        "final_pressure_psia": 145,
+        "pressure_ratio": 9.9,
+        "final_temperature_c": 291,
+        "final_temperature_f": 556
+      },
+      {
+        "final_pressure_kpa": 1379,
+        "final_pressure_psia": 200,
+        "pressure_ratio": 13.6,
+        "final_temperature_c": 344,
+        "final_temperature_f": 653
+      },
+      {
+        "final_pressure_kpa": 2068,
+        "final_pressure_psia": 300,
+        "pressure_ratio": 20.4,
+        "final_temperature_c": 421,
+        "final_temperature_f": 789
+      },
+      {
+        "final_pressure_kpa": 2758,
+        "final_pressure_psia": 400,
+        "pressure_ratio": 27.2,
+        "final_temperature_c": 480,
+        "final_temperature_f": 896
+      },
+      {
+        "final_pressure_kpa": 3447,
+        "final_pressure_psia": 500,
+        "pressure_ratio": 34.0,
+        "final_temperature_c": 530,
+        "final_temperature_f": 986
+      },
+      {
+        "final_pressure_kpa": 5170,
+        "final_pressure_psia": 750,
+        "pressure_ratio": 51.0,
+        "final_temperature_c": 628,
+        "final_temperature_f": 1163
+      }
+    ]
+  },
+  "screening_guidance": [
     {
-      "rule_id": "JSC-MONEL-PREFERRED",
-      "material_family": "monel",
-      "tier": "D",
-      "source": "JSC-27301 Rev J (center practice)",
-      "rule": "Monel 400/K-500: preferred for high-pressure oxygen service. Nonflammable in most configurations.",
-      "is_prohibition": false,
-      "pressure_threshold_psia": null,
-      "note": "Tier D — widely used and supported by test data, but the preference is center practice."
-    },
-    {
-      "rule_id": "TITANIUM-100PSIA-MYTH",
+      "rule_id": "ASTM_MNL36_TITANIUM_PROMOTED_IGNITION",
       "material_family": "titanium",
-      "tier": "D",
-      "source": "Various center practices (commonly misattributed)",
-      "rule": "Some center practices cite a 100 psia threshold for titanium. This is LESS restrictive than the governing MPR 67 (5 psia O2 partial pressure) and SHALL NOT override the Tier A prohibition.",
-      "is_prohibition": false,
-      "pressure_threshold_psia": 100,
-      "note": "CAUTION: This Tier D heuristic is LESS restrictive than Tier A. MPR 67 governs."
+      "screening_outcome": "high_concern",
+      "description": "Commercially pure titanium and Ti-6Al-4V burned at or below 1 psia in ASTM G124 standard rod configuration.",
+      "configuration": "0.125 in. rod in stagnant GOX",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 32,
+        "provenance": "published_handbook_compilation",
+        "table": "3-1",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "rule_id": "ASTM_MNL36_MAGNESIUM_PROMOTED_IGNITION",
+      "material_family": "magnesium",
+      "screening_outcome": "high_concern",
+      "description": "Commercially pure magnesium burned at or below 12.4 psia in ASTM G124 standard rod configuration.",
+      "configuration": "0.125 in. rod in stagnant GOX",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 32,
+        "provenance": "published_handbook_compilation",
+        "table": "3-1",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "rule_id": "ASTM_MNL36_ALUMINUM_PROMOTED_IGNITION",
+      "material_family": "aluminum",
+      "screening_outcome": "high_concern",
+      "description": "Commercially pure aluminum burned at about 12.4 psia, 2219 at about 25 psia, and 1100 at about 100 psia in standard rod geometry.",
+      "configuration": "0.125 in. rod in stagnant GOX",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 31,
+        "provenance": "published_handbook_compilation",
+        "table": "3-1",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "rule_id": "ASTM_MNL36_300_SERIES_STAINLESS_PROMOTED_IGNITION",
+      "material_family": "austenitic_steel",
+      "screening_outcome": "moderate_concern",
+      "description": "300 Series stainless steel showed a measured burn/no-burn transition at approximately 200/111 psia in standard rod geometry.",
+      "configuration": "0.125 in. rod in stagnant GOX",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 31,
+        "provenance": "published_handbook_compilation",
+        "table": "3-1",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "rule_id": "ASTM_MNL36_ALUMINUM_BRONZE_PROMOTED_IGNITION",
+      "material_family": "copper",
+      "screening_outcome": "moderate_concern",
+      "description": "Aluminum-bronze showed a measured burn/no-burn transition at approximately 250/200 psia in standard rod geometry.",
+      "configuration": "0.125 in. rod in stagnant GOX",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 31,
+        "provenance": "published_handbook_compilation",
+        "table": "3-1",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "rule_id": "ASTM_MNL36_COPPER_AND_NICKEL_BULK_RESISTANCE",
+      "material_family": "copper",
+      "screening_outcome": "supportive",
+      "description": "Commercially pure copper, Nickel 200, and Monel 400 showed no burn above 10,000 psia in standard rod configuration.",
+      "configuration": "0.125 in. rod in stagnant GOX",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 30,
+        "provenance": "published_handbook_compilation",
+        "table": "3-1",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "rule_id": "ASTM_MNL36_GEOMETRY_SENSITIVITY_MONEL",
+      "material_family": "nickel_alloy",
+      "screening_outcome": "geometry_sensitive",
+      "description": "Monel 400 shifts from no burn above 10,000 psia as a rod to about 100 psia as a sintered-filter-like specimen and about 12.4 psia as wire mesh.",
+      "configuration": "rod vs sintered vs 60 x 60 wire mesh",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 33,
+        "provenance": "published_handbook_compilation",
+        "table": "3-3",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "rule_id": "ASTM_MNL36_GEOMETRY_SENSITIVITY_STAINLESS",
+      "material_family": "austenitic_steel",
+      "screening_outcome": "geometry_sensitive",
+      "description": "304 and 316 stainless wire-mesh cylinders burned at or below 12.4 psia despite higher thresholds in bulk rod form.",
+      "configuration": "60 x 60 wire mesh cylinder",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 33,
+        "provenance": "published_handbook_compilation",
+        "table": "3-2",
+        "test_standard": "ASTM G124"
+      }
+    }
+  ],
+  "screening_pressure_data": [
+    {
+      "material": "Copper (commercially pure)",
+      "family": "copper",
+      "configuration": "0.32 cm rod",
+      "lowest_burn_pressure_mpa": null,
+      "lowest_burn_pressure_psia": null,
+      "highest_no_burn_pressure_mpa": 68.9,
+      "highest_no_burn_pressure_psia": 10000,
+      "qualifier": "no burn above highest tested pressure",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 30,
+        "provenance": "published_handbook_compilation",
+        "table": "3-1",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Monel 400",
+      "family": "nickel_alloy",
+      "configuration": "0.32 cm rod",
+      "lowest_burn_pressure_mpa": null,
+      "lowest_burn_pressure_psia": null,
+      "highest_no_burn_pressure_mpa": 68.9,
+      "highest_no_burn_pressure_psia": 10000,
+      "qualifier": "no burn above highest tested pressure",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 30,
+        "provenance": "published_handbook_compilation",
+        "table": "3-1",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Nickel 200",
+      "family": "nickel_alloy",
+      "configuration": "0.32 cm rod",
+      "lowest_burn_pressure_mpa": null,
+      "lowest_burn_pressure_psia": null,
+      "highest_no_burn_pressure_mpa": 68.9,
+      "highest_no_burn_pressure_psia": 10000,
+      "qualifier": "no burn above highest tested pressure",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 30,
+        "provenance": "published_handbook_compilation",
+        "table": "3-1",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Inconel 718",
+      "family": "nickel_alloy",
+      "configuration": "0.32 cm rod",
+      "lowest_burn_pressure_mpa": 3.4,
+      "lowest_burn_pressure_psia": 500,
+      "highest_no_burn_pressure_mpa": null,
+      "highest_no_burn_pressure_psia": null,
+      "qualifier": "burn at or below stated pressure",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 31,
+        "provenance": "published_handbook_compilation",
+        "table": "3-1",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "440C stainless steel",
+      "family": "austenitic_steel",
+      "configuration": "0.32 cm rod",
+      "lowest_burn_pressure_mpa": 3.4,
+      "lowest_burn_pressure_psia": 500,
+      "highest_no_burn_pressure_mpa": null,
+      "highest_no_burn_pressure_psia": null,
+      "qualifier": "burn at or below stated pressure",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 31,
+        "provenance": "published_handbook_compilation",
+        "table": "3-1",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "300 Series stainless steel",
+      "family": "austenitic_steel",
+      "configuration": "0.32 cm rod",
+      "lowest_burn_pressure_mpa": 1.4,
+      "lowest_burn_pressure_psia": 200,
+      "highest_no_burn_pressure_mpa": 0.8,
+      "highest_no_burn_pressure_psia": 111,
+      "qualifier": "measured burn/no-burn transition",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 31,
+        "provenance": "published_handbook_compilation",
+        "table": "3-1",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Aluminum-bronze",
+      "family": "copper",
+      "configuration": "0.32 cm rod",
+      "lowest_burn_pressure_mpa": 1.7,
+      "lowest_burn_pressure_psia": 250,
+      "highest_no_burn_pressure_mpa": 1.4,
+      "highest_no_burn_pressure_psia": 200,
+      "qualifier": "measured burn/no-burn transition",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 31,
+        "provenance": "published_handbook_compilation",
+        "table": "3-1",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Aluminum 1100",
+      "family": "aluminum",
+      "configuration": "0.32 cm rod",
+      "lowest_burn_pressure_mpa": 0.7,
+      "lowest_burn_pressure_psia": 100,
+      "highest_no_burn_pressure_mpa": 0.3,
+      "highest_no_burn_pressure_psia": 50,
+      "qualifier": "measured burn/no-burn transition",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 31,
+        "provenance": "published_handbook_compilation",
+        "table": "3-1",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Aluminum 2219",
+      "family": "aluminum",
+      "configuration": "0.32 cm rod",
+      "lowest_burn_pressure_mpa": 0.17,
+      "lowest_burn_pressure_psia": 25,
+      "highest_no_burn_pressure_mpa": 0.1,
+      "highest_no_burn_pressure_psia": 15,
+      "qualifier": "measured burn/no-burn transition",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 32,
+        "provenance": "published_handbook_compilation",
+        "table": "3-1",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Aluminum (commercially pure)",
+      "family": "aluminum",
+      "configuration": "0.32 cm rod",
+      "lowest_burn_pressure_mpa": 0.09,
+      "lowest_burn_pressure_psia": 12.4,
+      "highest_no_burn_pressure_mpa": null,
+      "highest_no_burn_pressure_psia": null,
+      "qualifier": "burn at or below stated pressure",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 32,
+        "provenance": "published_handbook_compilation",
+        "table": "3-1",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Magnesium (commercially pure)",
+      "family": "magnesium",
+      "configuration": "0.32 cm rod",
+      "lowest_burn_pressure_mpa": 0.09,
+      "lowest_burn_pressure_psia": 12.4,
+      "highest_no_burn_pressure_mpa": null,
+      "highest_no_burn_pressure_psia": null,
+      "qualifier": "burn at or below stated pressure",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 32,
+        "provenance": "published_handbook_compilation",
+        "table": "3-1",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Titanium (commercially pure)",
+      "family": "titanium",
+      "configuration": "0.32 cm rod",
+      "lowest_burn_pressure_mpa": 0.007,
+      "lowest_burn_pressure_psia": 1,
+      "highest_no_burn_pressure_mpa": null,
+      "highest_no_burn_pressure_psia": null,
+      "qualifier": "burn at or below stated pressure",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 32,
+        "provenance": "published_handbook_compilation",
+        "table": "3-1",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Ti-6Al-4V",
+      "family": "titanium",
+      "configuration": "0.32 cm rod",
+      "lowest_burn_pressure_mpa": 0.007,
+      "lowest_burn_pressure_psia": 1,
+      "highest_no_burn_pressure_mpa": null,
+      "highest_no_burn_pressure_psia": null,
+      "qualifier": "burn at or below stated pressure",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 32,
+        "provenance": "published_handbook_compilation",
+        "table": "3-1",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Nickel 200",
+      "configuration": "60 x 60 wire mesh cylinder",
+      "lowest_burn_pressure_mpa": null,
+      "lowest_burn_pressure_psia": null,
+      "highest_no_burn_pressure_mpa": 68.9,
+      "highest_no_burn_pressure_psia": 10000,
+      "qualifier": "no burn above highest tested pressure",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 33,
+        "provenance": "published_handbook_compilation",
+        "table": "3-2",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Copper 100",
+      "configuration": "60 x 60 wire mesh cylinder",
+      "lowest_burn_pressure_mpa": 0.3,
+      "lowest_burn_pressure_psia": 47,
+      "highest_no_burn_pressure_mpa": 0.085,
+      "highest_no_burn_pressure_psia": 12.4,
+      "qualifier": "measured burn/no-burn transition",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 33,
+        "provenance": "published_handbook_compilation",
+        "table": "3-2",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Monel 400",
+      "configuration": "60 x 60 wire mesh cylinder",
+      "lowest_burn_pressure_mpa": 0.085,
+      "lowest_burn_pressure_psia": 12.4,
+      "highest_no_burn_pressure_mpa": null,
+      "highest_no_burn_pressure_psia": null,
+      "qualifier": "burn at or below stated pressure",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 33,
+        "provenance": "published_handbook_compilation",
+        "table": "3-2",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "316 stainless steel",
+      "configuration": "60 x 60 wire mesh cylinder",
+      "lowest_burn_pressure_mpa": 0.085,
+      "lowest_burn_pressure_psia": 12.4,
+      "highest_no_burn_pressure_mpa": null,
+      "highest_no_burn_pressure_psia": null,
+      "qualifier": "burn at or below stated pressure",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 33,
+        "provenance": "published_handbook_compilation",
+        "table": "3-2",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "304 stainless steel",
+      "configuration": "60 x 60 wire mesh cylinder",
+      "lowest_burn_pressure_mpa": 0.085,
+      "lowest_burn_pressure_psia": 12.4,
+      "highest_no_burn_pressure_mpa": null,
+      "highest_no_burn_pressure_psia": null,
+      "qualifier": "burn at or below stated pressure",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 33,
+        "provenance": "published_handbook_compilation",
+        "table": "3-2",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Carbon steel",
+      "configuration": "60 x 60 wire mesh cylinder",
+      "lowest_burn_pressure_mpa": 0.085,
+      "lowest_burn_pressure_psia": 12.4,
+      "highest_no_burn_pressure_mpa": null,
+      "highest_no_burn_pressure_psia": null,
+      "qualifier": "burn at or below stated pressure",
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 33,
+        "provenance": "published_handbook_compilation",
+        "table": "3-2",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Monel 400",
+      "configuration": "sintered filter-like",
+      "lowest_burn_pressure_mpa": 0.69,
+      "lowest_burn_pressure_psia": 100,
+      "highest_no_burn_pressure_mpa": 0.082,
+      "highest_no_burn_pressure_psia": 12.4,
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 33,
+        "provenance": "published_handbook_compilation",
+        "table": "3-3",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "316L stainless steel",
+      "configuration": "sintered filter-like",
+      "lowest_burn_pressure_mpa": 0.082,
+      "lowest_burn_pressure_psia": 12.4,
+      "highest_no_burn_pressure_mpa": null,
+      "highest_no_burn_pressure_psia": null,
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 33,
+        "provenance": "published_handbook_compilation",
+        "table": "3-3",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Tin-bronze 10P",
+      "configuration": "sintered filter-like",
+      "lowest_burn_pressure_mpa": null,
+      "lowest_burn_pressure_psia": null,
+      "highest_no_burn_pressure_mpa": 68.9,
+      "highest_no_burn_pressure_psia": 10000,
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 33,
+        "provenance": "published_handbook_compilation",
+        "table": "3-3",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Tin-bronze 90P",
+      "configuration": "sintered filter-like",
+      "lowest_burn_pressure_mpa": null,
+      "lowest_burn_pressure_psia": null,
+      "highest_no_burn_pressure_mpa": 68.9,
+      "highest_no_burn_pressure_psia": 10000,
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 33,
+        "provenance": "published_handbook_compilation",
+        "table": "3-3",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Tin-bronze 250P",
+      "configuration": "sintered filter-like",
+      "lowest_burn_pressure_mpa": null,
+      "lowest_burn_pressure_psia": null,
+      "highest_no_burn_pressure_mpa": 68.9,
+      "highest_no_burn_pressure_psia": 10000,
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 33,
+        "provenance": "published_handbook_compilation",
+        "table": "3-3",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Tin-bronze 153A",
+      "configuration": "sintered filter-like",
+      "lowest_burn_pressure_mpa": 37.9,
+      "lowest_burn_pressure_psia": 5500,
+      "highest_no_burn_pressure_mpa": 27.6,
+      "highest_no_burn_pressure_psia": 4000,
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 33,
+        "provenance": "published_handbook_compilation",
+        "table": "3-3",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Tin-bronze 103A",
+      "configuration": "sintered filter-like",
+      "lowest_burn_pressure_mpa": 68.9,
+      "lowest_burn_pressure_psia": 10000,
+      "highest_no_burn_pressure_mpa": 55.2,
+      "highest_no_burn_pressure_psia": 8000,
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 33,
+        "provenance": "published_handbook_compilation",
+        "table": "3-3",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Tin-bronze 61A",
+      "configuration": "sintered filter-like",
+      "lowest_burn_pressure_mpa": null,
+      "lowest_burn_pressure_psia": null,
+      "highest_no_burn_pressure_mpa": 68.9,
+      "highest_no_burn_pressure_psia": 10000,
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 33,
+        "provenance": "published_handbook_compilation",
+        "table": "3-3",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Tin-bronze 68HP",
+      "configuration": "sintered filter-like",
+      "lowest_burn_pressure_mpa": null,
+      "lowest_burn_pressure_psia": null,
+      "highest_no_burn_pressure_mpa": 68.9,
+      "highest_no_burn_pressure_psia": 10000,
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 33,
+        "provenance": "published_handbook_compilation",
+        "table": "3-3",
+        "test_standard": "ASTM G124"
+      }
+    },
+    {
+      "material": "Tin-bronze 23HP",
+      "configuration": "sintered filter-like",
+      "lowest_burn_pressure_mpa": null,
+      "lowest_burn_pressure_psia": null,
+      "highest_no_burn_pressure_mpa": 68.9,
+      "highest_no_burn_pressure_psia": 10000,
+      "source": {
+        "source": "ASTM MNL36 2nd Ed.",
+        "page": 33,
+        "provenance": "published_handbook_compilation",
+        "table": "3-3",
+        "test_standard": "ASTM G124"
+      }
     }
   ]
 }

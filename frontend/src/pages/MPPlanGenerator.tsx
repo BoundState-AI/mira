@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
+import { MiraHelpLabel, MiraInlineHelp } from '@/components/mira/MiraInlineHelp';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -50,6 +51,7 @@ import {
   type MPPlanVehiclePreset,
 } from '@/lib/api';
 import helpContent from '@/config/helpContent';
+import { getMiraGuidanceEntry, getMiraInputGuidance } from '@/lib/mira-guidance';
 
 type Step = 'setup' | 'environment' | 'materials' | 'analysis' | 'generate';
 
@@ -95,6 +97,8 @@ const QUESTION_TYPE_LABELS: Record<string, { label: string; color: string }> = {
 
 export default function MPPlanGenerator() {
   const { t } = useTranslation(['mpPlanGenerator', 'common']);
+  const mpPlanHelp = (fieldId: string) => getMiraInputGuidance('mp_plan', fieldId);
+  const mpPlanEntry = (section: string, id: string) => getMiraGuidanceEntry('mp_plan', section, id);
   // Step state
   const [step, setStep] = useState<Step>('setup');
   const [loading, setLoading] = useState(false);
@@ -466,7 +470,9 @@ export default function MPPlanGenerator() {
           <CardContent className="space-y-6">
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-2">
-                <Label htmlFor="programName">{t('session.programName', { ns: 'mpPlanGenerator', defaultValue: 'Program Name *' })}</Label>
+                <MiraHelpLabel htmlFor="programName" entry={mpPlanHelp('program_name')}>
+                  {t('session.programName', { ns: 'mpPlanGenerator', defaultValue: 'Program Name *' })}
+                </MiraHelpLabel>
                 <Input
                   id="programName"
                   placeholder={t('session.programPlaceholder', {
@@ -478,7 +484,9 @@ export default function MPPlanGenerator() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="programPhase">{t('session.programPhase', { ns: 'mpPlanGenerator', defaultValue: 'Program Phase' })}</Label>
+                <MiraHelpLabel htmlFor="programPhase" entry={mpPlanHelp('program_phase')}>
+                  {t('session.programPhase', { ns: 'mpPlanGenerator', defaultValue: 'Program Phase' })}
+                </MiraHelpLabel>
                 <Select value={programPhase} onValueChange={setProgramPhase}>
                   <SelectTrigger>
                     <SelectValue placeholder={t('session.programPhasePlaceholder', {
@@ -496,7 +504,13 @@ export default function MPPlanGenerator() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="vehiclePreset">{t('session.vehiclePreset', { ns: 'mpPlanGenerator', defaultValue: 'Vehicle Preset' })}</Label>
+                <MiraHelpLabel
+                  htmlFor="vehiclePreset"
+                  entry={mpPlanHelp('policy_pack_id')}
+                  title={t('session.vehiclePreset', { ns: 'mpPlanGenerator', defaultValue: 'Vehicle Preset' })}
+                >
+                  {t('session.vehiclePreset', { ns: 'mpPlanGenerator', defaultValue: 'Vehicle Preset' })}
+                </MiraHelpLabel>
                 <Select value={vehiclePreset} onValueChange={setVehiclePreset}>
                   <SelectTrigger>
                     <SelectValue placeholder={t('session.vehiclePresetPlaceholder', {
@@ -537,6 +551,7 @@ export default function MPPlanGenerator() {
             <CardTitle className="flex items-center gap-2">
               <Thermometer className="h-5 w-5" />
               {t('environment.title', { ns: 'mpPlanGenerator', defaultValue: 'Define Service Environment' })}
+              <MiraInlineHelp entry={mpPlanHelp('environments')} />
             </CardTitle>
             <CardDescription>
               {t('environment.description', {
@@ -570,9 +585,9 @@ export default function MPPlanGenerator() {
             <div className="space-y-3">
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1">
-                  <Label className="text-xs">
+                  <MiraHelpLabel entry={mpPlanHelp('environments')} labelClassName="text-xs" title="Environment Name">
                     {t('environment.name', { ns: 'mpPlanGenerator', defaultValue: 'Environment Name *' })}
-                  </Label>
+                  </MiraHelpLabel>
                   <Input
                     placeholder={t('environment.namePlaceholder', {
                       ns: 'mpPlanGenerator',
@@ -702,7 +717,10 @@ export default function MPPlanGenerator() {
       {step === 'materials' && session && (
         <Card>
           <CardHeader>
-            <CardTitle>{t('materials.title', { ns: 'mpPlanGenerator', defaultValue: 'Add Materials' })}</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              {t('materials.title', { ns: 'mpPlanGenerator', defaultValue: 'Add Materials' })}
+              <MiraInlineHelp entry={mpPlanHelp('materials')} />
+            </CardTitle>
             <CardDescription>
               {t('materials.description', {
                 ns: 'mpPlanGenerator',
@@ -716,9 +734,11 @@ export default function MPPlanGenerator() {
                 <div key={material.id} className="space-y-2">
                   <div className="grid gap-3 sm:grid-cols-5 items-end">
                     <div className="space-y-1 relative">
-                      {index === 0 && <Label className="text-xs">
-                        {t('materials.columns.material', { ns: 'mpPlanGenerator', defaultValue: 'Material Name *' })}
-                      </Label>}
+                      {index === 0 && (
+                        <MiraHelpLabel entry={mpPlanHelp('materials')} labelClassName="text-xs" title="Material Name">
+                          {t('materials.columns.material', { ns: 'mpPlanGenerator', defaultValue: 'Material Name *' })}
+                        </MiraHelpLabel>
+                      )}
                       <div className="relative">
                         <Input
                           placeholder={t('materials.materialPlaceholder', {
@@ -760,9 +780,11 @@ export default function MPPlanGenerator() {
                       />
                     </div>
                     <div className="space-y-1">
-                      {index === 0 && <Label className="text-xs">
-                        {t('materials.maptisCode', { ns: 'mpPlanGenerator', defaultValue: 'MAPTIS Code' })}
-                      </Label>}
+                      {index === 0 && (
+                        <MiraHelpLabel entry={mpPlanHelp('materials.maptis_code')} labelClassName="text-xs">
+                          {t('materials.maptisCode', { ns: 'mpPlanGenerator', defaultValue: 'MAPTIS Code' })}
+                        </MiraHelpLabel>
+                      )}
                       <Input
                         placeholder={t('materials.maptisPlaceholder', {
                           ns: 'mpPlanGenerator',
@@ -848,6 +870,7 @@ export default function MPPlanGenerator() {
                 <CardTitle className="flex items-center gap-2">
                   <Shield className="h-5 w-5" />
                   {t('analysis.title', { ns: 'mpPlanGenerator', defaultValue: 'Compliance Analysis' })}
+                  <MiraInlineHelp entry={mpPlanEntry('compute_loop', 'engine_sequence')} />
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -890,9 +913,12 @@ export default function MPPlanGenerator() {
 
           {/* Blocking Questions */}
           <Card>
-            <CardHeader>
-              <CardTitle>{t('analysis.questionsTitle', { ns: 'mpPlanGenerator', defaultValue: 'Blocking Questions' })}</CardTitle>
-              <CardDescription>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              {t('analysis.questionsTitle', { ns: 'mpPlanGenerator', defaultValue: 'Blocking Questions' })}
+              <MiraInlineHelp entry={mpPlanEntry('compute_loop', 'compute_question_recompute')} />
+            </CardTitle>
+            <CardDescription>
                 {t('analysis.questionsDescription', {
                   ns: 'mpPlanGenerator',
                   defaultValue: 'Answer these questions to resolve compliance gaps and proceed to generation',

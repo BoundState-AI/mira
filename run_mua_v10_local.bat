@@ -12,7 +12,7 @@ REM ============================================================================
 
 set "REPO_ROOT=%~dp0"
 cd /d "%REPO_ROOT%"
-if not defined MUA_BACKEND_PORT set "MUA_BACKEND_PORT=8010"
+if not defined MUA_BACKEND_PORT set "MUA_BACKEND_PORT=8000"
 if not defined MUA_FRONTEND_PORT set "MUA_FRONTEND_PORT=8080"
 
 if not exist "mira\api\app.py" (

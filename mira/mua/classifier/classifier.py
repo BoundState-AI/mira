@@ -44,7 +44,10 @@ logger = logging.getLogger(__name__)
 # Screening columns recognized by the pipeline
 # ---------------------------------------------------------------------------
 
-SCREENING_COLUMNS: list[str] = ["FLAM", "SCC", "CORR", "TVS", "TOX", "FS"]
+SCREENING_COLUMNS: list[str] = [
+    "FLAM", "SCC", "CORR", "TVS", "TOX", "FS",
+    "LEGACY_OC", "LEGACY_COMPAT",
+]
 
 
 # ---------------------------------------------------------------------------
@@ -119,8 +122,13 @@ def step1_identify_flags(
         rating_upper = rating_str.upper()
         if rating_upper == "A":
             continue  # Pass, no MUA needed
+        # N means different things per column. Only skip if the column's
+        # dictionary maps N to NO_FLAG (e.g., SCC). For FLAM, N is
+        # NEEDS_REVIEW and must flow to Step 2.
         if rating_upper == "N":
-            continue  # Not applicable, no MUA needed
+            col_dict = COLUMN_FLAG_DICT.get(column, {})
+            if col_dict.get("N") == FlagType.NO_FLAG:
+                continue  # Genuinely not applicable (SCC=N)
         flags.append((column, rating_upper))
     return flags
 
@@ -327,7 +335,7 @@ _CATEGORY_MAP: dict[MUAType, MUACategorySpec | None] = {
     MUAType.ANTI_RULE: MUACategorySpec.II,
     MUAType.INCOMPLETE_PASS: MUACategorySpec.II,
     MUAType.REAL_PROBLEM: MUACategorySpec.I,
-    MUAType.REAL_GAP: MUACategorySpec.II,  # Default II, engineer may elevate to I
+    MUAType.REAL_GAP: MUACategorySpec.II,  # Default II; environment or engineer may elevate
     MUAType.STANDARD: None,
     MUAType.FLAG_FOR_HUMAN: None,
 }
@@ -339,18 +347,121 @@ _AUTOMATABLE: set[MUAType] = {
 }
 
 
+# ---------------------------------------------------------------------------
+# Environment-based Category I triggers — ported from v7/category_router.py
+# Thresholds from NASA-STD-6016C with section citations.
+# These can only ELEVATE (II → I), never demote (I → II).
+# ---------------------------------------------------------------------------
+
+_CAT_I_O2_THRESHOLD = 23.5      # §4.2.1.4 — enriched oxygen
+_CAT_I_O2_PRESSURE_PSIA = 265.0  # §4.2.1.4.1 — GOX/enriched air acceptance
+_CAT_I_CRYO_TEMP_F = -150.0      # §4.2.6.1 — cryogenic evaluation
+
+_PROHIBITED_FAMILIES_O2: set[str] = {"TITANIUM", "MAGNESIUM"}  # §4.2.1.4 Notes 2-3
+
+
+def _check_cat_i_triggers(
+    media: str,
+    o2_percent: float | None = None,
+    pressure_psia: float | None = None,
+    temp_min_f: float | None = None,
+    material_family: str = "",
+) -> list[str]:
+    """Return list of Category I rule IDs that fired.
+
+    Each rule carries a citation so the classification_reason is auditable.
+    Empty list = no Cat I triggers = stay at type-based category.
+    """
+    media_upper = media.upper().strip()
+    triggers: list[str] = []
+
+    # CAT1-001: LOX/GOX service
+    if media_upper in ("LOX", "GOX"):
+        triggers.append(
+            f"CAT1-001: {media_upper} service requires Category I "
+            f"assessment per NASA-STD-6016C §4.2.1.4"
+        )
+
+    # CAT1-002: Enriched oxygen >= 23.5%
+    if o2_percent is not None and o2_percent >= _CAT_I_O2_THRESHOLD:
+        triggers.append(
+            f"CAT1-002: O2 concentration {o2_percent}% >= {_CAT_I_O2_THRESHOLD}% "
+            f"per NASA-STD-6016C §4.2.1.4"
+        )
+
+    # CAT1-003: O2 service + high pressure (> 265 psia)
+    is_o2_service = media_upper in _O2_ENRICHED_MEDIA
+    if is_o2_service and pressure_psia is not None and pressure_psia > _CAT_I_O2_PRESSURE_PSIA:
+        triggers.append(
+            f"CAT1-003: Pressure {pressure_psia} psia > {_CAT_I_O2_PRESSURE_PSIA} psia "
+            f"in O2 service per NASA-STD-6016C §4.2.1.4.1"
+        )
+
+    # CAT1-004: Hydrogen service (embrittlement)
+    if media_upper in _H2_MEDIA:
+        triggers.append(
+            f"CAT1-004: Hydrogen service ({media_upper}) requires "
+            f"embrittlement assessment per NASA-STD-6016C §4.2.6.4"
+        )
+
+    # CAT1-005: Prohibited material family in O2 service
+    family_upper = material_family.upper().strip()
+    if (is_o2_service or (o2_percent is not None and o2_percent >= _CAT_I_O2_THRESHOLD)):
+        if family_upper in _PROHIBITED_FAMILIES_O2:
+            triggers.append(
+                f"CAT1-005: Prohibited family '{material_family}' in O2 service "
+                f"per NASA-STD-6016C §4.2.1.4 Notes 2-3"
+            )
+
+    # CAT1-006: Cryogenic service
+    if temp_min_f is not None and temp_min_f <= _CAT_I_CRYO_TEMP_F:
+        triggers.append(
+            f"CAT1-006: Temperature {temp_min_f}°F <= {_CAT_I_CRYO_TEMP_F}°F "
+            f"per NASA-STD-6016C §4.2.6.1"
+        )
+
+    return triggers
+
+
 def step6_assign_category(
     mua_type: MUAType,
-) -> MUACategorySpec | None:
-    """Assign MUA category from type.
+    media: str = "",
+    o2_percent: float | None = None,
+    pressure_psia: float | None = None,
+    temp_min_f: float | None = None,
+    material_family: str = "",
+) -> tuple[MUACategorySpec | None, list[str]]:
+    """Assign MUA category from type + environment triggers.
 
-    All automatable MUAs are Category II. This is inherent — if the
-    tool can determine the hazard doesn't apply, it's by definition
-    "not considered a hazard in its use application."
+    Returns (category, cat_i_triggers) where cat_i_triggers is a list of
+    rule IDs that fired. Environment triggers can only elevate Cat II → Cat I,
+    never demote.
 
-    Category I requires engineering judgment about accepted risk.
+    Per NASA-STD-6016C §4.1.6.1:
+    - Cat I: Could affect safety AND must be used for functional reasons
+    - Cat II: Fails screening, not considered hazard in use application
     """
-    return _CATEGORY_MAP.get(mua_type)
+    base_category = _CATEGORY_MAP.get(mua_type)
+
+    # No MUA needed (STANDARD, FLAG_FOR_HUMAN) — environment doesn't matter
+    if base_category is None:
+        return None, []
+
+    # Check environment-based Cat I triggers
+    cat_i_triggers = _check_cat_i_triggers(
+        media=media,
+        o2_percent=o2_percent,
+        pressure_psia=pressure_psia,
+        temp_min_f=temp_min_f,
+        material_family=material_family,
+    )
+
+    # Environment triggers can elevate Cat II → Cat I
+    if cat_i_triggers and base_category == MUACategorySpec.II:
+        return MUACategorySpec.I, cat_i_triggers
+
+    # REAL_PROBLEM is already Cat I from the type map
+    return base_category, cat_i_triggers
 
 
 # =========================================================================
@@ -387,8 +498,9 @@ def _get_companion_ref(media_upper: str) -> str | None:
     """Return H2COMPAT companion MUA reference if in H2 service."""
     if media_upper in _H2_MEDIA:
         return (
-            "H2COMPAT companion MUA per NASA-STD-6016C §4.2.6.4 "
-            "[MPR 192/193] and §4.2.1.3 [MPR 47] (TBD)"
+            "A separate hydrogen compatibility MUA is REQUIRED per "
+            "NASA-STD-6016C §4.2.6.4 [MPR 192/193] before hardware "
+            "acceptance"
         )
     return None
 
@@ -402,6 +514,9 @@ def classify_mua(
     environment: str = "non-habitable",
     o2_percent: float | None = None,
     batch_verified: bool = False,
+    pressure_psia: float | None = None,
+    temp_min_f: float | None = None,
+    material_family: str = "",
 ) -> ClassifierResult:
     """Classify a single MAPTIS flag through Steps 2-6 of the pipeline.
 
@@ -568,8 +683,15 @@ def classify_mua(
     mua_type = step5_classify_type(flag_type, hazard)
     is_automatable = mua_type in _AUTOMATABLE
 
-    # ── Step 6: Category ──
-    category = step6_assign_category(mua_type)
+    # ── Step 6: Category (with environment-based Cat I elevation) ──
+    category, cat_i_triggers = step6_assign_category(
+        mua_type,
+        media=media_upper,
+        o2_percent=o2_percent,
+        pressure_psia=pressure_psia,
+        temp_min_f=temp_min_f,
+        material_family=material_family,
+    )
     confidence = _TYPE_CONFIDENCE.get(mua_type, 0.0)
 
     # Companion reference for H2 service
@@ -581,6 +703,8 @@ def classify_mua(
         f"Hazard applies in {media_upper}: {hazard}.",
         f"Classification: {mua_type.value}.",
     ]
+    if cat_i_triggers:
+        reason_parts.append(f"Category elevated to I: {'; '.join(cat_i_triggers)}.")
     if is_automatable:
         reason_parts.append("Automatable — tool can generate Form 551.")
     else:

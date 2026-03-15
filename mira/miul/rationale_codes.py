@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Module: Rationale Codes
-Purpose: NASA-STD-6016A Rationale Codes for MIUL.
+Purpose: NASA-STD-6016C Rationale Codes for MIUL.
 
 BoundState AI 2025
 Version: 1.0.0
@@ -42,7 +42,7 @@ __safety_critical__ = True
 
 
 class RationaleCategory(str, Enum):
-    """NASA-STD-6016A rationale code categories."""
+    """NASA-STD-6016C rationale code categories."""
 
     FLAMMABILITY = "FLAM"      # 100 series
     TOXICITY = "TOX"          # 200 series

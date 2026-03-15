@@ -1,0 +1,989 @@
+{
+  "version": 2,
+  "inputs": [
+    {
+      "field_id": "workbench.material_name",
+      "label": "Material Name",
+      "engine_status": "active_screening_input",
+      "what": "The exact material you want the tool to screen.",
+      "why": "The engine matches evidence, family rules, and prohibitions by material identity first.",
+      "guidance": "Use the alloy or material name the oxygen will actually touch, such as 316L, Monel 400, PTFE, or Ti-6Al-4V.",
+      "source": "BS-SPEC-OCA-001-REV1; OCA reference pack"
+    },
+    {
+      "field_id": "workbench.spec",
+      "label": "Specification",
+      "engine_status": "active_screening_input",
+      "what": "The material specification or procurement standard.",
+      "why": "A specification can separate look-alike materials that behave differently in oxygen service.",
+      "guidance": "Enter the controlling spec when you know it, such as AMS 5666, ASTM A240, or MIL-P-46183.",
+      "source": "BS-SPEC-OCA-001-REV1; material identity screening practice"
+    },
+    {
+      "field_id": "workbench.grade",
+      "label": "Grade",
+      "engine_status": "active_screening_input",
+      "what": "The grade, condition, or sub-type inside a broader material family.",
+      "why": "Different grades can have different ignition behavior, strength, and accepted use history.",
+      "guidance": "Use the grade that would appear on the drawing, cert, or purchase order, such as 718 or C17200.",
+      "source": "BS-SPEC-OCA-001-REV1; ASTM MNL36 Ch. 3"
+    },
+    {
+      "field_id": "workbench.temper",
+      "label": "Temper",
+      "engine_status": "active_screening_input",
+      "what": "The heat-treatment or worked condition of the material.",
+      "why": "Condition can change hardness, friction behavior, and how a material responds to ignition tests.",
+      "guidance": "Use a shop-floor description like annealed, H1025, T6, or solution treated when that condition is known.",
+      "source": "BS-SPEC-OCA-001-REV1; ASTM MNL36 Ch. 3"
+    },
+    {
+      "field_id": "workbench.product_form",
+      "label": "Product Form",
+      "engine_status": "active_screening_input",
+      "what": "The physical form of the material in the actual part.",
+      "why": "Wire, mesh, thin wall, bar, and powder do not behave the same way in oxygen service.",
+      "guidance": "Describe the real form that is wetted or heated in service, such as bar, tube, sheet, mesh, or seal stock.",
+      "source": "BS-SPEC-OCA-001-REV1; ASTM MNL36 Ch. 3"
+    },
+    {
+      "field_id": "workbench.role_in_component",
+      "label": "Role in Component",
+      "engine_status": "traceability_only",
+      "what": "The job this material performs inside the part.",
+      "why": "A body, seat, seal, spring, or coating sees different ignition mechanisms and different evidence rules.",
+      "guidance": "Name the function, not just the location. Examples: body, seat, seal, filter element, spring.",
+      "source": "BS-SPEC-OCA-001-REV1"
+    },
+    {
+      "field_id": "workbench.coating",
+      "label": "Coating",
+      "engine_status": "active_screening_input",
+      "what": "Any surface coating, plating, passivation, or surface treatment on the wetted material.",
+      "why": "The oxygen sees the surface first, and coatings can change ignition resistance or contamination risk.",
+      "guidance": "Enter the real finished condition, such as passivated, silver plated, anodized, or none.",
+      "source": "BS-SPEC-OCA-001-REV1; NASA/TM-2007-213740"
+    },
+    {
+      "field_id": "workbench.surface_condition",
+      "label": "Surface Condition",
+      "engine_status": "traceability_only",
+      "what": "The prepared state of the surface that oxygen will contact.",
+      "why": "Roughness, damage, machining marks, and contamination can all raise ignition risk.",
+      "guidance": "Use practical wording like cleaned, machined, polished, as-received, or grit-blasted.",
+      "source": "BS-SPEC-OCA-001-REV1; NASA/TM-2007-213740"
+    },
+    {
+      "field_id": "workbench.component_class",
+      "label": "Component Class",
+      "engine_status": "active_screening_input",
+      "what": "The type of hardware being assessed.",
+      "why": "Valves, filters, lines, seals, and vessels each have different expected hazards and acceptance paths.",
+      "guidance": "Pick the closest real hardware type. Choose other only when none of the listed classes fit.",
+      "source": "BS-SPEC-OCA-001-REV1"
+    },
+    {
+      "field_id": "workbench.geometry_class",
+      "label": "Geometry Class",
+      "engine_status": "active_screening_input",
+      "what": "A simplified shape category for the oxygen-exposed feature.",
+      "why": "Thin sections, porous forms, and mesh can ignite and propagate differently than bulk stock.",
+      "guidance": "Choose the form that best matches the oxygen-wetted feature, not the overall assembly outline.",
+      "source": "BS-SPEC-OCA-001-REV1; ASTM MNL36 Ch. 3"
+    },
+    {
+      "field_id": "workbench.design_function",
+      "label": "Design Function",
+      "engine_status": "active_screening_input",
+      "what": "A plain-language description of what the part is meant to do.",
+      "why": "Function helps reviewers understand the duty cycle, expected motion, and what failure would mean.",
+      "guidance": "Describe the job in a short phrase, such as pressure control, isolation, filtration, or sealing.",
+      "source": "BS-SPEC-OCA-001-REV1"
+    },
+    {
+      "field_id": "workbench.pressure_boundary_material",
+      "label": "Pressure Boundary Material",
+      "engine_status": "traceability_only",
+      "what": "The material that contains the oxygen pressure load.",
+      "why": "Some rules apply specifically to the pressure-containing shell, not just to small internal features.",
+      "guidance": "Use the material of the body, tube wall, vessel wall, or housing that actually holds pressure.",
+      "source": "BS-SPEC-OCA-001-REV1; NASA-STD-6016C MPR 53"
+    },
+    {
+      "field_id": "workbench.seal_type",
+      "label": "Seal Type",
+      "engine_status": "active_screening_input",
+      "what": "The general seal family used in the component.",
+      "why": "Metal, polymer, and composite seals have different flammability, friction, and acceptance-test implications.",
+      "guidance": "Choose the broad seal family that best matches the wetted seal material in the current design.",
+      "source": "BS-SPEC-OCA-001-REV1; NASA-STD-6016C MPR 53"
+    },
+    {
+      "field_id": "workbench.oxidizer_type",
+      "label": "Oxidizer Type",
+      "engine_status": "active_screening_input",
+      "what": "The oxygen-rich environment the part will see.",
+      "why": "GOX, LOX, enriched air, and compressed air do not create the same ignition and combustion conditions.",
+      "guidance": "Choose the actual service fluid. If the hardware sees more than one, use the worst-case screening case first.",
+      "source": "BS-SPEC-OCA-001-REV1; NASA/TM-2007-213740"
+    },
+    {
+      "field_id": "workbench.phase",
+      "label": "Phase",
+      "engine_status": "active_screening_input",
+      "what": "Whether the oxygen is gas or liquid at the hardware interface.",
+      "why": "Liquid oxygen creates a much harsher ignition environment than warm gas in many cases.",
+      "guidance": "Pick the physical state at the part, not the upstream storage condition.",
+      "source": "BS-SPEC-OCA-001-REV1"
+    },
+    {
+      "field_id": "workbench.o2_fraction",
+      "label": "O2 Fraction",
+      "engine_status": "active_screening_input",
+      "what": "The oxygen concentration of the working fluid, expressed as a fraction from 0 to 1.",
+      "why": "Higher oxygen concentration makes ignition easier and combustion more severe.",
+      "guidance": "Use 1.0 for pure oxygen, 0.21 for normal air, and the real mixed value for enriched-air systems.",
+      "source": "BS-SPEC-OCA-001-REV1; ASTM D2863 context"
+    },
+    {
+      "field_id": "workbench.velocity_m_s",
+      "label": "Velocity (m/s)",
+      "engine_status": "active_screening_input",
+      "what": "The local fluid speed at the part or feature of interest.",
+      "why": "Velocity affects particle impact, flow friction, erosion, and some rapid-pressurization scenarios.",
+      "guidance": "Use the highest credible local velocity, especially at seats, orifices, restrictions, and downstream cavities.",
+      "source": "ASTM MNL36 Ch. 2-3; NASA/TM-2007-213740"
+    },
+    {
+      "field_id": "workbench.total_pressure_min_psia",
+      "label": "Pressure Min (psia)",
+      "engine_status": "traceability_only",
+      "what": "The lowest total pressure the part sees in the screened operating envelope.",
+      "why": "This documents the low end of the service envelope for reviewers and lineage. The current engine is driven mainly by maximum pressure, not this minimum-pressure field.",
+      "guidance": "Enter the real low end of service if you know it. Today this field is retained for traceability and review context more than direct screening logic.",
+      "source": "BS-SPEC-OCA-001-REV1"
+    },
+    {
+      "field_id": "workbench.total_pressure_max_psia",
+      "label": "Pressure Max (psia)",
+      "engine_status": "active_screening_input",
+      "what": "The highest total pressure the material or part will see in service.",
+      "why": "Pressure drives which ignition mechanisms are credible and when materials need added testing or special controls.",
+      "guidance": "Use the worst-case service or proof-relevant pressure at the part. Literature often treats polymer risk as materially worse above about 200 psia in oxygen, but this tool's current MPR 53 acceptance-test branch is triggered at 265 psia for high-pressure GOX or enriched-air cases.",
+      "source": "ASTM MNL36 Ch. 2-3; NASA/TM-2007-213740 §4.3; NASA-STD-6016C MPR 53"
+    },
+    {
+      "field_id": "workbench.temp_min_c",
+      "label": "Temp Min (°C)",
+      "engine_status": "active_screening_input",
+      "what": "The cold end of the service temperature envelope.",
+      "why": "Temperature changes material properties, seal behavior, and whether evidence from other tests is applicable.",
+      "guidance": "Use the coldest temperature the oxygen-wetted hardware actually sees during operation or exposure.",
+      "source": "BS-SPEC-OCA-001-REV1"
+    },
+    {
+      "field_id": "workbench.temp_max_c",
+      "label": "Temp Max (°C)",
+      "engine_status": "active_screening_input",
+      "what": "The hot end of the service temperature envelope.",
+      "why": "Hotter hardware is closer to ignition and can invalidate evidence gathered at milder temperatures.",
+      "guidance": "Use the hottest credible steady or transient temperature at the wetted part, not just ambient room temperature.",
+      "source": "BS-SPEC-OCA-001-REV1"
+    },
+    {
+      "field_id": "workbench.flow_regime",
+      "label": "Flow Regime",
+      "engine_status": "traceability_only",
+      "what": "A simple description of how the oxygen moves through the part.",
+      "why": "This helps reviewers understand whether the case is nominally static or flowing. The current engine does not use this selector directly; velocity and ignition-context inputs drive the actual screening.",
+      "guidance": "Pick the regime that best describes the documented condition for traceability. Use velocity and the ignition-context toggles to capture the real screening drivers.",
+      "source": "BS-SPEC-OCA-001-REV1; NASA/TM-2007-213740"
+    },
+    {
+      "field_id": "workbench.mission_phase",
+      "label": "Mission Phase",
+      "engine_status": "traceability_only",
+      "what": "The operating phase during which the screened condition occurs.",
+      "why": "This is useful review and lineage context because different phases can imply different operations and assumptions. The current engine stores it, but does not change the screening result from this field alone.",
+      "guidance": "Choose the phase tied to the condition you are documenting so reviewers know when the case applies. Do not rely on this field by itself to tighten or relax the assessment.",
+      "source": "BS-SPEC-OCA-001-REV1"
+    },
+    {
+      "field_id": "workbench.cleanliness_verified",
+      "label": "Cleanliness Verified",
+      "engine_status": "active_screening_input",
+      "what": "Whether the hardware is confirmed to meet the required oxygen-clean level.",
+      "why": "Contamination is one of the fastest ways to make a material look unsafe in oxygen service.",
+      "guidance": "Leave this off unless cleaning has actually been performed and verified to the applicable standard or work instruction.",
+      "source": "NASA-STD-6016C MPR 54; BS-SPEC-OCA-001-REV1"
+    },
+    {
+      "field_id": "workbench.contamination_notes",
+      "label": "Contamination Notes",
+      "engine_status": "reviewer_context",
+      "what": "Known or suspected contamination, debris sources, or cleaning assumptions.",
+      "why": "Reviewers need to know whether the assessment rests on an unverified cleanliness assumption.",
+      "guidance": "Note fibers, oils, machining debris, assembly residue, or any open item that could change the oxygen risk picture.",
+      "source": "NASA-STD-6016C MPR 54; BS-SPEC-OCA-001-REV1"
+    },
+    {
+      "field_id": "workbench.dynamic_contact_flag",
+      "label": "Dynamic Contact",
+      "engine_status": "active_screening_input",
+      "what": "Whether surfaces rub, slide, strike, or cycle against each other during service.",
+      "why": "Moving contact increases friction, galling, particle generation, and mechanical ignition risk.",
+      "guidance": "Turn this on for valves, regulators, check valves, or any part with moving seats, stems, or seals.",
+      "source": "ASTM MNL36 Ch. 2-3; NASA/TM-2007-213740"
+    },
+    {
+      "field_id": "workbench.entrainable_particles_present",
+      "label": "Entrainable Particles",
+      "engine_status": "derived_default_override",
+      "what": "Whether loose particles can be carried by the oxygen stream into the hardware.",
+      "why": "Particle impact is a major oxygen ignition mechanism, especially at higher velocity and pressure.",
+      "guidance": "Turn this on if upstream debris, scale, wear products, or process contamination can realistically travel with the flow.",
+      "source": "ASTM MNL36 Ch. 2-3; particle impact testing data"
+    },
+    {
+      "field_id": "workbench.dead_end_configuration",
+      "label": "Dead-End Configuration",
+      "engine_status": "active_screening_input",
+      "what": "Whether oxygen can be compressed into a blocked pocket or closed volume.",
+      "why": "Dead ends make heat-of-compression and rapid-pressurization ignition more credible.",
+      "guidance": "Turn this on when flow can stop suddenly at a seat, cap, plugged leg, or blind cavity.",
+      "source": "NASA/TM-2007-213740 §4; BS-SPEC-OCA-001-REV1"
+    },
+    {
+      "field_id": "workbench.nonmetal_exposed_to_flow",
+      "label": "Nonmetal in Flow",
+      "engine_status": "derived_default_override",
+      "what": "Whether a polymer, composite, or other nonmetal is directly exposed to the moving oxygen stream.",
+      "why": "Nonmetals often become the first ignition concern in oxygen systems, especially at pressure.",
+      "guidance": "Turn this on when seats, seals, liners, filters, hoses, or coatings are directly in the flow path.",
+      "source": "NASA-STD-6016C MPR 52-53; ASTM MNL36 Ch. 3"
+    },
+    {
+      "field_id": "workbench.vibration_or_erosion_present",
+      "label": "Vibration / Erosion",
+      "engine_status": "active_screening_input",
+      "what": "Whether the hardware experiences vibration, chatter, erosion, or wear during service.",
+      "why": "These conditions can create fresh particles, expose fresh metal, and make friction-related ignition more likely.",
+      "guidance": "Turn this on when the design is known to chatter, shake, erode, or shed wear products.",
+      "source": "ASTM MNL36 Ch. 2; NASA/TM-2007-213740"
+    },
+    {
+      "field_id": "workbench.acoustic_cavity_present",
+      "label": "Acoustic Cavity",
+      "engine_status": "active_screening_input",
+      "what": "Whether the design has a cavity that can resonate under flow.",
+      "why": "Resonance can produce local heating and raise ignition risk downstream of restrictions and valves.",
+      "guidance": "Turn this on for downstream cavities, side branches, or volumes that can ring under high-speed flow.",
+      "source": "ASTM MNL36 Ch. 2; BS-SPEC-OCA-001-REV1"
+    },
+    {
+      "field_id": "workbench.mechanical_impact_risk",
+      "label": "Mechanical Impact Risk",
+      "engine_status": "active_screening_input",
+      "what": "Whether parts can strike each other or a foreign object can create impact energy.",
+      "why": "Impact can ignite sensitive nonmetals and create hot spots on metals.",
+      "guidance": "Turn this on when slam events, dropped tools, loose hardware, or violent seating can occur.",
+      "source": "ASTM G86; ASTM MNL36 Ch. 3"
+    },
+    {
+      "field_id": "workbench.isolated_surface_present",
+      "label": "Isolated Surface",
+      "engine_status": "active_screening_input",
+      "what": "Whether there is a surface or volume that does not see good heat sinking or flushing.",
+      "why": "Poorly cooled isolated surfaces can stay hot longer and support localized ignition.",
+      "guidance": "Turn this on when the design has trapped recesses, thin isolated features, or poor thermal paths.",
+      "source": "NASA/TM-2007-213740"
+    },
+    {
+      "field_id": "workbench.dry_gas_environment",
+      "label": "Dry Gas",
+      "engine_status": "derived_default_override",
+      "what": "Whether the service gas is dry rather than humid or wet.",
+      "why": "Dry environments can make static and some friction-related mechanisms more credible.",
+      "guidance": "Leave this on for normal dry oxygen service unless moisture control is known to be absent.",
+      "source": "ASTM MNL36 Ch. 2"
+    },
+    {
+      "field_id": "workbench.electrical_power_present",
+      "label": "Electrical Power",
+      "engine_status": "active_screening_input",
+      "what": "Whether powered electrical hardware is present in or near the oxygen-exposed region.",
+      "why": "Electrical arcs and hot electrical faults can become direct ignition sources.",
+      "guidance": "Turn this on for energized sensors, heaters, actuators, connectors, or wiring in the oxygen hazard zone.",
+      "source": "ASTM MNL36 Ch. 2; NASA/TM-2007-213740"
+    },
+    {
+      "field_id": "workbench.reactive_chemical_pair_present",
+      "label": "Reactive Chemical Pair",
+      "engine_status": "active_screening_input",
+      "what": "Whether a reactive material pairing or chemical contamination is present.",
+      "why": "Some reactions create their own heat source before the oxygen hazard is even considered.",
+      "guidance": "Turn this on when incompatible chemicals, reactive metals, or trapped residues can react together.",
+      "source": "ASTM MNL36 Ch. 2; oxygen-system contamination practice"
+    },
+    {
+      "field_id": "workbench.porous_media_present",
+      "label": "Porous Media",
+      "engine_status": "active_screening_input",
+      "what": "Whether oxygen flows through a porous element, sintered part, fabric, or packed medium.",
+      "why": "Porous structures can trap heat, expose large surface area, and propagate burning differently than bulk solids.",
+      "guidance": "Turn this on for sintered filters, porous plugs, wicks, packed beds, and similar high-surface-area parts.",
+      "source": "ASTM MNL36 Ch. 2-3"
+    },
+    {
+      "field_id": "workbench.open_flame_or_hot_work_present",
+      "label": "Open Flame / Hot Work",
+      "engine_status": "active_screening_input",
+      "what": "Whether the hardware can be exposed to an external flame, welding, brazing, or other hot-work source.",
+      "why": "An outside ignition source can overwhelm otherwise acceptable screening assumptions.",
+      "guidance": "Turn this on for maintenance, test, or integration scenarios where hot work is realistically nearby.",
+      "source": "NASA/TM-2007-213740; oxygen safety practice"
+    },
+    {
+      "field_id": "workbench.rapid_pressurization_time_ms",
+      "label": "Rapid Pressurization Time (ms)",
+      "engine_status": "active_screening_input",
+      "what": "How quickly the pressure rise happens during the most severe fill or opening event.",
+      "why": "Fast compression creates higher transient temperature rise and can trigger heat-of-compression ignition.",
+      "guidance": "Use the fastest credible pressurization event, not the average fill time for the whole system.",
+      "source": "NASA/TM-2007-213740 §4; ASTM MNL36 Ch. 2"
+    },
+    {
+      "field_id": "workbench.is_rigid_metallic_tubing",
+      "label": "Rigid Metallic Tubing",
+      "engine_status": "active_screening_input",
+      "what": "Whether the item is rigid metal tubing that may fall into the MPR 53 exemption bucket.",
+      "why": "Some hardware types are treated differently from soft goods and moving components for acceptance testing.",
+      "guidance": "Turn this on only when the component truly is rigid metallic tubing in the meaning used by your oxygen standard.",
+      "source": "NASA-STD-6016C MPR 53; BS-SPEC-OCA-001-REV1"
+    },
+    {
+      "field_id": "workbench.is_metallic_flex_hose",
+      "label": "Metallic Flex Hose",
+      "engine_status": "active_screening_input",
+      "what": "Whether the item is a metallic flex hose covered by a specific exemption path.",
+      "why": "Flex hoses are evaluated differently from rigid tubing and from polymer hoses.",
+      "guidance": "Turn this on only for genuinely metallic flex hose construction, not for a hose with polymer wetted materials.",
+      "source": "NASA-STD-6016C MPR 53; BS-SPEC-OCA-001-REV1"
+    },
+    {
+      "field_id": "workbench.is_all_metal_seal",
+      "label": "All-Metal Seal",
+      "engine_status": "active_screening_input",
+      "what": "Whether the sealing element is entirely metallic with no polymer or composite wetted seal material.",
+      "why": "All-metal seals can remove some nonmetal ignition concerns that drive testing or routing.",
+      "guidance": "Turn this on only when the wetted sealing function is truly metal-to-metal.",
+      "source": "NASA-STD-6016C MPR 53; BS-SPEC-OCA-001-REV1"
+    },
+    {
+      "field_id": "workbench.is_metallic_pressure_vessel",
+      "label": "Metallic Pressure Vessel",
+      "engine_status": "active_screening_input",
+      "what": "Whether the screened item is a metallic pressure vessel under the standard's exemption language.",
+      "why": "Pressure vessels can follow a different acceptance path than soft goods and internal moving parts.",
+      "guidance": "Turn this on only when the component is the vessel itself, not a valve or fitting attached to a vessel.",
+      "source": "NASA-STD-6016C MPR 53; BS-SPEC-OCA-001-REV1"
+    },
+    {
+      "field_id": "system_builder.o2_fraction",
+      "label": "O2 Fraction",
+      "engine_status": "active_screening_input",
+      "what": "The oxygen concentration for the whole system model.",
+      "why": "This value sets the baseline severity for every node, path, and downstream assessment.",
+      "guidance": "Use 1.0 for pure oxygen. For mixed service, enter the actual system concentration and reassess if the mission changes.",
+      "source": "BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "system_builder.system_pressure_min_psia",
+      "label": "System Pressure Min (psia)",
+      "engine_status": "topology_inference_input",
+      "what": "The low end of the system-wide pressure envelope.",
+      "why": "A topology assessment still needs the full operating envelope, not just the peak point.",
+      "guidance": "Use the minimum system operating pressure that matters for screening, especially if the system cycles widely.",
+      "source": "BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "system_builder.system_pressure_max_psia",
+      "label": "Max psia",
+      "engine_status": "active_screening_input",
+      "what": "The highest system pressure used for topology-wide assessment.",
+      "why": "This drives system-level routing, high-pressure GOX checks, and several mechanism inferences.",
+      "guidance": "Use the highest credible operating or qualification pressure seen by the assembled system. In the current tool, the MPR 53 acceptance-test branch turns on at 265 psia for non-exempt high-pressure GOX or enriched-air cases.",
+      "source": "BS-SPEC-OCA-002-REV0; NASA-STD-6016C MPR 53"
+    },
+    {
+      "field_id": "system_builder.phase",
+      "label": "Phase",
+      "engine_status": "active_screening_input",
+      "what": "The service fluid family for the system model.",
+      "why": "GOX, LOX, enriched air, and compressed air create different risk assumptions across the network.",
+      "guidance": "Choose the actual fluid the modeled system handles in the scenario you are assessing.",
+      "source": "BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "system_builder.oxygen_phase",
+      "label": "State",
+      "engine_status": "active_screening_input",
+      "what": "Whether the oxygen in the modeled system is gaseous or liquid.",
+      "why": "The physical state changes kindling, propagation, and material acceptability assumptions.",
+      "guidance": "Pick the state at the system boundary for the case you are running.",
+      "source": "BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "system_builder.temp_min_c",
+      "label": "System Temp Min (°C)",
+      "engine_status": "active_screening_input",
+      "what": "The cold end of the system temperature envelope.",
+      "why": "System-level evidence and assumptions are only valid inside the real temperature range.",
+      "guidance": "Use the minimum system temperature if the model needs cryogenic or cold-gas screening.",
+      "source": "BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "system_builder.temp_max_c",
+      "label": "System Temp Max (°C)",
+      "engine_status": "active_screening_input",
+      "what": "The hot end of the system temperature envelope.",
+      "why": "Hotter service can make upstream and downstream assumptions less conservative if omitted.",
+      "guidance": "Use the hottest credible system temperature at the oxygen-wetted hardware.",
+      "source": "BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "system_builder.design_flow_rate_m3_s",
+      "label": "Flow (m3/s)",
+      "engine_status": "topology_inference_input",
+      "what": "The design flow rate for the modeled system.",
+      "why": "Flow rate helps the builder infer velocity, particle transport, dead-leg severity, and resonance risk.",
+      "guidance": "Use the highest normal or screening flow rate through the network, not an average over the whole mission.",
+      "source": "BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "system_builder.cleanliness_spec",
+      "label": "Cleaning Spec",
+      "engine_status": "active_screening_input",
+      "what": "The cleaning standard or cleanliness target the assembly is expected to meet.",
+      "why": "System-level hazard controls depend heavily on whether contamination control is defined and credible.",
+      "guidance": "Use the governing cleaning level, procedure, or program language if one exists. If not, leave it blank and treat that as a review gap.",
+      "source": "BS-SPEC-OCA-002-REV0; NASA-STD-6016C MPR 54"
+    },
+    {
+      "field_id": "system_builder.mission_phase",
+      "label": "Mission",
+      "engine_status": "traceability_only",
+      "what": "The mission or operating phase attached to the system-level case.",
+      "why": "Different phases can change allowable assumptions, transient behavior, and review expectations.",
+      "guidance": "Use the phase tied to the worst-case system condition you are screening.",
+      "source": "BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "system_builder.project_name",
+      "label": "Project Name",
+      "engine_status": "reviewer_context",
+      "what": "The program or project that owns this oxygen system case.",
+      "why": "This keeps exported assessments traceable to the right hardware and review chain.",
+      "guidance": "Use the project name that will appear in review material, not a temporary personal note.",
+      "source": "BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "system_builder.hardware_name",
+      "label": "Hardware Name",
+      "engine_status": "reviewer_context",
+      "what": "The specific system or assembly name being modeled.",
+      "why": "Clear hardware naming prevents exported topology reviews from drifting away from the real item.",
+      "guidance": "Use the assembly name or drawing name reviewers already recognize.",
+      "source": "BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "system_builder.reviewer_name",
+      "label": "Reviewer Name",
+      "engine_status": "reviewer_context",
+      "what": "The person currently responsible for reviewing the system case.",
+      "why": "Topology screening is only useful if a reviewer can own the assumptions and follow-up actions.",
+      "guidance": "Use the current reviewer or leave it blank until ownership is assigned.",
+      "source": "BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "system_builder.bi_directional_flow_risk",
+      "label": "Bi-Dir Flow",
+      "engine_status": "topology_inference_input",
+      "what": "Whether the system can flow in both directions during any credible mode.",
+      "why": "Bidirectional flow changes zone assumptions, upstream protection, and what counts as a dead leg.",
+      "guidance": "Turn this on if backflow, reverse purge, or dual-direction operation can actually occur.",
+      "source": "BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "component_editor.label",
+      "label": "Component Label",
+      "engine_status": "reviewer_context",
+      "what": "The plain-language name shown on the system canvas.",
+      "why": "A clear label helps reviewers understand path risk without opening every node.",
+      "guidance": "Use a hardware name like Main Fill Valve or Dome Regulator, not just a generic class name.",
+      "source": "BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "component_editor.materials",
+      "label": "Materials",
+      "engine_status": "active_screening_input",
+      "what": "The wetted material stack for the selected component.",
+      "why": "The system builder can only assess what it knows is inside the node.",
+      "guidance": "Enter one slot per line using slot: material, such as body: 316L or seat: PTFE.",
+      "source": "BS-SPEC-OCA-002-REV0; OCA system material model"
+    },
+    {
+      "field_id": "component_editor.seal_type",
+      "label": "Seal Type",
+      "engine_status": "active_screening_input",
+      "what": "The seal family used in the selected component.",
+      "why": "Seal material often controls whether a node is low risk, testing-driven, or immediately concerning.",
+      "guidance": "Use a broad material family like metal, PTFE, elastomer, or composite if exact chemistry is not yet known.",
+      "source": "BS-SPEC-OCA-002-REV0; NASA-STD-6016C MPR 53"
+    },
+    {
+      "field_id": "component_editor.inner_diameter_mm",
+      "label": "Inner Diameter (mm)",
+      "engine_status": "topology_inference_input",
+      "what": "The inside diameter of the flow passage.",
+      "why": "Diameter helps the builder infer velocity, restriction severity, and some particle-impact concerns.",
+      "guidance": "Use the wetted flow diameter that drives local velocity, not the outside tube size.",
+      "source": "BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "component_editor.length_m",
+      "label": "Length (m)",
+      "engine_status": "topology_inference_input",
+      "what": "The flow-path length of the selected component.",
+      "why": "Length matters for dead-leg behavior, upstream volume, and line-level topology inferences.",
+      "guidance": "Use the effective flow length for the modeled segment rather than the whole assembly footprint.",
+      "source": "BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "component_editor.wall_thickness_mm",
+      "label": "Wall Thickness (mm)",
+      "engine_status": "traceability_only",
+      "what": "The thickness of the pressure-containing wall.",
+      "why": "Wall thickness helps reviewers understand whether the node behaves like bulk metal or a thin section.",
+      "guidance": "Use the actual pressure wall thickness, not paint or wrap thickness.",
+      "source": "BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "component_editor.micron_rating",
+      "label": "Micron Rating",
+      "engine_status": "traceability_only",
+      "what": "The nominal filtration rating for a filter element.",
+      "why": "Filter effectiveness changes which downstream zones can be treated as protected from particle transport.",
+      "guidance": "Use the rated filtration value if known. If not, leave it empty rather than guessing.",
+      "source": "BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "component_editor.volume_liters",
+      "label": "Volume (L)",
+      "engine_status": "topology_inference_input",
+      "what": "The internal fluid volume associated with the component.",
+      "why": "Volume affects dead-end behavior, pressurization energy, and how the builder estimates local hazard severity.",
+      "guidance": "Use the oxygen-exposed internal volume for the node, not the entire package volume.",
+      "source": "BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "component_editor.bore_diameter_mm",
+      "label": "Bore Diameter (mm)",
+      "engine_status": "topology_inference_input",
+      "what": "The restriction bore size for an orifice or similar feature.",
+      "why": "Small bores can drive local velocity, heating, and downstream resonance risk.",
+      "guidance": "Use the controlling restriction diameter, especially for orifices and nozzles.",
+      "source": "BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "component_editor.mawp_psia",
+      "label": "MAWP (psia)",
+      "engine_status": "traceability_only",
+      "what": "The maximum allowable working pressure for the selected component.",
+      "why": "MAWP helps check whether the modeled service envelope is reasonable and whether a node is screening in the right class.",
+      "guidance": "Use the design or nameplate MAWP for the component, not a wish or estimate.",
+      "source": "BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "component_editor.set_pressure_psia",
+      "label": "Set Pressure (psia)",
+      "engine_status": "topology_inference_input",
+      "what": "The actuation pressure for a relief device.",
+      "why": "The set point changes when and how the node becomes active in the topology model.",
+      "guidance": "Use the actual set pressure for the relief function, not the upstream nominal pressure.",
+      "source": "BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "component_editor.is_rigid_metallic_tubing",
+      "label": "Rigid Metallic Tubing",
+      "engine_status": "active_screening_input",
+      "what": "Whether the edited node qualifies as rigid metallic tubing.",
+      "why": "This changes how MPR 53 acceptance-test logic is applied in the builder.",
+      "guidance": "Turn this on only for true rigid metallic tubing segments.",
+      "source": "NASA-STD-6016C MPR 53; BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "component_editor.is_metallic_flex_hose",
+      "label": "Metallic Flex Hose",
+      "engine_status": "active_screening_input",
+      "what": "Whether the edited node qualifies as metallic flex hose.",
+      "why": "The builder uses this to separate metallic hose cases from polymer hose cases.",
+      "guidance": "Turn this on only if the wetted hose construction is metallic.",
+      "source": "NASA-STD-6016C MPR 53; BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "component_editor.is_all_metal_seal",
+      "label": "All-Metal Seal",
+      "engine_status": "active_screening_input",
+      "what": "Whether the node's sealing function is fully metallic.",
+      "why": "This removes some nonmetal ignition concerns from the screening path.",
+      "guidance": "Turn this on only for true metal-to-metal sealing with no polymer wetted seal element.",
+      "source": "NASA-STD-6016C MPR 53; BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "field_id": "component_editor.is_metallic_pressure_vessel",
+      "label": "Metallic Pressure Vessel",
+      "engine_status": "active_screening_input",
+      "what": "Whether the node is itself a metallic pressure vessel.",
+      "why": "Pressure vessels follow a different logic path than many other node types.",
+      "guidance": "Turn this on only when the node is the vessel body, not simply attached to a vessel.",
+      "source": "NASA-STD-6016C MPR 53; BS-SPEC-OCA-002-REV0"
+    }
+  ],
+  "mechanisms": [
+    {
+      "mechanism_id": "particle_impact",
+      "label": "Particle Impact (PI)",
+      "aliases": [
+        "Particle Impact",
+        "PI"
+      ],
+      "engine_status": "direct_signal",
+      "what": "A hard particle strikes a surface at enough speed to create a hot spot or ignition.",
+      "why": "This is one of the classic oxygen-system ignition paths, especially in dirty or high-velocity systems.",
+      "guidance": "Look for upstream debris, erosion, valve wear, and places where particles can hit a sensitive material after acceleration.",
+      "source": "ASTM MNL36 Ch. 2-3; particle impact test data"
+    },
+    {
+      "mechanism_id": "rapid_pressurization",
+      "label": "Rapid Pressurization (RP)",
+      "aliases": [
+        "Rapid Pressurization",
+        "RP",
+        "Heat of Compression"
+      ],
+      "engine_status": "direct_signal",
+      "what": "A fast pressure rise heats the trapped gas enough to ignite nearby material.",
+      "why": "Fast fills and dead-end pockets can create very high local temperatures even when the bulk system looks moderate.",
+      "guidance": "Watch for quick-opening valves, trapped volumes, and blind cavities. Slowing the pressure rise is often the first control.",
+      "source": "NASA/TM-2007-213740 §4; ASTM MNL36 Ch. 2"
+    },
+    {
+      "mechanism_id": "flow_friction",
+      "label": "Flow Friction (FF)",
+      "aliases": [
+        "Flow Friction",
+        "FF"
+      ],
+      "engine_status": "direct_signal",
+      "what": "Fast oxygen flow creates heating through friction, turbulence, or impingement.",
+      "why": "Restrictions, sharp turns, and high-speed flow can make a nominally safe material become credible for ignition.",
+      "guidance": "Focus on jets, restrictions, rough surfaces, and any local feature where velocity is much higher than the line average.",
+      "source": "ASTM MNL36 Ch. 2; NASA/TM-2007-213740"
+    },
+    {
+      "mechanism_id": "resonance",
+      "label": "Resonance (RS)",
+      "aliases": [
+        "Resonance",
+        "RS",
+        "Acoustic Resonance"
+      ],
+      "engine_status": "direct_signal",
+      "what": "Flow excites a cavity or geometry so that pressure waves create damaging local heating.",
+      "why": "This can appear in systems that otherwise look clean and well-material-matched.",
+      "guidance": "Check restrictions followed by cavities, side branches, and hollow spaces that can ring under flow.",
+      "source": "ASTM MNL36 Ch. 2; oxygen-system resonance guidance"
+    },
+    {
+      "mechanism_id": "mechanical_impact",
+      "label": "Mechanical Impact (MI)",
+      "aliases": [
+        "Mechanical Impact",
+        "MI"
+      ],
+      "engine_status": "direct_signal",
+      "what": "A strike or sudden collision creates enough local energy to ignite material.",
+      "why": "Impact-sensitive nonmetals and slam events can bypass calmer screening assumptions.",
+      "guidance": "Look for dropped-object risk, loose hardware, violent seating, and test or assembly conditions that allow impact.",
+      "source": "ASTM G86; ASTM MNL36 Ch. 3"
+    },
+    {
+      "mechanism_id": "galling_friction",
+      "label": "Galling & Friction (GF)",
+      "aliases": [
+        "Galling & Friction",
+        "Galling and Friction",
+        "GF"
+      ],
+      "engine_status": "direct_signal",
+      "what": "Sliding metal contact or rubbing surfaces create heat, adhesion, or hot debris.",
+      "why": "Moving hardware can self-generate an ignition source even when bulk materials are acceptable on paper.",
+      "guidance": "Pay attention to stems, threads, seats, sliding seals, and dissimilar metal pairs with high contact stress.",
+      "source": "ASTM MNL36 Ch. 2-3; friction ignition data"
+    },
+    {
+      "mechanism_id": "fresh_metal_exposure",
+      "label": "Fresh Metal Exposure (FM)",
+      "aliases": [
+        "Fresh Metal Exposure",
+        "FM"
+      ],
+      "engine_status": "direct_signal",
+      "what": "A new reactive surface is exposed by fracture, erosion, or wear.",
+      "why": "Freshly exposed metal can ignite more easily than an aged or protected surface.",
+      "guidance": "Consider wear, scraping, erosion, chipped coatings, and fracture surfaces in dynamic or dirty service.",
+      "source": "ASTM MNL36 Ch. 2; NASA/TM-2007-213740"
+    },
+    {
+      "mechanism_id": "static_discharge",
+      "label": "Static Discharge (SD)",
+      "aliases": [
+        "Static Discharge",
+        "SD"
+      ],
+      "engine_status": "direct_signal",
+      "what": "Stored electrical charge discharges and creates a spark or hot spot.",
+      "why": "Dry gas and isolated surfaces can make static a real ignition source even in otherwise simple hardware.",
+      "guidance": "Check dry flow, insulating surfaces, charge accumulation, and grounding or bonding paths.",
+      "source": "ASTM MNL36 Ch. 2"
+    },
+    {
+      "mechanism_id": "electrical_arc",
+      "label": "Electrical Arc (EA)",
+      "aliases": [
+        "Electrical Arc",
+        "EA"
+      ],
+      "engine_status": "direct_signal",
+      "what": "Powered electrical equipment creates an arc, fault, or hot electrical ignition source.",
+      "why": "An arc can directly ignite oxygen-compatible materials if it occurs in the wrong place.",
+      "guidance": "Look for energized connectors, switches, sensors, heaters, and damaged wiring in oxygen hazard zones.",
+      "source": "ASTM MNL36 Ch. 2; oxygen safety practice"
+    },
+    {
+      "mechanism_id": "chemical_reaction",
+      "label": "Chemical Reaction (CR)",
+      "aliases": [
+        "Chemical Reaction",
+        "CR"
+      ],
+      "engine_status": "direct_signal",
+      "what": "A chemical incompatibility creates heat or a reactive condition before the main oxygen burn even starts.",
+      "why": "Residues, incompatible chemicals, and reactive pairings can invalidate an otherwise clean material decision.",
+      "guidance": "Check cleaners, lubricants, trapped residues, and mixed-material combinations that can react exothermically.",
+      "source": "ASTM MNL36 Ch. 2; contamination control practice"
+    },
+    {
+      "mechanism_id": "thermal_runaway",
+      "label": "Thermal Runaway (TR)",
+      "aliases": [
+        "Thermal Runaway",
+        "TR"
+      ],
+      "engine_status": "direct_signal",
+      "what": "A local heating process feeds itself until temperature keeps rising instead of stabilizing.",
+      "why": "Once a part can no longer reject heat fast enough, a small upset can become a major ignition event.",
+      "guidance": "Watch confined volumes, high surface-area nonmetals, poor heat sinking, and repeated local heating events.",
+      "source": "ASTM MNL36 Ch. 2; oxygen ignition analysis practice"
+    },
+    {
+      "mechanism_id": "lightning",
+      "label": "Lightning",
+      "aliases": [
+        "Lightning"
+      ],
+      "engine_status": "cataloged_external",
+      "what": "A lightning strike or induced surge couples energy into oxygen hardware and creates an ignition source.",
+      "why": "This is a real oxygen-system hazard for exposed installations, but the current OCA UI does not collect lightning-exposure context directly.",
+      "guidance": "Treat this as a facility and installation review item. If the hardware is outdoors or in a strike path, document lightning protection outside the current component-level screening inputs.",
+      "source": "NASA/TM-2007-213740 §4.3.1 p.11"
+    },
+    {
+      "mechanism_id": "explosive_charges",
+      "label": "Explosive Charges",
+      "aliases": [
+        "Explosive Charges"
+      ],
+      "engine_status": "cataloged_external",
+      "what": "A pyrotechnic or explosive event couples shock, fragments, or heat into oxygen-wetted hardware.",
+      "why": "This mechanism matters in ordnance-adjacent systems, but the current OCA UI does not directly collect pyrotechnic-device or energy-coupling context.",
+      "guidance": "Use this as a flagged external-mechanism review item when explosive devices are in the system environment. Current OCA inputs do not directly resolve it.",
+      "source": "NASA/TM-2007-213740 §4.3.1 p.11"
+    },
+    {
+      "mechanism_id": "personnel_smoking_open_flames",
+      "label": "Personnel Smoking & Open Flames",
+      "aliases": [
+        "Personnel Smoking & Open Flames"
+      ],
+      "engine_status": "partial_proxy",
+      "what": "A personnel-created flame, ember, or hot-work source enters an oxygen-enriched area and creates ignition.",
+      "why": "The current OCA UI can partially screen this through the hot-work/open-flame toggle, but it does not collect personnel-access context directly.",
+      "guidance": "Use the hot-work toggle when a flame source is credible. Then treat personnel access, exclusion zones, and work controls as facility-level review items outside the current screen.",
+      "source": "NASA/TM-2007-213740 §4.3.1 p.11"
+    },
+    {
+      "mechanism_id": "fragments_from_bursting_vessels",
+      "label": "Fragments from Bursting Vessels",
+      "aliases": [
+        "Fragments from Bursting Vessels"
+      ],
+      "engine_status": "partial_proxy",
+      "what": "Fragments from a nearby vessel rupture strike oxygen-wetted hardware and create ignition.",
+      "why": "The current OCA UI can partially proxy fragment strike through the mechanical-impact toggle, but it does not directly model nearby-vessel proximity.",
+      "guidance": "Use mechanical-impact risk as a conservative partial proxy when fragment strike is a concern. Then document the actual nearby-vessel hazard separately in the design review.",
+      "source": "NASA/TM-2007-213740 §4.3.1 p.11"
+    },
+    {
+      "mechanism_id": "welding",
+      "label": "Welding",
+      "aliases": [
+        "Welding"
+      ],
+      "engine_status": "partial_proxy",
+      "what": "Welding, cutting, or brazing introduces enough heat to ignite oxygen-enriched hardware or residue.",
+      "why": "The current OCA engine can partially screen this from the hot-work/open-flame toggle plus oxygen enrichment, but it still relies on a broad proxy rather than a dedicated welding input.",
+      "guidance": "Use the hot-work toggle when welding or cutting is credible near oxygen hardware. In the current engine, enriched oxygen above ambient is treated as the residual-oxygen concern.",
+      "source": "NASA/TM-2007-213740 §4.3.1 p.11"
+    },
+    {
+      "mechanism_id": "engine_exhaust",
+      "label": "Engine Exhaust",
+      "aliases": [
+        "Engine Exhaust"
+      ],
+      "engine_status": "cataloged_external",
+      "what": "Engine or turbine exhaust impinges on oxygen hardware and provides a direct ignition source.",
+      "why": "This is a valid cataloged mechanism, but the current OCA UI does not collect exhaust-exposure context directly.",
+      "guidance": "Treat this as an external installation hazard. If exhaust impingement is possible, document it explicitly outside the current component-level inputs.",
+      "source": "NASA/TM-2007-213740 §4.3.1 p.11"
+    },
+    {
+      "mechanism_id": "other",
+      "label": "Other (OT)",
+      "aliases": [
+        "Other",
+        "OT"
+      ],
+      "engine_status": "direct_signal",
+      "what": "A credible ignition path that does not fit the standard named buckets cleanly.",
+      "why": "Real hardware sometimes presents a hazard that the canned list does not describe perfectly.",
+      "guidance": "Use this as a documented catch-all only when the actual mechanism is clear but the normal labels do not fit well.",
+      "source": "BS-SPEC-OCA-001-REV1; BS-SPEC-OCA-002-REV0"
+    }
+  ],
+  "mprs": [
+    {
+      "mpr_id": "MPR_51",
+      "label": "MPR 51",
+      "engine_status": "requirement_gate",
+      "what": "Every oxygen-service item must be evaluated for oxygen compatibility.",
+      "why": "This is the gate that says oxygen service is never assumed safe by default.",
+      "guidance": "If a part touches oxygen, it needs an oxygen assessment even when the material seems familiar.",
+      "source": "NASA-STD-6016C MPR 51"
+    },
+    {
+      "mpr_id": "MPR_52",
+      "label": "MPR 52",
+      "engine_status": "requirement_gate",
+      "what": "Flammable oxygen-service materials need an OCA plus documented Material Usage Agreement reasoning.",
+      "why": "A material can sometimes be used, but only when the hazard is understood and formally justified.",
+      "guidance": "Read this as: a flammable material is not an automatic yes. It needs a controlled, documented basis for use.",
+      "source": "NASA-STD-6016C MPR 52"
+    },
+    {
+      "mpr_id": "MPR_53",
+      "label": "MPR 53",
+      "engine_status": "requirement_gate",
+      "what": "High-pressure gaseous oxygen or enriched-air hardware above 265 psia usually needs oxygen component acceptance testing unless exempt.",
+      "why": "At higher gas pressure, ignition risk rises enough that rules alone are often not enough.",
+      "guidance": "If the hardware is in high-pressure GOX service and does not fit a listed exemption, expect an acceptance-test path.",
+      "source": "NASA-STD-6016C MPR 53"
+    },
+    {
+      "mpr_id": "MPR_67",
+      "label": "MPR 67",
+      "engine_status": "requirement_gate",
+      "what": "Titanium alloys are forbidden in the listed oxygen-service envelopes.",
+      "why": "Titanium can ignite and propagate violently enough that the rule is a hard stop, not a trade study.",
+      "guidance": "Treat this as a prohibition. If titanium is truly present in a prohibited oxygen case, the design has to change.",
+      "source": "NASA-STD-6016C MPR 67"
+    }
+  ],
+  "dispositions": [
+    {
+      "disposition_id": "compatible_as_configured",
+      "label": "Compatible As Configured",
+      "engine_status": "decision_output",
+      "what": "The screening did not find a prohibition or extra routing action for the case as entered.",
+      "why": "This is the cleanest outcome the tool can give, but it is still a screened answer, not final program approval.",
+      "guidance": "Read this as: nothing in the current inputs forced extra action. Keep normal review, cleaning, and configuration control in place.",
+      "source": "BS-SPEC-OCA-001-REV1 decision logic"
+    },
+    {
+      "disposition_id": "compatible_with_controls",
+      "label": "Compatible With Controls",
+      "engine_status": "decision_output",
+      "what": "The case can be workable, but only if specific controls are applied and maintained.",
+      "why": "The design is not wrong outright, but it depends on process controls or operational limits staying true.",
+      "guidance": "Expect action items such as cleanliness control, slow opening, filtration, inspection, or configuration restrictions.",
+      "source": "BS-SPEC-OCA-001-REV1 decision logic; BS-SPEC-OCA-002-REV0"
+    },
+    {
+      "disposition_id": "requires_mua",
+      "label": "Requires MUA",
+      "engine_status": "decision_output",
+      "what": "The case needs a formal Material Usage Agreement before it can be accepted.",
+      "why": "The tool found a path where judgment and documented rationale are still required.",
+      "guidance": "Read MUA as the signed engineering argument that says why this material is still acceptable in this use.",
+      "source": "NASA-STD-6016C MPR 52; BS-SPEC-OCA-001-REV1"
+    },
+    {
+      "disposition_id": "requires_acceptance_test",
+      "label": "Requires Acceptance Test",
+      "engine_status": "decision_output",
+      "what": "The hardware needs oxygen component acceptance testing before release.",
+      "why": "For this case, screening logic alone is not strong enough to close the oxygen risk.",
+      "guidance": "This usually appears in high-pressure GOX or enriched-air cases covered by MPR 53.",
+      "source": "NASA-STD-6016C MPR 53; BS-SPEC-OCA-001-REV1"
+    },
+    {
+      "disposition_id": "requires_supplemental_testing",
+      "label": "Requires Supplemental Testing",
+      "engine_status": "decision_output",
+      "what": "The case needs more testing or evidence, but not necessarily the exact MPR 53 acceptance-test path.",
+      "why": "The tool found an evidence gap large enough that the directional answer is not enough by itself.",
+      "guidance": "Use this when the material or mechanism picture is incomplete and targeted testing would close the gap.",
+      "source": "BS-SPEC-OCA-001-REV1 decision logic"
+    },
+    {
+      "disposition_id": "insufficient_evidence",
+      "label": "Insufficient Evidence",
+      "engine_status": "decision_output",
+      "what": "The tool does not have enough trustworthy information to make a confident call.",
+      "why": "This is a data-quality warning, not a hidden yes or no.",
+      "guidance": "Add better material identity, service conditions, or supporting evidence before treating the result as meaningful.",
+      "source": "BS-SPEC-OCA-001-REV1 decision logic"
+    },
+    {
+      "disposition_id": "prohibited",
+      "label": "Prohibited",
+      "engine_status": "decision_output",
+      "what": "A hard rule says this case is not allowed as entered.",
+      "why": "The tool found a governing prohibition, not just a recommendation or missing control.",
+      "guidance": "Treat this as stop and redesign. The right next action is usually to change the material or the service envelope.",
+      "source": "NASA-STD-6016C MPR 67; BS-SPEC-OCA-001-REV1"
+    }
+  ]
+}

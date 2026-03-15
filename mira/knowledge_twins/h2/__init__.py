@@ -16,19 +16,13 @@ Compliance: SWE-013, NASA-STD-8739.8B
 Safety Critical: False
 """
 
-# New simplified engine (recommended)
+# Active engine (recommended)
 from .engine_simple import H2Engine, H2Result, Verdict, query as h2_query
 
 # Aliases module
 from .aliases import get_canonical_name, normalize, CANONICAL_NAMES
 
-# Legacy imports (deprecated - will be removed)
-from .query import H2Query, H2Response
-from .rules import RuleGate, RuleEngine
-from .engine import H2DecisionEngine
-
 __all__ = [
-    # New simplified API
     "H2Engine",
     "H2Result",
     "Verdict",
@@ -36,10 +30,4 @@ __all__ = [
     "get_canonical_name",
     "normalize",
     "CANONICAL_NAMES",
-    # Legacy (deprecated)
-    "H2Query",
-    "H2Response",
-    "RuleGate",
-    "RuleEngine",
-    "H2DecisionEngine",
 ]

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, DragEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlaskConical, FileStack, Brain, ClipboardList, FolderTree, GripVertical, RotateCcw, Zap, Sparkles, Wind, Shield, LucideIcon } from 'lucide-react';
+import { FlaskConical, FileStack, Brain, ClipboardList, FolderTree, GripVertical, RotateCcw, Zap, Sparkles, Wind, Database, Search, ShieldAlert, ShieldCheck, Shield, LayoutGrid, LucideIcon, ScrollText } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { BoundStateLogo } from '@/components/BoundStateLogo';
 import { LanguageSelector } from '@/components/LanguageSelector';
@@ -34,11 +34,17 @@ const DEFAULT_NAV_ITEMS: NavItem[] = [
   { id: 'mp-plan', title: 'M&P Plan', navKey: 'mpPlan', url: '/mp-plan', icon: ClipboardList },
   { id: 'query', title: 'MIRA Query', navKey: 'query', url: '/query', icon: Zap },
   { id: 'gas-compatibility', title: 'Gas Compatibility', navKey: 'gasCompatibility', url: '/gas-compatibility', icon: Wind },
-  { id: 'oca', title: 'OCA Workbench', navKey: 'ocaWorkbench', url: '/oca', icon: Shield },
+  { id: 'galvanic-compatibility', title: 'Galvanic Compatibility', navKey: 'galvanicCompatibility', url: '/galvanic-compatibility', icon: ShieldAlert },
+  { id: 'fracture-control', title: 'Fracture Control', navKey: 'fractureControl', url: '/fracture-control', icon: ShieldCheck },
+  { id: 'oca-workbench', title: 'OCA Workbench', navKey: 'ocaWorkbench', url: '/oca/workbench', icon: Shield },
+  { id: 'oca-system', title: 'OCA System Builder', navKey: 'ocaSystemBuilder', url: '/oca/system-builder', icon: LayoutGrid },
   { id: 'test-classes', title: 'MAPTIS Search', navKey: 'testClasses', url: '/test-classes', icon: FlaskConical },
   { id: 'miul', title: 'MIUL Builder', navKey: 'miulBuilder', url: '/miul', icon: FileStack },
   { id: 'dt-editor', title: 'DT Editor', navKey: 'dtEditor', url: '/dt-editor', icon: FolderTree },
   { id: 'mua-v10', title: 'MUA Writer', navKey: 'muaV10', url: '/mua-v10', icon: Sparkles },
+  { id: 'forge', title: 'FORGE Build Console', navKey: 'forge', url: '/forge', icon: Database },
+  { id: 'forge-explorer', title: 'FORGE Explorer', navKey: 'forgeExplorer', url: '/forge-explorer', icon: Search },
+  { id: 'tocr', title: 'TOCR Review', navKey: 'tocr', url: '/tocr', icon: ScrollText },
   { id: 'knowledge-twins', title: 'Knowledge Twins', navKey: 'knowledgeTwins', url: '/', icon: Brain },
 ];
 

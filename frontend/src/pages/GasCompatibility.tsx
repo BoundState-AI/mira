@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/PageHeader';
 import { StatusBadge } from '@/components/StatusBadge';
 import { EvidenceTable } from '@/components/EvidenceTable';
+import { MiraHelpLabel, MiraInlineHelp } from '@/components/mira/MiraInlineHelp';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -27,6 +28,7 @@ import {
   type O2FamiliesResponse,
 } from '@/lib/api';
 import helpContent from '@/config/helpContent';
+import { getMiraGuidanceEntry, getMiraInputGuidance } from '@/lib/mira-guidance';
 
 type GasType = 'O2' | 'H2';
 type H2DecisionBand = 'prohibited' | 'judgement' | 'mixed' | 'none';
@@ -78,6 +80,7 @@ function parseH2DecisionBand(result: CompatibilityResponse | null): {
 }
 
 export default function GasCompatibility() {
+  const h2Help = (fieldId: string) => getMiraInputGuidance('h2', fieldId);
   const [gasType, setGasType] = useState<GasType>('O2');
   const [h2Condition, setH2Condition] = useState('');
   const [lastEvaluatedH2Condition, setLastEvaluatedH2Condition] = useState('');
@@ -444,7 +447,14 @@ export default function GasCompatibility() {
             {gasType === 'H2' && (
               <div className="space-y-2">
                 <div className="flex items-center gap-2 pt-1">
-                  <Label htmlFor="h2-condition" className="text-xs text-muted-foreground">Condition</Label>
+                  <MiraHelpLabel
+                    htmlFor="h2-condition"
+                    entry={h2Help('condition')}
+                    title="Condition"
+                    labelClassName="text-xs text-muted-foreground"
+                  >
+                    Condition
+                  </MiraHelpLabel>
                   <Input
                     id="h2-condition"
                     placeholder="optional, e.g. ST 1900F"
@@ -556,9 +566,14 @@ export default function GasCompatibility() {
                 {/* Known Conditions Dropdown */}
                 {conditionOptions.length > 0 && (
                   <div className="flex items-center gap-2 pt-1">
-                    <Label htmlFor="h2-condition-select" className="text-xs text-muted-foreground">
+                    <MiraHelpLabel
+                      htmlFor="h2-condition-select"
+                      entry={h2Help('condition')}
+                      title="Known Conditions"
+                      labelClassName="text-xs text-muted-foreground"
+                    >
                       Known Conditions
-                    </Label>
+                    </MiraHelpLabel>
                     <select
                       id="h2-condition-select"
                       value={conditionOptions.includes(h2Condition) ? h2Condition : ''}
@@ -626,7 +641,9 @@ export default function GasCompatibility() {
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="space-y-2">
-                <Label htmlFor="material">Material</Label>
+                <MiraHelpLabel htmlFor="material" entry={h2Help('material_key')}>
+                  Material
+                </MiraHelpLabel>
                 <Input
                   id="material"
                   placeholder="e.g., SS316, INCONEL 718"
@@ -635,7 +652,9 @@ export default function GasCompatibility() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="pressure">Pressure (PSIA)</Label>
+                <MiraHelpLabel htmlFor="pressure" entry={h2Help('pressure_psia')}>
+                  Pressure (PSIA)
+                </MiraHelpLabel>
                 <Input
                   id="pressure"
                   type="number"
@@ -645,7 +664,13 @@ export default function GasCompatibility() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="temperature">Temperature (°F)</Label>
+                <MiraHelpLabel
+                  htmlFor="temperature"
+                  entry={h2Help('temperature_k')}
+                  title="Temperature (°F)"
+                >
+                  Temperature (°F)
+                </MiraHelpLabel>
                 <Input
                   id="temperature"
                   type="number"
@@ -696,6 +721,9 @@ export default function GasCompatibility() {
                     <div className="space-y-2">
                       <div className="flex items-center gap-3">
                         <StatusBadge status={o2Result?.classification?.toLowerCase() || result?.classification || 'unknown'} />
+                        {gasType === 'H2' && result ? (
+                          <MiraInlineHelp entry={getMiraGuidanceEntry('h2', 'verdicts', result.classification)} />
+                        ) : null}
                         <span className="text-sm text-muted-foreground">
                           {gasType === 'O2'
                             ? `Oxygen Service (${phase.toUpperCase()})`

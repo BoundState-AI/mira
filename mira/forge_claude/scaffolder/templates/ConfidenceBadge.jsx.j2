@@ -1,0 +1,25 @@
+import { AlertTriangle, CheckCircle } from "lucide-react";
+
+export default function ConfidenceBadge({ score, caveats = [] }) {
+  if (score >= 0.7 && caveats.length === 0) {
+    return null; // No badge needed for reliable data
+  }
+
+  const color = score >= 0.5 ? "amber" : "red";
+
+  return (
+    <div className={`flex items-start gap-2 rounded-md p-3 text-sm bg-${color}-50 text-${color}-800 border border-${color}-200`}>
+      <AlertTriangle size={16} className="mt-0.5 flex-shrink-0" />
+      <div>
+        <p className="font-medium">Data quality warning ({(score * 100).toFixed(0)}% reliable)</p>
+        {caveats.length > 0 && (
+          <ul className="mt-1 list-disc list-inside text-xs">
+            {caveats.map((c, i) => (
+              <li key={i}>{c}</li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}

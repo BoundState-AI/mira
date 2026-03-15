@@ -1,0 +1,321 @@
+{
+  "module": "galvanic",
+  "dataset": "galvanic_mitigations",
+  "version": "0.1.0",
+  "generated_from": [
+    "MIL-STD-889D §5.4",
+    "MIL-STD-889D Appendix A.4.5-A.4.10",
+    "NASA-STD-6012A CPR 30-40"
+  ],
+  "entries": [
+    {
+      "mitigation_id": "physical_isolation",
+      "name": "Physical isolation barrier",
+      "mechanism": "isolation",
+      "mitigation_class": "CIRCUIT_BREAK",
+      "boundstate_priority": 1,
+      "description": "Use an inert, non-absorbing barrier such as a gasket, sleeve, washer, insert, sealant, or compatible insulating layer to electrically isolate dissimilar faying surfaces.",
+      "coat_cathode_warning": false,
+      "application_constraints": [],
+      "environment_constraints": [],
+      "restrictions": [
+        "Use only where the joint is not required to remain electrically conductive.",
+        "Barrier material must be inert and non-absorbing."
+      ],
+      "source_clauses": [
+        "MIL-STD-889D §5.4d",
+        "MIL-STD-889D §5.11c",
+        "MIL-STD-889D §5.11d"
+      ],
+      "standards": [
+        "MIL-STD-889D"
+      ],
+      "notes": [
+        "This is the cleanest galvanic mitigation because it breaks the electron path rather than trying to tolerate it."
+      ]
+    },
+    {
+      "mitigation_id": "seal_faying_surfaces",
+      "name": "Seal faying surfaces",
+      "mechanism": "barrier",
+      "mitigation_class": "CIRCUIT_BREAK",
+      "boundstate_priority": 2,
+      "description": "Seal faying surfaces and exposed joint edges to exclude electrolyte from the couple interface.",
+      "coat_cathode_warning": false,
+      "application_constraints": [],
+      "environment_constraints": [
+        "Required for Class 1 through Class 5 and Class 7 faying surface couples."
+      ],
+      "restrictions": [
+        "If sealing is not feasible, justification is required by the corrosion control process."
+      ],
+      "source_clauses": [
+        "MIL-STD-889D §5.4b",
+        "MIL-STD-889D §5.8",
+        "MIL-STD-889D §5.11d",
+        "NASA-STD-6012A CPR 30",
+        "NASA-STD-6012A CPR 40"
+      ],
+      "standards": [
+        "MIL-STD-889D",
+        "NASA-STD-6012A"
+      ],
+      "notes": [
+        "For graphite or CFRP contacts, sealing is mandatory under CPR 40."
+      ]
+    },
+    {
+      "mitigation_id": "wet_install_fasteners",
+      "name": "Wet install fasteners",
+      "mechanism": "barrier",
+      "mitigation_class": "CIRCUIT_BREAK",
+      "boundstate_priority": 3,
+      "description": "Apply primer or sealant to the fastener and hole interface before installation to exclude electrolyte from the annular gap.",
+      "coat_cathode_warning": false,
+      "application_constraints": [],
+      "environment_constraints": [
+        "Applies to fasteners in corrosive environments and graphite-composite contacts."
+      ],
+      "restrictions": [
+        "Installation torque behavior and blind-hole pressure effects must be evaluated.",
+        "Electrical bonding fasteners follow a different protection path."
+      ],
+      "source_clauses": [
+        "NASA-STD-6012A CPR 31",
+        "NASA-STD-6012A CPR 32",
+        "NASA-STD-6012A CPR 33",
+        "NASA-STD-6012A CPR 40"
+      ],
+      "standards": [
+        "NASA-STD-6012A"
+      ],
+      "notes": [
+        "Titanium fasteners in graphite composite joints are specifically permitted when wet installed."
+      ]
+    },
+    {
+      "mitigation_id": "cathodic_barrier_coating",
+      "name": "Barrier coating on the cathodic member",
+      "mechanism": "coating",
+      "mitigation_class": "CIRCUIT_BREAK",
+      "boundstate_priority": 4,
+      "description": "Apply a protective coating system to the more noble member to interrupt the galvanic cell and reduce cathodic driving area.",
+      "coat_cathode_warning": true,
+      "application_constraints": [],
+      "environment_constraints": [],
+      "restrictions": [
+        "Full coverage is needed for circuit-break behavior.",
+        "Partial damage or holidays do not eliminate galvanic risk."
+      ],
+      "source_clauses": [
+        "MIL-STD-889D §5.4c",
+        "MIL-STD-889D §5.11f"
+      ],
+      "standards": [
+        "MIL-STD-889D"
+      ],
+      "notes": [
+        "Atlas must surface the coat-the-cathode rule whenever a coating mitigation is recommended."
+      ]
+    },
+    {
+      "mitigation_id": "anodize_aluminum",
+      "name": "Anodize aluminum",
+      "mechanism": "coating",
+      "mitigation_class": "KINETICS_MODIFIER",
+      "boundstate_priority": 5,
+      "description": "Anodize aluminum and post-treat with an approved corrosion-resistant finish to increase surface resistance and suppress corrosion rate without claiming a literal new aluminum EMF.",
+      "coat_cathode_warning": false,
+      "application_constraints": [
+        "Aluminum and aluminum alloys only."
+      ],
+      "environment_constraints": [],
+      "restrictions": [
+        "Hot water seal should not be used unless authorized by design authority.",
+        "Wear, abrasion, erosion, severe corrosion, and fatigue impacts require explicit design authority review."
+      ],
+      "source_clauses": [
+        "MIL-STD-889D Appendix A.4.5a",
+        "MIL-STD-889D Appendix A.4.5b",
+        "MIL-STD-889D Appendix A.4.5c"
+      ],
+      "standards": [
+        "MIL-STD-889D"
+      ],
+      "notes": [
+        "Frontend should render anodize as a rate modifier, not a box movement."
+      ]
+    },
+    {
+      "mitigation_id": "sacrificial_anode_gacp",
+      "name": "Sacrificial anode cathodic protection",
+      "mechanism": "sacrificial",
+      "mitigation_class": "SURFACE_STATE_SUBSTITUTION",
+      "boundstate_priority": 6,
+      "description": "Attach a sacrificial zinc, aluminum, or magnesium anode to drive the protected structure cathodic in wet service.",
+      "coat_cathode_warning": false,
+      "application_constraints": [
+        "Not for flight hardware."
+      ],
+      "environment_constraints": [
+        "Wet or immersed environments only."
+      ],
+      "restrictions": [
+        "Magnesium underwater use is only acceptable as a sacrificial anode.",
+        "Selection depends on service environment and structure."
+      ],
+      "source_clauses": [
+        "MIL-STD-889D §5.10",
+        "MIL-STD-889D §5.4a"
+      ],
+      "standards": [
+        "MIL-STD-889D"
+      ],
+      "notes": [
+        "This is a system-level mitigation, not a default hardware finish."
+      ]
+    },
+    {
+      "mitigation_id": "zinc_nickel_plating_for_steel",
+      "name": "Zinc-nickel plating on steel",
+      "mechanism": "sacrificial",
+      "mitigation_class": "SURFACE_STATE_SUBSTITUTION",
+      "boundstate_priority": 7,
+      "description": "Apply a zinc-nickel metallic coating to carbon or low-alloy steel where a metallic corrosion-protective coating is required.",
+      "coat_cathode_warning": false,
+      "application_constraints": [
+        "Most relevant to carbon and low-alloy steels."
+      ],
+      "environment_constraints": [],
+      "restrictions": [
+        "High-strength steels require hydrogen-embrittlement prevention and bake-out controls.",
+        "Supplemental sealant, primer, or paint may still be required."
+      ],
+      "source_clauses": [
+        "MIL-STD-889D Appendix A.4.6a",
+        "MIL-STD-889D Appendix A.4.6b",
+        "MIL-STD-889D Appendix A.4.6e"
+      ],
+      "standards": [
+        "MIL-STD-889D"
+      ],
+      "notes": [
+        "This entry is included as the preferred modern steel plating option in Phase 1 guidance."
+      ]
+    },
+    {
+      "mitigation_id": "cadmium_plating_restricted",
+      "name": "Cadmium plating (restricted use)",
+      "mechanism": "sacrificial",
+      "mitigation_class": "SURFACE_STATE_SUBSTITUTION",
+      "boundstate_priority": 8,
+      "description": "Cadmium remains an available metallic coating in MIL-STD-889D treatment guidance, but NASA restrictions sharply limit where it may be used.",
+      "coat_cathode_warning": false,
+      "application_constraints": [],
+      "environment_constraints": [],
+      "restrictions": [
+        "Cadmium shall not be used in crew or vacuum environments.",
+        "Cadmium-plated tools and hardware shall not be used in manufacture or test of mission-critical spaceflight hardware.",
+        "Cadmium can cause liquid-metal or solid-metal embrittlement in titanium."
+      ],
+      "source_clauses": [
+        "MIL-STD-889D Appendix A.4.4",
+        "MIL-STD-889D Appendix A.4.7 caution",
+        "NASA-STD-6016C MPR 77",
+        "NASA-STD-6016C MPR 78"
+      ],
+      "standards": [
+        "MIL-STD-889D",
+        "NASA-STD-6016C"
+      ],
+      "notes": [
+        "Atlas must always surface the restriction text for this entry."
+      ]
+    },
+    {
+      "mitigation_id": "iccp_structures_only",
+      "name": "Impressed current cathodic protection",
+      "mechanism": "cathodic",
+      "mitigation_class": "SURFACE_STATE_SUBSTITUTION",
+      "boundstate_priority": 9,
+      "description": "Use an externally powered cathodic protection system only for appropriate ground or fixed structures where continuous monitoring and control are feasible.",
+      "coat_cathode_warning": false,
+      "application_constraints": [
+        "Allowed only for launch structures, ground support equipment, or fixed installations."
+      ],
+      "environment_constraints": [
+        "Requires conductive wet service and active monitoring."
+      ],
+      "restrictions": [
+        "Prohibited for flight hardware and spacecraft structure in Phase 1 product logic."
+      ],
+      "source_clauses": [
+        "BoundState Phase 1 product gate from corrosion handoff"
+      ],
+      "standards": [
+        "BoundState product rule"
+      ],
+      "notes": [
+        "This is a product gating rule, not a MIL-STD-889D normative clause."
+      ]
+    },
+    {
+      "mitigation_id": "titanium_fasteners_for_cfrp",
+      "name": "Titanium fasteners for graphite-composite joints",
+      "mechanism": "design_change",
+      "mitigation_class": "CIRCUIT_BREAK",
+      "boundstate_priority": 10,
+      "description": "Use titanium fasteners in graphite-based composite joints and wet install them with sealant or primer.",
+      "coat_cathode_warning": false,
+      "application_constraints": [
+        "Graphite-based composite to metal contact."
+      ],
+      "environment_constraints": [],
+      "restrictions": [
+        "Still treat the contact as a dissimilar couple and seal it.",
+        "Titanium contact with cadmium or zinc is prohibited."
+      ],
+      "source_clauses": [
+        "NASA-STD-6012A CPR 40",
+        "MIL-STD-889D Appendix A.4.7 caution",
+        "MIL-STD-889D Appendix A.4.8a"
+      ],
+      "standards": [
+        "NASA-STD-6012A",
+        "MIL-STD-889D"
+      ],
+      "notes": [
+        "This is the preferred fastener recommendation for CFRP joints in the current handoff."
+      ]
+    },
+    {
+      "mitigation_id": "passivate_stainless_fasteners",
+      "name": "Passivate stainless hardware",
+      "mechanism": "coating",
+      "mitigation_class": "KINETICS_MODIFIER",
+      "boundstate_priority": 11,
+      "description": "Passivate stainless steel and precipitation-hardening stainless steel hardware after machining and before service.",
+      "coat_cathode_warning": false,
+      "application_constraints": [
+        "Stainless steels and PH stainless steels."
+      ],
+      "environment_constraints": [],
+      "restrictions": [
+        "Not required where corrosion-resistant steels are to be inorganically coated.",
+        "High-hardness martensitic and PH grades also require hydrogen-embrittlement precautions."
+      ],
+      "source_clauses": [
+        "NASA-STD-6012A CPR 35",
+        "MIL-STD-889D Appendix A.4.10a",
+        "MIL-STD-889D Appendix A.4.10b"
+      ],
+      "standards": [
+        "NASA-STD-6012A",
+        "MIL-STD-889D"
+      ],
+      "notes": [
+        "Passivation should be surfaced as a base requirement for stainless fasteners, not a substitute for sealing incompatible joints."
+      ]
+    }
+  ]
+}

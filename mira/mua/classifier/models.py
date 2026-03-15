@@ -237,7 +237,7 @@ RATING_SEMANTICS: dict[tuple[str, str], RatingSemantics] = {
     # TOX ratings
     ("TOX", "A"): RatingSemantics(
         issue_key="TOX", rating="A",
-        meaning="Passes TML <=1.0%, CVCM <=0.1%.",
+        meaning="Passes offgassing screening per NASA-STD-6001B Test 7.",
         mua_required=False, severity="none",
     ),
     ("TOX", "U"): RatingSemantics(
@@ -308,6 +308,27 @@ RATING_SEMANTICS: dict[tuple[str, str], RatingSemantics] = {
         meaning="Not tested for stress corrosion cracking.",
         mua_required=True, severity="real_gap",
     ),
+    # FS=C, TOX=C, TOX=X, CORR=C — real failures added per audit Finding #5
+    ("FS", "C"): RatingSemantics(
+        issue_key="FS", rating="C",
+        meaning="Incompatible with test fluid per NASA-STD-6001B Test 15.",
+        mua_required=True, severity="real_failure",
+    ),
+    ("TOX", "C"): RatingSemantics(
+        issue_key="TOX", rating="C",
+        meaning="Fails offgassing criteria per NASA-STD-6001B Test 7.",
+        mua_required=True, severity="real_failure",
+    ),
+    ("TOX", "X"): RatingSemantics(
+        issue_key="TOX", rating="X",
+        meaning="Fails or rejected per legacy criteria.",
+        mua_required=True, severity="real_failure",
+    ),
+    ("CORR", "C"): RatingSemantics(
+        issue_key="CORR", rating="C",
+        meaning="Susceptible to corrosion under service conditions.",
+        mua_required=True, severity="real_failure",
+    ),
     ("FLAM", "N"): RatingSemantics(
         issue_key="FLAM", rating="N",
         meaning="Not applicable or not tested. Context-dependent.",
@@ -334,10 +355,13 @@ COLUMN_FLAG_DICT: dict[str, dict[str, FlagType]] = {
     },
     "FS": {
         "A": FlagType.NO_FLAG,
+        "C": FlagType.REAL_FAIL,
         "U": FlagType.NO_DATA,
     },
     "TOX": {
         "A": FlagType.NO_FLAG,
+        "C": FlagType.REAL_FAIL,
+        "X": FlagType.REAL_FAIL,
         "U": FlagType.NO_DATA,
         "K": FlagType.BAD_DATA,
     },
@@ -356,7 +380,22 @@ COLUMN_FLAG_DICT: dict[str, dict[str, FlagType]] = {
     "CORR": {
         "A": FlagType.NO_FLAG,
         "B": FlagType.BATCH_REQUIRED,
+        "C": FlagType.REAL_FAIL,
         "U": FlagType.NO_DATA,
+    },
+    # Legacy columns — always route to human for manual review.
+    # These appear in historic MAPTIS data and the golden set.
+    "LEGACY_OC": {
+        "A": FlagType.NO_FLAG,
+        "B": FlagType.NEEDS_REVIEW,
+        "C": FlagType.NEEDS_REVIEW,
+        "U": FlagType.NEEDS_REVIEW,
+        "X": FlagType.NEEDS_REVIEW,
+    },
+    "LEGACY_COMPAT": {
+        "A": FlagType.NO_FLAG,
+        "B": FlagType.NEEDS_REVIEW,
+        "X": FlagType.NEEDS_REVIEW,
     },
 }
 
@@ -533,6 +572,9 @@ class Form551Fields(BaseModel):
     rationale: str = ""
     disposition: str = ""
 
+    # MIUL rationale code (e.g., "102" for FLAM Cat II per NASA-STD-6016C)
+    rationale_code: str = ""
+
     # Approval
     approval_signatures: list[str] = Field(default_factory=list)
 
@@ -572,3 +614,6 @@ class PipelineResult(BaseModel):
     automatable_count: int = 0
     human_required_count: int = 0
     no_mua_needed_count: int = 0
+
+    # Rating coverage warnings (e.g., metal with TOX rating)
+    coverage_warnings: list[str] = Field(default_factory=list)

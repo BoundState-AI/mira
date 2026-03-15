@@ -1,0 +1,34 @@
+{
+  "spec_id": "BS-SPEC-OCA-002-REV0",
+  "version": "1.0.0",
+  "formula": {
+    "velocity": "v = Q / A",
+    "area": "A = pi * r^2"
+  },
+  "units": {
+    "velocity": "m/s",
+    "flow_rate": "m^3/s",
+    "diameter": "m"
+  },
+  "thresholds": [
+    {
+      "mechanism": "Particle Impact",
+      "code": "PI",
+      "velocity_threshold_m_per_s": 30,
+      "comparison": ">=",
+      "impact": "characteristic element satisfied"
+    }
+  ],
+  "requirements": {
+    "design_flow_rate_required": true,
+    "blocked_state_when_missing": "HYDRAULIC_STATE_INCOMPLETE"
+  },
+  "citations": [
+    "TM §4.3.1",
+    "ASTM STP 986"
+  ],
+  "provenance": {
+    "source": "BS-SPEC-OCA-002-REV0 §3.1, §11.1",
+    "confidence": "high"
+  }
+}

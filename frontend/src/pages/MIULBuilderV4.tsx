@@ -8,7 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { PageHelp } from "@/components/PageHelp";
+import { MiraHelpLabel, MiraInlineHelp } from "@/components/mira/MiraInlineHelp";
 import helpContent from "@/config/helpContent";
+import { getMiraInputGuidance } from "@/lib/mira-guidance";
 import { cn } from "@/lib/utils";
 import {
   Upload,
@@ -506,9 +508,12 @@ function ReviewItemCard({
               const listId = `gl-${itemKey}-${fieldName}`;
               return (
                 <div key={fieldName} className="flex items-center gap-2">
-                  <Label className="w-32 text-xs text-right capitalize">
-                    {fieldName.replace(/_/g, " ")}
-                  </Label>
+                  <div className="flex w-32 items-center justify-end gap-1.5">
+                    <Label className="text-xs text-right capitalize">
+                      {fieldName.replace(/_/g, " ")}
+                    </Label>
+                    <MiraInlineHelp entry={miulHelp(fieldName)} title={fieldName.replace(/_/g, " ")} />
+                  </div>
                   <div className="flex-1 relative">
                     <Input
                       className="h-8 text-sm"
@@ -734,6 +739,7 @@ function DrawingRemovalPanel({
 export default function MIULBuilderV4() {
   const { t } = useTranslation("miulBuilder");
   const { toast } = useToast();
+  const miulHelp = (fieldId: string) => getMiraInputGuidance("miul", fieldId);
 
   // ---- Upload state ----
   const [dtJsonFile, setDtJsonFile] = useState<File | null>(null);
@@ -1528,9 +1534,9 @@ export default function MIULBuilderV4() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-sm font-medium">
+                <MiraHelpLabel entry={miulHelp("detail_drawing")} labelClassName="text-sm font-medium">
                   {t("upload.drawingTree", { defaultValue: "Drawing Tree JSON (Optional)" })}
-                </Label>
+                </MiraHelpLabel>
                 <p className="text-xs text-muted-foreground mb-1">
                   {t("upload.drawingTreeHint", {
                     defaultValue: "From DT Editor. Include for accurate NHA/Parent hierarchy.",
@@ -1593,33 +1599,63 @@ export default function MIULBuilderV4() {
               </div>
               <div className="grid grid-cols-4 gap-2">
                 <div>
-                  <Label className="text-xs text-muted-foreground">Pressure Min (psia)</Label>
+                  <MiraHelpLabel
+                    entry={miulHelp("max_pressure")}
+                    title="Pressure Min (psia)"
+                    labelClassName="text-xs text-muted-foreground"
+                  >
+                    Pressure Min (psia)
+                  </MiraHelpLabel>
                   <Input value={minPressure} onChange={(e) => setMinPressure(e.target.value)} className="h-8 text-sm" />
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground">Pressure Max (psia)</Label>
+                  <MiraHelpLabel entry={miulHelp("max_pressure")} labelClassName="text-xs text-muted-foreground">
+                    Pressure Max (psia)
+                  </MiraHelpLabel>
                   <Input value={maxPressure} onChange={(e) => setMaxPressure(e.target.value)} className="h-8 text-sm" />
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground">Temp Min (F)</Label>
+                  <MiraHelpLabel
+                    entry={miulHelp("max_temperature")}
+                    title="Temp Min (F)"
+                    labelClassName="text-xs text-muted-foreground"
+                  >
+                    Temp Min (F)
+                  </MiraHelpLabel>
                   <Input value={minTemp} onChange={(e) => setMinTemp(e.target.value)} className="h-8 text-sm" />
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground">Temp Max (F)</Label>
+                  <MiraHelpLabel entry={miulHelp("max_temperature")} labelClassName="text-xs text-muted-foreground">
+                    Temp Max (F)
+                  </MiraHelpLabel>
                   <Input value={maxTemp} onChange={(e) => setMaxTemp(e.target.value)} className="h-8 text-sm" />
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <Label className="text-xs text-muted-foreground">O2 Concentration (%)</Label>
+                  <MiraHelpLabel
+                    entry={miulHelp("environment")}
+                    title="O2 Concentration (%)"
+                    labelClassName="text-xs text-muted-foreground"
+                  >
+                    O2 Concentration (%)
+                  </MiraHelpLabel>
                   <Input value={o2Percent} onChange={(e) => setO2Percent(e.target.value)} className="h-8 text-sm" />
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground">Service Media</Label>
+                  <MiraHelpLabel
+                    entry={miulHelp("environment")}
+                    title="Service Media"
+                    labelClassName="text-xs text-muted-foreground"
+                  >
+                    Service Media
+                  </MiraHelpLabel>
                   <Input value={fluidType} onChange={(e) => setFluidType(e.target.value)} className="h-8 text-sm" />
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground">Environment</Label>
+                  <MiraHelpLabel entry={miulHelp("environment")} labelClassName="text-xs text-muted-foreground">
+                    Environment
+                  </MiraHelpLabel>
                   <Input value={envMedia} onChange={(e) => setEnvMedia(e.target.value)} className="h-8 text-sm" />
                 </div>
               </div>

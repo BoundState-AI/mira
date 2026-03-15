@@ -1,0 +1,48 @@
+{
+  "_meta": {
+    "description": "Flow velocity calculation parameters and thresholds per BS-SPEC-OCA-002-REV0 §5.2",
+    "source": "TM-2007-213740 §4.3.1, ASTM STP 986",
+    "version": "1.0.0",
+    "ingest_date": "2026-03-10"
+  },
+  "velocity_calculation": {
+    "formula": "v = Q / A",
+    "area_formula": "A = pi * (inner_diameter_m / 2)^2",
+    "units": {
+      "velocity": "m/s",
+      "flow_rate": "m^3/s",
+      "area": "m^2",
+      "inner_diameter": "mm (input), converted to m for calculation"
+    },
+    "notes": "Incompressible flow assumption. For compressible flow at high Mach numbers, this underestimates velocity."
+  },
+  "thresholds": [
+    {
+      "threshold_id": "PI-VELOCITY",
+      "mechanism": "particle_impact",
+      "value_m_s": 30.0,
+      "value_ft_s": 100.0,
+      "description": "Particle impact velocity threshold. Above this velocity, particles carry sufficient kinetic energy for ignition of flammable targets.",
+      "source": "TM-2007-213740 §4.3.1 p.5, ASTM STP 986",
+      "tier": "B",
+      "note": "The 100 ft/s (30 m/s) threshold is widely cited. Some references use lower thresholds for specific materials."
+    },
+    {
+      "threshold_id": "SONIC-RATIO",
+      "mechanism": "resonance",
+      "value": 1.893,
+      "description": "Critical pressure ratio for sonic flow (choked flow) in O2. P_upstream / P_downstream > 1.893 produces Mach 1 at the throat.",
+      "source": "Isentropic flow relations, gamma = 1.4 for O2",
+      "tier": "B",
+      "formula": "(2 / (gamma + 1))^(gamma / (gamma - 1)) = 0.5283 for gamma=1.4; critical ratio = 1/0.5283 = 1.893"
+    }
+  ],
+  "unit_conversions": {
+    "psia_to_mpa": 0.00689476,
+    "mpa_to_psia": 145.038,
+    "ft_s_to_m_s": 0.3048,
+    "m_s_to_ft_s": 3.28084,
+    "mm_to_m": 0.001,
+    "liters_to_m3": 0.001
+  }
+}

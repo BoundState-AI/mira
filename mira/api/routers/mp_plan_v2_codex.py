@@ -173,6 +173,28 @@ async def ping() -> dict[str, Any]:
     return {"status": "ok", "domain": "mp_plan_v2_codex", "version": __version__}
 
 
+@router.get("/vehicle-presets")
+async def list_vehicle_presets() -> dict[str, Any]:
+    """List available vehicle environment presets for v2 clients."""
+    from mira.mp_plan.policy import create_default_policy_pack
+
+    default = create_default_policy_pack()
+    presets: list[dict[str, Any]] = []
+
+    for preset_id, config in default.vehicle_environments.items():
+        presets.append(
+            {
+                "preset_id": preset_id,
+                "name": config.get("name", preset_id),
+                "o2_pct": config.get("o2_pct"),
+                "pressure_psia": config.get("pressure_psia"),
+                "habitable": config.get("habitable"),
+            }
+        )
+
+    return {"presets": presets}
+
+
 @router.post("/sessions")
 async def create_session(
     request: CreateSessionRequest,

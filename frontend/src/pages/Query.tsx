@@ -368,7 +368,7 @@ export default function Query() {
               <PageHelp content={helpContent.query} />
             </h1>
             <p className="text-lg text-muted-foreground mb-1">
-              Materials Intelligence & Risk Analysis
+              Materials Intelligence Research Assistant
             </p>
             <p className="text-sm text-muted-foreground">
               Ask MAPTIS questions in natural language

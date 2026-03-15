@@ -17,8 +17,14 @@ import MiraV4Query from "./pages/MiraV4Query";
 import BSMHQuery from "./pages/BSMHQuery";
 import MUAV10 from "./pages/MUAV10";
 import GasCompatibility from "./pages/GasCompatibility";
+import GalvanicCompatibility from "./pages/GalvanicCompatibility";
+import FractureControl from "./pages/FractureControl";
 import OCAWorkbench from "./pages/OCAWorkbench";
+import OCASystemBuilder from "./pages/OCASystemBuilder";
 import NotFound from "./pages/NotFound";
+import FORGE from "./pages/FORGE";
+import FORGEExplorer from "./pages/FORGEExplorer";
+import TOCR from "./pages/TOCR";
 
 const queryClient = new QueryClient();
 
@@ -43,7 +49,11 @@ const App = () => (
                   )}
                 />
                 <Route path="/gas-compatibility" element={<GasCompatibility />} />
-                <Route path="/oca" element={<OCAWorkbench />} />
+                <Route path="/galvanic-compatibility" element={<GalvanicCompatibility />} />
+                <Route path="/fracture-control" element={<FractureControl />} />
+                <Route path="/oca" element={<Navigate to="/oca/workbench" replace />} />
+                <Route path="/oca/workbench" element={<OCAWorkbench />} />
+                <Route path="/oca/system-builder" element={<OCASystemBuilder />} />
                 <Route path="/test-classes" element={<TestClasses />} />
                 <Route path="/test-classes/:testType" element={<TestClassDetail />} />
                 <Route
@@ -75,6 +85,9 @@ const App = () => (
                 <Route path="/mua-v7" element={<Navigate to="/mua-v10" replace />} />
                 <Route path="/mua-v8" element={<Navigate to="/mua-v10" replace />} />
                 <Route path="/mua-v10" element={<MUAV10 />} />
+                <Route path="/forge" element={<FORGE />} />
+                <Route path="/forge-explorer" element={<FORGEExplorer />} />
+                <Route path="/tocr" element={<TOCR />} />
                 <Route path="/knowledge-twins" element={<Navigate to="/" replace />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

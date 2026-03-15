@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import json
 import logging
+import math
 from collections import defaultdict
 from dataclasses import dataclass, field
 from difflib import SequenceMatcher
@@ -62,6 +63,14 @@ FUZZY_THRESHOLD = 0.75
 
 # Pressure thresholds for warnings (in PSI)
 HIGH_PRESSURE_PSI = 10000  # Most test data is below this
+
+# Conversion: 1 MPa = 145.038 PSI
+_MPA_PER_PSI = 0.00689476
+
+# Envelope tolerance factors — how close query must be to evidence
+_PRESSURE_LOG_TOLERANCE = 0.5   # ≤ ~3× ratio in pressure
+_TEMPERATURE_TOLERANCE_C = 50   # ± 50°C considered "matching"
+_CRYO_BOUNDARY_C = -150         # below this = cryogenic regime
 
 
 # =============================================================================
@@ -165,6 +174,9 @@ class H2Result:
     available_conditions: list[ConditionOption] = field(default_factory=list)
     clarification_prompt: Optional[str] = None
 
+    # Envelope context — populated when query includes pressure/temperature
+    envelope_context: Optional[dict] = None
+
     def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""
         result = {
@@ -194,6 +206,8 @@ class H2Result:
             ]
         if self.clarification_prompt:
             result["clarification_prompt"] = self.clarification_prompt
+        if self.envelope_context:
+            result["envelope_context"] = self.envelope_context
         return result
 
 
@@ -282,6 +296,7 @@ class H2Engine:
         self,
         material: str,
         pressure_psi: Optional[float] = None,
+        temperature_k: Optional[float] = None,
         condition: Optional[str] = None,
     ) -> H2Result:
         """Query hydrogen compatibility for a material.
@@ -289,11 +304,12 @@ class H2Engine:
         Args:
             material: Material name or alias (e.g., "Inconel 718", "718", "SS316L")
                       Can include condition suffix: "Inconel 718 ST", "Ti-6Al-4V annealed"
-            pressure_psi: Optional operating pressure in PSI (for warnings)
+            pressure_psi: Optional operating pressure in PSI (for envelope matching)
+            temperature_k: Optional operating temperature in Kelvin (for envelope matching)
             condition: Optional heat treatment condition filter (overrides parsed condition)
 
         Returns:
-            H2Result with verdict, rationale, and evidence.
+            H2Result with verdict, rationale, evidence, and envelope context.
         """
         self._ensure_loaded()
 
@@ -331,8 +347,18 @@ class H2Engine:
             except Exception as e:
                 LOGGER.warning(f"MUA lookup failed for '{effective_material}': {e}")
 
-        # Step 5: Add pressure warnings
-        if pressure_psi and pressure_psi > HIGH_PRESSURE_PSI:
+        # Step 5: Envelope matching — compare query conditions to evidence range
+        if matches and (pressure_psi is not None or temperature_k is not None):
+            envelope = self._compute_envelope_context(
+                matches, pressure_psi, temperature_k,
+            )
+            result.envelope_context = envelope
+
+            # Add envelope warnings
+            for warning in envelope.get("warnings", []):
+                result.warnings.append(warning)
+        elif pressure_psi and pressure_psi > HIGH_PRESSURE_PSI:
+            # Fallback: simple high-pressure warning when no matches to compare
             result.warnings.append(
                 f"Query pressure ({pressure_psi:,.0f} psi) exceeds most test data (~10,000 psi). "
                 "Extrapolation may be required."
@@ -393,11 +419,44 @@ class H2Engine:
 
         return result
 
+    # Known condition suffix patterns — ordered longest-first to avoid partial matches.
+    # Each entry: (regex_pattern, canonical_condition_label)
+    _CONDITION_SUFFIXES: list[tuple[str, str]] = [
+        # Multi-word
+        (r"\bsolution\s+treated?\s*\+?\s*aged\b", "solution_treated_aged"),
+        (r"\bsolution\s+treated?\s+and\s+aged\b", "solution_treated_aged"),
+        (r"\bst\s*\+?\s*aged?\b", "solution_treated_aged"),
+        (r"\bsolution\s+treated?\b", "solution_treated"),
+        (r"\bcold\s+worked\b", "cold_worked"),
+        (r"\bcold\s+drawn\b", "cold_drawn"),
+        (r"\bhot\s+rolled\b", "hot_rolled"),
+        (r"\bhot\s+finished\b", "hot_finished"),
+        (r"\bas\s+received\b", "as_received"),
+        (r"\bmill\s+annealed?\b", "mill_annealed"),
+        (r"\bpeak\s+aged?\b", "peak_aged"),
+        # Abbreviations (must come after multi-word to avoid partial matches)
+        (r"\bSTA\b", "solution_treated_aged"),
+        (r"\bST\s+(\d{3,4}\s*°?\s*F)\b", "solution_treated"),  # ST 1900F — keep temp in material
+        (r"\bST\b", "solution_treated"),
+        (r"\bCW\b", "cold_worked"),
+        # Single-word conditions
+        (r"\bannealed?\b", "annealed"),
+        (r"\baged?\b", "aged"),
+        (r"\bnormalized\b", "normalized"),
+        (r"\bquenched\b", "quenched"),
+        (r"\btempered\b", "tempered"),
+        (r"\bwrought\b", "wrought"),
+        (r"\bcast\b", "cast"),
+        (r"\bforged\b", "forged"),
+        (r"\bsintered\b", "sintered"),
+    ]
+
     def _parse_query(self, query: str) -> tuple[str, Optional[str]]:
         """Extract material name and condition from query string.
 
-        Parses condition suffixes from the query to enable natural queries like
-        "Inconel 718 ST" or "Ti-6Al-4V annealed".
+        Deterministic suffix matching — no LLM calls. Patterns are tried
+        longest-first against the tail of the query. Only matches at a word
+        boundary are accepted to avoid false positives.
 
         Args:
             query: Raw query string, possibly with condition suffix
@@ -411,9 +470,42 @@ class H2Engine:
             "Ti-6Al-4V annealed" → ("Ti-6Al-4V", "annealed")
             "K-Monel aged" → ("K-Monel", "aged")
             "316L" → ("316L", None)
+            "316L at 5000 psi" → ("316L", None)  # pressure not a condition
         """
-        # Condition parsing is delegated to explicit condition input + the
-        # resolver pipeline. Avoid ad-hoc suffix parsing here.
+        import re
+
+        text = query.strip()
+        if not text:
+            return query, None
+
+        # Strip trailing pressure/temperature phrases before condition parsing
+        # e.g., "Inconel 718 ST at 5000 psi" → "Inconel 718 ST"
+        text = re.sub(
+            r"\s+(?:at|@)\s+\d[\d,]*\.?\d*\s*(?:psi|psia|mpa|ksi|°?[FCK])\s*$",
+            "", text, flags=re.IGNORECASE,
+        ).strip()
+
+        for pattern, canonical in self._CONDITION_SUFFIXES:
+            # Only match at the end of the string (with optional trailing whitespace)
+            full_pattern = pattern + r"\s*$"
+            m = re.search(full_pattern, text, re.IGNORECASE)
+            if m:
+                # Special case: "ST 1900F" — the temperature is part of the condition
+                # label but we want to keep it in the condition, not the material
+                material = text[:m.start()].strip()
+                if not material:
+                    # The entire query was a condition — don't split
+                    return query, None
+
+                # Build display condition from matched text
+                matched_text = m.group(0).strip()
+
+                LOGGER.debug(
+                    "Parsed query '%s' → material='%s', condition='%s' (matched '%s')",
+                    query, material, canonical, matched_text,
+                )
+                return material, canonical
+
         return query, None
 
     def _find_matches(self, query: str) -> list[MatchedEvidence]:
@@ -618,6 +710,12 @@ class H2Engine:
 
         # =================================================================
         # STANDARD VERDICT: Worst-case assessment
+        #
+        # Rule coverage (vs knowledge_twins/h2/rules.py):
+        #   R001 Severe HEE Block     → severe/extreme → PROHIBITED (below)
+        #   R002 Weld HAZ Warning     → requires weld_state input (not in query API yet)
+        #   R003 Aged Condition Warn  → covered by clarification flow above
+        #   R004 High Strength        → 150 ksi guardrail in mira/h2/engine.py
         # =================================================================
 
         # Find worst-case band
@@ -810,9 +908,147 @@ class H2Engine:
                 "table": m.record.source_table,
                 "condition": m.record.condition,
                 "match_type": m.match_type,
+                "pressure_mpa": m.record.pressure_mpa,
+                "temperature_c": m.record.temperature_c,
             }
             for m in matches
         ]
+
+    # -----------------------------------------------------------------
+    # ENVELOPE MATCHING — pressure/temperature context
+    # -----------------------------------------------------------------
+
+    def _compute_envelope_context(
+        self,
+        matches: list[MatchedEvidence],
+        query_pressure_psi: Optional[float],
+        query_temperature_k: Optional[float],
+    ) -> dict:
+        """Compare query operating conditions against matched evidence envelopes.
+
+        Returns a structured context dict with:
+        - evidence_pressure_range_mpa: [min, max] across matched evidence
+        - evidence_temperature_range_c: [min, max] across matched evidence
+        - query_pressure_mpa / query_temperature_c: converted query values
+        - pressure_match / temperature_match: "within", "extrapolation", or None
+        - regime_match: whether query and evidence are in same thermal regime
+        - warnings: list of human-readable extrapolation warnings
+        """
+        warnings: list[str] = []
+
+        # Convert query values to metric
+        query_pressure_mpa = (
+            query_pressure_psi * _MPA_PER_PSI
+            if query_pressure_psi is not None
+            else None
+        )
+        query_temp_c = (
+            query_temperature_k - 273.15
+            if query_temperature_k is not None
+            else None
+        )
+
+        # Collect evidence pressure and temperature ranges
+        ev_pressures = [
+            m.record.pressure_mpa
+            for m in matches
+            if m.record.pressure_mpa is not None
+        ]
+        ev_temps = [
+            m.record.temperature_c
+            for m in matches
+            if m.record.temperature_c is not None
+        ]
+
+        context: dict = {
+            "query_pressure_mpa": round(query_pressure_mpa, 2) if query_pressure_mpa is not None else None,
+            "query_temperature_c": round(query_temp_c, 1) if query_temp_c is not None else None,
+            "evidence_pressure_range_mpa": (
+                [round(min(ev_pressures), 1), round(max(ev_pressures), 1)]
+                if ev_pressures else None
+            ),
+            "evidence_temperature_range_c": (
+                [round(min(ev_temps), 0), round(max(ev_temps), 0)]
+                if ev_temps else None
+            ),
+            "pressure_match": None,
+            "temperature_match": None,
+            "regime_match": None,
+            "warnings": warnings,
+        }
+
+        # --- Pressure envelope matching ---
+        if query_pressure_mpa is not None and ev_pressures:
+            p_min, p_max = min(ev_pressures), max(ev_pressures)
+
+            if p_min > 0 and query_pressure_mpa > 0:
+                # Use log-ratio to handle wide pressure ranges fairly
+                log_ratio_low = abs(math.log10(query_pressure_mpa / p_min)) if p_min > 0 else 0
+                log_ratio_high = abs(math.log10(query_pressure_mpa / p_max)) if p_max > 0 else 0
+
+                within_range = p_min <= query_pressure_mpa <= p_max
+                close_to_range = min(log_ratio_low, log_ratio_high) <= _PRESSURE_LOG_TOLERANCE
+
+                if within_range:
+                    context["pressure_match"] = "within"
+                elif close_to_range:
+                    context["pressure_match"] = "near"
+                else:
+                    context["pressure_match"] = "extrapolation"
+                    ratio = query_pressure_mpa / p_max if query_pressure_mpa > p_max else p_min / query_pressure_mpa
+                    warnings.append(
+                        f"Pressure extrapolation: query {query_pressure_mpa:.1f} MPa "
+                        f"({query_pressure_psi:,.0f} psi) is {ratio:.1f}× outside evidence range "
+                        f"[{p_min:.1f}–{p_max:.1f} MPa]. HEE behavior may differ at this pressure."
+                    )
+            elif query_pressure_mpa > 0 and p_min == 0:
+                context["pressure_match"] = "within"  # evidence at zero includes ambient
+
+        # --- Temperature envelope matching ---
+        if query_temp_c is not None and ev_temps:
+            t_min, t_max = min(ev_temps), max(ev_temps)
+
+            within_range = (t_min - _TEMPERATURE_TOLERANCE_C) <= query_temp_c <= (t_max + _TEMPERATURE_TOLERANCE_C)
+            if within_range:
+                context["temperature_match"] = "within"
+            else:
+                context["temperature_match"] = "extrapolation"
+                if query_temp_c < t_min:
+                    delta = t_min - query_temp_c
+                    warnings.append(
+                        f"Temperature extrapolation: query {query_temp_c:.0f}°C is "
+                        f"{delta:.0f}°C below evidence minimum ({t_min:.0f}°C). "
+                        "Cryogenic behavior may differ."
+                    )
+                else:
+                    delta = query_temp_c - t_max
+                    warnings.append(
+                        f"Temperature extrapolation: query {query_temp_c:.0f}°C is "
+                        f"{delta:.0f}°C above evidence maximum ({t_max:.0f}°C). "
+                        "Elevated-temperature embrittlement behavior may differ."
+                    )
+
+            # Regime check — cryogenic vs ambient/elevated
+            query_cryo = query_temp_c < _CRYO_BOUNDARY_C
+            evidence_has_cryo = any(t < _CRYO_BOUNDARY_C for t in ev_temps)
+            evidence_has_ambient = any(t >= _CRYO_BOUNDARY_C for t in ev_temps)
+
+            if query_cryo and not evidence_has_cryo:
+                context["regime_match"] = "mismatch"
+                warnings.append(
+                    "Thermal regime mismatch: query is cryogenic but evidence is "
+                    "ambient/elevated only. Cryogenic HEE behavior can differ significantly."
+                )
+            elif not query_cryo and not evidence_has_ambient:
+                context["regime_match"] = "mismatch"
+                warnings.append(
+                    "Thermal regime mismatch: query is ambient/elevated but evidence is "
+                    "cryogenic only."
+                )
+            else:
+                context["regime_match"] = "matched"
+
+        return context
 
     def get_all_materials(self) -> list[str]:
         """Get list of all unique material names in the evidence database."""
@@ -908,6 +1144,7 @@ def get_engine() -> H2Engine:
 def query(
     material: str,
     pressure_psi: Optional[float] = None,
+    temperature_k: Optional[float] = None,
     condition: Optional[str] = None,
 ) -> H2Result:
     """Convenience function to query H2 compatibility.
@@ -917,4 +1154,4 @@ def query(
         >>> print(result.verdict)
         prohibited
     """
-    return get_engine().query(material, pressure_psi, condition)
+    return get_engine().query(material, pressure_psi, temperature_k, condition)

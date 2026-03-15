@@ -1,0 +1,79 @@
+{
+  "generated_utc": "2026-03-04T21:43:27Z",
+  "account": {
+    "UserId": "AIDAYLVRFJR5R2KCB2DK6",
+    "Account": "574823419003",
+    "Arn": "arn:aws-us-gov:iam::574823419003:user/Administrator"
+  },
+  "regions": {
+    "us-gov-west-1": {
+      "rds_db_instances": [],
+      "rds_db_clusters": [],
+      "rds_manual_snapshots": [],
+      "rds_automated_snapshots": [],
+      "rds_manual_cluster_snapshots": [],
+      "rds_automated_cluster_snapshots": [],
+      "rds_automated_backups": [],
+      "s3_buckets": {
+        "Buckets": [],
+        "Owner": {
+          "ID": "72d141c900281c54b16fb86a16314167e15ff5104e99daccbcb05ea2d409c113"
+        },
+        "Prefix": null
+      },
+      "cloudwatch_log_groups": [],
+      "secretsmanager_names": [],
+      "ssm_parameters": [],
+      "dynamodb_tables": {
+        "TableNames": []
+      },
+      "efs_filesystems": [],
+      "fsx_filesystems": [],
+      "ebs_volumes": [],
+      "ebs_snapshots_owned": [],
+      "opensearch_domains": {
+        "DomainNames": []
+      },
+      "flow_logs": {
+        "FlowLogs": []
+      },
+      "ecr_repositories": []
+    },
+    "us-gov-east-1": {
+      "rds_db_instances": [],
+      "rds_db_clusters": [],
+      "rds_manual_snapshots": [],
+      "rds_automated_snapshots": [],
+      "rds_manual_cluster_snapshots": [],
+      "rds_automated_cluster_snapshots": [],
+      "rds_automated_backups": [],
+      "s3_buckets": {
+        "Buckets": [],
+        "Owner": {
+          "ID": "72d141c900281c54b16fb86a16314167e15ff5104e99daccbcb05ea2d409c113"
+        },
+        "Prefix": null
+      },
+      "cloudwatch_log_groups": [],
+      "secretsmanager_names": [],
+      "ssm_parameters": [],
+      "dynamodb_tables": {
+        "TableNames": []
+      },
+      "efs_filesystems": [],
+      "fsx_filesystems": [],
+      "ebs_volumes": [],
+      "ebs_snapshots_owned": [],
+      "opensearch_domains": {
+        "DomainNames": []
+      },
+      "flow_logs": {
+        "FlowLogs": []
+      },
+      "ecr_repositories": []
+    }
+  },
+  "ecs_clusters_west1": {
+    "clusterArns": []
+  }
+}

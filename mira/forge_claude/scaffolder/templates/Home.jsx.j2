@@ -1,0 +1,51 @@
+import { useState } from "react";
+{% for comp in components %}
+import {{ comp }} from "../components/{{ comp }}";
+{% endfor %}
+
+// TODO: Replace with API calls from lib/api.js
+const MOCK_COLUMNS = {{ mock_columns | tojson }};
+const MOCK_ROWS = {{ mock_rows | tojson }};
+const MOCK_FILTERS = {{ mock_filters | tojson }};
+
+export default function Home() {
+  const [results, setResults] = useState(MOCK_ROWS);
+  const [filters, setFilters] = useState({});
+
+  const handleSearch = (query) => {
+    // TODO: Call API search endpoint
+    const filtered = MOCK_ROWS.filter((row) =>
+      Object.values(row).some((v) =>
+        String(v).toLowerCase().includes(query.toLowerCase())
+      )
+    );
+    setResults(filtered);
+  };
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+    // TODO: Call API filter endpoint
+    let filtered = MOCK_ROWS;
+    for (const [key, value] of Object.entries(newFilters)) {
+      filtered = filtered.filter((row) => String(row[key]) === value);
+    }
+    setResults(filtered);
+  };
+
+  return (
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold text-gray-900">{{ title }}</h1>
+{% if 'SearchBar' in components %}
+      <SearchBar onSearch={handleSearch} placeholder="Search {{ database_name }}..." />
+{% endif %}
+      <div className="flex gap-6">
+{% if 'FilterSidebar' in components %}
+        <FilterSidebar filters={MOCK_FILTERS} onFilterChange={handleFilterChange} />
+{% endif %}
+        <div className="flex-1">
+          <ResultsTable columns={MOCK_COLUMNS} rows={results} />
+        </div>
+      </div>
+    </div>
+  );
+}

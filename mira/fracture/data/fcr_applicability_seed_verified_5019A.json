@@ -1,0 +1,222 @@
+{
+  "seed_name": "fcr_applicability_seed_verified_5019A",
+  "seed_purpose": "Verified applicability seed for rebuilding fracture applicability logic from NASA-STD-5019A w/Change 4. This file encodes baseline and conditional mappings so Atlas does not infer applicability from raw FCR ranges.",
+  "source_document": "NASA-STD-5019A w/Change 4",
+  "source_path": "/mnt/d/BoundState/BoundState_other/BoundState/docs/NASA-STD-5019A.pdf",
+  "verified_on": "2026-03-09",
+  "verified_from_pages": [
+    11,
+    12,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116,
+    117
+  ],
+  "notes": [
+    "Use this as a seed for fcr_applicability.json, not as the final classifier truth table.",
+    "FCR 9 is an NFC composite/bonded extension, not an FC requirement.",
+    "FCR 21 and FCR 22 attach to fracture-critical parts and NFC composite/bonded parts, not to all NFC metallic paths.",
+    "FCR 18 and FCR 19 are optional/conditional.",
+    "FCR 20 applies only when detected flaws are accepted for flight without repair or replacement."
+  ],
+  "classification_baselines": {
+    "EXEMPT": {
+      "required_fcrs": [
+        6
+      ],
+      "notes": [
+        "No NFC or FC downstream requirements attach once exempt classification is valid."
+      ]
+    },
+    "NFC_METALLIC_SPECIFIC": {
+      "required_fcrs": [
+        7
+      ],
+      "notes": [
+        "Use for NFC metallic hardware that qualifies under section 6.1 specific hardware paths."
+      ]
+    },
+    "NFC_METALLIC_GENERAL": {
+      "required_fcrs": [
+        8
+      ],
+      "notes": [
+        "Use for NFC metallic hardware that qualifies under section 6.2 general NFC categories."
+      ]
+    },
+    "NFC_COMPOSITE_BONDED_SPECIFIC": {
+      "required_fcrs": [
+        7,
+        9,
+        17,
+        21,
+        22
+      ],
+      "notes": [
+        "Specific NFC hardware path under section 6.1 plus the section 6.3 composite/bonded extension."
+      ]
+    },
+    "NFC_COMPOSITE_BONDED_GENERAL": {
+      "required_fcrs": [
+        8,
+        9,
+        17,
+        21,
+        22
+      ],
+      "notes": [
+        "General NFC path under section 6.2 plus the section 6.3 composite/bonded extension."
+      ]
+    },
+    "FC_SPECIFIC_HARDWARE": {
+      "required_fcrs": [
+        10,
+        11,
+        15,
+        21,
+        22,
+        23,
+        24,
+        25
+      ],
+      "notes": [
+        "Base FC path for hardware covered by section 7.2 established approaches.",
+        "Add metallic/composite NDE and optional flaw-screening subrequirements as conditionals."
+      ]
+    },
+    "FC_METALLIC_GENERAL": {
+      "required_fcrs": [
+        10,
+        12,
+        15,
+        16,
+        21,
+        22,
+        23,
+        24,
+        25
+      ],
+      "notes": [
+        "General metallic FC path for parts not covered by section 7.2 or approved optional approaches."
+      ]
+    },
+    "FC_COMPOSITE_BONDED_GENERAL": {
+      "required_fcrs": [
+        10,
+        13,
+        15,
+        17,
+        21,
+        22,
+        23,
+        24,
+        25
+      ],
+      "notes": [
+        "General composite/bonded FC path for parts not covered by section 7.2 or approved optional approaches."
+      ]
+    },
+    "FC_OPTIONAL_APPROACH": {
+      "required_fcrs": [
+        10,
+        14,
+        15,
+        21,
+        22,
+        23,
+        24,
+        25
+      ],
+      "notes": [
+        "Base FC optional path for section 7.5 cases approved by the RFCB.",
+        "Add metallic/composite NDE and flaw-screening conditionals based on actual material system and screening method."
+      ]
+    },
+    "INDETERMINATE": {
+      "required_fcrs": [],
+      "notes": [
+        "Product state only. Not an FCR classification in NASA-STD-5019A.",
+        "Conservative fallback should treat the part as fracture-critical pending evidence."
+      ]
+    }
+  },
+  "conditional_extensions": [
+    {
+      "name": "fc_metallic_nde",
+      "when": "classification is FC and material_system is metallic and NDE is the screening method",
+      "add_fcrs": [
+        16
+      ]
+    },
+    {
+      "name": "fc_composite_bonded_nde",
+      "when": "classification is FC and material_system is composite or bonded",
+      "add_fcrs": [
+        17
+      ]
+    },
+    {
+      "name": "proof_test_used",
+      "when": "proof testing is used as the flaw-screening technique",
+      "add_fcrs": [
+        18
+      ]
+    },
+    {
+      "name": "process_controls_used",
+      "when": "process controls are used to establish flaw-size bounds",
+      "add_fcrs": [
+        19
+      ]
+    },
+    {
+      "name": "detected_flaw_accepted_for_flight",
+      "when": "hardware with detected flaws is flown without repair or replacement",
+      "add_fcrs": [
+        20
+      ]
+    },
+    {
+      "name": "nfc_composite_or_bonded_extension",
+      "when": "NFC part uses composite or bonded material system",
+      "add_fcrs": [
+        9,
+        17,
+        21,
+        22
+      ]
+    }
+  ],
+  "special_rules": [
+    {
+      "rule": "nfc_low_risk_metallic",
+      "source_section": "6.2.5.a(2)",
+      "governing_fcr": 8,
+      "note": "KIc/Fty >= 0.33 sqrt(in) belongs here, not under general FCR 22."
+    },
+    {
+      "rule": "traceability_scope",
+      "source_section": "8.2",
+      "governing_fcr": 21,
+      "note": "Traceability applies to fracture-critical parts and NFC composite/bonded parts."
+    },
+    {
+      "rule": "materials_scope",
+      "source_section": "8.3",
+      "governing_fcr": 22,
+      "note": "FCR 22 applies to fracture-critical parts and NFC composite/bonded parts."
+    }
+  ]
+}

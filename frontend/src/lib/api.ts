@@ -146,6 +146,90 @@ export interface MUAResponse {
   generated_at: string;
 }
 
+export interface ForgeCompileRequest {
+  database_url: string;
+  app_name?: string;
+  sample_rows_per_table?: number;
+  persist_artifacts?: boolean;
+  output_dir?: string;
+  generate_bundle?: boolean;
+  require_llm_refinement?: boolean;
+  max_generated_questions?: number;
+}
+
+export interface ForgeCompilationSummary {
+  app_name: string;
+  database_url_redacted: string;
+  dialect: string;
+  schemas: string[];
+  table_count: number;
+  column_count: number;
+  relationship_count: number;
+  latent_relationship_count: number;
+  generated_question_count: number;
+}
+
+export interface ForgeGeneratedBundle {
+  root_dir: string;
+  artifacts_dir: string;
+  app_dir: string;
+  backend_dir: string;
+  frontend_dir: string;
+  authority_pack_dir: string;
+  bsms_pipeline_dir: string;
+  lineage_dir: string;
+  files: string[];
+}
+
+export interface ForgeCompileResponse {
+  status: 'ok';
+  summary: ForgeCompilationSummary;
+  schema_manifest: Record<string, unknown>;
+  semantic_map: Record<string, unknown>;
+  relationship_graph: Record<string, unknown>;
+  latent_relationships: Record<string, unknown>;
+  data_quality_report: Record<string, unknown>;
+  capabilities: Record<string, unknown>;
+  question_map: Record<string, unknown>;
+  scaffold_plan: Record<string, unknown>;
+  bsms_pipeline: Record<string, unknown>;
+  authority_pack: Record<string, unknown>;
+  lineage_schema: Record<string, unknown>;
+  warnings: string[];
+  output_dir?: string | null;
+  generated_bundle?: ForgeGeneratedBundle | null;
+}
+
+export interface ForgeCompileAcceptedResponse {
+  status: 'accepted';
+  job_id: string;
+  status_url: string;
+  poll_after_ms: number;
+}
+
+export interface ForgeCompileJobEvent {
+  timestamp: string;
+  status: 'queued' | 'running' | 'completed' | 'failed';
+  stage: string;
+  message: string;
+  progress: number;
+}
+
+export interface ForgeCompileJobResponse {
+  job_id: string;
+  status: 'queued' | 'running' | 'completed' | 'failed';
+  stage: string;
+  message: string;
+  progress: number;
+  created_at: string;
+  updated_at: string;
+  started_at?: string | null;
+  completed_at?: string | null;
+  error?: string | null;
+  result?: ForgeCompileResponse | null;
+  events: ForgeCompileJobEvent[];
+}
+
 // Convert Fahrenheit to Kelvin
 function fToK(f: number): number {
   return (f - 32) * 5/9 + 273.15;
@@ -1064,11 +1148,18 @@ export async function exportMPPlanJson(sessionId: string): Promise<Record<string
  * List vehicle presets.
  */
 export async function listMPPlanVehiclePresets(): Promise<{ presets: MPPlanVehiclePreset[] }> {
-  const response = await fetch(`${API_BASE}/mp-plan/vehicle-presets`);
-  if (!response.ok) {
-    throw new Error(`Failed to list vehicle presets: ${response.statusText}`);
+  // Prefer v2 endpoint (same namespace as the rest of MP Plan v2 API), then
+  // fall back to legacy path for older backend builds.
+  const v2Response = await fetch(`${API_BASE}/mp-plan/v2/vehicle-presets`);
+  if (v2Response.ok) {
+    return v2Response.json();
   }
-  return response.json();
+
+  const legacyResponse = await fetch(`${API_BASE}/mp-plan/vehicle-presets`);
+  if (!legacyResponse.ok) {
+    throw new Error(`Failed to list vehicle presets: ${legacyResponse.statusText}`);
+  }
+  return legacyResponse.json();
 }
 
 /**
@@ -1239,14 +1330,21 @@ export type OCAFlowRegime = 'static' | 'laminar' | 'turbulent';
 export type OCAMissionPhase = 'ground_test' | 'ascent' | 'on_orbit' | 'servicing';
 export type OCAComponentClass = 'valve' | 'regulator' | 'line' | 'vessel' | 'seal' | 'filter' | 'sensor' | 'fitting' | 'flex_hose' | 'other';
 export type OCAGeometryClass = 'bulk' | 'thin_wall' | 'mesh' | 'porous' | 'sintered' | 'seal' | 'other';
-export type OCAFlammabilityRating = 'A' | 'B' | 'C' | 'D' | 'X' | 'unknown';
-export type OCACredibleStatus = 'credible' | 'not_credible' | 'indeterminate';
-export type OCAReactionEffect = 'A' | 'B' | 'C' | 'D';
-export type OCADisposition = 'compatible_as_configured' | 'compatible_with_controls' | 'requires_mua' | 'requires_acceptance_test' | 'requires_supplemental_testing' | 'insufficient_evidence';
-export type OCARuleTier = 'A' | 'B' | 'C' | 'D';
+export type OCAFlammabilityRating = 'A' | 'B' | 'C' | 'D' | 'X' | 'U' | 'unknown';
+export type OCACredibleStatus = 'CREDIBLE' | 'NOT_CREDIBLE' | 'INDETERMINATE';
+export type OCADisposition =
+  | 'compatible_as_configured'
+  | 'compatible_with_controls'
+  | 'requires_mua'
+  | 'requires_acceptance_test'
+  | 'requires_supplemental_testing'
+  | 'insufficient_evidence'
+  | 'prohibited';
+export type OCARuleTier = 'tier_a' | 'tier_b' | 'tier_c' | 'tier_d';
+export type OCARequirementStatus = 'not_triggered' | 'satisfied' | 'action_required' | 'prohibited';
+export type OCAApplicabilityClass = 'DIRECT' | 'PARTIAL' | 'WEAK_ANALOG' | 'NOT_APPLICABLE';
 
 export interface OCAServiceContext {
-  case_id?: string;
   oxidizer_type: OCAOxidizerType;
   o2_fraction: number;
   total_pressure_min_psia: number;
@@ -1257,15 +1355,17 @@ export interface OCAServiceContext {
   temp_max_c?: number | null;
   flow_regime: OCAFlowRegime;
   velocity_m_s?: number | null;
-  cleanliness_verified: boolean;
+  cleanliness_verified?: boolean | null;
   contamination_notes?: string | null;
-  mission_phase: OCAMissionPhase;
+  mission_phase?: OCAMissionPhase | null;
+  application?: string | null;
 }
 
 export interface OCAComponent {
   component_id?: string;
   component_class: OCAComponentClass;
   geometry_class: OCAGeometryClass;
+  design_function: string;
   dynamic_contact_flag: boolean;
   is_rigid_metallic_tubing: boolean;
   is_metallic_flex_hose: boolean;
@@ -1276,80 +1376,126 @@ export interface OCAComponent {
 }
 
 export interface OCAMaterial {
-  material_instance_id?: string;
   material_name: string;
-  canonical_name?: string | null;
   spec?: string | null;
   grade?: string | null;
   temper?: string | null;
   product_form?: string | null;
   coating?: string | null;
+  surface_condition?: string | null;
   role_in_component?: string | null;
+}
+
+export interface OCAIgnitionContext {
+  entrainable_particles_present?: boolean | null;
+  rapid_pressurization_time_ms?: number | null;
+  dead_end_configuration?: boolean | null;
+  nonmetal_exposed_to_flow?: boolean | null;
+  vibration_or_erosion_present?: boolean | null;
+  acoustic_cavity_present?: boolean | null;
+  mechanical_impact_risk?: boolean | null;
+  isolated_surface_present?: boolean | null;
+  dry_gas_environment?: boolean | null;
+  electrical_power_present?: boolean | null;
+  reactive_chemical_pair_present?: boolean | null;
+  porous_media_present?: boolean | null;
+  open_flame_or_hot_work_present?: boolean | null;
+}
+
+export interface OCAResolvedMaterial extends OCAMaterial {
+  canonical_name: string;
+  family: string;
   identity_confidence: number;
-  flammability_rating: OCAFlammabilityRating;
-  is_titanium: boolean;
-  is_nonmetal: boolean;
+  synonym_list: string[];
+  rating_flam?: string | null;
+  o2_test_count: number;
+  max_tested_pressure_psia?: number | null;
+  data_source: string;
 }
 
 export interface OCABlockedState {
-  state_type: string;
-  description: string;
-  missing_fields: string[];
+  code: string;
+  detail: string;
   resolution_hint: string;
+  severity: string;
+}
+
+export interface OCAPrecheckWarning {
+  code: string;
+  message: string;
 }
 
 export interface OCATriggeredRequirement {
   requirement_id: string;
-  source_standard: string;
-  section: string;
   title: string;
+  citation: string;
   tier: OCARuleTier;
-  satisfied: boolean;
-  satisfaction_basis: string;
-  is_prohibition: boolean;
-  prohibition_detail?: string | null;
+  triggered: boolean;
+  status: OCARequirementStatus;
+  reasoning: string;
+  evidence_links: string[];
+  downstream_actions: string[];
+}
+
+export interface OCAEvidenceApplicability {
+  exact_material_match: boolean;
+  spec_match: boolean;
+  form_match: boolean;
+  geometry_match: boolean;
+  pressure_match: boolean;
+  o2_fraction_match: boolean;
+  phase_match: boolean;
+  temperature_match: boolean;
+  coating_match: boolean;
+  method_relevance: boolean;
+  aggregate_score: number;
+  applicability_class: OCAApplicabilityClass;
+}
+
+export interface OCAEvidenceCard {
+  evidence_id: string;
+  material_name: string;
+  source_id: string;
+  title: string;
+  citation: string;
+  tier: OCARuleTier;
+  summary: string;
+  test_method?: string | null;
+  specimen_description?: string | null;
+  test_conditions?: string | null;
+  result?: string | null;
+  applicability: OCAEvidenceApplicability;
+  gaps: string[];
 }
 
 export interface OCAMechanismTrace {
   mechanism_name: string;
   source_ref: string;
+  required_elements: string[];
+  observed_elements: string[];
+  missing_elements: string[];
+  rating_formula_version: string;
+  rating_result: number;
+  reviewer_comments: string[];
+}
+
+export interface OCAMechanismAssessment {
+  mechanism_name: string;
   credible_status: OCACredibleStatus;
   rating: number;
+  source_ref: string;
   required_elements: string[];
   observed_elements: string[];
   missing_elements: string[];
   linked_evidence_ids: string[];
-  controls_required: string[];
-  reviewer_comments: string[];
+  gaps_identified: string[];
+  mechanism_trace: OCAMechanismTrace;
 }
 
-export interface OCAKindlingChain {
-  kindling_chain_present: boolean;
-  propagation_path: string[];
-  reaction_effect: OCAReactionEffect;
+export interface OCADecisionAction {
+  action_id: string;
+  label: string;
   rationale: string;
-}
-
-export interface OCAHazardControl {
-  component_ref: string;
-  ignition_hazard: string;
-  probability_rating: number;
-  reaction_effect: OCAReactionEffect;
-  recommendation: string;
-  recommendation_class: string;
-  affected_mechanisms: string[];
-  confidence: string;
-  status: string;
-}
-
-export interface OCAMUASeed {
-  material_identity: string;
-  service_conditions: string;
-  trigger_reason: string;
-  mechanism_summary: string;
-  gaps: string[];
-  rationale_draft: string;
-  assumptions: string[];
 }
 
 export interface OCADecisionPacket {
@@ -1359,74 +1505,141 @@ export interface OCADecisionPacket {
   blocked_states: OCABlockedState[];
   unresolved_gaps: string[];
   kindling_chain_present: boolean;
-  reaction_effect: OCAReactionEffect;
+  reaction_effect?: string | null;
   history_of_use: string;
-  mua_seed?: OCAMUASeed | null;
+  mua_seed: Record<string, unknown>;
   acceptance_test_required: boolean;
   reviewer_required: boolean;
+  overall_confidence: string;
+  authority_level: OCARuleTier;
+  governing_prohibition?: string | null;
   summary_rationale: string;
-  mechanism_assessments: OCAMechanismTrace[];
-  hazard_controls: OCAHazardControl[];
-  kindling_chain?: OCAKindlingChain | null;
+  actions: OCADecisionAction[];
 }
 
 export interface OCACreateCaseRequest {
+  case_name?: string | null;
+  free_text_intake?: string | null;
   service_context: OCAServiceContext;
-  component: OCAComponent;
   materials: OCAMaterial[];
+  components: OCAComponent[];
+  ignition_context?: OCAIgnitionContext;
+}
+
+export interface OCANormalizedInput {
+  service_context: OCAServiceContext;
+  materials: OCAResolvedMaterial[];
+  components: OCAComponent[];
+  ignition_context: OCAIgnitionContext;
 }
 
 export interface OCACreateCaseResponse {
   case_id: string;
+  revision: number;
+  normalized_input: OCANormalizedInput;
   blocked_states: OCABlockedState[];
-  precheck_warnings: string[];
-  normalized_context: OCAServiceContext;
-  normalized_materials: OCAMaterial[];
+  precheck_warnings: OCAPrecheckWarning[];
 }
 
 export interface OCAPrecheckResponse {
   case_id: string;
+  revision: number;
+  blocked_states: OCABlockedState[];
   triggered_requirements: OCATriggeredRequirement[];
-  prohibitions: OCATriggeredRequirement[];
-  acceptance_test_required: boolean;
-  acceptance_test_exempt: boolean;
-  exemption_reason?: string | null;
+  precheck_warnings: OCAPrecheckWarning[];
+}
+
+export interface OCAEvidenceResponse {
+  case_id: string;
+  revision: number;
+  evidence: OCAEvidenceCard[];
+  gaps: string[];
 }
 
 export interface OCAMechanismResponse {
   case_id: string;
-  mechanism_assessments: OCAMechanismTrace[];
-  credible_count: number;
-  indeterminate_count: number;
+  revision: number;
+  mechanisms: OCAMechanismAssessment[];
 }
 
 export interface OCADecisionResponse {
   case_id: string;
+  revision: number;
   decision: OCADecisionPacket;
 }
 
-export interface OCAAdiabaticResult {
-  ti_k: number;
-  pi_psia: number;
-  pf_psia: number;
-  gamma: number;
-  tf_k: number;
-  tf_c: number;
-  tf_f: number;
+export interface OCARevision {
+  revision: number;
+  created_at: string;
+  note: string;
 }
 
-/**
- * OCA health check.
- */
-export async function ocaPing(): Promise<{ status: string; domain: string; version: string }> {
+export interface OCARuleTraceEvent {
+  stage: string;
+  rule_id: string;
+  tier: OCARuleTier;
+  outcome: string;
+  detail: string;
+  recorded_at: string;
+}
+
+export interface OCARequirementsResponse {
+  case_id: string;
+  revision: number;
+  requirements: OCATriggeredRequirement[];
+}
+
+export interface OCALineageResponse {
+  case_id: string;
+  revision: number;
+  revisions: OCARevision[];
+  decision_lineage: OCARuleTraceEvent[];
+}
+
+export interface OCAAuthoritySource {
+  source_id: string;
+  title: string;
+  edition: string;
+  change_number?: string | null;
+  publication_date: string;
+  checksum: string;
+  ingest_date: string;
+}
+
+export interface OCAAuthorityManifest {
+  spec_id: string;
+  approved_on: string;
+  sources: OCAAuthoritySource[];
+}
+
+export interface OCAExportArtifact {
+  artifact_type: string;
+  filename: string;
+  content_type: string;
+  generated_text: string;
+}
+
+export interface OCAExportResponse {
+  case_id: string;
+  revision: number;
+  artifacts: OCAExportArtifact[];
+}
+
+export async function ocaPing(): Promise<{ status: string; domain: string }> {
   const response = await fetch(`${API_BASE}/oca/ping`);
   if (!response.ok) throw new Error(`OCA ping failed: ${response.statusText}`);
   return response.json();
 }
 
-/**
- * Create a new OCA case.
- */
+export async function ocaGetAuthority(): Promise<OCAAuthorityManifest> {
+  const response = await fetch(`${API_BASE}/oca/authority`);
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `OCA authority lookup failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
 export async function ocaCreateCase(req: OCACreateCaseRequest): Promise<OCACreateCaseResponse> {
   const response = await fetch(`${API_BASE}/oca/cases`, {
     method: 'POST',
@@ -1440,24 +1653,6 @@ export async function ocaCreateCase(req: OCACreateCaseRequest): Promise<OCACreat
   return response.json();
 }
 
-/**
- * Run full OCA assessment and get decision.
- */
-export async function ocaRunDecision(caseId: string): Promise<OCADecisionResponse> {
-  const response = await fetch(`${API_BASE}/oca/cases/${caseId}/decision`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.detail || `OCA decision failed: ${response.statusText}`);
-  }
-  return response.json();
-}
-
-/**
- * Get OCA precheck (requirement triggers).
- */
 export async function ocaPrecheck(caseId: string): Promise<OCAPrecheckResponse> {
   const response = await fetch(`${API_BASE}/oca/cases/${caseId}/precheck`, {
     method: 'POST',
@@ -1470,9 +1665,18 @@ export async function ocaPrecheck(caseId: string): Promise<OCAPrecheckResponse> 
   return response.json();
 }
 
-/**
- * Assess ignition mechanisms.
- */
+export async function ocaGetEvidence(caseId: string): Promise<OCAEvidenceResponse> {
+  const response = await fetch(`${API_BASE}/oca/cases/${caseId}/evidence`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `OCA evidence lookup failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
 export async function ocaAssessMechanisms(caseId: string): Promise<OCAMechanismResponse> {
   const response = await fetch(`${API_BASE}/oca/cases/${caseId}/mechanisms`, {
     method: 'POST',
@@ -1485,49 +1689,40 @@ export async function ocaAssessMechanisms(caseId: string): Promise<OCAMechanismR
   return response.json();
 }
 
-/**
- * Adiabatic compression calculator.
- */
-export async function ocaAdiabaticCalc(
-  ti_k: number, pi_psia: number, pf_psia: number, gamma?: number
-): Promise<OCAAdiabaticResult> {
-  const params = new URLSearchParams({
-    ti_k: String(ti_k),
-    pi_psia: String(pi_psia),
-    pf_psia: String(pf_psia),
+export async function ocaRunDecision(caseId: string): Promise<OCADecisionResponse> {
+  const response = await fetch(`${API_BASE}/oca/cases/${caseId}/decision`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
   });
-  if (gamma) params.set('gamma', String(gamma));
-  const response = await fetch(`${API_BASE}/oca/adiabatic-calc?${params}`, { method: 'POST' });
-  if (!response.ok) throw new Error(`Adiabatic calc failed: ${response.statusText}`);
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `OCA decision failed: ${response.statusText}`);
+  }
   return response.json();
 }
 
-/**
- * List available ignition mechanisms.
- */
-export async function ocaListMechanisms(): Promise<{
-  mechanisms: Array<{
-    name: string;
-    display_name: string;
-    source_ref: string;
-    description: string;
-    characteristic_elements: string[];
-  }>;
-  total: number;
-}> {
-  const response = await fetch(`${API_BASE}/oca/mechanisms`);
-  if (!response.ok) throw new Error(`Failed to list mechanisms: ${response.statusText}`);
+export async function ocaGetRequirements(caseId: string): Promise<OCARequirementsResponse> {
+  const response = await fetch(`${API_BASE}/oca/cases/${caseId}/requirements`);
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `OCA requirements lookup failed: ${response.statusText}`);
+  }
   return response.json();
 }
 
-/**
- * Export OCA artifacts.
- */
-export async function ocaExport(caseId: string): Promise<Record<string, unknown>> {
+export async function ocaGetLineage(caseId: string): Promise<OCALineageResponse> {
+  const response = await fetch(`${API_BASE}/oca/cases/${caseId}/lineage`);
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `OCA lineage lookup failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+export async function ocaExport(caseId: string): Promise<OCAExportResponse> {
   const response = await fetch(`${API_BASE}/oca/cases/${caseId}/export`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ case_id: caseId }),
   });
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
@@ -1763,6 +1958,129 @@ export async function v4SchemaValidate(): Promise<V4SchemaValidationResponse> {
   return response.json();
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchJsonWithTimeout(input: string, init: RequestInit, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(input, {
+      ...init,
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+export async function forgeCompileStart(req: ForgeCompileRequest): Promise<ForgeCompileAcceptedResponse> {
+  const response = await fetchJsonWithTimeout(
+    `${API_BASE}/forge/compile`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req),
+    },
+    30_000,
+  );
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `FORGE compile failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function forgeCompileStatus(jobId: string): Promise<ForgeCompileJobResponse> {
+  const response = await fetchJsonWithTimeout(
+    `${API_BASE}/forge/compile/${jobId}`,
+    { method: 'GET' },
+    30_000,
+  );
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `FORGE compile status failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function forgeCompile(
+  req: ForgeCompileRequest,
+  options?: {
+    timeoutMs?: number;
+    pollIntervalMs?: number;
+    onProgress?: (job: ForgeCompileJobResponse) => void;
+  },
+): Promise<ForgeCompileResponse> {
+  const accepted = await forgeCompileStart(req);
+  const timeoutMs = options?.timeoutMs ?? 0;
+  const deadline = timeoutMs > 0 ? Date.now() + timeoutMs : Number.POSITIVE_INFINITY;
+  const pollIntervalMs = options?.pollIntervalMs ?? accepted.poll_after_ms ?? 1500;
+
+  while (Date.now() < deadline) {
+    const job = await forgeCompileStatus(accepted.job_id);
+    options?.onProgress?.(job);
+
+    if (job.status === 'completed') {
+      if (!job.result) {
+        throw new Error('FORGE compile completed without a result payload.');
+      }
+      return job.result;
+    }
+
+    if (job.status === 'failed') {
+      throw new Error(job.error || job.message || 'FORGE compile failed.');
+    }
+
+    await sleep(pollIntervalMs);
+  }
+
+  throw new Error('FORGE compile timed out before completion.');
+}
+
+export interface ForgeBSMSQueryRequest {
+  query: string;
+  question_map: Record<string, unknown>;
+  database_url?: string;
+  bsms_pipeline: Record<string, unknown>;
+  authority_pack: Record<string, unknown>;
+  limit?: number;
+  require_llm?: boolean;
+  persist_lineage?: boolean;
+  lineage_dir?: string;
+}
+
+export interface ForgeBSMSQueryResponse {
+  status: string;
+  pipeline: string;
+  bouncer: Record<string, unknown>;
+  parsed_intent?: Record<string, unknown> | null;
+  rules?: Record<string, unknown> | null;
+  answer: string;
+  lineage: Record<string, unknown>;
+}
+
+export async function forgeBSMSQuery(req: ForgeBSMSQueryRequest): Promise<ForgeBSMSQueryResponse> {
+  const response = await fetch(`${API_BASE}/forge/bsms/query`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `BSMS query failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
 // ============================================================================
 // BSMH (Temp) API
 // ============================================================================
@@ -1877,6 +2195,348 @@ export async function bsmhQuery(req: BSMHQueryRequest): Promise<BSMHQueryRespons
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
     throw new Error(error.detail || `BSMH query failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export interface GalvanicMaterialStateBand {
+  state: string;
+  representative_potential_mv_sce: number;
+}
+
+export interface GalvanicResolvedMaterial {
+  query: string;
+  canonical_name: string;
+  family: string;
+  chosen_state: string;
+  representative_potential_mv_sce: number;
+  potential_range_mv_sce: [number, number];
+  possible_states: GalvanicMaterialStateBand[];
+  source_type: string;
+}
+
+export interface GalvanicMitigationRecommendation {
+  mitigation_id: string;
+  name: string;
+  mechanism: string;
+  mitigation_class: string;
+  boundstate_priority: number;
+  description: string;
+  source_clauses: string[];
+  standards: string[];
+  restrictions: string[];
+  notes: string[];
+  coat_cathode_warning: boolean;
+  trigger_reason: string;
+}
+
+export interface GalvanicAssessmentRequest {
+  material_a: string;
+  material_b: string;
+  environment:
+    | 'seawater_proxy'
+    | 'coastal_condensing'
+    | 'industrial_atm'
+    | 'rural_atm'
+    | 'crew_condensing'
+    | 'dry_indoor'
+    | 'cryogenic_ops'
+    | 'space_vacuum';
+  application_type:
+    | 'FLIGHT_HARDWARE'
+    | 'SPACECRAFT_STRUCTURE'
+    | 'GROUND_SUPPORT_EQUIPMENT'
+    | 'LAUNCH_STRUCTURE'
+    | 'FIXED_INSTALLATION';
+  surface_condition_a?: string | null;
+  surface_condition_b?: string | null;
+  couple_context?: {
+    electrical_contact?: 'YES' | 'NO' | 'UNKNOWN';
+    electrolyte_pooling?: boolean;
+    joint_type?: 'FAYING_SURFACE' | 'FASTENER' | 'LAP_JOINT' | 'CREVICE_PRONE' | 'IMMERSED' | 'GENERAL';
+    cathode_to_anode_area_ratio?: number | null;
+  };
+}
+
+export interface GalvanicAssessmentResponse {
+  severity: 'COMPATIBLE' | 'CAUTION' | 'INCOMPATIBLE';
+  raw_delta_mv: number;
+  effective_delta_mv: number;
+  decision_basis: 'NASA_STD_6012A_CPR39' | 'BOUNDSTATE_SYNTHESIZED' | 'NO_ELECTRICAL_CONTACT' | 'NO_ELECTROLYTE';
+  screening_disclaimer: string;
+  environment: string;
+  environment_modifier: number;
+  application_type: string;
+  anode: string;
+  cathode: string;
+  material_a: GalvanicResolvedMaterial;
+  material_b: GalvanicResolvedMaterial;
+  warnings: string[];
+  mitigations: GalvanicMitigationRecommendation[];
+  source_manifest_version: string;
+}
+
+export interface GalvanicEnvironmentDescriptor {
+  key: string;
+  label: string;
+  modifier: number;
+  notes: string;
+}
+
+export interface GalvanicMaterialSearchResult {
+  canonical_name: string;
+  family: string;
+  aliases: string[];
+}
+
+export interface GalvanicSeriesRecord {
+  id: string;
+  variant_group: string;
+  canonical_name: string;
+  name: string;
+  primary: boolean;
+  family: string;
+  state: string;
+  aliases: string[];
+  potential_range_mv_sce: [number, number];
+  representative_potential_mv_sce: number;
+  source_type: string;
+  source_documents: string[];
+}
+
+export interface GalvanicSeriesPayload {
+  module: string;
+  dataset: string;
+  version: string;
+  extraction_status: string;
+  minimum_expected_records: number;
+  reference_environment: {
+    label: string;
+    conditions: string;
+    reference_electrode: string;
+  };
+  source_priority: Array<{
+    priority: string;
+    source: string;
+    path: string;
+  }>;
+  records: GalvanicSeriesRecord[];
+}
+
+export async function galvanicEvaluate(
+  req: GalvanicAssessmentRequest,
+  headers?: HeadersInit,
+): Promise<GalvanicAssessmentResponse> {
+  const response = await fetch(`${API_BASE}/mira/galvanic/evaluate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...(headers || {}) },
+    body: JSON.stringify(req),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Galvanic assessment failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function galvanicListEnvironments(
+  headers?: HeadersInit,
+): Promise<GalvanicEnvironmentDescriptor[]> {
+  const response = await fetch(`${API_BASE}/mira/galvanic/environments`, { headers });
+
+  if (!response.ok) {
+    throw new Error(`Failed to load galvanic environments: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function galvanicSearchMaterials(
+  q: string,
+  headers?: HeadersInit,
+): Promise<GalvanicMaterialSearchResult[]> {
+  const params = new URLSearchParams({ q });
+  const response = await fetch(`${API_BASE}/mira/galvanic/materials/search?${params.toString()}`, {
+    headers,
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Galvanic material search failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function galvanicGetSeries(headers?: HeadersInit): Promise<GalvanicSeriesPayload> {
+  const response = await fetch(`${API_BASE}/mira/galvanic/series`, { headers });
+
+  if (!response.ok) {
+    throw new Error(`Failed to load galvanic source dataset: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export interface FractureCitation {
+  fcr?: number | null;
+  title: string;
+  section: string;
+  source_document: string;
+  source_path: string;
+  source_pages: number[];
+  summary: string;
+}
+
+export interface FractureRequirementSummary {
+  fcr: number;
+  category: string;
+  title: string;
+  section: string;
+  description: string;
+  phase_1_relevant: boolean;
+  notes?: string | null;
+  citation: FractureCitation;
+}
+
+export interface FractureResolvedMaterial {
+  query: string;
+  canonical_name: string;
+  material_system: 'METALLIC' | 'COMPOSITE' | 'BONDED' | 'CERAMIC' | 'OTHER';
+  family: string;
+  aliases: string[];
+}
+
+export interface FractureMaterialFinding {
+  finding_id: string;
+  status: 'PASS' | 'CAUTION' | 'FAIL' | 'INFO' | 'DATA_GAP';
+  title: string;
+  detail: string;
+  governing_fcrs: number[];
+  source_clauses: string[];
+  data_provided: string[];
+  citations: FractureCitation[];
+}
+
+export interface FractureMaterialContext {
+  low_risk_candidate?: boolean;
+  additive_manufactured?: boolean;
+  kic_fty_ratio?: number | null;
+  ftu_ksi?: number | null;
+  short_transverse_dimension_in?: number | null;
+  chloride_exposure?: boolean;
+  sustained_load_expected?: boolean;
+  nasa_std_6016_qualified?: boolean | null;
+  mua_present?: boolean;
+  approved_source_data_attached?: boolean;
+}
+
+export interface FractureAssessmentRequest {
+  part_name: string;
+  mission_class: 'HUMAN_RATED' | 'CARGO' | 'EXPERIMENTAL' | 'GSE' | 'GROUND_SUPPORT';
+  hazard_consequence: 'CATASTROPHIC' | 'CRITICAL' | 'MARGINAL' | 'NEGLIGIBLE' | 'UNKNOWN';
+  load_path_type: 'SINGLE' | 'REDUNDANT' | 'UNKNOWN';
+  pressure_boundary: boolean;
+  lifecycle_phase?: 'NEW_BUILD' | 'REFLIGHT';
+  structural_role: 'PRIMARY' | 'SECONDARY' | 'NON_STRUCTURAL';
+  material_system: 'METALLIC' | 'COMPOSITE' | 'BONDED' | 'CERAMIC' | 'OTHER';
+  specific_hardware_type:
+    | 'GENERAL'
+    | 'FASTENER'
+    | 'SHATTERABLE'
+    | 'ROTATING_HARDWARE'
+    | 'SEALED_CONTAINER'
+    | 'TOOLS_TETHERS'
+    | 'BATTERY'
+    | 'PRESSURE_VESSEL'
+    | 'COPV'
+    | 'PRESSURIZED_COMPONENT'
+    | 'HABITABLE_STRUCTURE'
+    | 'PRESSURIZED_STRUCTURE';
+  material_name?: string | null;
+  optional_approach_requested?: boolean;
+  proof_test_used?: boolean;
+  process_controls_used?: boolean;
+  detected_flaw_accepted_for_flight?: boolean;
+  corrosion_iccp_recommended?: boolean;
+  material_context?: FractureMaterialContext;
+}
+
+export interface FractureAssessmentResponse {
+  classification: 'EXEMPT' | 'NFC_METALLIC' | 'NFC_COMPOSITE_BONDED' | 'FC' | 'INDETERMINATE';
+  baseline_key: string;
+  confidence_state: 'CONFIDENT' | 'INDETERMINATE' | 'CONSERVATIVE_FALLBACK';
+  screening_basis: string;
+  applicable_fcrs: number[];
+  requirements: FractureRequirementSummary[];
+  required_actions: string[];
+  required_documents: string[];
+  resolved_material?: FractureResolvedMaterial | null;
+  material_findings: FractureMaterialFinding[];
+  warnings: string[];
+  unresolved_inputs: string[];
+  conservative_fallback?: string | null;
+  citations: FractureCitation[];
+  source_manifest_version: string;
+}
+
+export interface FractureAuthorityManifest {
+  version: string;
+  total_fcrs: number;
+  baseline_count: number;
+  conditional_extension_count: number;
+  special_rule_count: number;
+  sources: Array<{
+    document: string;
+    path: string;
+  }>;
+}
+
+export interface FractureMaterialSearchResult {
+  canonical_name: string;
+  material_system: 'METALLIC' | 'COMPOSITE' | 'BONDED' | 'CERAMIC' | 'OTHER';
+  family: string;
+  aliases: string[];
+}
+
+export async function fractureClassify(
+  req: FractureAssessmentRequest,
+): Promise<FractureAssessmentResponse> {
+  const response = await fetch(`${API_BASE}/mira/fracture/classify`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Fracture assessment failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function fractureGetAuthority(): Promise<FractureAuthorityManifest> {
+  const response = await fetch(`${API_BASE}/mira/fracture/authority`);
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Fracture authority lookup failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function fractureSearchMaterials(q: string): Promise<FractureMaterialSearchResult[]> {
+  const params = new URLSearchParams({ q });
+  const response = await fetch(`${API_BASE}/mira/fracture/materials/search?${params.toString()}`);
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Fracture material search failed: ${response.statusText}`);
   }
 
   return response.json();

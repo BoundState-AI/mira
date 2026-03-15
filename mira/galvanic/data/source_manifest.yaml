@@ -1,0 +1,61 @@
+module: galvanic
+version: 0.1.0
+generated_on: 2026-03-09
+source_root: D:\BoundState\docs\Galvanic
+notes:
+  - CRC source images currently reside directly under docs/Galvanic.
+  - No CRC_source subfolder exists in the current workspace snapshot.
+  - Phase 1 outputs included here are source-backed where the source text was directly verified locally.
+sources:
+  crc_handbook_images:
+    description: CRC Handbook 60th edition image captures used for galvanic series and electrochemical series reference.
+    files:
+      - D:\BoundState\docs\Galvanic\IMG_5949.jpg
+      - D:\BoundState\docs\Galvanic\IMG_5950.jpg
+      - D:\BoundState\docs\Galvanic\IMG_5951.jpg
+      - D:\BoundState\docs\Galvanic\IMG_5952.jpg
+      - D:\BoundState\docs\Galvanic\IMG_5953.jpg
+      - D:\BoundState\docs\Galvanic\IMG_5954.jpg
+      - D:\BoundState\docs\Galvanic\IMG_5955.jpg
+      - D:\BoundState\docs\Galvanic\IMG_5956.jpg
+      - D:\BoundState\docs\Galvanic\IMG_5957.jpg
+      - D:\BoundState\docs\Galvanic\IMG_5958.jpg
+  nasa_std_6012a:
+    file: D:\BoundState\docs\Galvanic\NASA-STD-6012A  corrsion protection for spacecraft.pdf
+    verified_sections:
+      - 4.9.1 CPR 30
+      - 4.9.2 CPR 31-35
+      - 4.9.4 CPR 39-41
+      - Table 1 Compatible Couples in Seawater
+  mil_std_889d:
+    file: D:\BoundState\docs\Galvanic\MIL-STD-889D galvanic compatibility.pdf
+    verified_sections:
+      - 1.3 Methodology
+      - 5.1 Galvanic compatibility
+      - 5.4 Protection of galvanically incompatible materials
+      - 5.5 Anode to cathode area ratio
+      - 5.10 Magnesium
+      - Appendix A.4.4 Treatment for cadmium or beryllium
+      - Appendix A.4.5 Treatment for aluminum and aluminum alloys
+      - Appendix A.4.6 Treatment for carbon and low alloy steels
+      - Appendix A.4.7 Treatment for titanium and titanium alloys
+      - Appendix A.4.8 Treatment for electrically conductive composites
+      - Appendix A.4.9 Treatment for graphite
+      - Appendix A.4.10 Treatment for stainless steels
+  nasa_std_6016c:
+    file: D:\BoundState\docs\Galvanic\NASA-STD-6016C.pdf
+    verified_sections:
+      - MPR 77 Cadmium shall not be used in crew or vacuum environments
+      - MPR 78 Cadmium-plated tools and hardware restriction
+      - MPR 79 Zinc plating restriction for mission-critical spaceflight hardware
+      - MPR 189 Corrosion prevention and control
+outputs:
+  - path: mira/galvanic/data/galvanic_series.json
+    status: scaffolded_pending_primary_extraction
+  - path: mira/galvanic/data/nasa_table1_groups.json
+    status: populated_from_verified_primary_source
+  - path: mira/galvanic/data/galvanic_mitigations.json
+    status: populated_from_verified_primary_sources_and_product_rules
+review_required:
+  - Decide whether Atlas will use the drag-to-goal interaction or a simpler mitigation picker before C-8.
+  - Resolve full galvanic series extraction from CRC images into galvanic_series.json records.

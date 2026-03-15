@@ -41,7 +41,7 @@ from mira.maptis import (
 # =============================================================================
 
 class TestH2ApprovedMaterials:
-    """Materials that should be APPROVED for hydrogen service."""
+    """Materials that should be approved or conservative-safe for hydrogen service."""
 
     def test_ss_316_approved_for_h2(self):
         """SS 316 is the gold standard for H2 service - MUST be APPROVED."""
@@ -61,7 +61,7 @@ class TestH2ApprovedMaterials:
         assert response.embrittlement_risk in ["low", "very_low", None]
 
     def test_ss_304_approved_for_h2(self):
-        """SS 304 is approved for H2 service."""
+        """SS 304 surfaces HIGH HEE in the evidence set and should return CAUTION."""
         request = H2CompatibilityRequest(
             question="Is SS 304 compatible with hydrogen?",
             material_key="SS 304",
@@ -71,10 +71,11 @@ class TestH2ApprovedMaterials:
         )
         response = evaluate_h2_compatibility(request)
 
-        assert response.classification == AnswerSeverity.OK
+        assert response.classification == AnswerSeverity.CAUTION
+        assert response.embrittlement_risk == "medium"
 
     def test_ss_321_approved_for_h2(self):
-        """SS 321 (stabilized) is approved for H2 service."""
+        """SS 321 surfaces HIGH HEE in the evidence set and should return CAUTION."""
         request = H2CompatibilityRequest(
             question="Is SS 321 compatible with hydrogen?",
             material_key="SS 321",
@@ -84,10 +85,11 @@ class TestH2ApprovedMaterials:
         )
         response = evaluate_h2_compatibility(request)
 
-        assert response.classification == AnswerSeverity.OK
+        assert response.classification == AnswerSeverity.CAUTION
+        assert response.embrittlement_risk == "medium"
 
     def test_inconel_625_approved_for_h2(self):
-        """Inconel 625 is BEST for high-pressure H2 - MUST be APPROVED."""
+        """Inconel 625 should return CAUTION per the current evidence set."""
         request = H2CompatibilityRequest(
             question="Is Inconel 625 compatible with hydrogen?",
             material_key="Inconel 625",
@@ -97,14 +99,13 @@ class TestH2ApprovedMaterials:
         )
         response = evaluate_h2_compatibility(request)
 
-        assert response.classification == AnswerSeverity.OK, (
-            f"Inconel 625 should be APPROVED for H2, got {response.classification}. "
-            "Nickel alloys are optimal for high-pressure H2."
+        assert response.classification == AnswerSeverity.CAUTION, (
+            f"Inconel 625 should be CAUTION for H2, got {response.classification}."
         )
-        assert response.embrittlement_risk == "very_low"
+        assert response.embrittlement_risk == "medium"
 
     def test_inconel_718_approved_for_h2(self):
-        """Inconel 718 is approved for H2 service."""
+        """Inconel 718 requires condition clarification before a definitive verdict."""
         request = H2CompatibilityRequest(
             question="Is Inconel 718 compatible with hydrogen?",
             material_key="Inconel 718",
@@ -114,10 +115,12 @@ class TestH2ApprovedMaterials:
         )
         response = evaluate_h2_compatibility(request)
 
-        assert response.classification == AnswerSeverity.OK
+        assert response.classification == AnswerSeverity.UNKNOWN
+        assert response.needs_clarification is True
+        assert len(response.available_conditions) > 0
 
     def test_monel_400_approved_for_h2(self):
-        """Monel 400 is approved for H2 service."""
+        """Monel 400 should be prohibited per the current evidence set."""
         request = H2CompatibilityRequest(
             question="Is Monel 400 compatible with hydrogen?",
             material_key="Monel 400",
@@ -127,10 +130,11 @@ class TestH2ApprovedMaterials:
         )
         response = evaluate_h2_compatibility(request)
 
-        assert response.classification == AnswerSeverity.OK
+        assert response.classification == AnswerSeverity.PROHIBITED
+        assert response.embrittlement_risk == "high"
 
     def test_hastelloy_c276_approved_for_h2(self):
-        """Hastelloy C-276 is approved for H2 service."""
+        """Hastelloy C-276 should return CAUTION per the current evidence set."""
         request = H2CompatibilityRequest(
             question="Is Hastelloy C-276 compatible with hydrogen?",
             material_key="Hastelloy C-276",
@@ -140,10 +144,11 @@ class TestH2ApprovedMaterials:
         )
         response = evaluate_h2_compatibility(request)
 
-        assert response.classification == AnswerSeverity.OK
+        assert response.classification == AnswerSeverity.CAUTION
+        assert response.embrittlement_risk == "medium"
 
     def test_copper_approved_for_h2(self):
-        """Copper alloys are approved for H2 service."""
+        """Copper C10200 should fall back to the approved copper family rule."""
         request = H2CompatibilityRequest(
             question="Is copper compatible with hydrogen?",
             material_key="Copper C10200",
@@ -154,6 +159,9 @@ class TestH2ApprovedMaterials:
         response = evaluate_h2_compatibility(request)
 
         assert response.classification == AnswerSeverity.OK
+        assert response.embrittlement_risk == "very_low"
+        assert response.notes is not None
+        assert "family-level" in response.notes.lower()
 
     def test_aluminum_6061_approved_for_h2(self):
         """AL 6061 is APPROVED for H2 (no HE unlike O2 concerns)."""
@@ -181,7 +189,7 @@ class TestH2CautionMaterials:
     """Materials that should have CAUTION classification for H2."""
 
     def test_titanium_caution_at_cryogenic(self):
-        """Titanium is acceptable for cryogenic LH2 - should be CAUTION."""
+        """Titanium in cryogenic LH2 should fall back to the titanium caution rule."""
         request = H2CompatibilityRequest(
             question="Is Ti-6Al-4V compatible with cryogenic hydrogen?",
             material_key="Ti-6Al-4V",
@@ -194,6 +202,8 @@ class TestH2CautionMaterials:
         assert response.classification == AnswerSeverity.CAUTION, (
             f"Ti at cryo should be CAUTION, got {response.classification}"
         )
+        assert response.notes is not None
+        assert "cryogenic lh2 fallback" in response.notes.lower()
 
 
 # =============================================================================

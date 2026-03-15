@@ -1,0 +1,182 @@
+{
+  "_meta": {
+    "description": "Mechanism-to-feature mapping rules with provenance per BS-SPEC-OCA-002-REV0 §6.2",
+    "source": "BS-SPEC-OCA-002-REV0 (Fran review)",
+    "version": "1.0.0",
+    "ingest_date": "2026-03-10"
+  },
+  "mechanism_feature_map": [
+    {
+      "mechanism": "particle_impact",
+      "abbreviation": "PI",
+      "required_features": ["wetted_surface_flag"],
+      "characteristic_elements": [
+        {"element": "particles_entrainable", "satisfied_by": "creates_particles OR NOT filter_integrity_assumed", "tier": "B"},
+        {"element": "velocity_above_30_m_s", "satisfied_by": "velocity_estimate > 30", "tier": "B"},
+        {"element": "flammable_target_material", "satisfied_by": "reactive_metal_present OR flammability_rating in [C,D,X,unknown]", "tier": "B"},
+        {"element": "oxygen_enriched_environment", "satisfied_by": "o2_fraction >= 0.21", "tier": "A"}
+      ],
+      "controls_that_remove": [
+        {"control": "Add upstream filter", "removes": "particles_entrainable", "assumption": "Filter intact, no bypass path", "tier": "D"},
+        {"control": "Reduce velocity below 30 m/s", "removes": "velocity_above_30_m_s", "assumption": "Flow rate unchanged, larger diameter", "tier": "B"},
+        {"control": "Use nonflammable target material", "removes": "flammable_target_material", "assumption": "Material change at impact site only", "tier": "B"}
+      ],
+      "explanation_template": "Particle impact is {status} because {elements_summary}. {controls_summary}"
+    },
+    {
+      "mechanism": "rapid_pressurization",
+      "abbreviation": "RP",
+      "required_features": ["has_dead_volume"],
+      "characteristic_elements": [
+        {"element": "pressurization_time_under_1s", "satisfied_by": "upstream valve opening_profile = fast OR actuation_type = solenoid", "tier": "B"},
+        {"element": "exposed_nonmetal_near_dead_end", "satisfied_by": "has_polymer_seal AND has_dead_volume", "tier": "B"},
+        {"element": "pressure_ratio_exceeds_ait_threshold", "satisfied_by": "adiabatic_tf > material AIT", "tier": "B"},
+        {"element": "oxygen_enriched_environment", "satisfied_by": "o2_fraction >= 0.21", "tier": "A"}
+      ],
+      "controls_that_remove": [
+        {"control": "Add slow-opening actuator (>1s)", "removes": "pressurization_time_under_1s", "assumption": "Actuator profile as specified", "tier": "B"},
+        {"control": "Eliminate dead-end configuration", "removes": "exposed_nonmetal_near_dead_end", "assumption": "Topology change verified", "tier": "B"},
+        {"control": "Replace nonmetal with metal seal", "removes": "exposed_nonmetal_near_dead_end", "assumption": "Metal seal compatible at temperature", "tier": "B"}
+      ],
+      "explanation_template": "Rapid pressurization is {status} because {elements_summary}. {controls_summary}"
+    },
+    {
+      "mechanism": "flow_friction",
+      "abbreviation": "FF",
+      "required_features": ["wetted_surface_flag"],
+      "characteristic_elements": [
+        {"element": "nonmetal_in_flow_path", "satisfied_by": "has_polymer_seal AND (exposed_to_flow OR wetted_surface_flag)", "tier": "B"},
+        {"element": "high_velocity_flow", "satisfied_by": "velocity_estimate > 0", "tier": "B"},
+        {"element": "vibration_or_chatter", "satisfied_by": "dynamic_contact_flag", "tier": "B"},
+        {"element": "oxygen_enriched_environment", "satisfied_by": "o2_fraction >= 0.21", "tier": "A"}
+      ],
+      "controls_that_remove": [
+        {"control": "Eliminate nonmetals from flow path", "removes": "nonmetal_in_flow_path", "assumption": "All seals metal-to-metal", "tier": "B"},
+        {"control": "Reduce vibration", "removes": "vibration_or_chatter", "assumption": "Design change verified", "tier": "D"}
+      ],
+      "explanation_template": "Flow friction is {status} because {elements_summary}. {controls_summary}"
+    },
+    {
+      "mechanism": "resonance",
+      "abbreviation": "RS",
+      "required_features": ["has_cavity_downstream"],
+      "characteristic_elements": [
+        {"element": "sonic_jet_present", "satisfied_by": "sonic_flow_points detected upstream", "tier": "B"},
+        {"element": "cavity_or_branch_tube", "satisfied_by": "has_cavity_downstream", "tier": "B"},
+        {"element": "flammable_material_at_closed_end", "satisfied_by": "downstream component has flammable material", "tier": "B"},
+        {"element": "oxygen_enriched_environment", "satisfied_by": "o2_fraction >= 0.21", "tier": "A"}
+      ],
+      "controls_that_remove": [
+        {"control": "Eliminate cavities and branch tubes", "removes": "cavity_or_branch_tube", "assumption": "Topology change verified", "tier": "B"},
+        {"control": "Use nonflammable material at cavity end", "removes": "flammable_material_at_closed_end", "assumption": "Material change at cavity end only", "tier": "B"}
+      ],
+      "explanation_template": "Resonance is {status} because {elements_summary}. {controls_summary}"
+    },
+    {
+      "mechanism": "mechanical_impact",
+      "abbreviation": "MI",
+      "required_features": ["dynamic_contact_flag"],
+      "characteristic_elements": [
+        {"element": "impact_energy_source", "satisfied_by": "dynamic_contact_flag AND (has_moving_contact OR chatter_susceptible)", "tier": "B"},
+        {"element": "nonmetal_or_reactive_metal_target", "satisfied_by": "has_polymer_seal OR reactive_metal_present", "tier": "B"},
+        {"element": "oxygen_enriched_environment", "satisfied_by": "o2_fraction >= 0.21", "tier": "A"}
+      ],
+      "controls_that_remove": [
+        {"control": "Eliminate impact sources", "removes": "impact_energy_source", "assumption": "No valve slam, water hammer, or chatter", "tier": "B"},
+        {"control": "Use impact-resistant materials", "removes": "nonmetal_or_reactive_metal_target", "assumption": "Per NASA-STD-6001B Test 13", "tier": "B"}
+      ],
+      "explanation_template": "Mechanical impact is {status} because {elements_summary}. {controls_summary}"
+    },
+    {
+      "mechanism": "galling_friction",
+      "abbreviation": "GF",
+      "required_features": ["has_moving_contact", "metal_pair_contact"],
+      "characteristic_elements": [
+        {"element": "metal_to_metal_contact", "satisfied_by": "metal_pair_contact", "tier": "B"},
+        {"element": "rapid_relative_motion", "satisfied_by": "dynamic_contact_flag", "tier": "B"},
+        {"element": "chatter_in_valves_regulators", "satisfied_by": "chatter_susceptible AND archetype in [valve, regulator, check_valve, relief_valve]", "tier": "D"},
+        {"element": "oxygen_enriched_environment", "satisfied_by": "o2_fraction >= 0.21", "tier": "A"}
+      ],
+      "controls_that_remove": [
+        {"control": "Use dissimilar metals", "removes": "metal_to_metal_contact", "assumption": "Material pair selected for galling resistance", "tier": "D"},
+        {"control": "Apply O2-compatible lubricant", "removes": "rapid_relative_motion", "assumption": "Lubricant verified compatible", "tier": "D"},
+        {"control": "Prevent valve chatter by design", "removes": "chatter_in_valves_regulators", "assumption": "System dynamics analysis completed", "tier": "D"}
+      ],
+      "explanation_template": "Galling/friction is {status} because {elements_summary}. {controls_summary}"
+    },
+    {
+      "mechanism": "fresh_metal_exposure",
+      "abbreviation": "FM",
+      "required_features": ["reactive_metal_present"],
+      "characteristic_elements": [
+        {"element": "quick_oxidizing_metal_present", "satisfied_by": "reactive_metal_present", "tier": "B"},
+        {"element": "oxide_layer_removal_mechanism", "satisfied_by": "has_moving_contact OR dynamic_contact_flag", "tier": "B"},
+        {"element": "oxygen_enriched_environment", "satisfied_by": "o2_fraction >= 0.21", "tier": "A"}
+      ],
+      "controls_that_remove": [
+        {"control": "Avoid Al/Ti in O2-wetted paths", "removes": "quick_oxidizing_metal_present", "assumption": "Material substitution verified", "tier": "B"},
+        {"control": "Use bulk configurations", "removes": "oxide_layer_removal_mechanism", "assumption": "Maximizes heat dissipation", "tier": "B"}
+      ],
+      "explanation_template": "Fresh metal exposure is {status} because {elements_summary}. {controls_summary}"
+    },
+    {
+      "mechanism": "static_discharge",
+      "abbreviation": "SD",
+      "required_features": [],
+      "characteristic_elements": [
+        {"element": "charge_buildup_on_isolated_surface", "satisfied_by": "electrical_energy_present OR isolated conductor detected", "tier": "B"},
+        {"element": "flammable_material_at_discharge", "satisfied_by": "has_polymer_seal AND wetted_surface_flag", "tier": "B"},
+        {"element": "oxygen_enriched_environment", "satisfied_by": "o2_fraction >= 0.21", "tier": "A"}
+      ],
+      "controls_that_remove": [
+        {"control": "Ground all conductive surfaces", "removes": "charge_buildup_on_isolated_surface", "assumption": "Grounding verified", "tier": "B"}
+      ],
+      "explanation_template": "Static discharge is {status} because {elements_summary}. {controls_summary}"
+    },
+    {
+      "mechanism": "electrical_arc",
+      "abbreviation": "EA",
+      "required_features": ["electrical_energy_present"],
+      "characteristic_elements": [
+        {"element": "power_source_present", "satisfied_by": "electrical_energy_present", "tier": "B"},
+        {"element": "arc_generation_possible", "satisfied_by": "electrical_energy_present AND NOT hermetically_sealed", "tier": "B"},
+        {"element": "oxygen_enriched_environment", "satisfied_by": "o2_fraction >= 0.21", "tier": "A"}
+      ],
+      "controls_that_remove": [
+        {"control": "Isolate electrical circuits from O2", "removes": "arc_generation_possible", "assumption": "Isolation verified", "tier": "B"},
+        {"control": "Use hermetically sealed components", "removes": "arc_generation_possible", "assumption": "Seal integrity maintained", "tier": "B"}
+      ],
+      "explanation_template": "Electrical arc is {status} because {elements_summary}. {controls_summary}"
+    },
+    {
+      "mechanism": "chemical_reaction",
+      "abbreviation": "CR",
+      "required_features": [],
+      "characteristic_elements": [
+        {"element": "reactive_chemical_pair_present", "satisfied_by": "specific material pairs identified (e.g., Al + PCTFE)", "tier": "B"},
+        {"element": "mixing_or_contact_possible", "satisfied_by": "materials in contact or proximity", "tier": "B"},
+        {"element": "oxygen_enriched_environment", "satisfied_by": "o2_fraction >= 0.21", "tier": "A"}
+      ],
+      "controls_that_remove": [
+        {"control": "Separate incompatible chemicals", "removes": "mixing_or_contact_possible", "assumption": "Physical barrier present", "tier": "B"}
+      ],
+      "explanation_template": "Chemical reaction is {status} because {elements_summary}. {controls_summary}"
+    },
+    {
+      "mechanism": "thermal_runaway",
+      "abbreviation": "TR",
+      "required_features": ["porous_media_flag"],
+      "characteristic_elements": [
+        {"element": "high_surface_area_to_volume", "satisfied_by": "sa_to_volume_ratio = high", "tier": "B"},
+        {"element": "porous_or_fines_material", "satisfied_by": "porous_media_flag", "tier": "B"},
+        {"element": "poor_heat_dissipation", "satisfied_by": "sa_to_volume_ratio = high AND no heat sink path", "tier": "B"},
+        {"element": "oxygen_enriched_environment", "satisfied_by": "o2_fraction >= 0.21", "tier": "A"}
+      ],
+      "controls_that_remove": [
+        {"control": "Avoid porous/high-SA/V materials", "removes": "porous_or_fines_material", "assumption": "Material substitution verified", "tier": "B"},
+        {"control": "Ensure heat dissipation path", "removes": "poor_heat_dissipation", "assumption": "Thermal analysis completed", "tier": "B"}
+      ],
+      "explanation_template": "Thermal runaway is {status} because {elements_summary}. {controls_summary}"
+    }
+  ]
+}

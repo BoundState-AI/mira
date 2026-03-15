@@ -1,0 +1,167 @@
+{
+  "version": "0.1.0",
+  "entries": [
+    {
+      "canonical_name": "Aluminum 2024-T3",
+      "material_system": "METALLIC",
+      "family": "aluminum",
+      "aliases": ["2024-T3", "Al 2024-T3", "2024"]
+    },
+    {
+      "canonical_name": "Aluminum 2219-T87",
+      "material_system": "METALLIC",
+      "family": "aluminum",
+      "aliases": ["2219-T87", "Al 2219-T87", "2219"]
+    },
+    {
+      "canonical_name": "Aluminum 6061-T6",
+      "material_system": "METALLIC",
+      "family": "aluminum",
+      "aliases": ["6061-T6", "Al 6061-T6", "6061"]
+    },
+    {
+      "canonical_name": "Aluminum 7050-T7451",
+      "material_system": "METALLIC",
+      "family": "aluminum",
+      "aliases": ["7050-T7451", "Al 7050-T7451", "7050"]
+    },
+    {
+      "canonical_name": "Aluminum 7075-T651",
+      "material_system": "METALLIC",
+      "family": "aluminum",
+      "aliases": ["7075-T651", "7075", "Al 7075-T651"]
+    },
+    {
+      "canonical_name": "Ti-6Al-4V",
+      "material_system": "METALLIC",
+      "family": "titanium",
+      "aliases": ["Titanium 6-4", "Ti64", "Ti 6Al-4V", "6Al-4V", "Titanium 64", "titanium 64"]
+    },
+    {
+      "canonical_name": "300M Steel",
+      "material_system": "METALLIC",
+      "family": "steel",
+      "aliases": ["300M", "300M alloy steel"]
+    },
+    {
+      "canonical_name": "4340 Steel",
+      "material_system": "METALLIC",
+      "family": "steel",
+      "aliases": ["4340", "AISI 4340", "4340 alloy steel"]
+    },
+    {
+      "canonical_name": "17-4PH Stainless",
+      "material_system": "METALLIC",
+      "family": "steel",
+      "aliases": ["17-4PH", "17-4 PH", "17-4 precipitation hardening stainless"]
+    },
+    {
+      "canonical_name": "316L Stainless",
+      "material_system": "METALLIC",
+      "family": "steel",
+      "aliases": ["316L", "316 L", "Stainless 316L", "SS 316L"]
+    },
+    {
+      "canonical_name": "304 Stainless",
+      "material_system": "METALLIC",
+      "family": "steel",
+      "aliases": ["304", "304L", "Stainless 304", "SS 304", "SS 304L"]
+    },
+    {
+      "canonical_name": "A286",
+      "material_system": "METALLIC",
+      "family": "steel",
+      "aliases": ["A-286", "A 286"]
+    },
+    {
+      "canonical_name": "Inconel 718",
+      "material_system": "METALLIC",
+      "family": "nickel",
+      "aliases": ["718", "Alloy 718", "IN718"]
+    },
+    {
+      "canonical_name": "CFRP / Epoxy Laminate",
+      "material_system": "COMPOSITE",
+      "family": "composite",
+      "aliases": ["CFRP", "Carbon Fiber Reinforced Polymer", "Carbon Epoxy", "Composite Laminate"]
+    },
+    {
+      "canonical_name": "Bonded Composite Assembly",
+      "material_system": "BONDED",
+      "family": "bonded",
+      "aliases": ["Bonded Composite", "Bonded Panel", "Bonded Structure"]
+    },
+    {
+      "canonical_name": "COPV Metallic Liner",
+      "material_system": "METALLIC",
+      "family": "pressure_hardware",
+      "aliases": ["COPV Liner", "Composite Overwrapped Pressure Vessel Liner"]
+    },
+    {
+      "canonical_name": "Inconel 625",
+      "material_system": "METALLIC",
+      "family": "nickel",
+      "aliases": ["625", "Alloy 625", "IN625"]
+    },
+    {
+      "canonical_name": "Ti-3Al-2.5V",
+      "material_system": "METALLIC",
+      "family": "titanium",
+      "aliases": ["Ti-3-2.5", "Ti 3Al-2.5V", "3Al-2.5V", "Grade 9 titanium"]
+    },
+    {
+      "canonical_name": "15-5PH Stainless",
+      "material_system": "METALLIC",
+      "family": "steel",
+      "aliases": ["15-5PH", "15-5 PH", "15-5 precipitation hardening stainless"]
+    },
+    {
+      "canonical_name": "13-8PH Stainless",
+      "material_system": "METALLIC",
+      "family": "steel",
+      "aliases": ["13-8PH", "13-8 PH", "13-8Mo"]
+    },
+    {
+      "canonical_name": "Aluminum 2195-T8",
+      "material_system": "METALLIC",
+      "family": "aluminum",
+      "aliases": ["2195-T8", "2195", "Al 2195-T8", "Al-Li 2195"]
+    },
+    {
+      "canonical_name": "Aluminum 2014-T6",
+      "material_system": "METALLIC",
+      "family": "aluminum",
+      "aliases": ["2014-T6", "2014", "Al 2014-T6"]
+    },
+    {
+      "canonical_name": "Maraging 250",
+      "material_system": "METALLIC",
+      "family": "steel",
+      "aliases": ["Maraging 250", "18Ni-250", "Maraging steel 250"]
+    },
+    {
+      "canonical_name": "Maraging 300",
+      "material_system": "METALLIC",
+      "family": "steel",
+      "aliases": ["Maraging 300", "18Ni-300", "Maraging steel 300"]
+    },
+    {
+      "canonical_name": "C-103",
+      "material_system": "METALLIC",
+      "family": "refractory",
+      "aliases": ["C103", "Nb C-103", "Niobium C-103", "Columbium C-103"]
+    },
+    {
+      "canonical_name": "MP35N",
+      "material_system": "METALLIC",
+      "family": "cobalt",
+      "aliases": ["MP35N", "Multiphase 35N"]
+    },
+    {
+      "canonical_name": "Haynes 230",
+      "material_system": "METALLIC",
+      "family": "nickel",
+      "aliases": ["230", "Alloy 230", "HA230"]
+    }
+  ]
+}

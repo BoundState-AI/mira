@@ -16,7 +16,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <span className="text-sm font-medium">Menu</span>
           </div>
           <div className="p-4 md:p-8">
-            <div className="max-w-4xl mx-auto animate-fade-in">
+            <div className="max-w-4xl animate-fade-in lg:ml-24 lg:mr-auto">
               {children}
             </div>
           </div>
