@@ -86,6 +86,9 @@ def create_app() -> FastAPI:
     include_with_api_alias(routers.galvanic_router, prefix="/mira", tags=["galvanic"])
     include_with_api_alias(routers.fracture_router, prefix="/mira", tags=["fracture"])
 
+    # H2 Knowledge Twin router (hydrogen compatibility — first-class surface)
+    include_with_api_alias(routers.h2_router, prefix="/mira", tags=["h2"])
+
     # OCA Workbench router (Oxygen Compatibility Assessment per TM-2007-213740)
     include_with_api_alias(routers.oca_router, prefix="/oca", tags=["oca"])
 

@@ -11,6 +11,10 @@ credentials.json
 
 # --- LARGE DATA DIRECTORIES ---
 data/
+# H2 evidence corpus is a runtime dependency — must ship with the build
+!mira/data/
+mira/data/*
+!mira/data/h2_evidence_merged.json
 raw/
 EM32/
 sandbox/
