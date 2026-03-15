@@ -46,8 +46,8 @@ LOGGER = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/h2")
 
-# Guidance JSON — loaded once at import time
-_GUIDANCE_PATH = Path(__file__).parent.parent.parent.parent / "frontend" / "src" / "data" / "mira-guidance" / "h2-guidance.json"
+# Guidance JSON — loaded once at import time from the backend-packaged copy.
+_GUIDANCE_PATH = Path(__file__).resolve().parents[2] / "h2" / "data" / "guidance.json"
 _GUIDANCE_CACHE: dict | None = None
 
 

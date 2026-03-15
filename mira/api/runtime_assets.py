@@ -77,11 +77,11 @@ REQUIRED_RUNTIME_ASSETS: tuple[RuntimeAsset, ...] = (
     ),
     RuntimeAsset(
         asset_id="h2_guidance_pack",
-        relative_path="frontend/src/data/mira-guidance/h2-guidance.json",
+        relative_path="mira/h2/data/guidance.json",
         domain="h2",
         sha256="60c71b6300c7606e6d8c5e6f79d323b17c7590f2fd76bca60dd420310a4ce770",
         required_by=("mira.api.routers.h2",),
-        notes="H2 router returns this guidance payload to clients.",
+        notes="Backend-packaged H2 guidance payload served by the H2 router.",
     ),
     RuntimeAsset(
         asset_id="mp_plan_6016c_catalog",
