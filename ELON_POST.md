@@ -1,44 +1,67 @@
-# Hey Uncle Elon — Let Me Tell You About Mira
+# Hey Uncle Elon — Here's What Mira Does
 
-You know how every time one of your rockets or spacecraft needs a new material qualified, some poor engineer has to spend weeks digging through binders of NASA standards, old test reports, and tribal knowledge just to answer the question: *"Can I use this alloy in liquid oxygen at 200 psi?"*
+You know how qualifying a material for spaceflight takes forever? Engineers buried in binders, hunting through decades of test reports, cross-referencing NASA standards, trying to answer one question: *"Can I use this alloy here?"*
 
-**Mira kills that bottleneck.**
+**Mira is the AI that answers that question — with receipts.**
 
-## What It Actually Does
+Mira stands for **Materials Intelligence & Risk Analysis**. You ask it a plain-English question, it searches real evidence, and gives you a traceable verdict. Not a guess. An auditable decision with citations.
 
-Mira — **Materials Intelligence & Risk Analysis** — is an AI-powered decision engine for aerospace material compatibility. You ask it a plain-English question like:
-
-> *"Is Inconel 718 compatible with gaseous hydrogen at 15,000 psi and 400°F?"*
-
-And it doesn't just guess. It runs a full evidence pipeline:
-
-1. **Parses** your constraints (material, fluid, pressure, temperature)
-2. **Searches** a database of Materials Usage Approvals (MUAs) — real historical records of what's been tested and flown
-3. **Checks hard boundaries** — NASA-STD-6016, JSC-27301F, the stuff that's non-negotiable
-4. **Retrieves test data** and runs semantic search across thousands of ingested documents
-5. **Evaluates evidence sufficiency** — is there enough data to make a call, or does this need more testing?
-6. **Delivers a traceable verdict** — not a vibe, an auditable decision with citations
-
-The whole thing is **evidence-first**. No MUA, no answer. That's the rule.
-
-## The Cool Parts
-
-**Knowledge Twins** — Domain-specific AI models that actually understand the physics. The H2 twin knows about hydrogen embrittlement, HEE severity bands from NASA/TM-2016-218602, nickel content thresholds, heat treatment sensitivity. The O2 twin handles ignition and promoted combustion risks. These aren't chatbots — they're digital metallurgists.
-
-**Auto-Configuration (v5)** — Used to take weeks of manual schema mapping to onboard a new database. Now a "Generative Pre-trained Translation Layer" analyzes the schema and auto-generates the config. Weeks → hours.
-
-**Athena** — A document ingestion pipeline that eats NASA standards, ASTM guidelines, and Sandia reports, extracts the actual rules (Body of Knowledge), chunks them semantically, and makes them searchable.
-
-## The Stack
-
-FastAPI backend, PostgreSQL, FAISS vector search, Claude for LLM generation, React frontend. ~200k lines of Python. Every safety-critical function is tagged, traced, and tested to NASA software standards (SWE-013, SWE-032, SWE-033).
-
-## Why You Should Care
-
-Every Raptor engine, every Starship heat shield tile, every pressure vessel on Dragon — someone had to qualify those materials. Mira makes that process faster, more reliable, and fully traceable. No more "I think Bob approved this in 2014 but he retired."
-
-**It's the engineer's copilot for materials decisions — except it actually reads the standards.**
+Here's what's under the hood:
 
 ---
 
-*Built by BoundState AI. Co-authored by humans and AIs who take metallurgy seriously.*
+**Pipeline** — The brain. Takes a question, routes it through the right stages, and comes back with an answer. Parse, classify, search, evaluate, decide, respond. Assembly line for materials decisions.
+
+**Knowledge Twins** — Digital metallurgists. The **H2 Twin** knows hydrogen embrittlement inside and out — severity bands, nickel content thresholds, heat treatment effects. The **O2 Twin** handles oxygen compatibility — ignition risks, promoted combustion, pressure limits. They know the physics so your engineers don't have to re-derive it every time.
+
+**MUA Engine** — The memory. Searches a database of Materials Usage Approvals — real records of what's been tested, approved, and flown. Eight versions deep, with conflict detection, confidence scoring, and draft generation.
+
+**Compliance** — Checks materials against the Body of Knowledge — NASA-STD-6016, JSC-27301F, the works. Flags violations, rates severity, and makes sure nothing slips through.
+
+**Precedent Engine** — Pattern recognition for historical approvals. Finds the closest prior decisions using semantic search so engineers can leverage what's already been proven.
+
+**MIUL** — Materials Inventory Utility List. Manages material codes, normalizes alloy names, synthesizes MUAs from standards, and runs FMECA (failure mode analysis) on inventory.
+
+**MP Plan** — Materials & Process qualification planning. Identifies gaps in qualification, generates test plans, enforces policy, and maps out what still needs to happen before flight.
+
+**Athena** — The reader. Ingests NASA standards, ASTM guidelines, Sandia reports — OCRs them, extracts the rules, chunks them semantically, and indexes everything for search.
+
+**BSMH** — B-Spline Material Harmonization. Advanced materials analysis — fracture mechanics, rules engines, standards adaptation. The deep math layer.
+
+**Fracture** — Classifies fracture risk for materials under specific conditions. Pulls from test data to flag brittle failure concerns.
+
+**Galvanic** — Corrosion risk engine. Evaluates galvanic compatibility between dissimilar metals and recommends mitigations.
+
+**H2 / O2 Modules** — Dedicated environment engines. H2 handles hydrogen-specific decisions with rationale generation and runtime databases. O2 handles oxygen-specific anti-patterns and policy enforcement.
+
+**OCA** — Oxygen Compatibility Assessment. Rates materials for oxygen service, resolves conditions, and integrates with the broader decision pipeline.
+
+**MAPTIS** — Connects to NASA's Materials and Processes Technical Information System. Pulls reference data, ratings, and system-level engineering context.
+
+**NLP** — Understands what you're asking. Intent classification (compatibility check vs. material search vs. document lookup), constraint parsing, unit normalization.
+
+**Search** — Hybrid search across everything — semantic vectors, keyword matching, MUA databases. Finds the needle in a haystack of decades of materials data.
+
+**Forge** — Code generation and compilation for materials-specific runtimes. Builds the custom logic that drives each material domain.
+
+**Analytics** — Statistical analysis layer. A/B basis values, outlier detection, quality control for test data. Makes sure the numbers are solid before anyone trusts them.
+
+**Data Laundering** — Cleans and normalizes messy legacy databases from external sources (like Granta) into Mira's schema. Because real-world data is never clean.
+
+**Sentinel (GPTL)** — Generative Pre-trained Translation Layer. Auto-configures Mira for new databases by reading schemas and generating mappings. Turns weeks of manual setup into hours.
+
+**Providers** — LLM abstraction layer. Plugs into Claude and other models so the rest of the system doesn't care which AI is doing the thinking.
+
+---
+
+## Why This Matters to You
+
+Every Raptor engine, every Starship heat shield tile, every pressure vessel on Dragon — someone had to qualify those materials. Right now that process is slow, manual, and locked in people's heads.
+
+Mira makes it fast, evidence-based, and fully traceable. The engineer asks, Mira searches everything that's ever been tested and approved, and delivers a decision you can take to a review board.
+
+**No more "I think Bob approved this in 2014 but he retired."**
+
+---
+
+*Built by BoundState AI. ~200k lines of Python. Evidence-first, always.*
