@@ -1,0 +1,992 @@
+{
+  "guidance_pack_id": "mira-galvanic-guidance",
+  "schema_version": "2.0.0",
+  "platform": "mira",
+  "module": "galvanic",
+  "locale": "en",
+  "status": "approved",
+  "authored_by": "J. Wilde",
+  "reviewed_by": [
+    "Beth"
+  ],
+  "approved_by": "J. Wilde",
+  "effective_date": "2026-04-01",
+  "supersedes": null,
+  "change_log": [
+    {
+      "version": "2.0.0",
+      "date": "2026-04-01",
+      "notes": "Migrated legacy MIRA inline guidance into Universal Guidance Schema v2."
+    }
+  ],
+  "module_mode_overrides": {
+    "galvanic": {
+      "expert_mode_minimum_severity": "caution",
+      "rationale": "Legacy inline guidance remains visible in expert mode after v2 migration."
+    }
+  },
+  "fields": {
+    "inputs.material_a": {
+      "label": "Material A",
+      "what": "The first material in the galvanic couple being assessed.\n\nSource basis: MIRA_GALVANIC_KB_v1_1.docx; CRC Handbook 60th Ed. Fig. 1",
+      "why": "The engine resolves each material to a position on the galvanic series to calculate the potential difference that drives corrosion.",
+      "how": "Use the alloy name that will actually be in contact, such as 316L, Aluminum 7075, or Monel 400. If the surface is plated, enter the plating material, not the substrate — the electrolyte sees the surface first.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.material_b": {
+      "label": "Material B",
+      "what": "The second material in the galvanic couple being assessed.\n\nSource basis: MIRA_GALVANIC_KB_v1_1.docx; CRC Handbook 60th Ed. Fig. 1",
+      "why": "Galvanic corrosion requires two electrically connected materials with different electrochemical potentials. The engine compares Material A against Material B to find the driving voltage.",
+      "how": "Enter the second material in direct or indirect electrical contact with Material A. If you are assessing a fastener joint, one material is the fastener and the other is the plate or structure.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.environment": {
+      "label": "Environment",
+      "what": "The corrosive environment the coupled materials will operate in.\n\nSource basis: MIL-STD-889D §5.4; NASA-STD-6012A CPR 39; MIRA_GALVANIC_ORACLE_SYNTHESIS.docx",
+      "why": "The environment controls how aggressive the electrolyte is. Seawater immersion drives far more galvanic current than dry indoor air. The engine multiplies the raw potential difference by an environment severity modifier.",
+      "how": "Choose the environment that best represents the worst-case exposure the joint will see in service. If the hardware cycles between environments, screen against the most aggressive one.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.application_type": {
+      "label": "Application Type",
+      "what": "The hardware category the assessment applies to, such as flight hardware, ground support equipment, or launch structure.\n\nSource basis: MIL-STD-889D §5.10; NASA-STD-6012A CPR 30-40",
+      "why": "Application type controls which mitigations are available. For example, sacrificial anodes and impressed-current cathodic protection are not permitted on flight hardware.",
+      "how": "Pick the category that matches your program's hardware classification. When in doubt, use FLIGHT_HARDWARE — it applies the most conservative mitigation filtering.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.surface_condition_a": {
+      "label": "Surface Condition A",
+      "what": "The surface treatment or finish on Material A, such as bare, passivated, anodized, plated, or fully coated.\n\nSource basis: MIL-STD-889D Appendix A.4.5; MIRA_GALVANIC_KB_v1_1.docx",
+      "why": "Surface condition modifies the effective galvanic driving force. Anodizing reduces corrosion rate, plating substitutes the surface potential, and a full coating can break the galvanic circuit entirely.",
+      "how": "Enter the actual finished condition of the wetted surface. If the surface is fully coated with no holidays or damage, the engine treats the circuit as open and returns compatible. Partial coating damage does not count as a circuit break.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.surface_condition_b": {
+      "label": "Surface Condition B",
+      "what": "The surface treatment or finish on Material B.\n\nSource basis: MIL-STD-889D Appendix A.4.5; MIRA_GALVANIC_KB_v1_1.docx",
+      "why": "Both surfaces contribute to the effective galvanic severity. Each surface modifier is applied independently.",
+      "how": "Same rules as Surface Condition A. If one side is bare and the other is anodized, the engine applies each modifier separately.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.electrical_contact": {
+      "label": "Electrical Contact",
+      "what": "Whether the two materials are electrically connected — meaning electrons can flow between them.\n\nSource basis: ASTM G82; MIL-STD-889D §5.4d",
+      "why": "Galvanic corrosion requires an electrical path. If there is no electron flow between the two materials, the galvanic cell cannot operate regardless of potential difference.",
+      "how": "Set to YES unless you are certain the materials are fully electrically isolated by design. If you are unsure, leave it as YES — that is the conservative assumption. Setting it to NO returns an automatic compatible verdict.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.electrolyte_pooling": {
+      "label": "Electrolyte Pooling",
+      "what": "Whether liquid can collect and stay at the joint instead of draining away.\n\nSource basis: MIL-STD-889D §5.8; MIRA_GALVANIC_ORACLE_SYNTHESIS.docx",
+      "why": "Pooled electrolyte keeps the galvanic cell active longer and increases corrosion severity. The engine applies a 15% severity increase when pooling is present.",
+      "how": "Turn this on when the joint geometry traps water, condensation, or other conductive fluid. Horizontal faying surfaces, cup-shaped features, and upward-facing laps are common pooling traps.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.joint_type": {
+      "label": "Joint Type",
+      "what": "The physical configuration of the connection between the two materials.\n\nSource basis: MIL-STD-889D §5.11; NASA-STD-6012A CPR 31-33",
+      "why": "Joint type affects which mitigations are triggered. Fastener joints get specific recommendations like wet installation. Crevice-prone joints flag additional corrosion concerns beyond the galvanic couple itself.",
+      "how": "Choose the joint type that best describes the physical connection. FASTENER means bolted, riveted, or screwed joints. FAYING_SURFACE means flat surfaces pressed together. LAP_JOINT means overlapping sheets. CREVICE_PRONE means tight gaps where electrolyte can stagnate.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.cathode_to_anode_area_ratio": {
+      "label": "Cathode-to-Anode Area Ratio",
+      "what": "The ratio of the exposed area of the more noble material (cathode) to the less noble material (anode).\n\nSource basis: ASTM G82; MIL-STD-889D §5.4; MIRA_GALVANIC_ORACLE_SYNTHESIS.docx",
+      "why": "A large cathode driving current through a small anode concentrates all the corrosion damage into a small area. A small bolt (anode) connected to a large plate (cathode) corrodes faster than the reverse because more cathode area drives more current through less anode material.",
+      "how": "Estimate the ratio of exposed cathode area to exposed anode area. A ratio above 10 triggers a specific warning. The engine applies a logarithmic scaling factor — ratios from 0.1 to 100 are meaningful. If you do not know the ratio, leave it blank and the engine assumes 1:1.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "environments.seawater_proxy": {
+      "label": "Seawater / Salt Fog",
+      "what": "Full immersion or salt-fog exposure — the reference worst-case wet environment for galvanic screening.\n\nSource basis: CRC Handbook 60th Ed. Fig. 1; MIL-STD-889D Table IV reference conditions",
+      "why": "Seawater is the baseline severity environment (modifier 1.0). All other environments are scaled relative to seawater immersion. This is the most aggressive standard galvanic condition.",
+      "how": "Use this for hardware exposed to ocean environments, salt-fog testing, or any scenario where continuous saltwater contact is credible. If your actual environment is less severe, choose a more specific option to avoid over-conservatism.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "environments.coastal_condensing": {
+      "label": "Coastal Condensing Humidity",
+      "what": "Coastal environments where salt-laden condensation forms on hardware surfaces.\n\nSource basis: MIRA_GALVANIC_ORACLE_SYNTHESIS.docx; MIL-STD-889D atmospheric exposure guidance",
+      "why": "Condensation provides the electrolyte film needed for galvanic corrosion, but at lower severity than full immersion (modifier 0.7).",
+      "how": "Use this for hardware stored or operated near the coast where salt air condensation is expected. Launch pad hardware in coastal locations typically falls here unless it is directly spray-exposed.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "environments.industrial_atm": {
+      "label": "Industrial Atmosphere",
+      "what": "Polluted industrial air with sulfur compounds, particulates, and acidic condensation.\n\nSource basis: MIRA_GALVANIC_ORACLE_SYNTHESIS.docx",
+      "why": "Industrial atmospheres are corrosive but less aggressive than salt immersion (modifier 0.6). Sulfur dioxide and nitrogen oxides in the air create acidic films that sustain galvanic cells.",
+      "how": "Use this for hardware operating in or near industrial facilities, chemical plants, or urban environments with significant air pollution.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "environments.rural_atm": {
+      "label": "Rural Atmosphere",
+      "what": "Clean, dry ambient air with minimal corrosive contaminants.\n\nSource basis: MIRA_GALVANIC_ORACLE_SYNTHESIS.docx",
+      "why": "Rural atmospheres significantly suppress galvanic risk (modifier 0.3) because electrolyte formation is intermittent and dilute.",
+      "how": "Use this for hardware in dry, inland environments away from coastal salt or industrial pollution. Most benign outdoor service conditions fall here.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "environments.crew_condensing": {
+      "label": "Controlled Interior / Crew",
+      "what": "Interior environments like crew cabins, laboratories, or pressurized modules where condensation can form.\n\nSource basis: MIRA_GALVANIC_ORACLE_SYNTHESIS.docx; NASA-STD-6012A corrosion protection context",
+      "why": "Even controlled interiors can sustain galvanic cells through humidity, crew perspiration, and cleaning residues (modifier 0.5).",
+      "how": "Use this for hardware inside crewed spacecraft, habitats, or any pressurized volume where human activity or HVAC cycling can produce condensation.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "environments.dry_indoor": {
+      "label": "Dry Controlled Indoor",
+      "what": "Temperature and humidity controlled indoor environments such as clean rooms or climate-controlled storage.\n\nSource basis: MIRA_GALVANIC_ORACLE_SYNTHESIS.docx",
+      "why": "Dry controlled conditions greatly reduce galvanic exposure (modifier 0.15) because electrolyte formation is rare and short-lived.",
+      "how": "Use this for hardware stored or operated in climate-controlled facilities. This is the most benign terrestrial environment. If the hardware will eventually see a harsher environment, screen against that environment instead.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "environments.cryogenic_ops": {
+      "label": "Cryogenic Ground Ops",
+      "what": "Ground operations involving cryogenic fluids where atmospheric moisture condenses and freezes on hardware surfaces.\n\nSource basis: MIRA_GALVANIC_ORACLE_SYNTHESIS.docx",
+      "why": "Pre-cool and tank loading operations create heavy condensation and frost that sustains galvanic cells (modifier 0.8). The freeze-thaw cycling can also crack protective coatings.",
+      "how": "Use this for any ground hardware that sees cryogenic propellant loading, pre-cool, or cryo transfer. The condensation can be aggressive even though the hardware is cold.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "environments.space_vacuum": {
+      "label": "Space / Hard Vacuum",
+      "what": "On-orbit vacuum or deep-space environments where no liquid electrolyte exists.\n\nSource basis: MIRA_GALVANIC_ORACLE_SYNTHESIS.docx; ASTM G82",
+      "why": "Galvanic corrosion requires a liquid electrolyte to carry ions between the two metals. In hard vacuum, there is no electrolyte, so galvanic corrosion is not active (modifier 0.0). The engine returns compatible automatically.",
+      "how": "Use this only for hardware that will exclusively operate in vacuum. If the same hardware sees ground processing, launch pad exposure, or reentry condensation, screen against the worst ground or atmospheric condition instead.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "verdicts.COMPATIBLE": {
+      "label": "Compatible",
+      "what": "The effective potential difference between the two materials is below 250 mV after all modifiers are applied, or the galvanic circuit is broken by design.\n\nSource basis: NASA-STD-6012A CPR 39; MIRA_GALVANIC_KB_v1_1.docx",
+      "why": "Below 250 mV, galvanic corrosion is generally not a significant design concern per NASA-STD-6012A CPR 39. This does not mean zero corrosion — it means the couple is within accepted practice for aerospace hardware.",
+      "how": "Compatible is the cleanest outcome the tool can give. Normal corrosion protection, cleaning, and configuration control still apply. If the couple is compatible only because of a specific surface condition or environment assumption, make sure those assumptions stay true through the hardware's service life.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "verdicts.CAUTION": {
+      "label": "Caution",
+      "what": "The effective potential difference is between 250 mV and 500 mV — the couple is in a marginal zone where galvanic corrosion is credible but may be manageable with mitigations.\n\nSource basis: MIRA_GALVANIC_ORACLE_SYNTHESIS.docx; MIL-STD-889D §5.4",
+      "why": "This range means the couple is not automatically acceptable, but engineering controls can often make it work. The tool will recommend specific mitigations like sealing, isolation, or coating.",
+      "how": "Review the recommended mitigations and decide which ones are feasible for your design. At minimum, seal faying surfaces to exclude electrolyte. Document your rationale for accepting this couple. If you cannot apply any of the recommended mitigations, consider changing one of the materials.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "verdicts.INCOMPATIBLE": {
+      "label": "Incompatible",
+      "what": "The effective potential difference exceeds 500 mV — this couple presents a significant galvanic corrosion risk that requires either isolation, redesign, or formal justification.\n\nSource basis: MIRA_GALVANIC_ORACLE_SYNTHESIS.docx; MIL-STD-889D §5.4; NASA-STD-6012A CPR 39",
+      "why": "Above 500 mV, the electrochemical driving force is strong enough to cause rapid, concentrated attack on the anodic member, especially when the cathode-to-anode area ratio is unfavorable.",
+      "how": "Your first option is to change one of the materials to reduce the potential difference. If that is not possible, apply physical isolation to break the electrical circuit. If neither is feasible, you need a formal engineering justification with documented mitigations, inspection intervals, and acceptance criteria. Do not leave an incompatible couple unaddressed.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "mitigations.physical_isolation": {
+      "label": "Physical Isolation Barrier",
+      "what": "An inert, non-absorbing barrier such as a gasket, sleeve, washer, or insulating layer placed between the two materials to break the electrical path.\n\nSource basis: MIL-STD-889D §5.4d; MIL-STD-889D §5.11c-d",
+      "why": "This is the cleanest galvanic mitigation because it stops electron flow entirely rather than trying to slow down corrosion. If the circuit is open, no galvanic corrosion occurs.",
+      "how": "The barrier must be continuous and non-conductive. If it cracks, wears through, or absorbs electrolyte, the circuit closes again. Do not use isolation where the joint must remain electrically conductive for grounding or bonding purposes.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "mitigations.seal_faying_surfaces": {
+      "label": "Seal Faying Surfaces",
+      "what": "Sealing the mating surfaces and exposed joint edges to keep electrolyte out of the couple interface.\n\nSource basis: MIL-STD-889D §5.4b; MIL-STD-889D §5.8; NASA-STD-6012A CPR 30, CPR 40",
+      "why": "If no electrolyte reaches the contact zone, the galvanic cell cannot operate even though the metals are electrically connected. This is the second most effective mitigation after full isolation.",
+      "how": "Apply sealant to both faying surfaces and all exposed edges before assembly. For graphite or CFRP contacts with metals, sealing is mandatory under NASA-STD-6012A CPR 40. If sealing is not feasible, document why in the corrosion control plan.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "mitigations.wet_install_fasteners": {
+      "label": "Wet Install Fasteners",
+      "what": "Applying primer or sealant to the fastener and hole interface before installation to keep electrolyte out of the annular gap.\n\nSource basis: NASA-STD-6012A CPR 31-33, CPR 40",
+      "why": "The gap between a fastener shank and its hole is a natural crevice that traps moisture. Wet installation fills that gap with a protective barrier before the joint is closed.",
+      "how": "Apply sealant or primer to the fastener shank and the hole before driving the fastener. Check that installation torque is still achievable with the sealant in place. Electrical bonding fasteners may follow a different protection path — check your bonding requirements.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "mitigations.cathodic_barrier_coating": {
+      "label": "Barrier Coating on Cathode",
+      "what": "Applying a protective coating to the more noble (cathodic) member to reduce its effective driving area.\n\nSource basis: MIL-STD-889D §5.4c; MIL-STD-889D §5.11f",
+      "why": "Coating the cathode reduces how much current it can push through the anode. This is the correct member to coat — coating only the anode is dangerous because any holiday in the anode coating concentrates all the attack into the exposed spot.",
+      "how": "Always coat the cathode, not the anode. Full coverage is required for circuit-break behavior. If the coating is damaged or has holidays, the galvanic risk returns at those spots. Partial coating on the anode can make things worse, not better.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "mitigations.anodize_aluminum": {
+      "label": "Anodize Aluminum",
+      "what": "Anodizing aluminum alloy surfaces to build a hard oxide layer that increases surface resistance and slows corrosion rate.\n\nSource basis: MIL-STD-889D Appendix A.4.5a-c",
+      "why": "Anodizing does not change the aluminum's position on the galvanic series — it reduces the corrosion rate by making the surface harder to attack. The engine treats this as a rate modifier, not a potential shift.",
+      "how": "Anodize and post-treat with an approved corrosion-resistant finish. Hot water seal should not be used unless authorized by the design authority. Check that wear, abrasion, and fatigue impacts have been considered for the anodized surface.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "mitigations.sacrificial_anode_gacp": {
+      "label": "Sacrificial Anode Cathodic Protection",
+      "what": "Attaching a sacrificial zinc, aluminum, or magnesium anode to the structure so the sacrificial metal corrodes instead of the protected structure.\n\nSource basis: MIL-STD-889D §5.10; MIL-STD-889D §5.4a",
+      "why": "The sacrificial anode becomes the preferential corrosion site, protecting the structure it is attached to. This is a system-level mitigation that requires periodic anode replacement.",
+      "how": "Not available for flight hardware. Only applicable in wet or immersed environments for ground support equipment, launch structures, or fixed installations. The sacrificial anode material must be chosen for the specific environment and protected structure.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "mitigations.zinc_nickel_plating_for_steel": {
+      "label": "Zinc-Nickel Plating on Steel",
+      "what": "Applying a zinc-nickel metallic coating to carbon or low-alloy steel to provide sacrificial corrosion protection.\n\nSource basis: MIL-STD-889D Appendix A.4.6a-b, A.4.6e",
+      "why": "The zinc-nickel plating corrodes preferentially, protecting the steel substrate. This is the preferred modern plating for steel in galvanic service.",
+      "how": "High-strength steels require hydrogen-embrittlement prevention and bake-out controls after plating. Supplemental sealant, primer, or paint may still be required depending on the environment. This plating substitutes the surface potential — the engine will use the plating's galvanic position, not the bare steel.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "mitigations.cadmium_plating_restricted": {
+      "label": "Cadmium Plating (Restricted Use)",
+      "what": "Cadmium plating is an available sacrificial coating option but is heavily restricted by NASA and environmental regulations.\n\nSource basis: MIL-STD-889D Appendix A.4.4, A.4.7; NASA-STD-6016C MPR 77-78",
+      "why": "Cadmium provides excellent sacrificial protection but is toxic, prohibited in crew and vacuum environments, and can cause liquid-metal embrittlement in titanium.",
+      "how": "Do not use cadmium unless no other option exists and your program explicitly permits it. Cadmium is prohibited in crew environments, vacuum environments, and near titanium hardware. Cadmium-plated tools shall not be used in manufacture or test of mission-critical spaceflight hardware.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "mitigations.iccp_structures_only": {
+      "label": "Impressed Current Cathodic Protection",
+      "what": "An externally powered system that forces the protected structure cathodic using a controlled DC current.\n\nSource basis: BoundState Phase 1 product gate; MIL-STD-889D context",
+      "why": "ICCP provides active, adjustable protection for large structures in conductive wet environments. It requires continuous monitoring and power supply.",
+      "how": "Only available for ground support equipment, launch structures, or fixed installations — never for flight hardware or spacecraft. Requires conductive wet service and active monitoring infrastructure. This is a system-level decision, not a component-level fix.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "mitigations.titanium_fasteners_for_cfrp": {
+      "label": "Titanium Fasteners for CFRP Joints",
+      "what": "Using titanium fasteners in graphite-based composite joints, wet installed with sealant or primer.\n\nSource basis: NASA-STD-6012A CPR 40; MIL-STD-889D Appendix A.4.7-A.4.8a",
+      "why": "Titanium is one of the few metals galvanically compatible enough with carbon fiber to be used as a direct fastener. Other metals coupled with CFRP will corrode aggressively.",
+      "how": "Still treat the contact as a dissimilar couple and seal it — titanium with CFRP is not zero-risk. Titanium contact with cadmium or zinc is prohibited. Wet install the fasteners with primer or sealant.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "mitigations.passivate_stainless_fasteners": {
+      "label": "Passivate Stainless Hardware",
+      "what": "Passivating stainless steel and precipitation-hardening stainless hardware after machining and before service.\n\nSource basis: NASA-STD-6012A CPR 35; MIL-STD-889D Appendix A.4.10a-b",
+      "why": "Passivation rebuilds the protective chromium-oxide layer that machining removes. Without it, the stainless surface is more reactive than its passive galvanic series position suggests.",
+      "how": "Passivate after all machining is complete and before assembly. Not required when the stainless part will receive an inorganic coating. High-hardness martensitic and PH grades also require hydrogen-embrittlement precautions during and after passivation.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.galvanic_series_position": {
+      "label": "Galvanic Series Position",
+      "what": "A ranking of metals and alloys by their electrochemical potential measured in millivolts versus a saturated calomel electrode (SCE) in flowing seawater.\n\nSource basis: CRC Handbook 60th Ed. Fig. 1; MIL-STD-889D Table IV; NASA-STD-6012A Table 1",
+      "why": "The difference in galvanic series position between two metals is what drives galvanic corrosion. The more noble metal (higher position, more positive potential) becomes the cathode and is protected, while the more active metal (lower position, more negative potential) becomes the anode and corrodes.",
+      "how": "Noble metals like gold and platinum sit at the top of the series (most positive). Active metals like magnesium and zinc sit at the bottom (most negative). Stainless steels can appear in two positions — passive (near the noble end) and active (much lower) — depending on whether their protective oxide film is intact. Always check whether your stainless is in the passive or active condition for your environment.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.active_passive_behavior": {
+      "label": "Active vs. Passive State",
+      "what": "Some alloys, especially stainless steels and titanium, can exist in two very different electrochemical states depending on whether their protective oxide layer is intact.\n\nSource basis: CRC Handbook 60th Ed. Fig. 1; MIRA_GALVANIC_KB_v1_1.docx",
+      "why": "In the passive state, stainless steel sits near the noble end of the galvanic series and is well-protected. If that oxide film breaks down — from chloride attack, crevice conditions, or mechanical damage — the same alloy drops hundreds of millivolts to the active state and becomes much more vulnerable.",
+      "how": "The engine screens against the worst-case state combination for each material pair. If your environment can break down passive films (chloride-rich, crevice-prone, or oxygen-starved conditions), expect the engine to use the active-state potential for stainless steels. Passivation treatment helps maintain the passive state.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.area_ratio_effect": {
+      "label": "Cathode-to-Anode Area Ratio Effect",
+      "what": "The relative exposed areas of the cathode and anode control how concentrated the corrosion attack is on the anodic member.\n\nSource basis: ASTM G82; MIL-STD-889D §5.4; NASA-STD-6012A CPR 34",
+      "why": "A small bolt (anode) connected to a large plate (cathode) corrodes faster than the reverse because more cathode area drives more current through less anode material. The total current stays roughly the same, but all of it flows through a tiny anode, concentrating the damage.",
+      "how": "Ratios above 10:1 (large cathode, small anode) are flagged as dangerous. To reduce area-ratio risk, either make the anode area larger, make the cathode area smaller, or coat the cathode to reduce its effective driving area. The best design rule is to make the fastener the cathodic (more noble) member, so its small area is on the protected side.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.coat_the_cathode_rule": {
+      "label": "Coat the Cathode Rule",
+      "what": "When using a barrier coating to control galvanic corrosion, always coat the more noble (cathodic) member, not the more active (anodic) member.\n\nSource basis: MIL-STD-889D §5.4c; MIL-STD-889D §5.11f",
+      "why": "If you coat the anode and the coating gets a scratch or holiday, all the galvanic current concentrates on the tiny exposed anode area — making the corrosion far worse than if you had left the anode bare. Coating the cathode is safe because a scratch on the cathode only exposes a small driving area.",
+      "how": "This is one of the most commonly violated rules in galvanic corrosion control. Every time a coating mitigation is recommended, check which member is the cathode and coat that one. If you must coat both, coat the cathode first and ensure its coverage is complete.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.effective_delta_mv": {
+      "label": "Effective Potential Difference (mV)",
+      "what": "The raw potential difference between two materials, adjusted by environment severity, area ratio, and surface condition modifiers.\n\nSource basis: NASA-STD-6012A CPR 39; MIRA_GALVANIC_ORACLE_SYNTHESIS.docx",
+      "why": "The raw galvanic series difference is measured in seawater immersion. Real-world severity depends on how aggressive the actual environment is, how much cathode area is driving the cell, and whether surface treatments reduce the driving force.",
+      "how": "The engine calculates this automatically. Effective delta below 250 mV is compatible, 250-500 mV is caution, above 500 mV is incompatible. If the effective delta is close to a threshold, small changes in environment or area ratio can flip the verdict — pay extra attention to these borderline cases.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.graphite_cfrp_warning": {
+      "label": "Graphite / CFRP Contact Warning",
+      "what": "Carbon fiber reinforced polymer (CFRP) and graphite are electrically conductive and sit at the very noble end of the galvanic series — near platinum and gold.\n\nSource basis: NASA-STD-6012A CPR 40; MIL-STD-889D Appendix A.4.7-A.4.8",
+      "why": "Any metal coupled with CFRP or graphite will be the anodic member and subject to accelerated corrosion. The large surface area of composite panels makes the area ratio problem even worse.",
+      "how": "All graphite and CFRP contacts with metals must be treated as dissimilar couples and sealed per NASA-STD-6012A CPR 40. Titanium fasteners are the preferred hardware for CFRP joints because titanium's passive potential is closest to carbon. Always wet install fasteners in CFRP joints.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.magnesium_special_rules": {
+      "label": "Magnesium Special Rules",
+      "what": "Magnesium alloys sit at the very active end of the galvanic series and require the maximum feasible protective system in any galvanic couple.\n\nSource basis: MIL-STD-889D §5.10; CRC Handbook 60th Ed. Fig. 1",
+      "why": "Magnesium is so active that almost any metal contact will drive severe galvanic corrosion. The potential difference with most engineering alloys exceeds 500 mV easily.",
+      "how": "If magnesium is present in any couple, apply the maximum feasible protection per MIL-STD-889D §5.10. This typically means full isolation barriers, sealed joints, and redundant coating systems. If you can replace the magnesium with aluminum, the galvanic situation improves dramatically.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.decision_basis": {
+      "label": "Decision Basis",
+      "what": "The standard or logic path the engine used to reach its verdict.\n\nSource basis: NASA-STD-6012A CPR 39; MIRA_GALVANIC_ORACLE_SYNTHESIS.docx",
+      "why": "Different verdicts come from different sources. A verdict based on NASA-STD-6012A CPR 39 uses the 250 mV threshold from the standard. A verdict based on no electrical contact or no electrolyte is a physics shortcut — if the cell cannot operate, the materials do not matter.",
+      "how": "NASA_STD_6012A_CPR39 means the verdict came from the standard threshold. BOUNDSTATE_SYNTHESIZED means the engine used its own analysis beyond the standard's scope. NO_ELECTRICAL_CONTACT and NO_ELECTROLYTE mean the galvanic cell cannot operate for physical reasons.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    }
+  },
+  "workflows": {},
+  "contexts": {}
+}

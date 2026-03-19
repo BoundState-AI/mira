@@ -18,7 +18,7 @@ import {
   ChevronDown, AlertTriangle, CircleDot, Flame, Filter, Gauge,
   Pipette, Box, Disc, Wrench, Thermometer, Circle, Cable, Pencil,
 } from 'lucide-react';
-import { getMechanismGuidance } from '@/lib/oca-guidance';
+import { getOcaMechanismField } from '@/lib/guidance/oca-pack';
 import type { SystemComponent } from '@/lib/oca-system-api';
 import { ZONE_COLORS, ZONE_LABELS } from '@/lib/oca-system-api';
 
@@ -129,7 +129,7 @@ function ComponentNode({ data, selected }: NodeProps & { data: ComponentNodeData
         {component.credible_mechanisms.length > 0 ? (
           <div className="flex flex-wrap gap-1">
             {component.credible_mechanisms.map((abbr) => {
-              const guidance = getMechanismGuidance(abbr);
+              const guidance = getOcaMechanismField(abbr);
               const badge = (
                 <Badge
                   key={abbr}

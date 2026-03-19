@@ -12,13 +12,14 @@ import {
 } from 'lucide-react';
 
 import {
+  GuidanceCompletionTracker,
   GuidanceContextIndicator,
   GuidanceField,
+  GuidanceInlineHelp,
   GuidanceModeSelector,
   GuidanceProvider,
 } from '@/components/guidance';
 import { MaterialCombobox } from '@/components/oca/MaterialCombobox';
-import { OCAInlineHelp } from '@/components/oca/OCAInlineHelp';
 import { PageHeader } from '@/components/PageHeader';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -60,12 +61,6 @@ import {
   type OCAFlowRegime,
   type OCARequirementsResponse,
 } from '@/lib/api';
-import {
-  getDispositionGuidance,
-  getInputGuidance,
-  getMechanismGuidance,
-  getMprGuidance,
-} from '@/lib/oca-guidance';
 
 
 const OXIDIZER_OPTIONS: Array<{ value: OCAOxidizerType; label: string }> = [
@@ -173,10 +168,6 @@ function downloadArtifact(artifact: OCAExportArtifact) {
   anchor.click();
   document.body.removeChild(anchor);
   URL.revokeObjectURL(url);
-}
-
-function workbenchHelp(fieldId: string) {
-  return getInputGuidance(`workbench.${fieldId}`);
 }
 
 type GuidanceValidationState = 'valid' | 'invalid' | 'warning' | 'pending';
@@ -413,6 +404,16 @@ export default function OCAWorkbench() {
   })).filter((entry) => entry.items.length > 0);
   const displayedRequirements = requirements?.requirements ?? precheck?.triggered_requirements ?? [];
   const displayedMechanisms = mechanisms?.mechanisms ?? [];
+  const completionFields = [
+    { name: 'workbench.material_name', label: 'Material', required: true, valid: Boolean(materialName.trim()), hasWarnings: false },
+    { name: 'workbench.component_class', label: 'Component class', required: true, valid: Boolean(componentClass), hasWarnings: false },
+    { name: 'workbench.design_function', label: 'Design function', required: true, valid: Boolean(designFunction.trim()), hasWarnings: false },
+    { name: 'workbench.oxidizer_type', label: 'Oxidizer', required: true, valid: Boolean(oxidizerType), hasWarnings: false },
+    { name: 'workbench.total_pressure_max_psia', label: 'Max pressure', required: true, valid: Number.isFinite(Number(pressureMax)) && pressureMax.trim() !== '', hasWarnings: false },
+    { name: 'workbench.total_pressure_min_psia', label: 'Min pressure', required: true, valid: Number.isFinite(Number(pressureMin)) && pressureMin.trim() !== '', hasWarnings: false },
+    { name: 'workbench.temp_max_c', label: 'Max temperature', required: true, valid: Number.isFinite(Number(tempMax)) && tempMax.trim() !== '', hasWarnings: false },
+    { name: 'workbench.o2_fraction', label: 'O2 fraction', required: true, valid: Number.isFinite(Number(o2Fraction)) && o2Fraction.trim() !== '', hasWarnings: false },
+  ];
 
   return (
     <GuidanceProvider
@@ -594,13 +595,16 @@ export default function OCAWorkbench() {
                     { fieldId: 'porous_media_present', label: 'Porous Media', value: porousMedia, setter: setPorousMedia },
                     { fieldId: 'open_flame_or_hot_work_present', label: 'Open Flame / Hot Work', value: openFlame, setter: setOpenFlame },
                   ].map(({ fieldId, label, value, setter }) => (
-                    <label key={fieldId} className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm">
-                      <span className="flex items-center gap-1.5">
-                        <span>{label}</span>
-                        <OCAInlineHelp entry={workbenchHelp(fieldId)} />
-                      </span>
-                      <Switch checked={Boolean(value)} onCheckedChange={setter as (value: boolean) => void} />
-                    </label>
+                    <GuidanceField
+                      key={fieldId}
+                      name={`workbench.${fieldId}`}
+                      label={label}
+                      className="rounded-xl border border-slate-200 bg-white px-3 py-2"
+                    >
+                      <div className="flex justify-end">
+                        <Switch checked={Boolean(value)} onCheckedChange={setter as (value: boolean) => void} />
+                      </div>
+                    </GuidanceField>
                   ))}
                 </div>
                 <div className="mt-4 space-y-2">
@@ -720,21 +724,17 @@ export default function OCAWorkbench() {
                   { fieldId: 'is_all_metal_seal', label: 'All-Metal Seal', value: allMetalSeal, setter: setAllMetalSeal },
                   { fieldId: 'is_metallic_pressure_vessel', label: 'Metallic Pressure Vessel', value: metallicPressureVessel, setter: setMetallicPressureVessel },
                 ].map(({ fieldId, label, value, setter }) => (
-                  <label key={fieldId} className="flex items-center justify-between gap-3 text-sm">
-                    <span className="flex items-center gap-1.5">
-                      <span>{label}</span>
-                      <OCAInlineHelp entry={workbenchHelp(fieldId)} />
-                    </span>
-                    <Switch checked={Boolean(value)} onCheckedChange={setter as (value: boolean) => void} />
-                  </label>
+                  <GuidanceField key={fieldId} name={`workbench.${fieldId}`} label={label}>
+                    <div className="flex justify-end">
+                      <Switch checked={Boolean(value)} onCheckedChange={setter as (value: boolean) => void} />
+                    </div>
+                  </GuidanceField>
                 ))}
-                <label className="flex items-center justify-between gap-3 text-sm">
-                  <span className="flex items-center gap-1.5">
-                    <span>Cleanliness Verified</span>
-                    <OCAInlineHelp entry={workbenchHelp('cleanliness_verified')} />
-                  </span>
-                  <Switch checked={cleanlinessVerified} onCheckedChange={setCleanlinessVerified} />
-                </label>
+                <GuidanceField name="workbench.cleanliness_verified" label="Cleanliness Verified">
+                  <div className="flex justify-end">
+                    <Switch checked={cleanlinessVerified} onCheckedChange={setCleanlinessVerified} />
+                  </div>
+                </GuidanceField>
                 <GuidanceField name="workbench.contamination_notes" htmlFor="contamination-notes">
                   <Textarea
                     id="contamination-notes"
@@ -773,6 +773,7 @@ export default function OCAWorkbench() {
                 )}
               </div>
 
+              <GuidanceCompletionTracker fields={completionFields} nextStep="Run OCA screening" />
               <Button type="submit" disabled={loading} className="w-full gap-2">
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ScrollText className="h-4 w-4" />}
                 Run OCA Case
@@ -825,7 +826,7 @@ export default function OCAWorkbench() {
                   <Badge className={DISPOSITION_META[decision.final_disposition]?.className || 'bg-slate-700 text-white'}>
                     {DISPOSITION_META[decision.final_disposition]?.label || decision.final_disposition}
                   </Badge>
-                  <OCAInlineHelp entry={getDispositionGuidance(decision.final_disposition)} />
+                  <GuidanceInlineHelp name={`disposition.${decision.final_disposition}`} />
                 </div>
               </div>
             </CardHeader>
@@ -899,7 +900,7 @@ export default function OCAWorkbench() {
                       </span>
                       <span className="flex items-center gap-1.5">
                         <span className="text-sm font-medium">{item.requirement_id}</span>
-                        <OCAInlineHelp entry={getMprGuidance(item.requirement_id)} />
+                        <GuidanceInlineHelp name={`mpr.${item.requirement_id}`} />
                       </span>
                     </div>
                     <Badge className={statusClass(item.status)}>{item.status.replaceAll('_', ' ')}</Badge>
@@ -1026,7 +1027,7 @@ export default function OCAWorkbench() {
                         <div>
                           <div className="flex items-center gap-1.5">
                             <div className="text-sm font-medium">{mechanism.mechanism_name}</div>
-                            <OCAInlineHelp entry={getMechanismGuidance(mechanism.mechanism_name)} />
+                            <GuidanceInlineHelp name={`mechanism.${mechanism.mechanism_name}`} />
                           </div>
                           <div className="mt-1 text-xs text-slate-500">{mechanism.source_ref}</div>
                         </div>

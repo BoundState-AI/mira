@@ -9,7 +9,13 @@ import {
 } from 'lucide-react';
 
 import { PageHeader } from '@/components/PageHeader';
-import { MiraHelpLabel, MiraInlineHelp } from '@/components/mira/MiraInlineHelp';
+import {
+  GuidanceContextIndicator,
+  GuidanceField,
+  GuidanceInlineHelp,
+  GuidanceModeSelector,
+  GuidanceProvider,
+} from '@/components/guidance';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,7 +33,8 @@ import {
   type MuaV10PipelineResult,
   type ProcessMiulResponse,
 } from '@/lib/mua-v10-api';
-import { getMiraGuidanceEntry, getMiraInputGuidance } from '@/lib/mira-guidance';
+import { authorityRegistry, createMuaContext, muaGuidancePack } from '@/lib/guidance/mua-pack';
+import type { GuidanceModeName } from '@/lib/guidance/types';
 
 const ISSUE_COLUMNS = ['FLAM', 'FS', 'TOX', 'TVS', 'SCC', 'CORR'] as const;
 
@@ -109,8 +116,7 @@ function normalizeRating(value: string): string {
 }
 
 export default function MUAV10() {
-  const muaHelp = (fieldId: string) => getMiraInputGuidance('mua', fieldId);
-  const muaEntry = (section: string, id: string) => getMiraGuidanceEntry('mua', section, id);
+  const [guidanceMode, setGuidanceMode] = useState<GuidanceModeName>('live');
   // Step 1
   const [maptisCode, setMaptisCode] = useState('');
   const [materialDesignation, setMaterialDesignation] = useState('');
@@ -148,6 +154,12 @@ export default function MUAV10() {
   const [resolutionCandidates, setResolutionCandidates] = useState<Array<Record<string, unknown>>>([]);
   const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
   const [precedentExpanded, setPrecedentExpanded] = useState<Record<string, boolean>>({});
+  const guidanceContext = createMuaContext({
+    user_mode: guidanceMode,
+    program: project || undefined,
+    service_environment: media || environment,
+    material_class: materialClass === 'metal' ? 'metallic' : 'nonmetallic',
+  });
 
   const clearDownstreamState = () => {
     setPipelineResult(null);
@@ -516,12 +528,30 @@ export default function MUAV10() {
   };
 
   return (
-    <div className="space-y-6">
+    <GuidanceProvider
+      schema={muaGuidancePack}
+      context={guidanceContext}
+      mode={guidanceMode}
+      telemetryEnabled
+      onModeChange={(newMode) => setGuidanceMode(newMode)}
+      authorityRegistry={authorityRegistry}
+    >
+      <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
-        <PageHeader
-          title="MUA Writer"
-          description="Flag-first classifier - walk through each classification step"
-        />
+        <div className="space-y-3">
+          <PageHeader
+            title="MUA Writer"
+            description="Flag-first classifier - walk through each classification step"
+          />
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+            <GuidanceContextIndicator context={guidanceContext} />
+            <GuidanceModeSelector
+              currentMode={guidanceMode}
+              context={guidanceContext}
+              onModeChange={(newMode) => setGuidanceMode(newMode)}
+            />
+          </div>
+        </div>
         <div className="flex items-center gap-2">
           {sessionId ? (
             <Button type="button" variant="outline" size="sm" onClick={() => setDraftSavedAt(new Date().toISOString())}>
@@ -540,10 +570,10 @@ export default function MUAV10() {
       <Card className={step === 1 ? '' : 'opacity-75'}>
         {step === 1 ? (
           <>
-            <CardHeader>
+              <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 Step 1: Who / What / Where
-                <MiraInlineHelp entry={muaEntry('workflow', 'needs_input')} title="MUA workflow" />
+                <GuidanceInlineHelp name="workflow.needs_input" />
               </CardTitle>
               <CardDescription>Identify the material, MAPTIS code, and service environment.</CardDescription>
             </CardHeader>
@@ -633,32 +663,23 @@ export default function MUAV10() {
               ) : null}
 
               <div className="grid gap-4 md:grid-cols-3">
-                <div className="space-y-2">
-                  <MiraHelpLabel htmlFor="maptis-code" entry={muaHelp('material_key')}>
-                    MAPTIS Code (optional)
-                  </MiraHelpLabel>
+                <GuidanceField name="inputs.material_key" htmlFor="maptis-code" label="MAPTIS Code (optional)" className="space-y-2">
                   <Input
                     id="maptis-code"
                     value={maptisCode}
                     onChange={(event) => setMaptisCode(event.target.value)}
                     placeholder="e.g., 10392"
                   />
-                </div>
-                <div className="space-y-2">
-                  <MiraHelpLabel htmlFor="material-designation" entry={muaHelp('material_name')}>
-                    Material Designation
-                  </MiraHelpLabel>
+                </GuidanceField>
+                <GuidanceField name="inputs.material_name" htmlFor="material-designation" label="Material Designation" className="space-y-2">
                   <Input
                     id="material-designation"
                     value={materialDesignation}
                     onChange={(event) => setMaterialDesignation(event.target.value)}
                     placeholder="e.g., A286 CRES"
                   />
-                </div>
-                <div className="space-y-2">
-                  <MiraHelpLabel htmlFor="material-class" entry={muaHelp('material_class')}>
-                    Material Class
-                  </MiraHelpLabel>
+                </GuidanceField>
+                <GuidanceField name="inputs.material_class" htmlFor="material-class" label="Material Class" className="space-y-2">
                   <select
                     id="material-class"
                     value={materialClass}
@@ -668,25 +689,19 @@ export default function MUAV10() {
                     <option value="metal">metal</option>
                     <option value="nonmetallic">nonmetallic</option>
                   </select>
-                </div>
+                </GuidanceField>
               </div>
 
               <div className="grid gap-4 md:grid-cols-3">
-                <div className="space-y-2">
-                  <MiraHelpLabel htmlFor="media" entry={muaHelp('environment.fluid_medium')} title="Media">
-                    Media
-                  </MiraHelpLabel>
+                <GuidanceField name="inputs.environment.fluid_medium" htmlFor="media" label="Media" className="space-y-2">
                   <Input
                     id="media"
                     value={media}
                     onChange={(event) => setMedia(event.target.value)}
                     placeholder="e.g., GH2"
                   />
-                </div>
-                <div className="space-y-2">
-                  <MiraHelpLabel htmlFor="environment" entry={muaHelp('environment.habitable_volume')} title="Environment">
-                    Environment
-                  </MiraHelpLabel>
+                </GuidanceField>
+                <GuidanceField name="inputs.environment.habitable_volume" htmlFor="environment" label="Environment" className="space-y-2">
                   <select
                     id="environment"
                     value={environment}
@@ -696,11 +711,8 @@ export default function MUAV10() {
                     <option value="non-habitable">non-habitable</option>
                     <option value="habitable">habitable</option>
                   </select>
-                </div>
-                <div className="space-y-2">
-                  <MiraHelpLabel htmlFor="o2-percent" entry={muaHelp('environment.oxygen_pct')} title="O2 Percent">
-                    O2 Percent
-                  </MiraHelpLabel>
+                </GuidanceField>
+                <GuidanceField name="inputs.environment.oxygen_pct" htmlFor="o2-percent" label="O2 Percent" className="space-y-2">
                   <Input
                     id="o2-percent"
                     type="number"
@@ -708,26 +720,20 @@ export default function MUAV10() {
                     onChange={(event) => setO2Percent(event.target.value)}
                     placeholder="optional"
                   />
-                </div>
+                </GuidanceField>
               </div>
 
               <div className="grid gap-4 md:grid-cols-3">
-                <div className="space-y-2">
-                  <MiraHelpLabel htmlFor="project" entry={muaHelp('program')} title="Project">
-                    Project
-                  </MiraHelpLabel>
+                <GuidanceField name="inputs.program" htmlFor="project" label="Project" className="space-y-2">
                   <Input id="project" value={project} onChange={(event) => setProject(event.target.value)} />
-                </div>
+                </GuidanceField>
                 <div className="space-y-2">
                   <Label htmlFor="system">System</Label>
                   <Input id="system" value={system} onChange={(event) => setSystem(event.target.value)} />
                 </div>
-                <div className="space-y-2">
-                  <MiraHelpLabel htmlFor="pressure" entry={muaHelp('environment.pressure_kpa')} title="Pressure">
-                    Pressure
-                  </MiraHelpLabel>
+                <GuidanceField name="inputs.environment.pressure_kpa" htmlFor="pressure" label="Pressure" className="space-y-2">
                   <Input id="pressure" value={pressure} onChange={(event) => setPressure(event.target.value)} />
-                </div>
+                </GuidanceField>
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
@@ -786,7 +792,7 @@ export default function MUAV10() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   Step 2: Why is MAPTIS flagging?
-                  <MiraInlineHelp entry={muaEntry('classifier_steps', 'step1_identify_flags')} title="Flag classification" />
+                  <GuidanceInlineHelp name="classifier_steps.step1_identify_flags" />
                 </CardTitle>
                 <CardDescription>Enter the MAPTIS ratings. Each rating is decoded as you type.</CardDescription>
               </CardHeader>
@@ -796,13 +802,13 @@ export default function MUAV10() {
                     const value = ratings[column].trim().toUpperCase();
                     const hint = RATING_HINTS[column][value];
                     return (
-                      <div key={column} className="space-y-2">
-                        <MiraHelpLabel
-                          htmlFor={`rating-${column}`}
-                          entry={muaEntry('screening_columns', column)}
-                        >
-                          {column}
-                        </MiraHelpLabel>
+                      <GuidanceField
+                        key={column}
+                        name={`screening_columns.${column}`}
+                        htmlFor={`rating-${column}`}
+                        label={column}
+                        className="space-y-2"
+                      >
                         <Input
                           id={`rating-${column}`}
                           value={ratings[column]}
@@ -817,7 +823,7 @@ export default function MUAV10() {
                             <p className="text-xs text-red-600">Unknown rating '{value}' for {column}</p>
                           )
                         ) : null}
-                      </div>
+                      </GuidanceField>
                     );
                   })}
                 </div>
@@ -1215,6 +1221,7 @@ export default function MUAV10() {
           </CardContent>
         </Card>
       ) : null}
-    </div>
+      </div>
+    </GuidanceProvider>
   );
 }

@@ -9,8 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
-import { OCAHelpLabel, OCAInlineHelp } from '@/components/oca/OCAInlineHelp';
-import { getInputGuidance } from '@/lib/oca-guidance';
+import { OCAHelpLabelBridge as OCAHelpLabel, OCAInlineHelpBridge as OCAInlineHelp } from '@/components/guidance';
 import type { SystemInputs } from '@/lib/oca-system-api';
 
 interface SystemInputBarProps {
@@ -24,7 +23,7 @@ export default function SystemInputBar({ inputs, onChange }: SystemInputBarProps
       {/* O2 Fraction */}
       <div className="space-y-1 w-28">
         <OCAHelpLabel
-          entry={getInputGuidance('system_builder.o2_fraction')}
+          fieldId="system_builder.o2_fraction"
           className="gap-1"
           labelClassName="text-[10px] text-muted-foreground"
         >
@@ -40,7 +39,7 @@ export default function SystemInputBar({ inputs, onChange }: SystemInputBarProps
       {/* Max Pressure */}
       <div className="space-y-1 w-24">
         <OCAHelpLabel
-          entry={getInputGuidance('system_builder.system_pressure_max_psia')}
+          fieldId="system_builder.system_pressure_max_psia"
           className="gap-1"
           labelClassName="text-[10px] text-muted-foreground"
         >
@@ -57,7 +56,7 @@ export default function SystemInputBar({ inputs, onChange }: SystemInputBarProps
       {/* Phase */}
       <div className="space-y-1 w-28">
         <OCAHelpLabel
-          entry={getInputGuidance('system_builder.phase')}
+          fieldId="system_builder.phase"
           className="gap-1"
           labelClassName="text-[10px] text-muted-foreground"
         >
@@ -77,7 +76,7 @@ export default function SystemInputBar({ inputs, onChange }: SystemInputBarProps
       {/* Oxygen Phase */}
       <div className="space-y-1 w-20">
         <OCAHelpLabel
-          entry={getInputGuidance('system_builder.oxygen_phase')}
+          fieldId="system_builder.oxygen_phase"
           className="gap-1"
           labelClassName="text-[10px] text-muted-foreground"
         >
@@ -95,7 +94,7 @@ export default function SystemInputBar({ inputs, onChange }: SystemInputBarProps
       {/* Flow Rate */}
       <div className="space-y-1 w-24">
         <OCAHelpLabel
-          entry={getInputGuidance('system_builder.design_flow_rate_m3_s')}
+          fieldId="system_builder.design_flow_rate_m3_s"
           className="gap-1"
           labelClassName="text-[10px] text-muted-foreground"
         >
@@ -113,7 +112,7 @@ export default function SystemInputBar({ inputs, onChange }: SystemInputBarProps
       {/* Mission Phase */}
       <div className="space-y-1 w-28">
         <OCAHelpLabel
-          entry={getInputGuidance('system_builder.mission_phase')}
+          fieldId="system_builder.mission_phase"
           className="gap-1"
           labelClassName="text-[10px] text-muted-foreground"
         >
@@ -133,7 +132,7 @@ export default function SystemInputBar({ inputs, onChange }: SystemInputBarProps
       {/* Cleanliness */}
       <div className="space-y-1 w-28">
         <OCAHelpLabel
-          entry={getInputGuidance('system_builder.cleanliness_spec')}
+          fieldId="system_builder.cleanliness_spec"
           className="gap-1"
           labelClassName="text-[10px] text-muted-foreground"
         >
@@ -157,7 +156,7 @@ export default function SystemInputBar({ inputs, onChange }: SystemInputBarProps
         <div className="flex items-center gap-1">
           <span className="text-[10px] text-muted-foreground">Bi-Dir Flow</span>
           <OCAInlineHelp
-            entry={getInputGuidance('system_builder.bi_directional_flow_risk')}
+            fieldId="system_builder.bi_directional_flow_risk"
             className="h-3.5 w-3.5"
             iconClassName="h-3 w-3"
           />

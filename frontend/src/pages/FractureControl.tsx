@@ -3,7 +3,13 @@ import { AlertTriangle, CheckCircle2, Loader2, ShieldAlert, ShieldCheck, ShieldX
 
 import { PageHeader } from '@/components/PageHeader';
 import { StatusBadge } from '@/components/StatusBadge';
-import { MiraHelpLabel, MiraInlineHelp } from '@/components/mira/MiraInlineHelp';
+import {
+  GuidanceContextIndicator,
+  GuidanceField,
+  GuidanceInlineHelp,
+  GuidanceModeSelector,
+  GuidanceProvider,
+} from '@/components/guidance';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,7 +31,12 @@ import {
   type FractureAuthorityManifest,
   type FractureMaterialSearchResult,
 } from '@/lib/api';
-import { getMiraGuidanceEntry, getMiraInputGuidance } from '@/lib/mira-guidance';
+import {
+  authorityRegistry,
+  createFractureContext,
+  fractureGuidancePack,
+} from '@/lib/guidance/fracture-pack';
+import type { GuidanceModeName } from '@/lib/guidance/types';
 
 const MISSION_OPTIONS = [
   { value: 'HUMAN_RATED', label: 'Human-Rated' },
@@ -135,7 +146,7 @@ function classificationIcon(classification: string) {
 }
 
 export default function FractureControl() {
-  const fractureHelp = (fieldId: string) => getMiraInputGuidance('fracture', fieldId);
+  const [guidanceMode, setGuidanceMode] = useState<GuidanceModeName>('live');
   const [partName, setPartName] = useState('Primary Bracket');
   const [materialName, setMaterialName] = useState('Al 6061-T6');
   const [missionClass, setMissionClass] = useState('HUMAN_RATED');
@@ -167,6 +178,11 @@ export default function FractureControl() {
   const [loading, setLoading] = useState(false);
   const [bootLoading, setBootLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const guidanceContext = createFractureContext({
+    user_mode: guidanceMode,
+    service_environment: lifecyclePhase,
+    material_class: materialSystem === 'METALLIC' ? 'metallic' : materialSystem === 'COMPOSITE' ? 'composite' : undefined,
+  });
 
   const deferredMaterialName = useDeferredValue(materialName);
 
@@ -294,11 +310,27 @@ export default function FractureControl() {
   ];
 
   return (
-    <div className="space-y-8">
-      <PageHeader
-        title="Fracture Control"
-        description="Deterministic NASA-STD-5019A classifier for fracture-control routing. Define the part context, review applicable FCRs, and surface Phase 1 material findings with citations."
-      />
+    <GuidanceProvider
+      schema={fractureGuidancePack}
+      context={guidanceContext}
+      mode={guidanceMode}
+      telemetryEnabled
+      onModeChange={(newMode) => setGuidanceMode(newMode)}
+      authorityRegistry={authorityRegistry}
+    >
+      <div className="space-y-8">
+        <PageHeader
+          title="Fracture Control"
+          description="Deterministic NASA-STD-5019A classifier for fracture-control routing. Define the part context, review applicable FCRs, and surface Phase 1 material findings with citations."
+        />
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+          <GuidanceContextIndicator context={guidanceContext} />
+          <GuidanceModeSelector
+            currentMode={guidanceMode}
+            context={guidanceContext}
+            onModeChange={(newMode) => setGuidanceMode(newMode)}
+          />
+        </div>
 
       <Card className="border-border/70">
         <CardHeader>
@@ -310,16 +342,10 @@ export default function FractureControl() {
         <CardContent>
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <MiraHelpLabel htmlFor="part-name" entry={fractureHelp('part_name')}>
-                  Part Name
-                </MiraHelpLabel>
+              <GuidanceField name="inputs.part_name" htmlFor="part-name" label="Part Name">
                 <Input id="part-name" value={partName} onChange={(event) => setPartName(event.target.value)} className="mt-2" />
-              </div>
-              <div>
-                <MiraHelpLabel htmlFor="material-name" entry={fractureHelp('material_name')}>
-                  Material
-                </MiraHelpLabel>
+              </GuidanceField>
+              <GuidanceField name="inputs.material_name" htmlFor="material-name" label="Material">
                 <Input
                   id="material-name"
                   value={materialName}
@@ -328,103 +354,98 @@ export default function FractureControl() {
                   className="mt-2"
                 />
                 <MaterialSuggestions results={searchResults} onPick={setMaterialName} />
-              </div>
+              </GuidanceField>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-              <div>
-                <MiraHelpLabel entry={fractureHelp('mission_class')}>Mission Class</MiraHelpLabel>
+              <GuidanceField name="inputs.mission_class" label="Mission Class">
                 <Select value={missionClass} onValueChange={setMissionClass}>
                   <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
                   <SelectContent>{MISSION_OPTIONS.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}</SelectContent>
                 </Select>
-              </div>
-              <div>
-                <MiraHelpLabel entry={fractureHelp('hazard_consequence')}>Hazard Consequence</MiraHelpLabel>
+              </GuidanceField>
+              <GuidanceField name="inputs.hazard_consequence" label="Hazard Consequence">
                 <Select value={hazardConsequence} onValueChange={setHazardConsequence}>
                   <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
                   <SelectContent>{HAZARD_OPTIONS.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}</SelectContent>
                 </Select>
-              </div>
-              <div>
-                <MiraHelpLabel entry={fractureHelp('load_path_type')}>Load Path</MiraHelpLabel>
+              </GuidanceField>
+              <GuidanceField name="inputs.load_path_type" label="Load Path">
                 <Select value={loadPathType} onValueChange={setLoadPathType}>
                   <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
                   <SelectContent>{LOAD_PATH_OPTIONS.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}</SelectContent>
                 </Select>
-              </div>
-              <div>
-                <MiraHelpLabel entry={fractureHelp('lifecycle_phase')}>Lifecycle Phase</MiraHelpLabel>
+              </GuidanceField>
+              <GuidanceField name="inputs.lifecycle_phase" label="Lifecycle Phase">
                 <Select value={lifecyclePhase} onValueChange={setLifecyclePhase}>
                   <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
                   <SelectContent>{LIFECYCLE_OPTIONS.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}</SelectContent>
                 </Select>
-              </div>
-              <div>
-                <MiraHelpLabel entry={fractureHelp('structural_role')}>Structural Role</MiraHelpLabel>
+              </GuidanceField>
+              <GuidanceField name="inputs.structural_role" label="Structural Role">
                 <Select value={structuralRole} onValueChange={setStructuralRole}>
                   <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
                   <SelectContent>{STRUCTURAL_ROLE_OPTIONS.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}</SelectContent>
                 </Select>
-              </div>
+              </GuidanceField>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              <div>
-                <MiraHelpLabel entry={fractureHelp('material_system')}>Material System</MiraHelpLabel>
+              <GuidanceField name="inputs.material_system" label="Material System">
                 <Select value={materialSystem} onValueChange={setMaterialSystem}>
                   <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
                   <SelectContent>{MATERIAL_SYSTEM_OPTIONS.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}</SelectContent>
                 </Select>
-              </div>
-              <div>
-                <MiraHelpLabel entry={fractureHelp('specific_hardware_type')}>Specific Hardware Type</MiraHelpLabel>
+              </GuidanceField>
+              <GuidanceField name="inputs.specific_hardware_type" label="Specific Hardware Type">
                 <Select value={specificHardwareType} onValueChange={setSpecificHardwareType}>
                   <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
                   <SelectContent>{HARDWARE_TYPE_OPTIONS.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}</SelectContent>
                 </Select>
-              </div>
-              <div>
-                <MiraHelpLabel entry={fractureHelp('nasa_std_6016_qualified')}>
-                  NASA-STD-6016 Qualification
-                </MiraHelpLabel>
+              </GuidanceField>
+              <GuidanceField name="inputs.nasa_std_6016_qualified" label="NASA-STD-6016 Qualification">
                 <Select value={qualificationState} onValueChange={setQualificationState}>
                   <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
                   <SelectContent>{QUALIFICATION_OPTIONS.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}</SelectContent>
                 </Select>
-              </div>
+              </GuidanceField>
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
-              <div>
-                <MiraHelpLabel htmlFor="kic-fty" entry={fractureHelp('kic_fty_ratio')}>
-                  KIc/Fty ratio
-                </MiraHelpLabel>
+              <GuidanceField name="inputs.kic_fty_ratio" htmlFor="kic-fty" label="KIc/Fty ratio">
                 <Input id="kic-fty" value={kicFtyRatio} onChange={(event) => setKicFtyRatio(event.target.value)} placeholder="Example: 0.41" className="mt-2" />
-              </div>
-              <div>
-                <MiraHelpLabel htmlFor="ftu-ksi" entry={fractureHelp('ftu_ksi')}>
-                  FTU (ksi)
-                </MiraHelpLabel>
+              </GuidanceField>
+              <GuidanceField name="inputs.ftu_ksi" htmlFor="ftu-ksi" label="FTU (ksi)">
                 <Input id="ftu-ksi" value={ftuKsi} onChange={(event) => setFtuKsi(event.target.value)} placeholder="Example: 190" className="mt-2" />
-              </div>
-              <div>
-                <MiraHelpLabel htmlFor="short-transverse" entry={fractureHelp('short_transverse_dimension_in')}>
-                  Short-Transverse Dimension (in)
-                </MiraHelpLabel>
+              </GuidanceField>
+              <GuidanceField
+                name="inputs.short_transverse_dimension_in"
+                htmlFor="short-transverse"
+                label="Short-Transverse Dimension (in)"
+              >
                 <Input id="short-transverse" value={shortTransverseDimension} onChange={(event) => setShortTransverseDimension(event.target.value)} placeholder="Example: 3.5" className="mt-2" />
-              </div>
+              </GuidanceField>
             </div>
 
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {checkboxes.map((item) => (
-                <label key={item.label} className="flex items-center gap-3 rounded-lg border border-dashed border-border px-4 py-3">
-                  <Checkbox checked={item.checked} onCheckedChange={(checked) => item.setChecked(Boolean(checked))} />
-                  <div className="flex items-center gap-1.5 text-sm font-medium">
-                    <span>{item.label}</span>
-                    <MiraInlineHelp entry={fractureHelp(item.fieldId)} title={item.label} />
-                  </div>
-                </label>
+                item.fieldId ? (
+                  <GuidanceField
+                    key={item.label}
+                    name={`inputs.${item.fieldId}`}
+                    label={item.label}
+                    className="rounded-lg border border-dashed border-border px-4 py-3"
+                  >
+                    <div className="flex justify-end">
+                      <Checkbox checked={item.checked} onCheckedChange={(checked) => item.setChecked(Boolean(checked))} />
+                    </div>
+                  </GuidanceField>
+                ) : (
+                  <label key={item.label} className="flex items-center gap-3 rounded-lg border border-dashed border-border px-4 py-3">
+                    <Checkbox checked={item.checked} onCheckedChange={(checked) => item.setChecked(Boolean(checked))} />
+                    <div className="text-sm font-medium">{item.label}</div>
+                  </label>
+                )
               ))}
             </div>
 
@@ -469,7 +490,7 @@ export default function FractureControl() {
                 </div>
                 <div className="flex items-center gap-2">
                   <StatusBadge status={classificationBadge(result.classification)} />
-                  <MiraInlineHelp entry={getMiraGuidanceEntry('fracture', 'classifications', result.classification)} />
+                  <GuidanceInlineHelp name={`classifications.${result.classification}`} />
                 </div>
               </div>
             </div>
@@ -633,6 +654,7 @@ export default function FractureControl() {
           </Card>
         </div>
       )}
-    </div>
+      </div>
+    </GuidanceProvider>
   );
 }

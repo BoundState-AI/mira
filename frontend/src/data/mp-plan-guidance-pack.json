@@ -1,0 +1,944 @@
+{
+  "guidance_pack_id": "mira-mp-plan-guidance",
+  "schema_version": "2.0.0",
+  "platform": "mira",
+  "module": "mp_plan",
+  "locale": "en",
+  "status": "approved",
+  "authored_by": "J. Wilde",
+  "reviewed_by": [
+    "Beth"
+  ],
+  "approved_by": "J. Wilde",
+  "effective_date": "2026-04-01",
+  "supersedes": null,
+  "change_log": [
+    {
+      "version": "2.0.0",
+      "date": "2026-04-01",
+      "notes": "Migrated legacy MIRA inline guidance into Universal Guidance Schema v2."
+    }
+  ],
+  "module_mode_overrides": {
+    "mp_plan": {
+      "expert_mode_minimum_severity": "caution",
+      "rationale": "Legacy inline guidance remains visible in expert mode after v2 migration."
+    }
+  },
+  "fields": {
+    "inputs.program_name": {
+      "label": "Program Name",
+      "what": "The NASA program this M&P plan covers (e.g., Gateway, HLS, Orion).\n\nSource basis: PolicyPack.applicable_programs; NASA-STD-6016C §1.2",
+      "why": "The program selects the policy pack, which defines vehicle environment presets, tailored thresholds, and reviewer heuristics specific to that program.",
+      "how": "Select from the available programs. Each program has pre-configured environments and hardware implications. If your program is not listed, work with M&P engineering to create a new policy pack before proceeding.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.program_phase": {
+      "label": "Program Phase",
+      "what": "The current lifecycle phase of the program (e.g., Preliminary Design Review, Critical Design Review, Flight).\n\nSource basis: NASA-STD-6016C §3.1; program lifecycle requirements",
+      "why": "Phase determines which MPRs are mandatory vs. deferrable and affects the stringency of gap closure requirements.",
+      "how": "Earlier phases (PDR) allow more open gaps with due dates. Flight phase requires all gaps closed or formally accepted with risk statements.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.policy_pack_id": {
+      "label": "Policy Pack",
+      "what": "The configuration file that encodes program-specific rules, thresholds, and tribal knowledge.\n\nSource basis: PolicyPack model in policy/pack.py; program-specific configuration",
+      "why": "Policy packs capture what the standard leaves to program discretion — vehicle environment presets, hardware-type implications, closure path rules, and reviewer heuristics. Without a policy pack, the system uses conservative defaults.",
+      "how": "Policy packs are versioned and hashed for cache validation. If a pack is updated, all sessions using it must recompute. Each pack specifies applicable centers and programs — do not use a Gateway pack for Orion hardware.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.environments": {
+      "label": "Service Environments",
+      "what": "The environments the hardware operates in — each defined by oxygen percentage, pressure, temperature, fluid medium, and habitability.\n\nSource basis: EnvironmentDefinition model; NASA-STD-6016C §4.2.1; policy pack vehicle_environments",
+      "why": "Environments drive MPR applicability. O2 above 23.5% triggers flammability screening. Habitable volumes trigger toxicity. Vacuum triggers outgassing. Multi-environment hardware needs separate evaluation for each environment.",
+      "how": "Define every distinct environment the hardware sees across its lifecycle (storage, transport, ground processing, flight). Policy packs provide vehicle-specific presets (e.g., Gateway crew cabin = 34% O2 at 56.5 kPa). Each material-environment pair is evaluated independently.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.materials": {
+      "label": "Material Inventory",
+      "what": "The list of materials on the hardware, each with a name, application, MAPTIS code (if known), and physical quantities.\n\nSource basis: MaterialEntry model; JSC 27301F §4.2.1; NASA-STD-6016C §4.1",
+      "why": "The material inventory is the foundation of the entire plan. Every material must be resolved to a MAPTIS code to retrieve ratings, and physical quantities (mass, surface area) determine minor quantity eligibility.",
+      "how": "Enter all materials on the bill of materials. Include the MAPTIS code if known — this speeds resolution. If the code is unknown, provide the specification (AMS, ASTM, MIL) and the system will attempt resolution. Mass in grams and surface area in cm² are needed for minor quantity evaluation.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.materials.mass_g": {
+      "label": "Material Mass (grams)",
+      "what": "The mass of this material used on the hardware, in grams.\n\nSource basis: MINOR_QTY_MASS_LIMIT_G = 45.0; NASA-STD-6016C §4.2.1.1 MPR 44(c)",
+      "why": "Mass is one of two thresholds for minor quantity eligibility. If total mass of nonconforming materials in a zone is ≤45 grams, the minor quantity closure path may apply.",
+      "how": "Use the actual mass of the material as-used on the hardware. If mass is unknown, the system applies a conservative default of 1000g (assumes the material exceeds the limit). Providing actual mass can unlock the minor quantity path and avoid unnecessary MUAs.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.materials.surface_area_cm2": {
+      "label": "Material Surface Area (cm²)",
+      "what": "The exposed surface area of this material on the hardware, in square centimeters.\n\nSource basis: MINOR_QTY_AREA_LIMIT_CM2 = 13.0; NASA-STD-6016C §4.2.1.1 MPR 44(c)",
+      "why": "Surface area is the second threshold for minor quantity eligibility. If total exposed area of nonconforming materials in a zone is ≤13 cm², the minor quantity closure path may apply.",
+      "how": "Measure or calculate the exposed surface area — the surface that interacts with the service environment. If unknown, the system defaults to 100 cm² (conservative, assumes exceeds limit). Like mass, actual values can unlock closure paths.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.materials.maptis_code": {
+      "label": "MAPTIS Code",
+      "what": "The unique numeric identifier for this material in the NASA MAPTIS database.\n\nSource basis: MAPTIS database; Engine A (Data Acquisition)",
+      "why": "The MAPTIS code links a material to its complete test history — flammability, toxicity, outgassing, SCC, and corrosion ratings. Without it, no compliance evaluation is possible.",
+      "how": "Enter the exact MAPTIS code if known. If unknown, the Data Acquisition engine will attempt resolution using the material name and specification. Ambiguous resolutions generate a MATERIAL_AMBIGUOUS blocking question for user clarification.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.hardware_context": {
+      "label": "Hardware Context",
+      "what": "Description of the hardware assembly — its function, structural classification, and where it operates.\n\nSource basis: HardwareContext model; PolicyPack.hardware_type_implications",
+      "why": "Hardware context affects applicability decisions. Some MPRs have hardware-type implications (e.g., engine components vs. avionics). Policy packs map hardware types to implied screening requirements.",
+      "how": "Provide the hardware name, function, and operating location. If the policy pack has hardware_type_implications for your hardware class, additional screenings may be automatically applied.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.material_environment_usages": {
+      "label": "Material-Environment Mappings",
+      "what": "Explicit mappings defining which materials are used in which environments, including ignition source proximity and adjacency grouping.\n\nSource basis: MaterialEnvironmentUsage model; Engine A ensure_environment_mappings()",
+      "why": "Not every material sees every environment. These mappings enable precise applicability evaluation and minor quantity zone-based aggregation.",
+      "how": "If not explicitly provided, the system creates default mappings of all materials to all environments (conservative). For minor quantity analysis, specify the ignition_source_proximity (none, low_energy, high_energy) and adjacency_group for accurate zone-based grouping.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "engines.engine_a_data_acquisition": {
+      "label": "Engine A: Data Acquisition",
+      "what": "Resolves material names to MAPTIS codes, retrieves test ratings, and detects missing data that blocks downstream engines.\n\nSource basis: data_acquisition.py; MAPTIS database interface",
+      "why": "Every compliance decision depends on having the correct MAPTIS ratings. Engine A ensures the data pipeline is complete before evaluation begins.",
+      "how": "Engine A runs first in every compute loop iteration. It produces three outputs: MaterialResolutionResults (resolved ratings), DeficiencySignals (missing data), and MaterialEnvironmentUsage mappings. If a material cannot be resolved, a MATERIAL_AMBIGUOUS blocking question is generated. Conservative defaults are available for missing mass (1000g) and area (100 cm²) to allow plan generation even with incomplete data.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "engines.engine_b_applicability": {
+      "label": "Engine B: Applicability",
+      "what": "Determines which Material and Process Requirements (MPRs) apply to each material-environment pair.\n\nSource basis: applicability.py; NASA-STD-6016C §4.2; MPR index",
+      "why": "Not all MPRs apply to every situation. Flammability screening only triggers above 23.5% O2. Toxicity only matters in habitable volumes. Applicability filtering eliminates irrelevant requirements.",
+      "how": "Engine B produces the applicability matrix — a lookup of (material_id:environment_id) → {MPR → status}. Status is APPLICABLE, NOT_APPLICABLE_BY_CONDITION, or NOT_APPLICABLE_BY_DESIGN. The MPR count comes from the dynamic MPR index (never hardcoded). If applicability results look wrong, check the environment definition — especially O2%, habitable flag, and vacuum_exposure.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "engines.engine_c_compliance_eval": {
+      "label": "Engine C: Compliance Evaluation",
+      "what": "Evaluates each material against its applicable MPRs and identifies nonconformances (rating failures) and deficiencies (missing data).\n\nSource basis: compliance_eval.py; NASA-STD-6016C §4.2.1; gap severity model",
+      "why": "This is where the plan determines compliance status. Engine C finds the gaps between what the standard requires and what the test data shows.",
+      "how": "Engine C evaluates three specific hazards: flammability (O2 >23.5%, rating not A or B), outgassing (vacuum or habitable, TVS not A), and toxicity (habitable, TOX not A). Each gap becomes either a DeficiencySignal (missing data, blocks decisions) or a NonconformanceSignal (evidence of failure, requires closure). Severity levels: CRITICAL, HIGH, MEDIUM, LOW. Critical and High nonconformances require MUAs.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "engines.engine_d_minor_quantity": {
+      "label": "Engine D: Minor Quantity Aggregation",
+      "what": "Groups nonconforming materials by environment, ignition source, and physical adjacency, then evaluates whether each group qualifies for the minor quantity closure path.\n\nSource basis: minor_quantity.py; NASA-STD-6016C §4.2.1.1 MPR 44(c); MINOR_QTY_MASS_LIMIT_G=45.0, MINOR_QTY_AREA_LIMIT_CM2=13.0",
+      "why": "Minor quantity is a powerful closure path that can eliminate the need for individual MUAs on small amounts of nonconforming material. But it requires zone-based aggregation — you cannot evaluate materials in isolation.",
+      "how": "A group is eligible if total mass ≤45 grams AND total surface area ≤13 cm². Groups are formed by: same environment, same ignition source class, same adjacency group. If materials lack explicit adjacency data, the system conservatively assumes they are co-located (grouped together) and generates a GROUPING_CONFIRMATION blocking question. Confirm or override the grouping assumptions to get accurate results.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "gap_types.deficiency_signal": {
+      "label": "Deficiency Signal",
+      "what": "Missing input or evidence that blocks a compliance decision — NOT a compliance failure.\n\nSource basis: DeficiencySignal model in gaps.py; Engine A detect_deficiencies()",
+      "why": "Deficiencies are data gaps, not test failures. The compliance engine cannot make a determination because information is missing. This is different from a nonconformance, where data exists but shows failure.",
+      "how": "Common deficiency types: missing_maptis_code (material not resolved), missing_mass (no mass data for minor quantity), missing_surface_area. Each deficiency identifies which decision it blocks (blocked_decision_ids). Conservative defaults may be available — using them allows plan generation but with conservative assumptions flagged in the output.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "gap_types.nonconformance_signal": {
+      "label": "Nonconformance Signal",
+      "what": "Evidence that a material does not meet a requirement — a real compliance failure that requires closure.\n\nSource basis: NonconformanceSignal model in gaps.py; Engine C evaluate_material_in_environment()",
+      "why": "Nonconformances are the core output of compliance evaluation. Each one represents a gap between the standard's requirement and the material's demonstrated performance. Every nonconformance must be closed (via MUA, minor quantity, or formal acceptance) before the plan can be finalized.",
+      "how": "Each nonconformance records: the failure mode (FLAM, TVS, TOX, etc.), the failing and required values, severity, confidence, and affected MPRs. Severity drives routing — CRITICAL and HIGH require MUAs (via requires_mua() method). MEDIUM and LOW may be closable through minor quantity or configuration analysis.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "gap_types.gap_split": {
+      "label": "Deficiency vs. Nonconformance Split",
+      "what": "The system automatically separates gap signals into deficiencies (missing data) and nonconformances (evidence of failure).\n\nSource basis: split_gap_signals() in gaps.py; GapTrigger enum",
+      "why": "The split was a key design decision. Deficiencies need more data. Nonconformances need engineering disposition. Treating them the same leads to confusion — an engineer closing a 'gap' might not realize it is a data gap (get more data) vs. a performance gap (write an MUA).",
+      "how": "MISSING_DATA trigger → DeficiencySignal. RATING_NON_A trigger → NonconformanceSignal. The split happens automatically in Engine C via split_gap_signals(). If a gap seems miscategorized, check the trigger type.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "compute_loop.compute_question_recompute": {
+      "label": "Compute-Question-Recompute Loop",
+      "what": "The core execution pattern — the system computes everything it can, generates blocking questions for what it cannot, waits for user answers, then recomputes with the new information.\n\nSource basis: compute_loop.py; PlanGeneratorSession.can_generate()",
+      "why": "M&P plans require iterative refinement. The system cannot evaluate compliance until materials are resolved. It cannot do minor quantity analysis until nonconformances are found. The loop ensures each engine runs as soon as its inputs are available.",
+      "how": "Each iteration runs engines A→B→C→D in sequence, then generates blocking questions, then checks readiness. The loop exits when can_generate() returns true (all materials resolved, all gaps closed or accepted) or when max iterations is reached. If the loop stalls, check which blocking questions are unanswered.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "compute_loop.engine_sequence": {
+      "label": "Engine Execution Sequence",
+      "what": "The four engines run in strict order: A (data) → B (applicability) → C (compliance) → D (minor quantity).\n\nSource basis: compute_loop.py engine sequence; dependency chain",
+      "why": "Each engine depends on the previous engine's output. Engine B needs Engine A's MAPTIS resolutions. Engine C needs Engine B's applicability matrix. Engine D needs Engine C's nonconformances.",
+      "how": "If an engine's prerequisites are not met, it is skipped in that iteration. Example: on the first iteration with no materials resolved, only Engine A runs. After the user resolves ambiguous materials, the next iteration can run Engines A through C. The loop naturally handles this progression.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "compute_loop.can_generate": {
+      "label": "Readiness Check",
+      "what": "The session's readiness assessment — checks whether the plan has enough information to generate output documents.\n\nSource basis: PlanGeneratorSession.can_generate() in session.py",
+      "why": "Plan generation requires a minimum completeness level: environments defined, materials present, all materials resolved, no unresolved blocking deficiencies, and all nonconformances closed or accepted.",
+      "how": "can_generate() returns (bool, list[str]) — the boolean and a list of blocker descriptions. Common blockers: 'No environments defined', 'Material X has no MAPTIS resolution', 'Nonconformance Y has no closure decision'. Fix each blocker to proceed.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "blocking_questions.MATERIAL_AMBIGUOUS": {
+      "label": "Material Ambiguous",
+      "what": "The system found multiple possible MAPTIS entries for a material and needs the user to select the correct one.\n\nSource basis: BlockingQuestionType.MATERIAL_AMBIGUOUS; Engine A resolve_materials()",
+      "why": "Ambiguous material resolution is the most common blocking question. Many material names map to multiple MAPTIS codes with different test histories.",
+      "how": "Review the options and select the correct MAPTIS code. Check the specification and test conditions to confirm the match. If none of the options are correct, enter the MAPTIS code manually.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "blocking_questions.ENVIRONMENT_MISSING": {
+      "label": "Environment Missing",
+      "what": "No service environment has been defined for the session — the system cannot evaluate applicability without knowing the environment.\n\nSource basis: BlockingQuestionType.ENVIRONMENT_MISSING; generate_blocking_questions()",
+      "why": "Environment parameters (O2%, habitable, pressure, medium) drive every applicability decision. Without them, Engines B, C, and D cannot run.",
+      "how": "Select from policy pack presets or define a custom environment. The blocking question offers options from the active policy pack's vehicle_environments. If the environment is not listed, provide O2%, pressure, temperature, fluid medium, and habitability flag.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "blocking_questions.QUANTITY_MISSING": {
+      "label": "Quantity Data Missing",
+      "what": "A nonconforming material has no mass or surface area data, which is needed for minor quantity evaluation.\n\nSource basis: BlockingQuestionType.QUANTITY_MISSING; Engine A conservative defaults",
+      "why": "Minor quantity eligibility depends on physical quantities. Without mass and area, Engine D cannot determine if the minor quantity closure path is available.",
+      "how": "Provide mass in grams and surface area in cm² as a comma-separated pair (e.g., '12.5, 8.3'). If unknown, the system will use conservative defaults (1000g, 100 cm²) that assume the limits are exceeded.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "blocking_questions.CLOSURE_SELECTION": {
+      "label": "Closure Path Selection",
+      "what": "A nonconformance has been identified and the user must select how to close it — MUA, minor quantity, configuration analysis, or formal acceptance.\n\nSource basis: BlockingQuestionType.CLOSURE_SELECTION; ClosureOption model in closure.py",
+      "why": "Each nonconformance needs a disposition. The system presents eligible closure paths based on the gap type, severity, and available data. The user (or engineer) selects the appropriate path.",
+      "how": "Review the available closure options. Each option shows: path name, eligibility status, citation, required inputs, and rationale. Minor quantity is only eligible if the aggregated group meets the 45g/13cm² limits. MUA paths route through the MUA Writer module. Accept-as-open requires a risk statement, owner, and due date.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "blocking_questions.GROUPING_CONFIRMATION": {
+      "label": "Grouping Confirmation",
+      "what": "The system assumed certain materials are co-located (in the same physical zone) for minor quantity aggregation — the user must confirm or override this assumption.\n\nSource basis: BlockingQuestionType.GROUPING_CONFIRMATION; Engine D detect_grouping_assumptions()",
+      "why": "Minor quantity aggregation depends on physical adjacency. Materials in different zones should not be grouped together. The system conservatively groups materials without explicit adjacency data and asks the user to confirm.",
+      "how": "Review which materials the system grouped together. If they are physically near each other on the hardware, confirm the grouping. If they are in different locations, separate them by assigning different adjacency groups. Incorrect grouping can either over-count (grouping distant materials) or under-count (separating adjacent materials) the zone totals.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "blocking_questions.TAILORING_APPROVAL": {
+      "label": "Tailoring Approval",
+      "what": "The system needs approval to apply a program-specific tailoring of a standard requirement.\n\nSource basis: BlockingQuestionType.TAILORING_APPROVAL; PolicyPack threshold_overrides",
+      "why": "Programs may tailor NASA-STD-6016C requirements with approval. The system detects when tailoring rules in the policy pack apply and asks for confirmation before applying them.",
+      "how": "Review the tailoring rationale and citation. Tailoring typically adjusts thresholds or exempts specific MPRs for the program. Approval should come from someone with authority to accept the tailored requirement.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "closure_paths.mua_closure": {
+      "label": "MUA Closure",
+      "what": "Close the nonconformance by writing a Material Usage Agreement that documents why the material is acceptable despite failing screening.\n\nSource basis: NASA-STD-6016C §4.1.6.1; NonconformanceSignal.requires_mua()",
+      "why": "MUAs are the standard closure mechanism for materials that fail screening but must be used. The MUA Writer module handles the classification and drafting.",
+      "how": "Routes to the MUA Writer module. The MUA type (Category I or II) depends on the classifier's evaluation of hazard applicability. CRITICAL and HIGH severity nonconformances always require MUA closure.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "closure_paths.minor_quantity_closure": {
+      "label": "Minor Quantity Closure",
+      "what": "Close the nonconformance by demonstrating that the total amount of nonconforming material in the zone is below the minor quantity thresholds.\n\nSource basis: NASA-STD-6016C §4.2.1.1 MPR 44(c); MINOR_QTY_MASS_LIMIT_G=45.0, MINOR_QTY_AREA_LIMIT_CM2=13.0",
+      "why": "Minor quantity is the most efficient closure path — it can disposition multiple material gaps at once if the zone totals are within limits. No individual MUA is needed.",
+      "how": "Eligible only if the aggregated group total is ≤45g mass AND ≤13 cm² surface area. Both thresholds must be met. The group includes ALL nonconforming materials in the same environment, ignition source class, and adjacency zone — not just one material. Confirm grouping assumptions before relying on this path.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "closure_paths.accept_as_open": {
+      "label": "Accept as Open Gap",
+      "what": "Formally accept that the gap exists and will be closed later — the plan documents the risk and assigns an owner and due date.\n\nSource basis: AcceptedOpenGap model in closure.py; plan generation readiness rules",
+      "why": "Not all gaps can be closed immediately, especially in early program phases. Accepting a gap as open allows plan generation to proceed while tracking the open item.",
+      "how": "Requires: acceptance rationale, risk statement, responsible owner, due date, and whether to flag the gap in output documents. Use this for gaps where testing is planned but not yet complete, or where a material change is in progress. The gap appears in the plan output with a visible flag.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "closure_paths.configuration_analysis": {
+      "label": "Configuration Analysis",
+      "what": "Close the nonconformance by demonstrating through analysis that the material's configuration makes the hazard non-credible.\n\nSource basis: NASA-STD-6016C §4.2.1.1; ClosureOption model",
+      "why": "Some materials are encapsulated, covered, or used in configurations that eliminate the hazard. A material sealed inside a metal housing cannot participate in a cabin fire.",
+      "how": "Requires engineering analysis documenting how the configuration mitigates the hazard. The analysis must address the specific failure mode, not just general configuration. This path is most common for flammability gaps where the material is physically isolated from ignition sources and oxygen.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.decision_graph": {
+      "label": "Decision Graph",
+      "what": "A directed graph tracking dependencies between all decisions in the session — which inputs affect which outputs.\n\nSource basis: DecisionGraph model in graph.py; build_decision_graph() in compute_loop.py",
+      "why": "When a user changes an input (adds a material, updates mass, changes environment), the graph identifies exactly which downstream decisions are invalidated and need recomputation.",
+      "how": "The graph has nodes (materials, environments, resolutions, nonconformances, applicability decisions) and edges (depends_on, triggers, satisfies, invalidates). When debugging unexpected recomputation, check the graph to see what changed and what it invalidated.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.computation_context": {
+      "label": "Computation Context",
+      "what": "A versioned snapshot of all external data sources used in the session — MPR index hash, policy pack hash, MAPTIS dataset hash, and code version.\n\nSource basis: ComputationContext model in context.py; compute_cache_key()",
+      "why": "Computation context enables cache validation. If any external source changes (new MPR index, updated policy pack, new MAPTIS data), the cache key changes and the session must recompute.",
+      "how": "The cache key is a SHA-256 hash of all source hashes concatenated. Two sessions are compatible (can share cached results) only if all hashes match. If results seem stale, check whether the computation context has changed since the last run.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.conservative_defaults": {
+      "label": "Conservative Defaults",
+      "what": "When data is missing, the system can apply conservative assumptions to allow plan generation — flagging the assumptions in the output.\n\nSource basis: DeficiencySignal.conservative_default_value; Engine A detect_deficiencies()",
+      "why": "Real engineering programs cannot wait for perfect data. Conservative defaults let the system produce a plan that is never non-conservative — it may be stricter than necessary, but it will not miss a real issue.",
+      "how": "Default mass: 1000g (assumes exceeds 45g limit). Default surface area: 100 cm² (assumes exceeds 13 cm² limit). These defaults make minor quantity ineligible, forcing MUA closure. When actual data becomes available, the session recomputes and may find minor quantity is now eligible.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.policy_pack_explained": {
+      "label": "Policy Pack (Concept)",
+      "what": "A program-specific configuration that encodes environment presets, hardware implications, threshold overrides, closure rules, and reviewer heuristics.\n\nSource basis: PolicyPack model in policy/pack.py; program-specific configuration",
+      "why": "NASA-STD-6016C leaves many decisions to program discretion. Policy packs encode those decisions as machine-readable rules so the system can apply them consistently.",
+      "how": "Each policy pack includes: vehicle_environments (pre-configured environments for program vehicles), hardware_type_implications (which hardware types imply additional screening), threshold_overrides (program-specific parameter limits), closure_path_rules (which closure paths are allowed under what conditions), and reviewer_heuristics (predicted reviewer questions and recommended evidence).",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.mpr_applicability": {
+      "label": "MPR Applicability",
+      "what": "The determination of whether a specific Material and Process Requirement applies to a given material-environment pair.\n\nSource basis: Engine B applicability.py; NASA-STD-6016C §4.2; ApplicabilityStatus enum",
+      "why": "Applicability is binary — either the MPR applies or it does not. But the reason it does not apply matters: NOT_APPLICABLE_BY_CONDITION (environment does not trigger it) vs. NOT_APPLICABLE_BY_DESIGN (material class excludes it).",
+      "how": "Key applicability rules: MPR 44 (flammability) applies when O2 >23.5%. MPR 45/67 (toxicity/outgassing) apply to nonmetallics in habitable/vacuum environments. MPR 89 (toxicity screening) applies in habitable volumes. The MPR count comes from the dynamic MPR index — never hardcoded as '213' or any other number.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.gap_severity": {
+      "label": "Gap Severity Levels",
+      "what": "The four severity levels for nonconformances — CRITICAL, HIGH, MEDIUM, LOW — which drive closure routing.\n\nSource basis: GapSeverity enum; NonconformanceSignal.requires_mua(); Engine C severity assignment",
+      "why": "Severity determines which closure paths are available and how urgently the gap must be addressed. Critical and High gaps require MUAs. Medium and Low may qualify for minor quantity or configuration analysis.",
+      "how": "Severity mapping: flammability rating X or D → CRITICAL. Flammability rating C → HIGH. Outgassing/toxicity gaps → MEDIUM or HIGH (based on habitability). The requires_mua() method returns true for CRITICAL and HIGH. Lower severities have more closure options.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.compliance_status": {
+      "label": "Compliance Status",
+      "what": "The overall compliance determination for a material-environment-MPR combination.\n\nSource basis: ComplianceStatus enum; Engine C build_mpr_determination()",
+      "why": "Compliance status summarizes whether the material meets the requirement, fails it, or meets it with constraints. This is the bottom-line answer for each MPR evaluation.",
+      "how": "Five statuses: COMPLIANT (no gaps), NONCOMPLIANT (critical severity gap exists), COMPLIANT_WITH_CONSTRAINTS (gap exists but closable with mitigations), NOT_APPLICABLE (MPR does not apply), UNKNOWN (insufficient data). NONCOMPLIANT status requires closure before plan finalization.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.minor_quantity_zones": {
+      "label": "Minor Quantity Zones",
+      "what": "Physical zones defined by environment, ignition source proximity, and adjacency — the unit of aggregation for minor quantity evaluation.\n\nSource basis: MinorQuantityGroup model; Engine D create_groups(); zone key construction",
+      "why": "Minor quantity thresholds apply per zone, not per material or per vehicle. Materials in the same zone contribute to the same totals. Materials in different zones are evaluated independently.",
+      "how": "Zone key format: '{environment_id}:{ignition_class}:{adjacency_group}'. Ignition classes: none, low_energy, high_energy. If adjacency is not specified, the system conservatively groups all materials in the same environment+ignition class together and asks for confirmation.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    }
+  },
+  "workflows": {},
+  "contexts": {}
+}

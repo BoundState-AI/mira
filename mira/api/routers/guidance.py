@@ -27,6 +27,30 @@ _PACK_SOURCES: dict[str, dict[str, Path]] = {
         "pack": _FRONTEND_DATA / "oca-guidance-pack.json",
         "authority_registry": _FRONTEND_DATA / "authority-registry.json",
     },
+    "mira-mua-guidance": {
+        "pack": _FRONTEND_DATA / "mua-guidance-pack.json",
+        "authority_registry": _FRONTEND_DATA / "authority-registry.json",
+    },
+    "mira-miul-guidance": {
+        "pack": _FRONTEND_DATA / "miul-guidance-pack.json",
+        "authority_registry": _FRONTEND_DATA / "authority-registry.json",
+    },
+    "mira-h2-guidance": {
+        "pack": _FRONTEND_DATA / "h2-guidance-pack.json",
+        "authority_registry": _FRONTEND_DATA / "authority-registry.json",
+    },
+    "mira-galvanic-guidance": {
+        "pack": _FRONTEND_DATA / "galvanic-guidance-pack.json",
+        "authority_registry": _FRONTEND_DATA / "authority-registry.json",
+    },
+    "mira-fracture-guidance": {
+        "pack": _FRONTEND_DATA / "fracture-guidance-pack.json",
+        "authority_registry": _FRONTEND_DATA / "authority-registry.json",
+    },
+    "mira-mp-plan-guidance": {
+        "pack": _FRONTEND_DATA / "mp-plan-guidance-pack.json",
+        "authority_registry": _FRONTEND_DATA / "authority-registry.json",
+    },
 }
 
 _PACK_CACHE: dict[str, GuidancePack] = {}

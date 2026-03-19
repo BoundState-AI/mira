@@ -1,4 +1,24 @@
 {
+  "inline": {
+    "authority_id": "inline",
+    "document_id": "Legacy Guidance",
+    "revision": "Migrated v1",
+    "section": "Inline field help",
+    "requirement_id": null,
+    "requirement_type": null,
+    "verbatim_excerpt": null,
+    "boundstate_summary": "Guidance migrated from the legacy MIRA inline help catalogs into the Universal Guidance Schema v2 envelope.",
+    "interpretation": null,
+    "source_type": "derived_summary",
+    "source_url": null,
+    "internal_doc_handle": "bs://guidance/legacy-inline",
+    "page_ref": null,
+    "document_hash": null,
+    "verification_method": "manual_review",
+    "last_verified": "2026-03-19",
+    "status": "active",
+    "legal_disclaimer": "BoundState summaries and interpretations are paraphrases provided for usability. They do not constitute legal or regulatory advice. Always refer to the governing standard for authoritative text."
+  },
   "auth-bs-spec-oca-001-rev1": {
     "authority_id": "auth-bs-spec-oca-001-rev1",
     "document_id": "BS-SPEC-OCA-001",

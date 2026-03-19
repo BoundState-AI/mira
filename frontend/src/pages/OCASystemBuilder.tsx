@@ -18,7 +18,12 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { OCAInlineHelp } from '@/components/oca/OCAInlineHelp';
+import {
+  GuidanceContextIndicator,
+  GuidanceInlineHelp,
+  GuidanceModeSelector,
+  GuidanceProvider,
+} from '@/components/guidance';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -42,7 +47,8 @@ import {
   type PathInspectorResult, type ComponentArchetype,
   ZONE_COLORS, ZONE_LABELS,
 } from '@/lib/oca-system-api';
-import { getDispositionGuidance, getMprGuidance } from '@/lib/oca-guidance';
+import { authorityRegistry, createOcaContext, ocaGuidancePack } from '@/lib/guidance/oca-pack';
+import type { GuidanceModeName } from '@/lib/guidance/types';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -136,12 +142,25 @@ export default function OCASystemBuilder() {
   const [error, setError] = useState<string | null>(null);
   const [showKindling, setShowKindling] = useState(false);
   const [activeTab, setActiveTab] = useState('canvas');
+  const [guidanceMode, setGuidanceMode] = useState<GuidanceModeName>('live');
 
   // React Flow
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
+
+  const guidanceContext = createOcaContext({
+    user_mode: guidanceMode,
+    program: inputs.project_name || undefined,
+    service_environment: inputs.phase,
+    pressure_regime:
+      inputs.system_pressure_max_psia >= 265
+        ? 'high'
+        : inputs.system_pressure_max_psia >= 50
+          ? 'medium'
+          : 'low',
+  });
 
   // Component ID → server component map
   const componentMap = useRef<Map<string, SystemComponent>>(new Map());
@@ -400,80 +419,98 @@ export default function OCASystemBuilder() {
   // Render
   // ---------------------------------------------------------------------------
   return (
-    <div className="flex flex-col h-[calc(100vh-60px)]">
-      {/* Page Header */}
-      <div className="flex items-center justify-between px-4 py-2 border-b">
-        <div>
-          <h1 className="text-lg font-semibold tracking-tight flex items-center gap-2">
-            <LayoutGrid className="h-5 w-5" />
-            OCA System Builder
-          </h1>
-          <p className="text-xs text-muted-foreground">
-            Visual topology-aware oxygen hazard assessment per BS-SPEC-OCA-002-REV0
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          {assessment && (
-            <div className="flex items-center gap-2">
-              <Badge className={DISPOSITION_LABELS[assessment.system_disposition]?.color || 'bg-gray-600 text-white'}>
-                {DISPOSITION_LABELS[assessment.system_disposition]?.label || assessment.system_disposition}
-              </Badge>
-              <OCAInlineHelp entry={getDispositionGuidance(assessment.system_disposition)} />
+    <GuidanceProvider
+      schema={ocaGuidancePack}
+      context={guidanceContext}
+      mode={guidanceMode}
+      telemetryEnabled
+      onModeChange={(newMode) => setGuidanceMode(newMode)}
+      authorityRegistry={authorityRegistry}
+    >
+      <div className="flex h-[calc(100vh-60px)] flex-col">
+        {/* Page Header */}
+        <div className="space-y-3 border-b px-4 py-2">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="flex items-center gap-2 text-lg font-semibold tracking-tight">
+                <LayoutGrid className="h-5 w-5" />
+                OCA System Builder
+              </h1>
+              <p className="text-xs text-muted-foreground">
+                Visual topology-aware oxygen hazard assessment per BS-SPEC-OCA-002-REV0
+              </p>
             </div>
-          )}
-          <Badge variant="outline" className="text-xs">Phase 2</Badge>
-        </div>
-      </div>
-
-      {/* MPR 67 Banner */}
-      {assessment?.mpr67_active && (
-        <Alert variant="destructive" className="mx-4 mt-2 border-red-700 bg-red-950">
-          <XCircle className="h-4 w-4" />
-          <AlertTitle className="flex items-center gap-2 text-sm font-bold">
-            <span>MPR 67 GOVERNING PROHIBITION — Titanium forbidden in LOX/GOX at any pressure</span>
-            <OCAInlineHelp entry={getMprGuidance('MPR_67')} className="h-4 w-4 text-red-100" iconClassName="h-3.5 w-3.5" />
-          </AlertTitle>
-          <AlertDescription className="text-xs">
-            One or more components contain titanium alloys. Per NASA-STD-6016C §4.2.1.3c,
-            titanium SHALL NOT be used with LOX or GOX at any pressure, or with air above 5 psia O2 partial pressure.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/* Disclaimer */}
-      <div className="px-4 pt-2">
-        <Alert>
-          <Info className="h-4 w-4" />
-          <AlertDescription className="text-xs">
-            Screening aid only. Topology, not geometry. Every inferred state is visible. Every rule has provenance.
-          </AlertDescription>
-        </Alert>
-      </div>
-
-      {/* System Input Bar */}
-      <div className="px-4 py-2">
-        <SystemInputBar inputs={inputs} onChange={handleInputChange} />
-      </div>
-
-      {/* Blocked States */}
-      {assessment && assessment.blocked_states.length > 0 && (
-        <div className="px-4">
-          <Alert variant="destructive">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertTitle className="text-sm">Blocked States</AlertTitle>
-            <AlertDescription>
-              {assessment.blocked_states.map((b, i) => (
-                <div key={i} className="text-xs mt-1">
-                  <strong className="uppercase">{b.state_type.replace(/_/g, ' ')}</strong>: {b.description}
+            <div className="flex items-center gap-2">
+              {assessment && (
+                <div className="flex items-center gap-2">
+                  <Badge className={DISPOSITION_LABELS[assessment.system_disposition]?.color || 'bg-gray-600 text-white'}>
+                    {DISPOSITION_LABELS[assessment.system_disposition]?.label || assessment.system_disposition}
+                  </Badge>
+                  <GuidanceInlineHelp name={`disposition.${assessment.system_disposition}`} />
                 </div>
-              ))}
+              )}
+              <Badge variant="outline" className="text-xs">Phase 2</Badge>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+            <GuidanceContextIndicator context={guidanceContext} />
+            <GuidanceModeSelector
+              currentMode={guidanceMode}
+              context={guidanceContext}
+              onModeChange={(newMode) => setGuidanceMode(newMode)}
+            />
+          </div>
+        </div>
+
+        {/* MPR 67 Banner */}
+        {assessment?.mpr67_active && (
+          <Alert variant="destructive" className="mx-4 mt-2 border-red-700 bg-red-950">
+            <XCircle className="h-4 w-4" />
+            <AlertTitle className="flex items-center gap-2 text-sm font-bold">
+              <span>MPR 67 GOVERNING PROHIBITION — Titanium forbidden in LOX/GOX at any pressure</span>
+              <GuidanceInlineHelp name="mpr.MPR_67" className="h-4 w-4 text-red-100" iconClassName="h-3.5 w-3.5" />
+            </AlertTitle>
+            <AlertDescription className="text-xs">
+              One or more components contain titanium alloys. Per NASA-STD-6016C §4.2.1.3c,
+              titanium SHALL NOT be used with LOX or GOX at any pressure, or with air above 5 psia O2 partial pressure.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Disclaimer */}
+        <div className="px-4 pt-2">
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertDescription className="text-xs">
+              Screening aid only. Topology, not geometry. Every inferred state is visible. Every rule has provenance.
             </AlertDescription>
           </Alert>
         </div>
-      )}
 
-      {/* Action bar */}
-      <div className="flex items-center gap-2 px-4 py-1.5 border-b">
+        {/* System Input Bar */}
+        <div className="px-4 py-2">
+          <SystemInputBar inputs={inputs} onChange={handleInputChange} />
+        </div>
+
+        {/* Blocked States */}
+        {assessment && assessment.blocked_states.length > 0 && (
+          <div className="px-4">
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle className="text-sm">Blocked States</AlertTitle>
+              <AlertDescription>
+                {assessment.blocked_states.map((b, i) => (
+                  <div key={i} className="mt-1 text-xs">
+                    <strong className="uppercase">{b.state_type.replace(/_/g, ' ')}</strong>: {b.description}
+                  </div>
+                ))}
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
+
+        {/* Action bar */}
+        <div className="flex items-center gap-2 border-b px-4 py-1.5">
         <Button size="sm" onClick={runAssessment} disabled={loading || !systemId} className="gap-1.5">
           {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Zap className="h-3 w-3" />}
           Assess System
@@ -498,20 +535,20 @@ export default function OCASystemBuilder() {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Error */}
-      {error && (
-        <div className="px-4 py-1">
-          <Alert variant="destructive">
-            <XCircle className="h-4 w-4" />
-            <AlertDescription className="text-xs">{error}</AlertDescription>
-          </Alert>
         </div>
-      )}
 
-      {/* Main content area */}
-      <div className="flex flex-1 overflow-hidden">
+        {/* Error */}
+        {error && (
+          <div className="px-4 py-1">
+            <Alert variant="destructive">
+              <XCircle className="h-4 w-4" />
+              <AlertDescription className="text-xs">{error}</AlertDescription>
+            </Alert>
+          </div>
+        )}
+
+        {/* Main content area */}
+        <div className="flex flex-1 overflow-hidden">
         {/* Component Palette */}
         <div className="p-2">
           <ComponentPalette />
@@ -559,11 +596,11 @@ export default function OCASystemBuilder() {
             <PathInspectorPanel result={pathResult} onClose={() => setPathResult(null)} />
           </div>
         )}
-      </div>
+        </div>
 
-      {/* Bottom Panel — Assessment Results & Kindling Chains */}
-      {assessment && (
-        <div className="border-t bg-card">
+        {/* Bottom Panel — Assessment Results & Kindling Chains */}
+        {assessment && (
+          <div className="border-t bg-card">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="w-full justify-start rounded-none border-b px-4 h-8">
               <TabsTrigger value="canvas" className="text-xs h-7">Canvas</TabsTrigger>
@@ -597,7 +634,7 @@ export default function OCASystemBuilder() {
                       <Badge className={`text-[10px] ${DISPOSITION_LABELS[assessment.system_disposition]?.color || ''}`}>
                         {DISPOSITION_LABELS[assessment.system_disposition]?.label || assessment.system_disposition}
                       </Badge>
-                      <OCAInlineHelp entry={getDispositionGuidance(assessment.system_disposition)} />
+                      <GuidanceInlineHelp name={`disposition.${assessment.system_disposition}`} />
                     </div>
                   </div>
                   <div className="p-2 rounded bg-muted text-center">
@@ -634,7 +671,7 @@ export default function OCASystemBuilder() {
                           {r.requirement_id}
                           {r.is_prohibition && ' — PROHIBITION'}
                         </Badge>
-                        <OCAInlineHelp entry={getMprGuidance(r.requirement_id)} className="h-3.5 w-3.5" iconClassName="h-3 w-3" />
+                        <GuidanceInlineHelp name={`mpr.${r.requirement_id}`} className="h-3.5 w-3.5" iconClassName="h-3 w-3" />
                       </div>
                     ))}
                   </div>
@@ -706,8 +743,9 @@ export default function OCASystemBuilder() {
               </div>
             </TabsContent>
           </Tabs>
-        </div>
-      )}
-    </div>
+          </div>
+        )}
+      </div>
+    </GuidanceProvider>
   );
 }

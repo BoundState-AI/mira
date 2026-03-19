@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { OCAHelpLabel, OCAInlineHelp } from '@/components/oca/OCAInlineHelp';
+import { OCAHelpLabelBridge as OCAHelpLabel, OCAInlineHelpBridge as OCAInlineHelp } from '@/components/guidance';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,6 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   Search, Save, Settings2, ShieldCheck,
 } from 'lucide-react';
-import { getInputGuidance } from '@/lib/oca-guidance';
 import type {
   ComponentArchetype,
   ComponentConfig,
@@ -152,7 +151,7 @@ function parseMaterials(input: string): MaterialSlotValue[] {
 }
 
 function componentHelp(fieldId: string) {
-  return getInputGuidance(`component_editor.${fieldId}`);
+  return `component_editor.${fieldId}`;
 }
 
 export default function ComponentEditorSheet({
@@ -281,7 +280,7 @@ export default function ComponentEditorSheet({
               </div>
 
               <div className="space-y-2">
-                <OCAHelpLabel htmlFor="component-label" entry={componentHelp('label')}>
+                <OCAHelpLabel htmlFor="component-label" fieldId={componentHelp('label')}>
                   Label
                 </OCAHelpLabel>
                 <Input
@@ -293,7 +292,7 @@ export default function ComponentEditorSheet({
               </div>
 
               <div className="space-y-2">
-                <OCAHelpLabel htmlFor="component-materials" entry={componentHelp('materials')}>
+                <OCAHelpLabel htmlFor="component-materials" fieldId={componentHelp('materials')}>
                   Materials
                 </OCAHelpLabel>
                 <Textarea
@@ -317,7 +316,7 @@ export default function ComponentEditorSheet({
                   <div className="grid grid-cols-2 gap-3">
                     {visibleFields.map((field) => (
                       <div key={field.key} className="space-y-2">
-                        <OCAHelpLabel htmlFor={field.key} entry={componentHelp(field.key)}>
+                        <OCAHelpLabel htmlFor={field.key} fieldId={componentHelp(field.key)}>
                           {field.label}
                         </OCAHelpLabel>
                         <Input
@@ -346,28 +345,28 @@ export default function ComponentEditorSheet({
                   <div className="flex items-center justify-between gap-3">
                     <span className="flex items-center gap-1.5">
                       <Label htmlFor="rigid-tubing" className="text-sm">Rigid metallic tubing</Label>
-                      <OCAInlineHelp entry={componentHelp('is_rigid_metallic_tubing')} />
+                      <OCAInlineHelp fieldId={componentHelp('is_rigid_metallic_tubing')} />
                     </span>
                     <Switch id="rigid-tubing" checked={isRigidTubing} onCheckedChange={setIsRigidTubing} />
                   </div>
                   <div className="flex items-center justify-between gap-3">
                     <span className="flex items-center gap-1.5">
                       <Label htmlFor="metallic-flex" className="text-sm">Metallic flex hose</Label>
-                      <OCAInlineHelp entry={componentHelp('is_metallic_flex_hose')} />
+                      <OCAInlineHelp fieldId={componentHelp('is_metallic_flex_hose')} />
                     </span>
                     <Switch id="metallic-flex" checked={isMetallicFlexHose} onCheckedChange={setIsMetallicFlexHose} />
                   </div>
                   <div className="flex items-center justify-between gap-3">
                     <span className="flex items-center gap-1.5">
                       <Label htmlFor="all-metal-seal" className="text-sm">All-metal seal</Label>
-                      <OCAInlineHelp entry={componentHelp('is_all_metal_seal')} />
+                      <OCAInlineHelp fieldId={componentHelp('is_all_metal_seal')} />
                     </span>
                     <Switch id="all-metal-seal" checked={isAllMetalSeal} onCheckedChange={setIsAllMetalSeal} />
                   </div>
                   <div className="flex items-center justify-between gap-3">
                     <span className="flex items-center gap-1.5">
                       <Label htmlFor="metallic-vessel" className="text-sm">Metallic pressure vessel</Label>
-                      <OCAInlineHelp entry={componentHelp('is_metallic_pressure_vessel')} />
+                      <OCAInlineHelp fieldId={componentHelp('is_metallic_pressure_vessel')} />
                     </span>
                     <Switch
                       id="metallic-vessel"

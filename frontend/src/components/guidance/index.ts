@@ -1,5 +1,6 @@
 export { GuidanceProvider, useGuidance, useFieldGuidance } from './GuidanceProvider';
 export { GuidanceField } from './GuidanceField';
+export { GuidanceInlineHelp } from './GuidanceInlineHelp';
 export { GuidancePopover } from './GuidancePopover';
 export { GuidanceValidationIndicator } from './GuidanceValidationIndicator';
 export { GuidanceAuthorityBadge } from './GuidanceAuthorityBadge';

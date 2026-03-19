@@ -1,0 +1,632 @@
+{
+  "guidance_pack_id": "mira-h2-guidance",
+  "schema_version": "2.0.0",
+  "platform": "mira",
+  "module": "h2",
+  "locale": "en",
+  "status": "approved",
+  "authored_by": "J. Wilde",
+  "reviewed_by": [
+    "Beth"
+  ],
+  "approved_by": "J. Wilde",
+  "effective_date": "2026-04-01",
+  "supersedes": null,
+  "change_log": [
+    {
+      "version": "2.0.0",
+      "date": "2026-04-01",
+      "notes": "Migrated legacy MIRA inline guidance into Universal Guidance Schema v2."
+    }
+  ],
+  "module_mode_overrides": {
+    "h2": {
+      "expert_mode_minimum_severity": "caution",
+      "rationale": "Legacy inline guidance remains visible in expert mode after v2 migration."
+    }
+  },
+  "fields": {
+    "inputs.material_key": {
+      "label": "Material",
+      "what": "The material or alloy being evaluated for hydrogen service compatibility.\n\nSource basis: NASA/TM-2016-218602; NSS 1740.16 §4",
+      "why": "The engine matches the material against NASA and Sandia hydrogen embrittlement test databases to find evidence records. Material identity is the primary lookup key.",
+      "how": "Use the alloy name that will actually contact hydrogen, such as 316L, Inconel 718, Ti-6Al-4V, or Monel 400. If the surface is plated or coated, consider whether hydrogen can diffuse through the coating to the substrate — if it can, evaluate the substrate material too.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.pressure_psia": {
+      "label": "Pressure (psia)",
+      "what": "The hydrogen service pressure at the part, in pounds per square inch absolute.\n\nSource basis: NASA-STD-6016C §4.2.2; ASME B31.12 §IX",
+      "why": "Higher hydrogen pressure drives more hydrogen into the material's crystal structure, making embrittlement worse. The engine uses pressure to assess whether the operating envelope matches the test evidence.",
+      "how": "Use the maximum credible service pressure at the part. Hydrogen embrittlement becomes increasingly significant above about 500 psia and is severe above 5,000 psia for many alloys. If the hardware sees pressure cycles, use the peak pressure for screening.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.temperature_k": {
+      "label": "Temperature (K)",
+      "what": "The service temperature at the part, in Kelvin.\n\nSource basis: NSS 1740.16 §4.5; NASA/TM-2007-214003",
+      "why": "Temperature affects hydrogen diffusion rate and embrittlement severity differently depending on the material. Some materials become more susceptible at ambient temperatures and less susceptible at cryogenic temperatures. Titanium forms brittle hydrides above approximately 300 degF (422 K).",
+      "how": "Use the temperature at the hydrogen-wetted surface. For LH2 service, this is approximately 20 K. For ambient GH2, use the actual operating temperature. Be aware that titanium in gaseous hydrogen above 300 degF (422 K) triggers an automatic prohibition due to hydride formation risk.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.phase": {
+      "label": "Hydrogen Phase",
+      "what": "Whether the hydrogen is gaseous (GH2) or liquid (LH2).\n\nSource basis: NSS 1740.16 §4.3; NASA/TM-2016-218602",
+      "why": "Gaseous and liquid hydrogen create different embrittlement conditions. GH2 at high pressure drives hydrogen into the metal more aggressively. LH2 at cryogenic temperatures changes material properties and can suppress or worsen embrittlement depending on the alloy.",
+      "how": "Select the phase at the part. If the hardware sees both phases during operation (such as a tank that fills with LH2 and empties through GH2), screen against the worst-case phase for the material in question.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.yield_strength_ksi": {
+      "label": "Yield Strength (ksi)",
+      "what": "The yield strength of the material in ksi (thousands of pounds per square inch).\n\nSource basis: NSS 1740.16 §4.3.2; NASA/TM-2007-214003",
+      "why": "Higher-strength materials are more susceptible to hydrogen embrittlement. Above 150 ksi yield strength, the engine applies an automatic severe embrittlement risk classification — this is a hard safety guardrail.",
+      "how": "Enter the design-allowable or specification-minimum yield strength. If the yield strength exceeds 150 ksi, the engine will return a PROHIBITED verdict regardless of other inputs. This threshold comes from NSS 1740.16 and represents decades of hydrogen embrittlement failure experience. If you must use a high-strength material, you need a formal waiver with extensive test evidence.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.condition": {
+      "label": "Heat Treatment Condition",
+      "what": "The heat treatment or metallurgical condition of the material, such as annealed, solution treated (ST 1900F), or aged.\n\nSource basis: NASA/TM-2016-218602; Somerday/San Marchi data tables",
+      "why": "The same alloy in different heat-treatment conditions can have dramatically different hydrogen embrittlement behavior. The engine matches against condition-specific evidence records. If a material has multiple conditions with different HEE bands, the engine will ask you to specify which condition applies.",
+      "how": "Enter the actual condition from the drawing or material certification, such as annealed, ST 1750F, solution treated + aged, or H1025. If you do not specify a condition, the engine uses worst-case across all known conditions for that alloy. Specifying the exact condition gives a more accurate (and often less conservative) result.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.application_id": {
+      "label": "Application",
+      "what": "An optional identifier for the subsystem or component being assessed.\n\nSource basis: domain_practice",
+      "why": "Helps reviewers trace the assessment back to a specific piece of hardware in the system.",
+      "how": "Enter a drawing number, assembly name, or component identifier. This is optional but recommended for traceability.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "verdicts.ACCEPTABLE": {
+      "label": "Acceptable",
+      "what": "The material has evidence of acceptable hydrogen compatibility for the assessed conditions, with negligible or small hydrogen environment embrittlement (HEE).\n\nSource basis: NASA/TM-2016-218602; NSS 1740.16",
+      "why": "The engine found test evidence showing this material in this condition has low susceptibility to hydrogen embrittlement at the assessed pressure and temperature range.",
+      "how": "Acceptable means the evidence supports using this material in hydrogen service. Normal hydrogen-service design practices still apply — proper cleaning, leak-tight joints, controlled pressurization rates, and documented compatibility assessment per NASA-STD-6016C.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "verdicts.CAUTION": {
+      "label": "Caution",
+      "what": "The material shows moderate hydrogen environment embrittlement (high HEE band). It may be usable with specific controls but requires careful engineering evaluation.\n\nSource basis: NASA/TM-2016-218602; Somerday/San Marchi data",
+      "why": "The evidence shows measurable property degradation in hydrogen. The material is not prohibited, but it is not fully benign either.",
+      "how": "Review the HEE band data and specific test conditions. Consider whether your service conditions are more or less severe than the test conditions. You may need additional testing, reduced design allowables, or operational controls (such as limited pressure cycling) to use this material safely. Document the engineering basis for acceptance.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "verdicts.PROHIBITED": {
+      "label": "Prohibited",
+      "what": "The material is not safe for use in the assessed hydrogen conditions. This can be triggered by severe/extreme HEE evidence, high yield strength (>150 ksi), or titanium in hot GH2.\n\nSource basis: NSS 1740.16 §4.3.2; §4.5; NASA-STD-6016C §4.2.2",
+      "why": "The engine found either overwhelming embrittlement evidence, a deterministic safety guardrail violation, or both. Using this material under these conditions creates an unacceptable risk of brittle failure.",
+      "how": "Change the material. There is no mitigation that makes a prohibited material safe in hydrogen service — the hydrogen diffuses into the crystal structure regardless of coatings or surface treatments. If you believe the prohibition is incorrect for your specific case, you need formal testing to demonstrate otherwise, reviewed by the hydrogen safety authority.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "verdicts.UNKNOWN": {
+      "label": "Unknown",
+      "what": "The engine does not have enough evidence to make a confident compatibility determination for this material and condition.\n\nSource basis: NASA-STD-6016C §4.2.2; domain_practice",
+      "why": "Either the material was not found in the evidence database, the match quality was poor, or the evidence database is not loaded.",
+      "how": "An unknown verdict is not a hidden yes. It means the material has not been tested or the data is not in the system. Your next step is to find hydrogen compatibility test data for this specific material and condition — check NASA/TM-2016-218602, SAND2012-7321, or program-specific test reports. If no data exists, testing is required before the material can be used in hydrogen service.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "verdicts.CLARIFICATION_NEEDED": {
+      "label": "Clarification Needed",
+      "what": "The material was found in the evidence database, but it has multiple heat-treatment conditions with different HEE bands. The engine needs you to specify which condition applies.\n\nSource basis: NASA/TM-2016-218602; Somerday/San Marchi data tables",
+      "why": "Different heat treatments of the same alloy can have vastly different hydrogen embrittlement behavior. Without knowing the exact condition, the engine cannot give an accurate verdict.",
+      "how": "Select the correct heat treatment condition from the options presented. The engine shows each condition with its HEE band and the verdict it would produce. If you do not know the condition, use worst-case or check the material certification.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.hydrogen_embrittlement": {
+      "label": "Hydrogen Embrittlement",
+      "what": "Hydrogen atoms are small enough to diffuse into a metal's crystal structure and weaken it from the inside. This makes strong materials fail at lower loads than expected, often without visible warning.\n\nSource basis: NASA/TM-2007-214003; NSS 1740.16 §4",
+      "why": "Hydrogen embrittlement is the central failure mode that the H2 module screens for. It can cause sudden brittle fracture in materials that would otherwise be ductile, at stresses well below the normal design allowable.",
+      "how": "Hydrogen embrittlement is not a surface effect — it happens throughout the material volume wherever hydrogen diffuses. Coatings and platings slow diffusion but do not eliminate it. The only reliable protection is choosing materials that are inherently resistant to hydrogen embrittlement, which is what this module assesses.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.hee_bands": {
+      "label": "HEE Bands (Hydrogen Environment Embrittlement)",
+      "what": "HEE bands categorize how much a material's mechanical properties degrade in hydrogen compared to an inert environment. The bands are: negligible, small, high, severe, and extreme.\n\nSource basis: NASA/TM-2016-218602 Table 1; Somerday/San Marchi classification",
+      "why": "The HEE band is the primary evidence metric from NASA and Sandia hydrogen testing. It tells you how much the material's ductility and fracture toughness drop when hydrogen is present.",
+      "how": "Negligible and small bands indicate low susceptibility — these materials are generally acceptable for hydrogen service. High band means moderate susceptibility requiring careful evaluation. Severe and extreme bands indicate the material should not be used in hydrogen service without extraordinary justification. The engine maps these bands to verdicts: negligible/small to acceptable, high to caution, severe/extreme to prohibited.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.austenitic_vs_ferritic": {
+      "label": "Austenitic vs. Ferritic/Martensitic Crystal Structure",
+      "what": "Austenitic alloys have a face-centered cubic (FCC) crystal structure. Ferritic and martensitic alloys have body-centered cubic (BCC) or body-centered tetragonal (BCT) structures. This crystal structure difference is the most important factor in hydrogen compatibility.\n\nSource basis: NSS 1740.16 §4.3; NASA/TM-2007-214003; ASME B31.12",
+      "why": "Hydrogen diffuses much more slowly through the tightly packed FCC austenitic structure than through BCC ferritic or martensitic structures. This is why austenitic stainless steels (300 series like 304, 316, 321) and nickel alloys (Inconel, Monel, Hastelloy) are the go-to materials for hydrogen service, while high-strength ferritic/martensitic steels are generally prohibited.",
+      "how": "When selecting materials for hydrogen service, austenitic alloys are your first choice. The 300-series austenitic stainless steels (304L, 316L, 321, 347) and nickel-base alloys (Inconel 625, 718, Monel 400, Hastelloy C-276) have extensive hydrogen compatibility data. Ferritic steels, martensitic steels, and precipitation-hardened stainless steels require much more careful evaluation.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.pressure_thresholds": {
+      "label": "Pressure Effects on Hydrogen Embrittlement",
+      "what": "Higher hydrogen pressure forces more hydrogen into the metal, increasing embrittlement severity. The relationship is not linear — there are practical thresholds where behavior changes significantly.\n\nSource basis: NSS 1740.16 §4.3; ASME B31.12 §IX; NASA/TM-2007-214003",
+      "why": "At low pressures, many materials tolerate hydrogen adequately. As pressure increases, more hydrogen enters the lattice and the embrittlement effect grows. Above approximately 5,000 psia, even materials with good hydrogen ratings may need additional evaluation.",
+      "how": "Below about 500 psia GH2, embrittlement concerns are moderate for most austenitic alloys. Between 500 and 5,000 psia, careful material selection is critical. Above 5,000 psia, only the most hydrogen-resistant materials should be considered, and evidence must closely match the actual service pressure. ASME B31.12 provides specific pressure-dependent design factors for hydrogen piping.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.high_strength_threshold": {
+      "label": "High-Strength Steel Threshold (150 ksi)",
+      "what": "Materials with yield strength above 150 ksi are automatically classified as severely susceptible to hydrogen embrittlement. This is a hard safety guardrail in the engine.\n\nSource basis: NSS 1740.16 §4.3.2",
+      "why": "Decades of hydrogen service experience and testing show that higher-strength materials are more susceptible to hydrogen embrittlement. Above 150 ksi, the risk of sudden brittle fracture in hydrogen is too high to accept without extraordinary measures.",
+      "how": "If your material exceeds 150 ksi yield strength, the engine returns PROHIBITED. This is not overridable through the normal assessment path. If you must use a high-strength material in hydrogen service, you need a formal waiver backed by material-specific hydrogen testing at the actual service conditions, reviewed by the hydrogen safety authority.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.titanium_hydride_formation": {
+      "label": "Titanium Hydride Formation",
+      "what": "Titanium in gaseous hydrogen above approximately 300 degF (422 K) absorbs hydrogen and forms brittle titanium hydrides that destroy the material's mechanical properties.\n\nSource basis: NSS 1740.16 §4.5",
+      "why": "This is a chemical reaction, not just embrittlement — the titanium actually reacts with hydrogen to form a different, brittle phase. Once formed, the damage is permanent and the material cannot be recovered.",
+      "how": "The engine applies an automatic prohibition for titanium alloys in GH2 above 300 degF. Titanium can be used in cryogenic LH2 service because the low temperature suppresses the hydride reaction. If your titanium hardware sees temperature cycling that includes warm GH2, the hydride risk must be evaluated for the entire temperature profile, not just the average condition.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.condition_specificity": {
+      "label": "Heat Treatment Condition Matters",
+      "what": "The same alloy in different heat-treatment conditions can range from negligible to severe hydrogen embrittlement susceptibility.\n\nSource basis: NASA/TM-2016-218602; Somerday/San Marchi data tables",
+      "why": "Heat treatment changes the material's microstructure, grain boundary chemistry, strength level, and residual stress state — all of which affect how hydrogen interacts with the material. A solution-treated alloy may be excellent in hydrogen while the same alloy in an aged or cold-worked condition may be severely embrittled.",
+      "how": "Always specify the exact heat treatment condition when assessing hydrogen compatibility. Examples: annealed, solution treated at 1900F, solution treated + aged, H1025, cold worked. If you do not specify a condition, the engine uses worst-case across all known conditions, which can be much more conservative than necessary.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.asme_b31_12": {
+      "label": "ASME B31.12 (Hydrogen Piping)",
+      "what": "ASME B31.12 is the piping code specifically for hydrogen service. It provides pressure-dependent design factors, material requirements, and fabrication rules for hydrogen piping systems.\n\nSource basis: ASME B31.12 §IX",
+      "why": "For hydrogen piping and pipeline systems, B31.12 is the governing standard. It includes performance-based and prescriptive design options with material-specific hydrogen design factors.",
+      "how": "If your hardware is piping, tubing, or pipeline components in hydrogen service, check ASME B31.12 requirements in addition to the NASA standards. B31.12 Table IX-5A provides material performance factors (Kp) that account for hydrogen effects on fatigue and fracture. These factors are pressure-dependent and must be applied to the design stress calculations.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "flags.high_strength_prohibited": {
+      "label": "High-Strength Material Prohibited",
+      "what": "The material's yield strength exceeds 150 ksi, triggering an automatic severe hydrogen embrittlement prohibition.\n\nSource basis: NSS 1740.16 §4.3.2",
+      "why": "This is a deterministic safety guardrail that fires before any evidence lookup. The risk of brittle fracture in hydrogen at this strength level is unacceptable by standard criteria.",
+      "how": "Select a lower-strength material for this hydrogen application. If the design requires high strength, consider austenitic nickel alloys (Inconel 718 in solution-treated condition, for example) that can achieve moderate strength while maintaining hydrogen resistance. Formal waiver with extensive testing is required if no alternative exists.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "flags.titanium_hot_gh2_prohibited": {
+      "label": "Titanium in Hot GH2 Prohibited",
+      "what": "Titanium is being used in gaseous hydrogen above 300 degF (422 K), where hydride formation will destroy the material.\n\nSource basis: NSS 1740.16 §4.5",
+      "why": "This is a deterministic safety guardrail based on the physics of titanium-hydrogen interaction. Above this temperature, hydrogen absorption and hydride formation are rapid and irreversible.",
+      "how": "Change the material or reduce the operating temperature. Titanium is acceptable in cryogenic LH2 service. If the hardware must operate at elevated temperatures in hydrogen, use an austenitic stainless steel or nickel alloy instead.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "flags.non_austenitic_high_pressure": {
+      "label": "Non-Austenitic Material in High-Pressure H2",
+      "what": "A non-austenitic material is being used in high-pressure hydrogen service where embrittlement risk is elevated.\n\nSource basis: NSS 1740.16 §4.3; ASME B31.12",
+      "why": "BCC and BCT crystal structures are inherently more susceptible to hydrogen embrittlement than FCC austenitic structures. At high pressure, this susceptibility becomes critical.",
+      "how": "Strongly prefer austenitic alloys (300-series stainless, nickel-base alloys) for high-pressure hydrogen service. If a non-austenitic material is required, provide condition-specific hydrogen test data at or above the service pressure to support the selection. Document the engineering justification.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "flags.missing_test_evidence": {
+      "label": "No Hydrogen Test Evidence Found",
+      "what": "The material was not found in the hydrogen evidence database, so no compatibility assessment can be made.\n\nSource basis: NASA-STD-6016C §4.2.2; ASTM G142; ASTM E1681",
+      "why": "Without test data, the engine cannot determine whether the material is safe in hydrogen service. An absence of evidence is not evidence of safety.",
+      "how": "Search NASA/TM-2016-218602, SAND2012-7321, or program-specific hydrogen compatibility test reports for data on this material. If no data exists, hydrogen compatibility testing is required before the material can be accepted for hydrogen service. Consider ASTM G142 (tensile testing in hydrogen) or ASTM E1681 (threshold stress intensity in hydrogen) as test methods.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "flags.condition_mismatch": {
+      "label": "Condition Not Specified or Mismatched",
+      "what": "The material has multiple heat-treatment conditions with different HEE bands, but no condition was specified, or the specified condition does not exactly match the evidence records.\n\nSource basis: NASA/TM-2016-218602; Somerday/San Marchi data tables",
+      "why": "Using worst-case across all conditions may be overly conservative. Specifying the exact condition allows a more accurate and often more favorable assessment.",
+      "how": "Check the material certification or drawing callout for the exact heat treatment condition. Select the matching condition from the options the engine presents. If the condition is not listed, the evidence may not cover your specific case — consider additional testing.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    }
+  },
+  "workflows": {},
+  "contexts": {}
+}

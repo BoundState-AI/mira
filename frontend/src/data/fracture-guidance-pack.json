@@ -1,0 +1,1088 @@
+{
+  "guidance_pack_id": "mira-fracture-guidance",
+  "schema_version": "2.0.0",
+  "platform": "mira",
+  "module": "fracture",
+  "locale": "en",
+  "status": "approved",
+  "authored_by": "J. Wilde",
+  "reviewed_by": [
+    "Beth"
+  ],
+  "approved_by": "J. Wilde",
+  "effective_date": "2026-04-01",
+  "supersedes": null,
+  "change_log": [
+    {
+      "version": "2.0.0",
+      "date": "2026-04-01",
+      "notes": "Migrated legacy MIRA inline guidance into Universal Guidance Schema v2."
+    }
+  ],
+  "module_mode_overrides": {
+    "fracture": {
+      "expert_mode_minimum_severity": "caution",
+      "rationale": "Legacy inline guidance remains visible in expert mode after v2 migration."
+    }
+  },
+  "fields": {
+    "inputs.part_name": {
+      "label": "Part Name",
+      "what": "The name or drawing identifier of the part being assessed for fracture control.\n\nSource basis: NASA-STD-5019A §4.1; fracture control plan practice",
+      "why": "The part name ties the assessment to a specific piece of hardware and its documentation trail. Every fracture assessment must be traceable to a real part.",
+      "how": "Use the name that appears on the engineering drawing or parts list. Include the drawing number if you have it. This is how reviewers will find and audit the assessment later.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.mission_class": {
+      "label": "Mission Class",
+      "what": "The certification class of the mission this hardware supports — human-rated, cargo, experimental, or ground support.\n\nSource basis: NASA-STD-5019A §1.2; §4.1",
+      "why": "NASA-STD-5019A is mandatory for human-rated spaceflight hardware. For other mission classes, the engine provides best-practice fracture guidance but the standard may not formally apply.",
+      "how": "Select HUMAN_RATED for any hardware on a crewed mission. This triggers the most stringent requirements including a mandatory Fracture Control Plan and Fracture Control Summary Report. If you are unsure, use HUMAN_RATED — it is the conservative choice.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.hazard_consequence": {
+      "label": "Hazard Consequence",
+      "what": "What happens if this part fails — catastrophic loss, critical damage, marginal impact, or negligible effect.\n\nSource basis: NASA-STD-5019A §3.2; §5.2 Table 1",
+      "why": "Hazard consequence is one of the two primary drivers of fracture classification. Catastrophic consequence on a single load path always makes a part fracture-critical.",
+      "how": "CATASTROPHIC means loss of vehicle, crew, or mission. CRITICAL means significant damage or degraded capability. MARGINAL means minor impact that can be managed. NEGLIGIBLE means no meaningful effect on safety or mission. If you do not know the consequence, the engine cannot classify the part and will fall back to a conservative fracture-critical assumption.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.load_path_type": {
+      "label": "Load Path Type",
+      "what": "Whether this part is the only structural path carrying the load (single) or shares it with other paths (redundant).\n\nSource basis: NASA-STD-5019A §3.2; §5.2",
+      "why": "A single load path combined with catastrophic or critical consequence makes the part fracture-critical. Redundant load paths allow the non-fracture-critical path because another member catches the load if one fails.",
+      "how": "SINGLE means if this part breaks, the load has nowhere else to go. REDUNDANT means at least one other independent structural path exists. If you are unsure, leave it as UNKNOWN and the engine will conservatively assume fracture-critical.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.pressure_boundary": {
+      "label": "Pressure Boundary",
+      "what": "Whether this part contains internal pressure — it is part of a vessel, line, or pressurized structure.\n\nSource basis: NASA-STD-5019A §6.3; §7.3",
+      "why": "Pressure-containing parts have specific fracture control requirements because a crack in a pressure boundary can grow to catastrophic failure under sustained pressure loading.",
+      "how": "Turn this on for vessels, tanks, pressurized lines, pressurized structures, and any component that retains internal pressure during service. Do not turn it on for parts that are merely near a pressure system.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.lifecycle_phase": {
+      "label": "Lifecycle Phase",
+      "what": "Whether this is new hardware being built for the first time or reflight hardware being reused from a prior mission.\n\nSource basis: NASA-STD-5019A §9; reflight assessment practice",
+      "why": "Reflight hardware requires additional review of prior flight history, inspection evidence, and material condition before reuse. New build follows the standard assessment path.",
+      "how": "Select REFLIGHT only when reusing hardware that has already flown or been exposed to operational loads. The engine will add warnings about prior flight history review and inspection traceability.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.structural_role": {
+      "label": "Structural Role",
+      "what": "Whether this part is primary structure, secondary structure, or non-structural.\n\nSource basis: NASA-STD-5019A §5.1; §5.2",
+      "why": "Non-structural parts with negligible or marginal hazard consequence can be exempt from fracture control requirements entirely. Primary and secondary structural parts must be classified.",
+      "how": "PRIMARY means the part carries flight loads or is essential to structural integrity. SECONDARY means it supports primary structure but is not itself a primary load path. NON_STRUCTURAL means the part has no structural function — brackets, covers, or decorative items that do not carry meaningful loads.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.material_system": {
+      "label": "Material System",
+      "what": "The broad material category — metallic, composite, bonded, ceramic, or other.\n\nSource basis: NASA-STD-5019A §6; §7",
+      "why": "The classification and applicable requirements change based on material system. Metallic parts follow the metallic fracture mechanics path. Composite and bonded parts follow a separate path with different failure modes and inspection approaches.",
+      "how": "METALLIC covers all metal alloys including aluminum, steel, titanium, and nickel alloys. COMPOSITE covers fiber-reinforced polymer structures. BONDED covers adhesively bonded joints. CERAMIC and OTHER route through optional approach paths that require RFCB review.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.specific_hardware_type": {
+      "label": "Specific Hardware Type",
+      "what": "A more specific classification of the hardware, such as pressure vessel, fastener, rotating hardware, or shatterable item.\n\nSource basis: NASA-STD-5019A §5.2; Table 1; §6.3; §7.3",
+      "why": "Certain hardware types have special fracture requirements. Pressure vessels, COPVs, pressurized components, habitable structures, and pressurized structures are always fracture-critical regardless of other inputs. Fasteners, shatterable items, and rotating hardware follow specific sub-paths.",
+      "how": "Select the type that most specifically describes your hardware. If your part is a pressure vessel, COPV, pressurized component, habitable structure, or pressurized structure, it will be classified fracture-critical automatically. Use GENERAL when none of the specific types apply.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.material_name": {
+      "label": "Material Name",
+      "what": "The specific material or alloy used in the part, such as Al 2024-T3, Ti-6Al-4V, or Inconel 718.\n\nSource basis: NASA-STD-5019A §8.3",
+      "why": "Material identity drives FCR 22 requirements for material property evidence, qualification status, and MUA obligations. The engine also screens for material-specific fracture concerns like titanium sustained-load cracking and high-strength steel bolt toughness.",
+      "how": "Enter the material callout from the drawing or material specification. If you do not enter a material, the engine cannot evaluate material-specific findings and will flag a data gap.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.optional_approach_requested": {
+      "label": "Optional Approach Requested",
+      "what": "Whether an RFCB-approved optional fracture control approach is being used instead of the standard safe-life or damage-tolerance path.\n\nSource basis: NASA-STD-5019A §7.5",
+      "why": "Optional approaches are alternative fracture control methods approved by the Responsible Fracture Control Board for cases where the standard paths do not fit cleanly.",
+      "how": "Only turn this on when you have RFCB approval for an alternative approach. This changes the applicable FCR baseline. If you are using standard safe-life or damage tolerance, leave this off.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.proof_test_used": {
+      "label": "Proof Test Used",
+      "what": "Whether a proof test is being used as part of the fracture control verification strategy.\n\nSource basis: NASA-STD-5019A §8.1.3",
+      "why": "Proof testing adds FCR 18 requirements — the proof test must be designed to screen for the critical flaw size and must not itself introduce damage.",
+      "how": "Turn this on when a proof test is part of your verification approach. The engine will add FCR 18 to the applicable requirements. Proof testing is common for pressure vessels and high-value fracture-critical hardware.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.process_controls_used": {
+      "label": "Process Controls Used",
+      "what": "Whether process controls are being credited as part of fracture control — for example, controlled machining, inspection, or material lot traceability.\n\nSource basis: NASA-STD-5019A §8.1.4",
+      "why": "Crediting process controls adds FCR 19 requirements. The controls must be documented, auditable, and maintained throughout production.",
+      "how": "Turn this on when specific manufacturing process controls are being used to limit initial flaw sizes or ensure material quality as part of the fracture control argument.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.detected_flaw_accepted_for_flight": {
+      "label": "Detected Flaw Accepted for Flight",
+      "what": "Whether a detected flaw in the hardware is being accepted for flight based on engineering analysis rather than rejection.\n\nSource basis: NASA-STD-5019A §8.1.5",
+      "why": "Accepting a detected flaw for flight is a formal disposition that adds FCR 20 requirements. The flaw must be characterized, the remaining life demonstrated, and the disposition documented.",
+      "how": "Turn this on only when a real detected flaw has been dispositioned as acceptable for flight. This is not a hypothetical — it means an actual flaw was found during inspection and is being accepted with engineering justification.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.low_risk_candidate": {
+      "label": "NFC Low-Risk Candidate",
+      "what": "Whether this part is being assessed as a metallic NFC low-risk part under the simplified screening criteria.\n\nSource basis: NASA-STD-5019A §6.2.5; §6.2.5.a(2)",
+      "why": "The low-risk path allows certain metallic NFC parts to skip full damage tolerance analysis if they meet specific material toughness and geometry criteria. This is a significant reduction in assessment burden.",
+      "how": "Only applicable for metallic parts on the NFC general path. The part must meet KIc/Fty ratio of at least 0.33 sqrt(in), must not be additively manufactured, and must not be sensitive to environmental cracking. If any of these criteria fail, the part cannot use the low-risk path.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.kic_fty_ratio": {
+      "label": "KIc / Fty Ratio",
+      "what": "The ratio of plane-strain fracture toughness (KIc) to tensile yield strength (Fty), expressed in units of sqrt(inches).\n\nSource basis: NASA-STD-5019A §6.2.5.a(2)",
+      "why": "This ratio is the primary screening criterion for the metallic NFC low-risk path. KIc is a measure of how resistant the material is to crack growth — higher is tougher. Fty is the yield strength. A ratio of at least 0.33 sqrt(in) means the material is tough enough relative to its strength to qualify for simplified screening.",
+      "how": "KIc is the plane-strain fracture toughness in ksi*sqrt(in). Fty is the yield strength in ksi. Divide KIc by Fty to get the ratio in sqrt(in). Values below 0.33 mean the material is too brittle relative to its strength for the low-risk path. If you do not have KIc data, flag it as a data gap and get the value from MMPDS or testing. WARNING: If your source data is in SI units (KIc in MPa*sqrt(m), Fty in MPa), the ratio will be in sqrt(m), not sqrt(in). Multiply the SI ratio by 1.0988 to convert to sqrt(in), or convert KIc first (1 MPa*sqrt(m) = 0.9099 ksi*sqrt(in)). Entering an unconverted SI ratio will underestimate toughness and may incorrectly fail the 0.33 criterion.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.ftu_ksi": {
+      "label": "Ultimate Tensile Strength (ksi)",
+      "what": "The ultimate tensile strength of the material in ksi (thousands of pounds per square inch).\n\nSource basis: NASA-STD-5019A §3.2 (low-fracture-toughness definition)",
+      "why": "For steel fasteners, ultimate strength above 180 ksi triggers a toughness watch — high-strength steel bolts with unknown KIc should be treated as low-fracture-toughness until property evidence is established.",
+      "how": "Enter the design-allowable or specification-minimum Ftu value. For steel bolts above 180 ksi, expect the engine to flag a caution about fracture toughness. This is not a failure — it is a prompt to provide KIc data.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.additive_manufactured": {
+      "label": "Additively Manufactured",
+      "what": "Whether the part was made using additive manufacturing (3D printing) rather than conventional wrought, forged, or cast processes.\n\nSource basis: NASA-STD-5019A via NASA-STD-6030 AMR15",
+      "why": "Additively manufactured metallic parts do not qualify for the NFC low-risk path. AM materials have different defect populations, anisotropic properties, and require separate fracture assessment approaches.",
+      "how": "Turn this on for any part made by powder bed fusion, directed energy deposition, wire arc AM, or any other additive process. This disqualifies the part from metallic NFC low-risk screening per NASA-STD-6030.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.chloride_exposure": {
+      "label": "Chloride Exposure",
+      "what": "Whether the part will be exposed to chloride-containing environments such as seawater, salt fog, or chlorinated cleaning agents.\n\nSource basis: NASA-STD-5019A §8.3.c",
+      "why": "Chloride exposure can cause stress corrosion cracking (SCC) and environmentally assisted cracking (EAC) in susceptible alloys, particularly austenitic stainless steels and some aluminum alloys. This must be accounted for in the fracture assessment.",
+      "how": "Turn this on for any hardware exposed to saltwater, coastal atmospheres, chlorinated solvents, or other chloride sources. The engine will flag that operating-condition effects must be included in the damage tolerance property data.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.sustained_load_expected": {
+      "label": "Sustained Load Expected",
+      "what": "Whether the part will see sustained (constant or near-constant) stress during service, as opposed to purely cyclic loading.\n\nSource basis: NASA-STD-5019A §3.2 (SLC definition); §7.3.2.f",
+      "why": "Sustained loads can drive sustained-load cracking (SLC) in susceptible materials, especially titanium alloys. This is a different failure mode from fatigue and requires separate property data.",
+      "how": "Turn this on for pressurized hardware, preloaded fasteners, constantly loaded structural members, or any part that sees significant steady stress. The engine will flag the need for sustained-load cracking review, and for titanium alloys, will specifically call out the SLC watch.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.approved_source_data_attached": {
+      "label": "Approved Source Data Attached",
+      "what": "Whether NASA-approved or conservative-bound material property data is included in the assessment package.\n\nSource basis: NASA-STD-5019A §8.3.d-e",
+      "why": "FCR 22 requires that fracture-critical and NFC composite/bonded parts have representative material property data from approved sources or with conservative bounds. Without this data, the assessment cannot be closed.",
+      "how": "Turn this on only when you have actual material property data attached — from MMPDS, NASGRO, program-specific testing, or other NASA-approved sources. If the data is not yet available, leave it off and the engine will flag it as a caution to remind you to close this item before the assessment is complete.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.short_transverse_dimension_in": {
+      "label": "Short-Transverse Dimension (in)",
+      "what": "The maximum dimension of the part in the short-transverse grain direction, in inches.\n\nSource basis: NASA-STD-5019A §6.2.5.a(3)",
+      "why": "Aluminum parts loaded in the short-transverse direction with a dimension above 3 inches do not qualify for the metallic NFC low-risk path. This is because thick aluminum sections are more susceptible to stress corrosion cracking and have lower fracture toughness in the short-transverse orientation.",
+      "how": "Enter the dimension in inches. This check only applies to aluminum alloys being evaluated for the NFC low-risk path. If the part is not loaded in the short-transverse direction, this field is not relevant. If the dimension exceeds 3 inches and the loading is in the short-transverse direction, the part cannot use the low-risk path.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "inputs.nasa_std_6016_qualified": {
+      "label": "NASA-STD-6016 Qualification Status",
+      "what": "Whether the material is qualified under NASA-STD-6016, the standard for materials and processes.\n\nSource basis: NASA-STD-5019A §8.3.f-g",
+      "why": "Materials not qualified under NASA-STD-6016 require a Material Usage Agreement (MUA) before they can be used in fracture-critical or NFC composite/bonded hardware. The MUA must be documented in the Fracture Control Summary Report.",
+      "how": "Select Qualified if the material appears in a NASA-approved materials specification or has been qualified per NASA-STD-6016. Select Not Qualified if the material lacks qualification — the engine will check whether an MUA is present and flag it if missing. Select Unknown if you have not yet verified the qualification status — the engine will flag this as a data gap.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "classifications.EXEMPT": {
+      "label": "Exempt",
+      "what": "The part is exempt from fracture control requirements because it is non-structural with negligible or marginal hazard consequence.\n\nSource basis: NASA-STD-5019A §5.1; §5.2",
+      "why": "Parts that cannot cause meaningful harm if they fail and do not carry structural loads do not need fracture analysis. This prevents wasting analysis resources on low-risk items.",
+      "how": "Exempt does not mean ignored — it means the part has been evaluated and determined not to need fracture control. Document the exemption basis. If the part's role or consequence changes later, re-evaluate.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "classifications.NFC_METALLIC": {
+      "label": "Non-Fracture-Critical (Metallic)",
+      "what": "The metallic part is not fracture-critical because its failure consequence is not catastrophic and it has a redundant load path.\n\nSource basis: NASA-STD-5019A §6.2",
+      "why": "NFC metallic parts still need some fracture control attention — they need material screening, may qualify for the low-risk simplified path, and still require documentation — but the full damage tolerance analysis burden does not apply.",
+      "how": "Check whether the part qualifies for the low-risk simplified screening (KIc/Fty >= 0.33 sqrt(in), not AM, no environmental cracking sensitivity). If it does, the assessment burden is significantly reduced. If not, the NFC general metallic path applies.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "classifications.NFC_COMPOSITE_BONDED": {
+      "label": "Non-Fracture-Critical (Composite/Bonded)",
+      "what": "The composite or bonded part is not fracture-critical but still requires fracture control attention because composite failure modes differ from metals.\n\nSource basis: NASA-STD-5019A §6.2; §8.3",
+      "why": "Composites and bonded joints can fail in ways that are harder to inspect and predict than metals. Even NFC composite parts need material evidence and specific FCR compliance.",
+      "how": "Composite NFC parts do not have a low-risk simplified path like metals. Material evidence requirements under FCR 22 still apply. Pay attention to bond integrity, delamination screening, and fiber damage assessment.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "classifications.FC": {
+      "label": "Fracture-Critical",
+      "what": "A single crack in this part could grow to failure before anyone catches it, and that failure would be catastrophic or critical. This means a single crack could cause loss of vehicle, crew, or mission.\n\nSource basis: NASA-STD-5019A §5.2; §7",
+      "why": "Fracture-critical is the highest-consequence classification. It triggers the full suite of damage tolerance requirements, mandatory documentation, RFCB review, and verification evidence.",
+      "how": "Fracture-critical parts require a Fracture Control Plan, Fracture Control Summary Report, full damage tolerance or safe-life analysis, appropriate NDE, and RFCB approval. Pressure vessels, COPVs, habitable structures, and pressurized structures are always fracture-critical regardless of other inputs. Do not shortcut this classification.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "classifications.INDETERMINATE": {
+      "label": "Indeterminate",
+      "what": "The engine cannot determine the classification because required inputs are missing — typically hazard consequence or load path type.\n\nSource basis: NASA-STD-5019A §5.2; MIRA conservative fallback logic",
+      "why": "Without knowing what happens if the part fails and whether there is a backup load path, the standard cannot route the part to the correct fracture control path.",
+      "how": "Provide the missing inputs (shown in the unresolved_inputs list) to get a definitive classification. Until then, the engine conservatively falls back to fracture-critical to prevent under-assessment. Resolve the inputs with your structures team or safety panel.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.fracture_critical_definition": {
+      "label": "What Fracture-Critical Means",
+      "what": "A part is fracture-critical when a single crack could grow to failure before the next scheduled inspection, and that failure would cause catastrophic or critical consequences.\n\nSource basis: NASA-STD-5019A §3.2",
+      "why": "This definition is the foundation of the entire fracture control program. It determines which parts get the most rigorous analysis, inspection, and documentation requirements.",
+      "how": "Think of it this way: if a crack starts in this part and nobody catches it, does something very bad happen? If yes, and there is no backup load path to save the situation, the part is fracture-critical. The key question is always: what is the consequence of a single undetected crack growing to failure?",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.safe_life_vs_damage_tolerance": {
+      "label": "Safe-Life vs. Damage Tolerance",
+      "what": "Two philosophies for proving a fracture-critical part is safe to fly. Safe-life proves no crack will initiate during the service life. Damage tolerance assumes a crack exists and proves it will not grow to failure before inspection catches it.\n\nSource basis: NASA-STD-5019A §7.2; §7.3",
+      "why": "Damage tolerance is the preferred approach because it accounts for the reality that flaws exist in real hardware. Safe-life is used when damage tolerance analysis is not feasible, but it requires a larger safety factor to compensate for the lack of crack growth tracking.",
+      "how": "Use damage tolerance when you have fracture toughness data, crack growth rate data, and a defined inspection program. Use safe-life when the part geometry or material makes crack growth analysis impractical — but expect to apply a scatter factor of 4 on life (cycles to failure) to account for material variability.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.nde_methods": {
+      "label": "NDE Method Selection",
+      "what": "Non-destructive evaluation (NDE) methods are the techniques used to find cracks in hardware without destroying it. Common methods include visual, penetrant, magnetic particle, eddy current, ultrasonic, and radiographic inspection.\n\nSource basis: NASA-STD-5019A §8.1; §7.3.2",
+      "why": "The minimum detectable crack size depends on which NDE method you use. Damage tolerance analysis starts from an assumed initial flaw size that must be smaller than what your chosen NDE method can reliably detect.",
+      "how": "Visual inspection detects surface cracks roughly 0.25 inches or larger. Penetrant inspection (FPI/LPI) detects surface cracks down to about 0.05-0.10 inches. Eddy current can find smaller surface cracks. Ultrasonic inspection finds both surface and subsurface flaws. Radiography finds volumetric defects. Choose the method that matches your flaw type and geometry — and make sure the assumed initial flaw size in your analysis is consistent with the NDE capability.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.critical_crack_size": {
+      "label": "Critical Crack Size vs. Detectable Crack Size",
+      "what": "The critical crack size is the flaw size at which the part fails under the applied load. The detectable crack size is the smallest flaw your NDE method can reliably find. The gap between these two numbers is your safety margin.\n\nSource basis: NASA-STD-5019A §7.3.2; §8.1",
+      "why": "If the critical crack size is smaller than what your NDE can detect, you have a problem — the crack could grow to failure without anyone seeing it. The whole point of damage tolerance is to ensure the crack grows slowly enough that inspections catch it before it reaches the critical size.",
+      "how": "Your inspection interval must be set so that a crack growing from the detectable size reaches the critical size in no less than two inspection intervals. This gives you at least two chances to find the crack before failure. If the gap between detectable and critical crack size is too small, you need a more sensitive NDE method, a shorter inspection interval, or a design change.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.da_dn_curves": {
+      "label": "da/dN Curves (Crack Growth Rate)",
+      "what": "A da/dN curve shows how fast a crack grows per load cycle as a function of the stress intensity factor range. The vertical axis is crack growth rate (inches per cycle), the horizontal axis is the stress intensity factor range (delta-K).\n\nSource basis: NASA-STD-5019A §8.3; NASGRO documentation",
+      "why": "This is how you predict how long a crack takes to grow from an initial size to the critical size. Steeper curves mean faster crack growth and shorter remaining life. The curve is material-specific and environment-specific.",
+      "how": "Get crack growth data from NASGRO, AFGROW, or program-specific testing. The data must match the material condition, environment, and loading type of your actual application. Using room-temperature air data for a part in saltwater will underestimate the crack growth rate and overestimate life.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.kic_fracture_toughness": {
+      "label": "KIc (Plane-Strain Fracture Toughness)",
+      "what": "KIc is a material property that measures resistance to crack extension under plane-strain conditions. Higher KIc means the material can tolerate larger cracks before failure. Units are ksi*sqrt(in).\n\nSource basis: NASA-STD-5019A §8.3; ASTM E399",
+      "why": "KIc determines the critical crack size — a higher KIc means a larger crack is tolerable before the part breaks. Combined with yield strength, the KIc/Fty ratio tells you whether the material is tough enough relative to its strength for simplified screening.",
+      "how": "KIc values come from MMPDS, NASGRO, or specific material testing per ASTM E399. The test must meet validity requirements — if the specimen is too small, you get an apparent toughness (Kc) that may be unconservatively high. Always use condition-specific data (heat treat, orientation, thickness) that matches your actual part.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.rfcb_review": {
+      "label": "RFCB (Responsible Fracture Control Board)",
+      "what": "The RFCB is the review authority that approves fracture control plans, classification decisions, optional approaches, and accepts fracture-critical hardware for flight.\n\nSource basis: NASA-STD-5019A §4.2; §4.3",
+      "why": "Fracture control decisions are safety-critical and require independent technical review. The RFCB provides that oversight and has authority to approve, reject, or require additional evidence.",
+      "how": "All fracture-critical parts need RFCB approval before flight. Optional approaches, detected-flaw dispositions, and any deviation from the standard path also require RFCB review. Engage the RFCB early — do not design the whole verification approach and then ask for approval at the end.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "concepts.fcr_requirements": {
+      "label": "FCR (Fracture Control Requirements)",
+      "what": "FCRs are the individual numbered requirements from NASA-STD-5019A. Each FCR specifies a particular obligation like material data, analysis, inspection, or documentation that must be met for the applicable classification path.\n\nSource basis: NASA-STD-5019A (all sections)",
+      "why": "The engine maps each part to a set of applicable FCRs based on its classification, material system, hardware type, and verification approach. This gives you a concrete checklist of what must be done.",
+      "how": "The engine returns the list of applicable FCRs with their section references. Each one is a real requirement from the standard that must be met and documented. Do not skip FCRs that seem minor — reviewers will check every one on the list.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "findings.material_identity_missing": {
+      "label": "Material Not Identified",
+      "what": "No material name was provided, so the engine cannot evaluate material-specific fracture requirements.\n\nSource basis: NASA-STD-5019A §8.3; §6.2.5",
+      "why": "Without knowing the material, the engine cannot check FCR 22 obligations, qualification status, environmental cracking susceptibility, or toughness criteria.",
+      "how": "Enter the material name from the drawing or specification. This is required before the engine can produce material-specific findings. If the material is not yet selected, note this as an open item and return when the material is defined.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "findings.approved_source_data_missing": {
+      "label": "Representative Source Data Not Confirmed",
+      "what": "FCR 22 expects representative material condition, orientation, and thickness treatment data from NASA-approved sources or with conservative bounds, but this has not been confirmed.\n\nSource basis: NASA-STD-5019A §8.3.d-e",
+      "why": "Fracture analysis is only as good as the material property data it uses. If the data does not match the real part's condition, the analysis results are unreliable.",
+      "how": "Attach material property data from MMPDS, NASGRO, or program-specific testing that matches the actual material condition, heat treatment, grain orientation, and thickness of your part. Mark the approved source data checkbox once this is done.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "findings.mua_required": {
+      "label": "MUA Requirement",
+      "what": "The material is marked as not qualified to NASA-STD-6016, so a Material Usage Agreement is required and must be included in the Fracture Control Summary Report.\n\nSource basis: NASA-STD-5019A §8.3.f-g",
+      "why": "Materials not qualified under the materials and processes standard need formal justification for use. This is a cross-module requirement that connects fracture control with materials certification.",
+      "how": "If the MUA already exists, mark it as present. If not, coordinate with your M&P engineer to generate one through the MIRA MUA Writer module. The MUA must be included in the FCSR package.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "findings.kic_fty_ratio_check": {
+      "label": "KIc/Fty Low-Risk Criterion",
+      "what": "The engine checks whether the provided KIc/Fty ratio meets the 0.33 sqrt(in) minimum for the metallic NFC low-risk path.\n\nSource basis: NASA-STD-5019A §6.2.5.a(2)",
+      "why": "This ratio determines whether the material is tough enough relative to its strength to qualify for simplified screening. Materials below this threshold are too brittle for the low-risk path.",
+      "how": "If the ratio is at or above 0.33, the low-risk criterion is met. If below 0.33, the part must follow the full NFC metallic general path instead. If you do not have KIc data, get it from MMPDS or testing — do not guess.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "findings.am_low_risk_disallowed": {
+      "label": "AM Parts Cannot Use Low-Risk Path",
+      "what": "Additively manufactured metallic parts are excluded from the NFC low-risk screening path.\n\nSource basis: NASA-STD-6030 AMR15",
+      "why": "AM materials have fundamentally different defect populations (porosity, lack of fusion, residual stress) than wrought materials. The low-risk criteria were developed for wrought metals and do not account for AM-specific failure modes.",
+      "how": "Reclassify the part to the full NFC metallic general path or fracture-critical path as appropriate. AM hardware typically needs more rigorous inspection and material characterization, not less.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "findings.titanium_slc_watch": {
+      "label": "Titanium Sustained-Load Cracking Watch",
+      "what": "Titanium alloys under sustained stress are susceptible to sustained-load cracking (SLC), which is a time-dependent crack growth mechanism separate from fatigue.\n\nSource basis: NASA-STD-5019A §3.2 (SLC definition); §7.3.2.f",
+      "why": "SLC can cause titanium parts to fail at loads well below the static fracture strength if the stress is maintained long enough. This is not captured by standard fatigue analysis.",
+      "how": "Provide sustained-load cracking data (KIscc or equivalent) for the specific titanium alloy and condition. Include sustained-load effects in the damage tolerance analysis. If sustained-load data is not available, flag this as a data gap requiring testing or conservative assumption.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "findings.steel_fastener_low_toughness_watch": {
+      "label": "High-Strength Steel Bolt Toughness Watch",
+      "what": "Steel bolts above 180 ksi ultimate strength with unknown fracture toughness should be treated as low-fracture-toughness material until property evidence is established.\n\nSource basis: NASA-STD-5019A §3.2 (low-fracture-toughness definition)",
+      "why": "High-strength steels can have very low fracture toughness, meaning small cracks can cause sudden brittle failure. Without KIc data, the conservative assumption is that the material is brittle.",
+      "how": "Provide KIc data for the specific steel grade and heat treatment condition. If the KIc is confirmed adequate, the watch is resolved. If KIc is low, the bolt may need to be treated as fracture-critical with full damage tolerance analysis.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    },
+    "findings.operating_conditions_present": {
+      "label": "Operating-Condition Effects Required",
+      "what": "Environmental exposure flags are present (chloride, sustained load, or both). FCR 22 requires these operating-condition effects to be accounted for in the material property data.\n\nSource basis: NASA-STD-5019A §8.3.c",
+      "why": "Fracture properties measured in lab air at room temperature can be significantly different from properties under actual service conditions. Using benign test data for an aggressive environment is unconservative.",
+      "how": "Include environment-specific crack growth rate data and toughness data in the assessment package. If environment-specific data is not available, apply conservative knockdown factors or get the data from testing.",
+      "authorities": [
+        {
+          "authority_ref": "inline",
+          "type": "guidance",
+          "relationship": "primary",
+          "applies_when": null,
+          "presentation_order": 1
+        }
+      ],
+      "validation": {
+        "type": "string",
+        "severity": "info",
+        "required": false
+      },
+      "tags": [
+        "migrated_v1_guidance"
+      ],
+      "related_fields": []
+    }
+  },
+  "workflows": {},
+  "contexts": {}
+}

@@ -2,7 +2,13 @@ import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/PageHeader';
 import { StatusBadge } from '@/components/StatusBadge';
 import { EvidenceTable } from '@/components/EvidenceTable';
-import { MiraHelpLabel, MiraInlineHelp } from '@/components/mira/MiraInlineHelp';
+import {
+  GuidanceContextIndicator,
+  GuidanceField,
+  GuidanceInlineHelp,
+  GuidanceModeSelector,
+  GuidanceProvider,
+} from '@/components/guidance';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -28,7 +34,8 @@ import {
   type O2FamiliesResponse,
 } from '@/lib/api';
 import helpContent from '@/config/helpContent';
-import { getMiraGuidanceEntry, getMiraInputGuidance } from '@/lib/mira-guidance';
+import { authorityRegistry, createH2Context, h2GuidancePack } from '@/lib/guidance/h2-pack';
+import type { GuidanceModeName } from '@/lib/guidance/types';
 
 type GasType = 'O2' | 'H2';
 type H2DecisionBand = 'prohibited' | 'judgement' | 'mixed' | 'none';
@@ -80,7 +87,7 @@ function parseH2DecisionBand(result: CompatibilityResponse | null): {
 }
 
 export default function GasCompatibility() {
-  const h2Help = (fieldId: string) => getMiraInputGuidance('h2', fieldId);
+  const [guidanceMode, setGuidanceMode] = useState<GuidanceModeName>('live');
   const [gasType, setGasType] = useState<GasType>('O2');
   const [h2Condition, setH2Condition] = useState('');
   const [lastEvaluatedH2Condition, setLastEvaluatedH2Condition] = useState('');
@@ -106,6 +113,12 @@ export default function GasCompatibility() {
   // O2 Families state
   const [familiesLoading, setFamiliesLoading] = useState(false);
   const [families, setFamilies] = useState<O2FamiliesResponse | null>(null);
+  const guidanceContext = createH2Context({
+    user_mode: guidanceMode,
+    service_environment: gasType === 'O2' ? phase : 'hydrogen',
+    pressure_regime:
+      Number(pressure) >= 265 ? 'high' : Number(pressure) >= 50 ? 'medium' : 'low',
+  });
 
   // Load families on mount
   useEffect(() => {
@@ -397,14 +410,30 @@ export default function GasCompatibility() {
   const showDecisionBand = gasType === 'H2' && h2DecisionBand.band !== 'none';
 
   return (
-    <div>
-      <PageHeader
-        title="Gas Compatibility"
-        description="Check material compatibility for oxygen or hydrogen service"
-        helpContent={helpContent.gasCompatibility}
-      />
+    <GuidanceProvider
+      schema={h2GuidancePack}
+      context={guidanceContext}
+      mode={guidanceMode}
+      telemetryEnabled
+      onModeChange={(newMode) => setGuidanceMode(newMode)}
+      authorityRegistry={authorityRegistry}
+    >
+      <div className="space-y-4">
+        <PageHeader
+          title="Gas Compatibility"
+          description="Check material compatibility for oxygen or hydrogen service"
+          helpContent={helpContent.gasCompatibility}
+        />
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+          <GuidanceContextIndicator context={guidanceContext} />
+          <GuidanceModeSelector
+            currentMode={guidanceMode}
+            context={guidanceContext}
+            onModeChange={(newMode) => setGuidanceMode(newMode)}
+          />
+        </div>
 
-      <Tabs defaultValue="compatibility" className="space-y-6">
+        <Tabs defaultValue="compatibility" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="compatibility" className="flex items-center gap-2">
             <Search className="h-4 w-4" />
@@ -446,34 +475,28 @@ export default function GasCompatibility() {
             {/* H2-specific controls */}
             {gasType === 'H2' && (
               <div className="space-y-2">
-                <div className="flex items-center gap-2 pt-1">
-                  <MiraHelpLabel
-                    htmlFor="h2-condition"
-                    entry={h2Help('condition')}
-                    title="Condition"
-                    labelClassName="text-xs text-muted-foreground"
-                  >
-                    Condition
-                  </MiraHelpLabel>
-                  <Input
-                    id="h2-condition"
-                    placeholder="optional, e.g. ST 1900F"
-                    value={h2Condition}
-                    onChange={(e) => setH2Condition(e.target.value)}
-                    className="h-8 max-w-xs"
-                  />
-                  {h2Condition && (
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="ghost"
-                      className="h-8 px-2"
-                      onClick={() => setH2Condition('')}
-                    >
-                      Clear
-                    </Button>
-                  )}
-                </div>
+                <GuidanceField name="inputs.condition" label="Condition">
+                  <div className="flex items-center gap-2 pt-1">
+                    <Input
+                      id="h2-condition"
+                      placeholder="optional, e.g. ST 1900F"
+                      value={h2Condition}
+                      onChange={(e) => setH2Condition(e.target.value)}
+                      className="h-8 max-w-xs"
+                    />
+                    {h2Condition && (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 px-2"
+                        onClick={() => setH2Condition('')}
+                      >
+                        Clear
+                      </Button>
+                    )}
+                  </div>
+                </GuidanceField>
                 {conditionLookupLoading && (
                   <p className="text-xs text-muted-foreground">Looking up known conditions...</p>
                 )}
@@ -565,37 +588,31 @@ export default function GasCompatibility() {
 
                 {/* Known Conditions Dropdown */}
                 {conditionOptions.length > 0 && (
-                  <div className="flex items-center gap-2 pt-1">
-                    <MiraHelpLabel
-                      htmlFor="h2-condition-select"
-                      entry={h2Help('condition')}
-                      title="Known Conditions"
-                      labelClassName="text-xs text-muted-foreground"
-                    >
-                      Known Conditions
-                    </MiraHelpLabel>
-                    <select
-                      id="h2-condition-select"
-                      value={conditionOptions.includes(h2Condition) ? h2Condition : ''}
-                      onChange={(e) => setH2Condition(e.target.value)}
-                      className="h-8 max-w-xs rounded-md border border-input bg-background px-2 text-sm"
-                    >
-                      <option value="">Select from evidence...</option>
-                      {conditionOptions.map((opt) => (
-                        <option key={opt} value={opt}>{opt}</option>
-                      ))}
-                    </select>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      className="h-8 px-2"
-                      disabled={loading || !h2Condition.trim()}
-                      onClick={() => runCompatibilityCheck()}
-                    >
-                      Apply
-                    </Button>
-                  </div>
+                  <GuidanceField name="inputs.condition" label="Known Conditions">
+                    <div className="flex items-center gap-2 pt-1">
+                      <select
+                        id="h2-condition-select"
+                        value={conditionOptions.includes(h2Condition) ? h2Condition : ''}
+                        onChange={(e) => setH2Condition(e.target.value)}
+                        className="h-8 max-w-xs rounded-md border border-input bg-background px-2 text-sm"
+                      >
+                        <option value="">Select from evidence...</option>
+                        {conditionOptions.map((opt) => (
+                          <option key={opt} value={opt}>{opt}</option>
+                        ))}
+                      </select>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="h-8 px-2"
+                        disabled={loading || !h2Condition.trim()}
+                        onClick={() => runCompatibilityCheck()}
+                      >
+                        Apply
+                      </Button>
+                    </div>
+                  </GuidanceField>
                 )}
 
                 {/* Condition Compare Table */}
@@ -640,21 +657,15 @@ export default function GasCompatibility() {
             )}
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="space-y-2">
-                <MiraHelpLabel htmlFor="material" entry={h2Help('material_key')}>
-                  Material
-                </MiraHelpLabel>
+              <GuidanceField name="inputs.material_key" htmlFor="material" label="Material" className="space-y-2">
                 <Input
                   id="material"
                   placeholder="e.g., SS316, INCONEL 718"
                   value={materialKey}
                   onChange={(e) => setMaterialKey(e.target.value)}
                 />
-              </div>
-              <div className="space-y-2">
-                <MiraHelpLabel htmlFor="pressure" entry={h2Help('pressure_psia')}>
-                  Pressure (PSIA)
-                </MiraHelpLabel>
+              </GuidanceField>
+              <GuidanceField name="inputs.pressure_psia" htmlFor="pressure" label="Pressure (PSIA)" className="space-y-2">
                 <Input
                   id="pressure"
                   type="number"
@@ -662,15 +673,8 @@ export default function GasCompatibility() {
                   value={pressure}
                   onChange={(e) => setPressure(e.target.value)}
                 />
-              </div>
-              <div className="space-y-2">
-                <MiraHelpLabel
-                  htmlFor="temperature"
-                  entry={h2Help('temperature_k')}
-                  title="Temperature (°F)"
-                >
-                  Temperature (°F)
-                </MiraHelpLabel>
+              </GuidanceField>
+              <GuidanceField name="inputs.temperature_k" htmlFor="temperature" label="Temperature (°F)" className="space-y-2">
                 <Input
                   id="temperature"
                   type="number"
@@ -678,7 +682,7 @@ export default function GasCompatibility() {
                   value={temperature}
                   onChange={(e) => setTemperature(e.target.value)}
                 />
-              </div>
+              </GuidanceField>
               {gasType === 'O2' && (
                 <div className="space-y-2">
                   <Label htmlFor="phase">Phase</Label>
@@ -722,7 +726,7 @@ export default function GasCompatibility() {
                       <div className="flex items-center gap-3">
                         <StatusBadge status={o2Result?.classification?.toLowerCase() || result?.classification || 'unknown'} />
                         {gasType === 'H2' && result ? (
-                          <MiraInlineHelp entry={getMiraGuidanceEntry('h2', 'verdicts', result.classification)} />
+                          <GuidanceInlineHelp name={`verdicts.${result.classification}`} />
                         ) : null}
                         <span className="text-sm text-muted-foreground">
                           {gasType === 'O2'
@@ -1037,7 +1041,8 @@ export default function GasCompatibility() {
             <p className="text-sm text-muted-foreground text-center">{families.note}</p>
           )}
         </TabsContent>
-      </Tabs>
-    </div>
+        </Tabs>
+      </div>
+    </GuidanceProvider>
   );
 }

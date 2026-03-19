@@ -8,9 +8,20 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { PageHelp } from "@/components/PageHelp";
-import { MiraHelpLabel, MiraInlineHelp } from "@/components/mira/MiraInlineHelp";
+import {
+  GuidanceContextIndicator,
+  GuidanceField,
+  GuidanceInlineHelp,
+  GuidanceModeSelector,
+  GuidanceProvider,
+} from "@/components/guidance";
 import helpContent from "@/config/helpContent";
-import { getMiraInputGuidance } from "@/lib/mira-guidance";
+import {
+  authorityRegistry,
+  createMiulContext,
+  miulGuidancePack,
+} from "@/lib/guidance/miul-pack";
+import type { GuidanceModeName } from "@/lib/guidance/types";
 import { cn } from "@/lib/utils";
 import {
   Upload,
@@ -512,7 +523,7 @@ function ReviewItemCard({
                     <Label className="text-xs text-right capitalize">
                       {fieldName.replace(/_/g, " ")}
                     </Label>
-                    <MiraInlineHelp entry={miulHelp(fieldName)} title={fieldName.replace(/_/g, " ")} />
+                    <GuidanceInlineHelp name={`inputs.${fieldName}`} />
                   </div>
                   <div className="flex-1 relative">
                     <Input
@@ -739,7 +750,7 @@ function DrawingRemovalPanel({
 export default function MIULBuilderV4() {
   const { t } = useTranslation("miulBuilder");
   const { toast } = useToast();
-  const miulHelp = (fieldId: string) => getMiraInputGuidance("miul", fieldId);
+  const [guidanceMode, setGuidanceMode] = useState<GuidanceModeName>("live");
 
   // ---- Upload state ----
   const [dtJsonFile, setDtJsonFile] = useState<File | null>(null);
@@ -787,6 +798,13 @@ export default function MIULBuilderV4() {
   const [recentSessions, setRecentSessions] = useState<SessionInfo[]>([]);
   const [isLoadingSessions, setIsLoadingSessions] = useState(false);
   const [sensitiveBuild, setSensitiveBuild] = useState(false);
+  const guidanceContext = createMiulContext({
+    user_mode: guidanceMode,
+    program: project || undefined,
+    service_environment: envMedia || fluidType,
+    pressure_regime:
+      Number(maxPressure) >= 265 ? "high" : Number(maxPressure) >= 50 ? "medium" : "low",
+  });
 
   // ---- Derived state ----
   const openCount = reviewItems.filter((i) => i.status === "open").length;
@@ -1464,20 +1482,38 @@ export default function MIULBuilderV4() {
   const stageStatuses = getStageStatuses(currentStage, buildComplete);
 
   return (
-    <div className="space-y-4 max-w-5xl mx-auto">
+    <GuidanceProvider
+      schema={miulGuidancePack}
+      context={guidanceContext}
+      mode={guidanceMode}
+      telemetryEnabled
+      onModeChange={(newMode) => setGuidanceMode(newMode)}
+      authorityRegistry={authorityRegistry}
+    >
+      <div className="space-y-4 max-w-5xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">
-            {t("title", { defaultValue: "MIUL Builder" })}
-          </h1>
-          <p className="text-muted-foreground">
-            {t("description", {
-              defaultValue: "Vision extraction with human-in-the-loop review",
-            })}
-          </p>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">
+              {t("title", { defaultValue: "MIUL Builder" })}
+            </h1>
+            <p className="text-muted-foreground">
+              {t("description", {
+                defaultValue: "Vision extraction with human-in-the-loop review",
+              })}
+            </p>
+          </div>
+          <PageHelp content={helpContent.miulBuilder} />
         </div>
-        <PageHelp content={helpContent.miulBuilder} />
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+          <GuidanceContextIndicator context={guidanceContext} />
+          <GuidanceModeSelector
+            currentMode={guidanceMode}
+            context={guidanceContext}
+            onModeChange={(newMode) => setGuidanceMode(newMode)}
+          />
+        </div>
       </div>
 
       {/* Pipeline Tracker */}
@@ -1533,10 +1569,11 @@ export default function MIULBuilderV4() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <MiraHelpLabel entry={miulHelp("detail_drawing")} labelClassName="text-sm font-medium">
-                  {t("upload.drawingTree", { defaultValue: "Drawing Tree JSON (Optional)" })}
-                </MiraHelpLabel>
+              <GuidanceField
+                name="inputs.detail_drawing"
+                label={t("upload.drawingTree", { defaultValue: "Drawing Tree JSON (Optional)" })}
+                className="space-y-1"
+              >
                 <p className="text-xs text-muted-foreground mb-1">
                   {t("upload.drawingTreeHint", {
                     defaultValue: "From DT Editor. Include for accurate NHA/Parent hierarchy.",
@@ -1560,7 +1597,7 @@ export default function MIULBuilderV4() {
                     })}
                   </p>
                 )}
-              </div>
+              </GuidanceField>
               <div>
                 <Label className="text-sm font-medium">
                   {t("program.name", { defaultValue: "Project Name" })}
@@ -1598,66 +1635,37 @@ export default function MIULBuilderV4() {
                 </div>
               </div>
               <div className="grid grid-cols-4 gap-2">
-                <div>
-                  <MiraHelpLabel
-                    entry={miulHelp("max_pressure")}
-                    title="Pressure Min (psia)"
-                    labelClassName="text-xs text-muted-foreground"
-                  >
-                    Pressure Min (psia)
-                  </MiraHelpLabel>
+                <GuidanceField
+                  name="inputs.max_pressure"
+                  label="Pressure Min (psia)"
+                  className="space-y-1"
+                >
                   <Input value={minPressure} onChange={(e) => setMinPressure(e.target.value)} className="h-8 text-sm" />
-                </div>
-                <div>
-                  <MiraHelpLabel entry={miulHelp("max_pressure")} labelClassName="text-xs text-muted-foreground">
-                    Pressure Max (psia)
-                  </MiraHelpLabel>
+                </GuidanceField>
+                <GuidanceField name="inputs.max_pressure" label="Pressure Max (psia)" className="space-y-1">
                   <Input value={maxPressure} onChange={(e) => setMaxPressure(e.target.value)} className="h-8 text-sm" />
-                </div>
-                <div>
-                  <MiraHelpLabel
-                    entry={miulHelp("max_temperature")}
-                    title="Temp Min (F)"
-                    labelClassName="text-xs text-muted-foreground"
-                  >
-                    Temp Min (F)
-                  </MiraHelpLabel>
+                </GuidanceField>
+                <GuidanceField
+                  name="inputs.max_temperature"
+                  label="Temp Min (F)"
+                  className="space-y-1"
+                >
                   <Input value={minTemp} onChange={(e) => setMinTemp(e.target.value)} className="h-8 text-sm" />
-                </div>
-                <div>
-                  <MiraHelpLabel entry={miulHelp("max_temperature")} labelClassName="text-xs text-muted-foreground">
-                    Temp Max (F)
-                  </MiraHelpLabel>
+                </GuidanceField>
+                <GuidanceField name="inputs.max_temperature" label="Temp Max (F)" className="space-y-1">
                   <Input value={maxTemp} onChange={(e) => setMaxTemp(e.target.value)} className="h-8 text-sm" />
-                </div>
+                </GuidanceField>
               </div>
               <div className="grid grid-cols-3 gap-2">
-                <div>
-                  <MiraHelpLabel
-                    entry={miulHelp("environment")}
-                    title="O2 Concentration (%)"
-                    labelClassName="text-xs text-muted-foreground"
-                  >
-                    O2 Concentration (%)
-                  </MiraHelpLabel>
+                <GuidanceField name="inputs.environment" label="O2 Concentration (%)" className="space-y-1">
                   <Input value={o2Percent} onChange={(e) => setO2Percent(e.target.value)} className="h-8 text-sm" />
-                </div>
-                <div>
-                  <MiraHelpLabel
-                    entry={miulHelp("environment")}
-                    title="Service Media"
-                    labelClassName="text-xs text-muted-foreground"
-                  >
-                    Service Media
-                  </MiraHelpLabel>
+                </GuidanceField>
+                <GuidanceField name="inputs.environment" label="Service Media" className="space-y-1">
                   <Input value={fluidType} onChange={(e) => setFluidType(e.target.value)} className="h-8 text-sm" />
-                </div>
-                <div>
-                  <MiraHelpLabel entry={miulHelp("environment")} labelClassName="text-xs text-muted-foreground">
-                    Environment
-                  </MiraHelpLabel>
+                </GuidanceField>
+                <GuidanceField name="inputs.environment" label="Environment" className="space-y-1">
                   <Input value={envMedia} onChange={(e) => setEnvMedia(e.target.value)} className="h-8 text-sm" />
-                </div>
+                </GuidanceField>
               </div>
             </div>
 
@@ -2180,7 +2188,8 @@ export default function MIULBuilderV4() {
           </CardContent>
         </Card>
       )}
-    </div>
+      </div>
+    </GuidanceProvider>
   );
 }
 
