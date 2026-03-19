@@ -42,6 +42,7 @@ from .forge import router as forge_router
 from .galvanic import router as galvanic_router
 from .fracture import router as fracture_router
 from .h2 import router as h2_router
+from .guidance import router as guidance_router
 from .oca import router as oca_router
 from .oca_systems import router as oca_systems_router
 try:
@@ -74,6 +75,7 @@ __all__ = [
     "galvanic_router",
     "fracture_router",
     "h2_router",
+    "guidance_router",
     "oca_router",
     "oca_systems_router",
     "tocr_router",

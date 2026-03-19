@@ -100,6 +100,7 @@ def _register_alias_routers(app: FastAPI) -> None:
     _include_with_api_alias(app, routers.query_router, prefix="/mira", tags=["query"])
     _include_with_api_alias(app, routers.aegis_router, prefix="/aegis", tags=["aegis"])
     _include_with_api_alias(app, routers.compliance_router, prefix="/compliance", tags=["compliance"])
+    _include_with_api_alias(app, routers.guidance_router, prefix="/guidance", tags=["guidance"])
 
     # Knowledge twins and decision modules
     _include_with_api_alias(app, routers.o2_router, prefix="/o2", tags=["o2"])

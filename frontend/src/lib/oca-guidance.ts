@@ -1,4 +1,11 @@
-import rawGuidance from '@/data/guidance.json';
+import {
+  authorityRegistry,
+  getOcaDispositionField,
+  getOcaField,
+  getOcaMechanismField,
+  getOcaMprField,
+  ocaGuidancePack,
+} from '@/lib/guidance/oca-pack';
 
 export type OCAEngineStatus =
   | 'active_screening_input'
@@ -74,49 +81,157 @@ interface OcaGuidanceDocument {
   dispositions: OCADispositionGuidanceEntry[];
 }
 
-const guidance = rawGuidance as OcaGuidanceDocument;
-
-function normalizeLookupKey(value: string): string {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/&/g, ' and ')
-    .replace(/[^a-z0-9]+/g, '_')
-    .replace(/^_+|_+$/g, '');
-}
-
-const inputIndex = new Map(guidance.inputs.map((entry) => [entry.field_id, entry]));
-const mprIndex = new Map(guidance.mprs.map((entry) => [entry.mpr_id, entry]));
-const dispositionIndex = new Map(guidance.dispositions.map((entry) => [entry.disposition_id, entry]));
-
-const mechanismIndex = new Map<string, OCAMechanismGuidanceEntry>();
-for (const entry of guidance.mechanisms) {
-  const lookupKeys = [entry.mechanism_id, entry.label, ...(entry.aliases ?? [])];
-  for (const key of lookupKeys) {
-    mechanismIndex.set(normalizeLookupKey(key), entry);
-  }
-}
-
 export type OCAHelpEntry =
   | OCAFieldGuidanceEntry
   | OCAMechanismGuidanceEntry
   | OCAMprGuidanceEntry
   | OCADispositionGuidanceEntry;
 
+function pickEngineStatus(tags: string[] | undefined): OCAEngineStatus {
+  const candidates = tags ?? [];
+  for (const tag of candidates) {
+    if (tag in OCA_ENGINE_STATUS_LABELS) {
+      return tag as OCAEngineStatus;
+    }
+  }
+  return 'reviewer_context';
+}
+
+function formatSource(fieldName: string): string {
+  const primaryAuthority = ocaGuidancePack.fields[fieldName]?.authorities?.[0];
+  if (!primaryAuthority) {
+    return 'BoundState OCA guidance pack';
+  }
+
+  const entry = authorityRegistry.get(primaryAuthority.authority_ref);
+  if (!entry) {
+    return primaryAuthority.authority_ref;
+  }
+
+  const parts = [entry.document_id];
+  if (entry.revision) parts.push(entry.revision);
+  if (entry.section) parts.push(`§${entry.section}`);
+  if (entry.requirement_id) parts.push(entry.requirement_id);
+  return parts.join(' ');
+}
+
+function toFieldEntry(fieldId: string): OCAFieldGuidanceEntry | null {
+  const field = getOcaField(fieldId);
+  if (!field) return null;
+
+  return {
+    field_id: fieldId,
+    label: field.label,
+    engine_status: pickEngineStatus(field.tags),
+    what: field.what,
+    why: field.why,
+    guidance: field.how ?? '',
+    source: formatSource(fieldId),
+  };
+}
+
+function toMechanismEntry(mechanismIdOrLabel: string): OCAMechanismGuidanceEntry | null {
+  const field = getOcaMechanismField(mechanismIdOrLabel);
+  if (!field) return null;
+
+  const mechanismId = Object.entries(ocaGuidancePack.fields).find(
+    ([key, candidate]) =>
+      key.startsWith('mechanism.') &&
+      candidate.label === field.label,
+  )?.[0].replace(/^mechanism\./, '') ?? mechanismIdOrLabel;
+
+  return {
+    mechanism_id: mechanismId,
+    label: field.label,
+    aliases: field.examples,
+    engine_status: pickEngineStatus(field.tags),
+    what: field.what,
+    why: field.why,
+    guidance: field.how ?? '',
+    source: formatSource(`mechanism.${mechanismId}`),
+  };
+}
+
+function toMprEntry(mprId: string): OCAMprGuidanceEntry | null {
+  const field = getOcaMprField(mprId);
+  if (!field) return null;
+
+  return {
+    mpr_id: mprId,
+    label: field.label,
+    engine_status: pickEngineStatus(field.tags),
+    what: field.what,
+    why: field.why,
+    guidance: field.how ?? '',
+    source: formatSource(`mpr.${mprId}`),
+  };
+}
+
+function toDispositionEntry(dispositionId: string): OCADispositionGuidanceEntry | null {
+  const field = getOcaDispositionField(dispositionId);
+  if (!field) return null;
+
+  return {
+    disposition_id: dispositionId,
+    label: field.label,
+    engine_status: pickEngineStatus(field.tags),
+    what: field.what,
+    why: field.why,
+    guidance: field.how ?? '',
+    source: formatSource(`disposition.${dispositionId}`),
+  };
+}
+
+function buildCompatibilityDocument(): OcaGuidanceDocument {
+  const inputs: OCAFieldGuidanceEntry[] = [];
+  const mechanisms: OCAMechanismGuidanceEntry[] = [];
+  const mprs: OCAMprGuidanceEntry[] = [];
+  const dispositions: OCADispositionGuidanceEntry[] = [];
+
+  for (const fieldId of Object.keys(ocaGuidancePack.fields)) {
+    if (fieldId.startsWith('mechanism.')) {
+      const mechanism = toMechanismEntry(fieldId.replace(/^mechanism\./, ''));
+      if (mechanism) mechanisms.push(mechanism);
+      continue;
+    }
+    if (fieldId.startsWith('mpr.')) {
+      const mpr = toMprEntry(fieldId.replace(/^mpr\./, ''));
+      if (mpr) mprs.push(mpr);
+      continue;
+    }
+    if (fieldId.startsWith('disposition.')) {
+      const disposition = toDispositionEntry(fieldId.replace(/^disposition\./, ''));
+      if (disposition) dispositions.push(disposition);
+      continue;
+    }
+
+    const input = toFieldEntry(fieldId);
+    if (input) inputs.push(input);
+  }
+
+  return {
+    version: Number.parseFloat(ocaGuidancePack.schema_version) || 1,
+    inputs,
+    mechanisms,
+    mprs,
+    dispositions,
+  };
+}
+
 export function getInputGuidance(fieldId: string): OCAFieldGuidanceEntry | null {
-  return inputIndex.get(fieldId) ?? null;
+  return toFieldEntry(fieldId);
 }
 
 export function getMechanismGuidance(mechanismIdOrLabel: string): OCAMechanismGuidanceEntry | null {
-  return mechanismIndex.get(normalizeLookupKey(mechanismIdOrLabel)) ?? null;
+  return toMechanismEntry(mechanismIdOrLabel);
 }
 
 export function getMprGuidance(mprId: string): OCAMprGuidanceEntry | null {
-  return mprIndex.get(mprId) ?? null;
+  return toMprEntry(mprId);
 }
 
 export function getDispositionGuidance(dispositionId: string): OCADispositionGuidanceEntry | null {
-  return dispositionIndex.get(dispositionId) ?? null;
+  return toDispositionEntry(dispositionId);
 }
 
-export const ocaGuidance = guidance;
+export const ocaGuidance = buildCompatibilityDocument();

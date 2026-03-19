@@ -11,8 +11,14 @@ import {
   ShieldX,
 } from 'lucide-react';
 
+import {
+  GuidanceContextIndicator,
+  GuidanceField,
+  GuidanceModeSelector,
+  GuidanceProvider,
+} from '@/components/guidance';
 import { MaterialCombobox } from '@/components/oca/MaterialCombobox';
-import { OCAHelpLabel, OCAInlineHelp } from '@/components/oca/OCAInlineHelp';
+import { OCAInlineHelp } from '@/components/oca/OCAInlineHelp';
 import { PageHeader } from '@/components/PageHeader';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -27,6 +33,8 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { authorityRegistry, createOcaContext, ocaGuidancePack } from '@/lib/guidance/oca-pack';
+import type { GuidanceModeName } from '@/lib/guidance/types';
 import {
   ocaAssessMechanisms,
   ocaCreateCase,
@@ -171,6 +179,17 @@ function workbenchHelp(fieldId: string) {
   return getInputGuidance(`workbench.${fieldId}`);
 }
 
+type GuidanceValidationState = 'valid' | 'invalid' | 'warning' | 'pending';
+
+function requiredTextState(value: string): GuidanceValidationState | undefined {
+  return value.trim() ? undefined : 'invalid';
+}
+
+function numericInputState(value: string): GuidanceValidationState | undefined {
+  if (!value.trim()) return 'invalid';
+  return Number.isFinite(Number(value)) ? undefined : 'invalid';
+}
+
 function dispositionPlainEnglish(disposition: string, decision: OCADecisionPacket): string {
   const materialNames = decision.mua_seed?.materials?.join(', ') || 'this material';
   switch (disposition) {
@@ -198,6 +217,7 @@ export default function OCAWorkbench() {
   const [loading, setLoading] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [guidanceMode, setGuidanceMode] = useState<GuidanceModeName>('live');
 
   const [materialName, setMaterialName] = useState('316L');
   const [spec, setSpec] = useState('');
@@ -251,6 +271,13 @@ export default function OCAWorkbench() {
   const [decision, setDecision] = useState<OCADecisionPacket | null>(null);
   const [lineage, setLineage] = useState<OCALineageResponse | null>(null);
   const [exports, setExports] = useState<OCAExportArtifact[]>([]);
+
+  const guidanceContext = createOcaContext({
+    user_mode: guidanceMode,
+    program: authority?.spec_id,
+    service_environment: 'oxygen',
+    pressure_regime: Number(pressureMax) >= 265 ? 'high' : Number(pressureMax) >= 50 ? 'medium' : 'low',
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -388,13 +415,33 @@ export default function OCAWorkbench() {
   const displayedMechanisms = mechanisms?.mechanisms ?? [];
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="OCA Workbench"
-        description="Deterministic oxygen compatibility screening and case routing per BS-SPEC-OCA-001-REV1."
-      />
+    <GuidanceProvider
+      schema={ocaGuidancePack}
+      context={guidanceContext}
+      mode={guidanceMode}
+      telemetryEnabled
+      onModeChange={(newMode) => setGuidanceMode(newMode)}
+      authorityRegistry={authorityRegistry}
+    >
+      <div className="space-y-6">
+        <div className="space-y-3">
+          <PageHeader
+            title="OCA Workbench"
+            description="Deterministic oxygen compatibility screening and case routing per BS-SPEC-OCA-001-REV1."
+          />
+          <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+            <GuidanceContextIndicator context={guidanceContext} />
+            <GuidanceModeSelector
+              currentMode={guidanceMode}
+              context={guidanceContext}
+              modeRules={ocaGuidancePack.mode_rules}
+              moduleOverride={ocaGuidancePack.module_mode_overrides?.[ocaGuidancePack.module]}
+              onModeChange={(newMode) => setGuidanceMode(newMode)}
+            />
+          </div>
+        </div>
 
-      <section className="rounded-3xl border border-slate-900/15 bg-[linear-gradient(135deg,_rgba(88,58,22,0.97)_0%,_rgba(47,55,69,0.97)_38%,_rgba(8,27,42,1)_100%)] px-6 py-6 text-slate-50 shadow-[0_18px_50px_rgba(15,23,42,0.18)]">
+        <section className="rounded-3xl border border-slate-900/15 bg-[linear-gradient(135deg,_rgba(88,58,22,0.97)_0%,_rgba(47,55,69,0.97)_38%,_rgba(8,27,42,1)_100%)] px-6 py-6 text-slate-50 shadow-[0_18px_50px_rgba(15,23,42,0.18)]">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-2xl space-y-2">
             <p className="text-xs uppercase tracking-[0.22em] text-amber-100/90">Oxygen Compatibility Assessment</p>
@@ -410,9 +457,9 @@ export default function OCAWorkbench() {
             </div>
           </div>
         </div>
-      </section>
+        </section>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
         <Card className="overflow-hidden border-slate-200">
           <CardHeader className="border-b border-slate-200 bg-slate-50/70">
             <CardTitle>Assessment Input</CardTitle>
@@ -426,63 +473,55 @@ export default function OCAWorkbench() {
                   <span className="text-sm font-semibold text-slate-800">What material?</span>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2 md:col-span-2">
-                    <OCAHelpLabel htmlFor="material-name" entry={workbenchHelp('material_name')}>
-                      Material Name
-                    </OCAHelpLabel>
+                  <GuidanceField
+                    name="workbench.material_name"
+                    htmlFor="material-name"
+                    className="md:col-span-2"
+                    validationState={requiredTextState(materialName)}
+                    validationMessage="Material name is required."
+                  >
                     <MaterialCombobox id="material-name" value={materialName} onChange={setMaterialName} />
                     <p className="text-[11px] text-slate-400">
                       Start typing to see known materials with their flammability class. Unknown materials are still accepted.
                     </p>
-                  </div>
-                  <div className="space-y-2">
-                    <OCAHelpLabel htmlFor="product-form" entry={workbenchHelp('product_form')}>
-                      Product Form
-                    </OCAHelpLabel>
+                  </GuidanceField>
+                  <GuidanceField
+                    name="workbench.product_form"
+                    htmlFor="product-form"
+                    validationState={requiredTextState(productForm)}
+                    validationMessage="Product form is required."
+                  >
                     <Input id="product-form" value={productForm} onChange={(e) => setProductForm(e.target.value)} placeholder="bar / tube / mesh" />
-                  </div>
-                  <div className="space-y-2">
-                    <OCAHelpLabel htmlFor="role" entry={workbenchHelp('role_in_component')}>
-                      Role in Component
-                    </OCAHelpLabel>
+                  </GuidanceField>
+                  <GuidanceField
+                    name="workbench.role_in_component"
+                    htmlFor="role"
+                    validationState={requiredTextState(roleInComponent)}
+                    validationMessage="Role in component is required."
+                  >
                     <Input id="role" value={roleInComponent} onChange={(e) => setRoleInComponent(e.target.value)} placeholder="body / seat / seal" />
-                  </div>
+                  </GuidanceField>
                 </div>
                 <details className="mt-3">
                   <summary className="cursor-pointer text-xs font-medium text-slate-500 hover:text-slate-700">
                     More material details (spec, grade, temper, coating)
                   </summary>
                   <div className="mt-3 grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <OCAHelpLabel htmlFor="spec" entry={workbenchHelp('spec')}>
-                        Specification
-                      </OCAHelpLabel>
+                    <GuidanceField name="workbench.spec" htmlFor="spec">
                       <Input id="spec" value={spec} onChange={(e) => setSpec(e.target.value)} placeholder="AMS 5666" />
-                    </div>
-                    <div className="space-y-2">
-                      <OCAHelpLabel htmlFor="grade" entry={workbenchHelp('grade')}>
-                        Grade
-                      </OCAHelpLabel>
+                    </GuidanceField>
+                    <GuidanceField name="workbench.grade" htmlFor="grade">
                       <Input id="grade" value={grade} onChange={(e) => setGrade(e.target.value)} placeholder="718" />
-                    </div>
-                    <div className="space-y-2">
-                      <OCAHelpLabel htmlFor="temper" entry={workbenchHelp('temper')}>
-                        Temper
-                      </OCAHelpLabel>
+                    </GuidanceField>
+                    <GuidanceField name="workbench.temper" htmlFor="temper">
                       <Input id="temper" value={temper} onChange={(e) => setTemper(e.target.value)} placeholder="T6 / annealed" />
-                    </div>
-                    <div className="space-y-2">
-                      <OCAHelpLabel htmlFor="coating" entry={workbenchHelp('coating')}>
-                        Coating
-                      </OCAHelpLabel>
+                    </GuidanceField>
+                    <GuidanceField name="workbench.coating" htmlFor="coating">
                       <Input id="coating" value={coating} onChange={(e) => setCoating(e.target.value)} placeholder="passivated / none" />
-                    </div>
-                    <div className="space-y-2">
-                      <OCAHelpLabel htmlFor="surface-condition" entry={workbenchHelp('surface_condition')}>
-                        Surface Condition
-                      </OCAHelpLabel>
+                    </GuidanceField>
+                    <GuidanceField name="workbench.surface_condition" htmlFor="surface-condition">
                       <Input id="surface-condition" value={surfaceCondition} onChange={(e) => setSurfaceCondition(e.target.value)} placeholder="cleaned / machined" />
-                    </div>
+                    </GuidanceField>
                   </div>
                 </details>
               </div>
@@ -494,10 +533,7 @@ export default function OCAWorkbench() {
                 </div>
               </div>
               <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <OCAHelpLabel entry={workbenchHelp('component_class')}>
-                    Component Class
-                  </OCAHelpLabel>
+                <GuidanceField name="workbench.component_class">
                   <Select value={componentClass} onValueChange={(value) => setComponentClass(value as (typeof COMPONENT_OPTIONS)[number])}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -506,11 +542,8 @@ export default function OCAWorkbench() {
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="space-y-2">
-                  <OCAHelpLabel entry={workbenchHelp('geometry_class')}>
-                    Geometry Class
-                  </OCAHelpLabel>
+                </GuidanceField>
+                <GuidanceField name="workbench.geometry_class">
                   <Select value={geometryClass} onValueChange={(value) => setGeometryClass(value as (typeof GEOMETRY_OPTIONS)[number])}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -519,22 +552,26 @@ export default function OCAWorkbench() {
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
+                </GuidanceField>
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <OCAHelpLabel htmlFor="design-function" entry={workbenchHelp('design_function')}>
-                    Design Function
-                  </OCAHelpLabel>
+                <GuidanceField
+                  name="workbench.design_function"
+                  htmlFor="design-function"
+                  validationState={requiredTextState(designFunction)}
+                  validationMessage="Design function is required."
+                >
                   <Input id="design-function" value={designFunction} onChange={(e) => setDesignFunction(e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <OCAHelpLabel htmlFor="boundary-material" entry={workbenchHelp('pressure_boundary_material')}>
-                    Pressure Boundary Material
-                  </OCAHelpLabel>
+                </GuidanceField>
+                <GuidanceField
+                  name="workbench.pressure_boundary_material"
+                  htmlFor="boundary-material"
+                  validationState={requiredTextState(pressureBoundaryMaterial)}
+                  validationMessage="Pressure boundary material is required."
+                >
                   <Input id="boundary-material" value={pressureBoundaryMaterial} onChange={(e) => setPressureBoundaryMaterial(e.target.value)} />
-                </div>
+                </GuidanceField>
               </div>
 
               <details className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
@@ -567,10 +604,14 @@ export default function OCAWorkbench() {
                   ))}
                 </div>
                 <div className="mt-4 space-y-2">
-                  <OCAHelpLabel htmlFor="rapid-press" entry={workbenchHelp('rapid_pressurization_time_ms')}>
-                    Rapid Pressurization Time (ms)
-                  </OCAHelpLabel>
+                  <GuidanceField
+                    name="workbench.rapid_pressurization_time_ms"
+                    htmlFor="rapid-press"
+                    validationState={numericInputState(rapidPressurizationMs)}
+                    validationMessage="Rapid pressurization time must be numeric."
+                  >
                   <Input id="rapid-press" type="number" value={rapidPressurizationMs} onChange={(e) => setRapidPressurizationMs(e.target.value)} />
+                  </GuidanceField>
                 </div>
               </details>
             </div>
@@ -581,10 +622,7 @@ export default function OCAWorkbench() {
                 <span className="text-sm font-semibold text-slate-800">Service conditions</span>
               </div>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                <div className="space-y-2">
-                  <OCAHelpLabel entry={workbenchHelp('oxidizer_type')}>
-                    Oxidizer Type
-                  </OCAHelpLabel>
+                <GuidanceField name="workbench.oxidizer_type">
                   <Select value={oxidizerType} onValueChange={(value) => setOxidizerType(value as OCAOxidizerType)}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -593,11 +631,8 @@ export default function OCAWorkbench() {
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="space-y-2">
-                  <OCAHelpLabel entry={workbenchHelp('phase')}>
-                    Phase
-                  </OCAHelpLabel>
+                </GuidanceField>
+                <GuidanceField name="workbench.phase">
                   <Select value={phase} onValueChange={(value) => setPhase(value as OCAPhase)}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -606,47 +641,56 @@ export default function OCAWorkbench() {
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="space-y-2">
-                  <OCAHelpLabel htmlFor="o2-fraction" entry={workbenchHelp('o2_fraction')}>
-                    O2 Fraction
-                  </OCAHelpLabel>
+                </GuidanceField>
+                <GuidanceField
+                  name="workbench.o2_fraction"
+                  htmlFor="o2-fraction"
+                  validationState={numericInputState(o2Fraction)}
+                  validationMessage="O2 fraction must be numeric."
+                >
                   <Input id="o2-fraction" type="number" step="0.01" value={o2Fraction} onChange={(e) => setO2Fraction(e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <OCAHelpLabel htmlFor="velocity" entry={workbenchHelp('velocity_m_s')}>
-                    Velocity (m/s)
-                  </OCAHelpLabel>
+                </GuidanceField>
+                <GuidanceField
+                  name="workbench.velocity_m_s"
+                  htmlFor="velocity"
+                  validationState={numericInputState(velocity)}
+                  validationMessage="Velocity must be numeric."
+                >
                   <Input id="velocity" type="number" step="0.1" value={velocity} onChange={(e) => setVelocity(e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <OCAHelpLabel htmlFor="pressure-min" entry={workbenchHelp('total_pressure_min_psia')}>
-                    Pressure Min (psia)
-                  </OCAHelpLabel>
+                </GuidanceField>
+                <GuidanceField
+                  name="workbench.total_pressure_min_psia"
+                  htmlFor="pressure-min"
+                  validationState={numericInputState(pressureMin)}
+                  validationMessage="Minimum pressure must be numeric."
+                >
                   <Input id="pressure-min" type="number" step="0.1" value={pressureMin} onChange={(e) => setPressureMin(e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <OCAHelpLabel htmlFor="pressure-max" entry={workbenchHelp('total_pressure_max_psia')}>
-                    Pressure Max (psia)
-                  </OCAHelpLabel>
+                </GuidanceField>
+                <GuidanceField
+                  name="workbench.total_pressure_max_psia"
+                  htmlFor="pressure-max"
+                  validationState={numericInputState(pressureMax)}
+                  validationMessage="Maximum pressure must be numeric."
+                >
                   <Input id="pressure-max" type="number" step="0.1" value={pressureMax} onChange={(e) => setPressureMax(e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <OCAHelpLabel htmlFor="temp-min" entry={workbenchHelp('temp_min_c')}>
-                    Temp Min (°C)
-                  </OCAHelpLabel>
+                </GuidanceField>
+                <GuidanceField
+                  name="workbench.temp_min_c"
+                  htmlFor="temp-min"
+                  validationState={numericInputState(tempMin)}
+                  validationMessage="Minimum temperature must be numeric."
+                >
                   <Input id="temp-min" type="number" step="0.1" value={tempMin} onChange={(e) => setTempMin(e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <OCAHelpLabel htmlFor="temp-max" entry={workbenchHelp('temp_max_c')}>
-                    Temp Max (°C)
-                  </OCAHelpLabel>
+                </GuidanceField>
+                <GuidanceField
+                  name="workbench.temp_max_c"
+                  htmlFor="temp-max"
+                  validationState={numericInputState(tempMax)}
+                  validationMessage="Maximum temperature must be numeric."
+                >
                   <Input id="temp-max" type="number" step="0.1" value={tempMax} onChange={(e) => setTempMax(e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <OCAHelpLabel entry={workbenchHelp('flow_regime')}>
-                    Flow Regime
-                  </OCAHelpLabel>
+                </GuidanceField>
+                <GuidanceField name="workbench.flow_regime">
                   <Select value={flowRegime} onValueChange={(value) => setFlowRegime(value as OCAFlowRegime)}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -655,11 +699,8 @@ export default function OCAWorkbench() {
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="space-y-2">
-                  <OCAHelpLabel entry={workbenchHelp('mission_phase')}>
-                    Mission Phase
-                  </OCAHelpLabel>
+                </GuidanceField>
+                <GuidanceField name="workbench.mission_phase">
                   <Select value={missionPhase} onValueChange={(value) => setMissionPhase(value as OCAMissionPhase)}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -668,7 +709,7 @@ export default function OCAWorkbench() {
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
+                </GuidanceField>
               </div>
 
               <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 space-y-4">
@@ -694,17 +735,14 @@ export default function OCAWorkbench() {
                   </span>
                   <Switch checked={cleanlinessVerified} onCheckedChange={setCleanlinessVerified} />
                 </label>
-                <div className="space-y-2">
-                  <OCAHelpLabel htmlFor="contamination-notes" entry={workbenchHelp('contamination_notes')}>
-                    Contamination Notes
-                  </OCAHelpLabel>
+                <GuidanceField name="workbench.contamination_notes" htmlFor="contamination-notes">
                   <Textarea
                     id="contamination-notes"
                     value={contaminationNotes}
                     onChange={(e) => setContaminationNotes(e.target.value)}
                     placeholder="Known debris sources, cleaning assumptions, or unresolved contamination concerns."
                   />
-                </div>
+                </GuidanceField>
               </div>
 
               <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -1090,14 +1128,15 @@ export default function OCAWorkbench() {
         </>
       )}
 
-      {loading ? (
-        <Card className="border-slate-200">
-          <CardContent className="flex items-center justify-center gap-3 py-10 text-sm text-slate-600">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Building deterministic OCA case, evidence map, mechanism traces, and decision lineage.
-          </CardContent>
-        </Card>
-      ) : null}
-    </div>
+        {loading ? (
+          <Card className="border-slate-200">
+            <CardContent className="flex items-center justify-center gap-3 py-10 text-sm text-slate-600">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Building deterministic OCA case, evidence map, mechanism traces, and decision lineage.
+            </CardContent>
+          </Card>
+        ) : null}
+      </div>
+    </GuidanceProvider>
   );
 }

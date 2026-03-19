@@ -13,6 +13,7 @@
 import React from 'react';
 
 import { Label } from '@/components/ui/label';
+import type { OCAHelpEntry } from '@/lib/oca-guidance';
 import { cn } from '@/lib/utils';
 import type { GuidanceFieldDefinition, GuidanceModeName } from '@/lib/guidance/types';
 
@@ -28,21 +29,33 @@ interface OCAInlineHelpBridgeProps {
   fieldId?: string;
   /** Or pass a field definition directly from one of the old lookup functions */
   field?: GuidanceFieldDefinition | null;
+  /** Legacy entry shape from the old OCA guidance helpers */
+  entry?: OCAHelpEntry | null;
   mode?: GuidanceModeName;
   className?: string;
   iconClassName?: string;
   align?: 'start' | 'center' | 'end';
 }
 
+function resolveFieldFromEntry(entry?: OCAHelpEntry | null) {
+  if (!entry) return null;
+  if ('field_id' in entry) return getOcaField(entry.field_id);
+  if ('mechanism_id' in entry) return getOcaMechanismField(entry.mechanism_id);
+  if ('mpr_id' in entry) return getOcaMprField(entry.mpr_id);
+  if ('disposition_id' in entry) return getOcaDispositionField(entry.disposition_id);
+  return null;
+}
+
 export function OCAInlineHelpBridge({
   fieldId,
   field: fieldProp,
+  entry,
   mode = 'live',
   className,
   iconClassName,
   align = 'start',
 }: OCAInlineHelpBridgeProps) {
-  const field = fieldProp ?? (fieldId ? getOcaField(fieldId) : null);
+  const field = fieldProp ?? resolveFieldFromEntry(entry) ?? (fieldId ? getOcaField(fieldId) : null);
   if (!field) return null;
 
   const name = fieldId ?? field.label;
@@ -52,6 +65,8 @@ export function OCAInlineHelpBridge({
       field={field}
       fieldName={name}
       mode={mode}
+      authorities={field.authorities ?? []}
+      actions={field.actions ?? []}
       authorityRegistry={authorityRegistry}
       className={className}
       iconClassName={iconClassName}
@@ -69,6 +84,7 @@ interface OCAHelpLabelBridgeProps {
   children: React.ReactNode;
   fieldId?: string;
   field?: GuidanceFieldDefinition | null;
+  entry?: OCAHelpEntry | null;
   mode?: GuidanceModeName;
   className?: string;
   labelClassName?: string;
@@ -79,11 +95,12 @@ export function OCAHelpLabelBridge({
   children,
   fieldId,
   field: fieldProp,
+  entry,
   mode = 'live',
   className,
   labelClassName,
 }: OCAHelpLabelBridgeProps) {
-  const field = fieldProp ?? (fieldId ? getOcaField(fieldId) : null);
+  const field = fieldProp ?? resolveFieldFromEntry(entry) ?? (fieldId ? getOcaField(fieldId) : null);
 
   return (
     <div className={cn('flex items-center gap-1.5', className)}>
@@ -95,6 +112,8 @@ export function OCAHelpLabelBridge({
           field={field}
           fieldName={fieldId ?? field.label}
           mode={mode}
+          authorities={field.authorities ?? []}
+          actions={field.actions ?? []}
           authorityRegistry={authorityRegistry}
         />
       )}

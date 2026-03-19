@@ -1,9 +1,14 @@
-import { CircleHelp } from 'lucide-react';
-
 import { Label } from '@/components/ui/label';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { OCA_ENGINE_STATUS_LABELS } from '@/lib/oca-guidance';
+import { GuidancePopover } from '@/components/guidance/GuidancePopover';
+import {
+  authorityRegistry,
+  getOcaDispositionField,
+  getOcaField,
+  getOcaMechanismField,
+  getOcaMprField,
+} from '@/lib/guidance/oca-pack';
 import { cn } from '@/lib/utils';
+import type { GuidanceFieldDefinition } from '@/lib/guidance/types';
 import type { OCAHelpEntry } from '@/lib/oca-guidance';
 
 interface OCAInlineHelpProps {
@@ -13,55 +18,46 @@ interface OCAInlineHelpProps {
   align?: 'start' | 'center' | 'end';
 }
 
+function resolveGuidanceField(entry: OCAHelpEntry | null | undefined): GuidanceFieldDefinition | null {
+  if (!entry) return null;
+
+  if ('field_id' in entry) {
+    return getOcaField(entry.field_id);
+  }
+  if ('mechanism_id' in entry) {
+    return getOcaMechanismField(entry.mechanism_id);
+  }
+  if ('mpr_id' in entry) {
+    return getOcaMprField(entry.mpr_id);
+  }
+  if ('disposition_id' in entry) {
+    return getOcaDispositionField(entry.disposition_id);
+  }
+
+  return null;
+}
+
 export function OCAInlineHelp({
   entry,
   className,
   iconClassName,
   align = 'start',
 }: OCAInlineHelpProps) {
-  if (!entry) return null;
+  const field = resolveGuidanceField(entry);
+  if (!field) return null;
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <button
-          type="button"
-          className={cn(
-            'inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-            className,
-          )}
-          aria-label={`Help for ${entry.label}`}
-        >
-          <CircleHelp className={cn('h-3.5 w-3.5', iconClassName)} />
-        </button>
-      </PopoverTrigger>
-      <PopoverContent align={align} className="w-80 space-y-3">
-        <div className="space-y-1">
-          <div className="text-sm font-semibold text-foreground">{entry.label}</div>
-          <p className="text-xs leading-relaxed text-muted-foreground">{entry.what}</p>
-        </div>
-        <div className="rounded-md border border-border bg-muted/40 px-2.5 py-2 text-[11px] leading-relaxed text-muted-foreground">
-          <span className="font-semibold text-foreground">Engine status:</span>
-          {' '}
-          {OCA_ENGINE_STATUS_LABELS[entry.engine_status]}
-        </div>
-        <div className="space-y-2 text-xs leading-relaxed text-foreground">
-          <p>
-            <span className="font-semibold">Why it matters:</span>
-            {' '}
-            {entry.why}
-          </p>
-          <p>
-            <span className="font-semibold">How to use it:</span>
-            {' '}
-            {entry.guidance}
-          </p>
-        </div>
-        <div className="border-t border-border pt-2 text-[11px] leading-relaxed text-muted-foreground">
-          {entry.source}
-        </div>
-      </PopoverContent>
-    </Popover>
+    <GuidancePopover
+      field={field}
+      fieldName={field.label}
+      mode="live"
+      authorities={field.authorities ?? []}
+      actions={field.actions ?? []}
+      authorityRegistry={authorityRegistry}
+      className={className}
+      iconClassName={iconClassName}
+      align={align}
+    />
   );
 }
 
