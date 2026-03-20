@@ -15,6 +15,7 @@ from functools import lru_cache
 from pathlib import Path
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
+_TEXT_RUNTIME_ASSET_SUFFIXES = {".json", ".yaml", ".yml", ".txt", ".md", ".csv"}
 
 
 @dataclass(frozen=True)
@@ -96,9 +97,14 @@ REQUIRED_RUNTIME_ASSETS: tuple[RuntimeAsset, ...] = (
 
 def _sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
+    raw = path.read_bytes()
+
+    # Runtime assets are tracked text payloads. Normalize line endings so
+    # clean git snapshots (LF) and CRLF working trees hash identically.
+    if path.suffix.lower() in _TEXT_RUNTIME_ASSET_SUFFIXES:
+        raw = raw.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+
+    digest.update(raw)
     return digest.hexdigest()
 
 

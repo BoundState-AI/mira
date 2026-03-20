@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from mira.api.runtime_assets import iter_required_runtime_assets, validate_required_runtime_assets
+from mira.api.runtime_assets import _sha256_file, iter_required_runtime_assets, validate_required_runtime_assets
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -38,3 +38,13 @@ def test_required_runtime_assets_are_tracked_in_git():
             f"{asset.relative_path} must be tracked in git for clean-checkout deploys. "
             f"git output: {result.stderr.strip() or result.stdout.strip()}"
         )
+
+
+def test_runtime_asset_hashes_ignore_text_line_endings(tmp_path: Path):
+    lf_path = tmp_path / "guidance.json"
+    crlf_path = tmp_path / "guidance-copy.json"
+
+    lf_path.write_text('{\n  "status": "ok"\n}\n', encoding="utf-8", newline="\n")
+    crlf_path.write_text('{\n  "status": "ok"\n}\n', encoding="utf-8", newline="\r\n")
+
+    assert _sha256_file(lf_path) == _sha256_file(crlf_path)
