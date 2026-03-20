@@ -1,0 +1,23 @@
+{
+  "engine_id": "oca",
+  "display_name": "Oxygen Compatibility Assessment",
+  "version": "2.1.0",
+  "supported_tasks": ["answer_only"],
+  "supported_domains": ["oxygen_compatibility"],
+  "required_inputs": ["material_designation"],
+  "optional_inputs": ["pressure", "temperature", "configuration"],
+  "adapter_module": "mira.chat.adapters.oca_adapter",
+  "adapter_class": "OcaAdapter",
+  "multi_step": true,
+  "case_driven": true,
+  "side_effect_level": "read_only",
+  "output_schema_version": "1.0",
+  "routing_aliases": ["oca", "oxygen"],
+  "chaining_outputs": {
+    "CONDITIONAL_PASS": {
+      "suggests": "mua",
+      "auto_chain": false,
+      "data_handoff": ["material", "environment", "gaps", "verdict"]
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "engine_id": "galvanic",
+  "display_name": "Galvanic Corrosion Assessment",
+  "version": "1.0.0",
+  "supported_tasks": ["answer_only"],
+  "supported_domains": ["galvanic_corrosion", "dissimilar_metals"],
+  "required_inputs": ["material_designation"],
+  "optional_inputs": ["second_material", "environment", "joint_type", "electrical_contact", "surface_condition_a", "surface_condition_b", "cathode_to_anode_area_ratio", "electrolyte_pooling"],
+  "adapter_module": "mira.chat.adapters.galvanic_adapter",
+  "adapter_class": "GalvanicAdapter",
+  "multi_step": false,
+  "case_driven": false,
+  "side_effect_level": "read_only",
+  "output_schema_version": "1.0",
+  "routing_aliases": ["galvanic"],
+  "chaining_outputs": {
+    "FAIL": {
+      "suggests": "bsmh",
+      "auto_chain": false,
+      "data_handoff": ["material_a", "material_b", "severity", "mitigations"]
+    }
+  }
+}

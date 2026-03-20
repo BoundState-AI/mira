@@ -1,0 +1,17 @@
+{
+  "engine_id": "h2",
+  "display_name": "Hydrogen Compatibility Assessment",
+  "version": "1.0.0",
+  "supported_tasks": ["answer_only"],
+  "supported_domains": ["hydrogen_compatibility"],
+  "required_inputs": ["material_designation"],
+  "optional_inputs": ["pressure", "temperature", "phase", "condition"],
+  "adapter_module": "mira.chat.adapters.h2_adapter",
+  "adapter_class": "H2Adapter",
+  "multi_step": false,
+  "case_driven": false,
+  "side_effect_level": "read_only",
+  "output_schema_version": "1.0",
+  "routing_aliases": ["h2", "hydrogen"],
+  "chaining_outputs": {}
+}

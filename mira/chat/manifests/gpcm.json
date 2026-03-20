@@ -1,0 +1,17 @@
+{
+  "engine_id": "gpcm",
+  "display_name": "General Purpose Compliance Module",
+  "version": "1.0.0",
+  "supported_tasks": ["answer_only"],
+  "supported_domains": ["compliance", "nasa_std_6016c"],
+  "required_inputs": ["material_designation"],
+  "optional_inputs": ["gas_service", "pressure", "temperature", "standard_ref"],
+  "adapter_module": "mira.chat.adapters.gpcm_adapter",
+  "adapter_class": "GPCMAdapter",
+  "multi_step": true,
+  "case_driven": false,
+  "side_effect_level": "read_only",
+  "output_schema_version": "1.0",
+  "routing_aliases": ["gpcm", "compliance"],
+  "chaining_outputs": {}
+}

@@ -1,0 +1,23 @@
+{
+  "engine_id": "fracture",
+  "display_name": "Fracture Mechanics Assessment",
+  "version": "1.0.0",
+  "supported_tasks": ["answer_only"],
+  "supported_domains": ["fracture_mechanics", "damage_tolerance"],
+  "required_inputs": ["part_name"],
+  "optional_inputs": ["material_designation", "mission_class", "material_system", "hazard_consequence", "load_path_type", "structural_role", "specific_hardware_type", "pressure_boundary"],
+  "adapter_module": "mira.chat.adapters.fracture_adapter",
+  "adapter_class": "FractureAdapter",
+  "multi_step": false,
+  "case_driven": false,
+  "side_effect_level": "read_only",
+  "output_schema_version": "1.0",
+  "routing_aliases": ["fracture"],
+  "chaining_outputs": {
+    "CONDITIONAL_PASS": {
+      "suggests": "galvanic",
+      "auto_chain": false,
+      "data_handoff": ["material", "classification", "corrosion_iccp_recommended"]
+    }
+  }
+}

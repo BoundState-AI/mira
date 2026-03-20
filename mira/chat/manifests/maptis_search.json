@@ -1,0 +1,17 @@
+{
+  "engine_id": "maptis_search",
+  "display_name": "MAPTIS Material Search",
+  "version": "1.0.0",
+  "supported_tasks": ["answer_only"],
+  "supported_domains": ["material_search", "test_data", "material_general"],
+  "required_inputs": ["query_text"],
+  "optional_inputs": ["material_designation", "property_filter"],
+  "adapter_module": "mira.chat.adapters.maptis_adapter",
+  "adapter_class": "MAPTISAdapter",
+  "multi_step": false,
+  "case_driven": false,
+  "side_effect_level": "read_only",
+  "output_schema_version": "1.0",
+  "routing_aliases": ["maptis_search", "search", "material_search"],
+  "chaining_outputs": {}
+}

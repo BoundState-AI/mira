@@ -1,0 +1,17 @@
+{
+  "engine_id": "bsmh",
+  "display_name": "BoundState Material Helper",
+  "version": "1.0.0",
+  "supported_tasks": ["answer_only"],
+  "supported_domains": ["general_help", "material_general"],
+  "required_inputs": ["query_text"],
+  "optional_inputs": [],
+  "adapter_module": "mira.chat.adapters.bsmh_adapter",
+  "adapter_class": "BSMHAdapter",
+  "multi_step": false,
+  "case_driven": false,
+  "side_effect_level": "read_only",
+  "output_schema_version": "1.0",
+  "routing_aliases": ["bsmh", "general", "help"],
+  "chaining_outputs": {}
+}
