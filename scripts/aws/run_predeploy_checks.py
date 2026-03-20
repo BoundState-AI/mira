@@ -181,7 +181,6 @@ def _select_plan(changed_paths: list[str]) -> tuple[list[str], bool, list[str]]:
 def _candidate_test_pythons(repo_root: Path) -> list[Path]:
     candidates = [
         Path(os.environ["PREDEPLOY_TEST_PYTHON"]) if os.environ.get("PREDEPLOY_TEST_PYTHON") else None,
-        Path(sys.executable),
         Path("/tmp/mira-mpplan-venv/bin/python3"),
         repo_root / ".venv" / "bin" / "python",
         repo_root.parent / ".venv" / "bin" / "python",
@@ -189,6 +188,7 @@ def _candidate_test_pythons(repo_root: Path) -> list[Path]:
         repo_root / ".venv" / "Scripts" / "python.exe",
         repo_root.parent / ".venv" / "Scripts" / "python.exe",
         repo_root.parent.parent / ".venv" / "Scripts" / "python.exe",
+        Path(sys.executable),
     ]
     return [candidate for candidate in candidates if candidate is not None]
 
@@ -198,15 +198,19 @@ def _resolve_pytest_python(repo_root: Path) -> Path:
         if not candidate.exists():
             continue
         result = subprocess.run(
-            [str(candidate), "-m", "pytest", "--version"],
+            [
+                str(candidate),
+                "-c",
+                "import pytest, sqlalchemy; print('predeploy-python-ok')",
+            ],
             capture_output=True,
             text=True,
             check=False,
         )
-        if result.returncode == 0:
+        if result.returncode == 0 and "predeploy-python-ok" in result.stdout:
             return candidate
     raise RuntimeError(
-        "Unable to find a Python interpreter with pytest installed. "
+        "Unable to find a Python interpreter with pytest and sqlalchemy installed. "
         "Set PREDEPLOY_TEST_PYTHON to a suitable interpreter."
     )
 
