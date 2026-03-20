@@ -24,6 +24,7 @@ EMPTY_TREE = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 BASELINE_PYTEST_TARGETS = (
     "tests/api/test_runtime_assets.py",
     "tests/api/test_app_entrypoint_parity.py",
+    "tests/api/test_chat_endpoint.py",
 )
 
 
@@ -36,6 +37,11 @@ class CheckRule:
 
 
 RULES: tuple[CheckRule, ...] = (
+    CheckRule(
+        name="chat",
+        prefixes=("mira/chat/", "mira/api/app_factory.py"),
+        pytest_targets=("tests/api/test_chat_endpoint.py",),
+    ),
     CheckRule(
         name="tocr",
         prefixes=("sentinel/tocr/", "mira/api/routers/tocr.py"),

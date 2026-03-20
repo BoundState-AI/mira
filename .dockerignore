@@ -36,6 +36,7 @@ logs/
 temp/
 uploads/
 *.log
+audit_log.jsonl
 
 # Editor/OS files
 .DS_Store

@@ -13,6 +13,7 @@ import TestClassDetail from "./pages/TestClassDetail";
 import MPPlanGenerator from "./pages/MPPlanGenerator";
 import DTTreeEditor from "./pages/DTTreeEditor";
 import MIULBuilderV4 from "./pages/MIULBuilderV4";
+import MiraChat from "./pages/MiraChat";
 import MiraV4Query from "./pages/MiraV4Query";
 import BSMHQuery from "./pages/BSMHQuery";
 import MUAV10 from "./pages/MUAV10";
@@ -39,6 +40,7 @@ const App = () => (
             <AppLayout>
               <Routes>
                 <Route path="/" element={<KnowledgeTwins />} />
+                <Route path="/chat" element={<MiraChat />} />
                 <Route
                   path="/query"
                   element={(

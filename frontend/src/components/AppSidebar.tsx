@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, DragEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlaskConical, FileStack, Brain, ClipboardList, FolderTree, GripVertical, RotateCcw, Zap, Sparkles, Wind, Database, Search, ShieldAlert, ShieldCheck, Shield, LayoutGrid, LucideIcon, ScrollText } from 'lucide-react';
+import { FlaskConical, FileStack, Brain, Bot, ClipboardList, FolderTree, GripVertical, RotateCcw, Zap, Sparkles, Wind, Database, Search, ShieldAlert, ShieldCheck, Shield, LayoutGrid, LucideIcon, ScrollText } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { BoundStateLogo } from '@/components/BoundStateLogo';
 import { LanguageSelector } from '@/components/LanguageSelector';
@@ -32,6 +32,7 @@ interface NavItem {
 
 const DEFAULT_NAV_ITEMS: NavItem[] = [
   { id: 'mp-plan', title: 'M&P Plan', navKey: 'mpPlan', url: '/mp-plan', icon: ClipboardList },
+  { id: 'chat', title: 'MIRA Chat', navKey: 'chat', url: '/chat', icon: Bot },
   { id: 'query', title: 'MIRA Query', navKey: 'query', url: '/query', icon: Zap },
   { id: 'gas-compatibility', title: 'Gas Compatibility', navKey: 'gasCompatibility', url: '/gas-compatibility', icon: Wind },
   { id: 'galvanic-compatibility', title: 'Galvanic Compatibility', navKey: 'galvanicCompatibility', url: '/galvanic-compatibility', icon: ShieldAlert },

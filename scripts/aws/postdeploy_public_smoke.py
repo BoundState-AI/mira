@@ -32,6 +32,7 @@ HEALTH_CHECKS: tuple[RouteCheck, ...] = (
 )
 
 CRITICAL_ROUTE_CHECKS: tuple[RouteCheck, ...] = (
+    RouteCheck("/api/chat/ping", (200, 401, 403), "chat router mounted"),
     RouteCheck("/api/tocr/ping", (200, 401, 403), "TOCR router mounted"),
     RouteCheck("/api/forge/ping", (200, 401, 403), "FORGE router mounted"),
     RouteCheck("/api/mp-plan/v2/ping", (200, 401, 403), "M&P Plan v2 router mounted"),

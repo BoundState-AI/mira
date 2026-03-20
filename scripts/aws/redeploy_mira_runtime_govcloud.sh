@@ -53,6 +53,8 @@ COGNITO_CLIENT_ID="${COGNITO_CLIENT_ID:-1tklem8thjkg04ipupvcb1heal}"
 BASE_URL="${BASE_URL:-https://mira.boundstate.ai}"
 JWT_SECRET_KEY="${JWT_SECRET_KEY:-mira-runtime-${DATE_TAG}}"
 BEDROCK_MODEL_ID="${BEDROCK_MODEL_ID:-us.anthropic.claude-sonnet-4-5-20250929-v1:0}"
+MIRA_REQUIRE_CHAT="${MIRA_REQUIRE_CHAT:-true}"
+MIRA_CHAT_AUDIT_PATH="${MIRA_CHAT_AUDIT_PATH:-/tmp/mira-chat-audit.jsonl}"
 NO_DATA_RUNTIME="${NO_DATA_RUNTIME:-1}"
 SKIP_AUTHENTICATED_SMOKE="${SKIP_AUTHENTICATED_SMOKE:-0}"
 RECEIPTS_DIR="${RECEIPTS_DIR:-${ROOT_DIR}/.deploy_receipts}"
@@ -333,6 +335,7 @@ cat > "${BACKEND_TASK_JSON}" <<JSON
         {"name": "RELOAD", "value": "false"},
         {"name": "ITAR_PATH_PREFIXES", "value": "/miul,/bom"},
         {"name": "ENVIRONMENT", "value": "production"},
+        {"name": "MIRA_ENV", "value": "production"},
         {"name": "AWS_DEFAULT_REGION", "value": "${AWS_REGION}"},
         {"name": "CORS_EXTRA_ORIGINS", "value": "${BASE_URL}"},
         {"name": "ENABLE_DEBUG_ENDPOINTS", "value": "false"},
@@ -346,6 +349,8 @@ cat > "${BACKEND_TASK_JSON}" <<JSON
         {"name": "BEDROCK_MODEL_ID", "value": "${BEDROCK_MODEL_ID}"},
         {"name": "COGNITO_CLIENT_ID", "value": "${COGNITO_CLIENT_ID}"},
         {"name": "JWT_SECRET_KEY", "value": "${JWT_SECRET_KEY}"},
+        {"name": "MIRA_REQUIRE_CHAT", "value": "${MIRA_REQUIRE_CHAT}"},
+        {"name": "MIRA_CHAT_AUDIT_PATH", "value": "${MIRA_CHAT_AUDIT_PATH}"},
         {"name": "MIRA_DISABLE_HERITAGE_DB", "value": "${NO_DATA_RUNTIME}"},
         {"name": "MIRA_NO_DATA_RUNTIME", "value": "${NO_DATA_RUNTIME}"},
         {"name": "POSTGRES_HOST", "value": "localhost"},

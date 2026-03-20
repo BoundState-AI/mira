@@ -21,7 +21,6 @@ import { useFieldGuidance } from './GuidanceProvider';
 import { GuidancePopover } from './GuidancePopover';
 import { GuidanceValidationIndicator } from './GuidanceValidationIndicator';
 import { GuidanceHeritageBanner } from './GuidanceHeritageBanner';
-import { GuidanceAuthorityBadge } from './GuidanceAuthorityBadge';
 
 // ---------------------------------------------------------------------------
 // Props
@@ -101,42 +100,9 @@ export function GuidanceField({
           authorityRegistry={authorityRegistry}
           telemetry={telemetry}
         />
-        {/* Authority badges — always visible per Section 3.5.5 Rule 4 */}
-        {mode !== 'expert' && authorities.length > 0 && (
-          <div className="flex gap-0.5">
-            {authorities.slice(0, 2).map((auth) => (
-              <GuidanceAuthorityBadge
-                key={auth.authority_ref}
-                authRef={auth}
-                authorityRegistry={authorityRegistry}
-                mode={mode}
-                fieldName={name}
-                telemetry={telemetry}
-              />
-            ))}
-            {authorities.length > 2 && (
-              <span className="text-[10px] text-muted-foreground">
-                +{authorities.length - 2}
-              </span>
-            )}
-          </div>
-        )}
-        {/* Expert mode: mini badges (Section 6.1) */}
-        {mode === 'expert' && authorities.length > 0 && (
-          <div className="flex gap-0.5">
-            {authorities.slice(0, 1).map((auth) => (
-              <GuidanceAuthorityBadge
-                key={auth.authority_ref}
-                authRef={auth}
-                authorityRegistry={authorityRegistry}
-                mode={mode}
-                fieldName={name}
-                telemetry={telemetry}
-                compact
-              />
-            ))}
-          </div>
-        )}
+        {/* Authority badges removed — all OCA fields reference the same spec
+            (BS-SPEC-OCA-001) so per-field badges were pure visual noise.
+            Authority info remains accessible via the GuidancePopover (? icon). */}
       </div>
 
       {/* Heritage banner */}
