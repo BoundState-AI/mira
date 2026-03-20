@@ -1,0 +1,75 @@
+from __future__ import annotations
+
+
+def test_chat_ping_reports_expected_adapters(api_client):
+    response = api_client.get("/api/chat/ping")
+
+    assert response.status_code == 200
+    payload = response.json()
+
+    assert payload["status"] == "ok"
+    assert payload["domain"] == "chat"
+    adapters = set(payload["adapters_loaded"].split(","))
+    assert {"bsmh", "fracture", "galvanic", "gpcm", "h2", "maptis_search", "oca"} <= adapters
+
+
+def test_chat_returns_structured_response(api_client):
+    response = api_client.post(
+        "/api/chat/",
+        json={"message": "Is 316L compatible with GOX at 3000 psi?"},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+
+    assert payload["session_id"]
+    assert payload["engine_used"] == "oca"
+    assert payload["verdict"] in {
+        "PASS",
+        "CONDITIONAL_PASS",
+        "FAIL",
+        "INSUFFICIENT_DATA",
+    }
+    assert isinstance(payload["response"], str) and payload["response"]
+    assert isinstance(payload["follow_up_suggestions"], list)
+    assert payload["entities"]["material_designation"] == "316L"
+    assert payload["entities"]["gas_service"] == "oxygen"
+
+
+def test_chat_can_resume_from_frontend_history_without_server_session(api_client):
+    first_response = api_client.post(
+        "/api/chat/",
+        json={"message": "Is 316L compatible with GOX at 3000 psi?"},
+    )
+    assert first_response.status_code == 200
+    first_payload = first_response.json()
+
+    history = [
+        {
+            "role": "user",
+            "content": "Is 316L compatible with GOX at 3000 psi?",
+            "entities": first_payload["entities"],
+        },
+        {
+            "role": "assistant",
+            "content": first_payload["response"],
+            "engine_used": first_payload["engine_used"],
+            "entities": first_payload["entities"],
+        },
+    ]
+
+    second_response = api_client.post(
+        "/api/chat/",
+        json={
+            "session_id": "frontend-history-only",
+            "message": "What about at 1500 psi?",
+            "history": history,
+        },
+    )
+
+    assert second_response.status_code == 200
+    second_payload = second_response.json()
+
+    assert second_payload["engine_used"] == "oca"
+    assert second_payload["entities"]["material_designation"] == "316L"
+    assert second_payload["entities"]["pressure_value"] == 1500.0

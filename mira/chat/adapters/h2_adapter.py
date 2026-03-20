@@ -125,8 +125,10 @@ class H2Adapter(EngineAdapter):
 
         material = (parsed_input.get("material") or "").strip()
         if not material:
-            return self.wrap_refusal(
-                reason="A material name or identifier is required for H2 compatibility evaluation.",
+            return self.wrap_envelope(
+                status=Status.INSUFFICIENT_DATA,
+                response_text="Which material would you like to assess for hydrogen service?",
+                missing_inputs=["material designation"],
             )
 
         # Build the H2 request from parsed_input

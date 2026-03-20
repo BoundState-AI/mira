@@ -13,6 +13,7 @@ import logging
 import os
 import sys
 from pathlib import Path
+from typing import Optional
 
 from dotenv import load_dotenv
 from fastapi import APIRouter, FastAPI, Request
@@ -48,6 +49,27 @@ _EXPOSE_HEADERS = [
     "X-Lineage-ID",
     "X-Confidence-Score",
 ]
+
+
+def _chat_required() -> bool:
+    raw = os.getenv("MIRA_REQUIRE_CHAT", "").strip().lower()
+    if raw:
+        return raw in {"1", "true", "yes", "on"}
+    return os.getenv("MIRA_ENV", "development").lower() == "production"
+
+
+def _load_chat_router() -> Optional[APIRouter]:
+    try:
+        from mira.chat import chat_router
+    except Exception as exc:
+        if _chat_required():
+            raise RuntimeError("MIRA chat failed to import and is required for this runtime.") from exc
+        logging.getLogger("mira.startup").warning(
+            "Chat router unavailable; continuing without /api/chat because chat is optional in this environment.",
+            exc_info=True,
+        )
+        return None
+    return chat_router
 
 
 def _build_cors_origins() -> list[str]:
@@ -141,11 +163,13 @@ def _register_alias_routers(app: FastAPI) -> None:
     _include_with_api_alias(app, routers.bsmh_router, prefix="/mira/bsmh", tags=["bsmh-temp"])
 
 
-def _register_direct_routers(app: FastAPI) -> None:
+def _register_direct_routers(app: FastAPI, chat_router: APIRouter | None) -> None:
     # These routers already own their external prefixes.
     app.include_router(routers.hybrid_query_router, tags=["hybrid-query"])
     app.include_router(routers.ui_router, tags=["ui"])
     app.include_router(routers.test_classes_router, tags=["test-classes"])
+    if chat_router is not None:
+        app.include_router(chat_router, tags=["chat"])
 
 
 def _register_health_routes(app: FastAPI) -> None:
@@ -189,6 +213,7 @@ def create_app(
 ) -> FastAPI:
     """Create the canonical BoundState API application."""
     validate_required_runtime_assets()
+    chat_router = _load_chat_router()
 
     is_production = os.getenv("MIRA_ENV", "development").lower() == "production"
 
@@ -215,7 +240,7 @@ def create_app(
     )
 
     _register_alias_routers(app)
-    _register_direct_routers(app)
+    _register_direct_routers(app, chat_router)
     _register_health_routes(app)
     _log_startup_identity(app, app_identity_file=app_identity_file)
     return app

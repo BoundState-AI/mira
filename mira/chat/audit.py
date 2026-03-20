@@ -31,7 +31,7 @@ LOGGER = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 # Default path relative to project root; override with MIRA_CHAT_AUDIT_PATH.
-_DEFAULT_AUDIT_LOG_PATH = "data/chat_audit.jsonl"
+_DEFAULT_AUDIT_LOG_PATH = "audit_log.jsonl"
 
 _write_lock = threading.Lock()
 

@@ -73,12 +73,12 @@ class ChatRequest(BaseModel):
     session_id: Optional[str] = None
     history: list[ChatMessage] = Field(
         default_factory=list,
-        max_length=5,
-        description="Last N turns, capped at 5.",
+        max_length=10,
+        description="Last 5 turns (up to 10 messages), capped by the backend.",
     )
-    module_context: Optional[str] = Field(
+    module_context: Optional[dict[str, Any]] = Field(
         default=None,
-        description="Module hint: 'oca', 'h2', 'galvanic', etc.",
+        description="Optional module context from the frontend (module, case_id, material, etc.).",
     )
 
 
@@ -86,6 +86,7 @@ class ChatResponse(BaseModel):
     """Outbound response sent to the frontend."""
 
     response: str
+    session_id: str
     engine_used: Optional[str] = None
     verdict: Optional[str] = None
     audit_id: Optional[str] = None
@@ -169,28 +170,26 @@ class AuditRecord(BaseModel):
     audit_id: str = Field(default_factory=lambda: f"aud-{uuid4().hex[:12]}")
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
-    # What was asked
-    session_id: Optional[str] = None
-    user_message: str = ""
-    module_context: Optional[str] = None
-
-    # What answered
-    engine_id: str = ""
-    engine_version: str = "1.0.0"
-    mode: TaskMode = TaskMode.ANSWER_ONLY
-    status: Status = Status.ERROR
-    side_effect_level: SideEffectLevel = SideEffectLevel.READ_ONLY
-
-    # The full envelope (serialised)
-    envelope_json: dict[str, Any] = Field(default_factory=dict)
-
-    # Lineage
-    authority_basis: list[str] = Field(default_factory=list)
-    citations: list[str] = Field(default_factory=list)
+    session_id: str = ""
+    user_input: str = ""
+    parsed_entities: dict[str, Any] = Field(default_factory=dict)
+    normalized_units: dict[str, str] = Field(default_factory=dict)
+    coarse_intent: str = ""
+    fine_routing: str = ""
+    task_mode: TaskMode = TaskMode.ANSWER_ONLY
+    routing_confidence: float = 0.0
+    engines_invoked: list[str] = Field(default_factory=list)
+    engine_versions: dict[str, str] = Field(default_factory=dict)
+    engine_status: Status = Status.ERROR
+    source_citations: list[str] = Field(default_factory=list)
     assumptions: list[str] = Field(default_factory=list)
     missing_inputs: list[str] = Field(default_factory=list)
-    recommended_actions: list[str] = Field(default_factory=list)
-    domain_payload: dict[str, Any] = Field(default_factory=dict)
-
-    # Error capture
+    llm_model_used: Optional[str] = None
+    response_hash: str = ""
+    artifact_generated: bool = False
+    follow_ups_offered: list[str] = Field(default_factory=list)
+    follow_ups_taken: list[str] = Field(default_factory=list)
+    module_context: Optional[dict[str, Any]] = None
+    authority_basis: list[str] = Field(default_factory=list)
+    envelope_json: dict[str, Any] = Field(default_factory=dict)
     error_detail: Optional[str] = None

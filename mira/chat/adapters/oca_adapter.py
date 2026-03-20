@@ -383,6 +383,7 @@ class OcaAdapter(EngineAdapter):
                 "revision": decision_resp.revision,
                 "final_disposition": disposition.value,
                 "overall_confidence": decision.overall_confidence,
+                "verdict_confidence": decision.overall_confidence,
                 "authority_level": decision.authority_level.value,
                 "kindling_chain_present": decision.kindling_chain_present,
                 "reaction_effect": decision.reaction_effect,

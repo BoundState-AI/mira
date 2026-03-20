@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
 """
 Module: Capability Registry
-Purpose: Phase 1 hardcoded registry of MIRA engine capabilities.
+Purpose: Phase 2 self-declaring engine registry with JSON manifest discovery.
 
-Maps engine IDs to their contracts: supported tasks, domains, required inputs,
-chaining rules, and side-effect levels.  Phase 2 will load this from a config
-file; Phase 1 uses a Python dict.
+Engines declare their capabilities via JSON manifests in ``mira/chat/manifests/``.
+At startup, the registry scans the manifest directory, validates each file, and
+builds the in-memory registry.  Any engines still using the hardcoded Phase 1
+format are merged as a fallback.
 
-Implements BS-SPEC-MIRA-CHAT-001-REV2 Section 7 (Engine Registry).
+Implements BS-SPEC-MIRA-CHAT-001-REV2 Section 4.2 (Engine Self-Declaration)
+and Section 7 (Engine Registry).
 
 BoundState AI 2026
-Version: 1.0.0
+Version: 2.0.0
 Classification: BoundState Proprietary
 
-Co-Authored-By: Claude "Beth" <noreply@anthropic.com>
+Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
 Co-Authored-By: Dr. Joseph Wilde, BoundState AI
 
 Compliance: SWE-013, SWE-032, NASA-STD-8739.8B
@@ -22,111 +24,193 @@ Safety Critical: False
 
 from __future__ import annotations
 
+import json
 import logging
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
-# Phase 1 registry — hardcoded
+# Constants
 # ---------------------------------------------------------------------------
 
-_PHASE1_REGISTRY: Dict[str, Dict[str, Any]] = {
-    "oca": {
-        "engine_id": "oca",
-        "display_name": "Oxygen Compatibility Assessment",
-        "supported_tasks": ["answer_only"],
-        "supported_domains": ["oxygen_compatibility"],
-        "required_inputs": ["material_designation"],
-        "optional_inputs": ["pressure", "temperature", "configuration"],
-        "service_module": "mira.oca",
-        "multi_step": True,
-        "case_driven": True,
-        "side_effect_level": "read_only",
-        "chaining_outputs": {
-            "CONDITIONAL_PASS": {
-                "suggests": "mua",
-                "auto_chain": False,
-                "data_handoff": ["material", "environment", "gaps", "verdict"],
-            },
-        },
-    },
-    "h2": {
-        "engine_id": "h2",
-        "display_name": "Hydrogen Compatibility Assessment",
-        "supported_tasks": ["answer_only"],
-        "supported_domains": ["hydrogen_compatibility"],
-        "required_inputs": ["material_designation"],
-        "optional_inputs": ["pressure", "temperature", "phase", "condition"],
-        "service_module": "mira.h2",
-        "multi_step": False,
-        "case_driven": False,
-        "side_effect_level": "read_only",
-        "chaining_outputs": {},
-    },
-    "maptis_search": {
-        "engine_id": "maptis_search",
-        "display_name": "MAPTIS Material Search",
-        "supported_tasks": ["answer_only"],
-        "supported_domains": ["materials_search", "test_data", "material_general"],
-        "required_inputs": ["query_text"],
-        "optional_inputs": ["material_designation", "property_filter"],
-        "service_module": "mira.search",
-        "multi_step": False,
-        "case_driven": False,
-        "side_effect_level": "read_only",
-        "chaining_outputs": {},
-    },
-    "galvanic": {
-        "engine_id": "galvanic",
-        "display_name": "Galvanic Corrosion Assessment",
-        "supported_tasks": ["answer_only"],
-        "supported_domains": ["galvanic_corrosion", "dissimilar_metals"],
-        "required_inputs": ["material_designation"],
-        "optional_inputs": ["second_material", "environment"],
-        "service_module": "mira.galvanic",
-        "multi_step": False,
-        "case_driven": False,
-        "side_effect_level": "read_only",
-        "chaining_outputs": {},
-    },
-    "bsmh": {
-        "engine_id": "bsmh",
-        "display_name": "BoundState Material Helper",
-        "supported_tasks": ["answer_only"],
-        "supported_domains": ["general_help", "material_general"],
-        "required_inputs": ["query_text"],
-        "optional_inputs": [],
-        "service_module": "mira.bsmh.bouncer",
-        "multi_step": False,
-        "case_driven": False,
-        "side_effect_level": "read_only",
-        "chaining_outputs": {},
-    },
-}
+MANIFESTS_DIR = Path(__file__).resolve().parent / "manifests"
+_SUPPORTED_SCHEMA_VERSIONS = {"1.0"}
 
-# Fine-routing target → engine_id mapping
-# Used by get_engine_for_routing() to translate fine_routing from the
-# query interpreter into the engine that should handle it.
-_ROUTING_MAP: Dict[str, str] = {
-    "oca": "oca",
-    "h2": "h2",
-    "maptis_search": "maptis_search",
-    "galvanic": "galvanic",
-    "bsmh": "bsmh",
-    # Aliases
-    "oxygen": "oca",
-    "hydrogen": "h2",
-    "search": "maptis_search",
-    "material_search": "maptis_search",
-    "general": "bsmh",
-    "help": "bsmh",
-}
+# Required fields in every manifest JSON
+_REQUIRED_MANIFEST_FIELDS = frozenset({
+    "engine_id",
+    "display_name",
+    "version",
+    "supported_tasks",
+    "supported_domains",
+    "required_inputs",
+    "adapter_module",
+    "adapter_class",
+    "side_effect_level",
+    "output_schema_version",
+})
 
 
 # ---------------------------------------------------------------------------
-# Public API
+# Phase 1 fallback registry — only engines NOT yet migrated to manifests
+# ---------------------------------------------------------------------------
+# Once all engines have manifests, this dict can be emptied.
+
+_PHASE1_FALLBACK: Dict[str, Dict[str, Any]] = {}
+
+
+# ---------------------------------------------------------------------------
+# Manifest-based registry (populated at first access)
+# ---------------------------------------------------------------------------
+
+_registry: Dict[str, Dict[str, Any]] = {}
+_routing_map: Dict[str, str] = {}
+_initialized: bool = False
+
+
+# ---------------------------------------------------------------------------
+# Manifest validation
+# ---------------------------------------------------------------------------
+
+
+def _validate_manifest(data: Dict[str, Any], path: Path) -> Optional[str]:
+    """Validate a parsed manifest dict.  Returns an error string or None."""
+    missing = _REQUIRED_MANIFEST_FIELDS - set(data.keys())
+    if missing:
+        return f"Missing required fields: {sorted(missing)}"
+
+    schema_version = str(data.get("output_schema_version", ""))
+    if schema_version not in _SUPPORTED_SCHEMA_VERSIONS:
+        return (
+            f"Unsupported output_schema_version '{schema_version}' "
+            f"(supported: {_SUPPORTED_SCHEMA_VERSIONS})"
+        )
+
+    if not isinstance(data.get("supported_tasks"), list):
+        return "'supported_tasks' must be a list"
+
+    if not isinstance(data.get("supported_domains"), list):
+        return "'supported_domains' must be a list"
+
+    if not isinstance(data.get("required_inputs"), list):
+        return "'required_inputs' must be a list"
+
+    return None
+
+
+# ---------------------------------------------------------------------------
+# Discovery & initialization
+# ---------------------------------------------------------------------------
+
+
+def _discover_manifests() -> Dict[str, Dict[str, Any]]:
+    """Scan the manifests directory and load all valid engine manifests."""
+    discovered: Dict[str, Dict[str, Any]] = {}
+
+    if not MANIFESTS_DIR.is_dir():
+        logger.warning(
+            "[REGISTRY] Manifests directory not found: %s", MANIFESTS_DIR
+        )
+        return discovered
+
+    for manifest_path in sorted(MANIFESTS_DIR.glob("*.json")):
+        try:
+            with manifest_path.open("r", encoding="utf-8") as f:
+                data = json.load(f)
+        except (json.JSONDecodeError, OSError) as exc:
+            logger.warning(
+                "[REGISTRY] Failed to parse manifest %s: %s",
+                manifest_path.name, exc,
+            )
+            continue
+
+        error = _validate_manifest(data, manifest_path)
+        if error:
+            logger.warning(
+                "[REGISTRY] Invalid manifest %s: %s",
+                manifest_path.name, error,
+            )
+            continue
+
+        engine_id = str(data["engine_id"])
+
+        if engine_id in discovered:
+            logger.warning(
+                "[REGISTRY] Duplicate engine_id '%s' in %s (already loaded)",
+                engine_id, manifest_path.name,
+            )
+            continue
+
+        # Normalize optional fields with defaults
+        data.setdefault("optional_inputs", [])
+        data.setdefault("multi_step", False)
+        data.setdefault("case_driven", False)
+        data.setdefault("chaining_outputs", {})
+        data.setdefault("routing_aliases", [engine_id])
+
+        discovered[engine_id] = data
+        logger.info(
+            "[REGISTRY] Loaded manifest: %s (%s v%s)",
+            engine_id, data["display_name"], data["version"],
+        )
+
+    return discovered
+
+
+def _build_routing_map(registry: Dict[str, Dict[str, Any]]) -> Dict[str, str]:
+    """Build the fine_routing -> engine_id mapping from manifest routing_aliases."""
+    routing: Dict[str, str] = {}
+    for engine_id, entry in registry.items():
+        # The engine_id itself is always a valid route
+        routing[engine_id] = engine_id
+        # Plus any declared aliases
+        for alias in entry.get("routing_aliases", []):
+            alias_lower = alias.lower()
+            if alias_lower in routing and routing[alias_lower] != engine_id:
+                logger.warning(
+                    "[REGISTRY] Routing alias '%s' conflicts: %s vs %s (keeping first)",
+                    alias, routing[alias_lower], engine_id,
+                )
+                continue
+            routing[alias_lower] = engine_id
+    return routing
+
+
+def _ensure_initialized() -> None:
+    """Initialize the registry on first access (thread-safe enough for startup)."""
+    global _registry, _routing_map, _initialized
+    if _initialized:
+        return
+
+    # Phase 2: discover from JSON manifests
+    discovered = _discover_manifests()
+
+    # Merge Phase 1 fallback for any engines without manifests
+    merged = dict(_PHASE1_FALLBACK)
+    merged.update(discovered)  # Manifests take precedence
+
+    _registry = merged
+    _routing_map = _build_routing_map(_registry)
+    _initialized = True
+
+    logger.info(
+        "[REGISTRY] Initialized with %d engine(s): %s",
+        len(_registry), sorted(_registry.keys()),
+    )
+
+
+def reload_registry() -> None:
+    """Force re-discovery of manifests.  Useful for testing or hot-reload."""
+    global _initialized
+    _initialized = False
+    _ensure_initialized()
+
+
+# ---------------------------------------------------------------------------
+# Public API (same interface as Phase 1)
 # ---------------------------------------------------------------------------
 
 
@@ -136,7 +220,8 @@ def get_engine(engine_id: str) -> Optional[Dict[str, Any]]:
 
     Returns None if the engine is not registered (rather than raising).
     """
-    entry = _PHASE1_REGISTRY.get(engine_id)
+    _ensure_initialized()
+    entry = _registry.get(engine_id)
     if entry is None:
         logger.warning("[REGISTRY] Unknown engine_id: %s", engine_id)
     return entry
@@ -149,13 +234,14 @@ def get_engines_for_domain(domain: str) -> List[Dict[str, Any]]:
     The list is ordered with the most specific engines first (fewest
     supported domains) so callers can pick the best match.
     """
+    _ensure_initialized()
     matches = [
         entry
-        for entry in _PHASE1_REGISTRY.values()
-        if domain in entry["supported_domains"]
+        for entry in _registry.values()
+        if domain in entry.get("supported_domains", [])
     ]
     # Sort: fewer supported domains = more specialised = first
-    matches.sort(key=lambda e: len(e["supported_domains"]))
+    matches.sort(key=lambda e: len(e.get("supported_domains", [])))
     return matches
 
 
@@ -166,7 +252,11 @@ def get_engine_for_routing(fine_routing: str) -> Optional[str]:
 
     Returns None if the routing target is not recognised.
     """
-    engine_id = _ROUTING_MAP.get(fine_routing)
+    _ensure_initialized()
+    engine_id = _routing_map.get(fine_routing)
+    if engine_id is None:
+        # Try case-insensitive fallback
+        engine_id = _routing_map.get(fine_routing.lower())
     if engine_id is None:
         logger.warning("[REGISTRY] No engine mapped for fine_routing=%s", fine_routing)
     return engine_id
@@ -192,12 +282,13 @@ def validate_inputs(
         ``valid`` is True when all required inputs are present and non-None.
         ``missing`` lists the required keys that are absent or None.
     """
-    entry = _PHASE1_REGISTRY.get(engine_id)
+    _ensure_initialized()
+    entry = _registry.get(engine_id)
     if entry is None:
         logger.warning("[REGISTRY] validate_inputs: unknown engine %s", engine_id)
         return False, [f"unknown_engine:{engine_id}"]
 
-    required = entry["required_inputs"]
+    required = entry.get("required_inputs", [])
     missing = [
         key for key in required
         if key not in inputs or inputs[key] is None
@@ -207,7 +298,8 @@ def validate_inputs(
 
 def list_engines() -> List[Dict[str, Any]]:
     """Return all registered engines (shallow copies)."""
-    return [dict(e) for e in _PHASE1_REGISTRY.values()]
+    _ensure_initialized()
+    return [dict(e) for e in _registry.values()]
 
 
 def get_chaining_suggestion(
@@ -223,7 +315,31 @@ def get_chaining_suggestion(
         get_chaining_suggestion("oca", "CONDITIONAL_PASS")
         # -> {"suggests": "mua", "auto_chain": False, "data_handoff": [...]}
     """
-    entry = _PHASE1_REGISTRY.get(engine_id)
+    _ensure_initialized()
+    entry = _registry.get(engine_id)
     if entry is None:
         return None
     return entry.get("chaining_outputs", {}).get(outcome)
+
+
+def get_manifest(engine_id: str) -> Optional[Dict[str, Any]]:
+    """Return the full manifest dict for an engine, or None."""
+    _ensure_initialized()
+    return _registry.get(engine_id)
+
+
+def get_adapter_info(engine_id: str) -> Optional[Tuple[str, str]]:
+    """
+    Return (adapter_module, adapter_class) for the given engine_id.
+
+    Useful for dynamic adapter loading in Phase 2+.
+    """
+    _ensure_initialized()
+    entry = _registry.get(engine_id)
+    if entry is None:
+        return None
+    module = entry.get("adapter_module")
+    cls = entry.get("adapter_class")
+    if module and cls:
+        return (module, cls)
+    return None

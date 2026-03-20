@@ -90,6 +90,7 @@ ROUTING_CONFIDENCE_THRESHOLDS: Dict[str, float] = {
 
 # HIGH-RISK parameters — NEVER inherited from conversation history
 _HIGH_RISK_PARAMS = frozenset({
+    "crewed",
     "hardware_class",
     "mission_type",
     "fracture_critical",
@@ -101,6 +102,11 @@ _ANAPHORA_PATTERNS = re.compile(
     r"\b(it|that material|the same|same thing|same material|that one|those|the material|this material)\b",
     re.IGNORECASE,
 )
+_FOLLOW_UP_PATTERNS = re.compile(
+    r"\b(what about|how about|what if|and at|same pressure|same environment|same service)\b",
+    re.IGNORECASE,
+)
+_HISTORY_LOOKBACK_MESSAGES = 10
 
 
 # ---------------------------------------------------------------------------
@@ -216,6 +222,25 @@ _MATERIAL_PATTERNS: List[re.Pattern] = [
     re.compile(r"\b[A-Z]-?\d{3,4}[A-Z]?\b"),
     re.compile(r"\bMP\d{2,3}N?\b", re.I),
 ]
+_GENERIC_MATERIAL_PATTERNS: List[re.Pattern] = [
+    re.compile(r"\b(?:is|are)\s+([A-Za-z][A-Za-z0-9._-]{2,})\s+(?:compatible|safe|acceptable|approved|rated)\b", re.I),
+    re.compile(r"\buse\s+([A-Za-z][A-Za-z0-9._-]{2,})\s+(?:in|for|with)\b", re.I),
+]
+_NON_MATERIAL_CANDIDATES = {
+    "compatible",
+    "material",
+    "materials",
+    "oxygen",
+    "hydrogen",
+    "gox",
+    "lox",
+    "gh2",
+    "lh2",
+    "service",
+    "system",
+    "this",
+    "that",
+}
 
 # Gas service mapping
 _GAS_SERVICE_MAP: Dict[str, str] = {
@@ -272,6 +297,13 @@ def _extract_material(text: str) -> Optional[str]:
             if re.fullmatch(r"\d+", raw):
                 continue
             return raw
+    for pattern in _GENERIC_MATERIAL_PATTERNS:
+        m = pattern.search(text)
+        if not m:
+            continue
+        candidate = m.group(1).strip(" .,;:!?()[]{}")
+        if candidate.lower() not in _NON_MATERIAL_CANDIDATES:
+            return candidate
     return None
 
 
@@ -325,6 +357,13 @@ def _extract_standard_ref(text: str) -> Optional[str]:
     return None
 
 
+def _is_material_list_query(text: str) -> bool:
+    return bool(
+        re.search(r"\bwhat\s+materials?\s+are\s+compatible\b", text, re.I)
+        or re.search(r"\blist\s+materials?\b", text, re.I)
+    )
+
+
 # ---------------------------------------------------------------------------
 # Entity / Domain routing table
 # ---------------------------------------------------------------------------
@@ -356,6 +395,8 @@ def _determine_fine_routing(
 
     # Material queries
     if coarse_intent == "materials_query":
+        if gas_service == "hydrogen":
+            return "h2", 0.85
         return "maptis_search", 0.85
 
     # Document lookup
@@ -380,7 +421,7 @@ def _determine_fine_routing(
 
     # Fracture context
     if fracture_context:
-        return "bsmh", 0.75
+        return "fracture", 0.85
 
     # General help / fallback
     return "bsmh", 0.70
@@ -417,36 +458,28 @@ def _classify_task_mode(text: str) -> TaskMode:
 # ---------------------------------------------------------------------------
 
 def _resolve_from_history(
-    text: str,
     history: List[ChatMessage],
     current_entities: Dict[str, Any],
 ) -> Dict[str, Any]:
     """
-    If the query references prior context ("it", "that material", etc.),
-    inherit entities from the most recent assistant turn.
+    Inherit missing entities from the most recent turns in the session.
 
     HIGH-RISK parameters are NEVER inherited.
 
     Returns dict of inherited entity key→value (empty if no inheritance).
     """
-    if not _ANAPHORA_PATTERNS.search(text):
-        return {}
     if not history:
         return {}
 
-    # Walk backwards up to 5 turns looking for the most recent assistant turn
-    # with entities attached.
     inherited: Dict[str, Any] = {}
-    for turn in reversed(history[-5:]):
-        if turn.role == "assistant" and turn.entities:
-            for key, value in turn.entities.items():
-                # Never inherit high-risk parameters
-                if key in _HIGH_RISK_PARAMS:
-                    continue
-                # Only inherit if we don't already have a value
-                if key not in current_entities or current_entities[key] is None:
-                    inherited[key] = value
-            break  # Only inherit from the most recent assistant turn
+    for turn in reversed(history[-_HISTORY_LOOKBACK_MESSAGES:]):
+        if not turn.entities:
+            continue
+        for key, value in turn.entities.items():
+            if key in _HIGH_RISK_PARAMS:
+                continue
+            if key not in current_entities or current_entities[key] is None:
+                inherited.setdefault(key, value)
 
     return inherited
 
@@ -463,11 +496,13 @@ def _detect_topic_switch(
     if not history or current_gas is None:
         return False
 
-    for turn in reversed(history[-5:]):
-        if turn.role == "assistant" and turn.entities:
-            prior_gas = turn.entities.get("gas_service")
-            if prior_gas and prior_gas != current_gas:
-                return True
+    for turn in reversed(history[-_HISTORY_LOOKBACK_MESSAGES:]):
+        if not turn.entities:
+            continue
+        prior_gas = turn.entities.get("gas_service")
+        if prior_gas and prior_gas != current_gas:
+            return True
+        if prior_gas:
             break
     return False
 
@@ -480,7 +515,7 @@ def _detect_topic_switch(
 def interpret(
     text: str,
     history: Optional[List[ChatMessage]] = None,
-    module_context: Optional[str] = None,
+    module_context: Optional[dict[str, Any]] = None,
 ) -> ParsedQuery:
     """
     Full query interpretation pipeline.
@@ -491,15 +526,15 @@ def interpret(
         The raw user message.
     history : list[ChatMessage], optional
         Up to 5 previous turns for entity resolution.
-    module_context : str, optional
-        Module hint from the frontend (e.g. "oca", "h2").
+    module_context : dict[str, Any], optional
+        Module context from the frontend (e.g. module, case_id, material).
 
     Returns
     -------
     ParsedQuery
         Fully populated query interpretation result.
     """
-    history = history or []
+    history = (history or [])[-_HISTORY_LOOKBACK_MESSAGES:]
     pq = ParsedQuery(raw_query=text)
 
     # ----- Stage 1: Coarse Intent -----
@@ -512,7 +547,7 @@ def interpret(
         best_intent = "help"
         best_score = 0.3
 
-    pq.coarse_intent = best_intent
+    pq.coarse_intent = "materials_query" if _is_material_list_query(text) else best_intent
 
     logger.debug(
         "[INTERPRET] Stage 1: coarse_intent=%s (%.2f), all_scores=%s",
@@ -528,6 +563,18 @@ def interpret(
     pq.dissimilar_metals = bool(_DISSIMILAR_METALS_PATTERN.search(text))
     pq.fracture_context = bool(_FRACTURE_PATTERN.search(text))
 
+    if module_context:
+        pq.material_designation = pq.material_designation or module_context.get("material")
+        if pq.gas_service is None:
+            environment = str(module_context.get("environment") or "").lower()
+            if "oxygen" in environment or "gox" in environment or "lox" in environment:
+                pq.gas_service = "oxygen"
+            elif "hydrogen" in environment or "gh2" in environment or "lh2" in environment:
+                pq.gas_service = "hydrogen"
+        if pq.pressure_value is None and module_context.get("pressure_psi") is not None:
+            pq.pressure_value = float(module_context["pressure_psi"])
+            pq.pressure = f"{pq.pressure_value:g} psi"
+
     # History-based inheritance
     current_entities = {
         "material_designation": pq.material_designation,
@@ -542,15 +589,25 @@ def interpret(
         logger.info("[INTERPRET] Topic switch detected — resetting inherited entities")
         # On topic switch, only carry over material designation if we don't have one
         inherited: Dict[str, Any] = {}
-        if pq.material_designation is None:
-            for turn in reversed(history[-5:]):
-                if turn.role == "assistant" and turn.entities:
-                    mat = turn.entities.get("material_designation")
-                    if mat:
-                        inherited["material_designation"] = mat
+        if pq.material_designation is None and not _is_material_list_query(text):
+            for turn in reversed(history[-_HISTORY_LOOKBACK_MESSAGES:]):
+                if not turn.entities:
+                    continue
+                mat = turn.entities.get("material_designation")
+                if mat:
+                    inherited["material_designation"] = mat
                     break
     else:
-        inherited = _resolve_from_history(text, history, current_entities)
+        should_inherit = bool(
+            history
+            and (
+                _ANAPHORA_PATTERNS.search(text)
+                or _FOLLOW_UP_PATTERNS.search(text)
+                or (pq.coarse_intent == "compatibility_query" and pq.material_designation is None)
+                or (pq.coarse_intent == "compatibility_query" and pq.gas_service is None)
+            )
+        )
+        inherited = _resolve_from_history(history, current_entities) if should_inherit else {}
 
     # Apply inherited entities
     if inherited:
@@ -576,10 +633,13 @@ def interpret(
         pq.inherited_entities,
     )
 
+    # ----- Stage 3: Task Mode -----
+    pq.task_mode = _classify_task_mode(text)
+
     # ----- Fine routing -----
-    # Module context override: if the frontend tells us which module, trust it
-    if module_context:
-        pq.fine_routing = module_context
+    module_name = str(module_context.get("module")) if module_context else ""
+    if module_name:
+        pq.fine_routing = module_name
         pq.routing_confidence = 0.99
     else:
         pq.fine_routing, pq.routing_confidence = _determine_fine_routing(
@@ -597,7 +657,13 @@ def interpret(
         ROUTING_CONFIDENCE_THRESHOLDS["default"],
     )
 
-    if pq.routing_confidence < threshold and not module_context:
+    if pq.coarse_intent == "compatibility_query" and pq.material_designation is None:
+        pq.clarification_needed = True
+        pq.clarification_question = _build_clarification(pq)
+    elif pq.coarse_intent == "compatibility_query" and pq.gas_service is None:
+        pq.clarification_needed = True
+        pq.clarification_question = _build_clarification(pq)
+    elif pq.routing_confidence < threshold and not module_name:
         # Confidence below threshold — generate a clarification question
         pq.clarification_needed = True
         pq.clarification_question = _build_clarification(pq)
@@ -605,9 +671,6 @@ def interpret(
             "[INTERPRET] Confidence %.2f < threshold %.2f for %s — requesting clarification",
             pq.routing_confidence, threshold, pq.coarse_intent,
         )
-
-    # ----- Stage 3: Task Mode -----
-    pq.task_mode = _classify_task_mode(text)
 
     logger.info(
         "[INTERPRET] FINAL: intent=%s, routing=%s (%.2f), task=%s, clarify=%s",

@@ -33,9 +33,9 @@ LOGGER = logging.getLogger(__name__)
 # Configuration
 # ---------------------------------------------------------------------------
 
-DEFAULT_FORMATTER_MODEL = "claude-sonnet-4-20250514"
+DEFAULT_FORMATTER_MODEL = "claude-sonnet-4-6"
 FORMATTER_MAX_TOKENS = 1500
-FORMATTER_TEMPERATURE = 0.0
+FORMATTER_TEMPERATURE = 0.3  # Enough for natural M&P engineer voice, not enough to drift
 
 # ---------------------------------------------------------------------------
 # System prompt: Senior M&P Engineer persona
@@ -201,7 +201,12 @@ def extract_follow_ups(envelope: EngineEnvelope) -> list[dict[str, str]]:
     """
     follow_ups: list[dict[str, str]] = []
     for action in envelope.recommended_actions:
-        action_text = str(action).strip()
+        if isinstance(action, dict):
+            action_text = str(action.get("label") or action.get("action") or "").strip()
+            action_query = str(action.get("query") or action.get("action") or action_text).strip()
+        else:
+            action_text = str(action).strip()
+            action_query = action_text
         if not action_text:
             continue
         # Truncate long actions for the chip label
@@ -209,7 +214,7 @@ def extract_follow_ups(envelope: EngineEnvelope) -> list[dict[str, str]]:
         follow_ups.append(
             {
                 "label": label,
-                "query": action_text,
+                "query": action_query,
             }
         )
     return follow_ups
@@ -230,6 +235,12 @@ async def format_response(
     (missing API key, network error, rate limit, etc.), falls back to a
     deterministic plain-text rendering.
     """
+    if session_context is not None:
+        session_context["formatter_model_used"] = None
+
+    if envelope.status == Status.REFUSE:
+        return envelope.response_text
+
     try:
         import anthropic
 
@@ -239,6 +250,8 @@ async def format_response(
             return _fallback_format(envelope, session_context)
 
         model = os.environ.get("MIRA_CHAT_FORMATTER_MODEL", DEFAULT_FORMATTER_MODEL)
+        if session_context is not None:
+            session_context["formatter_model_used"] = model
         client = anthropic.AsyncAnthropic(api_key=api_key)
 
         turn_count = 1
@@ -265,7 +278,17 @@ async def format_response(
         for block in response.content:
             if hasattr(block, "text"):
                 formatted += block.text
-        return formatted.strip() if formatted.strip() else _fallback_format(envelope, session_context)
+        formatted = formatted.strip()
+
+        if not formatted:
+            return _fallback_format(envelope, session_context)
+
+        # Grade the LLM output against the envelope before returning
+        from .grader import grade_and_gate
+        final_text, grader_result = await grade_and_gate(
+            formatted, envelope, _fallback_format, session_context
+        )
+        return final_text
 
     except Exception:
         LOGGER.exception("Formatter LLM call failed — falling back to plain-text rendering")
@@ -286,22 +309,21 @@ def _fallback_format(
     Even without the LLM, we still write in the voice of a senior engineer
     rather than a raw data dump.
     """
-    lines: list[str] = []
-
-    # Verdict header — conversational
     status = envelope.status
+    if status == Status.REFUSE:
+        return envelope.response_text
+
+    lines: list[str] = []
     engine_label = f"{envelope.engine_id} v{envelope.engine_version}"
 
     if status == Status.PASS:
         lines.append(f"**PASS** — This checks out. [{engine_label}]")
     elif status == Status.CONDITIONAL_PASS:
-        lines.append(f"**CONDITIONAL PASS** — Acceptable with conditions. [{engine_label}]")
+        lines.append(f"**CONDITIONAL_PASS** — Acceptable with conditions. [{engine_label}]")
     elif status == Status.FAIL:
         lines.append(f"**FAIL** — This does not meet requirements. [{engine_label}]")
-    elif status == Status.REFUSE:
-        lines.append(f"**REFUSED** — The engine could not safely assess this. [{engine_label}]")
     elif status == Status.INSUFFICIENT_DATA:
-        lines.append(f"**INSUFFICIENT DATA** — I need more information to run this assessment. [{engine_label}]")
+        lines.append(f"**INSUFFICIENT_DATA** — I need more information to run this assessment. [{engine_label}]")
     else:
         lines.append(f"**{status.value}** — [{engine_label}]")
 
@@ -319,11 +341,6 @@ def _fallback_format(
     if envelope.mua_disposition:
         lines.append("")
         lines.append(f"**MUA disposition:** {envelope.mua_disposition}")
-
-    # REFUSE — direct, no softening
-    if status == Status.REFUSE:
-        lines.append("")
-        lines.append("The engine refused this request. The reason is stated above — this is not something I can work around.")
 
     # INSUFFICIENT_DATA — guide the engineer
     if status == Status.INSUFFICIENT_DATA and envelope.missing_inputs:

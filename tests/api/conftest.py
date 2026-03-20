@@ -28,6 +28,7 @@ sys.path.insert(0, str(project_root))
 os.environ["DEBUG"] = "false"
 os.environ["ENVIRONMENT"] = "test"
 os.environ["MIRA_AUTH_MODE"] = "none"
+os.environ["MIRA_REQUIRE_CHAT"] = "true"
 
 
 @pytest.fixture(scope="session")
