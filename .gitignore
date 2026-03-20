@@ -45,6 +45,8 @@ mira/MIRA_V2/data/bok_embeddings/
 mira/MIRA_V2/data/mua_embeddings/
 
 # --- GENERATED OUTPUT ---
+audit_log.jsonl
+phase2_chat_audit_results.json
 tests/model_eval/results/*.json
 tests/model_eval/results/*.csv
 tests/model_eval/results/*.md
