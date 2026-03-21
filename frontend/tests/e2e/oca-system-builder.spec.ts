@@ -708,7 +708,14 @@ test('oca system builder restores component property editing from the node sheet
     await page.getByTestId('oca-system-edit-selected').click();
   }
   await expect(page.getByText('Component Details')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByText('Component Details')).toHaveCount(0);
+  await expect(page.getByTestId(`component-node-${line.component_id}`)).toBeVisible();
+  await page.waitForTimeout(1200);
+  await expect(page.getByTestId(`component-node-${line.component_id}`)).toBeVisible();
 
+  await page.getByTestId('oca-system-edit-selected').click();
+  await expect(page.getByText('Component Details')).toBeVisible();
   await page.locator('#component-label').fill('Main Feed Line');
   await page.locator('#component-materials').fill('body: Inconel 625');
   await page.locator('#wall_thickness_mm').fill('1.8');

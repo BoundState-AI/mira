@@ -220,6 +220,7 @@ export default function OCASystemBuilder() {
   // Edge ID → server connection ID
   const edgeToConnectionId = useRef<Map<string, string>>(new Map());
   const lastDraftSignatureRef = useRef<string | null>(null);
+  const hasAutoFitRef = useRef(false);
 
   const selectedComponent = useMemo(
     () => (editorComponentId ? componentMap.current.get(editorComponentId) ?? null : null),
@@ -492,6 +493,26 @@ export default function OCASystemBuilder() {
     const timeoutId = window.setTimeout(() => setRestoreNotice(null), 5000);
     return () => window.clearTimeout(timeoutId);
   }, [restoreNotice]);
+
+  useEffect(() => {
+    if (!rfInstance) return undefined;
+
+    if (nodes.length === 0) {
+      hasAutoFitRef.current = false;
+      return undefined;
+    }
+
+    if (hasAutoFitRef.current) {
+      return undefined;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      rfInstance.fitView({ padding: 0.16, duration: 0 });
+      hasAutoFitRef.current = true;
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, [nodes.length, rfInstance]);
 
   // ---------------------------------------------------------------------------
   // Update inputs
@@ -948,7 +969,6 @@ export default function OCASystemBuilder() {
               ));
             }}
             nodeTypes={nodeTypes}
-            fitView
             deleteKeyCode="Delete"
             className="bg-background"
           >
