@@ -188,7 +188,7 @@ export default function OCASystemBuilder() {
   const [showKindling, setShowKindling] = useState(false);
   const [activeTab, setActiveTab] = useState('canvas');
   const [guidanceMode, setGuidanceMode] = useState<GuidanceModeName>('live');
-  const [selectedComponentId, setSelectedComponentId] = useState<string | null>(null);
+  const [editorComponentId, setEditorComponentId] = useState<string | null>(null);
   const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
   const [restoreNotice, setRestoreNotice] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
@@ -217,13 +217,19 @@ export default function OCASystemBuilder() {
   const nodeToComponentId = useRef<Map<string, string>>(new Map());
   // Edge ID → server connection ID
   const edgeToConnectionId = useRef<Map<string, string>>(new Map());
+  const selectedNodeComponentId = useMemo(() => {
+    const selectedNode = nodes.find((node) => node.selected);
+    if (!selectedNode) return null;
+    return nodeToComponentId.current.get(selectedNode.id) ?? null;
+  }, [nodes]);
+
   const selectedComponent = useMemo(
-    () => (selectedComponentId ? componentMap.current.get(selectedComponentId) ?? null : null),
-    [selectedComponentId, nodes, assessment],
+    () => (editorComponentId ? componentMap.current.get(editorComponentId) ?? null : null),
+    [editorComponentId, nodes, assessment],
   );
 
   const handleOpenEditor = useCallback((componentId: string) => {
-    setSelectedComponentId(componentId);
+    setEditorComponentId(componentId);
   }, []);
 
   const handleInspect = useCallback(async (componentId: string) => {
@@ -575,8 +581,8 @@ export default function OCASystemBuilder() {
           await ocaRemoveComponent(systemId, compId);
           componentMap.current.delete(compId);
           nodeToComponentId.current.delete(node.id);
-          if (selectedComponentId === compId) {
-            setSelectedComponentId(null);
+          if (editorComponentId === compId) {
+            setEditorComponentId(null);
           }
           setIsDirty(true);
         } catch {
@@ -584,7 +590,7 @@ export default function OCASystemBuilder() {
         }
       }
     }
-  }, [selectedComponentId, systemId]);
+  }, [editorComponentId, systemId]);
 
   // ---------------------------------------------------------------------------
   // Handle edge deletion
@@ -829,6 +835,17 @@ export default function OCASystemBuilder() {
           <Download className="h-3 w-3" />
           Export
         </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => selectedNodeComponentId && handleOpenEditor(selectedNodeComponentId)}
+          disabled={!selectedNodeComponentId}
+          className="gap-1.5"
+          data-testid="oca-system-edit-selected"
+        >
+          <LayoutGrid className="h-3 w-3" />
+          Edit Selected
+        </Button>
         {assessment && assessment.kindling_chains.length > 0 && (
           <Button size="sm" variant={showKindling ? 'default' : 'outline'} onClick={() => setShowKindling(!showKindling)} className="gap-1.5">
             <Flame className="h-3 w-3" />
@@ -938,7 +955,7 @@ export default function OCASystemBuilder() {
           open={Boolean(selectedComponent)}
           onOpenChange={(open) => {
             if (!open) {
-              setSelectedComponentId(null);
+              setEditorComponentId(null);
             }
           }}
           onSave={handleSaveComponent}

@@ -703,6 +703,10 @@ test('oca system builder restores component property editing from the node sheet
 
   const [line] = state.components;
   await page.getByTestId(`component-node-${line.component_id}`).click();
+  await expect(page.getByTestId('oca-system-edit-selected')).toBeEnabled();
+  if (await page.getByText('Component Details').count() === 0) {
+    await page.getByTestId('oca-system-edit-selected').click();
+  }
   await expect(page.getByText('Component Details')).toBeVisible();
 
   await page.locator('#component-label').fill('Main Feed Line');
