@@ -87,6 +87,69 @@ function messageId(prefix: "user" | "assistant"): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
 }
 
+function renderInlineText(text: string) {
+  const matches = Array.from(text.matchAll(/\*\*(.+?)\*\*/g));
+  if (!matches.length) {
+    return text;
+  }
+
+  const nodes: Array<string | JSX.Element> = [];
+  let cursor = 0;
+
+  matches.forEach((match, index) => {
+    const start = match.index ?? 0;
+    const end = start + match[0].length;
+    if (start > cursor) {
+      nodes.push(text.slice(cursor, start));
+    }
+    nodes.push(
+      <strong key={`strong-${index}`} className="font-semibold text-inherit">
+        {match[1]}
+      </strong>,
+    );
+    cursor = end;
+  });
+
+  if (cursor < text.length) {
+    nodes.push(text.slice(cursor));
+  }
+
+  return nodes;
+}
+
+function renderMessageContent(text: string) {
+  const blocks = text
+    .split(/\n\s*\n/)
+    .map((block) => block.trim())
+    .filter(Boolean);
+
+  return blocks.map((block, blockIndex) => {
+    const lines = block.split("\n").map((line) => line.trimEnd());
+    const bulletLines = lines.filter((line) => /^[-*]\s+/.test(line.trim()));
+
+    if (bulletLines.length === lines.length) {
+      return (
+        <ul key={`list-${blockIndex}`} className="list-disc space-y-1 pl-5 marker:text-slate-400">
+          {bulletLines.map((line, lineIndex) => (
+            <li key={`item-${blockIndex}-${lineIndex}`}>{renderInlineText(line.replace(/^[-*]\s+/, ""))}</li>
+          ))}
+        </ul>
+      );
+    }
+
+    return (
+      <p key={`paragraph-${blockIndex}`} className="whitespace-pre-wrap">
+        {lines.map((line, lineIndex) => (
+          <span key={`line-${blockIndex}-${lineIndex}`}>
+            {renderInlineText(line)}
+            {lineIndex < lines.length - 1 ? <br /> : null}
+          </span>
+        ))}
+      </p>
+    );
+  });
+}
+
 export default function MiraChat() {
   const initialConversation = useMemo(() => loadConversation(), []);
   const [sessionId, setSessionId] = useState<string | null>(initialConversation.sessionId);
@@ -227,7 +290,7 @@ export default function MiraChat() {
         </div>
       </Card>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_22rem]">
         <Card className="border-border/70">
           <div className="flex items-center justify-between border-b border-border/70 px-5 py-4">
             <div>
@@ -243,7 +306,7 @@ export default function MiraChat() {
             </Button>
           </div>
 
-          <ScrollArea className="h-[58vh]">
+          <ScrollArea className="h-[62vh] 2xl:h-[68vh]">
             <div
               className="flex min-h-full flex-col gap-4 bg-[linear-gradient(180deg,rgba(248,250,252,0.95),rgba(241,245,249,0.95))] p-5"
             >
@@ -282,7 +345,7 @@ export default function MiraChat() {
                   >
                     <div
                       className={cn(
-                        "max-w-[85%] rounded-2xl border px-4 py-3 shadow-sm",
+                        "max-w-[92%] rounded-2xl border px-4 py-3 shadow-sm 2xl:max-w-[88%]",
                         isAssistant
                           ? "border-slate-200 bg-white text-slate-900"
                           : "border-teal-700 bg-teal-700 text-white",
@@ -302,7 +365,7 @@ export default function MiraChat() {
                           </Badge>
                         )}
                       </div>
-                      <p className="whitespace-pre-wrap text-sm leading-6">{message.content}</p>
+                      <div className="space-y-3 text-sm leading-6">{renderMessageContent(message.content)}</div>
 
                       {isAssistant && (message.auditId || message.followUps?.length) && (
                         <div className="mt-4 space-y-3 border-t border-slate-200 pt-3">

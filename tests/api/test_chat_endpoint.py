@@ -73,3 +73,41 @@ def test_chat_can_resume_from_frontend_history_without_server_session(api_client
     assert second_payload["engine_used"] == "oca"
     assert second_payload["entities"]["material_designation"] == "316L"
     assert second_payload["entities"]["pressure_value"] == 1500.0
+
+
+def test_chat_routes_hydrogen_shorthand_to_h2(api_client):
+    response = api_client.post(
+        "/api/chat/",
+        json={"message": "is A286 ok in H2"},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+
+    assert payload["engine_used"] == "h2"
+    assert payload["verdict"] in {
+        "PASS",
+        "CONDITIONAL_PASS",
+        "FAIL",
+        "INSUFFICIENT_DATA",
+    }
+    assert payload["entities"]["material_designation"] == "A286"
+    assert payload["entities"]["gas_service"] == "hydrogen"
+
+
+def test_chat_routes_galvanic_pair_questions_to_galvanic(api_client):
+    response = api_client.post(
+        "/api/chat/",
+        json={"message": "What galvanic risk do I have between 7075-T73 and CRES 304 in seawater proxy?"},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+
+    assert payload["engine_used"] == "galvanic"
+    assert payload["verdict"] in {"PASS", "CONDITIONAL_PASS", "FAIL", "INSUFFICIENT_DATA"}
+    assert payload["entities"]["material_designation"] == "7075-T73"
+    assert payload["entities"]["second_material"] == "CRES 304"
+    assert payload["entities"]["environment"] == "seawater_proxy"
+    assert "7075" in payload["response"]
+    assert "304" in payload["response"]

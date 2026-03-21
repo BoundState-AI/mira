@@ -51,7 +51,9 @@ class ParsedQuery:
 
     # Extracted entities
     material_designation: Optional[str] = None
+    second_material: Optional[str] = None
     gas_service: Optional[str] = None           # "oxygen" | "hydrogen" | None
+    environment: Optional[str] = None          # galvanic environment key | None
     pressure: Optional[str] = None              # raw string with units
     pressure_value: Optional[float] = None      # numeric psi
     temperature: Optional[str] = None           # raw string with units
@@ -107,6 +109,10 @@ _FOLLOW_UP_PATTERNS = re.compile(
     re.IGNORECASE,
 )
 _HISTORY_LOOKBACK_MESSAGES = 10
+_PAIRING_HINT_PATTERN = re.compile(
+    r"\b(?:between|vs\.?|versus|against|paired\s+with|coupled\s+(?:to|with)|galvanic|dissimilar|anode|cathode)\b",
+    re.IGNORECASE,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -120,11 +126,12 @@ _INTENT_PATTERNS: Dict[str, List[Tuple[re.Pattern, float]]] = {
     "compatibility_query": [
         # Explicit compatibility language
         (re.compile(r"\b(compatible|compatibility|approved|rated)\b", re.I), 4.0),
+        (re.compile(r"\b(ok|okay|good)\s+(?:in|for|with)\s+(GOX|LOX|GH2|LH2|oxygen|hydrogen|O2|H2)\b", re.I), 4.5),
         # Gas service context
         (re.compile(r"\b(O2|oxygen|hydrogen|H2)\s*(service|compatible|safe|approved)\b", re.I), 5.0),
         (re.compile(r"\b(GOX|LOX|GH2|LH2)\s*(service|compatible|use)\b", re.I), 5.0),
         # Bare gas keywords (strong but not as strong as combined)
-        (re.compile(r"\b(GOX|LOX|GH2|LH2|oxygen|hydrogen)\b", re.I), 3.0),
+        (re.compile(r"\b(GOX|LOX|GH2|LH2|oxygen|hydrogen|O2|H2)\b", re.I), 3.0),
         # Pressure/temperature envelope implies compatibility check
         (re.compile(r"\b(?:at|for)\s+\d+\s*(?:psi|psia|bar|Pa|kPa|MPa)\b", re.I), 3.0),
         # "Can I use X in Y" pattern
@@ -241,6 +248,10 @@ _NON_MATERIAL_CANDIDATES = {
     "this",
     "that",
 }
+_MATERIAL_PREFIXES = re.compile(
+    r"\b(?:SS|CRES|stainless(?:\s+steel)?|AL|Aluminum|Aluminium)\b",
+    re.IGNORECASE,
+)
 
 # Gas service mapping
 _GAS_SERVICE_MAP: Dict[str, str] = {
@@ -256,6 +267,20 @@ _GAS_SERVICE_MAP: Dict[str, str] = {
 _GAS_PATTERN = re.compile(
     r"\b(GOX|LOX|GH2|LH2|oxygen|hydrogen|O2|H2)\b", re.I
 )
+_ENVIRONMENT_PATTERNS: List[Tuple[re.Pattern, str]] = [
+    (re.compile(r"\bseawater(?:\s+proxy)?\b", re.I), "seawater_proxy"),
+    (re.compile(r"\bsalt(?:\s+fog)?\b", re.I), "seawater_proxy"),
+    (re.compile(r"\bcoastal(?:\s+condensing)?\b", re.I), "coastal_condensing"),
+    (re.compile(r"\bindustrial(?:\s+atmospher(?:e|ic))?\b", re.I), "industrial_atm"),
+    (re.compile(r"\brural(?:\s+atmospher(?:e|ic))?\b", re.I), "rural_atm"),
+    (re.compile(r"\bcrew(?:\s+condensing)?\b", re.I), "crew_condensing"),
+    (re.compile(r"\binterior\b", re.I), "crew_condensing"),
+    (re.compile(r"\bdry(?:\s+indoor)?\b", re.I), "dry_indoor"),
+    (re.compile(r"\bindoor\b", re.I), "dry_indoor"),
+    (re.compile(r"\bcryo(?:genic)?(?:\s+ops)?\b", re.I), "cryogenic_ops"),
+    (re.compile(r"\bspace(?:\s+vacuum)?\b", re.I), "space_vacuum"),
+    (re.compile(r"\bvacuum\b", re.I), "space_vacuum"),
+]
 
 # Pressure extraction
 _PRESSURE_PATTERN = re.compile(
@@ -276,7 +301,7 @@ _STANDARD_PATTERN = re.compile(
 
 # Dissimilar metals flag
 _DISSIMILAR_METALS_PATTERN = re.compile(
-    r"\b(?:dissimilar\s+metal|galvanic\s+(?:corrosion|couple)|bimetallic|mixed\s+metal)\b",
+    r"\b(?:dissimilar\s+metal|galvanic(?:\s+(?:corrosion|couple|risk|compatibility|assessment|screen))?|bimetallic|mixed\s+metal)\b",
     re.I,
 )
 
@@ -289,6 +314,9 @@ _FRACTURE_PATTERN = re.compile(
 
 def _extract_material(text: str) -> Optional[str]:
     """Extract the first plausible material designation from the query."""
+    materials = _extract_materials(text)
+    if materials:
+        return materials[0]
     for pattern in _MATERIAL_PATTERNS:
         m = pattern.search(text)
         if m:
@@ -307,12 +335,68 @@ def _extract_material(text: str) -> Optional[str]:
     return None
 
 
+def _material_key(value: str) -> str:
+    normalized = _MATERIAL_PREFIXES.sub("", value)
+    return re.sub(r"[^A-Z0-9]+", "", normalized.upper())
+
+
+def _extract_materials(text: str) -> List[str]:
+    """Extract plausible material mentions in their original order."""
+    found: List[Tuple[int, str]] = []
+
+    for pattern in _MATERIAL_PATTERNS:
+        for match in pattern.finditer(text):
+            raw = match.group(0).strip()
+            if re.fullmatch(r"\d+", raw):
+                continue
+            found.append((match.start(), raw))
+
+    for pattern in _GENERIC_MATERIAL_PATTERNS:
+        for match in pattern.finditer(text):
+            candidate = match.group(1).strip(" .,;:!?()[]{}")
+            if candidate.lower() in _NON_MATERIAL_CANDIDATES:
+                continue
+            found.append((match.start(1), candidate))
+
+    found.sort(key=lambda item: item[0])
+
+    selected: List[str] = []
+    for _, candidate in found:
+        key = _material_key(candidate)
+        if not key:
+            continue
+
+        duplicate_index: Optional[int] = None
+        for idx, existing in enumerate(selected):
+            existing_key = _material_key(existing)
+            if key == existing_key or key in existing_key or existing_key in key:
+                duplicate_index = idx
+                break
+
+        if duplicate_index is None:
+            selected.append(candidate)
+            continue
+
+        if len(candidate) > len(selected[duplicate_index]):
+            selected[duplicate_index] = candidate
+
+    return selected
+
+
 def _extract_gas_service(text: str) -> Optional[str]:
     """Map gas tokens to canonical 'oxygen' | 'hydrogen'."""
     m = _GAS_PATTERN.search(text)
     if m:
         token = m.group(1).lower()
         return _GAS_SERVICE_MAP.get(token)
+    return None
+
+
+def _extract_environment(text: str) -> Optional[str]:
+    """Extract galvanic-style service environment from the query."""
+    for pattern, canonical in _ENVIRONMENT_PATTERNS:
+        if pattern.search(text):
+            return canonical
     return None
 
 
@@ -383,6 +467,9 @@ def _determine_fine_routing(
     """
     # Compatibility queries route by gas service
     if coarse_intent == "compatibility_query":
+        # Dissimilar metals / galvanic takes priority within compatibility
+        if dissimilar_metals:
+            return "galvanic", 0.95
         if gas_service == "oxygen":
             return "oca", 0.95
         if gas_service == "hydrogen":
@@ -409,6 +496,8 @@ def _determine_fine_routing(
 
     # Comparison
     if coarse_intent == "comparison":
+        if dissimilar_metals:
+            return "galvanic", 0.92
         if gas_service == "oxygen":
             return "oca", 0.85
         if gas_service == "hydrogen":
@@ -555,16 +644,26 @@ def interpret(
     )
 
     # ----- Stage 2: Entity Extraction -----
-    pq.material_designation = _extract_material(text)
+    extracted_materials = _extract_materials(text)
+    pq.material_designation = extracted_materials[0] if extracted_materials else None
+    pq.second_material = extracted_materials[1] if len(extracted_materials) > 1 else None
     pq.gas_service = _extract_gas_service(text)
+    pq.environment = _extract_environment(text)
     pq.pressure, pq.pressure_value = _extract_pressure(text)
     pq.temperature, pq.temperature_value = _extract_temperature(text)
     pq.standard_ref = _extract_standard_ref(text)
-    pq.dissimilar_metals = bool(_DISSIMILAR_METALS_PATTERN.search(text))
+    pq.dissimilar_metals = bool(
+        _DISSIMILAR_METALS_PATTERN.search(text)
+        or (len(extracted_materials) > 1 and _PAIRING_HINT_PATTERN.search(text))
+    )
     pq.fracture_context = bool(_FRACTURE_PATTERN.search(text))
 
     if module_context:
         pq.material_designation = pq.material_designation or module_context.get("material")
+        if pq.second_material is None and module_context.get("material_b"):
+            pq.second_material = str(module_context["material_b"])
+        if pq.environment is None and module_context.get("environment"):
+            pq.environment = str(module_context["environment"])
         if pq.gas_service is None:
             environment = str(module_context.get("environment") or "").lower()
             if "oxygen" in environment or "gox" in environment or "lox" in environment:
@@ -578,7 +677,9 @@ def interpret(
     # History-based inheritance
     current_entities = {
         "material_designation": pq.material_designation,
+        "second_material": pq.second_material,
         "gas_service": pq.gas_service,
+        "environment": pq.environment,
         "pressure": pq.pressure,
         "temperature": pq.temperature,
         "standard_ref": pq.standard_ref,
@@ -613,8 +714,12 @@ def interpret(
     if inherited:
         if "material_designation" in inherited and pq.material_designation is None:
             pq.material_designation = inherited["material_designation"]
+        if "second_material" in inherited and pq.second_material is None:
+            pq.second_material = inherited["second_material"]
         if "gas_service" in inherited and pq.gas_service is None:
             pq.gas_service = inherited["gas_service"]
+        if "environment" in inherited and pq.environment is None:
+            pq.environment = inherited["environment"]
         if "pressure" in inherited and pq.pressure is None:
             pq.pressure = inherited["pressure"]
             pq.pressure_value = inherited.get("pressure_value")
@@ -625,11 +730,14 @@ def interpret(
             pq.standard_ref = inherited["standard_ref"]
         pq.inherited_entities = inherited
 
+    if pq.second_material:
+        pq.dissimilar_metals = True
+
     logger.debug(
-        "[INTERPRET] Stage 2: material=%s, gas=%s, pressure=%s, temp=%s, std=%s, "
-        "dissimilar=%s, fracture=%s, inherited=%s",
-        pq.material_designation, pq.gas_service, pq.pressure, pq.temperature,
-        pq.standard_ref, pq.dissimilar_metals, pq.fracture_context,
+        "[INTERPRET] Stage 2: material=%s, second_material=%s, gas=%s, environment=%s, "
+        "pressure=%s, temp=%s, std=%s, dissimilar=%s, fracture=%s, inherited=%s",
+        pq.material_designation, pq.second_material, pq.gas_service, pq.environment,
+        pq.pressure, pq.temperature, pq.standard_ref, pq.dissimilar_metals, pq.fracture_context,
         pq.inherited_entities,
     )
 

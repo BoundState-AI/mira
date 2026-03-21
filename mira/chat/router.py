@@ -878,8 +878,12 @@ def _build_turn_entities(parsed: ParsedQuery) -> dict[str, Any]:
     entities: dict[str, Any] = {}
     if parsed.material_designation:
         entities["material_designation"] = parsed.material_designation
+    if parsed.second_material:
+        entities["second_material"] = parsed.second_material
     if parsed.gas_service:
         entities["gas_service"] = parsed.gas_service
+    if parsed.environment:
+        entities["environment"] = parsed.environment
     if parsed.pressure:
         entities["pressure"] = parsed.pressure
         entities["pressure_value"] = parsed.pressure_value
@@ -905,7 +909,9 @@ def _build_parsed_input(parsed: ParsedQuery) -> dict[str, Any]:
         "fine_routing": parsed.fine_routing,
         "task_mode": parsed.task_mode.value,
         "material_designation": parsed.material_designation,
+        "second_material": parsed.second_material,
         "gas_service": parsed.gas_service,
+        "environment": parsed.environment,
         "pressure": parsed.pressure,
         "pressure_value": parsed.pressure_value,
         "temperature": parsed.temperature,
@@ -948,8 +954,12 @@ def _build_parsed_input(parsed: ParsedQuery) -> dict[str, Any]:
 
     # Galvanic needs two materials + environment
     if parsed.fine_routing == "galvanic":
-        base["second_material"] = parsed.inherited_entities.get("second_material")
-        base["environment"] = parsed.inherited_entities.get("environment")
+        base["second_material"] = (
+            parsed.second_material or parsed.inherited_entities.get("second_material")
+        )
+        base["environment"] = (
+            parsed.environment or parsed.inherited_entities.get("environment")
+        )
 
     # Fracture needs part_name + material
     if parsed.fine_routing == "fracture":

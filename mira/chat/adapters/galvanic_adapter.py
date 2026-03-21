@@ -24,6 +24,7 @@ __safety_critical__ = True
 
 import asyncio
 import logging
+import re
 from typing import Any, Optional
 
 from mira.chat.engine_adapter import EngineAdapter
@@ -152,6 +153,21 @@ def _extract_material_pair(parsed_input: dict[str, Any]) -> tuple[str | None, st
     return material_a, material_b
 
 
+def _normalize_material_query(raw: str | None) -> str | None:
+    """Normalize common chat shorthand to galvanic-series-friendly aliases."""
+    if not raw:
+        return None
+
+    normalized = raw.strip()
+    normalized = re.sub(
+        r"^(?:CRES|SS|stainless(?:\s+steel)?)\s+",
+        "",
+        normalized,
+        flags=re.IGNORECASE,
+    )
+    return normalized.strip() or None
+
+
 # ---------------------------------------------------------------------------
 # Galvanic Adapter
 # ---------------------------------------------------------------------------
@@ -196,6 +212,8 @@ class GalvanicAdapter(EngineAdapter):
         from mira.galvanic.models import CoupleContext, GalvanicAssessmentRequest
 
         material_a, material_b = _extract_material_pair(parsed_input)
+        material_a = _normalize_material_query(material_a)
+        material_b = _normalize_material_query(material_b)
 
         if not material_a:
             return self.wrap_envelope(

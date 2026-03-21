@@ -21,9 +21,12 @@ Co-Authored-By: Dr. Joseph Wilde, BoundState AI
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 from typing import Any
+
+from mira.providers.llm_provider import complete as llm_complete, resolve_model
 
 from .models import EngineEnvelope, Status, TaskMode
 
@@ -33,9 +36,11 @@ LOGGER = logging.getLogger(__name__)
 # Configuration
 # ---------------------------------------------------------------------------
 
-DEFAULT_FORMATTER_MODEL = "claude-sonnet-4-6"
+DEFAULT_FORMATTER_MODEL = resolve_model("sonnet")
+DEFAULT_FORMATTER_PROVIDER = "bedrock-converse"
 FORMATTER_MAX_TOKENS = 1500
 FORMATTER_TEMPERATURE = 0.3  # Enough for natural M&P engineer voice, not enough to drift
+FORMATTER_TIMEOUT_S = 45
 
 # ---------------------------------------------------------------------------
 # System prompt: Senior M&P Engineer persona
@@ -77,7 +82,7 @@ VOICE:
   ("You're probably wondering about the kindling chain — here's what the \
   evidence shows")
 - Be conversational but never chatty — engineers don't want essays
-- If this is a follow-up turn, acknowledge continuity ("Looking at {material} \
+- If this is a follow-up turn, acknowledge continuity ("Looking at the same material \
   again at the new pressure...")
 
 RULES (non-negotiable):
@@ -242,17 +247,18 @@ async def format_response(
         return envelope.response_text
 
     try:
-        import anthropic
-
-        api_key = os.environ.get("ANTHROPIC_API_KEY")
-        if not api_key:
-            LOGGER.warning("ANTHROPIC_API_KEY not set — using plain-text fallback formatter")
-            return _fallback_format(envelope, session_context)
-
-        model = os.environ.get("MIRA_CHAT_FORMATTER_MODEL", DEFAULT_FORMATTER_MODEL)
+        provider = (
+            os.environ.get("MIRA_CHAT_LLM_PROVIDER", DEFAULT_FORMATTER_PROVIDER).strip()
+            or DEFAULT_FORMATTER_PROVIDER
+        )
+        model = (
+            os.environ.get("MIRA_CHAT_FORMATTER_MODEL")
+            or os.environ.get("BEDROCK_MODEL_ID")
+            or os.environ.get("LLM_SONNET_MODEL")
+            or DEFAULT_FORMATTER_MODEL
+        ).strip()
         if session_context is not None:
             session_context["formatter_model_used"] = model
-        client = anthropic.AsyncAnthropic(api_key=api_key)
 
         turn_count = 1
         if session_context:
@@ -265,20 +271,20 @@ async def format_response(
         )
         user_prompt = build_formatter_prompt(envelope, session_context)
 
-        response = await client.messages.create(
-            model=model,
-            max_tokens=FORMATTER_MAX_TOKENS,
-            temperature=FORMATTER_TEMPERATURE,
-            system=system,
-            messages=[{"role": "user", "content": user_prompt}],
+        loop = asyncio.get_running_loop()
+        response = await loop.run_in_executor(
+            None,
+            lambda: llm_complete(
+                system=system,
+                user=user_prompt,
+                model=model,
+                max_tokens=FORMATTER_MAX_TOKENS,
+                temperature=FORMATTER_TEMPERATURE,
+                timeout_s=FORMATTER_TIMEOUT_S,
+                provider=provider,
+            ),
         )
-
-        # Extract text from response content blocks
-        formatted = ""
-        for block in response.content:
-            if hasattr(block, "text"):
-                formatted += block.text
-        formatted = formatted.strip()
+        formatted = response.text.strip()
 
         if not formatted:
             return _fallback_format(envelope, session_context)
@@ -326,6 +332,11 @@ def _fallback_format(
         lines.append(f"**INSUFFICIENT_DATA** — I need more information to run this assessment. [{engine_label}]")
     else:
         lines.append(f"**{status.value}** — [{engine_label}]")
+
+    summary = _plain_language_summary(envelope)
+    if summary:
+        lines.append("")
+        lines.append(summary)
 
     # Draft warning
     if envelope.mode == TaskMode.DRAFT_ARTIFACT:
@@ -401,3 +412,31 @@ def _fallback_format(
                 lines.append(f"  - {r}")
 
     return "\n".join(lines)
+
+
+def _plain_language_summary(envelope: EngineEnvelope) -> str:
+    """Return a short plain-language lead-in for deterministic fallback mode."""
+    if envelope.engine_id == "galvanic":
+        if envelope.status == Status.PASS:
+            return "In plain language: this material couple screens as acceptable in the stated environment."
+        if envelope.status == Status.CONDITIONAL_PASS:
+            return "In plain language: this couple may be workable, but only if you apply the listed mitigations."
+        if envelope.status == Status.FAIL:
+            return "In plain language: this couple carries meaningful galvanic risk in the stated environment."
+
+    if envelope.engine_id == "bsmh":
+        structured = envelope.domain_payload.get("structured_query", {})
+        intent = str(structured.get("intent") or "").replace("_", " ").strip()
+        if intent:
+            return f"I parsed this as a {intent} question and pulled the key inputs below."
+
+    if envelope.status == Status.PASS:
+        return "In plain language: the current engine result is acceptable as stated."
+    if envelope.status == Status.CONDITIONAL_PASS:
+        return "In plain language: the current engine result is acceptable only within the stated conditions."
+    if envelope.status == Status.FAIL:
+        return "In plain language: the current engine result does not support proceeding as stated."
+    if envelope.status == Status.INSUFFICIENT_DATA:
+        return "In plain language: I do not have enough grounded input to answer this yet."
+
+    return ""

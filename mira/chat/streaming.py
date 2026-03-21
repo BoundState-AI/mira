@@ -41,11 +41,13 @@ from typing import Any, AsyncGenerator
 from .models import EngineEnvelope, Status
 from .response_formatter import (
     DEFAULT_FORMATTER_MODEL,
+    DEFAULT_FORMATTER_PROVIDER,
     FORMATTER_MAX_TOKENS,
     FORMATTER_SYSTEM_PROMPT,
     FORMATTER_TEMPERATURE,
     build_formatter_prompt,
     _fallback_format,
+    format_response,
 )
 
 LOGGER = logging.getLogger(__name__)
@@ -118,17 +120,34 @@ async def stream_formatter_response(
     # ------------------------------------------------------------------
     # 3. Attempt streaming Claude call
     # ------------------------------------------------------------------
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
-        LOGGER.warning("ANTHROPIC_API_KEY not set — streaming falls back to deterministic formatter")
-        for event in _yield_fallback(envelope, session_context):
-            yield event
+    provider = (
+        os.environ.get("MIRA_CHAT_LLM_PROVIDER", DEFAULT_FORMATTER_PROVIDER).strip()
+        or DEFAULT_FORMATTER_PROVIDER
+    )
+    if provider != "anthropic":
+        formatted = await format_response(envelope, session_context=session_context)
+        session_context["_stream_final_text"] = formatted
+        yield _sse_event({"type": "text_start"})
+        yield _sse_event({"type": "text", "content": formatted})
+        yield _sse_event({"type": "text_end"})
         return
 
     try:
         import anthropic
 
-        model = os.environ.get("MIRA_CHAT_FORMATTER_MODEL", DEFAULT_FORMATTER_MODEL)
+        api_key = os.environ.get("ANTHROPIC_API_KEY")
+        if not api_key:
+            LOGGER.warning("ANTHROPIC_API_KEY not set — streaming falls back to deterministic formatter")
+            for event in _yield_fallback(envelope, session_context):
+                yield event
+            return
+
+        model = (
+            os.environ.get("MIRA_CHAT_FORMATTER_MODEL")
+            or os.environ.get("BEDROCK_MODEL_ID")
+            or os.environ.get("LLM_SONNET_MODEL")
+            or DEFAULT_FORMATTER_MODEL
+        )
         session_context["formatter_model_used"] = model
         client = anthropic.AsyncAnthropic(api_key=api_key)
 
