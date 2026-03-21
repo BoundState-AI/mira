@@ -11,9 +11,10 @@
 
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import {
-  ReactFlow, addEdge, useNodesState, useEdgesState,
+  ReactFlow, addEdge, applyNodeChanges, useNodesState, useEdgesState,
   Controls, MiniMap, Background, BackgroundVariant,
   type Connection, type Edge, type Node, type OnConnect,
+  type OnNodesChange,
   type ReactFlowInstance,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
@@ -188,13 +189,14 @@ export default function OCASystemBuilder() {
   const [showKindling, setShowKindling] = useState(false);
   const [activeTab, setActiveTab] = useState('canvas');
   const [guidanceMode, setGuidanceMode] = useState<GuidanceModeName>('live');
+  const [selectedNodeComponentId, setSelectedNodeComponentId] = useState<string | null>(null);
   const [editorComponentId, setEditorComponentId] = useState<string | null>(null);
   const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
   const [restoreNotice, setRestoreNotice] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
 
   // React Flow
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [nodes, setNodes] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
@@ -217,18 +219,15 @@ export default function OCASystemBuilder() {
   const nodeToComponentId = useRef<Map<string, string>>(new Map());
   // Edge ID → server connection ID
   const edgeToConnectionId = useRef<Map<string, string>>(new Map());
-  const selectedNodeComponentId = useMemo(() => {
-    const selectedNode = nodes.find((node) => node.selected);
-    if (!selectedNode) return null;
-    return nodeToComponentId.current.get(selectedNode.id) ?? null;
-  }, [nodes]);
+  const lastDraftSignatureRef = useRef<string | null>(null);
 
   const selectedComponent = useMemo(
     () => (editorComponentId ? componentMap.current.get(editorComponentId) ?? null : null),
-    [editorComponentId, nodes, assessment],
+    [editorComponentId, assessment],
   );
 
   const handleOpenEditor = useCallback((componentId: string) => {
+    setSelectedNodeComponentId(componentId);
     setEditorComponentId(componentId);
   }, []);
 
@@ -278,7 +277,11 @@ export default function OCASystemBuilder() {
     });
   }, [handleInspect, handleOpenEditor, setNodes]);
 
-  const buildDraftSnapshot = useCallback((): BuilderDraft => {
+  const handleNodesChange: OnNodesChange = useCallback((changes) => {
+    setNodes((currentNodes) => applyNodeChanges(changes, currentNodes));
+  }, [setNodes]);
+
+  const buildDraftPayload = useCallback(() => {
     const nodePositionByComponentId = new Map<string, { x: number; y: number }>();
     for (const node of nodes) {
       const componentId = nodeToComponentId.current.get(node.id);
@@ -316,7 +319,6 @@ export default function OCASystemBuilder() {
 
     return {
       version: 1,
-      saved_at: new Date().toISOString(),
       inputs,
       components,
       connections,
@@ -400,6 +402,12 @@ export default function OCASystemBuilder() {
 
     setNodes(restoredNodes);
     setEdges(restoredEdges);
+    lastDraftSignatureRef.current = JSON.stringify({
+      version: draft.version,
+      inputs: draft.inputs,
+      components: draft.components,
+      connections: draft.connections,
+    });
     setDraftSavedAt(draft.saved_at);
     if (draft.components.length > 0 || draft.connections.length > 0) {
       setRestoreNotice(
@@ -459,7 +467,16 @@ export default function OCASystemBuilder() {
 
     const timeoutId = window.setTimeout(() => {
       try {
-        const draft = buildDraftSnapshot();
+        const draftPayload = buildDraftPayload();
+        const signature = JSON.stringify(draftPayload);
+        if (lastDraftSignatureRef.current === signature) {
+          return;
+        }
+        lastDraftSignatureRef.current = signature;
+        const draft: BuilderDraft = {
+          ...draftPayload,
+          saved_at: new Date().toISOString(),
+        };
         window.localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft));
         setDraftSavedAt(draft.saved_at);
       } catch {
@@ -468,7 +485,7 @@ export default function OCASystemBuilder() {
     }, 300);
 
     return () => window.clearTimeout(timeoutId);
-  }, [buildDraftSnapshot, systemId]);
+  }, [buildDraftPayload, systemId]);
 
   useEffect(() => {
     if (!restoreNotice) return undefined;
@@ -584,13 +601,16 @@ export default function OCASystemBuilder() {
           if (editorComponentId === compId) {
             setEditorComponentId(null);
           }
+          if (selectedNodeComponentId === compId) {
+            setSelectedNodeComponentId(null);
+          }
           setIsDirty(true);
         } catch {
           // ignore
         }
       }
     }
-  }, [editorComponentId, systemId]);
+  }, [editorComponentId, selectedNodeComponentId, systemId]);
 
   // ---------------------------------------------------------------------------
   // Handle edge deletion
@@ -898,7 +918,7 @@ export default function OCASystemBuilder() {
             data-testid="oca-system-canvas"
             nodes={nodes}
             edges={edges}
-            onNodesChange={onNodesChange}
+            onNodesChange={handleNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             onNodesDelete={onNodesDelete}
@@ -919,6 +939,14 @@ export default function OCASystemBuilder() {
             onDragOver={onDragOver}
             onDrop={onDrop}
             onInit={setRfInstance}
+            onSelectionChange={({ nodes: selectedNodes }) => {
+              const nextSelectedComponentId = selectedNodes[0]
+                ? nodeToComponentId.current.get(selectedNodes[0].id) ?? null
+                : null;
+              setSelectedNodeComponentId((current) => (
+                current === nextSelectedComponentId ? current : nextSelectedComponentId
+              ));
+            }}
             nodeTypes={nodeTypes}
             fitView
             deleteKeyCode="Delete"
