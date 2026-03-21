@@ -662,6 +662,32 @@ test('oca system builder supports raw palette add, connect, tabs, and reassessme
   await expect(page.getByText('Needs reassessment')).toBeVisible();
 });
 
+test('oca system builder restores component property editing from the node sheet', async ({ page }) => {
+  const state = await installSystemBuilderMock(page);
+
+  await page.goto('/oca/system-builder');
+  await expect(page.getByRole('heading', { name: 'OCA System Builder' })).toBeVisible();
+
+  await dragPaletteItemToCanvas(page, 'palette-line', 420, 220);
+  await expect.poll(() => state.components.length).toBe(1);
+
+  const [line] = state.components;
+  await page.getByTestId(`component-node-${line.component_id}`).click();
+  await expect(page.getByText('Component Details')).toBeVisible();
+
+  await page.locator('#component-label').fill('Main Feed Line');
+  await page.locator('#component-materials').fill('body: Inconel 625');
+  await page.locator('#wall_thickness_mm').fill('1.8');
+  await page.locator('#inner_diameter_mm').fill('9.5');
+  await page.getByRole('button', { name: 'Save Changes' }).click();
+
+  await expect(page.getByText('Main Feed Line').first()).toBeVisible();
+  await expect.poll(() => state.components[0]?.label ?? null).toBe('Main Feed Line');
+  await expect.poll(() => state.components[0]?.materials?.[0]?.material?.material_name ?? null).toBe('Inconel 625');
+  await expect.poll(() => state.components[0]?.config?.wall_thickness_mm ?? null).toBe(1.8);
+  await expect.poll(() => state.components[0]?.config?.inner_diameter_mm ?? null).toBe(9.5);
+});
+
 test('oca system builder surfaces blocked states and MPR67 banner', async ({ page }) => {
   const state = await installSystemBuilderMock(page, { assessmentMode: 'blocked_mpr67' });
   await seedBuilderDraft(page, {

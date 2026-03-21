@@ -16,10 +16,11 @@ export default defineConfig(({ mode }) => ({
         target: process.env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:8000',
         changeOrigin: true,
         rewrite: (requestPath) => {
-          // Keep /api prefix for MUA v10 to support backend builds that only
-          // expose /api/mua/v10, while preserving legacy rewrite behavior for
-          // the rest of the API surface.
-          if (requestPath.startsWith('/api/mua/v10')) {
+          // Preserve routes that are only exposed with their /api prefix.
+          if (
+            requestPath.startsWith('/api/mua/v10') ||
+            requestPath.startsWith('/api/chat')
+          ) {
             return requestPath;
           }
           return requestPath.replace(/^\/api/, '');

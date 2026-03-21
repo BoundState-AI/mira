@@ -31,11 +31,14 @@ from typing import Protocol, runtime_checkable
 LOGGER = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
-# Model tier defaults — Amazon Nova (no Anthropic assumptions)
+# Model tier defaults — Bedrock-first runtime defaults
 # ---------------------------------------------------------------------------
 
+_DEFAULT_SONNET_MODEL = "us.anthropic.claude-sonnet-4-5-20250929-v1:0"
+_DEFAULT_SONNET_MODEL_GOVCLOUD = "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0"
+
 MODEL_DEFAULTS: dict[str, str] = {
-    "sonnet": "amazon.nova-pro-v1:0",
+    "sonnet": _DEFAULT_SONNET_MODEL,
     "haiku": "amazon.nova-lite-v1:0",
 }
 
@@ -53,6 +56,15 @@ def resolve_model(tier: str) -> str:
         val = os.environ.get(env_var, "").strip()
         if val:
             return val
+    if tier == "sonnet":
+        region = (
+            os.environ.get("BEDROCK_REGION")
+            or os.environ.get("AWS_REGION")
+            or os.environ.get("AWS_DEFAULT_REGION")
+            or ""
+        ).strip().lower()
+        if region.startswith("us-gov-"):
+            return _DEFAULT_SONNET_MODEL_GOVCLOUD
     return MODEL_DEFAULTS.get(tier, tier)
 
 

@@ -53,15 +53,15 @@ COGNITO_USER_POOL_ID="${COGNITO_USER_POOL_ID:-us-gov-west-1_nEpMTffMH}"
 COGNITO_CLIENT_ID="${COGNITO_CLIENT_ID:-1tklem8thjkg04ipupvcb1heal}"
 BASE_URL="${BASE_URL:-https://mira.boundstate.ai}"
 JWT_SECRET_KEY="${JWT_SECRET_KEY:-mira-runtime-${DATE_TAG}}"
-BEDROCK_MODEL_ID="${BEDROCK_MODEL_ID:-us.anthropic.claude-sonnet-4-5-20250929-v1:0}"
+BEDROCK_MODEL_ID="${BEDROCK_MODEL_ID:-us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0}"
 MIRA_REQUIRE_CHAT="${MIRA_REQUIRE_CHAT:-true}"
 MIRA_CHAT_AUDIT_PATH="${MIRA_CHAT_AUDIT_PATH:-/tmp/mira-chat-audit.jsonl}"
 NO_DATA_RUNTIME="${NO_DATA_RUNTIME:-1}"
 SKIP_AUTHENTICATED_SMOKE="${SKIP_AUTHENTICATED_SMOKE:-0}"
 RECEIPTS_DIR="${RECEIPTS_DIR:-${ROOT_DIR}/.deploy_receipts}"
 
-BACKEND_CPU="${BACKEND_CPU:-256}"
-BACKEND_MEMORY="${BACKEND_MEMORY:-512}"
+BACKEND_CPU="${BACKEND_CPU:-1024}"
+BACKEND_MEMORY="${BACKEND_MEMORY:-4096}"
 FRONTEND_CPU="${FRONTEND_CPU:-256}"
 FRONTEND_MEMORY="${FRONTEND_MEMORY:-512}"
 
@@ -347,7 +347,14 @@ cat > "${BACKEND_TASK_JSON}" <<JSON
         {"name": "ADMIN_PATH_PREFIXES", "value": "/admin"},
         {"name": "COGNITO_REGION", "value": "${COGNITO_REGION}"},
         {"name": "ENABLE_AUDIT_LOGGING", "value": "false"},
+        {"name": "LLM_PROVIDER", "value": "bedrock-converse"},
+        {"name": "LLM_SONNET_MODEL", "value": "${BEDROCK_MODEL_ID}"},
+        {"name": "USE_BEDROCK", "value": "1"},
         {"name": "BEDROCK_MODEL_ID", "value": "${BEDROCK_MODEL_ID}"},
+        {"name": "BSMH_SONNET_MODEL", "value": "${BEDROCK_MODEL_ID}"},
+        {"name": "BSMH_SONNET_BEDROCK_MODEL", "value": "${BEDROCK_MODEL_ID}"},
+        {"name": "MIRA_CHAT_LLM_PROVIDER", "value": "bedrock-converse"},
+        {"name": "MIRA_CHAT_FORMATTER_MODEL", "value": "${BEDROCK_MODEL_ID}"},
         {"name": "COGNITO_CLIENT_ID", "value": "${COGNITO_CLIENT_ID}"},
         {"name": "JWT_SECRET_KEY", "value": "${JWT_SECRET_KEY}"},
         {"name": "MIRA_REQUIRE_CHAT", "value": "${MIRA_REQUIRE_CHAT}"},

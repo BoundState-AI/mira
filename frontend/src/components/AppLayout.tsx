@@ -1,11 +1,15 @@
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
+import { useLocation } from 'react-router-dom';
 
 interface AppLayoutProps {
   children: React.ReactNode;
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
+  const location = useLocation();
+  const isWideWorkspace = location.pathname === '/chat';
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
@@ -16,7 +20,14 @@ export function AppLayout({ children }: AppLayoutProps) {
             <span className="text-sm font-medium">Menu</span>
           </div>
           <div className="p-4 md:p-8">
-            <div className="max-w-4xl animate-fade-in lg:ml-24 lg:mr-auto">
+            <div
+              className={[
+                'w-full animate-fade-in',
+                isWideWorkspace
+                  ? 'max-w-[min(110rem,calc(100vw-5rem))] lg:ml-6 lg:mr-0'
+                  : 'max-w-4xl lg:ml-24 lg:mr-auto',
+              ].join(' ')}
+            >
               {children}
             </div>
           </div>

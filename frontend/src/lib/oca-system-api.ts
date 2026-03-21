@@ -262,7 +262,7 @@ export async function ocaUpdateComponent(
   systemId: string,
   componentId: string,
   updates: ComponentUpdateRequest,
-): Promise<{ status: string }> {
+): Promise<{ status: string; component?: SystemComponent }> {
   return fetchJSON(`${API_BASE}/oca/systems/${systemId}/components/${componentId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },

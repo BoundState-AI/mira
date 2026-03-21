@@ -167,7 +167,7 @@ async def update_component(
     system_id: str,
     component_id: str,
     updates: dict[str, Any],
-) -> dict[str, str]:
+) -> dict[str, Any]:
     """Update a component's properties."""
     system = _get_system(system_id)
     if system.locked:
@@ -212,7 +212,7 @@ async def update_component(
         "timestamp": datetime.utcnow().isoformat(),
     })
 
-    return {"status": "updated"}
+    return {"status": "updated", "component": comp.model_dump()}
 
 
 @router.delete("/{system_id}/components/{component_id}")
