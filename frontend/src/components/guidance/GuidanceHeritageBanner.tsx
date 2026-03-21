@@ -4,10 +4,10 @@
  * Shows auto-extraction provenance. Confirm action when unverified.
  *
  * When heritage is present:
- * - Training/Live: prominent banner showing extraction source and confidence
- * - Expert: subtle indicator, click to expand
- * - If user_confirmed is false: renders "Confirm" action button
- * - Low confidence (< 80%): triggers warning regardless of mode
+ * - Training: full explanation banner with source, confidence, and message
+ * - Live/Expert: compact badge (source + confidence), click to expand
+ * - If user_confirmed is false: renders "Confirm"/"Reject" action buttons
+ * - Low confidence (< 80%): triggers full warning banner regardless of mode
  */
 
 import React, { useState } from 'react';
@@ -44,7 +44,8 @@ export function GuidanceHeritageBanner({
   onReject,
   className,
 }: GuidanceHeritageBannerProps) {
-  const [expanded, setExpanded] = useState(mode !== 'expert');
+  // Training starts expanded (full banner), Live/Expert start compact
+  const [expanded, setExpanded] = useState(mode === 'training');
 
   // Build display message from template
   const message = displayTemplate
@@ -53,23 +54,57 @@ export function GuidanceHeritageBanner({
         .replace('{confidence}', String(Math.round(confidence * 100)))
     : `Extracted from ${source} (confidence: ${Math.round(confidence * 100)}%). Please verify.`;
 
-  // Expert mode: subtle indicator
-  if (mode === 'expert' && !lowConfidence && !expanded) {
+  // Expert/Live collapsed: subtle indicator (click to expand)
+  // Expert: always compact badge unless low confidence
+  // Live: compact badge unless low confidence
+  const isCompactMode = mode === 'expert' || mode === 'live';
+
+  if (isCompactMode && !lowConfidence && !expanded) {
     return (
       <button
         type="button"
         onClick={() => setExpanded(true)}
         className={cn(
-          'flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground',
+          'inline-flex items-center gap-1.5 rounded-md border border-border px-2 py-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors',
           className,
         )}
       >
-        <FileSearch className="h-3 w-3" />
-        <span>Auto-extracted</span>
+        <FileSearch className="h-3 w-3 shrink-0" />
+        <span className="font-medium">{source}</span>
+        <span className="text-muted-foreground/70">
+          {Math.round(confidence * 100)}%
+        </span>
+        {!confirmed && (
+          <>
+            <span className="mx-0.5 text-muted-foreground/40">|</span>
+            <span
+              className="font-medium text-primary hover:underline"
+              onClick={(e) => {
+                e.stopPropagation();
+                telemetry?.heritageConfirmed(fieldName, confidence);
+                onConfirm?.();
+              }}
+            >
+              Confirm
+            </span>
+            <span
+              className="font-medium text-destructive hover:underline"
+              onClick={(e) => {
+                e.stopPropagation();
+                telemetry?.heritageRejected(fieldName, confidence);
+                onReject?.();
+              }}
+            >
+              Reject
+            </span>
+          </>
+        )}
       </button>
     );
   }
 
+  // Training: full explanation banner
+  // Also shown when low confidence (any mode) or when compact mode is expanded
   return (
     <div
       className={cn(

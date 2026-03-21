@@ -80,12 +80,14 @@ export function GuidancePopover({
   const [activeTab, setActiveTab] = useState<TabId>('what');
   const [isOpen, setIsOpen] = useState(false);
 
-  // Determine which tabs have content
+  // Determine which tabs have content and are allowed in current mode
+  // Expert: What + Why only (hide How and Do)
+  // Training/Live: all tabs that have content
   const hasHow = !!field.how;
   const hasDo = actions.length > 0;
   const visibleTabs = TABS.filter((t) => {
-    if (t.id === 'how' && !hasHow) return false;
-    if (t.id === 'do' && !hasDo) return false;
+    if (t.id === 'how' && (!hasHow || mode === 'expert')) return false;
+    if (t.id === 'do' && (!hasDo || mode === 'expert')) return false;
     return true;
   });
 
@@ -130,6 +132,7 @@ export function GuidancePopover({
                 <PopoverBody
                   field={field}
                   fieldName={fieldName}
+                  mode={mode}
                   activeTab={activeTab}
                   visibleTabs={visibleTabs}
                   authorities={authorities}
@@ -176,6 +179,7 @@ export function GuidancePopover({
               <PopoverBody
                 field={field}
                 fieldName={fieldName}
+                mode={mode}
                 activeTab={activeTab}
                 visibleTabs={visibleTabs}
                 authorities={authorities}
@@ -202,6 +206,7 @@ export function GuidancePopover({
 interface PopoverBodyProps {
   field: GuidanceFieldDefinition;
   fieldName: string;
+  mode: GuidanceModeName;
   activeTab: TabId;
   visibleTabs: TabDef[];
   authorities: AuthorityRef[];
@@ -214,6 +219,7 @@ interface PopoverBodyProps {
 function PopoverBody({
   field,
   fieldName,
+  mode,
   activeTab,
   visibleTabs,
   authorities,
@@ -252,11 +258,12 @@ function PopoverBody({
 
       {/* Tab content */}
       <div role="tabpanel" className="text-xs leading-relaxed">
-        {activeTab === 'what' && <WhatPanel field={field} />}
+        {activeTab === 'what' && <WhatPanel field={field} mode={mode} />}
         {activeTab === 'why' && (
           <WhyPanel
             field={field}
             fieldName={fieldName}
+            mode={mode}
             authorities={authorities}
             authorityRegistry={authorityRegistry}
             telemetry={telemetry}
@@ -279,17 +286,23 @@ function PopoverBody({
 // Tab Panels
 // ---------------------------------------------------------------------------
 
-function WhatPanel({ field }: { field: GuidanceFieldDefinition }) {
+function WhatPanel({ field, mode }: { field: GuidanceFieldDefinition; mode: GuidanceModeName }) {
+  // Training: examples + common_errors
+  // Live: examples only (common_errors hidden)
+  // Expert: neither examples nor common_errors
+  const showExamples = mode !== 'expert';
+  const showCommonErrors = mode === 'training';
+
   return (
     <div className="space-y-2">
       <p className="text-muted-foreground">{field.what}</p>
-      {field.examples && field.examples.length > 0 && (
+      {showExamples && field.examples && field.examples.length > 0 && (
         <div>
           <span className="font-semibold text-foreground">Examples: </span>
           <span className="text-muted-foreground">{field.examples.join(', ')}</span>
         </div>
       )}
-      {field.common_errors && field.common_errors.length > 0 && (
+      {showCommonErrors && field.common_errors && field.common_errors.length > 0 && (
         <div className="space-y-1">
           <span className="font-semibold text-foreground">Common errors:</span>
           <ul className="ml-4 list-disc text-muted-foreground">
@@ -306,23 +319,36 @@ function WhatPanel({ field }: { field: GuidanceFieldDefinition }) {
 function WhyPanel({
   field,
   fieldName,
+  mode,
   authorities,
   authorityRegistry,
   telemetry,
 }: {
   field: GuidanceFieldDefinition;
   fieldName: string;
+  mode: GuidanceModeName;
   authorities: AuthorityRef[];
   authorityRegistry: Map<string, AuthorityRegistryEntry>;
   telemetry?: TelemetryEmitter;
 }) {
+  // Training: citations expanded by default
+  // Live/Expert: citations collapsed (click to expand)
+  const defaultExpanded = mode === 'training';
+
+  // Filter out internal BoundState specs — only show real external standards
+  const externalAuthorities = authorities.filter((auth) => {
+    const entry = authorityRegistry.get(auth.authority_ref);
+    if (!entry) return true; // unknown → show (safe default)
+    return entry.source_type !== 'internal_controlled_copy' && entry.source_type !== 'derived_summary';
+  });
+
   return (
     <div className="space-y-2">
       <p className="text-foreground">{field.why}</p>
-      {authorities.length > 0 && (
+      {externalAuthorities.length > 0 && (
         <div className="space-y-1.5">
           <span className="font-semibold text-foreground">Governing standards:</span>
-          {authorities.map((auth) => {
+          {externalAuthorities.map((auth) => {
             const entry = authorityRegistry.get(auth.authority_ref);
             return (
               <AuthorityInline
@@ -331,6 +357,7 @@ function WhyPanel({
                 entry={entry}
                 fieldName={fieldName}
                 telemetry={telemetry}
+                defaultExpanded={defaultExpanded}
               />
             );
           })}
@@ -381,13 +408,15 @@ function AuthorityInline({
   entry,
   fieldName,
   telemetry,
+  defaultExpanded = false,
 }: {
   authRef: AuthorityRef;
   entry: AuthorityRegistryEntry | undefined;
   fieldName: string;
   telemetry?: TelemetryEmitter;
+  defaultExpanded?: boolean;
 }) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(defaultExpanded);
 
   function handleExpand() {
     setExpanded(!expanded);

@@ -85,7 +85,7 @@ export function GuidanceField({
   const lowConfidence = (heritageConfidence ?? 100) < 80;
 
   return (
-    <div className={cn('space-y-1.5', enhanced && 'ring-1 ring-primary/20 rounded-md p-2', className)}>
+    <div className={cn('space-y-1.5', enhanced && mode === 'training' && 'ring-1 ring-primary/20 rounded-md p-2', className)}>
       {/* Label row with guidance popover */}
       <div className="flex items-center gap-1.5">
         <Label htmlFor={htmlFor} className={cn(required && "after:ml-0.5 after:text-destructive after:content-['*']")}>
@@ -104,6 +104,11 @@ export function GuidanceField({
             (BS-SPEC-OCA-001) so per-field badges were pure visual noise.
             Authority info remains accessible via the GuidancePopover (? icon). */}
       </div>
+
+      {/* Inline field description — Training mode only (from field.what) */}
+      {mode === 'training' && field.what && (
+        <p className="text-[11px] leading-relaxed text-muted-foreground">{field.what}</p>
+      )}
 
       {/* Heritage banner */}
       {showHeritage && (
@@ -133,22 +138,27 @@ export function GuidanceField({
         />
       )}
 
-      {/* Warnings from schema (Section 3.3) */}
-      {guidance.warnings.length > 0 && mode !== 'expert' && (
+      {/* Warnings from schema (Section 3.3)
+          Training/Live: all warnings shown
+          Expert: only severity === 'caution' (info suppressed)
+          Policy warnings / compliance gates are NEVER suppressed (§6.1) */}
+      {guidance.warnings.length > 0 && (
         <div className="space-y-1">
-          {guidance.warnings.map((w) => (
-            <div
-              key={w.condition_ref}
-              className={cn(
-                'rounded-md px-2.5 py-1.5 text-[11px] leading-relaxed',
-                w.severity === 'caution'
-                  ? 'border border-yellow-200 bg-yellow-50 text-yellow-800 dark:border-yellow-800 dark:bg-yellow-950 dark:text-yellow-200'
-                  : 'border border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-200',
-              )}
-            >
-              {w.message}
-            </div>
-          ))}
+          {guidance.warnings
+            .filter((w) => mode !== 'expert' || w.severity === 'caution')
+            .map((w) => (
+              <div
+                key={w.condition_ref}
+                className={cn(
+                  'rounded-md px-2.5 py-1.5 text-[11px] leading-relaxed',
+                  w.severity === 'caution'
+                    ? 'border border-yellow-200 bg-yellow-50 text-yellow-800 dark:border-yellow-800 dark:bg-yellow-950 dark:text-yellow-200'
+                    : 'border border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-200',
+                )}
+              >
+                {w.message}
+              </div>
+            ))}
         </div>
       )}
     </div>
