@@ -236,12 +236,11 @@ def _run_pytest(pytest_python: Path, build_root: Path, targets: list[str]) -> di
         cmd,
         cwd=build_root,
         env=env,
-        text=True,
         capture_output=True,
         check=False,
     )
-    stdout = result.stdout.strip()
-    stderr = result.stderr.strip()
+    stdout = result.stdout.decode("utf-8", errors="replace").strip()
+    stderr = result.stderr.decode("utf-8", errors="replace").strip()
     if stdout:
         print(stdout)
     if stderr:
@@ -265,12 +264,11 @@ def _run_frontend_build(repo_root: Path, build_root: Path) -> dict[str, object]:
     result = subprocess.run(
         cmd,
         cwd=build_root / "frontend",
-        text=True,
         capture_output=True,
         check=False,
     )
-    stdout = result.stdout.strip()
-    stderr = result.stderr.strip()
+    stdout = result.stdout.decode("utf-8", errors="replace").strip()
+    stderr = result.stderr.decode("utf-8", errors="replace").strip()
     if stdout:
         print(stdout)
     if stderr:
