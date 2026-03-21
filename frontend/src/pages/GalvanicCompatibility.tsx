@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 
 import { PageHeader } from '@/components/PageHeader';
+import { ModuleChatButton } from '@/components/mira/ModuleChatButton';
 import { StatusBadge } from '@/components/StatusBadge';
 import {
   GuidanceContextIndicator,
@@ -48,6 +49,11 @@ import {
   galvanicGuidancePack,
 } from '@/lib/guidance/galvanic-pack';
 import type { GuidanceModeName } from '@/lib/guidance/types';
+import {
+  buildChatContextSummary,
+  createModuleChatLaunchState,
+  registerRouteModuleChatState,
+} from '@/lib/mira-chat-context';
 import { useAuth } from '@/auth/AuthContext';
 
 const APPLICATION_OPTIONS = [
@@ -433,6 +439,31 @@ export default function GalvanicCompatibility() {
   const targetMarkerPosition = deltaMarkerPosition(targetDeltaMv, targetScaleMax);
   const targetSeverity = classifyDelta(targetDeltaMv);
   const targetPlan = result ? buildMitigationPlan(result, targetDeltaMv) : null;
+  const galvanicChatLaunchState = createModuleChatLaunchState({
+    scopeKey: 'galvanic-compatibility',
+    moduleLabel: 'Galvanic Compatibility',
+    moduleContext: {
+      module: 'galvanic',
+      material: materialA.trim(),
+      material_a: materialA.trim(),
+      material_b: materialB.trim(),
+      environment,
+    },
+    originPath: '/galvanic-compatibility',
+    originTitle: 'Galvanic Compatibility',
+    description: 'Ground the chat in the current galvanic couple, environment, and joint setup.',
+    contextSummary: buildChatContextSummary([
+      { label: 'Material A', value: materialA.trim() },
+      { label: 'Material B', value: materialB.trim() },
+      { label: 'Environment', value: selectedEnvironment?.label ?? environment },
+      { label: 'Application', value: applicationType.replaceAll('_', ' ') },
+      { label: 'Joint', value: jointType.replaceAll('_', ' ') },
+    ]),
+  });
+
+  useEffect(() => {
+    registerRouteModuleChatState('/galvanic-compatibility', galvanicChatLaunchState);
+  }, [applicationType, environment, jointType, materialA, materialB, selectedEnvironment?.label]);
 
   return (
     <GuidanceProvider
@@ -447,6 +478,7 @@ export default function GalvanicCompatibility() {
         <PageHeader
           title="Galvanic Compatibility"
           description="Corrosion prevention screen for dissimilar material couples. The intrinsic EMF positions update as you type, and the right-side target box can be dragged toward green to see what protection scheme gets you there."
+          actions={<ModuleChatButton launchState={galvanicChatLaunchState} />}
         />
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
           <GuidanceContextIndicator context={guidanceContext} />

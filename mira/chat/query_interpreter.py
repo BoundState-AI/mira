@@ -64,6 +64,7 @@ class ParsedQuery:
 
     # Routing confidence (0.0–1.0)
     routing_confidence: float = 0.0
+    explicit_engine_target: Optional[str] = None
 
     # Clarification
     clarification_needed: bool = False
@@ -111,6 +112,47 @@ _FOLLOW_UP_PATTERNS = re.compile(
 _HISTORY_LOOKBACK_MESSAGES = 10
 _PAIRING_HINT_PATTERN = re.compile(
     r"\b(?:between|vs\.?|versus|against|paired\s+with|coupled\s+(?:to|with)|galvanic|dissimilar|anode|cathode)\b",
+    re.IGNORECASE,
+)
+_MODULE_ENGINE_ALIASES: Dict[str, str] = {
+    "oca": "oca",
+    "h2": "h2",
+    "galvanic": "galvanic",
+    "fracture": "fracture",
+    "gpcm": "gpcm",
+    "compliance": "gpcm",
+    "maptis": "maptis_search",
+    "maptis_search": "maptis_search",
+    "bsmh": "bsmh",
+}
+_EXPLICIT_ENGINE_PATTERNS: Dict[str, re.Pattern] = {
+    "oca": re.compile(
+        r"\b(?:oca|oxygen\s+compatibility|oxygen\s+service|GOX|LOX|O2)\b",
+        re.IGNORECASE,
+    ),
+    "h2": re.compile(
+        r"\b(?:h2|gh2|lh2|hydrogen\s+compatibility|hydrogen\s+service|hydrogen)\b",
+        re.IGNORECASE,
+    ),
+    "galvanic": re.compile(
+        r"\b(?:galvanic|dissimilar\s+metals?|anodic|cathodic|anode|cathode|corrosion\s+couple)\b",
+        re.IGNORECASE,
+    ),
+    "fracture": re.compile(
+        r"\b(?:fracture(?:\s+control)?|fracture-critical|crack(?:\s+growth)?|fatigue\s+crack|kic)\b",
+        re.IGNORECASE,
+    ),
+    "maptis_search": re.compile(
+        r"\b(?:maptis|outgassing|e595|test\s+evidence|test\s+data)\b",
+        re.IGNORECASE,
+    ),
+    "gpcm": re.compile(
+        r"\b(?:gpcm|nasa-std-6016|6016c|materials?\s+and\s+process(?:es)?\s+plan|mpr\b)\b",
+        re.IGNORECASE,
+    ),
+}
+_ENGINE_SWITCH_PATTERN = re.compile(
+    r"\b(?:instead|rather\s+than|switch(?:ing)?\s+to|move\s+to|cross\s+over\s+to)\b",
     re.IGNORECASE,
 )
 
@@ -516,6 +558,45 @@ def _determine_fine_routing(
     return "bsmh", 0.70
 
 
+def _normalize_module_engine(module_name: str) -> str:
+    """Map frontend module names to router engine IDs."""
+    return _MODULE_ENGINE_ALIASES.get(module_name.lower(), module_name.lower())
+
+
+def _detect_explicit_cross_domain_target(
+    text: str,
+    module_name: str,
+) -> Optional[str]:
+    """
+    Return a non-module engine explicitly requested by the user, if any.
+
+    Module chat should stay in-module by default, but clear cross-domain asks
+    like "what about hydrogen?" from OCA or "check galvanic risk" from
+    fracture should be allowed to escape the module lock.
+    """
+    current_engine = _normalize_module_engine(module_name)
+    matches = [
+        engine_id
+        for engine_id, pattern in _EXPLICIT_ENGINE_PATTERNS.items()
+        if pattern.search(text)
+    ]
+    if not matches:
+        return None
+
+    other_matches = [engine_id for engine_id in matches if engine_id != current_engine]
+    if not other_matches:
+        return None
+
+    # If the current module and another engine are both named explicitly,
+    # only escape the lock when the user clearly signals a switch.
+    if current_engine in matches and len(matches) > 1:
+        if len(other_matches) == 1 and _ENGINE_SWITCH_PATTERN.search(text):
+            return other_matches[0]
+        return None
+
+    return other_matches[0] if len(other_matches) == 1 else None
+
+
 # ---------------------------------------------------------------------------
 # Stage 3: Task Classification
 # ---------------------------------------------------------------------------
@@ -745,19 +826,27 @@ def interpret(
     pq.task_mode = _classify_task_mode(text)
 
     # ----- Fine routing -----
+    base_routing, base_confidence = _determine_fine_routing(
+        coarse_intent=pq.coarse_intent,
+        gas_service=pq.gas_service,
+        dissimilar_metals=pq.dissimilar_metals,
+        fracture_context=pq.fracture_context,
+        material=pq.material_designation,
+        standard_ref=pq.standard_ref,
+    )
     module_name = str(module_context.get("module")) if module_context else ""
     if module_name:
-        pq.fine_routing = module_name
-        pq.routing_confidence = 0.99
+        explicit_target = _detect_explicit_cross_domain_target(text, module_name)
+        pq.explicit_engine_target = explicit_target
+        if explicit_target:
+            pq.fine_routing = explicit_target
+            pq.routing_confidence = max(base_confidence, 0.96)
+        else:
+            pq.fine_routing = _normalize_module_engine(module_name)
+            pq.routing_confidence = 0.99
     else:
-        pq.fine_routing, pq.routing_confidence = _determine_fine_routing(
-            coarse_intent=pq.coarse_intent,
-            gas_service=pq.gas_service,
-            dissimilar_metals=pq.dissimilar_metals,
-            fracture_context=pq.fracture_context,
-            material=pq.material_designation,
-            standard_ref=pq.standard_ref,
-        )
+        pq.fine_routing = base_routing
+        pq.routing_confidence = base_confidence
 
     # ----- Confidence threshold check -----
     threshold = ROUTING_CONFIDENCE_THRESHOLDS.get(

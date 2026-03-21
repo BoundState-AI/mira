@@ -111,3 +111,47 @@ def test_chat_routes_galvanic_pair_questions_to_galvanic(api_client):
     assert payload["entities"]["environment"] == "seawater_proxy"
     assert "7075" in payload["response"]
     assert "304" in payload["response"]
+
+
+def test_chat_module_context_keeps_follow_up_in_module(api_client):
+    response = api_client.post(
+        "/api/chat/",
+        json={
+            "message": "What about this material at 1500 psi?",
+            "module_context": {
+                "module": "oca",
+                "material": "316L",
+                "environment": "GOX",
+                "pressure_psi": 3000,
+            },
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+
+    assert payload["engine_used"] == "oca"
+    assert payload["entities"]["material_designation"] == "316L"
+    assert payload["entities"]["pressure_value"] == 1500.0
+
+
+def test_chat_module_context_allows_explicit_cross_domain_override(api_client):
+    response = api_client.post(
+        "/api/chat/",
+        json={
+            "message": "What about hydrogen compatibility for this material at 1500 psi?",
+            "module_context": {
+                "module": "oca",
+                "material": "316L",
+                "environment": "GOX",
+                "pressure_psi": 3000,
+            },
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+
+    assert payload["engine_used"] == "h2"
+    assert payload["entities"]["material_designation"] == "316L"
+    assert payload["entities"]["gas_service"] == "hydrogen"

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/PageHeader';
+import { ModuleChatButton } from '@/components/mira/ModuleChatButton';
 import { StatusBadge } from '@/components/StatusBadge';
 import { EvidenceTable } from '@/components/EvidenceTable';
 import {
@@ -36,6 +37,11 @@ import {
 import helpContent from '@/config/helpContent';
 import { authorityRegistry, createH2Context, h2GuidancePack } from '@/lib/guidance/h2-pack';
 import type { GuidanceModeName } from '@/lib/guidance/types';
+import {
+  buildChatContextSummary,
+  createModuleChatLaunchState,
+  registerRouteModuleChatState,
+} from '@/lib/mira-chat-context';
 
 type GasType = 'O2' | 'H2';
 type H2DecisionBand = 'prohibited' | 'judgement' | 'mixed' | 'none';
@@ -119,6 +125,33 @@ export default function GasCompatibility() {
     pressure_regime:
       Number(pressure) >= 265 ? 'high' : Number(pressure) >= 50 ? 'medium' : 'low',
   });
+  const gasChatLaunchState = createModuleChatLaunchState({
+    scopeKey: gasType === 'O2' ? 'gas-compatibility-o2' : 'gas-compatibility-h2',
+    moduleLabel: gasType === 'O2' ? 'Oxygen Compatibility' : 'Hydrogen Compatibility',
+    moduleContext: {
+      module: gasType === 'O2' ? 'oca' : 'h2',
+      material: materialKey.trim(),
+      environment: gasType === 'O2' ? phase.toUpperCase() : 'HYDROGEN',
+      pressure_psi: pressure.trim() ? Number(pressure) : undefined,
+    },
+    originPath: '/gas-compatibility',
+    originTitle: 'Gas Compatibility',
+    description:
+      gasType === 'O2'
+        ? 'Ground the chat in the current oxygen-service inputs from this page.'
+        : 'Ground the chat in the current hydrogen-service inputs from this page.',
+    contextSummary: buildChatContextSummary([
+      { label: 'Mode', value: gasType === 'O2' ? 'Oxygen' : 'Hydrogen' },
+      { label: 'Material', value: materialKey.trim() },
+      { label: 'Service', value: gasType === 'O2' ? phase.toUpperCase() : 'Hydrogen' },
+      { label: 'Pressure', value: pressure.trim() ? `${pressure.trim()} psi` : null },
+      { label: 'Condition', value: gasType === 'H2' ? h2Condition.trim() : null },
+    ]),
+  });
+
+  useEffect(() => {
+    registerRouteModuleChatState('/gas-compatibility', gasChatLaunchState);
+  }, [gasType, h2Condition, materialKey, phase, pressure]);
 
   // Load families on mount
   useEffect(() => {
@@ -423,6 +456,7 @@ export default function GasCompatibility() {
           title="Gas Compatibility"
           description="Check material compatibility for oxygen or hydrogen service"
           helpContent={helpContent.gasCompatibility}
+          actions={<ModuleChatButton launchState={gasChatLaunchState} />}
         />
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
           <GuidanceContextIndicator context={guidanceContext} />

@@ -25,6 +25,7 @@ import {
   GuidanceModeSelector,
   GuidanceProvider,
 } from '@/components/guidance';
+import { ModuleChatButton } from '@/components/mira/ModuleChatButton';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -55,6 +56,11 @@ import {
 } from '@/lib/oca-system-api';
 import { authorityRegistry, createOcaContext, ocaGuidancePack } from '@/lib/guidance/oca-pack';
 import type { GuidanceModeName } from '@/lib/guidance/types';
+import {
+  buildChatContextSummary,
+  createModuleChatLaunchState,
+  registerRouteModuleChatState,
+} from '@/lib/mira-chat-context';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -226,6 +232,39 @@ export default function OCASystemBuilder() {
     () => (editorComponentId ? componentMap.current.get(editorComponentId) ?? null : null),
     [editorComponentId, assessment],
   );
+  const selectedMaterialName = selectedComponent?.materials[0]?.material.material_name ?? '';
+  const systemBuilderChatLaunchState = createModuleChatLaunchState({
+    scopeKey: 'oca-system-builder',
+    moduleLabel: 'OCA System Builder',
+    moduleContext: {
+      module: 'oca',
+      material: selectedMaterialName,
+      environment: inputs.phase.toUpperCase(),
+      pressure_psi: inputs.system_pressure_max_psia,
+    },
+    originPath: '/oca/system-builder',
+    originTitle: 'OCA System Builder',
+    description: 'Ground the chat in the current OCA system-builder inputs and selected component.',
+    contextSummary: buildChatContextSummary([
+      { label: 'System', value: inputs.hardware_name || inputs.project_name || systemId },
+      { label: 'Selected', value: selectedComponent?.label ?? null },
+      { label: 'Material', value: selectedMaterialName },
+      { label: 'Phase', value: inputs.phase.toUpperCase() },
+      { label: 'Max Pressure', value: `${inputs.system_pressure_max_psia} psia` },
+    ]),
+  });
+
+  useEffect(() => {
+    registerRouteModuleChatState('/oca/system-builder', systemBuilderChatLaunchState);
+  }, [
+    inputs.hardware_name,
+    inputs.phase,
+    inputs.project_name,
+    inputs.system_pressure_max_psia,
+    selectedComponent?.label,
+    selectedMaterialName,
+    systemId,
+  ]);
 
   const handleOpenEditor = useCallback((componentId: string) => {
     setSelectedNodeComponentId(componentId);
@@ -789,6 +828,7 @@ export default function OCASystemBuilder() {
               </p>
             </div>
             <div className="flex items-center gap-2">
+              <ModuleChatButton launchState={systemBuilderChatLaunchState} />
               {assessment && (
                 <div className="flex items-center gap-2">
                   <Badge className={DISPOSITION_LABELS[assessment.system_disposition]?.color || 'bg-gray-600 text-white'}>

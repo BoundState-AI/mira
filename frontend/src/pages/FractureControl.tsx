@@ -2,6 +2,7 @@ import { useDeferredValue, useEffect, useState, type FormEvent } from 'react';
 import { AlertTriangle, CheckCircle2, Loader2, ShieldAlert, ShieldCheck, ShieldX } from 'lucide-react';
 
 import { PageHeader } from '@/components/PageHeader';
+import { ModuleChatButton } from '@/components/mira/ModuleChatButton';
 import { StatusBadge } from '@/components/StatusBadge';
 import {
   GuidanceContextIndicator,
@@ -37,6 +38,11 @@ import {
   fractureGuidancePack,
 } from '@/lib/guidance/fracture-pack';
 import type { GuidanceModeName } from '@/lib/guidance/types';
+import {
+  buildChatContextSummary,
+  createModuleChatLaunchState,
+  registerRouteModuleChatState,
+} from '@/lib/mira-chat-context';
 
 const MISSION_OPTIONS = [
   { value: 'HUMAN_RATED', label: 'Human-Rated' },
@@ -308,6 +314,30 @@ export default function FractureControl() {
     { checked: approvedSourceDataAttached, setChecked: setApprovedSourceDataAttached, label: 'Approved source data attached', fieldId: 'approved_source_data_attached' },
     { checked: muaPresent, setChecked: setMuaPresent, label: 'MUA already present' },
   ];
+  const fractureChatLaunchState = createModuleChatLaunchState({
+    scopeKey: 'fracture-control',
+    moduleLabel: 'Fracture Control',
+    moduleContext: {
+      module: 'fracture',
+      material: materialName.trim(),
+      part_name: partName.trim(),
+      mission_class: missionClass,
+    },
+    originPath: '/fracture-control',
+    originTitle: 'Fracture Control',
+    description: 'Ground the chat in the current part, mission class, and fracture-screen inputs.',
+    contextSummary: buildChatContextSummary([
+      { label: 'Part', value: partName.trim() },
+      { label: 'Material', value: materialName.trim() },
+      { label: 'Mission', value: missionClass.replaceAll('_', ' ') },
+      { label: 'Lifecycle', value: lifecyclePhase.replaceAll('_', ' ') },
+      { label: 'Hardware', value: specificHardwareType.replaceAll('_', ' ') },
+    ]),
+  });
+
+  useEffect(() => {
+    registerRouteModuleChatState('/fracture-control', fractureChatLaunchState);
+  }, [lifecyclePhase, materialName, missionClass, partName, specificHardwareType]);
 
   return (
     <GuidanceProvider
@@ -322,6 +352,7 @@ export default function FractureControl() {
         <PageHeader
           title="Fracture Control"
           description="Deterministic NASA-STD-5019A classifier for fracture-control routing. Define the part context, review applicable FCRs, and surface Phase 1 material findings with citations."
+          actions={<ModuleChatButton launchState={fractureChatLaunchState} />}
         />
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
           <GuidanceContextIndicator context={guidanceContext} />

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bot, Loader2, RotateCcw, SendHorizonal, User2 } from "lucide-react";
+import { ArrowLeft, Bot, Compass, Loader2, RotateCcw, SendHorizonal, User2 } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,12 +8,24 @@ import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { fetchMiraChatPing, sendMiraChatMessage, type MiraChatMessage } from "@/lib/chat-api";
+import {
+  conversationStorageKey,
+  isMiraModuleChatLaunchState,
+  loadStoredConversation,
+  loadPersistedModuleChatLaunchState,
+  MIRA_CHAT_GLOBAL_SCOPE_KEY,
+  MIRA_CHAT_LEGACY_STORAGE_KEY,
+  persistModuleChatLaunchState,
+  saveStoredConversation,
+  type MiraChatStoredConversation,
+  type MiraChatStoredMessage,
+  type MiraModuleChatLaunchState,
+} from "@/lib/mira-chat-context";
 import { cn } from "@/lib/utils";
 
-const STORAGE_KEY = "mira-chat-session-v1";
 const MAX_HISTORY_MESSAGES = 10;
 const MAX_STORED_MESSAGES = 24;
-const EXAMPLE_PROMPTS = [
+const GLOBAL_EXAMPLE_PROMPTS = [
   "Is 316L compatible with GOX at 3000 psi?",
   "What galvanic risk do I have between 7075-T73 and CRES 304 in seawater proxy?",
   "Can you compare hydrogen compatibility for Inconel 718 and A286?",
@@ -21,57 +34,13 @@ const EXAMPLE_PROMPTS = [
 
 type Verdict = "PASS" | "CONDITIONAL_PASS" | "FAIL" | "REFUSE" | "INSUFFICIENT_DATA" | "ERROR" | null;
 
-interface ChatUiMessage {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  engineUsed?: string | null;
-  verdict?: Verdict;
-  auditId?: string | null;
-  followUps?: string[];
-  entities: Record<string, unknown>;
-}
-
-interface StoredConversation {
-  sessionId: string | null;
-  messages: ChatUiMessage[];
-}
+type ChatUiMessage = MiraChatStoredMessage & { verdict?: Verdict };
 
 function verdictVariant(verdict: Verdict): "default" | "secondary" | "destructive" | "outline" {
   if (verdict === "PASS") return "default";
   if (verdict === "FAIL" || verdict === "ERROR" || verdict === "REFUSE") return "destructive";
   if (verdict === "CONDITIONAL_PASS") return "secondary";
   return "outline";
-}
-
-function loadConversation(): StoredConversation {
-  if (typeof window === "undefined") {
-    return { sessionId: null, messages: [] };
-  }
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      return { sessionId: null, messages: [] };
-    }
-    const parsed = JSON.parse(raw) as StoredConversation;
-    return {
-      sessionId: parsed.sessionId ?? null,
-      messages: Array.isArray(parsed.messages) ? parsed.messages : [],
-    };
-  } catch {
-    return { sessionId: null, messages: [] };
-  }
-}
-
-function saveConversation(conversation: StoredConversation): void {
-  if (typeof window === "undefined") {
-    return;
-  }
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(conversation));
-  } catch {
-    // Ignore storage failures; the chat still works without persistence.
-  }
 }
 
 function toHistoryMessages(messages: ChatUiMessage[]): MiraChatMessage[] {
@@ -151,19 +120,69 @@ function renderMessageContent(text: string) {
 }
 
 export default function MiraChat() {
-  const initialConversation = useMemo(() => loadConversation(), []);
-  const [sessionId, setSessionId] = useState<string | null>(initialConversation.sessionId);
-  const [messages, setMessages] = useState<ChatUiMessage[]>(initialConversation.messages);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const scopeKeyFromQuery = useMemo(() => {
+    const value = new URLSearchParams(location.search).get("scope");
+    return value?.trim() ?? "";
+  }, [location.search]);
+  const activeModuleLaunchState = useMemo<MiraModuleChatLaunchState | null>(() => {
+    if (isMiraModuleChatLaunchState(location.state)) {
+      return location.state;
+    }
+    if (scopeKeyFromQuery) {
+      return loadPersistedModuleChatLaunchState(scopeKeyFromQuery);
+    }
+    return null;
+  }, [location.state, scopeKeyFromQuery]);
+  const isModuleChat = Boolean(activeModuleLaunchState);
+  const scopeKey = activeModuleLaunchState?.scopeKey ?? MIRA_CHAT_GLOBAL_SCOPE_KEY;
+  const storageKey = useMemo(() => conversationStorageKey(scopeKey), [scopeKey]);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<ChatUiMessage[]>([]);
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
   const [adapters, setAdapters] = useState<string[]>([]);
   const [pingError, setPingError] = useState<string | null>(null);
+  const [conversationLoaded, setConversationLoaded] = useState(false);
   const conversationEndRef = useRef<HTMLDivElement | null>(null);
+  const starterPrompts = activeModuleLaunchState?.starterPrompts.length
+    ? activeModuleLaunchState.starterPrompts
+    : GLOBAL_EXAMPLE_PROMPTS;
+  const scopeLabel = activeModuleLaunchState?.moduleLabel ?? "Global Chat";
+  const scopeDescription = activeModuleLaunchState?.description
+    ?? "Ask one question, route into OCA, H2, galvanic, fracture, MAPTIS, BSMH, or compliance logic, and keep the conversation grounded with browser-held history.";
 
   useEffect(() => {
-    saveConversation({ sessionId, messages });
-  }, [messages, sessionId]);
+    if (activeModuleLaunchState) {
+      persistModuleChatLaunchState(activeModuleLaunchState);
+    }
+  }, [activeModuleLaunchState]);
+
+  useEffect(() => {
+    setConversationLoaded(false);
+    const storedConversation = loadStoredConversation(
+      storageKey,
+      scopeKey === MIRA_CHAT_GLOBAL_SCOPE_KEY ? [MIRA_CHAT_LEGACY_STORAGE_KEY] : [],
+    );
+    setSessionId(storedConversation.sessionId);
+    setMessages(storedConversation.messages);
+    setDraft("");
+    setError(null);
+    setConversationLoaded(true);
+  }, [scopeKey, storageKey]);
+
+  useEffect(() => {
+    if (!conversationLoaded) {
+      return;
+    }
+    saveStoredConversation(
+      storageKey,
+      { sessionId, messages } as MiraChatStoredConversation,
+      scopeKey === MIRA_CHAT_GLOBAL_SCOPE_KEY,
+    );
+  }, [conversationLoaded, messages, scopeKey, sessionId, storageKey]);
 
   useEffect(() => {
     let cancelled = false;
@@ -196,7 +215,11 @@ export default function MiraChat() {
     setMessages([]);
     setDraft("");
     setError(null);
-    saveConversation({ sessionId: null, messages: [] });
+    saveStoredConversation(
+      storageKey,
+      { sessionId: null, messages: [] },
+      scopeKey === MIRA_CHAT_GLOBAL_SCOPE_KEY,
+    );
   };
 
   const submitMessage = async (rawMessage: string) => {
@@ -224,6 +247,7 @@ export default function MiraChat() {
         message,
         session_id: sessionId ?? undefined,
         history: toHistoryMessages(messages),
+        module_context: activeModuleLaunchState?.moduleContext,
       });
 
       const turnEntities = response.entities ?? {};
@@ -262,19 +286,24 @@ export default function MiraChat() {
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-3">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs uppercase tracking-[0.18em] text-slate-200">
-                <Bot className="h-3.5 w-3.5" />
-                Unified MIRA Chat
+                {isModuleChat ? <Compass className="h-3.5 w-3.5" /> : <Bot className="h-3.5 w-3.5" />}
+                {isModuleChat ? "Module Chat" : "Unified MIRA Chat"}
               </div>
               <div className="space-y-2">
-                <h1 className="text-3xl font-semibold tracking-tight">Multi-domain engineering chat</h1>
+                <h1 className="text-3xl font-semibold tracking-tight">
+                  {isModuleChat ? `${scopeLabel} grounded chat` : "Multi-domain engineering chat"}
+                </h1>
                 <p className="max-w-2xl text-sm text-slate-200/85">
-                  Ask one question, route into OCA, H2, galvanic, fracture, MAPTIS, BSMH, or
-                  compliance logic, and keep the conversation grounded with browser-held history.
+                  {scopeDescription}
                 </p>
               </div>
             </div>
 
-            <div className="grid gap-3 text-sm text-slate-100 sm:grid-cols-2">
+            <div className="grid gap-3 text-sm text-slate-100 sm:grid-cols-3">
+              <div className="rounded-xl border border-white/10 bg-white/8 px-4 py-3">
+                <div className="text-xs uppercase tracking-[0.18em] text-slate-300">Scope</div>
+                <div className="mt-1 font-medium">{scopeLabel}</div>
+              </div>
               <div className="rounded-xl border border-white/10 bg-white/8 px-4 py-3">
                 <div className="text-xs uppercase tracking-[0.18em] text-slate-300">Session</div>
                 <div className="mt-1 font-medium">{sessionId ?? "new conversation"}</div>
@@ -287,6 +316,19 @@ export default function MiraChat() {
               </div>
             </div>
           </div>
+          {isModuleChat && activeModuleLaunchState?.contextSummary.length ? (
+            <div className="mt-5 flex flex-wrap gap-2">
+              {activeModuleLaunchState.contextSummary.map((item) => (
+                <div
+                  key={`${item.label}-${item.value}`}
+                  className="rounded-full border border-white/12 bg-white/10 px-3 py-1.5 text-xs text-slate-100/90"
+                >
+                  <span className="mr-2 uppercase tracking-[0.14em] text-slate-300">{item.label}</span>
+                  <span className="font-medium">{item.value}</span>
+                </div>
+              ))}
+            </div>
+          ) : null}
         </div>
       </Card>
 
@@ -296,14 +338,38 @@ export default function MiraChat() {
             <div>
               <h2 className="text-lg font-semibold">Conversation</h2>
               <p className="text-sm text-muted-foreground">
-                The client sends the last 10 messages back to the API so follow-ups survive a server
-                recycle.
+                {isModuleChat
+                  ? "This conversation keeps module context attached on every turn. Ask explicitly if you want to switch engines."
+                  : "The client sends the last 10 messages back to the API so follow-ups survive a server recycle."}
               </p>
             </div>
-            <Button type="button" variant="outline" size="sm" onClick={clearConversation}>
-              <RotateCcw className="mr-2 h-4 w-4" />
-              New chat
-            </Button>
+            <div className="flex items-center gap-2">
+              {isModuleChat && activeModuleLaunchState ? (
+                <>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate(activeModuleLaunchState.originPath)}
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to {activeModuleLaunchState.originTitle}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate("/chat")}
+                  >
+                    Open global chat
+                  </Button>
+                </>
+              ) : null}
+              <Button type="button" variant="outline" size="sm" onClick={clearConversation}>
+                <RotateCcw className="mr-2 h-4 w-4" />
+                New chat
+              </Button>
+            </div>
           </div>
 
           <ScrollArea className="h-[62vh] 2xl:h-[68vh]">
@@ -315,11 +381,13 @@ export default function MiraChat() {
                   <div className="space-y-1">
                     <h3 className="font-medium">Starting points</h3>
                     <p className="text-sm text-muted-foreground">
-                      Pick a grounded engineering question or write your own.
+                      {isModuleChat
+                        ? "These prompts stay inside the current module unless you explicitly ask to switch."
+                        : "Pick a grounded engineering question or write your own."}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {EXAMPLE_PROMPTS.map((prompt) => (
+                    {starterPrompts.map((prompt) => (
                       <Button
                         key={prompt}
                         type="button"
@@ -429,7 +497,9 @@ export default function MiraChat() {
 
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="text-sm text-muted-foreground">
-                  Chat history stays in this browser and the API receives the last 10 messages each turn.
+                  {isModuleChat
+                    ? "Chat history stays in this browser, the API receives the last 10 messages, and the current module context is sent each turn."
+                    : "Chat history stays in this browser and the API receives the last 10 messages each turn."}
                 </div>
                 <Button type="button" onClick={() => void submitMessage(draft)} disabled={isSending || !draft.trim()}>
                   {isSending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <SendHorizonal className="mr-2 h-4 w-4" />}
@@ -449,18 +519,35 @@ export default function MiraChat() {
         <div className="space-y-4">
           <Card className="border-border/70 p-5">
             <div className="space-y-3">
-              <h2 className="text-base font-semibold">Module coverage</h2>
+              <h2 className="text-base font-semibold">{isModuleChat ? "Active grounding" : "Module coverage"}</h2>
               <p className="text-sm text-muted-foreground">
-                The current runtime exposes a single conversational entrypoint and routes into the
-                domain engines listed below.
+                {isModuleChat
+                  ? "This chat stays grounded in the originating page context until you explicitly ask to cross into another engine."
+                  : "The current runtime exposes a single conversational entrypoint and routes into the domain engines listed below."}
               </p>
-              <div className="flex flex-wrap gap-2">
-                {(adapters.length ? adapters : ["oca", "h2", "galvanic", "fracture", "maptis_search", "bsmh", "gpcm"]).map((adapter) => (
-                  <Badge key={adapter} variant="secondary" className="px-2.5 py-1">
-                    {adapter}
-                  </Badge>
-                ))}
-              </div>
+              {isModuleChat && activeModuleLaunchState?.contextSummary.length ? (
+                <div className="space-y-2">
+                  {activeModuleLaunchState.contextSummary.map((item) => (
+                    <div
+                      key={`context-${item.label}-${item.value}`}
+                      className="rounded-xl border border-border/70 bg-muted/30 px-3 py-2"
+                    >
+                      <div className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+                        {item.label}
+                      </div>
+                      <div className="mt-1 text-sm font-medium text-foreground">{item.value}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {(adapters.length ? adapters : ["oca", "h2", "galvanic", "fracture", "maptis_search", "bsmh", "gpcm"]).map((adapter) => (
+                    <Badge key={adapter} variant="secondary" className="px-2.5 py-1">
+                      {adapter}
+                    </Badge>
+                  ))}
+                </div>
+              )}
               {pingError && (
                 <div className="rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2 text-sm text-destructive">
                   {pingError}
@@ -473,7 +560,7 @@ export default function MiraChat() {
             <div className="space-y-3">
               <h2 className="text-base font-semibold">Suggested prompts</h2>
               <div className="space-y-2">
-                {EXAMPLE_PROMPTS.map((prompt) => (
+                {starterPrompts.map((prompt) => (
                   <button
                     key={prompt}
                     type="button"
@@ -493,8 +580,9 @@ export default function MiraChat() {
             <div className="space-y-2">
               <h2 className="text-base font-semibold">Context notes</h2>
               <p className="text-sm text-muted-foreground">
-                For module-specific follow-ups, this page relies on echoed entities and recent history.
-                That keeps the current single-replica AWS deployment usable even without a dedicated chat DB.
+                {isModuleChat
+                  ? "Module chat relies on explicit page context plus echoed entities from prior turns. That keeps follow-ups stable even if the chat worker recycles."
+                  : "Global chat relies on echoed entities and recent history. That keeps the current single-replica AWS deployment usable even without a dedicated chat DB."}
               </p>
             </div>
           </Card>

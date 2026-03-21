@@ -172,7 +172,8 @@ def resolve_module_context(
     _resolve_module_specific(module_name, module_context, parsed)
 
     # --- Routing override ---
-    if module_name:
+    explicit_target = getattr(parsed, "explicit_engine_target", None)
+    if module_name and not explicit_target:
         routing_target = _MODULE_TO_ROUTING.get(module_name)
         if routing_target:
             parsed.fine_routing = routing_target
@@ -181,6 +182,11 @@ def resolve_module_context(
                 "[MODULE_CONTEXT] Routing overridden to %s (conf=0.99) from module=%s",
                 routing_target, module_name,
             )
+    elif explicit_target:
+        logger.debug(
+            "[MODULE_CONTEXT] Preserving explicit cross-domain target=%s over module=%s",
+            explicit_target, module_name,
+        )
 
     # --- Case ID propagation ---
     case_id = module_context.get("case_id")

@@ -21,6 +21,7 @@ import {
 } from '@/components/guidance';
 import { MaterialCombobox } from '@/components/oca/MaterialCombobox';
 import { PageHeader } from '@/components/PageHeader';
+import { ModuleChatButton } from '@/components/mira/ModuleChatButton';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -36,6 +37,11 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { authorityRegistry, createOcaContext, ocaGuidancePack } from '@/lib/guidance/oca-pack';
 import type { GuidanceModeName } from '@/lib/guidance/types';
+import {
+  buildChatContextSummary,
+  createModuleChatLaunchState,
+  registerRouteModuleChatState,
+} from '@/lib/mira-chat-context';
 import {
   ocaAssessMechanisms,
   ocaCreateCase,
@@ -414,6 +420,32 @@ export default function OCAWorkbench() {
     { name: 'workbench.temp_max_c', label: 'Max temperature', required: true, valid: Number.isFinite(Number(tempMax)) && tempMax.trim() !== '', hasWarnings: false },
     { name: 'workbench.o2_fraction', label: 'O2 fraction', required: true, valid: Number.isFinite(Number(o2Fraction)) && o2Fraction.trim() !== '', hasWarnings: false },
   ];
+  const ocaChatLaunchState = createModuleChatLaunchState({
+    scopeKey: 'oca-workbench',
+    moduleLabel: 'OCA Workbench',
+    moduleContext: {
+      module: 'oca',
+      case_id: createdCase?.case_id,
+      material: materialName.trim(),
+      environment: oxidizerType.toUpperCase(),
+      pressure_psi: pressureMax.trim() ? Number(pressureMax) : undefined,
+      temperature: tempMax.trim() ? Number(tempMax) : undefined,
+    },
+    originPath: '/oca/workbench',
+    originTitle: 'OCA Workbench',
+    description: 'Ground the chat in the active oxygen compatibility workbench inputs and case.',
+    contextSummary: buildChatContextSummary([
+      { label: 'Case', value: createdCase?.case_id },
+      { label: 'Material', value: materialName.trim() },
+      { label: 'Oxidizer', value: oxidizerType.toUpperCase() },
+      { label: 'Max Pressure', value: pressureMax.trim() ? `${pressureMax.trim()} psia` : null },
+      { label: 'Component', value: componentClass },
+    ]),
+  });
+
+  useEffect(() => {
+    registerRouteModuleChatState('/oca/workbench', ocaChatLaunchState);
+  }, [componentClass, createdCase?.case_id, materialName, oxidizerType, pressureMax, tempMax]);
 
   return (
     <GuidanceProvider
@@ -429,6 +461,7 @@ export default function OCAWorkbench() {
           <PageHeader
             title="OCA Workbench"
             description="Deterministic oxygen compatibility screening and case routing per BS-SPEC-OCA-001-REV1."
+            actions={<ModuleChatButton launchState={ocaChatLaunchState} />}
           />
           <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
             <GuidanceContextIndicator context={guidanceContext} />

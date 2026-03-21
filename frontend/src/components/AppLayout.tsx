@@ -1,5 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
+import { MiraChatDock } from '@/components/mira/MiraChatDock';
 import { useLocation } from 'react-router-dom';
 
 interface AppLayoutProps {
@@ -31,6 +32,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               {children}
             </div>
           </div>
+          <MiraChatDock />
         </main>
       </div>
     </SidebarProvider>
