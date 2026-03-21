@@ -509,16 +509,46 @@ async function dragPaletteItemToCanvas(page: Page, testId: string, offsetX: numb
 }
 
 async function connectComponents(page: Page, sourceTestId: string, targetTestId: string) {
-  const source = await page.getByTestId(sourceTestId).boundingBox();
-  const target = await page.getByTestId(targetTestId).boundingBox();
-  if (!source || !target) {
-    throw new Error('Component port bounds unavailable');
-  }
+  await page.evaluate(({ sourceId, targetId }) => {
+    const source = document.querySelector(`[data-testid="${sourceId}"]`);
+    const target = document.querySelector(`[data-testid="${targetId}"]`);
+    if (!(source instanceof Element) || !(target instanceof Element)) {
+      throw new Error('Component port handles unavailable');
+    }
 
-  await page.mouse.move(source.x + source.width / 2, source.y + source.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(target.x + target.width / 2, target.y + target.height / 2, { steps: 16 });
-  await page.mouse.up();
+    const sourceBox = source.getBoundingClientRect();
+    const targetBox = target.getBoundingClientRect();
+    const sourceX = sourceBox.left + sourceBox.width / 2;
+    const sourceY = sourceBox.top + sourceBox.height / 2;
+    const targetX = targetBox.left + targetBox.width / 2;
+    const targetY = targetBox.top + targetBox.height / 2;
+    const steps = 16;
+
+    const mouseEvent = (type: string, x: number, y: number, buttons: number) => new MouseEvent(type, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      button: 0,
+      buttons,
+      clientX: x,
+      clientY: y,
+      screenX: x,
+      screenY: y,
+      view: window,
+    });
+
+    source.dispatchEvent(mouseEvent('mousedown', sourceX, sourceY, 1));
+    for (let step = 1; step <= steps; step += 1) {
+      const progress = step / steps;
+      const x = sourceX + (targetX - sourceX) * progress;
+      const y = sourceY + (targetY - sourceY) * progress;
+      document.dispatchEvent(mouseEvent('mousemove', x, y, 1));
+    }
+    target.dispatchEvent(mouseEvent('mouseup', targetX, targetY, 0));
+  }, {
+    sourceId: sourceTestId,
+    targetId: targetTestId,
+  });
 }
 
 test('oca system builder supports draft restore, assessment, path inspection, and export', async ({ page }) => {
@@ -579,8 +609,8 @@ test('oca system builder supports draft restore, assessment, path inspection, an
   await page.getByTestId(`component-node-${state.components[0].component_id}`).click();
   await expect(page.getByText('Component Details')).toBeVisible();
 
-  await page.getByLabel('Label').fill('Main Isolation Valve');
-  await page.getByLabel('Materials').fill('body: 316L\nseat: PTFE');
+  await page.locator('#component-label').fill('Main Isolation Valve');
+  await page.locator('#component-materials').fill('body: 316L\nseat: PTFE');
   await page.getByRole('button', { name: 'Save Changes' }).click();
   await expect(page.getByText('Main Isolation Valve').first()).toBeVisible();
   await page.keyboard.press('Escape');
@@ -655,7 +685,7 @@ test('oca system builder supports raw palette add, connect, tabs, and reassessme
 
   await page.getByTestId(`component-node-${valve.component_id}`).click();
   await expect(page.getByText('Component Details')).toBeVisible();
-  await page.getByLabel('Label').fill('Edited Valve');
+  await page.locator('#component-label').fill('Edited Valve');
   await page.getByRole('button', { name: 'Save Changes' }).click();
   await expect(page.getByText('Edited Valve').first()).toBeVisible();
   await page.keyboard.press('Escape');
