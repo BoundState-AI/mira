@@ -20,7 +20,7 @@ import logging
 from datetime import datetime
 from typing import Any, Optional
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 from pydantic import BaseModel
 
 from mira.api.auth import authorize_owner_or_admin, get_request_user
@@ -32,6 +32,7 @@ from mira.oca.system_models import (
     ComponentConfig,
     CreateSystemRequest,
     CreateSystemResponse,
+    InferredFact,
     MaterialSlotValue,
     OCASystemAssembly,
     SystemAssessmentResponse,
@@ -40,6 +41,7 @@ from mira.oca.system_models import (
     SystemExportResponse,
     SystemKindlingChainResponse,
     TopologyResponse,
+    VisionMockupResponse,
 )
 
 LOGGER = logging.getLogger(__name__)
@@ -121,6 +123,51 @@ async def update_inputs(system_id: str, inputs: dict[str, Any], http_request: Re
         "timestamp": datetime.utcnow().isoformat(),
     })
     return {"status": "updated"}
+
+
+@router.post("/{system_id}/vision/mockup", response_model=VisionMockupResponse)
+async def build_vision_mockup(
+    system_id: str,
+    http_request: Request,
+    image: UploadFile = File(...),
+    flow_direction_hint: str = Form("unknown"),
+    notes: str = Form(""),
+) -> VisionMockupResponse:
+    """Generate a provisional canvas mockup from an uploaded system image."""
+    try:
+        system = _require_system(system_id, http_request)
+        payload = await image.read()
+
+        from mira.oca.system_vision import OCASystemVisionService
+
+        service = OCASystemVisionService()
+        result = service.build_mockup(
+            system_id=system_id,
+            image_bytes=payload,
+            media_type=image.content_type or "",
+            filename=image.filename or "upload.png",
+            flow_direction_hint=flow_direction_hint,
+            notes=notes,
+            current_inputs=system.inputs,
+        )
+
+        system.audit_log.append({
+            "action": "vision_mockup_preview",
+            "filename": image.filename or "upload.png",
+            "components": len(result.components),
+            "connections": len(result.connections),
+            "questions": len(result.questions),
+            "timestamp": datetime.utcnow().isoformat(),
+        })
+        system.updated_at = datetime.utcnow()
+        return result
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except HTTPException:
+        raise
+    except Exception as exc:
+        LOGGER.error(f"[OCA Systems] Vision mockup error: {exc}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to generate vision mockup") from exc
 
 
 @router.post("/{system_id}/components", response_model=AddComponentResponse)
@@ -205,10 +252,15 @@ async def update_component(
             item if isinstance(item, MaterialSlotValue) else MaterialSlotValue(**item)
             for item in updates["materials"]
         ]
+    if "inferred_facts" in updates:
+        comp.inferred_facts = [
+            item if isinstance(item, InferredFact) else InferredFact(**item)
+            for item in updates["inferred_facts"]
+        ]
 
     # Apply scalar updates after nested-model coercion.
     for key, value in updates.items():
-        if key in {"component_id", "archetype", "config", "materials"}:
+        if key in {"component_id", "archetype", "config", "materials", "inferred_facts"}:
             continue
         if hasattr(comp, key):
             setattr(comp, key, value)

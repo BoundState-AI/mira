@@ -465,4 +465,50 @@ class SystemExportResponse(BaseModel):
     audit_trail: list[dict[str, Any]] = Field(default_factory=list)
 
 
+class VisionImportQuestionSeverity(str, Enum):
+    BLOCKING = "blocking"
+    REVIEW = "review"
+
+
+class VisionMockupQuestion(BaseModel):
+    question_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    severity: VisionImportQuestionSeverity = VisionImportQuestionSeverity.REVIEW
+    prompt: str
+    target_temp_id: Optional[str] = None
+    field_path: Optional[str] = None
+
+
+class VisionMockupComponent(BaseModel):
+    temp_id: str
+    archetype: ComponentArchetype
+    label: str = ""
+    position_x: float = 0.0
+    position_y: float = 0.0
+    materials: list[MaterialSlotValue] = Field(default_factory=list)
+    config: ComponentConfig = Field(default_factory=ComponentConfig)
+    is_provisional: bool = True
+    human_confirmed: bool = False
+    inferred_facts: list[InferredFact] = Field(default_factory=list)
+    confidence: InferenceConfidence = InferenceConfidence.MEDIUM
+
+
+class VisionMockupConnection(BaseModel):
+    source_temp_id: str
+    source_port: str = "output"
+    target_temp_id: str
+    target_port: str = "input"
+    label: Optional[str] = None
+    confidence: InferenceConfidence = InferenceConfidence.MEDIUM
+
+
+class VisionMockupResponse(BaseModel):
+    system_id: str
+    model_used: str
+    suggested_inputs_patch: dict[str, Any] = Field(default_factory=dict)
+    components: list[VisionMockupComponent] = Field(default_factory=list)
+    connections: list[VisionMockupConnection] = Field(default_factory=list)
+    questions: list[VisionMockupQuestion] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+
+
 __safety_critical__ = True

@@ -229,3 +229,59 @@ def test_system_builder_lazy_assessment_paths(client: TestClient) -> None:
     export = client.post(f"/api/oca/systems/{system_id}/export")
     assert export.status_code == 200
     assert export.json()["system_id"] == system_id
+
+
+def test_system_builder_vision_mockup_preview_endpoint(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
+    system_id = _create_system(client)
+
+    class FakeVisionService:
+        def build_mockup(self, **kwargs):
+            assert kwargs["system_id"] == system_id
+            assert kwargs["media_type"] == "image/png"
+            return {
+                "system_id": system_id,
+                "model_used": "claude-sonnet-4-5-20250929",
+                "suggested_inputs_patch": {"hardware_name": "Imported Test System"},
+                "components": [
+                    {
+                        "temp_id": "cmp_vision_1",
+                        "archetype": "filter",
+                        "label": "Imported Filter",
+                        "position_x": 120.0,
+                        "position_y": 120.0,
+                        "materials": [{"slot_name": "housing_material", "material": {"material_name": "316L"}}],
+                        "config": {"micron_rating": 10},
+                        "is_provisional": True,
+                        "human_confirmed": False,
+                        "inferred_facts": [],
+                        "confidence": "medium",
+                    }
+                ],
+                "connections": [],
+                "questions": [
+                    {
+                        "question_id": "vision-q-1",
+                        "severity": "blocking",
+                        "prompt": "Confirm wetted materials for Imported Filter.",
+                        "target_temp_id": "cmp_vision_1",
+                        "field_path": "materials",
+                    }
+                ],
+                "warnings": ["Preview only"],
+            }
+
+    import mira.oca.system_vision as system_vision
+
+    monkeypatch.setattr(system_vision, "OCASystemVisionService", FakeVisionService)
+
+    response = client.post(
+        f"/api/oca/systems/{system_id}/vision/mockup",
+        files={"image": ("system.png", b"fake-image-bytes", "image/png")},
+        data={"flow_direction_hint": "left_to_right", "notes": "import this"},
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["system_id"] == system_id
+    assert payload["components"][0]["label"] == "Imported Filter"
+    assert payload["questions"][0]["severity"] == "blocking"
+    assert payload["warnings"] == ["Preview only"]

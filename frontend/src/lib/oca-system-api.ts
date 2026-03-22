@@ -117,6 +117,8 @@ export interface SystemComponent {
   highest_rating: number;
   credible_mechanisms: string[];
   connected: boolean;
+  is_provisional?: boolean;
+  human_confirmed?: boolean;
   is_rigid_metallic_tubing?: boolean;
   is_metallic_flex_hose?: boolean;
   is_all_metal_seal?: boolean;
@@ -183,10 +185,54 @@ export interface ComponentUpdateRequest {
   label?: string;
   materials?: MaterialSlotValue[];
   config?: Partial<ComponentConfig>;
+  inferred_facts?: InferredFact[];
+  is_provisional?: boolean;
+  human_confirmed?: boolean;
   is_rigid_metallic_tubing?: boolean;
   is_metallic_flex_hose?: boolean;
   is_all_metal_seal?: boolean;
   is_metallic_pressure_vessel?: boolean;
+}
+
+export interface VisionMockupQuestion {
+  question_id: string;
+  severity: 'blocking' | 'review';
+  prompt: string;
+  target_temp_id?: string | null;
+  field_path?: string | null;
+}
+
+export interface VisionMockupComponent {
+  temp_id: string;
+  archetype: ComponentArchetype;
+  label: string;
+  position_x: number;
+  position_y: number;
+  materials: MaterialSlotValue[];
+  config: ComponentConfig;
+  is_provisional: boolean;
+  human_confirmed: boolean;
+  inferred_facts: InferredFact[];
+  confidence: InferenceConfidence;
+}
+
+export interface VisionMockupConnection {
+  source_temp_id: string;
+  source_port: string;
+  target_temp_id: string;
+  target_port: string;
+  label?: string | null;
+  confidence: InferenceConfidence;
+}
+
+export interface VisionMockupResult {
+  system_id: string;
+  model_used: string;
+  suggested_inputs_patch: Partial<SystemInputs>;
+  components: VisionMockupComponent[];
+  connections: VisionMockupConnection[];
+  questions: VisionMockupQuestion[];
+  warnings: string[];
 }
 
 // Component library archetype definition
@@ -308,6 +354,25 @@ export async function ocaExportSystem(systemId: string): Promise<Record<string, 
 
 export async function ocaGetComponentLibrary(systemId: string): Promise<{ archetypes: ArchetypeDefinition[] }> {
   return fetchJSON(`${API_BASE}/oca/systems/${systemId}/library`);
+}
+
+export async function ocaVisionMockup(
+  systemId: string,
+  payload: {
+    image: File;
+    flowDirectionHint?: string;
+    notes?: string;
+  },
+): Promise<VisionMockupResult> {
+  const formData = new FormData();
+  formData.append('image', payload.image);
+  formData.append('flow_direction_hint', payload.flowDirectionHint ?? 'unknown');
+  formData.append('notes', payload.notes ?? '');
+
+  return fetchJSON(`${API_BASE}/oca/systems/${systemId}/vision/mockup`, {
+    method: 'POST',
+    body: formData,
+  });
 }
 
 // Mechanism abbreviation display map

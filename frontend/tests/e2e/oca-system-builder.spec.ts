@@ -28,6 +28,8 @@ type MockComponent = {
   highest_rating: number;
   credible_mechanisms: string[];
   connected: boolean;
+  is_provisional?: boolean;
+  human_confirmed?: boolean;
   is_rigid_metallic_tubing?: boolean;
   is_metallic_flex_hose?: boolean;
   is_all_metal_seal?: boolean;
@@ -159,6 +161,89 @@ async function installSystemBuilderMock(page: Page, options: BuilderMockOptions 
       return;
     }
 
+    if (path === `/oca/systems/${state.systemId}/vision/mockup` && request.method() === 'POST') {
+      await fulfillJson(route, {
+        system_id: state.systemId,
+        model_used: 'claude-sonnet-4-5-20250929',
+        suggested_inputs_patch: {
+          hardware_name: 'Imported Test System',
+        },
+        components: [
+          {
+            temp_id: 'cmp_vision_1',
+            archetype: 'filter',
+            label: 'Imported Filter',
+            position_x: 120,
+            position_y: 120,
+            materials: [
+              { slot_name: 'housing_material', material: { material_name: '316L' } },
+            ],
+            config: { micron_rating: 10 },
+            is_provisional: true,
+            human_confirmed: false,
+            inferred_facts: [
+              {
+                fact_id: 'vision-fact-1',
+                fact_name: 'vision_import',
+                value: true,
+                source: 'imported',
+                confidence: 'medium',
+                rule_id: 'VISION-001',
+                missing_assumptions: [],
+                explanation: 'Imported from uploaded image.',
+              },
+            ],
+            confidence: 'medium',
+          },
+          {
+            temp_id: 'cmp_vision_2',
+            archetype: 'valve',
+            label: 'Imported Valve',
+            position_x: 400,
+            position_y: 120,
+            materials: [],
+            config: { valve_type: 'ball' },
+            is_provisional: true,
+            human_confirmed: false,
+            inferred_facts: [
+              {
+                fact_id: 'vision-fact-2',
+                fact_name: 'vision_import',
+                value: true,
+                source: 'imported',
+                confidence: 'medium',
+                rule_id: 'VISION-001',
+                missing_assumptions: [],
+                explanation: 'Imported from uploaded image.',
+              },
+            ],
+            confidence: 'medium',
+          },
+        ],
+        connections: [
+          {
+            source_temp_id: 'cmp_vision_1',
+            source_port: 'output',
+            target_temp_id: 'cmp_vision_2',
+            target_port: 'input',
+            label: null,
+            confidence: 'medium',
+          },
+        ],
+        questions: [
+          {
+            question_id: 'vision-q-1',
+            severity: 'blocking',
+            prompt: 'Confirm wetted materials for Imported Valve.',
+            target_temp_id: 'cmp_vision_2',
+            field_path: 'materials',
+          },
+        ],
+        warnings: ['Topology inferred from uploaded image. Review before assessment.'],
+      });
+      return;
+    }
+
     if (path === `/oca/systems/${state.systemId}/components` && request.method() === 'POST') {
       if (options.failOn?.addComponent) {
         await fulfillError(route, 500, options.failOn.addComponent);
@@ -230,6 +315,9 @@ async function installSystemBuilderMock(page: Page, options: BuilderMockOptions 
       component.label = updates.label ?? component.label;
       component.materials = updates.materials ?? component.materials;
       component.config = { ...component.config, ...(updates.config ?? {}) };
+      component.inferred_facts = updates.inferred_facts ?? component.inferred_facts;
+      component.is_provisional = updates.is_provisional ?? component.is_provisional;
+      component.human_confirmed = updates.human_confirmed ?? component.human_confirmed;
       component.is_rigid_metallic_tubing = updates.is_rigid_metallic_tubing ?? component.is_rigid_metallic_tubing;
       component.is_metallic_flex_hose = updates.is_metallic_flex_hose ?? component.is_metallic_flex_hose;
       component.is_all_metal_seal = updates.is_all_metal_seal ?? component.is_all_metal_seal;
@@ -690,6 +778,36 @@ test('oca system builder supports raw palette add, connect, tabs, and reassessme
   await expect(page.getByText('Edited Valve').first()).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.getByText('Needs reassessment')).toBeVisible();
+});
+
+test('oca system builder previews and applies a vision mockup import', async ({ page }) => {
+  const state = await installSystemBuilderMock(page);
+
+  await page.goto('/oca/system-builder');
+  await expect(page.getByRole('heading', { name: 'OCA System Builder' })).toBeVisible();
+
+  await page.getByTestId('oca-system-import-image').click();
+  await page.setInputFiles('[data-testid="oca-system-import-image-input"]', {
+    name: 'system.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9sX5nWkAAAAASUVORK5CYII=',
+      'base64',
+    ),
+  });
+  await page.getByTestId('oca-system-import-generate').click();
+
+  await expect(page.getByText('Imported Components')).toBeVisible();
+  await expect(page.getByText('Imported Filter', { exact: true })).toBeVisible();
+  await expect(page.getByText('Imported Valve', { exact: true })).toBeVisible();
+  await expect(page.getByText('Confirm wetted materials for Imported Valve.')).toBeVisible();
+
+  await page.getByTestId('oca-system-import-apply-replace').click();
+  await expect.poll(() => state.components.length).toBe(2);
+  await expect.poll(() => state.connections.length).toBe(1);
+  await expect(page.getByText('Imported Filter').first()).toBeVisible();
+  await expect(page.getByText('Imported Valve').first()).toBeVisible();
+  await expect(page.getByText(/Applied AI mockup with 2 components\./)).toBeVisible();
 });
 
 test('oca system builder restores component property editing from the node sheet', async ({ page }) => {

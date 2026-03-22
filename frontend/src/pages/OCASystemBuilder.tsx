@@ -30,9 +30,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  Loader2, AlertTriangle, XCircle, Flame, Download, Zap, Info,
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Loader2, AlertTriangle, XCircle, Flame, Download, Zap, Info, Upload,
   ChevronRight, LayoutGrid, Clock3,
 } from 'lucide-react';
 
@@ -46,12 +51,12 @@ import {
   ocaCreateSystem, ocaAddComponent, ocaAddConnection,
   ocaUpdateInputs, ocaUpdateComponent,
   ocaRemoveComponent, ocaRemoveConnection,
-  ocaAssessSystem, ocaGetPathInspector, ocaExportSystem,
+  ocaAssessSystem, ocaGetPathInspector, ocaExportSystem, ocaVisionMockup,
   type ComponentConfig,
   type ComponentUpdateRequest,
   type MaterialSlotValue,
   type SystemInputs, type SystemComponent, type SystemAssessmentResult,
-  type PathInspectorResult, type ComponentArchetype,
+  type PathInspectorResult, type ComponentArchetype, type VisionMockupResult,
   ZONE_COLORS, ZONE_LABELS,
 } from '@/lib/oca-system-api';
 import { authorityRegistry, createOcaContext, ocaGuidancePack } from '@/lib/guidance/oca-pack';
@@ -110,6 +115,8 @@ interface BuilderDraft {
     target_component_id: string;
   }>;
 }
+
+type VisionApplyMode = 'append' | 'replace';
 
 function readDraft(): BuilderDraft | null {
   if (typeof window === 'undefined') return null;
@@ -200,6 +207,14 @@ export default function OCASystemBuilder() {
   const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
   const [restoreNotice, setRestoreNotice] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
+  const [visionDialogOpen, setVisionDialogOpen] = useState(false);
+  const [visionFile, setVisionFile] = useState<File | null>(null);
+  const [visionPreviewUrl, setVisionPreviewUrl] = useState<string | null>(null);
+  const [visionNotes, setVisionNotes] = useState('');
+  const [visionFlowDirectionHint, setVisionFlowDirectionHint] = useState('unknown');
+  const [visionLoading, setVisionLoading] = useState(false);
+  const [visionApplying, setVisionApplying] = useState(false);
+  const [visionResult, setVisionResult] = useState<VisionMockupResult | null>(null);
 
   // React Flow
   const [nodes, setNodes] = useNodesState([]);
@@ -316,6 +331,16 @@ export default function OCASystemBuilder() {
       };
     });
   }, [handleInspect, handleOpenEditor, setNodes]);
+
+  const resetVisionDialogState = useCallback(() => {
+    setVisionFile(null);
+    setVisionPreviewUrl(null);
+    setVisionNotes('');
+    setVisionFlowDirectionHint('unknown');
+    setVisionLoading(false);
+    setVisionApplying(false);
+    setVisionResult(null);
+  }, []);
 
   const handleNodesChange: OnNodesChange = useCallback((changes) => {
     setNodes((currentNodes) => applyNodeChanges(changes, currentNodes));
@@ -534,6 +559,17 @@ export default function OCASystemBuilder() {
   }, [restoreNotice]);
 
   useEffect(() => {
+    if (!visionFile || typeof window === 'undefined' || !visionFile.type.startsWith('image/')) {
+      setVisionPreviewUrl(null);
+      return undefined;
+    }
+
+    const nextUrl = window.URL.createObjectURL(visionFile);
+    setVisionPreviewUrl(nextUrl);
+    return () => window.URL.revokeObjectURL(nextUrl);
+  }, [visionFile]);
+
+  useEffect(() => {
     if (!rfInstance) return undefined;
 
     if (nodes.length === 0) {
@@ -719,6 +755,157 @@ export default function OCASystemBuilder() {
     syncComponentLocal(componentId, nextComponent);
     setIsDirty(true);
   }, [syncComponentLocal, systemId]);
+
+  const clearCanvas = useCallback(async () => {
+    if (!systemId) return;
+
+    const componentIds = Array.from(componentMap.current.keys());
+    for (const componentId of componentIds) {
+      await ocaRemoveComponent(systemId, componentId);
+    }
+
+    componentMap.current.clear();
+    nodeToComponentId.current.clear();
+    edgeToConnectionId.current.clear();
+    hasAutoFitRef.current = false;
+    setNodes([]);
+    setEdges([]);
+    setAssessment(null);
+    setPathResult(null);
+    setEditorComponentId(null);
+    setSelectedNodeComponentId(null);
+  }, [setEdges, setNodes, systemId]);
+
+  const handleGenerateVisionMockup = useCallback(async () => {
+    if (!systemId || !visionFile) return;
+
+    setVisionLoading(true);
+    setVisionResult(null);
+    setError(null);
+    try {
+      const result = await ocaVisionMockup(systemId, {
+        image: visionFile,
+        flowDirectionHint: visionFlowDirectionHint,
+        notes: visionNotes,
+      });
+      setVisionResult(result);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Vision mockup failed');
+    } finally {
+      setVisionLoading(false);
+    }
+  }, [systemId, visionFile, visionFlowDirectionHint, visionNotes]);
+
+  const applyVisionMockup = useCallback(async (mode: VisionApplyMode) => {
+    if (!systemId || !visionResult) return;
+
+    setVisionApplying(true);
+    setError(null);
+    try {
+      if (mode === 'replace') {
+        await clearCanvas();
+      }
+
+      const nextInputs: SystemInputs = {
+        ...inputs,
+        ...visionResult.suggested_inputs_patch,
+      };
+      setInputs(nextInputs);
+      await ocaUpdateInputs(systemId, nextInputs);
+
+      const componentIdMap = new Map<string, string>();
+      const nextNodes: Node[] = [];
+      const nextEdges: Edge[] = [];
+
+      for (const component of visionResult.components) {
+        const addResult = await ocaAddComponent(
+          systemId,
+          component.archetype,
+          component.label,
+          component.position_x,
+          component.position_y,
+          component.materials,
+          component.config,
+        );
+
+        let serverComp: SystemComponent = {
+          component_id: addResult.component_id,
+          archetype: component.archetype,
+          label: component.label,
+          position_x: component.position_x,
+          position_y: component.position_y,
+          materials: component.materials,
+          config: component.config,
+          features: addResult.features,
+          inferred_facts: component.inferred_facts,
+          zones: addResult.zones,
+          mechanism_assessments: [],
+          overall_status: 'pending',
+          highest_rating: 0,
+          credible_mechanisms: [],
+          connected: false,
+          is_provisional: component.is_provisional,
+          human_confirmed: component.human_confirmed,
+        };
+
+        if (component.inferred_facts.length > 0 || component.is_provisional || !component.human_confirmed) {
+          const updateResult = await ocaUpdateComponent(systemId, addResult.component_id, {
+            inferred_facts: component.inferred_facts,
+            is_provisional: component.is_provisional,
+            human_confirmed: component.human_confirmed,
+          });
+          serverComp = updateResult.component ?? serverComp;
+        }
+
+        componentIdMap.set(component.temp_id, addResult.component_id);
+        componentMap.current.set(addResult.component_id, serverComp);
+        nodeToComponentId.current.set(`node-${addResult.component_id}`, addResult.component_id);
+        nextNodes.push(buildNode(serverComp));
+      }
+
+      for (const connection of visionResult.connections) {
+        const sourceComponentId = componentIdMap.get(connection.source_temp_id);
+        const targetComponentId = componentIdMap.get(connection.target_temp_id);
+        if (!sourceComponentId || !targetComponentId) continue;
+
+        const addResult = await ocaAddConnection(systemId, sourceComponentId, targetComponentId);
+        const edgeId = `edge-${addResult.connection_id}`;
+        edgeToConnectionId.current.set(edgeId, addResult.connection_id);
+        nextEdges.push({
+          id: edgeId,
+          source: `node-${sourceComponentId}`,
+          target: `node-${targetComponentId}`,
+          animated: true,
+          style: { stroke: '#3b82f6', strokeWidth: 2 },
+        });
+      }
+
+      hasAutoFitRef.current = false;
+      setNodes((currentNodes) => (mode === 'append' ? [...currentNodes, ...nextNodes] : nextNodes));
+      setEdges((currentEdges) => (mode === 'append' ? [...currentEdges, ...nextEdges] : nextEdges));
+      setAssessment(null);
+      setPathResult(null);
+      setIsDirty(true);
+      setRestoreNotice(
+        `Applied AI mockup with ${visionResult.components.length} component${visionResult.components.length === 1 ? '' : 's'}.`,
+      );
+      setVisionDialogOpen(false);
+      resetVisionDialogState();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to apply vision mockup');
+    } finally {
+      setVisionApplying(false);
+    }
+  }, [
+    buildNode,
+    clearCanvas,
+    inputs,
+    resetVisionDialogState,
+    setEdges,
+    setNodes,
+    systemId,
+    visionResult,
+  ]);
 
   // ---------------------------------------------------------------------------
   // Run Assessment
@@ -919,6 +1106,17 @@ export default function OCASystemBuilder() {
         <Button
           size="sm"
           variant="outline"
+          onClick={() => setVisionDialogOpen(true)}
+          disabled={!systemId}
+          className="gap-1.5"
+          data-testid="oca-system-import-image"
+        >
+          <Upload className="h-3 w-3" />
+          Import Image
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
           onClick={() => selectedNodeComponentId && handleOpenEditor(selectedNodeComponentId)}
           disabled={!selectedNodeComponentId}
           className="gap-1.5"
@@ -1037,6 +1235,238 @@ export default function OCASystemBuilder() {
           </div>
         )}
         </div>
+
+        <Dialog
+          open={visionDialogOpen}
+          onOpenChange={(open) => {
+            setVisionDialogOpen(open);
+            if (!open) {
+              resetVisionDialogState();
+            }
+          }}
+        >
+          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Import System Image</DialogTitle>
+              <DialogDescription>
+                Generate a provisional OCA builder mockup from a clean schematic, P&amp;ID, or annotated system image.
+                Review the draft before applying it to the canvas.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="grid gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Source Image</div>
+                  <Input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/gif"
+                    data-testid="oca-system-import-image-input"
+                    onChange={(event) => {
+                      const file = event.target.files?.[0] ?? null;
+                      setVisionFile(file);
+                      setVisionResult(null);
+                    }}
+                  />
+                  <div className="text-[11px] text-muted-foreground">
+                    Best results come from clean diagrams and screenshots rather than raw hardware photos.
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Flow Direction</div>
+                  <select
+                    value={visionFlowDirectionHint}
+                    onChange={(event) => setVisionFlowDirectionHint(event.target.value)}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  >
+                    <option value="unknown">Unknown</option>
+                    <option value="left_to_right">Left to right</option>
+                    <option value="right_to_left">Right to left</option>
+                    <option value="top_to_bottom">Top to bottom</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Notes</div>
+                  <Textarea
+                    value={visionNotes}
+                    onChange={(event) => setVisionNotes(event.target.value)}
+                    placeholder="Optional context for the model, such as known flow direction, omitted components, or naming conventions."
+                    rows={5}
+                  />
+                </div>
+
+                {visionPreviewUrl ? (
+                  <div className="space-y-2">
+                    <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Preview</div>
+                    <img
+                      src={visionPreviewUrl}
+                      alt={visionFile?.name || 'Uploaded system image'}
+                      className="max-h-72 w-full rounded-md border object-contain bg-slate-50"
+                    />
+                  </div>
+                ) : visionFile ? (
+                  <div className="rounded-md border bg-slate-50 p-3 text-xs text-slate-600">
+                    Selected file: <span className="font-medium">{visionFile.name}</span>
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="space-y-4">
+                {!visionResult ? (
+                  <div className="flex min-h-[300px] items-center justify-center rounded-lg border border-dashed bg-slate-50 p-6 text-center text-sm text-muted-foreground">
+                    Upload an image and generate a provisional graph to preview the imported components, connections, and follow-up questions.
+                  </div>
+                ) : (
+                  <>
+                    <div className="grid gap-3 sm:grid-cols-4">
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardDescription>Model</CardDescription>
+                          <CardTitle className="text-sm">{visionResult.model_used}</CardTitle>
+                        </CardHeader>
+                      </Card>
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardDescription>Components</CardDescription>
+                          <CardTitle className="text-sm">{visionResult.components.length}</CardTitle>
+                        </CardHeader>
+                      </Card>
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardDescription>Connections</CardDescription>
+                          <CardTitle className="text-sm">{visionResult.connections.length}</CardTitle>
+                        </CardHeader>
+                      </Card>
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardDescription>Questions</CardDescription>
+                          <CardTitle className="text-sm">{visionResult.questions.length}</CardTitle>
+                        </CardHeader>
+                      </Card>
+                    </div>
+
+                    {visionResult.warnings.length > 0 && (
+                      <Alert>
+                        <Info className="h-4 w-4" />
+                        <AlertDescription className="space-y-1 text-xs">
+                          {visionResult.warnings.map((warning, index) => (
+                            <div key={`${warning}-${index}`}>{warning}</div>
+                          ))}
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
+                    {Object.keys(visionResult.suggested_inputs_patch).length > 0 && (
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm">Suggested Input Updates</CardTitle>
+                          <CardDescription>These values will be merged into the current system inputs when you apply the mockup.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-1 text-xs">
+                          {Object.entries(visionResult.suggested_inputs_patch).map(([key, value]) => (
+                            <div key={key} className="flex items-start justify-between gap-4 border-b border-border/50 pb-1">
+                              <span className="font-medium">{key}</span>
+                              <span className="text-right text-muted-foreground">{value === null ? 'null' : String(value)}</span>
+                            </div>
+                          ))}
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm">Imported Components</CardTitle>
+                        <CardDescription>All imported nodes start as provisional until reviewed.</CardDescription>
+                      </CardHeader>
+                      <CardContent className="max-h-64 space-y-2 overflow-y-auto">
+                        {visionResult.components.map((component) => (
+                          <div key={component.temp_id} className="rounded-md border p-3">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="font-medium">{component.label}</span>
+                              <Badge variant="outline">{component.archetype}</Badge>
+                              <Badge variant="outline">{component.confidence}</Badge>
+                              {component.is_provisional && <Badge className="bg-amber-100 text-amber-950 hover:bg-amber-100">Provisional</Badge>}
+                            </div>
+                            <div className="mt-2 text-xs text-muted-foreground">
+                              {component.materials.length === 0
+                                ? 'No materials identified.'
+                                : component.materials.map((item) => `${item.slot_name}: ${item.material.material_name}`).join(' | ')}
+                            </div>
+                          </div>
+                        ))}
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm">Follow-Up Questions</CardTitle>
+                        <CardDescription>Resolve blocking items before trusting the imported assessment.</CardDescription>
+                      </CardHeader>
+                      <CardContent className="max-h-52 space-y-2 overflow-y-auto">
+                        {visionResult.questions.length === 0 ? (
+                          <div className="text-xs text-muted-foreground">No explicit follow-up questions were returned.</div>
+                        ) : (
+                          visionResult.questions.map((question) => (
+                            <div key={question.question_id} className="rounded-md border p-3 text-xs">
+                              <div className="flex items-center gap-2">
+                                <Badge variant={question.severity === 'blocking' ? 'destructive' : 'outline'}>
+                                  {question.severity}
+                                </Badge>
+                                {question.target_temp_id && (
+                                  <Badge variant="outline">{question.target_temp_id}</Badge>
+                                )}
+                                {question.field_path && (
+                                  <Badge variant="outline">{question.field_path}</Badge>
+                                )}
+                              </div>
+                              <div className="mt-2">{question.prompt}</div>
+                            </div>
+                          ))
+                        )}
+                      </CardContent>
+                    </Card>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <DialogFooter>
+              {visionResult ? (
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={() => applyVisionMockup('append')}
+                    disabled={visionApplying}
+                    data-testid="oca-system-import-apply-append"
+                  >
+                    {visionApplying ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    Append To Canvas
+                  </Button>
+                  <Button
+                    variant="default"
+                    onClick={() => applyVisionMockup('replace')}
+                    disabled={visionApplying}
+                    data-testid="oca-system-import-apply-replace"
+                  >
+                    {visionApplying ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    Replace Canvas
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  onClick={handleGenerateVisionMockup}
+                  disabled={!visionFile || visionLoading || visionApplying}
+                  data-testid="oca-system-import-generate"
+                >
+                  {visionLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                  Generate Mockup
+                </Button>
+              )}
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <ComponentEditorSheet
           component={selectedComponent}
