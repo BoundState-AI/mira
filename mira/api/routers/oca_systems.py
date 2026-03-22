@@ -141,7 +141,7 @@ async def build_vision_mockup(
         from mira.oca.system_vision import OCASystemVisionService
 
         service = OCASystemVisionService()
-        result = service.build_mockup(
+        result = VisionMockupResponse.model_validate(service.build_mockup(
             system_id=system_id,
             image_bytes=payload,
             media_type=image.content_type or "",
@@ -149,7 +149,7 @@ async def build_vision_mockup(
             flow_direction_hint=flow_direction_hint,
             notes=notes,
             current_inputs=system.inputs,
-        )
+        ))
 
         system.audit_log.append({
             "action": "vision_mockup_preview",
