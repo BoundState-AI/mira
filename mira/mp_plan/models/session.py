@@ -80,6 +80,9 @@ class PlanGeneratorSession(BaseModel):
     updated_at: datetime = Field(default_factory=datetime.now)
     """When session was last updated."""
 
+    owner_username: Optional[str] = None
+    """Authenticated username that owns this session."""
+
     source: str = "interactive_session"
     """Source of session creation."""
 

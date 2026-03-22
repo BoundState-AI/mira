@@ -290,7 +290,10 @@ class ForgeCompiler:
 
     def _create_engine(self, url) -> Engine:
         connect_args = {"check_same_thread": False} if url.get_backend_name() == "sqlite" else {}
-        return create_engine(url, future=True, connect_args=connect_args)
+        kwargs = {"future": True, "connect_args": connect_args}
+        if url.get_backend_name() != "sqlite":
+            kwargs.update({"pool_pre_ping": True, "pool_size": 5, "max_overflow": 10})
+        return create_engine(url, **kwargs)
 
     def _introspect_database(
         self,

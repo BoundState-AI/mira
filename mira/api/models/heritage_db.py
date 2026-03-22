@@ -31,10 +31,9 @@ import logging
 import os
 from typing import Any, Dict, List, Optional
 
-import psycopg2
 from psycopg2.extras import RealDictCursor
 
-from mira.core.db_config import get_db_connection_params
+from mira.core.db_config import open_db_connection
 
 logger = logging.getLogger(__name__)
 
@@ -64,12 +63,12 @@ def _get_connection():
         raise RuntimeError("heritage DB disabled via MIRA_DISABLE_HERITAGE_DB")
 
     try:
-        from mira.core.db_config import get_db_connection_params
-        return psycopg2.connect(**get_db_connection_params())
+        return open_db_connection()
     except Exception:
         logger.warning(
             "[HERITAGE_DB] Could not load db_config; falling back to defaults"
         )
+        import psycopg2
         return psycopg2.connect(
             host="localhost",
             port=5432,

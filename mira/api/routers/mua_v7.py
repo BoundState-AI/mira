@@ -26,9 +26,10 @@ from datetime import datetime
 from functools import lru_cache
 from typing import Optional
 
-from fastapi import APIRouter, File, HTTPException, Query, UploadFile
+from fastapi import APIRouter, File, HTTPException, Query, Request, UploadFile
 from pydantic import BaseModel, Field
 
+from mira.api.auth import authorize_owner_or_admin, get_request_user
 from mira.mua.v7.models import (
     CategoryRoutingResult,
     Center,
@@ -300,6 +301,27 @@ def _get_db_params_cached() -> dict:
     return get_db_connection_params(options="-c search_path=maptis,public")
 
 
+def _open_maptis_connection():
+    from mira.core.db_config import open_db_connection
+
+    return open_db_connection(options="-c search_path=maptis,public")
+
+
+def _require_owned_session(session_id: str, http_request: Request):
+    session = session_manager.get_session(session_id)
+    if session is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Session '{session_id}' not found.",
+        )
+    authorize_owner_or_admin(
+        http_request,
+        getattr(session, "created_by", None),
+        resource_label="mua v7 session",
+    )
+    return session
+
+
 @lru_cache(maxsize=512)
 def _lookup_fs_media_context(material_code: str) -> dict:
     """Best-effort FS media context lookup for a MAPTIS material code.
@@ -336,8 +358,7 @@ def _lookup_fs_media_context(material_code: str) -> dict:
             examples.append(t[:220])
 
     try:
-        cfg = _get_db_params_cached()
-        with psycopg2.connect(**cfg) as conn:
+        with _open_maptis_connection() as conn:
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
                 # Optional user-provided FS media mapping table.
                 # If present, this is the highest-fidelity context.
@@ -973,9 +994,7 @@ async def material_intel_endpoint(request: MaterialIntelRequest) -> MaterialInte
             from psycopg2.extras import RealDictCursor
             from mira.core.db_config import get_db_connection_params
 
-            with psycopg2.connect(
-                **get_db_connection_params(options="-c search_path=maptis,public")
-            ) as conn:
+            with _open_maptis_connection() as conn:
                 with conn.cursor(cursor_factory=RealDictCursor) as cursor:
                     cursor.execute(
                         """
@@ -1277,6 +1296,7 @@ async def import_miul_endpoint(
 )
 async def investigate_endpoint(
     request: InvestigateRequest,
+    http_request: Request,
 ) -> InvestigateKickoffResponse:
     """Start the investigation pipeline asynchronously.
 
@@ -1294,9 +1314,11 @@ async def investigate_endpoint(
     # Auto-create session if none provided, or if the provided one is stale
     # (in-memory sessions are lost on server restart).
     session_id = request.session_id
+    actor = get_request_user(http_request)
+    actor_name = (actor.username if actor else None) or getattr(request, "created_by", None)
     if not session_id:
         session = session_manager.create_session(
-            created_by=getattr(request, "created_by", None),
+            created_by=actor_name,
             center=request.center,
         )
         session_id = session.session_id
@@ -1309,10 +1331,16 @@ async def investigate_endpoint(
                 session_id,
             )
             session = session_manager.create_session(
-                created_by=getattr(request, "created_by", None),
+                created_by=actor_name,
                 center=request.center,
             )
             session_id = session.session_id
+        else:
+            authorize_owner_or_admin(
+                http_request,
+                getattr(session, "created_by", None),
+                resource_label="mua v7 session",
+            )
 
     current_step = session_manager.get_current_step(session_id)
     if current_step not in (StepName.DEFINE, StepName.INVESTIGATE):
@@ -1449,6 +1477,7 @@ async def _run_investigation_background(
 )
 async def investigation_status_endpoint(
     session_id: str,
+    http_request: Request,
 ) -> InvestigationStatusResponse:
     """Poll the status of a running investigation.
 
@@ -1456,12 +1485,7 @@ async def investigation_status_endpoint(
     returns.  Returns ``status='complete'`` once the investigation
     pipeline finishes and results are stored on the session.
     """
-    session = session_manager.get_session(session_id)
-    if session is None:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Session '{session_id}' not found.",
-        )
+    session = _require_owned_session(session_id, http_request)
 
     progress = _investigation_progress.get(session_id)
 
@@ -1506,6 +1530,7 @@ async def investigation_status_endpoint(
 )
 async def review_decisions_endpoint(
     request: SaveReviewRequest,
+    http_request: Request,
 ) -> SaveReviewResponse:
     """Save the reviewing engineer's decisions on precedents, gaps, and conflicts.
 
@@ -1518,12 +1543,7 @@ async def review_decisions_endpoint(
     )
 
     # Validate session state.
-    session = session_manager.get_session(request.session_id)
-    if session is None:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Session '{request.session_id}' not found.",
-        )
+    session = _require_owned_session(request.session_id, http_request)
 
     current_step = session_manager.get_current_step(request.session_id)
     if current_step not in (StepName.INVESTIGATE, StepName.REVIEW):
@@ -1718,6 +1738,7 @@ async def review_decisions_endpoint(
 )
 async def generate_draft_endpoint(
     request: GenerateDraftRequest,
+    http_request: Request,
 ) -> GenerateDraftResponse:
     """Generate the MUA document draft from reviewed evidence.
 
@@ -1731,12 +1752,7 @@ async def generate_draft_endpoint(
     )
 
     # Validate session state.
-    session = session_manager.get_session(request.session_id)
-    if session is None:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Session '{request.session_id}' not found.",
-        )
+    session = _require_owned_session(request.session_id, http_request)
 
     current_step = session_manager.get_current_step(request.session_id)
     if current_step != StepName.REVIEW:
@@ -1890,6 +1906,7 @@ async def generate_draft_endpoint(
 )
 async def finalize_endpoint(
     request: FinalizeRequest,
+    http_request: Request,
 ) -> FinalizeResponse:
     """Finalize the MUA: lock the document, record the reviewer, build the
     audit trail, and optionally generate export text.
@@ -1904,12 +1921,7 @@ async def finalize_endpoint(
     )
 
     # Validate session state.
-    session = session_manager.get_session(request.session_id)
-    if session is None:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Session '{request.session_id}' not found.",
-        )
+    session = _require_owned_session(request.session_id, http_request)
 
     current_step = session_manager.get_current_step(request.session_id)
     if current_step != StepName.DRAFT:
@@ -2015,16 +2027,11 @@ async def finalize_endpoint(
     response_model=SessionDetailResponse,
     summary="Resume a session",
 )
-async def get_session_endpoint(session_id: str) -> SessionDetailResponse:
+async def get_session_endpoint(session_id: str, http_request: Request) -> SessionDetailResponse:
     """Retrieve full session state for resuming an in-progress MUA workflow."""
     logger.info("GET session: session_id=%s", session_id)
 
-    session = session_manager.get_session(session_id)
-    if session is None:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Session '{session_id}' not found.",
-        )
+    session = _require_owned_session(session_id, http_request)
 
     return SessionDetailResponse(
         session_id=session_id,
@@ -2049,6 +2056,7 @@ async def get_session_endpoint(session_id: str) -> SessionDetailResponse:
     summary="List user sessions",
 )
 async def list_sessions_endpoint(
+    http_request: Request,
     created_by: Optional[str] = Query(
         default=None, description="Filter by session creator"
     ),
@@ -2063,6 +2071,10 @@ async def list_sessions_endpoint(
     logger.info(
         "GET sessions: created_by=%s, status=%s", created_by, status
     )
+
+    actor = get_request_user(http_request)
+    if actor is not None and not actor.is_admin:
+        created_by = (actor.username or actor.email or "").strip() or created_by
 
     try:
         sessions = session_manager.list_sessions(
@@ -2099,6 +2111,7 @@ async def list_sessions_endpoint(
 )
 async def delete_session_endpoint(
     session_id: str,
+    http_request: Request,
 ) -> DeleteSessionResponse:
     """Mark a session as ABANDONED.
 
@@ -2107,12 +2120,7 @@ async def delete_session_endpoint(
     """
     logger.info("DELETE session: session_id=%s", session_id)
 
-    session = session_manager.get_session(session_id)
-    if session is None:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Session '{session_id}' not found.",
-        )
+    session = _require_owned_session(session_id, http_request)
 
     current_status = session_manager.get_status(session_id)
     if current_status == SessionStatus.FINALIZED:

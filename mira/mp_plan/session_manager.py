@@ -66,6 +66,7 @@ class SessionManager:
         program_phase: Optional[str] = None,
         policy_pack_id: Optional[str] = None,
         vehicle_preset: Optional[str] = None,
+        owner_username: Optional[str] = None,
     ) -> PlanGeneratorSession:
         """
         Create a new session.
@@ -86,6 +87,7 @@ class SessionManager:
             program_name=program_name,
             program_phase=program_phase,
             policy_pack_id=policy_pack_id or "default",
+            owner_username=owner_username,
             source="session_manager",
         )
 

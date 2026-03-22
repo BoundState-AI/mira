@@ -27,7 +27,15 @@ if _ENV_FILE.exists():
 
 from . import routers  # noqa: E402
 from .auth import CognitoAuthzMiddleware, validate_auth_configuration  # noqa: E402
+from .rate_limit import (  # noqa: E402
+    ApiRateLimitMiddleware,
+    rate_limit_enabled,
+    rate_limit_requests,
+    rate_limit_window_seconds,
+)
 from .runtime_assets import validate_required_runtime_assets  # noqa: E402
+from mira.core.db_config import require_production_credentials  # noqa: E402
+from mira.providers.llm_provider import validate_provider_configuration  # noqa: E402
 
 
 _EXPOSE_HEADERS = [
@@ -70,6 +78,19 @@ def _load_chat_router() -> Optional[APIRouter]:
         )
         return None
     return chat_router
+
+
+def _validate_runtime_environment(*, chat_router: APIRouter | None) -> None:
+    validate_auth_configuration()
+    require_production_credentials()
+    validate_provider_configuration()
+    if chat_router is not None:
+        chat_provider = os.environ.get(
+            "MIRA_CHAT_LLM_PROVIDER",
+            os.environ.get("LLM_PROVIDER", ""),
+        ).strip()
+        if chat_provider:
+            validate_provider_configuration(chat_provider)
 
 
 def _build_cors_origins() -> list[str]:
@@ -226,8 +247,14 @@ def create_app(
         openapi_url=None if is_production else "/openapi.json",
     )
 
-    validate_auth_configuration()
+    _validate_runtime_environment(chat_router=chat_router)
     app.add_middleware(SecurityHeadersMiddleware)  # M1: Security headers
+    if rate_limit_enabled():
+        app.add_middleware(
+            ApiRateLimitMiddleware,
+            max_requests=rate_limit_requests(),
+            window_seconds=rate_limit_window_seconds(),
+        )
     app.add_middleware(CognitoAuthzMiddleware)
     app.add_middleware(
         CORSMiddleware,

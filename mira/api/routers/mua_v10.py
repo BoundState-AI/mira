@@ -307,10 +307,10 @@ def _runtime_connect():
     if not _runtime_db_enabled() or psycopg2 is None:
         return None
 
-    params = get_db_connection_params(database="mira")
-    params.setdefault("connect_timeout", 2)
     try:
-        return psycopg2.connect(**params)
+        from mira.core.db_config import open_db_connection
+
+        return open_db_connection(database="mira", connect_timeout=2)
     except Exception as exc:  # pragma: no cover - infra dependent
         LOGGER.warning("mua_runtime DB unavailable: %s", exc)
         return None

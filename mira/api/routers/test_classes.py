@@ -101,6 +101,16 @@ RATING_FIELDS = [
     'fri_rating', 'crk_rating', 'frac_rating', 'crp_rating'
 ]
 
+TOXICITY_RATING_FIELDS = {
+    'tox_emurating',
+    'tox_orionrating',
+    'tox_shuttlerating',
+    'tox_spacestationrating',
+    'tox_spacestationrtg',
+    'tox_rtg',
+    'tox_rating',
+}
+
 # Reverse mapping: contract_id -> URL slug
 CONTRACT_TO_SLUG = {v: k for k, v in SLUG_TO_CONTRACT.items()}
 
@@ -219,8 +229,8 @@ CANONICAL_RATINGS = {
 def get_db_connection():
     """Get database connection using centralized config."""
     try:
-        from mira.core.db_config import get_db_connection_params
-        return psycopg2.connect(**get_db_connection_params())
+        from mira.core.db_config import open_db_connection
+        return open_db_connection()
     except ImportError:
         # Fallback if db_config not available
         import os
@@ -269,7 +279,16 @@ def build_rating_filter(contract_id: str, rating: str, rating_type: Optional[str
     params = []
 
     if contract_id == 'toxicity_report' and rating_type and rating_type != 'all':
-        where_clause = f"(normalized_payload->>'{rating_type}' = %s)"
+        normalized_rating_type = rating_type.strip().lower()
+        if normalized_rating_type not in TOXICITY_RATING_FIELDS:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "Invalid toxicity rating_type. "
+                    f"Allowed values: {', '.join(sorted(TOXICITY_RATING_FIELDS))}"
+                ),
+            )
+        where_clause = f"(normalized_payload->>'{normalized_rating_type}' = %s)"
         params = [rating]
     elif contract_id == 'toxicity_report':
         rating_fields = [
@@ -298,22 +317,46 @@ def build_rating_filter(contract_id: str, rating: str, rating_type: Optional[str
 
 
 @router.get("/api/materials/types")
-async def get_material_types():
+async def get_material_types(
+    page: int = Query(1, ge=1, description="Page number"),
+    per_page: int = Query(100, ge=1, le=500, description="Rows per page"),
+):
     """Get list of available material types for filter dropdowns."""
     try:
         conn = get_db_connection()
         cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor.execute("""
+            SELECT COUNT(*) AS total
+            FROM (
+                SELECT material_type_name
+                FROM materials
+                WHERE material_type_name IS NOT NULL
+                GROUP BY material_type_name
+            ) material_types
+        """)
+        total = int((cursor.fetchone() or {}).get("total", 0))
+        offset = (page - 1) * per_page
         cursor.execute("""
             SELECT material_type_name, COUNT(*) as count
             FROM materials
             WHERE material_type_name IS NOT NULL
             GROUP BY material_type_name
             ORDER BY count DESC
-        """)
+            LIMIT %s OFFSET %s
+        """, (per_page, offset))
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
-        return {"types": [{"name": r["material_type_name"], "count": r["count"]} for r in rows]}
+        total_pages = (total + per_page - 1) // per_page if total else 0
+        return {
+            "types": [{"name": r["material_type_name"], "count": r["count"]} for r in rows],
+            "pagination": {
+                "page": page,
+                "per_page": per_page,
+                "total_records": total,
+                "total_pages": total_pages,
+            },
+        }
     except Exception as e:
         logger.error(f"Error fetching material types: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -508,7 +551,11 @@ async def get_test_records(
 
 
 @router.get("/api/test-records/{test_type}/ratings")
-async def get_test_type_ratings(test_type: str):
+async def get_test_type_ratings(
+    test_type: str,
+    page: int = Query(1, ge=1, description="Page number"),
+    per_page: int = Query(100, ge=1, le=500, description="Rows per page"),
+):
     """Get list of available ratings for a test type."""
     contract_id = SLUG_TO_CONTRACT.get(test_type)
     if not contract_id:
@@ -540,17 +587,29 @@ async def get_test_type_ratings(test_type: str):
             WITH ratings_union AS (
                 {' UNION '.join(union_parts)}
             )
-            SELECT rating FROM ratings_union
+            SELECT rating, COUNT(*) OVER() AS total_count FROM ratings_union
             WHERE rating IS NOT NULL AND rating != ''
             ORDER BY rating
+            LIMIT %s OFFSET %s
         """
-        cursor.execute(query, [contract_id] * len(rating_fields))
+        offset = (page - 1) * per_page
+        cursor.execute(query, [contract_id] * len(rating_fields) + [per_page, offset])
         rows = cursor.fetchall()
         ratings = [row['rating'] for row in rows]
+        total = int(rows[0]['total_count']) if rows else 0
+        total_pages = (total + per_page - 1) // per_page if total else 0
 
         cursor.close()
         conn.close()
-        return {"ratings": ratings}
+        return {
+            "ratings": ratings,
+            "pagination": {
+                "page": page,
+                "per_page": per_page,
+                "total_records": total,
+                "total_pages": total_pages,
+            },
+        }
 
     except Exception as e:
         logger.error(f"Error fetching ratings for {test_type}: {e}")

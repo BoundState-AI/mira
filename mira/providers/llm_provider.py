@@ -365,6 +365,27 @@ _PROVIDER_REGISTRY: dict[str, type] = {
 }
 
 
+def validate_provider_configuration(name: str | None = None) -> None:
+    """Fail fast on obviously incomplete provider configuration."""
+    provider_name = (name or os.environ.get("LLM_PROVIDER", "bedrock-converse")).strip().lower()
+
+    if provider_name not in _PROVIDER_REGISTRY:
+        valid = ", ".join(sorted(_PROVIDER_REGISTRY))
+        raise RuntimeError(f"Unknown LLM provider {provider_name!r}. Valid: {valid}")
+
+    if provider_name == "anthropic":
+        if not (os.environ.get("ANTHROPIC_API_KEY", "").strip()):
+            raise RuntimeError("LLM_PROVIDER=anthropic requires ANTHROPIC_API_KEY.")
+        return
+
+    if provider_name == "openai-compat":
+        if not (os.environ.get("LLM_BASE_URL", "").strip()):
+            raise RuntimeError("LLM_PROVIDER=openai-compat requires LLM_BASE_URL.")
+        if not (os.environ.get("OPENAI_API_KEY", "").strip()):
+            raise RuntimeError("LLM_PROVIDER=openai-compat requires OPENAI_API_KEY.")
+        return
+
+
 def get_provider(name: str | None = None) -> LLMProvider:
     """Instantiate an LLM provider by name.
 

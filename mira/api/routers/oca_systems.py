@@ -20,9 +20,10 @@ import logging
 from datetime import datetime
 from typing import Any, Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 
+from mira.api.auth import authorize_owner_or_admin, get_request_user
 from mira.oca.system_models import (
     AddComponentRequest,
     AddComponentResponse,
@@ -55,6 +56,12 @@ def _get_system(system_id: str) -> OCASystemAssembly:
     return _systems[system_id]
 
 
+def _require_system(system_id: str, http_request: Request) -> OCASystemAssembly:
+    system = _get_system(system_id)
+    authorize_owner_or_admin(http_request, system.owner_username, resource_label="oca system")
+    return system
+
+
 # =============================================================================
 # ENDPOINTS (per Spec §14)
 # =============================================================================
@@ -67,12 +74,14 @@ async def ping() -> dict[str, str]:
 
 
 @router.post("", response_model=CreateSystemResponse)
-async def create_system(request: CreateSystemRequest) -> CreateSystemResponse:
+async def create_system(request: CreateSystemRequest, http_request: Request) -> CreateSystemResponse:
     """Create a new system assembly."""
     try:
+        actor = get_request_user(http_request)
         system = OCASystemAssembly(
             name=request.name,
             description=request.description,
+            owner_username=actor.username if actor else None,
             inputs=request.inputs,
         )
         _systems[system.system_id] = system
@@ -90,16 +99,16 @@ async def create_system(request: CreateSystemRequest) -> CreateSystemResponse:
 
 
 @router.get("/{system_id}")
-async def get_system(system_id: str) -> dict[str, Any]:
+async def get_system(system_id: str, http_request: Request) -> dict[str, Any]:
     """Get full system state."""
-    system = _get_system(system_id)
+    system = _require_system(system_id, http_request)
     return system.model_dump()
 
 
 @router.put("/{system_id}/inputs")
-async def update_inputs(system_id: str, inputs: dict[str, Any]) -> dict[str, str]:
+async def update_inputs(system_id: str, inputs: dict[str, Any], http_request: Request) -> dict[str, str]:
     """Update system-level inputs."""
-    system = _get_system(system_id)
+    system = _require_system(system_id, http_request)
     if system.locked:
         raise HTTPException(status_code=409, detail="System is locked")
 
@@ -115,10 +124,14 @@ async def update_inputs(system_id: str, inputs: dict[str, Any]) -> dict[str, str
 
 
 @router.post("/{system_id}/components", response_model=AddComponentResponse)
-async def add_component(system_id: str, request: AddComponentRequest) -> AddComponentResponse:
+async def add_component(
+    system_id: str,
+    request: AddComponentRequest,
+    http_request: Request,
+) -> AddComponentResponse:
     """Add a component to the canvas."""
     try:
-        system = _get_system(system_id)
+        system = _require_system(system_id, http_request)
         if system.locked:
             raise HTTPException(status_code=409, detail="System is locked")
 
@@ -167,9 +180,10 @@ async def update_component(
     system_id: str,
     component_id: str,
     updates: dict[str, Any],
+    http_request: Request,
 ) -> dict[str, Any]:
     """Update a component's properties."""
-    system = _get_system(system_id)
+    system = _require_system(system_id, http_request)
     if system.locked:
         raise HTTPException(status_code=409, detail="System is locked")
 
@@ -216,9 +230,14 @@ async def update_component(
 
 
 @router.delete("/{system_id}/components/{component_id}")
-async def remove_component(system_id: str, component_id: str) -> dict[str, str]:
+async def remove_component(
+    system_id: str,
+    component_id: str,
+    http_request: Request,
+) -> dict[str, str]:
     """Remove a component from the canvas."""
     system = _get_system(system_id)
+    authorize_owner_or_admin(http_request, system.owner_username, resource_label="oca system")
     if system.locked:
         raise HTTPException(status_code=409, detail="System is locked")
 
@@ -238,10 +257,14 @@ async def remove_component(system_id: str, component_id: str) -> dict[str, str]:
 
 
 @router.post("/{system_id}/connections", response_model=AddConnectionResponse)
-async def add_connection(system_id: str, request: AddConnectionRequest) -> AddConnectionResponse:
+async def add_connection(
+    system_id: str,
+    request: AddConnectionRequest,
+    http_request: Request,
+) -> AddConnectionResponse:
     """Connect two components."""
     try:
-        system = _get_system(system_id)
+        system = _require_system(system_id, http_request)
         if system.locked:
             raise HTTPException(status_code=409, detail="System is locked")
 
@@ -288,9 +311,14 @@ async def add_connection(system_id: str, request: AddConnectionRequest) -> AddCo
 
 
 @router.delete("/{system_id}/connections/{connection_id}")
-async def remove_connection(system_id: str, connection_id: str) -> dict[str, str]:
+async def remove_connection(
+    system_id: str,
+    connection_id: str,
+    http_request: Request,
+) -> dict[str, str]:
     """Remove a connection."""
     system = _get_system(system_id)
+    authorize_owner_or_admin(http_request, system.owner_username, resource_label="oca system")
     if system.locked:
         raise HTTPException(status_code=409, detail="System is locked")
 
@@ -305,10 +333,10 @@ async def remove_connection(system_id: str, connection_id: str) -> dict[str, str
 
 
 @router.post("/{system_id}/assess", response_model=SystemAssessmentResponse)
-async def assess_system(system_id: str) -> SystemAssessmentResponse:
+async def assess_system(system_id: str, http_request: Request) -> SystemAssessmentResponse:
     """Run full system OCA assessment."""
     try:
-        system = _get_system(system_id)
+        system = _require_system(system_id, http_request)
 
         from mira.oca.system_engine import run_system_assessment
         run_system_assessment(system)
@@ -333,10 +361,10 @@ async def assess_system(system_id: str) -> SystemAssessmentResponse:
 
 
 @router.get("/{system_id}/topology", response_model=TopologyResponse)
-async def get_topology(system_id: str) -> TopologyResponse:
+async def get_topology(system_id: str, http_request: Request) -> TopologyResponse:
     """Return inferred topology with zones and assumptions."""
     try:
-        system = _get_system(system_id)
+        system = _require_system(system_id, http_request)
 
         from mira.oca.system_engine import run_topology_inference
         topology = run_topology_inference(system)
@@ -355,10 +383,10 @@ async def get_topology(system_id: str) -> TopologyResponse:
 
 
 @router.get("/{system_id}/kindling-chain", response_model=SystemKindlingChainResponse)
-async def get_kindling_chain(system_id: str) -> SystemKindlingChainResponse:
+async def get_kindling_chain(system_id: str, http_request: Request) -> SystemKindlingChainResponse:
     """Return system propagation map."""
     try:
-        system = _get_system(system_id)
+        system = _require_system(system_id, http_request)
 
         if not system.kindling_chains:
             from mira.oca.system_engine import run_system_assessment
@@ -384,10 +412,10 @@ async def get_kindling_chain(system_id: str) -> SystemKindlingChainResponse:
 
 
 @router.get("/{system_id}/path/{component_id}")
-async def get_path_inspector(system_id: str, component_id: str) -> dict[str, Any]:
+async def get_path_inspector(system_id: str, component_id: str, http_request: Request) -> dict[str, Any]:
     """Path inspector for specific component."""
     try:
-        system = _get_system(system_id)
+        system = _require_system(system_id, http_request)
 
         from mira.oca.system_engine import inspect_component_path
         result = inspect_component_path(system, component_id)
@@ -401,10 +429,10 @@ async def get_path_inspector(system_id: str, component_id: str) -> dict[str, Any
 
 
 @router.post("/{system_id}/export")
-async def export_system(system_id: str) -> dict[str, Any]:
+async def export_system(system_id: str, http_request: Request) -> dict[str, Any]:
     """System-level report, BOM, MIUL seed, zone map export."""
     try:
-        system = _get_system(system_id)
+        system = _require_system(system_id, http_request)
 
         # Ensure assessment has been run
         if not system.system_disposition:
@@ -421,8 +449,9 @@ async def export_system(system_id: str) -> dict[str, Any]:
 
 
 @router.get("/{system_id}/library")
-async def get_component_library() -> dict[str, Any]:
+async def get_component_library(system_id: str, http_request: Request) -> dict[str, Any]:
     """Return the component archetype library."""
+    _require_system(system_id, http_request)
     import json
     from pathlib import Path
 
@@ -435,9 +464,9 @@ async def get_component_library() -> dict[str, Any]:
 
 
 @router.post("/{system_id}/lock")
-async def lock_system(system_id: str) -> dict[str, Any]:
+async def lock_system(system_id: str, http_request: Request) -> dict[str, Any]:
     """Lock system for export."""
-    system = _get_system(system_id)
+    system = _require_system(system_id, http_request)
     system.locked = True
     system.audit_log.append({
         "action": "lock_system",

@@ -46,6 +46,15 @@ from mira.forge_claude.introspector.samplers import (
 )
 
 
+def _create_introspection_engine(db_url: str):
+    kwargs = {}
+    if db_url.startswith("sqlite"):
+        kwargs["connect_args"] = {"check_same_thread": False}
+    else:
+        kwargs.update({"pool_pre_ping": True, "pool_size": 5, "max_overflow": 10})
+    return create_engine(db_url, **kwargs)
+
+
 def _table_parts(table_ref: str | tuple[str | None, str]) -> tuple[str | None, str]:
     if isinstance(table_ref, tuple):
         return table_ref
@@ -289,7 +298,7 @@ def introspect_database(
     Raises:
         sqlalchemy.exc.OperationalError: If connection fails.
     """
-    engine = create_engine(db_url)
+    engine = _create_introspection_engine(db_url)
     insp = inspect(engine)
 
     manifest = _build_manifest(engine, insp, db_url, sample_count)
@@ -333,7 +342,7 @@ def introspect_database_full(
     from mira.forge_claude.introspector.relationship_discovery import build_relationship_graph
     from mira.forge_claude.introspector.semantic_inference import build_semantic_map
 
-    engine = create_engine(db_url)
+    engine = _create_introspection_engine(db_url)
     insp = inspect(engine)
 
     # Step 1a: Build manifest (with profiling)

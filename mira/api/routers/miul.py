@@ -29,8 +29,10 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
-from fastapi import APIRouter, Body, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Body, Depends, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import Response, StreamingResponse
+
+from mira.api.auth import authorize_owner_or_admin, get_request_user
 
 # Lazy imports for enrichment workflow - only loaded when /enrich or /gaps called
 MIULWorkflow = None
@@ -770,6 +772,14 @@ def _get_v4_session(extraction_id: str):
     return _V4Session(extraction_id)
 
 
+def _authorize_v4_session(http_request: Request, session) -> None:
+    authorize_owner_or_admin(
+        http_request,
+        session.get_owner_username(),
+        resource_label="miul extraction session",
+    )
+
+
 def _is_blank_value(value: Any) -> bool:
     """Return True for None/empty/nan-like values."""
     if value is None:
@@ -1012,21 +1022,31 @@ def _run_extraction_background(
 # =============================================================================
 
 @router.get("/v4/sessions")
-async def list_v4_sessions(limit: int = 20) -> dict:
+async def list_v4_sessions(http_request: Request, limit: int = 20) -> dict:
     """List recent v4 extraction sessions for session resume UI."""
     from mira.miul.production.session import list_sessions
     sessions = list_sessions(limit=limit)
+    actor = get_request_user(http_request)
+    if actor is not None and not actor.is_admin:
+        actor_name = (actor.username or actor.email or "").strip().lower()
+        sessions = [
+            item for item in sessions
+            if (_get_v4_session(item["extraction_id"]).get_owner_username() or "").strip().lower() == actor_name
+        ]
     return {"sessions": sessions}
 
 
 @router.delete("/v4/sessions/{extraction_id}")
-async def delete_v4_session(extraction_id: str) -> dict:
+async def delete_v4_session(extraction_id: str, http_request: Request) -> dict:
     """Delete a v4 session (sensitive-build purge).
 
     Removes all session files (extraction, review, audit, status).
     Used when the user toggled 'sensitive build' to prevent data persistence.
     """
     from mira.miul.production.session import get_session_root
+
+    session = _get_v4_session(extraction_id)
+    _authorize_v4_session(http_request, session)
 
     session_dir = get_session_root() / extraction_id
     if not session_dir.exists():
@@ -1044,6 +1064,7 @@ async def delete_v4_session(extraction_id: str) -> dict:
 
 @router.post("/v4/extract")
 async def extract_miul_v4(
+    http_request: Request,
     drawings: List[UploadFile] = File(...),
     drawing_tree_json: UploadFile = File(None),
     project: str = Form(""),
@@ -1072,6 +1093,8 @@ async def extract_miul_v4(
     # Create session directory and set initial status
     from mira.miul.production.session import V4Session
     session = V4Session(extraction_id)
+    actor = get_request_user(http_request)
+    session.set_owner_username(actor.username if actor else None)
     session.set_status("uploading", "Receiving files...", progress=1)
 
     # Save files to a persistent temp dir (NOT cleaned up until background worker finishes)
@@ -1136,7 +1159,7 @@ async def extract_miul_v4(
 
 
 @router.get("/v4/extract/{extraction_id}/status")
-async def get_v4_extraction_status(extraction_id: str) -> dict:
+async def get_v4_extraction_status(extraction_id: str, http_request: Request) -> dict:
     """Poll extraction status. Frontend calls this every few seconds.
 
     Returns:
@@ -1147,13 +1170,15 @@ async def get_v4_extraction_status(extraction_id: str) -> dict:
         error: (only when failed) error message
     """
     session = _get_v4_session(extraction_id)
+    _authorize_v4_session(http_request, session)
     return session.get_status()
 
 
 @router.get("/v4/extract/{extraction_id}")
-async def get_v4_extraction(extraction_id: str) -> dict:
+async def get_v4_extraction(extraction_id: str, http_request: Request) -> dict:
     """Get v4 extraction result by ID."""
     session = _get_v4_session(extraction_id)
+    _authorize_v4_session(http_request, session)
     if not session.exists:
         raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
 
@@ -1176,6 +1201,7 @@ async def get_v4_extraction(extraction_id: str) -> dict:
 @router.get("/v4/extract/{extraction_id}/review")
 async def get_v4_review_items(
     extraction_id: str,
+    http_request: Request,
     confidence: Optional[str] = None,
     field: Optional[str] = None,
     status: Optional[str] = None,
@@ -1189,6 +1215,7 @@ async def get_v4_review_items(
         status: Filter by status ("open", "corrected", "accepted")
     """
     session = _get_v4_session(extraction_id)
+    _authorize_v4_session(http_request, session)
     if not session.exists:
         raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
 
@@ -1215,7 +1242,7 @@ async def get_v4_review_items(
 
 
 @router.get("/v4/extract/{extraction_id}/materials")
-async def get_v4_material_list(extraction_id: str) -> dict:
+async def get_v4_material_list(extraction_id: str, http_request: Request) -> dict:
     """Get the 'grocery list' -- unique material values across all extracted parts.
 
     Used to populate dropdowns in the review UI so engineers pick from
@@ -1223,6 +1250,7 @@ async def get_v4_material_list(extraction_id: str) -> dict:
     it shows up once in the list.
     """
     session = _get_v4_session(extraction_id)
+    _authorize_v4_session(http_request, session)
     if not session.exists:
         raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
 
@@ -1292,9 +1320,10 @@ async def get_v4_material_list(extraction_id: str) -> dict:
 
 
 @router.get("/v4/extract/{extraction_id}/drawings")
-async def get_v4_drawing_list(extraction_id: str) -> dict:
+async def get_v4_drawing_list(extraction_id: str, http_request: Request) -> dict:
     """Get extracted drawing packages for the review-stage remove flow."""
     session = _get_v4_session(extraction_id)
+    _authorize_v4_session(http_request, session)
     if not session.exists:
         raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
 
@@ -1310,11 +1339,13 @@ async def get_v4_drawing_list(extraction_id: str) -> dict:
 async def remove_v4_drawing(
     extraction_id: str,
     drawing_id: str,
+    http_request: Request,
     reviewer: str = "",
     reason: str = "",
 ) -> dict:
     """Remove a drawing from an extracted session and regenerate review data."""
     session = _get_v4_session(extraction_id)
+    _authorize_v4_session(http_request, session)
     if not session.exists:
         raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
 
@@ -1344,11 +1375,13 @@ async def remove_v4_drawing(
 async def remove_v4_part(
     extraction_id: str,
     part_number: str,
+    http_request: Request,
     reviewer: str = "",
     reason: str = "",
 ) -> dict:
     """Remove a part from an extracted session and regenerate review data."""
     session = _get_v4_session(extraction_id)
+    _authorize_v4_session(http_request, session)
     if not session.exists:
         raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
 
@@ -1378,6 +1411,7 @@ async def remove_v4_part(
 async def submit_v4_correction(
     extraction_id: str,
     part_number: str,
+    http_request: Request,
     corrections: dict = Body(..., embed=True),
     reviewer: str = Body("", embed=True),
 ) -> dict:
@@ -1392,6 +1426,7 @@ async def submit_v4_correction(
         reviewer: Who made the correction
     """
     session = _get_v4_session(extraction_id)
+    _authorize_v4_session(http_request, session)
     if not session.exists:
         raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
 
@@ -1409,6 +1444,7 @@ async def submit_v4_correction(
 async def accept_v4_item(
     extraction_id: str,
     part_number: str,
+    http_request: Request,
     reason: str = Form(""),
     reviewer: str = Form(""),
 ) -> dict:
@@ -1421,6 +1457,7 @@ async def accept_v4_item(
         reviewer: Who accepted
     """
     session = _get_v4_session(extraction_id)
+    _authorize_v4_session(http_request, session)
     if not session.exists:
         raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
 
@@ -1434,6 +1471,7 @@ async def accept_v4_item(
 @router.post("/v4/extract/{extraction_id}/approve")
 async def approve_v4_build(
     extraction_id: str,
+    http_request: Request,
     reviewer: str = Form(...),
 ) -> dict:
     """Approve a v4 extraction for MIUL build.
@@ -1446,6 +1484,7 @@ async def approve_v4_build(
         reviewer: Who is approving the build
     """
     session = _get_v4_session(extraction_id)
+    _authorize_v4_session(http_request, session)
     if not session.exists:
         raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
 
@@ -1468,6 +1507,7 @@ async def approve_v4_build(
 
 @router.post("/v4/build")
 async def build_miul_v4(
+    http_request: Request,
     extraction_id: str = Form(...),
     project: str = Form(""),
     max_temp: float = Form(120.0),
@@ -1501,6 +1541,7 @@ async def build_miul_v4(
         MAPTIS-compliant Excel file (base MIUL, no enrichment).
     """
     session = _get_v4_session(extraction_id)
+    _authorize_v4_session(http_request, session)
     if not session.exists:
         raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
 

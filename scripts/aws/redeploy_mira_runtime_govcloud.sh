@@ -346,7 +346,7 @@ cat > "${BACKEND_TASK_JSON}" <<JSON
         {"name": "MIRA_AUTH_MODE", "value": "cognito"},
         {"name": "ADMIN_PATH_PREFIXES", "value": "/admin"},
         {"name": "COGNITO_REGION", "value": "${COGNITO_REGION}"},
-        {"name": "ENABLE_AUDIT_LOGGING", "value": "false"},
+        {"name": "ENABLE_AUDIT_LOGGING", "value": "true"},
         {"name": "LLM_PROVIDER", "value": "bedrock-converse"},
         {"name": "LLM_SONNET_MODEL", "value": "${BEDROCK_MODEL_ID}"},
         {"name": "USE_BEDROCK", "value": "1"},

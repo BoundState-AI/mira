@@ -1082,11 +1082,10 @@ async def query_v4(request: V4QueryRequest) -> V4QueryResponse:
 
         def _get_data_source_capabilities() -> Dict[str, bool]:
             """Detect which material corpora are available in the connected DB."""
-            import psycopg2
             from psycopg2.extras import RealDictCursor
-            from mira.core.db_config import get_db_connection_params
+            from mira.core.db_config import open_db_connection
 
-            conn = psycopg2.connect(**get_db_connection_params())
+            conn = open_db_connection()
             try:
                 with conn.cursor(cursor_factory=RealDictCursor) as cur:
                     return {
@@ -1343,12 +1342,11 @@ async def query_v4(request: V4QueryRequest) -> V4QueryResponse:
 
         def _db_rich_search(pattern: str, limit: int = 25) -> list:
             """Search materials with hydrogen-aware source selection."""
-            import psycopg2
             from decimal import Decimal as _Decimal
             from psycopg2.extras import RealDictCursor
-            from mira.core.db_config import get_db_connection_params
+            from mira.core.db_config import open_db_connection
 
-            conn = psycopg2.connect(**get_db_connection_params())
+            conn = open_db_connection()
             try:
                 with conn.cursor(cursor_factory=RealDictCursor) as cur:
                     rows: list = []
@@ -1378,13 +1376,12 @@ async def query_v4(request: V4QueryRequest) -> V4QueryResponse:
 
         def _db_batch_search(patterns: List[str], per_pattern_limit: int = 5) -> list:
             """Search multiple patterns using one connection."""
-            import psycopg2
             from decimal import Decimal as _Decimal
             from psycopg2.extras import RealDictCursor
-            from mira.core.db_config import get_db_connection_params
+            from mira.core.db_config import open_db_connection
 
             all_rows = []
-            conn = psycopg2.connect(**get_db_connection_params())
+            conn = open_db_connection()
             try:
                 with conn.cursor(cursor_factory=RealDictCursor) as cur:
                     has_primary = _table_exists(cur, "materials")
@@ -1733,13 +1730,12 @@ async def query_v4_laundered(request: V4QueryRequest) -> Dict[str, Any]:
             patterns: list, per_pattern_limit: int = 5
         ) -> list:
             """MAPTIS batch search — injected into the validator adapter."""
-            import psycopg2
             from decimal import Decimal as _Decimal
             from psycopg2.extras import RealDictCursor
-            from mira.core.db_config import get_db_connection_params
+            from mira.core.db_config import open_db_connection
 
             all_rows = []
-            conn = psycopg2.connect(**get_db_connection_params())
+            conn = open_db_connection()
             try:
                 with conn.cursor(cursor_factory=RealDictCursor) as cur:
                     for pattern in patterns:

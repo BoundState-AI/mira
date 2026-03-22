@@ -338,6 +338,7 @@ class OCASystemAssembly(BaseModel):
     system_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str = "Untitled System"
     description: str = ""
+    owner_username: Optional[str] = None
     spec_id: str = "BS-SPEC-OCA-002-REV0"
 
     # System-level inputs

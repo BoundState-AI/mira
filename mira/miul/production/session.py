@@ -257,6 +257,10 @@ class V4Session:
         return self._dir / "status.json"
 
     @property
+    def metadata_path(self) -> Path:
+        return self._dir / "metadata.json"
+
+    @property
     def exists(self) -> bool:
         return self._dir.exists()
 
@@ -298,6 +302,25 @@ class V4Session:
             "message": "No status available",
             "progress": 0,
         }
+
+    def set_owner_username(self, owner_username: str | None) -> None:
+        """Persist the authenticated owner for authorization checks."""
+        normalized = (owner_username or "").strip() or None
+        metadata = self._read(self.metadata_path) or {}
+        metadata["owner_username"] = normalized
+        metadata.setdefault("extraction_id", self.extraction_id)
+        metadata.setdefault("created_at", _now())
+        metadata["updated_at"] = _now()
+        self._write(self.metadata_path, metadata)
+
+    def get_owner_username(self) -> Optional[str]:
+        """Return the stored owner username, if any."""
+        metadata = self._read(self.metadata_path) or {}
+        raw = metadata.get("owner_username")
+        if raw is None:
+            return None
+        normalized = str(raw).strip()
+        return normalized or None
 
     # ----- Extraction -----
 

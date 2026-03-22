@@ -213,6 +213,7 @@ class MatchmakerSession(BaseModel):
     session_id: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
+    owner_username: Optional[str] = None
     rule_pack_version: str
 
     material_input: str

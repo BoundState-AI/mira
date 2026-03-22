@@ -363,9 +363,14 @@ class ForgeBundleGenerator:
             """
             FROM python:3.11-slim
             WORKDIR /app
+            RUN apt-get update \
+                && apt-get install -y --no-install-recommends curl \
+                && rm -rf /var/lib/apt/lists/*
             COPY requirements.txt .
             RUN pip install --no-cache-dir -r requirements.txt
             COPY . .
+            HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+                CMD curl -fsS http://127.0.0.1:8000/api/health || exit 1
             CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
             """
         )
@@ -410,7 +415,10 @@ class ForgeBundleGenerator:
                 if not database_url:
                     raise HTTPException(status_code=500, detail="DATABASE_URL is required")
                 connect_args = {"check_same_thread": False} if database_url.startswith("sqlite") else {}
-                return create_engine(database_url, future=True, connect_args=connect_args)
+                kwargs = {"future": True, "connect_args": connect_args}
+                if not database_url.startswith("sqlite"):
+                    kwargs.update({"pool_pre_ping": True, "pool_size": 5, "max_overflow": 10})
+                return create_engine(database_url, **kwargs)
 
 
             def reflect_table(qualified_name: str) -> Table:

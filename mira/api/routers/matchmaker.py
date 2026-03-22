@@ -7,9 +7,10 @@ import uuid
 from datetime import datetime
 from typing import Any, Literal, Optional
 
-from fastapi import APIRouter, File, HTTPException, Query, UploadFile
+from fastapi import APIRouter, File, HTTPException, Query, Request, UploadFile
 from pydantic import BaseModel, Field
 
+from mira.api.auth import authorize_owner_or_admin, get_request_user
 from mira.mua.matchmaker.adapters import resolve_material
 from mira.mua.matchmaker.batch import bulk_apply_cat3_code, parse_miul_upload
 from mira.mua.matchmaker.matcher import (
@@ -119,50 +120,28 @@ async def ping() -> dict[str, Any]:
 
 
 @router.post("/sessions", response_model=MatchmakerSession)
-async def create_session(request: CreateSessionRequest) -> MatchmakerSession:
-    material = resolve_material(request.material)
-    issues: dict[str, IssueState] = {}
-
-    redirected = request.deviation_type == "manufacturing_nonconformance"
-    redirect_reason = None
-    if redirected:
-        redirect_reason = "Manufacturing nonconformance routed to MRB/DR (MPR 29)."
-    else:
-        issues = auto_detect_issues(
-            material=material,
-            environment=request.environment,
-            application_description=request.application_description,
-        )
-
-    session = MatchmakerSession(
-        session_id=str(uuid.uuid4()),
-        rule_pack_version=_RULE_PACK_VERSION,
-        material_input=request.material,
-        material_resolution=material,
-        environment=request.environment,
-        application_description=request.application_description or request.environment.application,
-        issues=issues,
-        banners=environment_banners(request.environment, material),
-        nonconformance_redirected=redirected,
-        redirect_reason=redirect_reason,
+async def create_session(request: CreateSessionRequest, http_request: Request) -> MatchmakerSession:
+    actor = get_request_user(http_request)
+    session = _build_session(
+        request,
+        owner_username=(actor.username if actor else None) or request.user,
     )
-    session.events.append(
-        MatchmakerEvent(
-            action="session_created",
-            note=f"user={request.user or 'unknown'}; deviation={request.deviation_type}",
-            rule_pack_version=_RULE_PACK_VERSION,
-        )
-    )
-    if not redirected:
-        _auto_seed_issue_answers(session)
-        _refresh_category(session)
     _STORE.create(session)
     return session
 
 
 @router.get("/sessions", response_model=SessionListResponse)
-async def list_sessions() -> SessionListResponse:
+async def list_sessions(http_request: Request) -> SessionListResponse:
+    actor = get_request_user(http_request)
     sessions = _STORE.list()
+    if actor is not None and not actor.is_admin:
+        filtered_sessions: list[SessionSummary] = []
+        actor_name = (actor.username or actor.email or "").strip().lower()
+        for summary in sessions:
+            session = _STORE.get(summary.session_id)
+            if session and (session.owner_username or "").strip().lower() == actor_name:
+                filtered_sessions.append(summary)
+        sessions = filtered_sessions
     return SessionListResponse(
         sessions=sessions,
         total=len(sessions),
@@ -171,28 +150,34 @@ async def list_sessions() -> SessionListResponse:
 
 
 @router.get("/sessions/{sid}", response_model=MatchmakerSession)
-async def get_session(sid: str) -> MatchmakerSession:
-    return _require_session(sid)
+async def get_session(sid: str, http_request: Request) -> MatchmakerSession:
+    return _require_session(sid, http_request)
 
 
 @router.delete("/sessions/{sid}")
-async def delete_session(sid: str) -> dict[str, Any]:
-    deleted = _STORE.delete(sid)
+async def delete_session(sid: str, http_request: Request) -> dict[str, Any]:
+    session = _require_session(sid, http_request)
+    deleted = _STORE.delete(session.session_id)
     if not deleted:
         raise HTTPException(status_code=404, detail=f"Session not found: {sid}")
     return {"session_id": sid, "deleted": True}
 
 
 @router.get("/sessions/{sid}/issues/{issue}/questions", response_model=IssueQuestionResponse)
-async def get_issue_questions(sid: str, issue: str) -> IssueQuestionResponse:
-    session = _require_session(sid)
+async def get_issue_questions(sid: str, issue: str, http_request: Request) -> IssueQuestionResponse:
+    session = _require_session(sid, http_request)
     state, issue_key = _require_issue(session, issue)
     return _build_issue_question_response(issue_key, state)
 
 
 @router.post("/sessions/{sid}/issues/{issue}/answer", response_model=IssueQuestionResponse)
-async def submit_issue_answer(sid: str, issue: str, request: IssueAnswerRequest) -> IssueQuestionResponse:
-    session = _require_session(sid)
+async def submit_issue_answer(
+    sid: str,
+    issue: str,
+    request: IssueAnswerRequest,
+    http_request: Request,
+) -> IssueQuestionResponse:
+    session = _require_session(sid, http_request)
     state, issue_key = _require_issue(session, issue)
     if state.out_of_scope:
         raise HTTPException(status_code=400, detail="Issue is manual_required and does not accept tree answers.")
@@ -231,8 +216,8 @@ async def submit_issue_answer(sid: str, issue: str, request: IssueAnswerRequest)
 
 
 @router.post("/sessions/{sid}/issues/{issue}/match", response_model=MatchResponse)
-async def run_issue_match(sid: str, issue: str) -> MatchResponse:
-    session = _require_session(sid)
+async def run_issue_match(sid: str, issue: str, http_request: Request) -> MatchResponse:
+    session = _require_session(sid, http_request)
     state, issue_key = _require_issue(session, issue)
     if state.out_of_scope:
         raise HTTPException(status_code=400, detail="Cannot run matching for manual_required issue.")
@@ -269,8 +254,13 @@ async def run_issue_match(sid: str, issue: str) -> MatchResponse:
 
 
 @router.post("/sessions/{sid}/issues/{issue}/rationale", response_model=IssueState)
-async def save_issue_rationale(sid: str, issue: str, request: RationaleRequest) -> IssueState:
-    session = _require_session(sid)
+async def save_issue_rationale(
+    sid: str,
+    issue: str,
+    request: RationaleRequest,
+    http_request: Request,
+) -> IssueState:
+    session = _require_session(sid, http_request)
     state, issue_key = _require_issue(session, issue)
 
     if state.out_of_scope:
@@ -319,10 +309,11 @@ async def save_issue_rationale(sid: str, issue: str, request: RationaleRequest) 
 
 
 @router.post("/batch/import-miul", response_model=BatchImportResponse)
-async def import_miul(file: UploadFile = File(...)) -> BatchImportResponse:
+async def import_miul(http_request: Request, file: UploadFile = File(...)) -> BatchImportResponse:
     contents = await file.read()
     groups = parse_miul_upload(contents, file.filename)
     created_ids: list[str] = []
+    actor = get_request_user(http_request)
 
     for group in groups:
         payload = CreateSessionRequest(
@@ -330,7 +321,8 @@ async def import_miul(file: UploadFile = File(...)) -> BatchImportResponse:
             environment=EnvironmentSpec.model_validate(group["environment"]),
             application_description="; ".join(group.get("sample_descriptions") or []),
         )
-        created = await create_session(payload)
+        created = _build_session(payload, owner_username=actor.username if actor else None)
+        _STORE.create(created)
         trigger_signature = str(group.get("trigger_signature") or "").strip()
         if trigger_signature:
             if _auto_seed_from_trigger_signature(created, trigger_signature):
@@ -346,9 +338,11 @@ async def import_miul(file: UploadFile = File(...)) -> BatchImportResponse:
 
 
 @router.post("/batch/bulk-apply")
-async def bulk_apply(request: BulkApplyRequest) -> dict[str, Any]:
+async def bulk_apply(request: BulkApplyRequest, http_request: Request) -> dict[str, Any]:
     if not request.session_ids:
         raise HTTPException(status_code=400, detail="session_ids is required")
+    for session_id in request.session_ids:
+        _require_session(session_id, http_request)
     try:
         result = bulk_apply_cat3_code(
             store=_STORE,
@@ -366,9 +360,10 @@ async def bulk_apply(request: BulkApplyRequest) -> dict[str, Any]:
 @router.get("/sessions/{sid}/export")
 async def export_session(
     sid: str,
+    http_request: Request,
     mode: ExportMode = Query(default=ExportMode.DRAFT),
 ) -> dict[str, Any]:
-    session = _require_session(sid)
+    session = _require_session(sid, http_request)
     _refresh_category(session)
     _STORE.save(session)
 
@@ -388,10 +383,53 @@ async def export_session(
     return response
 
 
-def _require_session(sid: str) -> MatchmakerSession:
+def _build_session(request: CreateSessionRequest, *, owner_username: str | None) -> MatchmakerSession:
+    material = resolve_material(request.material)
+    issues: dict[str, IssueState] = {}
+
+    redirected = request.deviation_type == "manufacturing_nonconformance"
+    redirect_reason = None
+    if redirected:
+        redirect_reason = "Manufacturing nonconformance routed to MRB/DR (MPR 29)."
+    else:
+        issues = auto_detect_issues(
+            material=material,
+            environment=request.environment,
+            application_description=request.application_description,
+        )
+
+    session = MatchmakerSession(
+        session_id=str(uuid.uuid4()),
+        owner_username=(owner_username or "").strip() or None,
+        rule_pack_version=_RULE_PACK_VERSION,
+        material_input=request.material,
+        material_resolution=material,
+        environment=request.environment,
+        application_description=request.application_description or request.environment.application,
+        issues=issues,
+        banners=environment_banners(request.environment, material),
+        nonconformance_redirected=redirected,
+        redirect_reason=redirect_reason,
+    )
+    session.events.append(
+        MatchmakerEvent(
+            action="session_created",
+            note=f"user={owner_username or request.user or 'unknown'}; deviation={request.deviation_type}",
+            rule_pack_version=_RULE_PACK_VERSION,
+        )
+    )
+    if not redirected:
+        _auto_seed_issue_answers(session)
+        _refresh_category(session)
+    return session
+
+
+def _require_session(sid: str, http_request: Request | None = None) -> MatchmakerSession:
     session = _STORE.get(sid)
     if session is None:
         raise HTTPException(status_code=404, detail=f"Session not found: {sid}")
+    if http_request is not None:
+        authorize_owner_or_admin(http_request, session.owner_username, resource_label="matchmaker session")
     session.issues = {k: normalize_manual_status(v) for k, v in session.issues.items()}
     changed = _ensure_required_issues(session)
     if _auto_seed_issue_answers(session):

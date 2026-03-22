@@ -285,6 +285,47 @@ async def require_admin_user(user: MIRAUser = Depends(get_current_user)) -> MIRA
     return user
 
 
+def get_request_user(request: Request) -> MIRAUser | None:
+    """Return the authenticated user attached by middleware, if present."""
+    user = getattr(request.state, "user", None)
+    return user if isinstance(user, MIRAUser) else None
+
+
+def authorize_owner_or_admin(
+    request: Request,
+    owner_username: str | None,
+    *,
+    resource_label: str = "resource",
+) -> MIRAUser | None:
+    """Allow access for the recorded owner or any admin.
+
+    When authentication is disabled (local/dev/test), this is a no-op.
+    Legacy ownerless resources require admin when auth is enabled.
+    """
+    user = get_request_user(request)
+    if user is None:
+        return None
+    if user.is_admin:
+        return user
+
+    actor = (user.username or user.email or "").strip().lower()
+    owner = (owner_username or "").strip().lower()
+
+    if owner and actor and actor == owner:
+        return user
+
+    if not owner:
+        raise HTTPException(
+            status_code=403,
+            detail=f"{resource_label.capitalize()} ownership is unavailable; admin access required",
+        )
+
+    raise HTTPException(
+        status_code=403,
+        detail=f"Owner or admin access required for this {resource_label}",
+    )
+
+
 class CognitoAuthzMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         if request.method == "OPTIONS":
@@ -387,6 +428,8 @@ __all__ = [
     "get_current_user",
     "require_itar_user",
     "require_admin_user",
+    "get_request_user",
+    "authorize_owner_or_admin",
     "verify_token",
     "validate_auth_configuration",
 ]

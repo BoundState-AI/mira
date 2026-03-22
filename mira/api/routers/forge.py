@@ -33,6 +33,12 @@ _ALLOWED_DIALECTS = {"sqlite", "postgresql", "mysql"}
 _LOCAL_HOSTS = {"localhost", "127.0.0.1", "::1"}
 
 
+def _engine_options(database_url: str) -> dict[str, Any]:
+    if database_url.startswith("sqlite"):
+        return {"future": True, "connect_args": {"check_same_thread": False}}
+    return {"future": True, "pool_pre_ping": True, "pool_size": 5, "max_overflow": 10}
+
+
 class BSMSQueryRequest(BaseModel):
     """Request to run a query through the BSMS pipeline."""
 
@@ -578,7 +584,7 @@ def _run_query_execution(
     filters: dict[str, Any],
     limit: int,
 ) -> dict[str, Any]:
-    engine = create_engine(database_url)
+    engine = create_engine(database_url, **_engine_options(database_url))
     metadata = MetaData()
     table_name = str(question.get("table", "")).strip()
     if not table_name:

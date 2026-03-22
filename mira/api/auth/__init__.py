@@ -10,10 +10,12 @@ from .audit import (
     log_query,
 )
 from .cognito import (
+    authorize_owner_or_admin,
     CognitoAuthzMiddleware,
     MIRAUser,
     auth_enabled,
     get_current_user,
+    get_request_user,
     require_admin_user,
     require_itar_user,
     verify_token,
@@ -23,8 +25,10 @@ from .cognito import (
 __all__ = [
     "CognitoAuthzMiddleware",
     "MIRAUser",
+    "authorize_owner_or_admin",
     "auth_enabled",
     "get_current_user",
+    "get_request_user",
     "require_admin_user",
     "require_itar_user",
     "verify_token",
@@ -34,4 +38,3 @@ __all__ = [
     "log_query",
     "log_admin_action",
 ]
-

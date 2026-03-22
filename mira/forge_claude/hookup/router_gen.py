@@ -9,12 +9,18 @@ def _pascal(name: str) -> str:
     return "".join(word.capitalize() for word in name.split("_"))
 
 
+def _sql_identifier(name: str) -> str:
+    return '"' + name.replace('"', '""') + '"'
+
+
 def _generate_search_router(table: str, columns: list[str]) -> str:
     """Generate a search router module."""
     cols_str = ", ".join(f'"{c}"' for c in columns)
+    table_ref = _sql_identifier(table)
     return f'''"""Search endpoints for {table}."""
 
 from fastapi import APIRouter, Depends, Query
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from database import get_db
@@ -33,7 +39,8 @@ def search_{table}(
     search_columns = [{cols_str}]
     # TODO: Implement full-text search
     results = db.execute(
-        f"SELECT * FROM {table} LIMIT {{limit}} OFFSET {{skip}}"
+        text("SELECT * FROM {table_ref} LIMIT :limit OFFSET :skip"),
+        {{"limit": limit, "skip": skip}},
     ).fetchall()
     return {{"items": [dict(r._mapping) for r in results], "total": len(results)}}
 '''
@@ -41,9 +48,12 @@ def search_{table}(
 
 def _generate_filter_router(table: str, filter_column: str) -> str:
     """Generate a filter router module."""
+    table_ref = _sql_identifier(table)
+    filter_ref = _sql_identifier(filter_column)
     return f'''"""Filter endpoints for {table}."""
 
 from fastapi import APIRouter, Depends, Query
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from database import get_db
@@ -59,22 +69,26 @@ def filter_{table}(
     db: Session = Depends(get_db),
 ):
     """Filter {table} by {filter_column}."""
-    query = "SELECT * FROM {table}"
+    query = "SELECT * FROM {table_ref}"
     params = {{}}
     if {filter_column}:
-        query += " WHERE {filter_column} = :{filter_column}"
+        query += " WHERE {filter_ref} = :{filter_column}"
         params["{filter_column}"] = {filter_column}
-    query += f" LIMIT {{limit}} OFFSET {{skip}}"
-    results = db.execute(query, params).fetchall()
+    query += " LIMIT :limit OFFSET :skip"
+    params["limit"] = limit
+    params["skip"] = skip
+    results = db.execute(text(query), params).fetchall()
     return {{"items": [dict(r._mapping) for r in results], "total": len(results)}}
 '''
 
 
 def _generate_detail_router(table: str) -> str:
     """Generate a detail router module."""
+    table_ref = _sql_identifier(table)
     return f'''"""Detail endpoints for {table}."""
 
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from database import get_db
@@ -89,7 +103,7 @@ def get_{table}_detail(
 ):
     """Get detailed view of a single {table} record."""
     result = db.execute(
-        "SELECT * FROM {table} WHERE id = :id", {{"id": {table}_id}}
+        text("SELECT * FROM {table_ref} WHERE id = :id"), {{"id": {table}_id}}
     ).fetchone()
     if not result:
         raise HTTPException(status_code=404, detail="{table} not found")
@@ -99,9 +113,11 @@ def get_{table}_detail(
 
 def _generate_analysis_router(table: str, columns: list[str]) -> str:
     """Generate an analysis/stats router module."""
+    table_ref = _sql_identifier(table)
     return f'''"""Analysis endpoints for {table}."""
 
 from fastapi import APIRouter, Depends
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from database import get_db
@@ -114,7 +130,7 @@ def get_{table}_stats(
     db: Session = Depends(get_db),
 ):
     """Get aggregate statistics for {table}."""
-    count = db.execute("SELECT COUNT(*) FROM {table}").scalar()
+    count = db.execute(text("SELECT COUNT(*) FROM {table_ref}")).scalar()
     return {{"table": "{table}", "count": count}}
 '''
 
@@ -122,9 +138,11 @@ def get_{table}_stats(
 def _generate_crossref_router(table: str, join_table: str, columns: list[str]) -> str:
     """Generate a cross-reference router module."""
     cols_str = ", ".join(f'"{c}"' for c in columns) if columns else ""
+    table_ref = _sql_identifier(table)
     return f'''"""Cross-reference endpoints for {table} with {join_table}."""
 
 from fastapi import APIRouter, Depends, Query
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from database import get_db
@@ -141,7 +159,8 @@ def cross_ref_{table}_with_{join_table}(
     """Cross-reference {table} with {join_table}."""
     # TODO: Implement join query between {table} and {join_table}
     results = db.execute(
-        "SELECT * FROM {table} LIMIT {{limit}} OFFSET {{skip}}"
+        text("SELECT * FROM {table_ref} LIMIT :limit OFFSET :skip"),
+        {{"limit": limit, "skip": skip}},
     ).fetchall()
     return {{"items": [dict(r._mapping) for r in results], "total": len(results)}}
 '''
@@ -149,9 +168,11 @@ def cross_ref_{table}_with_{join_table}(
 
 def _generate_join_router(table: str, join_table: str, columns: list[str]) -> str:
     """Generate a relationship join router module."""
+    table_ref = _sql_identifier(table)
     return f'''"""Relationship join endpoints for {table} with {join_table}."""
 
 from fastapi import APIRouter, Depends, Query
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from database import get_db
@@ -168,7 +189,8 @@ def join_{table}_with_{join_table}(
     """Join {table} with {join_table} via relationship."""
     # TODO: Implement join query between {table} and {join_table}
     results = db.execute(
-        "SELECT * FROM {table} LIMIT {{limit}} OFFSET {{skip}}"
+        text("SELECT * FROM {table_ref} LIMIT :limit OFFSET :skip"),
+        {{"limit": limit, "skip": skip}},
     ).fetchall()
     return {{"items": [dict(r._mapping) for r in results], "total": len(results)}}
 '''
