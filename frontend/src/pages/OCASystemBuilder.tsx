@@ -242,6 +242,7 @@ export default function OCASystemBuilder() {
   const edgeToConnectionId = useRef<Map<string, string>>(new Map());
   const lastDraftSignatureRef = useRef<string | null>(null);
   const hasAutoFitRef = useRef(false);
+  const initStartedRef = useRef(false);
 
   const selectedComponent = useMemo(
     () => (editorComponentId ? componentMap.current.get(editorComponentId) ?? null : null),
@@ -482,10 +483,19 @@ export default function OCASystemBuilder() {
     }
   }, [buildNode, setEdges, setNodes]);
 
+  const restoreDraftRef = useRef(restoreDraft);
+
+  useEffect(() => {
+    restoreDraftRef.current = restoreDraft;
+  }, [restoreDraft]);
+
   // ---------------------------------------------------------------------------
   // Initialize system on mount
   // ---------------------------------------------------------------------------
   useEffect(() => {
+    if (initStartedRef.current) return undefined;
+    initStartedRef.current = true;
+
     let cancelled = false;
 
     async function init() {
@@ -499,7 +509,7 @@ export default function OCASystemBuilder() {
         setSystemId(res.system_id);
 
         if (draft) {
-          await restoreDraft(res.system_id, draft);
+          await restoreDraftRef.current(res.system_id, draft);
         }
       } catch (err) {
         if (!cancelled) {
@@ -511,7 +521,7 @@ export default function OCASystemBuilder() {
     return () => {
       cancelled = true;
     };
-  }, [restoreDraft]);
+  }, []);
 
   useEffect(() => {
     if (!systemId) return undefined;

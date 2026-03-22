@@ -738,6 +738,48 @@ test('oca system builder supports draft restore, assessment, path inspection, an
   expect(download.suggestedFilename()).toContain('oca-system-');
 });
 
+test('oca system builder initializes at most once per mount when restoring a draft', async ({ page }) => {
+  const state = await installSystemBuilderMock(page);
+  await seedBuilderDraft(page, {
+    version: 1,
+    saved_at: '2026-03-10T12:00:00.000Z',
+    inputs: {
+      o2_fraction: 1,
+      system_pressure_min_psia: 14.7,
+      system_pressure_max_psia: 3000,
+      phase: 'gox',
+      oxygen_phase: 'gas',
+      temp_min_c: null,
+      temp_max_c: null,
+      design_flow_rate_m3_s: 0.02,
+      cleanliness_spec: 'Level 100',
+      mission_phase: 'ground_test',
+      project_name: '',
+      hardware_name: '',
+      reviewer_name: '',
+      bi_directional_flow_risk: false,
+    },
+    components: [
+      {
+        component_id: 'draft-valve',
+        archetype: 'valve',
+        label: 'Valve',
+        position_x: 280,
+        position_y: 140,
+        materials: [{ slot_name: 'body', material: { material_name: '316L' } }],
+        config: {},
+      },
+    ],
+    connections: [],
+  });
+
+  await page.goto('/oca/system-builder');
+  await expect(page.getByRole('heading', { name: 'OCA System Builder' })).toBeVisible();
+  await expect.poll(() => state.components.length).toBe(1);
+  await page.waitForTimeout(1000);
+  expect(state.createCount).toBeLessThanOrEqual(2);
+});
+
 test('oca system builder supports raw palette add, connect, tabs, and reassessment flow', async ({ page }) => {
   const state = await installSystemBuilderMock(page);
 
