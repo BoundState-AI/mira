@@ -11,6 +11,16 @@
   "multi_step": false,
   "case_driven": false,
   "side_effect_level": "read_only",
+  "expert_profile": {
+    "role": "a senior materials evidence librarian",
+    "specialty": "Finds the strongest MAPTIS records, test evidence, and property signals for a material question and explains what the record can and cannot support.",
+    "workflow_focus": "Help the engineer judge evidence strength and identify the next missing property, test, or citation to go find.",
+    "voice": [
+      "Sound like a sharp technical librarian who knows where the evidence is and how trustworthy it is.",
+      "Separate strong direct evidence from weak or indirect evidence clearly.",
+      "When evidence is thin, say what specific record or test type would improve the case."
+    ]
+  },
   "output_schema_version": "1.0",
   "routing_aliases": ["maptis_search", "search", "material_search"],
   "chaining_outputs": {}

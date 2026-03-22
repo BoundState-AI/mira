@@ -28,6 +28,7 @@ from typing import Any
 
 from mira.providers.llm_provider import complete as llm_complete, resolve_model
 
+from .capability_registry import get_engine
 from .models import EngineEnvelope, Status, TaskMode
 
 LOGGER = logging.getLogger(__name__)
@@ -58,56 +59,133 @@ FORMATTER_TIMEOUT_S = 45
 #   - Is patient: if data is missing, explains exactly what's needed and why
 #   - Remembers this is a conversation, not a report
 
+_DEFAULT_EXPERT_PROFILE = {
+    "display_name": "MIRA Engineering Chat",
+    "role": "a senior Materials & Processes engineer",
+    "specialty": (
+        "Broad aerospace M&P triage across compatibility, evidence review, "
+        "and standards-driven follow-up."
+    ),
+    "workflow_focus": (
+        "Help the engineer understand the next grounded step in this workflow, "
+        "not just the verdict."
+    ),
+    "voice": [
+        "Lead with the verdict in plain language, then connect the evidence to it.",
+        "Teach like a specialist mentor, but stay concise and practical.",
+        "Use the domain vocabulary the engine would use, not generic safety wording.",
+        "If the result is conditional or weakly supported, say what would change the answer next.",
+    ],
+}
+
+
 FORMATTER_SYSTEM_PROMPT = """\
-You are a senior Materials & Processes engineer with 30 years of aerospace \
-experience, helping a colleague through a MIRA assessment.
+You are {expert_role}, the specialist behind MIRA's {engine_display_name}.
 
-You are patient, thorough, and precise.  You explain your reasoning.  When \
-a result is conditional or fails, you explain what it means practically — \
-not just technically.  You guide the engineer toward the next step.
+SPECIALTY:
+- {expert_specialty}
+- {expert_workflow_focus}
 
-You ONLY use information from the engine result.  You never guess.  But you \
+SPECIALIST STYLE FOR THIS ENGINE:
+{expert_voice}
+
+You are helping a colleague through a MIRA assessment. You are patient, \
+thorough, and precise. You explain your reasoning. When a result is \
+conditional or fails, you explain what it means practically — not just \
+technically. You guide the engineer toward the next step.
+
+You ONLY use information from the engine result. You never guess. But you \
 explain what the engine found in a way that builds the engineer's \
 understanding, not just their compliance paperwork.
 
-Think: the best mentor you ever had, except they have instant access to \
-every NASA standard ever written.
+Think: the best domain mentor you ever had, except they have instant access \
+to every NASA standard, test result, and internal workflow note relevant to \
+this engine.
 
-VOICE:
+GENERAL VOICE:
 - Lead with the verdict in plain language: "316L gets a conditional pass here."
 - Then explain the WHY — connect the evidence to the conclusion
-- Use precise engineering terminology (CONDITIONAL_PASS, not "maybe okay"; \
-  promoted combustion, not "fire risk")
-- Anticipate the engineer's next question and address it proactively \
-  ("You're probably wondering about the kindling chain — here's what the \
-  evidence shows")
+- Use precise engineering terminology (CONDITIONAL_PASS, not "maybe okay")
+- Anticipate the engineer's next question and address it proactively
 - Be conversational but never chatty — engineers don't want essays
-- If this is a follow-up turn, acknowledge continuity ("Looking at the same material \
-  again at the new pressure...")
+- If this is a follow-up turn, acknowledge continuity ("Looking at the same material again at the new pressure...")
 
 RULES (non-negotiable):
 - Include ALL citations from the engine output — do not omit any
 - Do NOT add information not present in the engine result
-- Do NOT soften, hedge, or change the verdict — if the engine said FAIL, \
-  you say FAIL and explain what it means practically
-- When something is a REFUSE or INSUFFICIENT_DATA, you're direct but not \
-  dismissive — tell them exactly what's needed and why: "I need the \
-  operating pressure to run this assessment.  What pressure range are you \
-  looking at?"
+- Do NOT soften, hedge, or change the verdict — if the engine said FAIL, you say FAIL and explain what it means practically
+- When something is a REFUSE or INSUFFICIENT_DATA, you're direct but not dismissive — tell them exactly what's needed and why
 - Suggest follow-up actions ONLY from the engine's recommended_actions list
-- If recommended_actions includes a Category III note, call it out clearly: \
-  "Good news — this qualifies for Category III rationale code entry in the \
-  MIUL.  No full MUA submission required per NASA-STD-6016C."
-- If the result is a draft artifact, clearly label it: \
-  "DRAFT — This requires review and approval per your program's M&P Plan \
-  before use."
+- If recommended_actions includes a Category III note, call it out clearly
+- If the result is a draft artifact, clearly label it as a draft requiring review and approval
 - Never invent a confidence number — only report what the engine provided
-- When the engine returns assumptions, surface them: "I'm assuming annealed \
-  condition and ambient temperature — let me know if that's not your case."
+- When the engine returns assumptions, surface them clearly so the engineer can confirm or correct them
 
 Mode: {mode}
 Engine: {engine_id}
 Turn: {turn_count}"""
+
+
+def _stringify_profile_lines(value: Any, fallback: list[str]) -> list[str]:
+    """Normalize manifest profile text into a non-empty list of bullet lines."""
+    if isinstance(value, str):
+        cleaned = value.strip()
+        return [cleaned] if cleaned else list(fallback)
+    if isinstance(value, list):
+        lines = [str(item).strip() for item in value if str(item).strip()]
+        return lines or list(fallback)
+    return list(fallback)
+
+
+def get_formatter_profile(engine_id: str) -> dict[str, Any]:
+    """Resolve the specialist formatter profile for an engine.
+
+    Profiles live in the engine manifest under ``expert_profile`` so the
+    "panel of experts" behavior stays attached to the module declaration rather
+    than being scattered across the frontend.
+    """
+    profile = dict(_DEFAULT_EXPERT_PROFILE)
+    engine = get_engine(engine_id or "")
+    if isinstance(engine, dict):
+        display_name = str(engine.get("display_name") or "").strip()
+        if display_name:
+            profile["display_name"] = display_name
+
+        expert_profile = engine.get("expert_profile")
+        if isinstance(expert_profile, dict):
+            for field in ("role", "specialty", "workflow_focus"):
+                value = expert_profile.get(field)
+                if isinstance(value, str) and value.strip():
+                    profile[field] = value.strip()
+            profile["voice"] = _stringify_profile_lines(
+                expert_profile.get("voice"),
+                profile["voice"],
+            )
+
+    return profile
+
+
+def build_formatter_system_prompt(
+    envelope: EngineEnvelope,
+    session_context: dict[str, Any] | None = None,
+) -> str:
+    """Build the per-engine formatter system prompt."""
+    turn_count = 1
+    if session_context:
+        turn_count = int(session_context.get("turn_count", 1) or 1)
+
+    profile = get_formatter_profile(envelope.engine_id)
+    expert_voice = "\n".join(f"- {line}" for line in profile["voice"])
+    return FORMATTER_SYSTEM_PROMPT.format(
+        expert_role=profile["role"],
+        engine_display_name=profile["display_name"],
+        expert_specialty=profile["specialty"],
+        expert_workflow_focus=profile["workflow_focus"],
+        expert_voice=expert_voice,
+        mode=envelope.mode.value,
+        engine_id=envelope.engine_id,
+        turn_count=turn_count,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -260,15 +338,7 @@ async def format_response(
         if session_context is not None:
             session_context["formatter_model_used"] = model
 
-        turn_count = 1
-        if session_context:
-            turn_count = session_context.get("turn_count", 1)
-
-        system = FORMATTER_SYSTEM_PROMPT.format(
-            mode=envelope.mode.value,
-            engine_id=envelope.engine_id,
-            turn_count=turn_count,
-        )
+        system = build_formatter_system_prompt(envelope, session_context)
         user_prompt = build_formatter_prompt(envelope, session_context)
 
         loop = asyncio.get_running_loop()
@@ -320,7 +390,8 @@ def _fallback_format(
         return envelope.response_text
 
     lines: list[str] = []
-    engine_label = f"{envelope.engine_id} v{envelope.engine_version}"
+    profile = get_formatter_profile(envelope.engine_id)
+    engine_label = f"{profile['display_name']} v{envelope.engine_version}"
 
     if status == Status.PASS:
         lines.append(f"**PASS** — This checks out. [{engine_label}]")
@@ -416,6 +487,14 @@ def _fallback_format(
 
 def _plain_language_summary(envelope: EngineEnvelope) -> str:
     """Return a short plain-language lead-in for deterministic fallback mode."""
+    if envelope.engine_id == "h2":
+        if envelope.status == Status.PASS:
+            return "From a hydrogen-compatibility standpoint, the current material and condition screen as acceptable as stated."
+        if envelope.status == Status.CONDITIONAL_PASS:
+            return "From a hydrogen-compatibility standpoint, this is only acceptable within the stated condition limits and controls."
+        if envelope.status == Status.FAIL:
+            return "From a hydrogen-compatibility standpoint, the current case carries a real embrittlement or service risk."
+
     if envelope.engine_id == "galvanic":
         if envelope.status == Status.PASS:
             return "In plain language: this material couple screens as acceptable in the stated environment."
@@ -423,6 +502,30 @@ def _plain_language_summary(envelope: EngineEnvelope) -> str:
             return "In plain language: this couple may be workable, but only if you apply the listed mitigations."
         if envelope.status == Status.FAIL:
             return "In plain language: this couple carries meaningful galvanic risk in the stated environment."
+
+    if envelope.engine_id == "fracture":
+        if envelope.status == Status.PASS:
+            return "From a fracture-control standpoint, the current classification and context support proceeding as stated."
+        if envelope.status == Status.CONDITIONAL_PASS:
+            return "From a fracture-control standpoint, this path is only defensible if the listed controls, assumptions, or inspections hold."
+        if envelope.status == Status.FAIL:
+            return "From a fracture-control standpoint, the current part context does not support proceeding as stated."
+
+    if envelope.engine_id == "gpcm":
+        if envelope.status == Status.PASS:
+            return "From a standards-compliance standpoint, the current case closes cleanly against the governing requirement set."
+        if envelope.status == Status.CONDITIONAL_PASS:
+            return "From a standards-compliance standpoint, this can close only if the listed requirement gaps are resolved."
+        if envelope.status == Status.FAIL:
+            return "From a standards-compliance standpoint, the current case does not close against the governing requirements."
+
+    if envelope.engine_id == "maptis_search":
+        if envelope.status == Status.PASS:
+            return "I found grounded MAPTIS evidence that directly supports this material question."
+        if envelope.status == Status.CONDITIONAL_PASS:
+            return "I found useful MAPTIS evidence, but the record still needs interpretation or supplemental data."
+        if envelope.status == Status.FAIL:
+            return "The available MAPTIS evidence does not support the requested conclusion."
 
     if envelope.engine_id == "bsmh":
         structured = envelope.domain_payload.get("structured_query", {})

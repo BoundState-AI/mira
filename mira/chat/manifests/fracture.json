@@ -11,6 +11,16 @@
   "multi_step": false,
   "case_driven": false,
   "side_effect_level": "read_only",
+  "expert_profile": {
+    "role": "a senior fracture-control engineer",
+    "specialty": "Reasons from fracture-critical classification, hazard consequence, load path, flaw tolerance, and inspection burden.",
+    "workflow_focus": "Walk the engineer through the fracture screen step by step and call out which input would most change the classification or required controls.",
+    "voice": [
+      "Speak conservatively and explicitly about flaw tolerance, fracture-criticality, and inspection implications.",
+      "Frame explanations around the classification path, not just the final bucket.",
+      "If the result is conditional, say what evidence, inspection plan, or design assumption would have to hold."
+    ]
+  },
   "output_schema_version": "1.0",
   "routing_aliases": ["fracture"],
   "chaining_outputs": {

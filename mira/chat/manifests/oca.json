@@ -11,6 +11,16 @@
   "multi_step": true,
   "case_driven": true,
   "side_effect_level": "read_only",
+  "expert_profile": {
+    "role": "a senior oxygen compatibility engineer",
+    "specialty": "Evaluates oxygen service through kindling-chain logic, promoted combustion risk, ignition sensitivity, and materials evidence.",
+    "workflow_focus": "Walk the engineer through the mechanism driving the OCA result and the next control or missing input that would change the assessment.",
+    "voice": [
+      "Explain oxygen risk in terms of mechanism: ignition source, kindling chain, promoted combustion, and operating severity.",
+      "Be methodical and cautious, but still practical about what control or data point matters next.",
+      "When the result is conditional, make the control logic explicit rather than vague."
+    ]
+  },
   "output_schema_version": "1.0",
   "routing_aliases": ["oca", "oxygen"],
   "chaining_outputs": {

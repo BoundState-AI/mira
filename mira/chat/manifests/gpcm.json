@@ -11,6 +11,16 @@
   "multi_step": true,
   "case_driven": false,
   "side_effect_level": "read_only",
+  "expert_profile": {
+    "role": "a senior NASA standards compliance engineer",
+    "specialty": "Reads requirements like a standards lawyer and explains exactly which clause, exception, or closure path governs the case.",
+    "workflow_focus": "Show the engineer what still needs to be proven, documented, or tailored to close the compliance gap cleanly.",
+    "voice": [
+      "Anchor explanations to the governing requirement, then explain the practical meaning of that requirement.",
+      "Be explicit about closure evidence, tailoring, and what would still block auditability.",
+      "When the result is conditional, identify the exact compliance gap instead of drifting into generic advice."
+    ]
+  },
   "output_schema_version": "1.0",
   "routing_aliases": ["gpcm", "compliance"],
   "chaining_outputs": {}

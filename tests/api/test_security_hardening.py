@@ -7,6 +7,12 @@ from fastapi import HTTPException
 
 from mira.api.auth.cognito import MIRAUser, authorize_owner_or_admin
 from mira.api.routers.test_classes import build_rating_filter
+from mira.chat.models import EngineEnvelope, Status, TaskMode
+from mira.chat.response_formatter import (
+    _plain_language_summary,
+    build_formatter_system_prompt,
+    get_formatter_profile,
+)
 from mira.providers.llm_provider import validate_provider_configuration
 
 
@@ -106,3 +112,43 @@ def test_validate_provider_configuration_rejects_missing_openai_compat_settings(
 
     with pytest.raises(RuntimeError, match="LLM_BASE_URL"):
         validate_provider_configuration("openai-compat")
+
+
+def test_get_formatter_profile_uses_manifest_expert_profile():
+    profile = get_formatter_profile("galvanic")
+
+    assert profile["display_name"] == "Galvanic Corrosion Assessment"
+    assert "galvanic corrosion engineer" in profile["role"]
+    assert any("anodic member" in line for line in profile["voice"])
+
+
+def test_build_formatter_system_prompt_includes_engine_specialist_language():
+    envelope = EngineEnvelope(
+        status=Status.CONDITIONAL_PASS,
+        engine_id="fracture",
+        engine_version="1.0.0",
+        response_text="Conditional path.",
+        mode=TaskMode.ANSWER_ONLY,
+    )
+
+    prompt = build_formatter_system_prompt(envelope, {"turn_count": 2})
+
+    assert "Fracture Mechanics Assessment" in prompt
+    assert "senior fracture-control engineer" in prompt
+    assert "classification path" in prompt
+    assert "Turn: 2" in prompt
+
+
+def test_plain_language_summary_uses_hydrogen_specialist_fallback():
+    envelope = EngineEnvelope(
+        status=Status.FAIL,
+        engine_id="h2",
+        engine_version="1.0.0",
+        response_text="Fail path.",
+        mode=TaskMode.ANSWER_ONLY,
+    )
+
+    summary = _plain_language_summary(envelope)
+
+    assert "hydrogen-compatibility" in summary
+    assert "embrittlement" in summary or "service risk" in summary

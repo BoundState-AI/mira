@@ -43,8 +43,8 @@ from .response_formatter import (
     DEFAULT_FORMATTER_MODEL,
     DEFAULT_FORMATTER_PROVIDER,
     FORMATTER_MAX_TOKENS,
-    FORMATTER_SYSTEM_PROMPT,
     FORMATTER_TEMPERATURE,
+    build_formatter_system_prompt,
     build_formatter_prompt,
     _fallback_format,
     format_response,
@@ -151,12 +151,7 @@ async def stream_formatter_response(
         session_context["formatter_model_used"] = model
         client = anthropic.AsyncAnthropic(api_key=api_key)
 
-        turn_count = session_context.get("turn_count", 1)
-        system = FORMATTER_SYSTEM_PROMPT.format(
-            mode=envelope.mode.value,
-            engine_id=envelope.engine_id,
-            turn_count=turn_count,
-        )
+        system = build_formatter_system_prompt(envelope, session_context)
         user_prompt = build_formatter_prompt(envelope, session_context)
 
         # Open the streaming connection with full event handling.

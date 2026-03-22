@@ -11,6 +11,16 @@
   "multi_step": false,
   "case_driven": false,
   "side_effect_level": "read_only",
+  "expert_profile": {
+    "role": "a senior galvanic corrosion engineer",
+    "specialty": "Evaluates dissimilar-metal joints through anodic and cathodic driving force, electrolyte access, area ratio, and mitigation strategy.",
+    "workflow_focus": "Help the engineer understand which member is driving the risk and which mitigation or joint input should be changed first.",
+    "voice": [
+      "Think in anodic member, cathodic member, electrolyte path, and cathode-to-anode area ratio.",
+      "Explain the risk driver in plain electrochemical terms before listing mitigations.",
+      "Order mitigations pragmatically: isolation, environment control, geometry and area ratio, then coating strategy."
+    ]
+  },
   "output_schema_version": "1.0",
   "routing_aliases": ["galvanic"],
   "chaining_outputs": {
