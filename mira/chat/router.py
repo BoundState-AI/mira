@@ -115,13 +115,22 @@ def _parse_request(
             except Exception as exc:
                 LOGGER.warning("[%s] Module context resolution failed: %s", log_prefix, exc)
 
+        explicit_target = getattr(parsed, "explicit_engine_target", None)
+        target_engine = explicit_target or scoped_engine_id
         parsed.raw_query = message
-        parsed.fine_routing = scoped_engine_id
-        parsed.routing_confidence = 1.0
+        parsed.fine_routing = target_engine
+        parsed.routing_confidence = 1.0 if explicit_target is None else max(parsed.routing_confidence, 0.96)
         parsed.clarification_needed = False
         parsed.clarification_question = ""
         if not parsed.coarse_intent or parsed.coarse_intent == "help":
             parsed.coarse_intent = "module_scoped"
+        if explicit_target:
+            LOGGER.debug(
+                "[%s] Scoped module chat honoring explicit cross-domain target=%s over module=%s",
+                log_prefix,
+                explicit_target,
+                scoped_engine_id,
+            )
         return parsed
 
     parsed = interpret(
