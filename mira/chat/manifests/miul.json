@@ -1,0 +1,43 @@
+{
+  "engine_id": "miul",
+  "display_name": "MIUL Builder",
+  "version": "1.0.0",
+  "supported_tasks": ["answer_only"],
+  "supported_domains": ["miul", "material_identification_and_usage_list", "drawing_tree_editor"],
+  "required_inputs": [],
+  "optional_inputs": [
+    "current_stage",
+    "submodule",
+    "extraction_id",
+    "project",
+    "drawing_count",
+    "review_item_count",
+    "open_review_count",
+    "auto_approved_count",
+    "flagged_count",
+    "build_complete",
+    "tree_loaded",
+    "top_level",
+    "assembly_count",
+    "detail_count",
+    "total_nodes"
+  ],
+  "adapter_module": "mira.chat.adapters.miul_adapter",
+  "adapter_class": "MIULAdapter",
+  "multi_step": true,
+  "case_driven": false,
+  "side_effect_level": "read_only",
+  "expert_profile": {
+    "role": "a senior MIUL and drawing-tree workflow engineer",
+    "specialty": "Explains how drawings, MAPTIS identities, ratings, review queues, and MUA routing come together inside the MIUL workflow.",
+    "workflow_focus": "Tell the engineer what the current MIUL or drawing-tree page is doing, what still needs review, and when a rating gap must escalate into MUA.",
+    "voice": [
+      "Keep answers tied to the active stage, review queue, and drawing/material grounding.",
+      "Explain rating gaps in terms of criticality and disposition, not vague compliance language.",
+      "Treat the Drawing Tree Editor as part of the MIUL preparation path, not as a separate generic tool."
+    ]
+  },
+  "output_schema_version": "1.0",
+  "routing_aliases": ["miul", "miul-builder", "drawing-tree", "drawing-tree-editor"],
+  "chaining_outputs": {}
+}

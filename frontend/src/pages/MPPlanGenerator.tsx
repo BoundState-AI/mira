@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
+import { ModuleChatButton } from '@/components/mira/ModuleChatButton';
 import {
   GuidanceContextIndicator,
   GuidanceField,
@@ -63,6 +64,11 @@ import {
   mpPlanGuidancePack,
 } from '@/lib/guidance/mp-plan-pack';
 import type { GuidanceModeName } from '@/lib/guidance/types';
+import {
+  buildChatContextSummary,
+  createModuleChatLaunchState,
+  registerRouteModuleChatState,
+} from '@/lib/mira-chat-context';
 
 type Step = 'setup' | 'environment' | 'materials' | 'analysis' | 'generate';
 
@@ -146,6 +152,12 @@ export default function MPPlanGenerator() {
   const [maptisSearchResults, setMaptisSearchResults] = useState<Record<string, MaptisSearchResult[]>>({});
   const [searchingMaptis, setSearchingMaptis] = useState<Record<string, boolean>>({});
   const searchTimeouts = useRef<Record<string, NodeJS.Timeout>>({});
+  const populatedMaterialCount = materials.filter(
+    (material) =>
+      material.name.trim().length > 0
+      || material.application.trim().length > 0
+      || material.maptis_code.trim().length > 0,
+  ).length;
   const guidanceContext = createMpPlanContext({
     user_mode: guidanceMode,
     program: programName || undefined,
@@ -158,6 +170,54 @@ export default function MPPlanGenerator() {
   const [computeResult, setComputeResult] = useState<MPPlanComputeResult | null>(null);
   const [questions, setQuestions] = useState<MPPlanBlockingQuestion[]>([]);
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const blockingQuestionCount =
+    questions.length
+    || computeResult?.blocking_questions.length
+    || session?.blocking_question_count
+    || 0;
+  const mpPlanChatLaunchState = useMemo(
+    () =>
+      createModuleChatLaunchState({
+        scopeKey: session?.session_id ? `mp-plan:${session.session_id}` : 'mp-plan',
+        moduleLabel: 'M&P Plan',
+        moduleContext: {
+          module: 'mp_plan',
+          mp_plan_session_id: session?.session_id,
+          program_name: session?.program_name || programName.trim() || undefined,
+          program_phase: programPhase || undefined,
+          current_step: step,
+          environment_count: addedEnvironments.length,
+          material_count: populatedMaterialCount,
+          blocking_question_count: blockingQuestionCount,
+        },
+        originPath: '/mp-plan',
+        originTitle: 'M&P Plan',
+        description: 'Ground the chat in the active M&P plan session, workflow step, and blockers.',
+        contextSummary: buildChatContextSummary([
+          { label: 'Session', value: session?.session_id },
+          { label: 'Program', value: session?.program_name || programName.trim() || null },
+          { label: 'Phase', value: programPhase || null },
+          { label: 'Step', value: step },
+          { label: 'Environments', value: addedEnvironments.length },
+          { label: 'Materials', value: populatedMaterialCount },
+          { label: 'Blocking', value: blockingQuestionCount },
+        ]),
+      }),
+    [
+      addedEnvironments.length,
+      blockingQuestionCount,
+      populatedMaterialCount,
+      programName,
+      programPhase,
+      session?.program_name,
+      session?.session_id,
+      step,
+    ],
+  );
+
+  useEffect(() => {
+    registerRouteModuleChatState('/mp-plan', mpPlanChatLaunchState);
+  }, [mpPlanChatLaunchState]);
 
   // Generate state
   const [artifacts, setArtifacts] = useState<GeneratedMPArtifact[]>([]);
@@ -455,6 +515,7 @@ export default function MPPlanGenerator() {
             defaultValue: 'Generate Materials & Processes Plans with automated NASA-STD-6016C compliance analysis',
           })}
           helpContent={helpContent.mpPlan}
+          actions={<ModuleChatButton launchState={mpPlanChatLaunchState} />}
         />
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
           <GuidanceContextIndicator context={guidanceContext} />

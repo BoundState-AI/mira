@@ -34,38 +34,113 @@ LOGGER = logging.getLogger(__name__)
 # Model tier defaults — Bedrock-first runtime defaults
 # ---------------------------------------------------------------------------
 
-_DEFAULT_SONNET_MODEL = "us.anthropic.claude-sonnet-4-5-20250929-v1:0"
-_DEFAULT_SONNET_MODEL_GOVCLOUD = "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0"
-
-MODEL_DEFAULTS: dict[str, str] = {
-    "sonnet": _DEFAULT_SONNET_MODEL,
-    "haiku": "amazon.nova-lite-v1:0",
+_BEDROCK_MODEL_DEFAULTS: dict[str, str] = {
+    "sonnet": "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+    "haiku": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
 }
+_BEDROCK_MODEL_DEFAULTS_GOVCLOUD: dict[str, str] = {
+    "sonnet": "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0",
+    "haiku": "us-gov.anthropic.claude-haiku-4-5-20251001-v1:0",
+}
+_ANTHROPIC_MODEL_DEFAULTS: dict[str, str] = {
+    "sonnet": "claude-sonnet-4-5-20250929",
+    "haiku": "claude-haiku-4-5-20251001",
+}
+MODEL_DEFAULTS = _BEDROCK_MODEL_DEFAULTS
 
 
-def resolve_model(tier: str) -> str:
-    """Map a logical tier name to a concrete model ID.
+def resolve_provider_name(name: str | None = None) -> str:
+    """Resolve the active provider name, honoring chat-specific overrides."""
+    return (
+        name
+        or os.environ.get("LLM_PROVIDER")
+        or os.environ.get("MIRA_CHAT_LLM_PROVIDER")
+        or "bedrock-converse"
+    ).strip().lower()
 
-    Checks ``LLM_SONNET_MODEL`` / ``LLM_HAIKU_MODEL`` env vars first, then
-    falls back to ``MODEL_DEFAULTS``.  If *tier* is not a known alias the
-    string is returned verbatim (assumed to be a full model ID).
-    """
+
+def resolve_bedrock_region(
+    *,
+    model_id: str | None = None,
+    region_override: str | None = None,
+) -> str:
+    """Resolve the AWS Bedrock region with explicit env and model-aware fallbacks."""
+    if region_override and region_override.strip():
+        return region_override.strip()
+
+    for env_key in (
+        "BEDROCK_REGION",
+        "MIRA_CHAT_BEDROCK_REGION",
+        "AWS_REGION",
+        "AWS_DEFAULT_REGION",
+    ):
+        value = os.environ.get(env_key, "").strip()
+        if value:
+            return value
+
+    normalized_model = (model_id or "").strip().lower()
+    if normalized_model.startswith("us-gov."):
+        return "us-gov-west-1"
+    if normalized_model.startswith("us."):
+        return "us-east-1"
+    return "us-east-1"
+
+
+def resolve_model_for_provider(
+    tier: str,
+    *,
+    provider_name: str | None = None,
+    bedrock_region: str | None = None,
+) -> str:
+    """Resolve a logical tier for a specific provider/region combination."""
+    resolved_provider = resolve_provider_name(provider_name)
+    resolved_region = resolve_bedrock_region(
+        model_id=None,
+        region_override=bedrock_region,
+    ).lower()
+
     env_map = {"sonnet": "LLM_SONNET_MODEL", "haiku": "LLM_HAIKU_MODEL"}
     env_var = env_map.get(tier)
     if env_var:
         val = os.environ.get(env_var, "").strip()
         if val:
-            return val
-    if tier == "sonnet":
-        region = (
-            os.environ.get("BEDROCK_REGION")
-            or os.environ.get("AWS_REGION")
-            or os.environ.get("AWS_DEFAULT_REGION")
-            or ""
-        ).strip().lower()
-        if region.startswith("us-gov-"):
-            return _DEFAULT_SONNET_MODEL_GOVCLOUD
-    return MODEL_DEFAULTS.get(tier, tier)
+            if resolved_provider == "bedrock-converse":
+                if resolved_region.startswith("us-gov-") and val.startswith("us."):
+                    LOGGER.warning(
+                        "Ignoring commercial %s=%s for GovCloud Bedrock region %s; using GovCloud default.",
+                        env_var,
+                        val,
+                        resolved_region,
+                    )
+                elif (
+                    resolved_region.startswith("us-")
+                    and not resolved_region.startswith("us-gov-")
+                    and val.startswith("us-gov.")
+                ):
+                    LOGGER.warning(
+                        "Ignoring GovCloud %s=%s for commercial Bedrock region %s; using commercial default.",
+                        env_var,
+                        val,
+                        resolved_region,
+                    )
+                else:
+                    return val
+            else:
+                return val
+    if tier not in {"sonnet", "haiku"}:
+        return tier
+
+    if resolved_provider == "anthropic":
+        return _ANTHROPIC_MODEL_DEFAULTS[tier]
+
+    if resolved_provider == "bedrock-converse" and resolved_region.startswith("us-gov-"):
+        return _BEDROCK_MODEL_DEFAULTS_GOVCLOUD[tier]
+    return _BEDROCK_MODEL_DEFAULTS[tier]
+
+
+def resolve_model(tier: str) -> str:
+    """Map a logical tier name to a concrete model ID."""
+    return resolve_model_for_provider(tier)
 
 
 # ---------------------------------------------------------------------------
@@ -126,8 +201,9 @@ class BedrockConverseProvider:
     ) -> None:
         import boto3
 
-        self._region = region or os.environ.get(
-            "BEDROCK_REGION", os.environ.get("AWS_REGION", "us-east-1")
+        self._region = resolve_bedrock_region(
+            model_id=model_id,
+            region_override=region,
         )
         self._default_model = model_id or resolve_model("sonnet")
         self._client = boto3.client("bedrock-runtime", region_name=self._region)
@@ -367,7 +443,7 @@ _PROVIDER_REGISTRY: dict[str, type] = {
 
 def validate_provider_configuration(name: str | None = None) -> None:
     """Fail fast on obviously incomplete provider configuration."""
-    provider_name = (name or os.environ.get("LLM_PROVIDER", "bedrock-converse")).strip().lower()
+    provider_name = resolve_provider_name(name)
 
     if provider_name not in _PROVIDER_REGISTRY:
         valid = ", ".join(sorted(_PROVIDER_REGISTRY))
@@ -414,7 +490,7 @@ def get_provider(name: str | None = None) -> LLMProvider:
     ``OPENAI_API_KEY``   OpenAICompatProvider auth
     =================== ========================================
     """
-    provider_name = (name or os.environ.get("LLM_PROVIDER", "bedrock-converse")).strip().lower()
+    provider_name = resolve_provider_name(name)
 
     cls = _PROVIDER_REGISTRY.get(provider_name)
     if cls is None:
@@ -438,6 +514,7 @@ def complete(
     temperature: float = 0.0,
     timeout_s: int = 45,
     provider: str | None = None,
+    bedrock_region: str | None = None,
 ) -> LLMResponse:
     """Synchronous text completion via the configured provider.
 
@@ -454,15 +531,16 @@ def complete(
         temperature: Sampling temperature.
         timeout_s: Request timeout (used by providers that support it).
         provider: Override provider name (default: auto-detect via env).
+        bedrock_region: Explicit AWS Bedrock region override for Bedrock calls.
 
     Returns:
         LLMResponse with normalized text and metadata.
     """
-    backend_name = provider or os.environ.get("LLM_PROVIDER", "").strip().lower()
+    backend_name = resolve_provider_name(provider)
 
     # Map legacy provider names
     if backend_name == "bedrock-converse":
-        prov = BedrockConverseProvider(model_id=model)
+        prov = BedrockConverseProvider(region=bedrock_region, model_id=model)
     elif backend_name == "anthropic":
         prov = AnthropicProvider(model_id=model)
     elif backend_name in {"openai-compat", "ollama"}:

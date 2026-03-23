@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 
 import { PageHeader } from '@/components/PageHeader';
+import { ModuleChatButton } from '@/components/mira/ModuleChatButton';
 import {
   GuidanceContextIndicator,
   GuidanceField,
@@ -35,6 +36,11 @@ import {
 } from '@/lib/mua-v10-api';
 import { authorityRegistry, createMuaContext, muaGuidancePack } from '@/lib/guidance/mua-pack';
 import type { GuidanceModeName } from '@/lib/guidance/types';
+import {
+  buildChatContextSummary,
+  createModuleChatLaunchState,
+  registerRouteModuleChatState,
+} from '@/lib/mira-chat-context';
 
 const ISSUE_COLUMNS = ['FLAM', 'FS', 'TOX', 'TVS', 'SCC', 'CORR'] as const;
 
@@ -50,6 +56,14 @@ const DEFAULT_RATINGS: RatingsState = {
   TVS: '',
   SCC: '',
   CORR: '',
+};
+
+const STEP_LABELS: Record<WizardStep, string> = {
+  1: 'Who / What / Where',
+  2: 'Ratings',
+  3: 'Flag Review',
+  4: 'Rationale',
+  5: 'Download',
 };
 
 const RATING_HINTS: Record<string, Record<string, string>> = {
@@ -521,6 +535,74 @@ export default function MUAV10() {
   const humanRequiredCount = pipelineResult?.human_required_count ?? 0;
   const hasMaterialIdentifier = Boolean(maptisCode.trim() || materialDesignation.trim());
   const saveDraftLabel = draftSavedAt ? `Draft saved ${new Date(draftSavedAt).toLocaleString()}` : 'Save Draft';
+  const ratingsEnteredCount = Object.keys(toApiRatings(ratings)).length;
+  const muaChatLaunchState = useMemo(
+    () =>
+      createModuleChatLaunchState({
+        scopeKey: sessionId ? `mua:${sessionId}` : 'mua',
+        moduleLabel: 'MUA Writer',
+        moduleContext: {
+          module: 'mua',
+          workflow_step: step,
+          workflow_step_label: STEP_LABELS[step],
+          session_id: sessionId,
+          material_key: maptisCode.trim() || undefined,
+          material_name: materialDesignation.trim() || undefined,
+          material_class: materialClass,
+          fluid_medium: media.trim() || undefined,
+          service_environment: environment,
+          oxygen_pct: o2Percent.trim() || undefined,
+          project: project.trim() || undefined,
+          system: system.trim() || undefined,
+          ratings_entered_count: ratingsEnteredCount,
+          automatable_count: pipelineResult?.automatable_count,
+          human_required_count: pipelineResult?.human_required_count,
+          no_mua_needed_count: pipelineResult?.no_mua_needed_count,
+          form_count: pipelineResult?.forms.length,
+          resolution_candidate_count: resolutionCandidates.length,
+        },
+        originPath: '/mua-v10',
+        originTitle: 'MUA Writer',
+        description: 'Ground the chat in the active Material Usage Agreement workflow and classifier state.',
+        starterPrompts: [
+          'What should I do next in this MUA workflow?',
+          'Explain the current classification path on this page.',
+          'Do these ratings point to a real problem, a real gap, or an incomplete pass?',
+        ],
+        contextSummary: buildChatContextSummary([
+          { label: 'Step', value: `${step} - ${STEP_LABELS[step]}` },
+          { label: 'Material', value: materialDesignation.trim() || maptisCode.trim() || null },
+          { label: 'Medium', value: media.trim() || null },
+          { label: 'Ratings', value: ratingsEnteredCount || null },
+          { label: 'Automatable', value: pipelineResult?.automatable_count ?? null },
+          { label: 'Engineer', value: pipelineResult?.human_required_count ?? null },
+          { label: 'Forms', value: pipelineResult?.forms.length ?? null },
+        ]),
+      }),
+    [
+      environment,
+      humanRequiredCount,
+      maptisCode,
+      materialClass,
+      materialDesignation,
+      media,
+      o2Percent,
+      pipelineResult?.automatable_count,
+      pipelineResult?.forms.length,
+      pipelineResult?.human_required_count,
+      pipelineResult?.no_mua_needed_count,
+      project,
+      ratingsEnteredCount,
+      resolutionCandidates.length,
+      sessionId,
+      step,
+      system,
+    ],
+  );
+
+  useEffect(() => {
+    registerRouteModuleChatState('/mua-v10', muaChatLaunchState);
+  }, [muaChatLaunchState]);
 
   const getConfidencePct = (value: number): number => {
     if (!Number.isFinite(value)) return 0;
@@ -553,6 +635,7 @@ export default function MUAV10() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <ModuleChatButton launchState={muaChatLaunchState} />
           {sessionId ? (
             <Button type="button" variant="outline" size="sm" onClick={() => setDraftSavedAt(new Date().toISOString())}>
               {saveDraftLabel}

@@ -1,0 +1,39 @@
+{
+  "engine_id": "tocr",
+  "display_name": "TOCR Review",
+  "version": "1.0.0",
+  "supported_tasks": ["answer_only"],
+  "supported_domains": ["tocr", "task_order_compliance_review", "task_order_review"],
+  "required_inputs": [],
+  "optional_inputs": [
+    "mode",
+    "agency",
+    "vehicle",
+    "policy_pack",
+    "has_result",
+    "verdict",
+    "raw_score",
+    "findings_count",
+    "remediation_count",
+    "rules_fired",
+    "active_rule_ids"
+  ],
+  "adapter_module": "mira.chat.adapters.tocr_adapter",
+  "adapter_class": "TOCRAdapter",
+  "multi_step": true,
+  "case_driven": false,
+  "side_effect_level": "read_only",
+  "expert_profile": {
+    "role": "a task-order compliance review specialist",
+    "specialty": "Explains TOCR findings, remediation, parser choices, and workflow mode using the active TOCR report and guidance pack.",
+    "workflow_focus": "Tell the reviewer what the current task-order result means, what needs to be fixed, and whether scan or revision review is the right path.",
+    "voice": [
+      "Translate rule IDs and findings into concrete review actions.",
+      "Keep the answer tied to the active report and rule guidance, not generic contract theory.",
+      "Be direct about missing report state when TOCR has not been run yet."
+    ]
+  },
+  "output_schema_version": "1.0",
+  "routing_aliases": ["tocr", "task-order-compliance-review", "task-order-review"],
+  "chaining_outputs": {}
+}

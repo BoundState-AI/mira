@@ -45,6 +45,15 @@ function messageId(prefix: "user" | "assistant"): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
 }
 
+function resizeComposer(textarea: HTMLTextAreaElement | null, minHeight: number, maxHeight: number) {
+  if (!textarea) {
+    return;
+  }
+  textarea.style.height = "0px";
+  const nextHeight = Math.min(Math.max(textarea.scrollHeight, minHeight), maxHeight);
+  textarea.style.height = `${nextHeight}px`;
+}
+
 function toHistoryMessages(messages: ChatUiMessage[]): MiraChatMessage[] {
   return messages.slice(-MAX_HISTORY_MESSAGES).map((message) => ({
     role: message.role,
@@ -101,6 +110,79 @@ function fallbackLaunchState(pathname: string): MiraModuleChatLaunchState | null
         originTitle: "OCA System Builder",
         description: "Ground the chat in the active system-builder module.",
       });
+    case "/mp-plan":
+      return createModuleChatLaunchState({
+        scopeKey: "mp-plan",
+        moduleLabel: "M&P Plan",
+        moduleContext: { module: "mp_plan" },
+        originPath: pathname,
+        originTitle: "M&P Plan",
+        description: "Ground the chat in the active M&P plan workflow.",
+      });
+    case "/mua-v10":
+      return createModuleChatLaunchState({
+        scopeKey: "mua",
+        moduleLabel: "MUA Writer",
+        moduleContext: { module: "mua" },
+        originPath: pathname,
+        originTitle: "MUA Writer",
+        description: "Answer only from the active MUA workflow state and guidance pack.",
+      });
+    case "/miul":
+      return createModuleChatLaunchState({
+        scopeKey: "miul",
+        moduleLabel: "MIUL Builder",
+        moduleContext: { module: "miul" },
+        originPath: pathname,
+        originTitle: "MIUL Builder",
+        description: "Answer only from the active MIUL workflow state and guidance pack.",
+      });
+    case "/dt-editor":
+      return createModuleChatLaunchState({
+        scopeKey: "dt-editor",
+        moduleLabel: "Drawing Tree Editor",
+        moduleContext: { module: "miul", submodule: "dt_editor" },
+        originPath: pathname,
+        originTitle: "Drawing Tree Editor",
+        description: "Answer only from the active drawing-tree editor state and MIUL guidance.",
+      });
+    case "/forge":
+      return createModuleChatLaunchState({
+        scopeKey: "forge-build",
+        moduleLabel: "FORGE Build Console",
+        moduleContext: { module: "forge_build" },
+        originPath: pathname,
+        originTitle: "FORGE Build Console",
+        description: "Answer only from the active FORGE build-console state and compile artifacts.",
+      });
+    case "/forge-explorer":
+      return createModuleChatLaunchState({
+        scopeKey: "forge-explorer",
+        moduleLabel: "FORGE Explorer",
+        moduleContext: { module: "forge_explorer" },
+        originPath: pathname,
+        originTitle: "FORGE Explorer",
+        description: "Answer only from the active FORGE explorer state and BSMS query results.",
+      });
+    case "/tocr":
+      return createModuleChatLaunchState({
+        scopeKey: "tocr",
+        moduleLabel: "TOCR Review",
+        moduleContext: { module: "tocr" },
+        originPath: pathname,
+        originTitle: "TOCR Review",
+        description: "Answer only from the active TOCR review state and guidance pack.",
+      });
+    case "/":
+    case "/knowledge-twins":
+      return createModuleChatLaunchState({
+        scopeKey: "knowledge-twins",
+        moduleLabel: "Knowledge Twins",
+        moduleContext: { module: "knowledge_twins" },
+        originPath: pathname,
+        originTitle: "Knowledge Twins",
+        description: "Answer only from the active Knowledge Twins fluid, mode, and visible evidence.",
+      });
     default:
       return null;
   }
@@ -119,6 +201,7 @@ export function MiraChatDock() {
   const [conversationLoaded, setConversationLoaded] = useState(false);
   const [serviceHealthy, setServiceHealthy] = useState(true);
   const conversationEndRef = useRef<HTMLDivElement | null>(null);
+  const composerRef = useRef<HTMLTextAreaElement | null>(null);
 
   const activeModuleLaunchState = useMemo(
     () => loadRouteModuleChatState(location.pathname) ?? fallbackLaunchState(location.pathname),
@@ -212,6 +295,10 @@ export function MiraChatDock() {
     };
   }, [open]);
 
+  useEffect(() => {
+    resizeComposer(composerRef.current, 112, 220);
+  }, [draft, open]);
+
   if (location.pathname === "/chat") {
     return null;
   }
@@ -276,7 +363,7 @@ export function MiraChatDock() {
   return (
     <div className="pointer-events-none fixed bottom-5 right-5 z-50 flex max-w-[calc(100vw-1.5rem)] flex-col items-end gap-3">
       {open ? (
-        <Card className="pointer-events-auto flex h-[36rem] w-[24rem] max-w-[calc(100vw-1.5rem)] flex-col overflow-hidden border-border/80 shadow-2xl">
+        <Card className="pointer-events-auto flex h-[40rem] max-h-[calc(100vh-6.5rem)] w-[28rem] max-w-[calc(100vw-1rem)] flex-col overflow-hidden border-border/80 shadow-2xl">
           <div className="border-b border-border/70 bg-[radial-gradient(circle_at_top_left,_rgba(15,118,110,0.14),_transparent_40%),linear-gradient(135deg,_rgba(8,47,73,0.98),_rgba(15,23,42,0.98))] px-4 py-3 text-slate-50">
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1">
@@ -289,7 +376,7 @@ export function MiraChatDock() {
                 </div>
                 <div className="text-xs text-slate-200/80">
                   {activeModuleLaunchState
-                    ? "Stays in this module unless you explicitly ask to switch."
+                    ? "Answers only from this module's data, rules, and workflow state."
                     : "Ask a cross-domain engineering question."}
                 </div>
               </div>
@@ -328,8 +415,8 @@ export function MiraChatDock() {
             </div>
           </div>
 
-          <ScrollArea className="flex-1 bg-[linear-gradient(180deg,rgba(248,250,252,0.98),rgba(241,245,249,0.96))]">
-            <div className="flex min-h-full flex-col gap-3 p-4">
+          <ScrollArea className="min-h-0 flex-1 bg-[linear-gradient(180deg,rgba(248,250,252,0.98),rgba(241,245,249,0.96))]">
+            <div className="flex min-h-full flex-col gap-3 pb-4 pl-4 pr-7 pt-4">
               {!messages.length ? (
                 <div className="space-y-3 rounded-2xl border border-dashed border-border bg-background/85 p-4">
                   <div className="text-sm font-medium">Start here</div>
@@ -357,30 +444,33 @@ export function MiraChatDock() {
                 return (
                   <div
                     key={message.id}
-                    className={cn("flex", isAssistant ? "justify-start" : "justify-end")}
+                    className={cn("flex min-w-0", isAssistant ? "justify-start" : "justify-end pl-4 pr-5")}
                   >
                     <div
                       className={cn(
-                        "max-w-[90%] rounded-2xl border px-3 py-2 shadow-sm",
+                        "min-w-0 rounded-2xl border shadow-sm",
+                        isAssistant ? "max-w-[94%] px-3 py-2" : "max-w-[80%] px-4 py-3",
                         isAssistant
                           ? "border-slate-200 bg-white text-slate-900"
                           : "border-teal-700 bg-teal-700 text-white",
                       )}
                     >
-                      <div className="mb-1 flex items-center gap-2 text-[10px] uppercase tracking-[0.14em] opacity-80">
-                        {isAssistant ? "MIRA" : "You"}
-                        {isAssistant && message.engineUsed ? (
+                      {isAssistant ? (
+                        <div className="mb-1 flex flex-wrap items-center gap-1.5 text-[10px] uppercase tracking-[0.14em] opacity-80">
+                          {"MIRA"}
+                          {message.engineUsed ? (
                           <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[9px] font-medium text-slate-600">
                             {message.engineUsed}
                           </span>
-                        ) : null}
-                        {isAssistant && message.verdict ? (
-                          <Badge variant={verdictVariant(message.verdict)} className="ml-auto text-[10px]">
-                            {message.verdict}
-                          </Badge>
-                        ) : null}
-                      </div>
-                      <div className="whitespace-pre-wrap text-sm leading-5">{message.content}</div>
+                          ) : null}
+                          {message.verdict ? (
+                            <Badge variant={verdictVariant(message.verdict)} className="text-[10px] sm:ml-auto">
+                              {message.verdict}
+                            </Badge>
+                          ) : null}
+                        </div>
+                      ) : null}
+                      <div className="whitespace-pre-wrap break-words text-sm leading-5">{message.content}</div>
                       {isAssistant && message.followUps?.length ? (
                         <div className="mt-2 flex flex-wrap gap-1.5 border-t border-slate-200 pt-2">
                           {message.followUps.slice(0, 2).map((followUp) => (
@@ -424,6 +514,7 @@ export function MiraChatDock() {
               </div>
             ) : null}
             <Textarea
+              ref={composerRef}
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
               onKeyDown={(event) => {
@@ -433,7 +524,7 @@ export function MiraChatDock() {
                 }
               }}
               placeholder="Ask MIRA..."
-              className="min-h-[88px] resize-none text-sm"
+              className="min-h-[112px] max-h-[220px] resize-none overflow-y-auto px-4 py-3 text-sm leading-6"
             />
             <div className="flex items-center justify-between gap-3">
               <div className="text-[11px] text-muted-foreground">

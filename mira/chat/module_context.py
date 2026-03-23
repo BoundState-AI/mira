@@ -97,12 +97,29 @@ _MODULE_TO_ROUTING: dict[str, str] = {
     "h2": "h2",
     "galvanic": "galvanic",
     "fracture": "fracture",
+    "mp_plan": "mp_plan",
+    "mua": "mua",
+    "miul": "miul",
+    "forge_build": "forge_build",
+    "forge_explorer": "forge_explorer",
+    "tocr": "tocr",
+    "knowledge_twins": "knowledge_twins",
     "gpcm": "gpcm",
     "compliance": "gpcm",
     "maptis": "maptis_search",
     "maptis_search": "maptis_search",
     "bsmh": "bsmh",
 }
+
+
+def resolve_module_routing(module_context: dict[str, Any] | None) -> str | None:
+    """Return the engine id implied by ``module_context``, if any."""
+    if not module_context:
+        return None
+    module_name = str(module_context.get("module", "")).strip().lower()
+    if not module_name:
+        return None
+    return _MODULE_TO_ROUTING.get(module_name)
 
 
 # ---------------------------------------------------------------------------
@@ -336,16 +353,189 @@ def _resolve_module_specific(
 
     # Fracture: part name, mission class
     elif module_name == "fracture":
-        part_name = module_context.get("part_name")
-        if part_name:
-            parsed.inherited_entities["part_name"] = part_name
-        mission_class = module_context.get("mission_class")
-        if mission_class:
-            parsed.inherited_entities["mission_class"] = mission_class
+        for field in (
+            "part_name",
+            "mission_class",
+            "hazard_consequence",
+            "load_path_type",
+            "pressure_boundary",
+            "lifecycle_phase",
+            "structural_role",
+            "material_system",
+            "specific_hardware_type",
+            "optional_approach_requested",
+            "proof_test_used",
+            "process_controls_used",
+            "detected_flaw_accepted_for_flight",
+            "corrosion_iccp_recommended",
+            "low_risk_candidate",
+            "additive_manufactured",
+            "chloride_exposure",
+            "sustained_load_expected",
+            "approved_source_data_attached",
+            "mua_present",
+            "nasa_std_6016_qualified",
+            "kic_fty_ratio",
+            "ftu_ksi",
+            "short_transverse_dimension_in",
+        ):
+            value = module_context.get(field)
+            if value is not None:
+                parsed.inherited_entities[field] = value
         # Set fracture_context flag
         parsed.fracture_context = True
 
     # OCA / H2: case_id already handled above; nothing extra needed
+
+    elif module_name == "mp_plan":
+        for field in (
+            "mp_plan_session_id",
+            "program_name",
+            "program_phase",
+            "current_step",
+            "environment_count",
+            "material_count",
+            "blocking_question_count",
+        ):
+            value = module_context.get(field)
+            if value is not None:
+                parsed.inherited_entities[field] = value
+
+    elif module_name == "mua":
+        for field in (
+            "workflow_step",
+            "workflow_step_label",
+            "material_key",
+            "material_name",
+            "material_class",
+            "fluid_medium",
+            "service_environment",
+            "project",
+            "system",
+            "ratings_entered_count",
+            "automatable_count",
+            "human_required_count",
+            "no_mua_needed_count",
+            "form_count",
+            "resolution_candidate_count",
+        ):
+            value = module_context.get(field)
+            if value is not None:
+                parsed.inherited_entities[field] = value
+
+    elif module_name == "miul":
+        for field in (
+            "current_stage",
+            "submodule",
+            "extraction_id",
+            "project",
+            "drawing_count",
+            "review_item_count",
+            "open_review_count",
+            "auto_approved_count",
+            "flagged_count",
+            "build_complete",
+            "tree_loaded",
+            "top_level",
+            "assembly_count",
+            "detail_count",
+            "total_nodes",
+        ):
+            value = module_context.get(field)
+            if value is not None:
+                parsed.inherited_entities[field] = value
+
+    elif module_name == "forge_build":
+        for field in (
+            "database_url_redacted",
+            "app_name",
+            "sample_rows",
+            "output_dir",
+            "compile_stage",
+            "compile_progress",
+            "compile_message",
+            "build_in_progress",
+            "has_compile_result",
+            "table_count",
+            "question_count",
+            "relationship_count",
+            "latent_relationship_count",
+            "warnings_count",
+            "bundle_file_count",
+        ):
+            value = module_context.get(field)
+            if value is not None:
+                parsed.inherited_entities[field] = value
+
+    elif module_name == "forge_explorer":
+        for field in (
+            "database_url_redacted",
+            "compile_mode",
+            "compile_stage",
+            "compile_progress",
+            "build_in_progress",
+            "has_compile_result",
+            "table_count",
+            "question_count",
+            "relationship_count",
+            "latent_relationship_count",
+            "capability_count",
+            "candidate_archetype_count",
+            "current_query",
+            "has_query_result",
+            "bsms_status",
+            "bouncer_status",
+            "rules_verdict",
+            "lineage_available",
+        ):
+            value = module_context.get(field)
+            if value is not None:
+                parsed.inherited_entities[field] = value
+
+    elif module_name == "tocr":
+        for field in (
+            "mode",
+            "agency",
+            "vehicle",
+            "policy_pack",
+            "revision_status_override",
+            "use_sonnet",
+            "parser_summary",
+            "has_result",
+            "verdict",
+            "raw_score",
+            "findings_count",
+            "remediation_count",
+            "rules_fired",
+            "active_rule_ids",
+        ):
+            value = module_context.get(field)
+            if value is not None:
+                parsed.inherited_entities[field] = value
+
+    elif module_name == "knowledge_twins":
+        for field in (
+            "mode",
+            "active_fluid",
+            "query",
+            "llm_provider",
+            "material_result_count",
+            "bok_result_count",
+            "has_hybrid_response",
+            "deterministic_decision",
+            "decision_source",
+            "insufficient_data",
+            "mua_precedents_found",
+            "test_results_found",
+            "requirements_evaluated",
+            "semantic_results_found",
+            "high_confidence_semantic",
+            "bok_sources",
+            "semantic_sources",
+        ):
+            value = module_context.get(field)
+            if value is not None:
+                parsed.inherited_entities[field] = value
 
     # GPCM: standard reference
     elif module_name in ("gpcm", "compliance"):
@@ -394,6 +584,90 @@ def extract_module_entities(module_context: dict[str, Any] | None) -> dict[str, 
 
     if module_context.get("case_id"):
         entities["case_id"] = module_context["case_id"]
+
+    if module_context.get("mp_plan_session_id"):
+        entities["mp_plan_session_id"] = module_context["mp_plan_session_id"]
+
+    for field in (
+        "workflow_step",
+        "workflow_step_label",
+        "material_key",
+        "material_name",
+        "current_stage",
+        "submodule",
+        "extraction_id",
+        "tree_loaded",
+        "top_level",
+        "compile_mode",
+        "compile_stage",
+        "compile_progress",
+        "build_in_progress",
+        "has_compile_result",
+        "current_query",
+        "has_query_result",
+        "bsms_status",
+        "bouncer_status",
+        "rules_verdict",
+        "mode",
+        "active_fluid",
+        "has_hybrid_response",
+        "deterministic_decision",
+        "decision_source",
+    ):
+        if module_context.get(field) is not None:
+            entities[field] = module_context[field]
+
+    for field in (
+        "part_name",
+        "mission_class",
+        "hazard_consequence",
+        "load_path_type",
+        "pressure_boundary",
+        "lifecycle_phase",
+        "structural_role",
+        "material_system",
+        "specific_hardware_type",
+        "optional_approach_requested",
+        "proof_test_used",
+        "process_controls_used",
+        "detected_flaw_accepted_for_flight",
+        "corrosion_iccp_recommended",
+        "low_risk_candidate",
+        "additive_manufactured",
+        "chloride_exposure",
+        "sustained_load_expected",
+        "approved_source_data_attached",
+        "mua_present",
+        "nasa_std_6016_qualified",
+        "kic_fty_ratio",
+        "ftu_ksi",
+        "short_transverse_dimension_in",
+    ):
+        if module_context.get(field) is not None:
+            entities[field] = module_context[field]
+
+    for field in (
+        "table_count",
+        "question_count",
+        "relationship_count",
+        "latent_relationship_count",
+        "warnings_count",
+        "bundle_file_count",
+        "capability_count",
+        "candidate_archetype_count",
+        "findings_count",
+        "remediation_count",
+        "rules_fired",
+        "material_result_count",
+        "bok_result_count",
+        "mua_precedents_found",
+        "test_results_found",
+        "requirements_evaluated",
+        "semantic_results_found",
+        "high_confidence_semantic",
+    ):
+        if module_context.get(field) is not None:
+            entities[field] = module_context[field]
 
     if module_context.get("module"):
         entities["engine_used"] = _MODULE_TO_ROUTING.get(

@@ -40,7 +40,7 @@ from typing import Any, AsyncGenerator
 
 from .models import EngineEnvelope, Status
 from .response_formatter import (
-    DEFAULT_FORMATTER_MODEL,
+    DEFAULT_FORMATTER_MODEL_TIER,
     DEFAULT_FORMATTER_PROVIDER,
     FORMATTER_MAX_TOKENS,
     FORMATTER_TEMPERATURE,
@@ -49,6 +49,7 @@ from .response_formatter import (
     _fallback_format,
     format_response,
 )
+from mira.providers.llm_provider import resolve_model_for_provider, resolve_provider_name
 
 LOGGER = logging.getLogger(__name__)
 
@@ -120,7 +121,7 @@ async def stream_formatter_response(
     # ------------------------------------------------------------------
     # 3. Attempt streaming Claude call
     # ------------------------------------------------------------------
-    provider = (
+    provider = resolve_provider_name(
         os.environ.get("MIRA_CHAT_LLM_PROVIDER", DEFAULT_FORMATTER_PROVIDER).strip()
         or DEFAULT_FORMATTER_PROVIDER
     )
@@ -146,7 +147,10 @@ async def stream_formatter_response(
             os.environ.get("MIRA_CHAT_FORMATTER_MODEL")
             or os.environ.get("BEDROCK_MODEL_ID")
             or os.environ.get("LLM_SONNET_MODEL")
-            or DEFAULT_FORMATTER_MODEL
+            or resolve_model_for_provider(
+                DEFAULT_FORMATTER_MODEL_TIER,
+                provider_name=provider,
+            )
         )
         session_context["formatter_model_used"] = model
         client = anthropic.AsyncAnthropic(api_key=api_key)

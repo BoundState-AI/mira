@@ -119,6 +119,13 @@ _MODULE_ENGINE_ALIASES: Dict[str, str] = {
     "h2": "h2",
     "galvanic": "galvanic",
     "fracture": "fracture",
+    "mp_plan": "mp_plan",
+    "mua": "mua",
+    "miul": "miul",
+    "forge_build": "forge_build",
+    "forge_explorer": "forge_explorer",
+    "tocr": "tocr",
+    "knowledge_twins": "knowledge_twins",
     "gpcm": "gpcm",
     "compliance": "gpcm",
     "maptis": "maptis_search",
@@ -148,6 +155,34 @@ _EXPLICIT_ENGINE_PATTERNS: Dict[str, re.Pattern] = {
     ),
     "gpcm": re.compile(
         r"\b(?:gpcm|nasa-std-6016|6016c|materials?\s+and\s+process(?:es)?\s+plan|mpr\b)\b",
+        re.IGNORECASE,
+    ),
+    "mp_plan": re.compile(
+        r"\b(?:m\s*&\s*p\s+plan|materials?\s*(?:and|&)\s*process(?:es)?\s+plan|mp\s*plan)\b",
+        re.IGNORECASE,
+    ),
+    "mua": re.compile(
+        r"\b(?:mua|material\s+usage\s+agreement|form\s*551)\b",
+        re.IGNORECASE,
+    ),
+    "miul": re.compile(
+        r"\b(?:miul|material\s+identification\s+and\s+usage\s+list|drawing\s+tree(?:\s+editor)?)\b",
+        re.IGNORECASE,
+    ),
+    "forge_build": re.compile(
+        r"\b(?:forge\s+build(?:\s+console)?|build\s+console|compile\s+artifacts?)\b",
+        re.IGNORECASE,
+    ),
+    "forge_explorer": re.compile(
+        r"\b(?:forge\s+explorer|forge\s+bsms|answer\s+surface|question\s+catalog)\b",
+        re.IGNORECASE,
+    ),
+    "tocr": re.compile(
+        r"\b(?:tocr|task\s+order\s+compliance\s+review|task\s+order\s+review)\b",
+        re.IGNORECASE,
+    ),
+    "knowledge_twins": re.compile(
+        r"\b(?:knowledge\s+twins?|knowledge\s+twin(?:s)?|o2\/h2\s+evidence)\b",
         re.IGNORECASE,
     ),
 }

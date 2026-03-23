@@ -17,7 +17,9 @@ from mira.providers.llm_provider import (
     LLMResponse,
     OpenAICompatProvider,
     get_provider,
+    resolve_bedrock_region,
     resolve_model,
+    resolve_provider_name,
 )
 
 
@@ -74,6 +76,56 @@ class TestResolveModel:
     def test_empty_env_falls_back_to_default(self):
         with patch.dict(os.environ, {"LLM_SONNET_MODEL": "  "}, clear=True):
             assert resolve_model("sonnet") == MODEL_DEFAULTS["sonnet"]
+
+    def test_govcloud_region_selects_govcloud_models(self):
+        with patch.dict(
+            os.environ,
+            {
+                "LLM_PROVIDER": "bedrock-converse",
+                "BEDROCK_REGION": "us-gov-west-1",
+            },
+            clear=True,
+        ):
+            assert resolve_model("sonnet").startswith("us-gov.")
+            assert resolve_model("haiku").startswith("us-gov.")
+
+    def test_govcloud_region_ignores_commercial_model_override(self):
+        with patch.dict(
+            os.environ,
+            {
+                "LLM_PROVIDER": "bedrock-converse",
+                "BEDROCK_REGION": "us-gov-west-1",
+                "LLM_SONNET_MODEL": "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+            },
+            clear=True,
+        ):
+            assert resolve_model("sonnet").startswith("us-gov.")
+
+
+class TestProviderAndRegionResolution:
+    def test_provider_name_honors_chat_override(self):
+        with patch.dict(os.environ, {"MIRA_CHAT_LLM_PROVIDER": "bedrock-converse"}, clear=True):
+            assert resolve_provider_name() == "bedrock-converse"
+
+    def test_region_prefers_bedrock_region_over_aws_region(self):
+        with patch.dict(
+            os.environ,
+            {
+                "BEDROCK_REGION": "us-gov-west-1",
+                "AWS_REGION": "us-east-1",
+            },
+            clear=True,
+        ):
+            assert resolve_bedrock_region() == "us-gov-west-1"
+
+    def test_region_infers_govcloud_from_model_prefix(self):
+        with patch.dict(os.environ, {}, clear=True):
+            assert (
+                resolve_bedrock_region(
+                    model_id="us-gov.anthropic.claude-haiku-4-5-20251001-v1:0"
+                )
+                == "us-gov-west-1"
+            )
 
 
 # ---------------------------------------------------------------------------

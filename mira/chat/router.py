@@ -47,7 +47,7 @@ from .models import (
     Status,
     TaskMode,
 )
-from .module_context import resolve_module_context, extract_module_entities
+from .module_context import resolve_module_context, extract_module_entities, resolve_module_routing
 from .query_interpreter import ParsedQuery, interpret
 from .rate_limiter import get_rate_limiter
 from .response_formatter import extract_follow_ups, format_response
@@ -71,6 +71,72 @@ _session_lock = threading.Lock()
 # Cap the number of sessions to prevent unbounded memory growth.
 _MAX_SESSIONS = 500
 _MAX_HISTORY_MESSAGES = 10
+
+
+def _parse_request(
+    *,
+    message: str,
+    history: list[ChatMessage],
+    module_context: dict[str, Any] | None,
+    log_prefix: str,
+) -> ParsedQuery:
+    """Parse a chat turn, locking scoped module chat to its owning adapter."""
+    scoped_engine_id = resolve_module_routing(module_context)
+
+    if scoped_engine_id:
+        try:
+            parsed = interpret(
+                message,
+                history=history,
+                module_context=module_context,
+            )
+        except Exception as exc:
+            LOGGER.warning(
+                "[%s] Scoped module parse fell back to direct adapter dispatch: module=%s error=%s",
+                log_prefix,
+                scoped_engine_id,
+                exc,
+            )
+            parsed = ParsedQuery(
+                coarse_intent="module_scoped",
+                fine_routing=scoped_engine_id,
+                task_mode=TaskMode.ANSWER_ONLY,
+                routing_confidence=1.0,
+                raw_query=message,
+            )
+
+        if module_context:
+            try:
+                parsed = resolve_module_context(
+                    message,
+                    module_context,
+                    parsed,
+                )
+            except Exception as exc:
+                LOGGER.warning("[%s] Module context resolution failed: %s", log_prefix, exc)
+
+        parsed.raw_query = message
+        parsed.fine_routing = scoped_engine_id
+        parsed.routing_confidence = 1.0
+        parsed.clarification_needed = False
+        parsed.clarification_question = ""
+        if not parsed.coarse_intent or parsed.coarse_intent == "help":
+            parsed.coarse_intent = "module_scoped"
+        return parsed
+
+    parsed = interpret(
+        message,
+        history=history,
+        module_context=module_context,
+    )
+
+    if module_context:
+        parsed = resolve_module_context(
+            message,
+            module_context,
+            parsed,
+        )
+    return parsed
 
 
 def _get_session(session_id: str) -> dict[str, Any]:
@@ -144,6 +210,34 @@ def _load_adapters() -> dict[str, EngineAdapter]:
         from .adapters.gpcm_adapter import GPCMAdapter
         return GPCMAdapter()
 
+    def _mp_plan():
+        from .adapters.mp_plan_adapter import MPPlanAdapter
+        return MPPlanAdapter()
+
+    def _mua():
+        from .adapters.mua_adapter import MUAAdapter
+        return MUAAdapter()
+
+    def _miul():
+        from .adapters.miul_adapter import MIULAdapter
+        return MIULAdapter()
+
+    def _forge_build():
+        from .adapters.forge_build_adapter import FORGEBuildAdapter
+        return FORGEBuildAdapter()
+
+    def _forge_explorer():
+        from .adapters.forge_explorer_adapter import FORGEExplorerAdapter
+        return FORGEExplorerAdapter()
+
+    def _tocr():
+        from .adapters.tocr_adapter import TOCRAdapter
+        return TOCRAdapter()
+
+    def _knowledge_twins():
+        from .adapters.knowledge_twins_adapter import KnowledgeTwinsAdapter
+        return KnowledgeTwinsAdapter()
+
     _try_load("oca", _oca)
     _try_load("h2", _h2)
     _try_load("maptis_search", _maptis)
@@ -151,6 +245,13 @@ def _load_adapters() -> dict[str, EngineAdapter]:
     _try_load("galvanic", _galvanic)
     _try_load("fracture", _fracture)
     _try_load("gpcm", _gpcm)
+    _try_load("mp_plan", _mp_plan)
+    _try_load("mua", _mua)
+    _try_load("miul", _miul)
+    _try_load("forge_build", _forge_build)
+    _try_load("forge_explorer", _forge_explorer)
+    _try_load("tocr", _tocr)
+    _try_load("knowledge_twins", _knowledge_twins)
 
     return _adapter_cache
 
@@ -243,6 +344,7 @@ async def chat(request: ChatRequest) -> ChatResponse:
         "request_id": request_id,
         "turn_count": session["turn_count"],
         "accumulated_entities": dict(session["accumulated_entities"]),
+        "module_context": request.module_context,
         **session["engine_context"],  # Includes oca_case_id etc. from prior turns
     }
 
@@ -250,10 +352,11 @@ async def chat(request: ChatRequest) -> ChatResponse:
     # 2. Parse query
     # ------------------------------------------------------------------
     try:
-        parsed: ParsedQuery = interpret(
-            request.message,
+        parsed = _parse_request(
+            message=request.message,
             history=effective_history,
             module_context=request.module_context,
+            log_prefix="CHAT",
         )
     except Exception as exc:
         LOGGER.exception("[CHAT] Query interpretation failed: %s", exc)
@@ -263,19 +366,6 @@ async def chat(request: ChatRequest) -> ChatResponse:
             session_id=session_id,
             request_id=request_id,
         )
-
-    # ------------------------------------------------------------------
-    # 2a. Module context resolution (BS-SPEC Section 9.2)
-    # ------------------------------------------------------------------
-    if request.module_context:
-        try:
-            parsed = resolve_module_context(
-                request.message,
-                request.module_context,
-                parsed,
-            )
-        except Exception as exc:
-            LOGGER.warning("[CHAT] Module context resolution failed: %s", exc)
 
     # Build the entities dict that we'll return to the frontend
     turn_entities = _build_turn_entities(parsed)
@@ -403,7 +493,13 @@ async def chat(request: ChatRequest) -> ChatResponse:
             {
                 k: v
                 for k, v in session_context.items()
-                if k not in ("session_id", "request_id", "turn_count", "accumulated_entities")
+                if k not in (
+                    "session_id",
+                    "request_id",
+                    "turn_count",
+                    "accumulated_entities",
+                    "module_context",
+                )
             }
         )
 
@@ -565,6 +661,7 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
             "request_id": request_id,
             "turn_count": session["turn_count"],
             "accumulated_entities": dict(session["accumulated_entities"]),
+            "module_context": request.module_context,
             **session["engine_context"],
         }
 
@@ -572,10 +669,11 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
         # 2. Parse query
         # --------------------------------------------------------------
         try:
-            parsed: ParsedQuery = interpret(
-                request.message,
+            parsed = _parse_request(
+                message=request.message,
                 history=effective_history,
                 module_context=request.module_context,
+                log_prefix="CHAT-STREAM",
             )
         except Exception as exc:
             LOGGER.exception("[CHAT-STREAM] Query interpretation failed: %s", exc)
@@ -595,17 +693,6 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
                 "follow_ups": [],
             })
             return
-
-        # Module context resolution (BS-SPEC Section 9.2)
-        if request.module_context:
-            try:
-                parsed = resolve_module_context(
-                    request.message,
-                    request.module_context,
-                    parsed,
-                )
-            except Exception as exc:
-                LOGGER.warning("[CHAT-STREAM] Module context resolution failed: %s", exc)
 
         turn_entities = _build_turn_entities(parsed)
         session["accumulated_entities"].update(
@@ -764,7 +851,13 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
                 {
                     k: v
                     for k, v in session_context.items()
-                    if k not in ("session_id", "request_id", "turn_count", "accumulated_entities")
+                    if k not in (
+                        "session_id",
+                        "request_id",
+                        "turn_count",
+                        "accumulated_entities",
+                        "module_context",
+                    )
                 }
             )
 
@@ -965,9 +1058,38 @@ def _build_parsed_input(parsed: ParsedQuery) -> dict[str, Any]:
     if parsed.fine_routing == "fracture":
         base["part_name"] = parsed.inherited_entities.get("part_name", "")
         base["mission_class"] = parsed.inherited_entities.get("mission_class")
+        for field in (
+            "hazard_consequence",
+            "load_path_type",
+            "pressure_boundary",
+            "lifecycle_phase",
+            "structural_role",
+            "material_system",
+            "specific_hardware_type",
+            "optional_approach_requested",
+            "proof_test_used",
+            "process_controls_used",
+            "detected_flaw_accepted_for_flight",
+            "corrosion_iccp_recommended",
+            "low_risk_candidate",
+            "additive_manufactured",
+            "chloride_exposure",
+            "sustained_load_expected",
+            "approved_source_data_attached",
+            "mua_present",
+            "nasa_std_6016_qualified",
+            "kic_fty_ratio",
+            "ftu_ksi",
+            "short_transverse_dimension_in",
+        ):
+            if field in parsed.inherited_entities:
+                base[field] = parsed.inherited_entities.get(field)
 
     # GPCM needs material + gas_service
     if parsed.fine_routing == "gpcm":
+        base["query"] = parsed.raw_query
+
+    if parsed.fine_routing == "mp_plan":
         base["query"] = parsed.raw_query
 
     return base

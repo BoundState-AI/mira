@@ -16,6 +16,25 @@ def client():
     return TestClient(app)
 
 
+def _stub_resolve_materials(self, session):
+    results = []
+    for material in session.materials:
+        if not material.maptis_code:
+            continue
+        results.append(
+            MaterialResolutionResult(
+                material_id=material.id,
+                maptis_code=material.maptis_code,
+                flam_rating="U",
+                tvs_rating="U",
+                tox_rating="U",
+                test_o2_pct=21.0,
+                source="test_stub",
+            )
+        )
+    return results
+
+
 def test_ping(client):
     response = client.get("/mp-plan/v2/ping")
     assert response.status_code == 200
@@ -55,18 +74,24 @@ def test_compute_and_questions(client):
     assert payload["determinations"] > 0
     assert payload["materials"] == 1
     assert payload["environments"] == 1
+    assert payload["hitl_required"] == 0
 
     q_resp = client.get(f"/mp-plan/v2/sessions/{session_id}/questions")
     assert q_resp.status_code == 200
     q_payload = q_resp.json()
     assert q_payload["count"] >= 1
+    material_questions = [
+        q
+        for q in q_payload["questions"]
+        if q.get("question_type") == "material_ambiguous"
+    ]
+    assert material_questions
     review_questions = [
         q
         for q in q_payload["questions"]
         if q.get("question_type") == "tailoring_approval"
     ]
-    assert review_questions
-    assert "ADD_TEST_CITATION" in review_questions[0].get("options", [])
+    assert not review_questions
 
 
 def test_export_json(client):
@@ -117,7 +142,11 @@ def test_citation_helper_endpoint(client):
     assert "quick_actions" in payload
 
 
-def test_submit_answer_no_500_on_none_human_review(client):
+def test_submit_answer_no_500_on_none_human_review(client, monkeypatch):
+    from mira.mp_plan.engines.data_acquisition import DataAcquisitionEngine
+
+    monkeypatch.setattr(DataAcquisitionEngine, "resolve_materials", _stub_resolve_materials)
+
     create = client.post(
         "/mp-plan/v2/sessions",
         json={"program_name": "Answer Path Test", "vehicle_preset": "ISS"},
@@ -127,7 +156,15 @@ def test_submit_answer_no_500_on_none_human_review(client):
 
     add_materials = client.post(
         f"/mp-plan/v2/sessions/{session_id}/materials",
-        json={"materials": [{"name": "Kapton Tape", "application": "Wire harness wrap"}]},
+        json={
+            "materials": [
+                {
+                    "name": "Kapton Tape",
+                    "application": "Wire harness wrap",
+                    "maptis_code": "KAPTON-TEST",
+                }
+            ]
+        },
     )
     assert add_materials.status_code == 200
 

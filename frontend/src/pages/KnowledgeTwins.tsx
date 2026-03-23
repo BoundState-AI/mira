@@ -1,12 +1,18 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
+import { ModuleChatButton } from '@/components/mira/ModuleChatButton'
 import { PageHelp } from '@/components/PageHelp'
 import helpContent from '@/config/helpContent'
+import {
+  buildChatContextSummary,
+  createModuleChatLaunchState,
+  registerRouteModuleChatState,
+} from '@/lib/mira-chat-context'
 import {
   CheckCircle2,
   AlertTriangle,
@@ -158,6 +164,56 @@ export default function KnowledgeTwins() {
   const [hybridResponse, setHybridResponse] = useState<HybridQueryResponse | null>(null)
   const [llmProvider, setLlmProvider] = useState<'ollama' | 'haiku'>('ollama')
   const [error, setError] = useState<string | null>(null)
+  const knowledgeTwinsChatLaunchState = useMemo(
+    () =>
+      createModuleChatLaunchState({
+        scopeKey: query.trim()
+          ? `knowledge-twins:${activeFluid}:${mode}:${query.trim().toLowerCase()}`
+          : `knowledge-twins:${activeFluid}:${mode}`,
+        moduleLabel: 'Knowledge Twins',
+        moduleContext: {
+          module: 'knowledge_twins',
+          mode,
+          active_fluid: activeFluid,
+          query: query.trim() || undefined,
+          llm_provider: llmProvider,
+          material_result_count: materials.length,
+          bok_result_count: bokResults.length,
+          has_hybrid_response: Boolean(hybridResponse),
+          deterministic_decision: hybridResponse?.deterministic_decision,
+          decision_source: hybridResponse?.decision_source,
+          insufficient_data: hybridResponse?.insufficient_data,
+          mua_precedents_found: hybridResponse?.evidence_summary.mua_precedents_found,
+          test_results_found: hybridResponse?.evidence_summary.test_results_found,
+          requirements_evaluated: hybridResponse?.evidence_summary.requirements_evaluated,
+          semantic_results_found: hybridResponse?.evidence_summary.semantic_results_found,
+          high_confidence_semantic: hybridResponse?.evidence_summary.high_confidence_semantic,
+          bok_sources: bokResults.map((result) => result.source).slice(0, 10),
+          semantic_sources: hybridResponse?.semantic_evidence?.results?.map((result) => result.source).slice(0, 10),
+        },
+        originPath: '/',
+        originTitle: 'Knowledge Twins',
+        description: 'Ground the chat in the active fluid, mode, and visible Knowledge Twins evidence.',
+        starterPrompts: [
+          'What should I do next in this Knowledge Twins workflow?',
+          'What evidence is currently loaded for this fluid?',
+          'Should I browse first or run an ask-mode query here?',
+        ],
+        contextSummary: buildChatContextSummary([
+          { label: 'Fluid', value: activeFluid },
+          { label: 'Mode', value: mode },
+          { label: 'Query', value: query.trim() || null },
+          { label: 'Materials', value: materials.length || null },
+          { label: 'BOK', value: bokResults.length || null },
+          { label: 'Decision', value: hybridResponse?.deterministic_decision || null },
+        ]),
+      }),
+    [activeFluid, bokResults, hybridResponse, llmProvider, materials.length, mode, query],
+  )
+
+  useEffect(() => {
+    registerRouteModuleChatState('/', knowledgeTwinsChatLaunchState)
+  }, [knowledgeTwinsChatLaunchState])
 
   const handleSearch = async () => {
     if (!query.trim()) return
@@ -312,6 +368,7 @@ export default function KnowledgeTwins() {
             })}
           </p>
         </div>
+        <ModuleChatButton launchState={knowledgeTwinsChatLaunchState} />
       </div>
 
       <div className="space-y-6">

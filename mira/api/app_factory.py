@@ -63,7 +63,12 @@ def _chat_required() -> bool:
     raw = os.getenv("MIRA_REQUIRE_CHAT", "").strip().lower()
     if raw:
         return raw in {"1", "true", "yes", "on"}
-    return os.getenv("MIRA_ENV", "development").lower() == "production"
+    environment = (
+        os.getenv("MIRA_ENV")
+        or os.getenv("ENVIRONMENT")
+        or "development"
+    ).strip().lower()
+    return environment != "test"
 
 
 def _load_chat_router() -> Optional[APIRouter]:
@@ -219,6 +224,7 @@ def _log_startup_identity(app: FastAPI, *, app_identity_file: str) -> None:
             and (
                 "mua/v10" in route.path
                 or "mp-plan/v2" in route.path
+                or route.path.startswith("/api/chat")
                 or route.path.startswith("/api/tocr")
                 or route.path.startswith("/mira/h2")
             )

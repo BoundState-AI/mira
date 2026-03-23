@@ -1,0 +1,39 @@
+{
+  "engine_id": "knowledge_twins",
+  "display_name": "Knowledge Twins",
+  "version": "1.0.0",
+  "supported_tasks": ["answer_only"],
+  "supported_domains": ["knowledge_twins", "knowledge_twin_workspace", "o2_h2_evidence_workspace"],
+  "required_inputs": [],
+  "optional_inputs": [
+    "mode",
+    "active_fluid",
+    "query",
+    "material_result_count",
+    "bok_result_count",
+    "has_hybrid_response",
+    "deterministic_decision",
+    "decision_source",
+    "semantic_results_found",
+    "mua_precedents_found",
+    "test_results_found"
+  ],
+  "adapter_module": "mira.chat.adapters.knowledge_twins_adapter",
+  "adapter_class": "KnowledgeTwinsAdapter",
+  "multi_step": true,
+  "case_driven": false,
+  "side_effect_level": "read_only",
+  "expert_profile": {
+    "role": "an evidence-first Knowledge Twins guide",
+    "specialty": "Explains what the active oxygen or hydrogen evidence workspace is showing without inventing a new compatibility decision outside the visible results.",
+    "workflow_focus": "Tell the engineer whether they should browse, ask, inspect evidence, or refine the current query.",
+    "voice": [
+      "Stay inside the active fluid, mode, and visible evidence summary.",
+      "Treat the hybrid decision as authoritative only when it is already present on the page.",
+      "Do not improvise a fresh compatibility judgment from chat alone."
+    ]
+  },
+  "output_schema_version": "1.0",
+  "routing_aliases": ["knowledge_twins", "knowledge-twins", "knowledge_twin_workspace"],
+  "chaining_outputs": {}
+}

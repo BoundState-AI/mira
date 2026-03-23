@@ -56,6 +56,15 @@ function messageId(prefix: "user" | "assistant"): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
 }
 
+function resizeComposer(textarea: HTMLTextAreaElement | null, minHeight: number, maxHeight: number) {
+  if (!textarea) {
+    return;
+  }
+  textarea.style.height = "0px";
+  const nextHeight = Math.min(Math.max(textarea.scrollHeight, minHeight), maxHeight);
+  textarea.style.height = `${nextHeight}px`;
+}
+
 function renderInlineText(text: string) {
   const matches = Array.from(text.matchAll(/\*\*(.+?)\*\*/g));
   if (!matches.length) {
@@ -147,6 +156,7 @@ export default function MiraChat() {
   const [pingError, setPingError] = useState<string | null>(null);
   const [conversationLoaded, setConversationLoaded] = useState(false);
   const conversationEndRef = useRef<HTMLDivElement | null>(null);
+  const composerRef = useRef<HTMLTextAreaElement | null>(null);
   const starterPrompts = activeModuleLaunchState?.starterPrompts.length
     ? activeModuleLaunchState.starterPrompts
     : GLOBAL_EXAMPLE_PROMPTS;
@@ -209,6 +219,10 @@ export default function MiraChat() {
     }
     endMarker.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, isSending]);
+
+  useEffect(() => {
+    resizeComposer(composerRef.current, 132, 288);
+  }, [draft]);
 
   const clearConversation = () => {
     setSessionId(null);
@@ -291,7 +305,7 @@ export default function MiraChat() {
               </div>
               <div className="space-y-2">
                 <h1 className="text-3xl font-semibold tracking-tight">
-                  {isModuleChat ? `${scopeLabel} grounded chat` : "Multi-domain engineering chat"}
+                  {isModuleChat ? `${scopeLabel} expert chat` : "Multi-domain engineering chat"}
                 </h1>
                 <p className="max-w-2xl text-sm text-slate-200/85">
                   {scopeDescription}
@@ -409,17 +423,17 @@ export default function MiraChat() {
                 return (
                   <div
                     key={message.id}
-                    className={cn("flex", isAssistant ? "justify-start" : "justify-end")}
+                    className={cn("flex min-w-0", isAssistant ? "justify-start" : "justify-end")}
                   >
                     <div
                       className={cn(
-                        "max-w-[92%] rounded-2xl border px-4 py-3 shadow-sm 2xl:max-w-[88%]",
+                        "min-w-0 max-w-[92%] rounded-2xl border px-4 py-3 shadow-sm 2xl:max-w-[88%]",
                         isAssistant
                           ? "border-slate-200 bg-white text-slate-900"
                           : "border-teal-700 bg-teal-700 text-white",
                       )}
                     >
-                      <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-[0.18em] opacity-80">
+                      <div className="mb-2 flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.18em] opacity-80">
                         {isAssistant ? <Bot className="h-3.5 w-3.5" /> : <User2 className="h-3.5 w-3.5" />}
                         {isAssistant ? "MIRA" : "Engineer"}
                         {isAssistant && message.engineUsed && (
@@ -428,12 +442,12 @@ export default function MiraChat() {
                           </span>
                         )}
                         {isAssistant && message.verdict && (
-                          <Badge variant={verdictVariant(message.verdict)} className="ml-auto">
+                          <Badge variant={verdictVariant(message.verdict)} className="sm:ml-auto">
                             {message.verdict}
                           </Badge>
                         )}
                       </div>
-                      <div className="space-y-3 text-sm leading-6">{renderMessageContent(message.content)}</div>
+                      <div className="space-y-3 break-words text-sm leading-6">{renderMessageContent(message.content)}</div>
 
                       {isAssistant && (message.auditId || message.followUps?.length) && (
                         <div className="mt-4 space-y-3 border-t border-slate-200 pt-3">
@@ -483,6 +497,7 @@ export default function MiraChat() {
           <div className="border-t border-border/70 p-5">
             <div className="space-y-3">
               <Textarea
+                ref={composerRef}
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
                 onKeyDown={(event) => {
@@ -492,7 +507,7 @@ export default function MiraChat() {
                   }
                 }}
                 placeholder="Ask an engineering question. Press Enter to send, Shift+Enter for a new line."
-                className="min-h-[116px] resize-none"
+                className="min-h-[132px] max-h-[288px] resize-none overflow-y-auto px-4 py-3 leading-6"
               />
 
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

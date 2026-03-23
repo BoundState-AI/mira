@@ -70,6 +70,41 @@ const MODULE_PROMPTS: Record<string, string[]> = {
     "Walk me through what is still missing for a clean compliance closure.",
     "What is the most conservative reading of this requirement?",
   ],
+  mp_plan: [
+    "What is blocking this MP Plan from generating right now?",
+    "What should I do next in this MP Plan workflow?",
+    "Which materials, environments, or closure decisions still need attention?",
+  ],
+  mua: [
+    "What should I do next in this MUA workflow?",
+    "Explain the current classification path on this page.",
+    "Do these ratings point to a real problem, a real gap, or an incomplete pass?",
+  ],
+  miul: [
+    "What should I do next in this MIUL workflow?",
+    "What is still unresolved in this MIUL build?",
+    "When would this MIUL gap need to escalate into a formal MUA?",
+  ],
+  forge_build: [
+    "What should I inspect before I trust this FORGE build?",
+    "What does the current compile stage mean?",
+    "What warnings or artifact gaps should I look at first?",
+  ],
+  forge_explorer: [
+    "What can this compiled database answer right now?",
+    "What should I do next in this FORGE explorer workflow?",
+    "How do I read the current BSMS query result?",
+  ],
+  tocr: [
+    "What should I do next in this TOCR review?",
+    "What do the current findings actually mean?",
+    "Should this be a standalone scan or a revision review?",
+  ],
+  knowledge_twins: [
+    "What should I do next in this Knowledge Twins workflow?",
+    "What evidence is currently loaded for this fluid?",
+    "Should I browse first or run an ask-mode query here?",
+  ],
   bsmh: [
     "Help me sort this into the right engineering workflow.",
     "What inputs do you need before this should go to a specialist?",

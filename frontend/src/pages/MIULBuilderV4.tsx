@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { ModuleChatButton } from "@/components/mira/ModuleChatButton";
 import { PageHelp } from "@/components/PageHelp";
 import {
   GuidanceContextIndicator,
@@ -22,6 +23,11 @@ import {
   miulGuidancePack,
 } from "@/lib/guidance/miul-pack";
 import type { GuidanceModeName } from "@/lib/guidance/types";
+import {
+  buildChatContextSummary,
+  createModuleChatLaunchState,
+  registerRouteModuleChatState,
+} from "@/lib/mira-chat-context";
 import { cn } from "@/lib/utils";
 import {
   Upload,
@@ -843,7 +849,7 @@ export default function MIULBuilderV4() {
         return EXTRACT_SUBSTAGES[extractSubStage];
       case "review":
         if (reviewItems.length === 0) {
-          return t("stages.loadingReviewItems", { defaultValue: "Loading review items..." });
+        return t("stages.loadingReviewItems", { defaultValue: "Loading review items..." });
         }
         return t("stages.reviewDetail", {
           open: openCount,
@@ -872,6 +878,71 @@ export default function MIULBuilderV4() {
         return "";
     }
   }, [currentStage, extractSubStage, openCount, reviewItems.length, isApproved, isBuilding, buildSubStage, buildComplete, t]);
+  const miulChatLaunchState = useMemo(
+    () =>
+      createModuleChatLaunchState({
+        scopeKey: extractionId ? `miul:${extractionId}` : "miul",
+        moduleLabel: "MIUL Builder",
+        moduleContext: {
+          module: "miul",
+          current_stage: currentStage,
+          extraction_id: extractionId,
+          project: project || undefined,
+          drawing_count: drawingFiles?.length || 0,
+          source_drawing_count: sourceDrawings.length,
+          review_item_count: reviewItems.length,
+          open_review_count: openCount,
+          resolved_review_count: resolvedCount,
+          auto_approved_count: summary?.auto_approved ?? 0,
+          flagged_count: summary?.needs_review ?? 0,
+          build_complete: buildComplete,
+          dt_json_present: Boolean(dtJsonFile),
+          fluid_type: fluidType || undefined,
+          environment: envMedia || undefined,
+          max_pressure: maxPressure || undefined,
+          sensitive_build: sensitiveBuild,
+        },
+        originPath: "/miul",
+        originTitle: "MIUL Builder",
+        description: "Ground the chat in the active MIUL workflow stage, review queue, and rating-gap routing logic.",
+        starterPrompts: [
+          "What should I do next in this MIUL workflow?",
+          "What is still unresolved in this MIUL build?",
+          "When does a rating gap here require a formal MUA?",
+        ],
+        contextSummary: buildChatContextSummary([
+          { label: "Stage", value: currentStage },
+          { label: "Extraction", value: extractionId || null },
+          { label: "Project", value: project || null },
+          { label: "Drawings", value: drawingFiles?.length || null },
+          { label: "Review", value: reviewItems.length || null },
+          { label: "Open", value: openCount || null },
+          { label: "Auto", value: summary?.auto_approved ?? null },
+        ]),
+      }),
+    [
+      buildComplete,
+      currentStage,
+      drawingFiles,
+      dtJsonFile,
+      envMedia,
+      extractionId,
+      fluidType,
+      maxPressure,
+      openCount,
+      project,
+      resolvedCount,
+      reviewItems.length,
+      sensitiveBuild,
+      sourceDrawings.length,
+      summary?.auto_approved,
+      summary?.needs_review,
+    ],
+  );
+
+  useEffect(() => {
+    registerRouteModuleChatState("/miul", miulChatLaunchState);
+  }, [miulChatLaunchState]);
 
   const overallProgress = useMemo(() => {
     switch (currentStage) {
@@ -1504,7 +1575,10 @@ export default function MIULBuilderV4() {
               })}
             </p>
           </div>
-          <PageHelp content={helpContent.miulBuilder} />
+          <div className="flex items-center gap-2">
+            <ModuleChatButton launchState={miulChatLaunchState} />
+            <PageHelp content={helpContent.miulBuilder} />
+          </div>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
           <GuidanceContextIndicator context={guidanceContext} />

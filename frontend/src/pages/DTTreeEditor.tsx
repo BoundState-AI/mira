@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, DragEvent } from "react";
+import { useState, useRef, useCallback, DragEvent, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,8 +6,14 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { ModuleChatButton } from "@/components/mira/ModuleChatButton";
 import { PageHelp } from "@/components/PageHelp";
 import helpContent from "@/config/helpContent";
+import {
+  buildChatContextSummary,
+  createModuleChatLaunchState,
+  registerRouteModuleChatState,
+} from "@/lib/mira-chat-context";
 import {
   Upload,
   Download,
@@ -259,6 +265,42 @@ export default function DTTreeEditor() {
   // Stats
   const assemblyCount = treeData?.tree.filter((n) => n.type === "ASSEMBLY").length || 0;
   const detailCount = treeData?.tree.filter((n) => n.type === "DETAIL").length || 0;
+  const drawingTreeChatLaunchState = useMemo(
+    () =>
+      createModuleChatLaunchState({
+        scopeKey: treeData?.top_level ? `dt-editor:${treeData.top_level}` : "dt-editor",
+        moduleLabel: "Drawing Tree Editor",
+        moduleContext: {
+          module: "miul",
+          submodule: "dt_editor",
+          tree_loaded: Boolean(treeData),
+          top_level: treeData?.top_level,
+          assembly_count: assemblyCount,
+          detail_count: detailCount,
+          total_nodes: treeData?.tree.length || 0,
+          extraction_progress: extractionProgress || undefined,
+        },
+        originPath: "/dt-editor",
+        originTitle: "Drawing Tree Editor",
+        description: "Ground the chat in the active drawing-tree editor state and MIUL hierarchy guidance.",
+        starterPrompts: [
+          "What should I do next in this drawing tree editor?",
+          "How does this hierarchy feed the MIUL build?",
+          "What tree issue should I check before exporting?",
+        ],
+        contextSummary: buildChatContextSummary([
+          { label: "Top Level", value: treeData?.top_level || null },
+          { label: "Assemblies", value: assemblyCount || null },
+          { label: "Details", value: detailCount || null },
+          { label: "Total", value: treeData?.tree.length || null },
+        ]),
+      }),
+    [assemblyCount, detailCount, extractionProgress, treeData],
+  );
+
+  useEffect(() => {
+    registerRouteModuleChatState("/dt-editor", drawingTreeChatLaunchState);
+  }, [drawingTreeChatLaunchState]);
 
   // ============================================================================
   // File Operations
@@ -640,7 +682,10 @@ export default function DTTreeEditor() {
             </p>
           </div>
         </div>
-        <PageHelp content={helpContent.dtTreeEditor || helpContent.miul} />
+        <div className="flex items-center gap-2">
+          <ModuleChatButton launchState={drawingTreeChatLaunchState} />
+          <PageHelp content={helpContent.dtTreeEditor || helpContent.miul} />
+        </div>
       </div>
 
       {/* Toolbar */}

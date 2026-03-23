@@ -4,9 +4,15 @@ import { AlertTriangle, ClipboardCheck, FileSearch, Loader2, Scale, ShieldAlert 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { ModuleChatButton } from "@/components/mira/ModuleChatButton";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  buildChatContextSummary,
+  createModuleChatLaunchState,
+  registerRouteModuleChatState,
+} from "@/lib/mira-chat-context";
 import {
   tocrGetGuidance,
   tocrReviewTaskOrders,
@@ -119,6 +125,64 @@ export default function TOCR() {
       `Parsers: ${result.prior_parser_selected} -> ${result.proposed_parser_selected}`,
     ];
   }, [result]);
+  const tocrChatLaunchState = useMemo(
+    () =>
+      createModuleChatLaunchState({
+        scopeKey: report?.report_id ? `tocr:${report.report_id}` : "tocr",
+        moduleLabel: "TOCR Review",
+        moduleContext: {
+          module: "tocr",
+          mode,
+          agency: agency.trim() || undefined,
+          center: center.trim() || undefined,
+          vehicle: vehicle.trim() || undefined,
+          policy_pack: localPolicyPack.trim() || undefined,
+          revision_status_override: revisionStatus || undefined,
+          use_sonnet: useSonnet,
+          parser_summary: parserSummary.join(" | ") || undefined,
+          has_result: Boolean(report),
+          verdict: report?.score?.verdict,
+          raw_score: report?.score?.raw_score,
+          findings_count: findings.length,
+          remediation_count: remediationSteps.length,
+          rules_fired: report?.rules_fired,
+          active_rule_ids: findings.map((finding) => finding.rule_id),
+        },
+        originPath: "/tocr",
+        originTitle: "TOCR Review",
+        description: "Ground the chat in the active TOCR mode, compliance report, and rule guidance.",
+        starterPrompts: [
+          "What should I do next in this TOCR review?",
+          "What do the current findings actually mean?",
+          "Should this be a standalone scan or a revision review?",
+        ],
+        contextSummary: buildChatContextSummary([
+          { label: "Mode", value: mode },
+          { label: "Agency", value: agency.trim() || null },
+          { label: "Vehicle", value: vehicle.trim() || null },
+          { label: "Verdict", value: report?.score?.verdict || null },
+          { label: "Findings", value: findings.length || null },
+          { label: "Rules", value: report?.rules_fired ?? null },
+        ]),
+      }),
+    [
+      agency,
+      center,
+      findings,
+      localPolicyPack,
+      mode,
+      parserSummary,
+      remediationSteps.length,
+      report,
+      revisionStatus,
+      useSonnet,
+      vehicle,
+    ],
+  );
+
+  useEffect(() => {
+    registerRouteModuleChatState("/tocr", tocrChatLaunchState);
+  }, [tocrChatLaunchState]);
 
   const runAnalysis = async () => {
     setError(null);
@@ -213,7 +277,10 @@ export default function TOCR() {
               remediation steps for the task lead and contracting team.
             </p>
           </div>
-          <Badge variant="outline">Protected</Badge>
+          <div className="flex items-center gap-2">
+            <ModuleChatButton launchState={tocrChatLaunchState} />
+            <Badge variant="outline">Protected</Badge>
+          </div>
         </div>
 
         <div className="grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">

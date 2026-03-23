@@ -32,13 +32,17 @@ if not defined POSTGRES_DB set "POSTGRES_DB=mira"
 if not defined POSTGRES_USER set "POSTGRES_USER=postgres"
 if not defined POSTGRES_PASSWORD set "POSTGRES_PASSWORD=postgres"
 set "PYTHONPATH=%CD%"
+if not defined LLM_PROVIDER set "LLM_PROVIDER=bedrock-converse"
+if not defined BEDROCK_REGION set "BEDROCK_REGION=us-gov-west-1"
 if not defined BSMH_BOUNCER_MODE set "BSMH_BOUNCER_MODE=haiku"
-if not defined BSMH_BOUNCER_HAIKU_MODEL set "BSMH_BOUNCER_HAIKU_MODEL=claude-haiku-4-5-20251001"
+if not defined BSMH_BOUNCER_HAIKU_MODEL set "BSMH_BOUNCER_HAIKU_MODEL=us-gov.anthropic.claude-haiku-4-5-20251001-v1:0"
 
 echo [INFO] DB host: %POSTGRES_HOST%:%POSTGRES_PORT%  db=%POSTGRES_DB%  user=%POSTGRES_USER%
+echo [INFO] LLM_PROVIDER=%LLM_PROVIDER%
+echo [INFO] BEDROCK_REGION=%BEDROCK_REGION%
 echo [INFO] BSMH_BOUNCER_MODE=%BSMH_BOUNCER_MODE%
 echo [INFO] BSMH_BOUNCER_HAIKU_MODEL=%BSMH_BOUNCER_HAIKU_MODEL%
-if not defined ANTHROPIC_API_KEY (
+if /I "%LLM_PROVIDER%"=="anthropic" if not defined ANTHROPIC_API_KEY (
   echo [WARN] ANTHROPIC_API_KEY is not set. BSMH Haiku/Sonnet calls will fail closed.
 )
 

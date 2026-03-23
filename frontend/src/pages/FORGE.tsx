@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Database, FolderTree, Loader2, Network, ScrollText } from "lucide-react";
 
+import { ModuleChatButton } from "@/components/mira/ModuleChatButton";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,11 @@ import {
   type ForgeCompileRequest,
   type ForgeCompileResponse,
 } from "@/lib/api";
+import {
+  buildChatContextSummary,
+  createModuleChatLaunchState,
+  registerRouteModuleChatState,
+} from "@/lib/mira-chat-context";
 
 const EXAMPLE_SQLITE_URL = "sqlite:////tmp/forge_demo.sqlite";
 
@@ -29,6 +35,60 @@ export default function FORGE() {
   const [error, setError] = useState<string | null>(null);
   const [compileJob, setCompileJob] = useState<ForgeCompileJobResponse | null>(null);
   const [result, setResult] = useState<ForgeCompileResponse | null>(null);
+  const forgeBuildChatLaunchState = useMemo(
+    () =>
+      createModuleChatLaunchState({
+        scopeKey: result ? `forge-build:${result.summary.database_url_redacted}` : "forge-build",
+        moduleLabel: "FORGE Build Console",
+        moduleContext: {
+          module: "forge_build",
+          database_url_redacted: result?.summary.database_url_redacted || databaseUrl.trim() || undefined,
+          app_name: appName.trim() || undefined,
+          sample_rows: sampleRows.trim() || undefined,
+          output_dir: result?.output_dir || outputDir.trim() || undefined,
+          compile_stage: compileJob?.stage,
+          compile_progress: compileJob?.progress,
+          compile_message: compileJob?.message,
+          build_in_progress: loading,
+          has_compile_result: Boolean(result),
+          table_count: result?.summary.table_count,
+          question_count: result?.summary.generated_question_count,
+          relationship_count: result?.summary.relationship_count,
+          latent_relationship_count: result?.summary.latent_relationship_count,
+          warnings_count: result?.warnings.length ?? 0,
+          bundle_file_count: result?.generated_bundle?.files.length ?? 0,
+        },
+        originPath: "/forge",
+        originTitle: "FORGE Build Console",
+        description: "Ground the chat in the active FORGE compile job, emitted artifacts, and authority-pack metadata.",
+        starterPrompts: [
+          "What should I inspect before I trust this FORGE build?",
+          "What does the current compile stage mean?",
+          "What warnings or artifact gaps should I look at first?",
+        ],
+        contextSummary: buildChatContextSummary([
+          { label: "Database", value: result?.summary.database_url_redacted || databaseUrl.trim() || null },
+          { label: "Stage", value: compileJob?.stage || null },
+          { label: "Progress", value: compileJob ? `${Math.round(compileJob.progress)}%` : null },
+          { label: "Tables", value: result?.summary.table_count ?? null },
+          { label: "Questions", value: result?.summary.generated_question_count ?? null },
+          { label: "Warnings", value: result?.warnings.length ?? null },
+        ]),
+      }),
+    [
+      appName,
+      compileJob,
+      databaseUrl,
+      loading,
+      outputDir,
+      result,
+      sampleRows,
+    ],
+  );
+
+  useEffect(() => {
+    registerRouteModuleChatState("/forge", forgeBuildChatLaunchState);
+  }, [forgeBuildChatLaunchState]);
 
   const runCompile = async () => {
     if (!databaseUrl.trim()) {
@@ -82,7 +142,10 @@ export default function FORGE() {
               build and diagnostics page, not the exploration workflow.
             </p>
           </div>
-          <Badge variant="outline">Additive</Badge>
+          <div className="flex items-center gap-2">
+            <ModuleChatButton launchState={forgeBuildChatLaunchState} />
+            <Badge variant="outline">Additive</Badge>
+          </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">

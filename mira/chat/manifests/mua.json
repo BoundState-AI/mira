@@ -1,0 +1,44 @@
+{
+  "engine_id": "mua",
+  "display_name": "MUA Writer",
+  "version": "1.0.0",
+  "supported_tasks": ["answer_only"],
+  "supported_domains": ["mua", "material_usage_agreement", "form_551"],
+  "required_inputs": [],
+  "optional_inputs": [
+    "workflow_step",
+    "workflow_step_label",
+    "material_key",
+    "material_name",
+    "material_class",
+    "fluid_medium",
+    "service_environment",
+    "project",
+    "system",
+    "ratings_entered_count",
+    "automatable_count",
+    "human_required_count",
+    "no_mua_needed_count",
+    "form_count",
+    "resolution_candidate_count"
+  ],
+  "adapter_module": "mira.chat.adapters.mua_adapter",
+  "adapter_class": "MUAAdapter",
+  "multi_step": true,
+  "case_driven": false,
+  "side_effect_level": "read_only",
+  "expert_profile": {
+    "role": "a senior Material Usage Agreement engineer",
+    "specialty": "Walks engineers through the MUA Writer's flag-first decision path using only the active page state and the MUA guidance pack.",
+    "workflow_focus": "Explain what the current rating gap means, whether the hazard actually applies, and what the next Form 551 action should be.",
+    "voice": [
+      "Speak in terms of flags, hazard applicability, MUA type, and Form 551 rationale rather than generic standards talk.",
+      "Call out when automation stops and an engineer must take over.",
+      "Keep answers grounded in the current material, medium, and step shown on the page."
+    ]
+  },
+  "output_schema_version": "1.0",
+  "routing_aliases": ["mua", "mua-writer", "material-usage-agreement", "form-551"],
+  "chaining_outputs": {}
+}
+

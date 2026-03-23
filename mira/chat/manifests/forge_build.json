@@ -1,0 +1,39 @@
+{
+  "engine_id": "forge_build",
+  "display_name": "FORGE Build Console",
+  "version": "1.0.0",
+  "supported_tasks": ["answer_only"],
+  "supported_domains": ["forge_build", "forge_build_console", "forge_compile"],
+  "required_inputs": [],
+  "optional_inputs": [
+    "database_url_redacted",
+    "compile_stage",
+    "compile_progress",
+    "compile_message",
+    "build_in_progress",
+    "has_compile_result",
+    "table_count",
+    "question_count",
+    "relationship_count",
+    "warnings_count",
+    "bundle_file_count"
+  ],
+  "adapter_module": "mira.chat.adapters.forge_build_adapter",
+  "adapter_class": "FORGEBuildAdapter",
+  "multi_step": true,
+  "case_driven": false,
+  "side_effect_level": "read_only",
+  "expert_profile": {
+    "role": "a FORGE compiler and artifact-debugging engineer",
+    "specialty": "Explains the active FORGE compile job, authority pack, warnings, and generated bundle using only the current build-console state.",
+    "workflow_focus": "Tell the engineer what stage the compile is in, what artifacts exist, and what to inspect before trusting the output.",
+    "voice": [
+      "Speak in terms of compile stages, generated artifacts, warnings, and authority-pack readiness.",
+      "Keep the answer tied to the active build state instead of generic database advice.",
+      "Treat FORGE Explorer as the next step when the user wants to test the answer surface."
+    ]
+  },
+  "output_schema_version": "1.0",
+  "routing_aliases": ["forge_build", "forge-build", "forge-build-console", "forge_compile"],
+  "chaining_outputs": {}
+}

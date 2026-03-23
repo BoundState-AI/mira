@@ -175,6 +175,15 @@ def _citation_request_label(token: str) -> str:
     return "citation"
 
 
+def _resolved_material_ids(session: PlanGeneratorSession) -> set[str]:
+    return {resolution.material_id for resolution in session.maptis_resolutions}
+
+
+def _unresolved_materials(session: PlanGeneratorSession) -> list:
+    resolved_ids = _resolved_material_ids(session)
+    return [material for material in session.materials if material.id not in resolved_ids]
+
+
 def _inject_route_to_closure_nonconformances(session: PlanGeneratorSession) -> None:
     existing_ids = {n.nonconformance_id for n in session.nonconformances}
     for det in session.mpr_determinations:
@@ -226,10 +235,15 @@ def can_generate_codex(session: PlanGeneratorSession) -> tuple[bool, list[str]]:
     if not session.materials:
         blockers.append("No materials entered")
 
-    resolved_ids = {r.material_id for r in session.maptis_resolutions}
-    unresolved = [m for m in session.materials if m.id not in resolved_ids]
+    unresolved = _unresolved_materials(session)
     if unresolved:
         blockers.append(f"{len(unresolved)} materials not resolved in MAPTIS")
+
+    # Upstream session setup and material-resolution blockers take priority over
+    # downstream review load. Do not force HITL or closure work until the
+    # material identity/data foundation is complete.
+    if blockers:
+        return False, blockers
 
     closed_ids = {d.gap_id for d in session.closure_decisions}
     accepted_ids = {a.gap_id for a in session.accepted_open_gaps}
@@ -276,9 +290,10 @@ def generate_blocking_questions_codex(
         )
         return questions
 
-    resolved_ids = {r.material_id for r in session.maptis_resolutions}
-    for material in session.materials:
-        if material.id in resolved_ids:
+    unresolved_materials = _unresolved_materials(session)
+    unresolved_ids = {material.id for material in unresolved_materials}
+    for material in unresolved_materials:
+        if material.id not in unresolved_ids:
             continue
         qid = compute_question_id_codex(material.id, "resolution")
         msg = (
@@ -298,12 +313,17 @@ def generate_blocking_questions_codex(
             )
         )
 
+    if questions:
+        for det in session.mpr_determinations:
+            det["hitl_required"] = False
+        return questions
+
     selected_hitl_ids = _select_hitl_targets(session)
     for det in session.mpr_determinations:
         det_id = det.get("determination_id")
         if not det_id:
             continue
-        det["hitl_required"] = det_id in selected_hitl_ids or det.get("hitl_required", False)
+        det["hitl_required"] = det_id in selected_hitl_ids
 
     for det in session.mpr_determinations:
         det_id = det.get("determination_id")

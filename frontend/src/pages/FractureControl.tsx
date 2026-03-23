@@ -1,4 +1,4 @@
-import { useDeferredValue, useEffect, useState, type FormEvent } from 'react';
+import { useDeferredValue, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { AlertTriangle, CheckCircle2, Loader2, ShieldAlert, ShieldCheck, ShieldX } from 'lucide-react';
 
 import { PageHeader } from '@/components/PageHeader';
@@ -314,30 +314,92 @@ export default function FractureControl() {
     { checked: approvedSourceDataAttached, setChecked: setApprovedSourceDataAttached, label: 'Approved source data attached', fieldId: 'approved_source_data_attached' },
     { checked: muaPresent, setChecked: setMuaPresent, label: 'MUA already present' },
   ];
-  const fractureChatLaunchState = createModuleChatLaunchState({
-    scopeKey: 'fracture-control',
-    moduleLabel: 'Fracture Control',
-    moduleContext: {
-      module: 'fracture',
-      material: materialName.trim(),
-      part_name: partName.trim(),
-      mission_class: missionClass,
-    },
-    originPath: '/fracture-control',
-    originTitle: 'Fracture Control',
-    description: 'Ground the chat in the current part, mission class, and fracture-screen inputs.',
-    contextSummary: buildChatContextSummary([
-      { label: 'Part', value: partName.trim() },
-      { label: 'Material', value: materialName.trim() },
-      { label: 'Mission', value: missionClass.replaceAll('_', ' ') },
-      { label: 'Lifecycle', value: lifecyclePhase.replaceAll('_', ' ') },
-      { label: 'Hardware', value: specificHardwareType.replaceAll('_', ' ') },
-    ]),
-  });
+  const fractureChatLaunchState = useMemo(
+    () =>
+      createModuleChatLaunchState({
+        scopeKey: 'fracture-control',
+        moduleLabel: 'Fracture Control',
+        moduleContext: {
+          module: 'fracture',
+          material: materialName.trim(),
+          part_name: partName.trim(),
+          mission_class: missionClass,
+          hazard_consequence: hazardConsequence,
+          load_path_type: loadPathType,
+          pressure_boundary: pressureBoundary,
+          lifecycle_phase: lifecyclePhase,
+          structural_role: structuralRole,
+          material_system: materialSystem,
+          specific_hardware_type: specificHardwareType,
+          optional_approach_requested: optionalApproachRequested,
+          proof_test_used: proofTestUsed,
+          process_controls_used: processControlsUsed,
+          detected_flaw_accepted_for_flight: detectedFlawAcceptedForFlight,
+          corrosion_iccp_recommended: corrosionIccpRecommended,
+          low_risk_candidate: lowRiskCandidate,
+          additive_manufactured: additiveManufactured,
+          chloride_exposure: chlorideExposure,
+          sustained_load_expected: sustainedLoadExpected,
+          approved_source_data_attached: approvedSourceDataAttached,
+          mua_present: muaPresent,
+          nasa_std_6016_qualified:
+            qualificationState === 'unknown'
+              ? undefined
+              : qualificationState === 'qualified',
+          kic_fty_ratio: kicFtyRatio.trim() ? Number(kicFtyRatio) : undefined,
+          ftu_ksi: ftuKsi.trim() ? Number(ftuKsi) : undefined,
+          short_transverse_dimension_in: shortTransverseDimension.trim()
+            ? Number(shortTransverseDimension)
+            : undefined,
+          classification: result?.classification,
+        },
+        originPath: '/fracture-control',
+        originTitle: 'Fracture Control',
+        description: 'Ground the chat in the current part, fracture path inputs, and applicable hardware context.',
+        contextSummary: buildChatContextSummary([
+          { label: 'Part', value: partName.trim() },
+          { label: 'Material', value: materialName.trim() },
+          { label: 'Mission', value: missionClass.replaceAll('_', ' ') },
+          { label: 'Hazard', value: hazardConsequence.replaceAll('_', ' ') },
+          { label: 'Load Path', value: loadPathType.replaceAll('_', ' ') },
+          { label: 'Lifecycle', value: lifecyclePhase.replaceAll('_', ' ') },
+          { label: 'Hardware', value: specificHardwareType.replaceAll('_', ' ') },
+          { label: 'Class', value: result?.classification ?? null },
+        ]),
+      }),
+    [
+      additiveManufactured,
+      approvedSourceDataAttached,
+      chlorideExposure,
+      corrosionIccpRecommended,
+      detectedFlawAcceptedForFlight,
+      ftuKsi,
+      hazardConsequence,
+      kicFtyRatio,
+      lifecyclePhase,
+      loadPathType,
+      lowRiskCandidate,
+      materialName,
+      materialSystem,
+      missionClass,
+      muaPresent,
+      optionalApproachRequested,
+      partName,
+      pressureBoundary,
+      processControlsUsed,
+      proofTestUsed,
+      qualificationState,
+      result?.classification,
+      shortTransverseDimension,
+      specificHardwareType,
+      structuralRole,
+      sustainedLoadExpected,
+    ],
+  );
 
   useEffect(() => {
     registerRouteModuleChatState('/fracture-control', fractureChatLaunchState);
-  }, [lifecyclePhase, materialName, missionClass, partName, specificHardwareType]);
+  }, [fractureChatLaunchState]);
 
   return (
     <GuidanceProvider

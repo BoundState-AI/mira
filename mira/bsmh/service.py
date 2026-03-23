@@ -12,7 +12,12 @@ import os
 import re
 from uuid import uuid4
 
-from mira.providers.llm_provider import complete as llm_complete, resolve_model
+from mira.providers.llm_provider import (
+    complete as llm_complete,
+    resolve_bedrock_region,
+    resolve_model,
+    resolve_provider_name,
+)
 from mira.utils.json_extract import ExtractionError, extract_json
 
 LOGGER = logging.getLogger(__name__)
@@ -763,6 +768,12 @@ async def _parse_fracture_context_from_query(raw_query: str) -> FractureContextI
     import asyncio as _asyncio
 
     model = os.environ.get("BSMH_SONNET_MODEL", resolve_model("sonnet"))
+    provider_name = resolve_provider_name()
+    bedrock_region = (
+        resolve_bedrock_region(model_id=model)
+        if provider_name == "bedrock-converse"
+        else None
+    )
 
     def _call() -> FractureContextInput:
         response = llm_complete(
@@ -772,6 +783,8 @@ async def _parse_fracture_context_from_query(raw_query: str) -> FractureContextI
             max_tokens=500,
             temperature=0.0,
             timeout_s=20,
+            provider=provider_name,
+            bedrock_region=bedrock_region,
         )
         try:
             parsed = extract_json(response.text, expect="object")

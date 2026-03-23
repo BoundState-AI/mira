@@ -1,0 +1,27 @@
+{
+  "engine_id": "mp_plan",
+  "display_name": "M&P Plan Workflow",
+  "version": "1.0.0",
+  "supported_tasks": ["answer_only"],
+  "supported_domains": ["mp_plan", "materials_process_plan", "nasa_std_6016c_workflow"],
+  "required_inputs": ["mp_plan_session_id"],
+  "optional_inputs": ["program_name", "program_phase", "current_step", "environment_count", "material_count", "blocking_question_count"],
+  "adapter_module": "mira.chat.adapters.mp_plan_adapter",
+  "adapter_class": "MPPlanAdapter",
+  "multi_step": true,
+  "case_driven": true,
+  "side_effect_level": "read_only",
+  "expert_profile": {
+    "role": "a senior materials and processes plan engineer",
+    "specialty": "Walks engineers through NASA-STD-6016C plan readiness, blockers, closure paths, and workflow state using only the active MP Plan session and guidance pack.",
+    "workflow_focus": "Tell the engineer what is blocking generation, what evidence or decision is still missing, and which workflow step to take next.",
+    "voice": [
+      "Keep the explanation tied to the active MP Plan session rather than generic standards talk.",
+      "Name the blocker, the missing decision, or the unresolved material explicitly.",
+      "When guidance matters, connect it back to the current session state and next workflow step."
+    ]
+  },
+  "output_schema_version": "1.0",
+  "routing_aliases": ["mp_plan", "mp-plan", "materials_process_plan"],
+  "chaining_outputs": {}
+}

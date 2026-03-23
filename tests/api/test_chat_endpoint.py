@@ -10,7 +10,7 @@ def test_chat_ping_reports_expected_adapters(api_client):
     assert payload["status"] == "ok"
     assert payload["domain"] == "chat"
     adapters = set(payload["adapters_loaded"].split(","))
-    assert {"bsmh", "fracture", "galvanic", "gpcm", "h2", "maptis_search", "oca"} <= adapters
+    assert {"bsmh", "fracture", "galvanic", "gpcm", "h2", "maptis_search", "mp_plan", "oca"} <= adapters
 
 
 def test_chat_returns_structured_response(api_client):
@@ -155,3 +155,33 @@ def test_chat_module_context_allows_explicit_cross_domain_override(api_client):
     assert payload["engine_used"] == "h2"
     assert payload["entities"]["material_designation"] == "316L"
     assert payload["entities"]["gas_service"] == "hydrogen"
+
+
+def test_chat_routes_mp_plan_module_context_to_mp_plan(api_client):
+    create_session = api_client.post(
+        "/mp-plan/v2/sessions",
+        json={"program_name": "Gateway", "program_phase": "PDR"},
+    )
+    assert create_session.status_code == 200
+    session_id = create_session.json()["session_id"]
+
+    response = api_client.post(
+        "/api/chat/",
+        json={
+            "message": "What is blocking this plan right now?",
+            "module_context": {
+                "module": "mp_plan",
+                "mp_plan_session_id": session_id,
+                "program_name": "Gateway",
+                "program_phase": "PDR",
+                "current_step": "setup",
+            },
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+
+    assert payload["engine_used"] == "mp_plan"
+    assert payload["verdict"] == "INSUFFICIENT_DATA"
+    assert isinstance(payload["response"], str) and payload["response"]

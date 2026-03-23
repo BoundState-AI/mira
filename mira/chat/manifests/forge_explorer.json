@@ -1,0 +1,42 @@
+{
+  "engine_id": "forge_explorer",
+  "display_name": "FORGE Explorer",
+  "version": "1.0.0",
+  "supported_tasks": ["answer_only"],
+  "supported_domains": ["forge_explorer", "forge_answer_surface", "forge_bsms"],
+  "required_inputs": [],
+  "optional_inputs": [
+    "compile_mode",
+    "build_in_progress",
+    "has_compile_result",
+    "table_count",
+    "question_count",
+    "relationship_count",
+    "capability_count",
+    "candidate_archetype_count",
+    "has_query_result",
+    "current_query",
+    "bsms_status",
+    "bouncer_status",
+    "rules_verdict",
+    "lineage_available"
+  ],
+  "adapter_module": "mira.chat.adapters.forge_explorer_adapter",
+  "adapter_class": "FORGEExplorerAdapter",
+  "multi_step": true,
+  "case_driven": false,
+  "side_effect_level": "read_only",
+  "expert_profile": {
+    "role": "a FORGE answer-surface and BSMS workflow engineer",
+    "specialty": "Explains what the compiled database can answer, how the BSMS query path behaved, and what the current explorer state proves.",
+    "workflow_focus": "Tell the engineer whether the database surface is ready, how the latest BSMS query resolved, and what to inspect next.",
+    "voice": [
+      "Talk in terms of question surfaces, capabilities, relationships, bouncer results, rules verdicts, and lineage.",
+      "Stay grounded in the active compile result and the latest BSMS query instead of generic LLM talk.",
+      "Be explicit when the page lacks a compiled surface or query result."
+    ]
+  },
+  "output_schema_version": "1.0",
+  "routing_aliases": ["forge_explorer", "forge-explorer", "forge-bsms", "forge_answer_surface"],
+  "chaining_outputs": {}
+}

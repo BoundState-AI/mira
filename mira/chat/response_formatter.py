@@ -26,7 +26,12 @@ import logging
 import os
 from typing import Any
 
-from mira.providers.llm_provider import complete as llm_complete, resolve_model
+from mira.providers.llm_provider import (
+    complete as llm_complete,
+    resolve_bedrock_region,
+    resolve_model_for_provider,
+    resolve_provider_name,
+)
 
 from .capability_registry import get_engine
 from .models import EngineEnvelope, Status, TaskMode
@@ -37,7 +42,7 @@ LOGGER = logging.getLogger(__name__)
 # Configuration
 # ---------------------------------------------------------------------------
 
-DEFAULT_FORMATTER_MODEL = resolve_model("sonnet")
+DEFAULT_FORMATTER_MODEL_TIER = "sonnet"
 DEFAULT_FORMATTER_PROVIDER = "bedrock-converse"
 FORMATTER_MAX_TOKENS = 1500
 FORMATTER_TEMPERATURE = 0.3  # Enough for natural M&P engineer voice, not enough to drift
@@ -325,16 +330,57 @@ async def format_response(
         return envelope.response_text
 
     try:
-        provider = (
+        provider = resolve_provider_name(
             os.environ.get("MIRA_CHAT_LLM_PROVIDER", DEFAULT_FORMATTER_PROVIDER).strip()
             or DEFAULT_FORMATTER_PROVIDER
         )
-        model = (
+        formatter_region = (
+            resolve_bedrock_region(
+                model_id=os.environ.get("MIRA_CHAT_FORMATTER_MODEL")
+                or os.environ.get("BEDROCK_MODEL_ID")
+                or os.environ.get("LLM_SONNET_MODEL")
+                or None,
+                region_override=os.environ.get("MIRA_CHAT_BEDROCK_REGION")
+                or os.environ.get("BEDROCK_REGION")
+                or None,
+            )
+            if provider == "bedrock-converse"
+            else None
+        )
+        configured_model = (
             os.environ.get("MIRA_CHAT_FORMATTER_MODEL")
             or os.environ.get("BEDROCK_MODEL_ID")
             or os.environ.get("LLM_SONNET_MODEL")
-            or DEFAULT_FORMATTER_MODEL
+            or ""
         ).strip()
+        model = configured_model or resolve_model_for_provider(
+            DEFAULT_FORMATTER_MODEL_TIER,
+            provider_name=provider,
+            bedrock_region=formatter_region,
+        )
+        if provider == "bedrock-converse" and formatter_region:
+            if formatter_region.startswith("us-gov-") and model.startswith("us."):
+                LOGGER.warning(
+                    "Formatter model %s is commercial but region %s is GovCloud; using GovCloud Sonnet default.",
+                    model,
+                    formatter_region,
+                )
+                model = resolve_model_for_provider(
+                    DEFAULT_FORMATTER_MODEL_TIER,
+                    provider_name=provider,
+                    bedrock_region=formatter_region,
+                )
+            elif formatter_region.startswith("us-") and not formatter_region.startswith("us-gov-") and model.startswith("us-gov."):
+                LOGGER.warning(
+                    "Formatter model %s is GovCloud but region %s is commercial; using commercial Sonnet default.",
+                    model,
+                    formatter_region,
+                )
+                model = resolve_model_for_provider(
+                    DEFAULT_FORMATTER_MODEL_TIER,
+                    provider_name=provider,
+                    bedrock_region=formatter_region,
+                )
         if session_context is not None:
             session_context["formatter_model_used"] = model
 
@@ -352,6 +398,7 @@ async def format_response(
                 temperature=FORMATTER_TEMPERATURE,
                 timeout_s=FORMATTER_TIMEOUT_S,
                 provider=provider,
+                bedrock_region=formatter_region,
             ),
         )
         formatted = response.text.strip()
@@ -518,6 +565,18 @@ def _plain_language_summary(envelope: EngineEnvelope) -> str:
             return "From a standards-compliance standpoint, this can close only if the listed requirement gaps are resolved."
         if envelope.status == Status.FAIL:
             return "From a standards-compliance standpoint, the current case does not close against the governing requirements."
+
+    if envelope.engine_id == "mp_plan":
+        if envelope.domain_payload.get("guidance_only"):
+            return "Here is the grounded MP Plan startup workflow from this module."
+        if envelope.status == Status.PASS:
+            return "From an M&P plan workflow standpoint, the current session is ready to move into generation."
+        if envelope.status == Status.CONDITIONAL_PASS:
+            return "From an M&P plan workflow standpoint, this session can move forward only if the listed workflow controls hold."
+        if envelope.status == Status.FAIL:
+            return "From an M&P plan workflow standpoint, the current session state does not support proceeding as stated."
+        if envelope.status == Status.INSUFFICIENT_DATA:
+            return "From an M&P plan workflow standpoint, the active session still has grounded blockers or missing decisions."
 
     if envelope.engine_id == "maptis_search":
         if envelope.status == Status.PASS:

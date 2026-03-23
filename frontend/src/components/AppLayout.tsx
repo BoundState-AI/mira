@@ -26,7 +26,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                 'w-full animate-fade-in',
                 isWideWorkspace
                   ? 'max-w-[min(110rem,calc(100vw-5rem))] lg:ml-6 lg:mr-0'
-                  : 'max-w-4xl lg:ml-24 lg:mr-auto',
+                  : 'max-w-4xl lg:ml-12 lg:mr-auto',
               ].join(' ')}
             >
               {children}

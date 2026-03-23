@@ -12,7 +12,12 @@ import re
 from typing import Any, Dict, Optional
 
 from data_laundering.bedrock_client import LLMClient
-from mira.providers.llm_provider import complete as llm_complete, resolve_model
+from mira.providers.llm_provider import (
+    complete as llm_complete,
+    resolve_bedrock_region,
+    resolve_model,
+    resolve_provider_name,
+)
 from mira.utils.json_extract import ExtractionError, extract_json
 
 from .models import BouncerResult, BSMHStructuredQuery
@@ -592,6 +597,12 @@ async def _run_local_llm_bouncer(raw_query: str) -> BouncerResult:
 
 async def _run_haiku_bouncer(raw_query: str) -> BouncerResult:
     model = _resolve_haiku_bouncer_model()
+    provider_name = resolve_provider_name()
+    bedrock_region = (
+        resolve_bedrock_region(model_id=model)
+        if provider_name == "bedrock-converse"
+        else None
+    )
     max_tokens = int(os.environ.get("BSMH_BOUNCER_MAX_TOKENS", "600"))
     timeout_s = int(os.environ.get("BSMH_BOUNCER_TIMEOUT_S", "20"))
     retries = max(0, min(int(os.environ.get("BSMH_BOUNCER_JSON_RETRIES", "1")), 3))
@@ -604,6 +615,8 @@ async def _run_haiku_bouncer(raw_query: str) -> BouncerResult:
             max_tokens=max_tokens,
             temperature=0.0,
             timeout_s=timeout_s,
+            provider=provider_name,
+            bedrock_region=bedrock_region,
         )
         return response.text
 

@@ -13,7 +13,11 @@ import re
 from typing import Any, Dict, List
 
 from data_laundering.bedrock_client import LLMClient
-from mira.providers.llm_provider import complete as llm_complete, resolve_model
+from mira.providers.llm_provider import (
+    complete as llm_complete,
+    resolve_bedrock_region,
+    resolve_model,
+)
 
 from .models import RuleDecisionPacket
 
@@ -376,7 +380,6 @@ async def format_decision_haiku(
     user_message = json.dumps(payload, indent=2)
 
     use_bedrock = os.environ.get("USE_BEDROCK", "0").lower() in ("1", "true", "yes")
-    bedrock_region = os.environ.get("AWS_REGION", os.environ.get("BEDROCK_REGION", "us-east-1"))
     model_bedrock = os.environ.get(
         "BSMH_HAIKU_BEDROCK_MODEL",
         resolve_model("haiku"),
@@ -397,6 +400,7 @@ async def format_decision_haiku(
                 max_tokens=max_tokens,
                 temperature=0.0,
                 provider="bedrock-converse" if use_bedrock else None,
+                bedrock_region=resolve_bedrock_region(model_id=model) if use_bedrock else None,
             )
             return response.text.strip()
         except Exception as exc:
@@ -462,6 +466,7 @@ async def format_decision_sonnet(
             max_tokens=max_tokens,
             temperature=0.0,
             provider="bedrock-converse" if use_bedrock else None,
+            bedrock_region=resolve_bedrock_region(model_id=model) if use_bedrock else None,
         )
         text = response.text.strip()
         if not text:
@@ -653,6 +658,7 @@ async def format_fracture_decision_sonnet(
             max_tokens=max_tokens,
             temperature=0.0,
             provider="bedrock-converse" if use_bedrock else None,
+            bedrock_region=resolve_bedrock_region(model_id=model) if use_bedrock else None,
         )
         return response.text.strip()
 

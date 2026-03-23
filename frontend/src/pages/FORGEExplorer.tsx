@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Database, Search, Shield, Scale, FileText, Bot, Loader2,
   ChevronDown, ChevronRight, Network, ScrollText, Zap, Filter,
@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ModuleChatButton } from "@/components/mira/ModuleChatButton";
 import {
   forgeCompile,
   forgeBSMSQuery,
@@ -18,6 +19,11 @@ import {
   type ForgeCompileResponse,
   type ForgeBSMSQueryResponse,
 } from "@/lib/api";
+import {
+  buildChatContextSummary,
+  createModuleChatLaunchState,
+  registerRouteModuleChatState,
+} from "@/lib/mira-chat-context";
 
 /* ── Question type config ──────────────────────────────────────────── */
 
@@ -532,6 +538,69 @@ export default function FORGEExplorer() {
   const capabilityCoverage = compileResult ? extractCapabilityCoverage(compileResult) : [];
   const candidateArchetypes = compileResult ? extractCandidateArchetypes(compileResult) : [];
   const compilePhases = compileJob ? getCompilePhaseStates(compileJob, activeCompileMode) : [];
+  const forgeExplorerChatLaunchState = useMemo(
+    () =>
+      createModuleChatLaunchState({
+        scopeKey: compileResult
+          ? `forge-explorer:${compileResult.summary.database_url_redacted}`
+          : "forge-explorer",
+        moduleLabel: "FORGE Explorer",
+        moduleContext: {
+          module: "forge_explorer",
+          database_url_redacted: compileResult?.summary.database_url_redacted || databaseUrl.trim() || undefined,
+          compile_mode: activeCompileMode,
+          compile_stage: compileJob?.stage,
+          compile_progress: compileJob?.progress,
+          build_in_progress: compileLoading,
+          has_compile_result: Boolean(compileResult),
+          table_count: compileResult?.summary.table_count,
+          question_count: compileResult?.summary.generated_question_count,
+          relationship_count: compileResult?.summary.relationship_count,
+          latent_relationship_count: compileResult?.summary.latent_relationship_count,
+          capability_count: capabilityCoverage.length,
+          candidate_archetype_count: candidateArchetypes.length,
+          current_query: query.trim() || undefined,
+          has_query_result: Boolean(result),
+          bsms_status: result?.status,
+          bouncer_status: result?.bouncer?.status,
+          rules_verdict: result?.rules?.verdict,
+          lineage_available: Boolean(result?.lineage && Object.keys(result.lineage).length),
+          active_tab: tab,
+        },
+        originPath: "/forge-explorer",
+        originTitle: "FORGE Explorer",
+        description: "Ground the chat in the active FORGE answer surface, BSMS query path, and lineage state.",
+        starterPrompts: [
+          "What can this compiled database answer right now?",
+          "What should I do next in this FORGE explorer workflow?",
+          "How do I read the current BSMS query result?",
+        ],
+        contextSummary: buildChatContextSummary([
+          { label: "Mode", value: activeCompileMode },
+          { label: "Tables", value: compileResult?.summary.table_count ?? null },
+          { label: "Questions", value: compileResult?.summary.generated_question_count ?? null },
+          { label: "Query", value: query.trim() || null },
+          { label: "BSMS", value: result?.status || null },
+          { label: "Rules", value: result?.rules?.verdict || null },
+        ]),
+      }),
+    [
+      activeCompileMode,
+      candidateArchetypes.length,
+      capabilityCoverage.length,
+      compileJob,
+      compileLoading,
+      compileResult,
+      databaseUrl,
+      query,
+      result,
+      tab,
+    ],
+  );
+
+  useEffect(() => {
+    registerRouteModuleChatState("/forge-explorer", forgeExplorerChatLaunchState);
+  }, [forgeExplorerChatLaunchState]);
 
   // Progress bar animation
   useEffect(() => {
@@ -635,9 +704,12 @@ export default function FORGEExplorer() {
               workflow for engineers and analysts.
             </p>
           </div>
-          {compileResult && (
-            <Badge variant="outline">{compileResult.summary.database_url_redacted}</Badge>
-          )}
+          <div className="flex items-center gap-2">
+            <ModuleChatButton launchState={forgeExplorerChatLaunchState} />
+            {compileResult && (
+              <Badge variant="outline">{compileResult.summary.database_url_redacted}</Badge>
+            )}
+          </div>
         </div>
 
         {/* Compile controls */}
