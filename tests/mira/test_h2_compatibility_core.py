@@ -16,8 +16,10 @@ Compliance: SWE-013, NASA-STD-8739.8B
 Safety Critical: True
 """
 
-import pytest
 import sys
+import json
+
+import pytest
 
 # Ensure BoundState is in path
 sys.path.insert(0, r"C:\BoundState")
@@ -34,6 +36,7 @@ from mira.maptis import (
     get_h2_family_rule,
     H2_HIGH_STRENGTH_THRESHOLD_KSI,
 )
+from mira.knowledge_twins.h2.engine_simple import H2Engine, Verdict
 
 
 # =============================================================================
@@ -376,6 +379,41 @@ class TestH2ResponseStructure:
         response = evaluate_h2_compatibility(request)
 
         assert response.embrittlement_risk is not None
+
+    def test_missing_evidence_ids_do_not_collapse_distinct_sources(self, tmp_path):
+        """Rows without evidence_id must still surface as separate evidence records."""
+        evidence_path = tmp_path / "h2_evidence_merged.json"
+        evidence_path.write_text(json.dumps({
+            "evidence": [
+                {
+                    "evidence_id": None,
+                    "material_name": "Synthetic Alloy",
+                    "material_family": "nickel_superalloy",
+                    "hee_band": "extreme",
+                    "hee_index": 0.41,
+                    "source": {"document": "Doc A", "table": "Table 1"},
+                    "heat_treatment": {"condition": "aged"},
+                    "test_conditions": {"pressure_mpa": 10.0, "temperature_c": 20.0},
+                },
+                {
+                    "evidence_id": None,
+                    "material_name": "Synthetic Alloy",
+                    "material_family": "nickel_superalloy",
+                    "hee_band": "extreme",
+                    "hee_index": 0.43,
+                    "source": {"document": "Doc B", "table": "Table 2"},
+                    "heat_treatment": {"condition": "aged"},
+                    "test_conditions": {"pressure_mpa": 11.0, "temperature_c": 21.0},
+                },
+            ]
+        }), encoding="utf-8")
+
+        engine = H2Engine(evidence_path=evidence_path, enable_mua_search=False)
+        result = engine.query("Synthetic Alloy")
+
+        assert result.verdict == Verdict.PROHIBITED
+        assert result.evidence_count == 2
+        assert {item["source"] for item in result.top_evidence} == {"Doc A", "Doc B"}
 
 
 # =============================================================================

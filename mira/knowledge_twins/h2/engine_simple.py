@@ -526,11 +526,28 @@ class H2Engine:
         matches: list[MatchedEvidence] = []
         matched_ids: set[str] = set()  # Track what we've added
 
+        def match_key(record: EvidenceRecord) -> str:
+            """Build a stable dedupe key even when imported rows lack evidence_id."""
+            raw_id = str(record.evidence_id or "").strip()
+            if raw_id and raw_id.lower() not in {"unknown", "none", "null"}:
+                return f"id:{raw_id}"
+            return "|".join([
+                normalize(record.material_name),
+                str(record.source_document or "").strip().lower(),
+                str(record.source_table or "").strip().lower(),
+                str(record.condition or "").strip().lower(),
+                str(record.hee_band or "").strip().lower(),
+                "" if record.hee_index is None else f"{record.hee_index}",
+                "" if record.pressure_mpa is None else f"{record.pressure_mpa}",
+                "" if record.temperature_c is None else f"{record.temperature_c}",
+            ])
+
         def add_match(record: EvidenceRecord, match_type: str, score: float) -> None:
             """Add a match if not already added."""
-            if record.evidence_id not in matched_ids:
+            key = match_key(record)
+            if key not in matched_ids:
                 matches.append(MatchedEvidence(record, match_type, score))
-                matched_ids.add(record.evidence_id)
+                matched_ids.add(key)
 
         # Tier 1: Exact match in material index
         exact_found = False
