@@ -420,7 +420,7 @@ export default function DTTreeEditor() {
       try {
         const formData = new FormData();
         formData.append("dt_file", file);
-        formData.append("max_iterations", "3");
+        formData.append("max_iterations", "1");
 
         setExtractionProgress(
           t("extraction.analyzing", {

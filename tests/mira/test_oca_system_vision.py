@@ -104,4 +104,6 @@ def test_oca_system_vision_retries_once_for_non_json_response() -> None:
     )
 
     assert len(fake_messages.calls) == 2
+    retry_prompt = fake_messages.calls[1]["messages"][0]["content"][0]["text"]
+    assert "Keep the draft compact" in retry_prompt
     assert result.system_id == "sys-2"

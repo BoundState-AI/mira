@@ -44,6 +44,7 @@ router = APIRouter()
 
 XLSX_MEDIA_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 XLSM_MEDIA_TYPE = "application/vnd.ms-excel.sheet.macroEnabled.12"
+DT_EDITOR_MAX_ITERATIONS = max(1, int(os.getenv("DT_EDITOR_MAX_ITERATIONS", "1")))
 
 
 def _get_workflow():
@@ -65,7 +66,7 @@ async def ping() -> dict:
 @router.post("/extract-dt")
 async def extract_drawing_tree_endpoint(
     dt_file: UploadFile = File(...),
-    max_iterations: int = Form(3),
+    max_iterations: int = Form(1),
 ) -> dict:
     """Extract Drawing Tree hierarchy from PDF.
 
@@ -77,7 +78,7 @@ async def extract_drawing_tree_endpoint(
 
     Args:
         dt_file: Drawing Tree PDF file
-        max_iterations: Max validation/correction iterations (default 3)
+        max_iterations: Max validation/correction iterations (interactive route clamps to 1)
 
     Returns:
         JSON with 'top_level' and 'tree' (flat format with parent pointers)
@@ -97,9 +98,17 @@ async def extract_drawing_tree_endpoint(
         pdf_path = temp_dir / dt_file.filename
         pdf_path.write_bytes(content)
 
+        effective_iterations = max(1, min(max_iterations, DT_EDITOR_MAX_ITERATIONS))
+        if effective_iterations != max_iterations:
+            LOGGER.info(
+                "[DT Extract] Clamping requested iterations from %s to %s for interactive editor responsiveness",
+                max_iterations,
+                effective_iterations,
+            )
+
         # Run v3 DT extraction
         client = VisionClient()
-        result = extract_drawing_tree(pdf_path, client, max_iterations=max_iterations)
+        result = extract_drawing_tree(pdf_path, client, max_iterations=effective_iterations)
 
         if not result or not result.get("tree"):
             raise HTTPException(

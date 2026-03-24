@@ -19,6 +19,7 @@ Safety Critical: True
 import pytest
 from fastapi.testclient import TestClient
 from io import BytesIO
+from unittest.mock import patch
 
 
 @pytest.fixture
@@ -63,6 +64,26 @@ class TestMIULFastExtract:
             files={"dt_file": ("test.txt", fake_file, "text/plain")},
         )
         assert response.status_code == 400
+
+    def test_extract_dt_clamps_interactive_iterations_to_one(self, client):
+        """Interactive DT extraction should clamp validation retries to keep latency bounded."""
+        captured: dict[str, int] = {}
+
+        def _fake_extract(pdf_path, client_obj, max_iterations=3):
+            captured["max_iterations"] = max_iterations
+            return {"top_level": "ROOT", "tree": [{"drawing_number": "ROOT", "title": "Root", "parent": None, "type": "ASSEMBLY"}]}
+
+        fake_pdf = BytesIO(b"%PDF-1.4\n% fake drawing tree\n")
+        with patch("mira.miul.v3.extract.extract_drawing_tree", side_effect=_fake_extract), \
+             patch("mira.miul.v3.extract.VisionClient"):
+            response = client.post(
+                "/miul/extract-dt",
+                data={"max_iterations": "3"},
+                files={"dt_file": ("tree.pdf", fake_pdf, "application/pdf")},
+            )
+
+        assert response.status_code == 200
+        assert captured["max_iterations"] == 1
 
 
 class TestMIULEnrich:

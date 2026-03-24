@@ -60,6 +60,8 @@ BEDROCK_REGION = resolve_bedrock_region(
 )
 MAX_UPLOAD_BYTES = int(os.getenv("OCA_SYSTEM_VISION_MAX_UPLOAD_BYTES", str(10 * 1024 * 1024)))
 MAX_IMAGE_DIMENSION_PX = int(os.getenv("OCA_SYSTEM_VISION_MAX_DIMENSION_PX", "2048"))
+MAX_RESPONSE_TOKENS = int(os.getenv("OCA_SYSTEM_VISION_MAX_TOKENS", "8192"))
+MAX_COMPONENT_BUDGET = int(os.getenv("OCA_SYSTEM_VISION_MAX_COMPONENTS", "12"))
 SUPPORTED_MEDIA_TYPES = {"image/png", "image/jpeg", "image/webp", "image/gif"}
 MEDIA_TYPE_ALIASES = {
     "image/jpg": "image/jpeg",
@@ -185,11 +187,12 @@ class OCASystemVisionService:
                 notes=notes,
                 current_inputs=current_inputs,
                 strict_json=attempt > 0,
+                compact_topology=attempt > 0,
             )
             try:
                 response = client.messages.create(
                     model=self._model_id,
-                    max_tokens=4096,
+                    max_tokens=MAX_RESPONSE_TOKENS,
                     temperature=0,
                     messages=[
                         {
@@ -222,9 +225,10 @@ class OCASystemVisionService:
             except ValueError as exc:
                 last_parse_error = exc
                 LOGGER.warning(
-                    "[OCA Vision] Non-JSON response for %s on attempt %s: %s",
+                    "[OCA Vision] Non-JSON response for %s on attempt %s (%s chars): %s",
                     system_id,
                     attempt + 1,
+                    len(raw_text),
                     raw_text[:500],
                 )
 
@@ -384,6 +388,7 @@ def _build_prompt(
     notes: str,
     current_inputs: Optional[SystemInputs],
     strict_json: bool = False,
+    compact_topology: bool = False,
 ) -> str:
     current_inputs_json = json.dumps(current_inputs.model_dump() if current_inputs else {}, indent=2, default=str)
     library = _load_component_library()
@@ -398,8 +403,15 @@ def _build_prompt(
 
     notes_text = notes.strip() or "None"
     strict_json_note = (
-        "\n10. Response must be a single valid JSON object. Do not include any prose before or after the JSON.\n"
+        "\n12. Response must be a single valid JSON object. Do not include any prose before or after the JSON.\n"
         if strict_json
+        else ""
+    )
+    compact_topology_note = (
+        f"\n10. Keep the draft compact. Return no more than {MAX_COMPONENT_BUDGET} components."
+        f" Collapse visually repeated identical hardware into one representative component and note the quantity in the label or observations.\n"
+        "11. Omit null fields and empty arrays whenever schema defaults allow it.\n"
+        if compact_topology
         else ""
     )
     return f"""You are generating a provisional OCA system-builder graph from a single uploaded system image.
@@ -483,6 +495,7 @@ Rules:
 7. Keep components in approximate flow order.
 8. Return empty component and connection lists if the image is not usable.
 9. Return valid JSON only. No markdown fences.
+{compact_topology_note}
 {strict_json_note}"""
 
 
