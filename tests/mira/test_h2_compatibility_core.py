@@ -101,12 +101,17 @@ class TestH2ApprovedMaterials:
             f"SS 321 has HIGH HEE band per Sandia data, got {response.classification}"
         )
 
-    def test_inconel_625_caution_for_h2(self):
-        """Inconel 625 shows HIGH HEE band (0.76) per Sandia data — CAUTION.
+    def test_inconel_625_requires_condition_clarification_for_h2(self):
+        """Inconel 625 now requires condition selection with the full evidence set.
 
-        Evidence: SANDIA-023, HEE index 0.76, band "high" at 55.2 MPa / 24°C.
-        Despite excellent reputation, the evidence shows measurable property
-        degradation in hydrogen — CAUTION is the evidence-honest verdict.
+        The merged H2 dataset includes:
+        - a generic HIGH HEE Sandia row,
+        - a HIGH HEE solution-treated row, and
+        - an annealed SLS bulletin row marked conditional.
+
+        Without a specified condition, the evidence-first engine should ask for
+        clarification rather than flattening the material to a single CAUTION
+        verdict.
         """
         request = H2CompatibilityRequest(
             question="Is Inconel 625 compatible with hydrogen?",
@@ -117,10 +122,11 @@ class TestH2ApprovedMaterials:
         )
         response = evaluate_h2_compatibility(request)
 
-        assert response.classification == AnswerSeverity.CAUTION, (
-            f"Inconel 625 has HIGH HEE band per Sandia data, got {response.classification}"
+        assert response.classification == AnswerSeverity.UNKNOWN, (
+            f"Inconel 625 should require clarification with mixed-condition evidence, got {response.classification}"
         )
-        assert response.embrittlement_risk == "medium"
+        assert response.needs_clarification is True
+        assert len(response.available_conditions) >= 2
 
     def test_inconel_718_condition_dependent(self):
         """Inconel 718 without condition specified has EXTREME HEE in aged state.
