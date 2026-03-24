@@ -50,6 +50,47 @@ _CACHE_LOCK = Lock()
 _MEM_CACHE: dict[str, "ConditionResolution"] = {}
 _PG_TABLE_READY = False
 
+_KNOWN_CONDITION_DISPLAY: dict[str, str] = {
+    "annealed": "Annealed",
+    "aged": "Aged",
+    "solution_treated": "Solution Treated",
+    "solution_treated_aged": "Solution Treated + Aged",
+    "normalized": "Normalized",
+    "quenched_tempered": "Quenched & Tempered",
+    "as_received": "As Received",
+    "cold_worked": "Cold Worked",
+    "cold_drawn": "Cold Drawn",
+    "hot_rolled": "Hot Rolled",
+    "hot_finished": "Hot Finished",
+    "mill_annealed": "Mill Annealed",
+    "peak_aged": "Peak Aged",
+    "quenched": "Quenched",
+    "tempered": "Tempered",
+    "wrought": "Wrought",
+    "cast": "Cast",
+    "forged": "Forged",
+    "sintered": "Sintered",
+}
+
+_KNOWN_CONDITION_ALIASES: dict[str, str] = {
+    "ann": "annealed",
+    "sta": "solution_treated_aged",
+    "st": "solution_treated",
+    "solution treated": "solution_treated",
+    "solution treated aged": "solution_treated_aged",
+    "solution treated + aged": "solution_treated_aged",
+    "solution treated and aged": "solution_treated_aged",
+    "quenched tempered": "quenched_tempered",
+    "q&t": "quenched_tempered",
+    "as received": "as_received",
+    "cold worked": "cold_worked",
+    "cold drawn": "cold_drawn",
+    "hot rolled": "hot_rolled",
+    "hot finished": "hot_finished",
+    "mill annealed": "mill_annealed",
+    "peak aged": "peak_aged",
+}
+
 
 @dataclass
 class ConditionResolution:
@@ -62,6 +103,42 @@ class ConditionResolution:
     resolver_provider: str
     resolver_model: str
     needs_review: bool
+
+
+def _resolve_known_condition(*, raw_key: str, raw_text: str) -> Optional[ConditionResolution]:
+    normalized_text = normalize_condition_key(raw_text)
+    candidates = (
+        raw_key,
+        normalized_text,
+        raw_key.replace(" ", "_"),
+        normalized_text.replace(" ", "_"),
+    )
+
+    canonical: Optional[str] = None
+    for candidate in candidates:
+        if candidate in _KNOWN_CONDITION_DISPLAY:
+            canonical = candidate
+            break
+        mapped = _KNOWN_CONDITION_ALIASES.get(candidate)
+        if mapped:
+            canonical = mapped
+            break
+
+    if not canonical:
+        return None
+
+    display = _KNOWN_CONDITION_DISPLAY[canonical]
+    return ConditionResolution(
+        raw_key=raw_key,
+        raw_text=raw_text,
+        canonical_condition=canonical,
+        display_label=display,
+        is_condition=True,
+        confidence=1.0,
+        resolver_provider="deterministic",
+        resolver_model="known-condition",
+        needs_review=False,
+    )
 
 
 def _normalize_key(value: str) -> str:
@@ -295,6 +372,7 @@ def resolve_condition_label(
         return cached
 
     backend = get_runtime_backend()
+    known = _resolve_known_condition(raw_key=raw_key, raw_text=raw_text)
     _ensure_pg_table_if_needed()
     if backend in {"pg", "hybrid"}:
         try:
@@ -312,14 +390,22 @@ def resolve_condition_label(
                         "confidence": found.get("confidence"),
                     },
                 )
-                if _is_persisted_alias_usable(found) or provider == "off":
+                if bool(found.get("human_verified")):
+                    with _CACHE_LOCK:
+                        _MEM_CACHE[mem_key] = persisted
+                    return persisted
+                if known is not None:
+                    res = known
+                elif _is_persisted_alias_usable(found) or provider == "off":
                     with _CACHE_LOCK:
                         _MEM_CACHE[mem_key] = persisted
                     return persisted
         except Exception as exc:
             LOGGER.warning("Condition alias fetch failed (%s).", exc)
 
-    if provider == "off":
+    if known is not None:
+        res = known
+    elif provider == "off":
         res = _coerce_resolution(
             raw_key=raw_key,
             raw_text=raw_text,
