@@ -24,6 +24,7 @@ class RouteCheck:
     path: str
     allowed_statuses: tuple[int, ...]
     description: str
+    fallback_paths: tuple[str, ...] = ()
 
 
 HEALTH_CHECKS: tuple[RouteCheck, ...] = (
@@ -37,7 +38,12 @@ CRITICAL_ROUTE_CHECKS: tuple[RouteCheck, ...] = (
     RouteCheck("/api/forge/ping", (200, 401, 403), "FORGE router mounted"),
     RouteCheck("/api/mp-plan/v2/ping", (200, 401, 403), "M&P Plan v2 router mounted"),
     RouteCheck("/api/mua/v10/ping", (200, 401, 403), "MUA v10 router mounted"),
-    RouteCheck("/api/oca/ping", (200, 401, 403), "OCA router mounted"),
+    RouteCheck(
+        "/api/oca/ping",
+        (200, 401, 403),
+        "OCA router mounted",
+        fallback_paths=("/api/oca/oca/ping",),
+    ),
     RouteCheck("/api/mira/galvanic/ping", (200, 401, 403), "galvanic router mounted"),
     RouteCheck("/api/mira/fracture/ping", (200, 401, 403), "fracture router mounted"),
     RouteCheck("/api/mira/h2/ping", (200, 401, 403), "H2 router mounted"),
@@ -79,19 +85,29 @@ def _check_health(base_url: str, check: RouteCheck) -> dict[str, object]:
 
 
 def _check_route(base_url: str, check: RouteCheck) -> dict[str, object]:
-    status, _ = _fetch(f"{base_url}{check.path}")
-    if status not in check.allowed_statuses:
-        allowed = ", ".join(str(code) for code in check.allowed_statuses)
-        raise RuntimeError(
-            f"{check.path} returned {status}; expected one of [{allowed}] for {check.description}"
-        )
-    print(f"{check.path}: {status} ({check.description})")
-    return {
-        "path": check.path,
-        "status": status,
-        "description": check.description,
-        "allowed_statuses": list(check.allowed_statuses),
-    }
+    attempted_paths = (check.path, *check.fallback_paths)
+    attempted_results: list[dict[str, int | str]] = []
+    for candidate_path in attempted_paths:
+        status, _ = _fetch(f"{base_url}{candidate_path}")
+        attempted_results.append({"path": candidate_path, "status": status})
+        if status in check.allowed_statuses:
+            print(f"{candidate_path}: {status} ({check.description})")
+            return {
+                "path": candidate_path,
+                "status": status,
+                "description": check.description,
+                "allowed_statuses": list(check.allowed_statuses),
+                "attempted_paths": attempted_results,
+            }
+
+    allowed = ", ".join(str(code) for code in check.allowed_statuses)
+    attempted_summary = ", ".join(
+        f"{result['path']}={result['status']}" for result in attempted_results
+    )
+    raise RuntimeError(
+        f"{check.description}: none of {list(attempted_paths)!r} returned one of [{allowed}]"
+        f" (saw {attempted_summary})"
+    )
 
 
 def _run_checks(base_url: str, checks: Iterable[RouteCheck], *, health: bool) -> list[dict[str, object]]:
