@@ -80,6 +80,11 @@ function sanitizeEnvValue(value: string | undefined): string {
   return trimmed;
 }
 
+function envFlagEnabled(value: string | undefined, defaultValue: boolean): boolean {
+  const fallback = defaultValue ? "true" : "false";
+  return !["0", "false", "no"].includes(String(value ?? fallback).trim().toLowerCase());
+}
+
 const RAW_USER_POOL_ID =
   (import.meta.env.VITE_COGNITO_USER_POOL_ID as string | undefined) ||
   (import.meta.env.REACT_APP_COGNITO_USER_POOL_ID as string | undefined) ||
@@ -96,14 +101,11 @@ const CLIENT_ID_PATTERN = /^[A-Za-z0-9]+$/;
 const IS_VALID_USER_POOL_ID = USER_POOL_ID_PATTERN.test(USER_POOL_ID);
 const IS_VALID_CLIENT_ID = CLIENT_ID_PATTERN.test(CLIENT_ID);
 const HAS_VALID_COGNITO_CONFIG = IS_VALID_USER_POOL_ID && IS_VALID_CLIENT_ID;
-// Default to bypassing Cognito in local Vite dev unless explicitly disabled.
-const AUTH_BYPASS_LOCAL =
-  import.meta.env.DEV &&
-  !["0", "false", "no"].includes(
-    String(import.meta.env.VITE_AUTH_BYPASS_LOCAL ?? "true")
-      .trim()
-      .toLowerCase(),
-  );
+// Temporary deployment override: bypass Cognito unless explicitly disabled.
+const AUTH_BYPASS_ENABLED =
+  envFlagEnabled(import.meta.env.VITE_AUTH_BYPASS as string | undefined, true) ||
+  (import.meta.env.DEV &&
+    envFlagEnabled(import.meta.env.VITE_AUTH_BYPASS_LOCAL as string | undefined, true));
 const API_AUTH_HOSTS = (
   (import.meta.env.VITE_API_AUTH_HOSTS as string | undefined) || "127.0.0.1:8000,localhost:8000"
 )
@@ -114,7 +116,7 @@ const API_AUTH_HOSTS = (
 const cognitoStorage =
   typeof window !== "undefined" && window.sessionStorage ? window.sessionStorage : undefined;
 
-if (!AUTH_BYPASS_LOCAL && (USER_POOL_ID || CLIENT_ID) && !HAS_VALID_COGNITO_CONFIG) {
+if (!AUTH_BYPASS_ENABLED && (USER_POOL_ID || CLIENT_ID) && !HAS_VALID_COGNITO_CONFIG) {
   console.error(
     "[auth] Invalid Cognito configuration. Check VITE_COGNITO_USER_POOL_ID and VITE_COGNITO_CLIENT_ID.",
     {
@@ -126,7 +128,7 @@ if (!AUTH_BYPASS_LOCAL && (USER_POOL_ID || CLIENT_ID) && !HAS_VALID_COGNITO_CONF
 }
 
 let userPool: CognitoUserPool | null = null;
-if (!AUTH_BYPASS_LOCAL && HAS_VALID_COGNITO_CONFIG) {
+if (!AUTH_BYPASS_ENABLED && HAS_VALID_COGNITO_CONFIG) {
   try {
     userPool = new CognitoUserPool({
       UserPoolId: USER_POOL_ID,
@@ -141,9 +143,9 @@ if (!AUTH_BYPASS_LOCAL && HAS_VALID_COGNITO_CONFIG) {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const LOCAL_DEV_USER: AuthUser = {
-  username: "local-dev",
-  email: "local-dev@boundstate.local",
+const AUTH_BYPASS_USER: AuthUser = {
+  username: "mira-admin",
+  email: "mira-admin@boundstate.local",
   groups: ["mira-admin", "mira-itar"],
   role: "admin",
   itarAccess: "full",
@@ -277,8 +279,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
-    if (AUTH_BYPASS_LOCAL) {
-      setUser(LOCAL_DEV_USER);
+    if (AUTH_BYPASS_ENABLED) {
+      setUser(AUTH_BYPASS_USER);
       setToken(null);
       setLoading(false);
       return;
@@ -303,8 +305,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [beginSession]);
 
   const logout = useCallback(() => {
-    if (AUTH_BYPASS_LOCAL) {
-      setUser(LOCAL_DEV_USER);
+    if (AUTH_BYPASS_ENABLED) {
+      setUser(AUTH_BYPASS_USER);
       setToken(null);
       setLoading(false);
       return;

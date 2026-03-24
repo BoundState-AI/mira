@@ -11,6 +11,10 @@ import {
 import { PageHeader } from '@/components/PageHeader';
 import { ModuleChatButton } from '@/components/mira/ModuleChatButton';
 import {
+  ModuleAvailabilityGate,
+  TemporarilyUnavailableNotice,
+} from '@/components/TemporarilyUnavailableModule';
+import {
   GuidanceContextIndicator,
   GuidanceField,
   GuidanceInlineHelp,
@@ -41,6 +45,7 @@ import {
   createModuleChatLaunchState,
   registerRouteModuleChatState,
 } from '@/lib/mira-chat-context';
+import { isUnavailableModuleId } from '@/lib/moduleAvailability';
 
 const ISSUE_COLUMNS = ['FLAM', 'FS', 'TOX', 'TVS', 'SCC', 'CORR'] as const;
 
@@ -130,6 +135,7 @@ function normalizeRating(value: string): string {
 }
 
 export default function MUAV10() {
+  const isTemporarilyUnavailable = isUnavailableModuleId('mua-v10');
   const [guidanceMode, setGuidanceMode] = useState<GuidanceModeName>('live');
   // Step 1
   const [maptisCode, setMaptisCode] = useState('');
@@ -650,6 +656,11 @@ export default function MUAV10() {
         </div>
       </div>
 
+      {isTemporarilyUnavailable ? (
+        <TemporarilyUnavailableNotice moduleName="MUA Writer" />
+      ) : null}
+
+      <ModuleAvailabilityGate unavailable={isTemporarilyUnavailable} className="space-y-6">
       <Card className={step === 1 ? '' : 'opacity-75'}>
         {step === 1 ? (
           <>
@@ -1304,6 +1315,7 @@ export default function MUAV10() {
           </CardContent>
         </Card>
       ) : null}
+      </ModuleAvailabilityGate>
       </div>
     </GuidanceProvider>
   );

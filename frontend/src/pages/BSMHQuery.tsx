@@ -6,6 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  ModuleAvailabilityGate,
+  TemporarilyUnavailableNotice,
+} from "@/components/TemporarilyUnavailableModule";
 
 import {
   bsmhQuery,
@@ -36,6 +40,7 @@ interface BSMHQueryProps {
   subtitle?: string;
   description?: string;
   showPipelineBlurb?: boolean;
+  isTemporarilyUnavailable?: boolean;
 }
 
 export default function BSMHQuery({
@@ -45,6 +50,7 @@ export default function BSMHQuery({
   subtitle,
   description,
   showPipelineBlurb = true,
+  isTemporarilyUnavailable = false,
 }: BSMHQueryProps) {
   const { t } = useTranslation(["common", "query"]);
   const localizedExamples = t("examples", {
@@ -123,41 +129,48 @@ export default function BSMHQuery({
             </p>
           )}
 
-          <div className="flex gap-2 mb-3">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && run()}
-                placeholder={t("placeholder", { ns: "query", defaultValue: "Ask an M&P question..." })}
-                className="pl-9 h-11"
-              />
-            </div>
-            <Button onClick={run} disabled={loading || !query.trim()} className="h-11 px-6">
-              {loading
-                ? t("searching", { ns: "query", defaultValue: "Running..." })
-                : (runLabel ?? t("buttons.search", { ns: "common", defaultValue: endpoint === "query" ? "Run Query" : "Run BSMH" }))}
-            </Button>
-          </div>
+          {isTemporarilyUnavailable ? (
+            <TemporarilyUnavailableNotice moduleName={effectiveTitle} className="mb-6" />
+          ) : null}
 
-          <div className="flex flex-wrap gap-2">
-            {localizedExamples.map((example) => (
-              <Button
-                key={example}
-                variant="ghost"
-                size="sm"
-                className="text-xs"
-                onClick={() => setQuery(example)}
-              >
-                {example}
+          <ModuleAvailabilityGate unavailable={isTemporarilyUnavailable}>
+            <div className="flex gap-2 mb-3">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && run()}
+                  placeholder={t("placeholder", { ns: "query", defaultValue: "Ask an M&P question..." })}
+                  className="pl-9 h-11"
+                />
+              </div>
+              <Button onClick={run} disabled={loading || !query.trim()} className="h-11 px-6">
+                {loading
+                  ? t("searching", { ns: "query", defaultValue: "Running..." })
+                  : (runLabel ?? t("buttons.search", { ns: "common", defaultValue: endpoint === "query" ? "Run Query" : "Run BSMH" }))}
               </Button>
-            ))}
-          </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {localizedExamples.map((example) => (
+                <Button
+                  key={example}
+                  variant="ghost"
+                  size="sm"
+                  className="text-xs"
+                  onClick={() => setQuery(example)}
+                >
+                  {example}
+                </Button>
+              ))}
+            </div>
+          </ModuleAvailabilityGate>
         </div>
       </div>
 
       <div className="max-w-5xl mx-auto px-6 py-8 space-y-4">
+        <ModuleAvailabilityGate unavailable={isTemporarilyUnavailable} className="space-y-4">
         {loading && (
           <Card className="p-4 border-primary/30">
             <div className="flex items-center gap-2 mb-3">
@@ -357,6 +370,7 @@ export default function BSMHQuery({
             </Card>
           </>
         )}
+        </ModuleAvailabilityGate>
       </div>
     </div>
   );

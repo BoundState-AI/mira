@@ -15,12 +15,18 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {
+  isHiddenModuleId,
+  isUnavailableModuleId,
+  MODULE_UNAVAILABLE_TOOLTIP,
+} from '@/lib/moduleAvailability';
 
 interface NavItem {
   id: string;
@@ -49,6 +55,8 @@ const DEFAULT_NAV_ITEMS: NavItem[] = [
   { id: 'knowledge-twins', title: 'Knowledge Twins', navKey: 'knowledgeTwins', url: '/', icon: Brain },
 ];
 
+const VISIBLE_NAV_ITEMS = DEFAULT_NAV_ITEMS.filter((item) => !isHiddenModuleId(item.id));
+
 const STORAGE_KEY = 'mira-sidebar-order';
 
 function getOrderedItems(): NavItem[] {
@@ -57,13 +65,13 @@ function getOrderedItems(): NavItem[] {
     if (stored) {
       const order: string[] = JSON.parse(stored);
       // Map stored order to items, filtering out any that no longer exist
-      const itemMap = new Map(DEFAULT_NAV_ITEMS.map(item => [item.id, item]));
+      const itemMap = new Map(VISIBLE_NAV_ITEMS.map(item => [item.id, item]));
       const orderedItems = order
         .filter(id => itemMap.has(id))
         .map(id => itemMap.get(id)!);
       // Add any new items that weren't in stored order
       const orderedIds = new Set(order);
-      for (const item of DEFAULT_NAV_ITEMS) {
+      for (const item of VISIBLE_NAV_ITEMS) {
         if (!orderedIds.has(item.id)) {
           orderedItems.push(item);
         }
@@ -73,7 +81,7 @@ function getOrderedItems(): NavItem[] {
   } catch {
     // Ignore parse errors
   }
-  return DEFAULT_NAV_ITEMS;
+  return VISIBLE_NAV_ITEMS;
 }
 
 function saveOrder(items: NavItem[]) {
@@ -86,7 +94,7 @@ function saveOrder(items: NavItem[]) {
 
 export function AppSidebar() {
   const { t } = useTranslation(['common', 'navigation']);
-  const [items, setItems] = useState<NavItem[]>(DEFAULT_NAV_ITEMS);
+  const [items, setItems] = useState<NavItem[]>(VISIBLE_NAV_ITEMS);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dropTargetIndex, setDropTargetIndex] = useState<number | null>(null);
   const [isReorderMode, setIsReorderMode] = useState(false);
@@ -136,12 +144,12 @@ export function AppSidebar() {
   }, []);
 
   const handleReset = useCallback(() => {
-    setItems(DEFAULT_NAV_ITEMS);
+    setItems(VISIBLE_NAV_ITEMS);
     localStorage.removeItem(STORAGE_KEY);
     setIsReorderMode(false);
   }, []);
 
-  const isCustomOrder = items.some((item, idx) => item.id !== DEFAULT_NAV_ITEMS[idx]?.id);
+  const isCustomOrder = items.some((item, idx) => item.id !== VISIBLE_NAV_ITEMS[idx]?.id);
 
   return (
     <Sidebar className="border-r border-sidebar-border">
@@ -199,46 +207,65 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
               {items.map((item, index) => (
-                <SidebarMenuItem
-                  key={item.id}
-                  draggable={isReorderMode}
-                  onDragStart={(e) => isReorderMode && handleDragStart(e, index)}
-                  onDragOver={(e) => isReorderMode && handleDragOver(e, index)}
-                  onDragLeave={handleDragLeave}
-                  onDrop={(e) => isReorderMode && handleDrop(e, index)}
-                  onDragEnd={handleDragEnd}
-                  className={`
-                    transition-all duration-150
-                    ${isReorderMode ? 'cursor-grab active:cursor-grabbing' : ''}
-                    ${draggedIndex === index ? 'opacity-50' : ''}
-                    ${dropTargetIndex === index && draggedIndex !== index
-                      ? 'ring-2 ring-primary ring-offset-1 ring-offset-sidebar rounded-md'
-                      : ''
-                    }
-                  `}
-                >
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      end={item.url === '/'}
+                (() => {
+                  const isUnavailable = isUnavailableModuleId(item.id);
+
+                  return (
+                    <SidebarMenuItem
+                      key={item.id}
+                      draggable={isReorderMode}
+                      onDragStart={(e) => isReorderMode && handleDragStart(e, index)}
+                      onDragOver={(e) => isReorderMode && handleDragOver(e, index)}
+                      onDragLeave={handleDragLeave}
+                      onDrop={(e) => isReorderMode && handleDrop(e, index)}
+                      onDragEnd={handleDragEnd}
                       className={`
-                        flex items-center gap-3 px-3 py-2.5 rounded-md
-                        text-sidebar-foreground/80 hover:text-sidebar-foreground
-                        hover:bg-sidebar-accent transition-colors
-                        ${isReorderMode ? 'pointer-events-none' : ''}
+                        transition-all duration-150
+                        ${isReorderMode ? 'cursor-grab active:cursor-grabbing' : ''}
+                        ${draggedIndex === index ? 'opacity-50' : ''}
+                        ${dropTargetIndex === index && draggedIndex !== index
+                          ? 'ring-2 ring-primary ring-offset-1 ring-offset-sidebar rounded-md'
+                          : ''
+                        }
                       `}
-                      activeClassName="bg-sidebar-accent text-sidebar-foreground font-medium"
                     >
-                      {isReorderMode && (
-                        <GripVertical className="h-4 w-4 text-sidebar-foreground/40 flex-shrink-0 -ml-1" />
-                      )}
-                      <item.icon className="h-4 w-4" />
-                      <span>
-                        {t(item.navKey, { ns: 'navigation', defaultValue: item.title })}
-                      </span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                      <SidebarMenuButton asChild>
+                        <NavLink
+                          to={item.url}
+                          end={item.url === '/'}
+                          title={isUnavailable ? MODULE_UNAVAILABLE_TOOLTIP : undefined}
+                          className={`
+                            flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors
+                            ${isUnavailable
+                              ? 'text-sidebar-foreground/40'
+                              : 'text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent'
+                            }
+                            ${isReorderMode ? 'pointer-events-none' : ''}
+                          `}
+                          activeClassName={isUnavailable ? undefined : 'bg-sidebar-accent text-sidebar-foreground font-medium'}
+                        >
+                          {isReorderMode && (
+                            <GripVertical className="h-4 w-4 text-sidebar-foreground/40 flex-shrink-0 -ml-1" />
+                          )}
+                          <item.icon className="h-4 w-4" />
+                          <span className="flex min-w-0 items-center gap-2">
+                            <span className="truncate">
+                              {t(item.navKey, { ns: 'navigation', defaultValue: item.title })}
+                            </span>
+                            {isUnavailable ? (
+                              <Badge
+                                variant="outline"
+                                className="border-sidebar-border bg-transparent px-1.5 py-0 text-[10px] uppercase tracking-wide text-sidebar-foreground/45"
+                              >
+                                Inactive
+                              </Badge>
+                            ) : null}
+                          </span>
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })()
               ))}
             </SidebarMenu>
           </SidebarGroupContent>

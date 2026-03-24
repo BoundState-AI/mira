@@ -23,8 +23,6 @@ import FractureControl from "./pages/FractureControl";
 import OCAWorkbench from "./pages/OCAWorkbench";
 import OCASystemBuilder from "./pages/OCASystemBuilder";
 import NotFound from "./pages/NotFound";
-import FORGE from "./pages/FORGE";
-import FORGEExplorer from "./pages/FORGEExplorer";
 import TOCR from "./pages/TOCR";
 
 const queryClient = new QueryClient();
@@ -46,6 +44,7 @@ const App = () => (
                   element={(
                     <BSMHQuery
                       endpoint="query"
+                      isTemporarilyUnavailable
                       showPipelineBlurb
                     />
                   )}
@@ -87,8 +86,8 @@ const App = () => (
                 <Route path="/mua-v7" element={<Navigate to="/mua-v10" replace />} />
                 <Route path="/mua-v8" element={<Navigate to="/mua-v10" replace />} />
                 <Route path="/mua-v10" element={<MUAV10 />} />
-                <Route path="/forge" element={<FORGE />} />
-                <Route path="/forge-explorer" element={<FORGEExplorer />} />
+                <Route path="/forge" element={<Navigate to="/" replace />} />
+                <Route path="/forge-explorer" element={<Navigate to="/" replace />} />
                 <Route path="/tocr" element={<TOCR />} />
                 <Route path="/knowledge-twins" element={<Navigate to="/" replace />} />
                 <Route path="*" element={<NotFound />} />

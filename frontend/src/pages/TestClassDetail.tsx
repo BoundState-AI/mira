@@ -29,6 +29,11 @@ import {
 } from "@/components/ui/dialog";
 import { ArrowLeft, ChevronLeft, ChevronRight, Search, Download, Copy, FileText, Code, Printer } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  ModuleAvailabilityGate,
+  TemporarilyUnavailableNotice,
+} from "@/components/TemporarilyUnavailableModule";
+import { isUnavailableModuleId } from "@/lib/moduleAvailability";
 
 interface TestRecord {
   id: string;
@@ -80,6 +85,7 @@ const TEST_CLASS_FALLBACK: Record<string, { name: string; description: string }>
 
 export default function TestClassDetail() {
   const { t } = useTranslation(["testClasses", "common"]);
+  const isTemporarilyUnavailable = isUnavailableModuleId("test-classes");
   const { testType } = useParams<{ testType: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -120,6 +126,10 @@ export default function TestClassDetail() {
   // Fetch available ratings for this test type
   useEffect(() => {
     if (!testType) return;
+    if (isTemporarilyUnavailable) {
+      setAvailableRatings([]);
+      return;
+    }
 
     fetch(`${API_URL}/api/test-records/${testType}/ratings`)
       .then(response => response.json())
@@ -130,9 +140,21 @@ export default function TestClassDetail() {
         console.error('Failed to load ratings:', err);
         setAvailableRatings([]);
       });
-  }, [testType]);
+  }, [isTemporarilyUnavailable, testType]);
 
   useEffect(() => {
+    if (isTemporarilyUnavailable) {
+      setRecords([]);
+      setError(null);
+      setIsLoading(false);
+      setPagination((prev) => ({
+        ...prev,
+        total_records: 0,
+        total_pages: 0,
+      }));
+      return;
+    }
+
     if (!testType || !isKnownTestType) {
       setError(t("detail.unknownTestType", { ns: "testClasses", defaultValue: "Unknown test type" }));
       setIsLoading(false);
@@ -140,9 +162,10 @@ export default function TestClassDetail() {
     }
 
     fetchRecords(pagination.page, pagination.per_page);
-  }, [testType, isKnownTestType, pagination.page, ratingFilter, ratingType, stdTestFlag, t]);
+  }, [isKnownTestType, isTemporarilyUnavailable, pagination.page, ratingFilter, ratingType, stdTestFlag, t, testType]);
 
   const fetchRecords = async (page: number, perPage: number) => {
+    if (isTemporarilyUnavailable) return;
     setIsLoading(true);
     setError(null);
 
@@ -196,6 +219,7 @@ export default function TestClassDetail() {
   };
 
   const handleExport = async () => {
+    if (isTemporarilyUnavailable) return;
     try {
       const params = new URLSearchParams({
         format: 'csv',
@@ -266,6 +290,11 @@ export default function TestClassDetail() {
         </p>
       </div>
 
+      {isTemporarilyUnavailable ? (
+        <TemporarilyUnavailableNotice moduleName={testInfo.name} />
+      ) : null}
+
+      <ModuleAvailabilityGate unavailable={isTemporarilyUnavailable} className="space-y-6">
       {/* Filters */}
       <Card className="p-4">
         <div className="flex flex-col md:flex-row gap-4">
@@ -589,6 +618,7 @@ export default function TestClassDetail() {
           )}
         </DialogContent>
       </Dialog>
+      </ModuleAvailabilityGate>
     </div>
   );
 }

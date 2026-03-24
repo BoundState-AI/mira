@@ -51,6 +51,8 @@ FRONTEND_SECURITY_GROUP="${FRONTEND_SECURITY_GROUP:-sg-04ed4a32c58123c21}"
 COGNITO_REGION="${COGNITO_REGION:-us-gov-west-1}"
 COGNITO_USER_POOL_ID="${COGNITO_USER_POOL_ID:-us-gov-west-1_nEpMTffMH}"
 COGNITO_CLIENT_ID="${COGNITO_CLIENT_ID:-1tklem8thjkg04ipupvcb1heal}"
+MIRA_AUTH_MODE="${MIRA_AUTH_MODE:-none}"
+VITE_AUTH_BYPASS="${VITE_AUTH_BYPASS:-true}"
 BASE_URL="${BASE_URL:-https://mira.boundstate.ai}"
 JWT_SECRET_KEY="${JWT_SECRET_KEY:-mira-runtime-${DATE_TAG}}"
 BEDROCK_MODEL_ID="${BEDROCK_MODEL_ID:-us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0}"
@@ -221,15 +223,19 @@ run_postdeploy_smoke() {
 
   echo
   echo "== Authenticated protected-route smoke =="
-  if [ "${SKIP_AUTHENTICATED_SMOKE}" = "1" ]; then
+  if [ "${SKIP_AUTHENTICATED_SMOKE}" = "1" ] || [ "${MIRA_AUTH_MODE}" != "cognito" ]; then
+    local skip_reason="SKIP_AUTHENTICATED_SMOKE=1"
+    if [ "${MIRA_AUTH_MODE}" != "cognito" ]; then
+      skip_reason="MIRA_AUTH_MODE=${MIRA_AUTH_MODE}"
+    fi
     cat > "${AUTH_SMOKE_JSON}" <<JSON
 {
   "ok": false,
   "skipped": true,
-  "reason": "SKIP_AUTHENTICATED_SMOKE=1"
+  "reason": "${skip_reason}"
 }
 JSON
-    echo "Skipping authenticated smoke because SKIP_AUTHENTICATED_SMOKE=1"
+    echo "Skipping authenticated smoke because ${skip_reason}"
     return
   fi
 
@@ -292,6 +298,7 @@ echo
 echo "== Build frontend =="
 pushd "${BUILD_ROOT}/frontend" >/dev/null
 "${DOCKER_BIN}" build \
+  --build-arg "VITE_AUTH_BYPASS=${VITE_AUTH_BYPASS}" \
   --build-arg "VITE_COGNITO_USER_POOL_ID=${COGNITO_USER_POOL_ID}" \
   --build-arg "VITE_COGNITO_CLIENT_ID=${COGNITO_CLIENT_ID}" \
   --build-arg "VITE_API_AUTH_HOSTS=mira.boundstate.ai" \
@@ -343,7 +350,7 @@ cat > "${BACKEND_TASK_JSON}" <<JSON
         {"name": "COGNITO_USER_POOL_ID", "value": "${COGNITO_USER_POOL_ID}"},
         {"name": "DEBUG", "value": "false"},
         {"name": "ALLOWED_ORIGINS", "value": "${BASE_URL}"},
-        {"name": "MIRA_AUTH_MODE", "value": "cognito"},
+        {"name": "MIRA_AUTH_MODE", "value": "${MIRA_AUTH_MODE}"},
         {"name": "ADMIN_PATH_PREFIXES", "value": "/admin"},
         {"name": "COGNITO_REGION", "value": "${COGNITO_REGION}"},
         {"name": "ENABLE_AUDIT_LOGGING", "value": "true"},
