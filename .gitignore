@@ -39,7 +39,9 @@ C:/
 !frontend/src/data/mira-guidance/*.json
 
 # --- FAISS INDEXES (binary, rebuild from DB) ---
-mira/databases/
+mira/databases/*
+!mira/databases/o2_bok/
+!mira/databases/o2_bok/**
 mira/MIRA_V2/data/faiss_indexes/
 mira/MIRA_V2/data/bok_embeddings/
 mira/MIRA_V2/data/mua_embeddings/

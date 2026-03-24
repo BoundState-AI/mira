@@ -1,0 +1,3237 @@
+[
+  {
+    "idx": 0,
+    "doc_id": "NASA-STD-6001_p0_0",
+    "section": "0.0",
+    "title": "APPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n1 of 158 \n \nMETRIC/SI (ENGLISH) \n \n \n \n \n  ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 1,
+    "text_length": 421
+  },
+  {
+    "idx": 1,
+    "doc_id": "NASA-STD-6001_p2_0",
+    "section": "2.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n3 of 158 \nFO...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 3,
+    "text_length": 2118
+  },
+  {
+    "idx": 2,
+    "doc_id": "NASA-STD-6001_p3_0",
+    "section": "3.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n4 of 158 \n \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 4,
+    "text_length": 3015
+  },
+  {
+    "idx": 3,
+    "doc_id": "NASA-STD-6001_p4_0",
+    "section": "4.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n5 of 158 \n \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 5,
+    "text_length": 2637
+  },
+  {
+    "idx": 4,
+    "doc_id": "NASA-STD-6001_p5_0",
+    "section": "5.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n6 of 158 \n \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 6,
+    "text_length": 2792
+  },
+  {
+    "idx": 5,
+    "doc_id": "NASA-STD-6001_p6_0",
+    "section": "6.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n7 of 158 \nLI...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 7,
+    "text_length": 1662
+  },
+  {
+    "idx": 6,
+    "doc_id": "NASA-STD-6001_p7_0",
+    "section": "7.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n8 of 158 \nFL...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 8,
+    "text_length": 2124
+  },
+  {
+    "idx": 7,
+    "doc_id": "NASA-STD-6001_p8_0",
+    "section": "8.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n9 of 158 \n2....",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 9,
+    "text_length": 1539
+  },
+  {
+    "idx": 8,
+    "doc_id": "NASA-STD-6001_p9_0",
+    "section": "9.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n10 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 10,
+    "text_length": 1661
+  },
+  {
+    "idx": 9,
+    "doc_id": "NASA-STD-6001_p10_0",
+    "section": "10.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n11 of 158 \nA...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 11,
+    "text_length": 1651
+  },
+  {
+    "idx": 10,
+    "doc_id": "NASA-STD-6001_p11_0",
+    "section": "11.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n12 of 158 \n\u00b5...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 12,
+    "text_length": 1083
+  },
+  {
+    "idx": 11,
+    "doc_id": "NASA-STD-6001_p12_0",
+    "section": "12.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n13 of 158 \nL...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 13,
+    "text_length": 1217
+  },
+  {
+    "idx": 12,
+    "doc_id": "NASA-STD-6001_p13_0",
+    "section": "13.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n14 of 158 \nS...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 14,
+    "text_length": 1853
+  },
+  {
+    "idx": 13,
+    "doc_id": "NASA-STD-6001_p14_0",
+    "section": "14.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n15 of 158 \nG...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 15,
+    "text_length": 2414
+  },
+  {
+    "idx": 14,
+    "doc_id": "NASA-STD-6001_p15_0",
+    "section": "15.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n16 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 16,
+    "text_length": 2318
+  },
+  {
+    "idx": 15,
+    "doc_id": "NASA-STD-6001_p16_0",
+    "section": "16.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n17 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 17,
+    "text_length": 2020
+  },
+  {
+    "idx": 16,
+    "doc_id": "NASA-STD-6001_p17_0",
+    "section": "17.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n18 of 158 \nT...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 18,
+    "text_length": 2288
+  },
+  {
+    "idx": 17,
+    "doc_id": "NASA-STD-6001_p18_0",
+    "section": "18.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n19 of 158 \nT...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 19,
+    "text_length": 1619
+  },
+  {
+    "idx": 18,
+    "doc_id": "NASA-STD-6001_p19_0",
+    "section": "19.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n20 of 158 \n6...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 20,
+    "text_length": 2377
+  },
+  {
+    "idx": 19,
+    "doc_id": "NASA-STD-6001_p20_0",
+    "section": "20.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n21 of 158 \n6...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 21,
+    "text_length": 1935
+  },
+  {
+    "idx": 20,
+    "doc_id": "NASA-STD-6001_p21_0",
+    "section": "21.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n22 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 22,
+    "text_length": 204
+  },
+  {
+    "idx": 21,
+    "doc_id": "NASA-STD-6001_p22_0",
+    "section": "22.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n23 of 158 \n6...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 23,
+    "text_length": 2694
+  },
+  {
+    "idx": 22,
+    "doc_id": "NASA-STD-6001_p23_0",
+    "section": "23.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n24 of 158 \nT...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 24,
+    "text_length": 2254
+  },
+  {
+    "idx": 23,
+    "doc_id": "NASA-STD-6001_p24_0",
+    "section": "24.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n25 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 25,
+    "text_length": 2103
+  },
+  {
+    "idx": 24,
+    "doc_id": "NASA-STD-6001_p25_0",
+    "section": "25.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n26 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 26,
+    "text_length": 2209
+  },
+  {
+    "idx": 25,
+    "doc_id": "NASA-STD-6001_p26_0",
+    "section": "26.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n27 of 158 \nM...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 27,
+    "text_length": 1860
+  },
+  {
+    "idx": 26,
+    "doc_id": "NASA-STD-6001_p27_0",
+    "section": "27.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n28 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 28,
+    "text_length": 748
+  },
+  {
+    "idx": 27,
+    "doc_id": "NASA-STD-6001_p28_0",
+    "section": "28.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n29 of 158 \n7...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 29,
+    "text_length": 2225
+  },
+  {
+    "idx": 28,
+    "doc_id": "NASA-STD-6001_p29_0",
+    "section": "29.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n30 of 158 \nI...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 30,
+    "text_length": 2112
+  },
+  {
+    "idx": 29,
+    "doc_id": "NASA-STD-6001_p30_0",
+    "section": "30.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n31 of 158 \n(...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 31,
+    "text_length": 1866
+  },
+  {
+    "idx": 30,
+    "doc_id": "NASA-STD-6001_p31_0",
+    "section": "31.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n32 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 32,
+    "text_length": 2163
+  },
+  {
+    "idx": 31,
+    "doc_id": "NASA-STD-6001_p32_0",
+    "section": "32.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n33 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 33,
+    "text_length": 2212
+  },
+  {
+    "idx": 32,
+    "doc_id": "NASA-STD-6001_p34_0",
+    "section": "34.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n35 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 35,
+    "text_length": 1781
+  },
+  {
+    "idx": 33,
+    "doc_id": "NASA-STD-6001_p35_0",
+    "section": "35.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n36 of 158 \n(...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 36,
+    "text_length": 2347
+  },
+  {
+    "idx": 34,
+    "doc_id": "NASA-STD-6001_p36_0",
+    "section": "36.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n37 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 37,
+    "text_length": 2363
+  },
+  {
+    "idx": 35,
+    "doc_id": "NASA-STD-6001_p38_0",
+    "section": "38.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n39 of 158 \nC...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 39,
+    "text_length": 2251
+  },
+  {
+    "idx": 36,
+    "doc_id": "NASA-STD-6001_p39_0",
+    "section": "39.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n40 of 158 \nd...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 40,
+    "text_length": 2073
+  },
+  {
+    "idx": 37,
+    "doc_id": "NASA-STD-6001_p40_0",
+    "section": "40.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n41 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 41,
+    "text_length": 1898
+  },
+  {
+    "idx": 38,
+    "doc_id": "NASA-STD-6001_p41_0",
+    "section": "41.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n42 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 42,
+    "text_length": 1892
+  },
+  {
+    "idx": 39,
+    "doc_id": "NASA-STD-6001_p42_0",
+    "section": "42.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n43 of 158 \n[...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 43,
+    "text_length": 2061
+  },
+  {
+    "idx": 40,
+    "doc_id": "NASA-STD-6001_p43_0",
+    "section": "43.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n44 of 158 \nT...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 44,
+    "text_length": 2113
+  },
+  {
+    "idx": 41,
+    "doc_id": "NASA-STD-6001_p44_0",
+    "section": "44.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n45 of 158 \n7...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 45,
+    "text_length": 2026
+  },
+  {
+    "idx": 42,
+    "doc_id": "NASA-STD-6001_p45_0",
+    "section": "45.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n46 of 158 \n(...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 46,
+    "text_length": 2130
+  },
+  {
+    "idx": 43,
+    "doc_id": "NASA-STD-6001_p46_0",
+    "section": "46.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n47 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 47,
+    "text_length": 935
+  },
+  {
+    "idx": 44,
+    "doc_id": "NASA-STD-6001_p47_0",
+    "section": "47.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n48 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 48,
+    "text_length": 1428
+  },
+  {
+    "idx": 45,
+    "doc_id": "NASA-STD-6001_p48_0",
+    "section": "48.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n49 of 158 \nT...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 49,
+    "text_length": 2373
+  },
+  {
+    "idx": 46,
+    "doc_id": "NASA-STD-6001_p49_0",
+    "section": "49.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n50 of 158 \n(...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 50,
+    "text_length": 2024
+  },
+  {
+    "idx": 47,
+    "doc_id": "NASA-STD-6001_p50_0",
+    "section": "50.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n51 of 158 \nF...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 51,
+    "text_length": 1861
+  },
+  {
+    "idx": 48,
+    "doc_id": "NASA-STD-6001_p51_0",
+    "section": "51.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n52 of 158 \n7...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 52,
+    "text_length": 2432
+  },
+  {
+    "idx": 49,
+    "doc_id": "NASA-STD-6001_p52_0",
+    "section": "52.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n53 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 53,
+    "text_length": 1814
+  },
+  {
+    "idx": 50,
+    "doc_id": "NASA-STD-6001_p53_0",
+    "section": "53.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n54 of 158 \n7...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 54,
+    "text_length": 2179
+  },
+  {
+    "idx": 51,
+    "doc_id": "NASA-STD-6001_p54_0",
+    "section": "54.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n55 of 158 \nT...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 55,
+    "text_length": 2225
+  },
+  {
+    "idx": 52,
+    "doc_id": "NASA-STD-6001_p57_0",
+    "section": "57.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n58 of 158 \nA...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 58,
+    "text_length": 1937
+  },
+  {
+    "idx": 53,
+    "doc_id": "NASA-STD-6001_p58_0",
+    "section": "58.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n59 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 59,
+    "text_length": 2283
+  },
+  {
+    "idx": 54,
+    "doc_id": "NASA-STD-6001_p59_0",
+    "section": "59.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n60 of 158 \na...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 60,
+    "text_length": 2041
+  },
+  {
+    "idx": 55,
+    "doc_id": "NASA-STD-6001_p61_0",
+    "section": "61.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n62 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 62,
+    "text_length": 2083
+  },
+  {
+    "idx": 56,
+    "doc_id": "NASA-STD-6001_p62_0",
+    "section": "62.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n63 of 158 \nD...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 63,
+    "text_length": 1722
+  },
+  {
+    "idx": 57,
+    "doc_id": "NASA-STD-6001_p63_0",
+    "section": "63.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n64 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 64,
+    "text_length": 1868
+  },
+  {
+    "idx": 58,
+    "doc_id": "NASA-STD-6001_p64_0",
+    "section": "64.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n65 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 65,
+    "text_length": 1894
+  },
+  {
+    "idx": 59,
+    "doc_id": "NASA-STD-6001_p65_0",
+    "section": "65.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n66 of 158 \n(...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 66,
+    "text_length": 2081
+  },
+  {
+    "idx": 60,
+    "doc_id": "NASA-STD-6001_p66_0",
+    "section": "66.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n67 of 158 \nf...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 67,
+    "text_length": 2072
+  },
+  {
+    "idx": 61,
+    "doc_id": "NASA-STD-6001_p67_0",
+    "section": "67.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n68 of 158 \ng...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 68,
+    "text_length": 2160
+  },
+  {
+    "idx": 62,
+    "doc_id": "NASA-STD-6001_p68_0",
+    "section": "68.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n69 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 69,
+    "text_length": 1663
+  },
+  {
+    "idx": 63,
+    "doc_id": "NASA-STD-6001_p69_0",
+    "section": "69.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n70 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 70,
+    "text_length": 1868
+  },
+  {
+    "idx": 64,
+    "doc_id": "NASA-STD-6001_p70_0",
+    "section": "70.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n71 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 71,
+    "text_length": 2017
+  },
+  {
+    "idx": 65,
+    "doc_id": "NASA-STD-6001_p71_0",
+    "section": "71.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n72 of 158 \nI...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 72,
+    "text_length": 2242
+  },
+  {
+    "idx": 66,
+    "doc_id": "NASA-STD-6001_p74_0",
+    "section": "74.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n75 of 158 \nA...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 75,
+    "text_length": 1799
+  },
+  {
+    "idx": 67,
+    "doc_id": "NASA-STD-6001_p75_0",
+    "section": "75.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n76 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 76,
+    "text_length": 1795
+  },
+  {
+    "idx": 68,
+    "doc_id": "NASA-STD-6001_p76_0",
+    "section": "76.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n77 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 77,
+    "text_length": 1845
+  },
+  {
+    "idx": 69,
+    "doc_id": "NASA-STD-6001_p77_0",
+    "section": "77.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n78 of 158 \nb...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 78,
+    "text_length": 2168
+  },
+  {
+    "idx": 70,
+    "doc_id": "NASA-STD-6001_p78_0",
+    "section": "78.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n79 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 79,
+    "text_length": 2064
+  },
+  {
+    "idx": 71,
+    "doc_id": "NASA-STD-6001_p79_0",
+    "section": "79.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n80 of 158 \nO...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 80,
+    "text_length": 2018
+  },
+  {
+    "idx": 72,
+    "doc_id": "NASA-STD-6001_p80_0",
+    "section": "80.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n81 of 158 \nA...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 81,
+    "text_length": 2059
+  },
+  {
+    "idx": 73,
+    "doc_id": "NASA-STD-6001_p81_0",
+    "section": "81.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n82 of 158 \ns...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 82,
+    "text_length": 1942
+  },
+  {
+    "idx": 74,
+    "doc_id": "NASA-STD-6001_p82_0",
+    "section": "82.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n83 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 83,
+    "text_length": 1969
+  },
+  {
+    "idx": 75,
+    "doc_id": "NASA-STD-6001_p83_0",
+    "section": "83.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n84 of 158 \nT...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 84,
+    "text_length": 2036
+  },
+  {
+    "idx": 76,
+    "doc_id": "NASA-STD-6001_p84_0",
+    "section": "84.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n85 of 158 \nO...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 85,
+    "text_length": 1806
+  },
+  {
+    "idx": 77,
+    "doc_id": "NASA-STD-6001_p85_0",
+    "section": "85.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n86 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 86,
+    "text_length": 1265
+  },
+  {
+    "idx": 78,
+    "doc_id": "NASA-STD-6001_p86_0",
+    "section": "86.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n87 of 158 \nc...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 87,
+    "text_length": 2000
+  },
+  {
+    "idx": 79,
+    "doc_id": "NASA-STD-6001_p87_0",
+    "section": "87.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n88 of 158 \nF...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 88,
+    "text_length": 2085
+  },
+  {
+    "idx": 80,
+    "doc_id": "NASA-STD-6001_p90_0",
+    "section": "90.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n91 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 91,
+    "text_length": 840
+  },
+  {
+    "idx": 81,
+    "doc_id": "NASA-STD-6001_p91_0",
+    "section": "91.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n92 of 158 \nA...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 92,
+    "text_length": 1792
+  },
+  {
+    "idx": 82,
+    "doc_id": "NASA-STD-6001_p92_0",
+    "section": "92.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n93 of 158 \n(...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 93,
+    "text_length": 2277
+  },
+  {
+    "idx": 83,
+    "doc_id": "NASA-STD-6001_p93_0",
+    "section": "93.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n94 of 158 \n ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 94,
+    "text_length": 962
+  },
+  {
+    "idx": 84,
+    "doc_id": "NASA-STD-6001_p96_0",
+    "section": "96.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n97 of 158 \nT...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 97,
+    "text_length": 1659
+  },
+  {
+    "idx": 85,
+    "doc_id": "NASA-STD-6001_p97_0",
+    "section": "97.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n98 of 158 \nc...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 98,
+    "text_length": 1229
+  },
+  {
+    "idx": 86,
+    "doc_id": "NASA-STD-6001_p98_0",
+    "section": "98.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n99 of 158 \nA...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 99,
+    "text_length": 2023
+  },
+  {
+    "idx": 87,
+    "doc_id": "NASA-STD-6001_p99_0",
+    "section": "99.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n100 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 100,
+    "text_length": 2341
+  },
+  {
+    "idx": 88,
+    "doc_id": "NASA-STD-6001_p101_0",
+    "section": "101.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n102 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 102,
+    "text_length": 984
+  },
+  {
+    "idx": 89,
+    "doc_id": "NASA-STD-6001_p102_0",
+    "section": "102.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n103 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 103,
+    "text_length": 1827
+  },
+  {
+    "idx": 90,
+    "doc_id": "NASA-STD-6001_p103_0",
+    "section": "103.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n104 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 104,
+    "text_length": 1438
+  },
+  {
+    "idx": 91,
+    "doc_id": "NASA-STD-6001_p104_0",
+    "section": "104.0",
+    "title": "NASA-STD-6001B w/CHANGE 3 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n105 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 105,
+    "text_length": 1966
+  },
+  {
+    "idx": 92,
+    "doc_id": "NASA-STD-6001_p105_0",
+    "section": "105.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n106 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 106,
+    "text_length": 1940
+  },
+  {
+    "idx": 93,
+    "doc_id": "NASA-STD-6001_p106_0",
+    "section": "106.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n107 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 107,
+    "text_length": 2355
+  },
+  {
+    "idx": 94,
+    "doc_id": "NASA-STD-6001_p107_0",
+    "section": "107.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n108 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 108,
+    "text_length": 1828
+  },
+  {
+    "idx": 95,
+    "doc_id": "NASA-STD-6001_p108_0",
+    "section": "108.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n109 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 109,
+    "text_length": 2763
+  },
+  {
+    "idx": 96,
+    "doc_id": "NASA-STD-6001_p109_0",
+    "section": "109.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n110 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 110,
+    "text_length": 2030
+  },
+  {
+    "idx": 97,
+    "doc_id": "NASA-STD-6001_p110_0",
+    "section": "110.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n111 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 111,
+    "text_length": 2235
+  },
+  {
+    "idx": 98,
+    "doc_id": "NASA-STD-6001_p111_0",
+    "section": "111.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n112 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 112,
+    "text_length": 2209
+  },
+  {
+    "idx": 99,
+    "doc_id": "NASA-STD-6001_p112_0",
+    "section": "112.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n113 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 113,
+    "text_length": 1867
+  },
+  {
+    "idx": 100,
+    "doc_id": "NASA-STD-6001_p114_0",
+    "section": "114.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n115 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 115,
+    "text_length": 2312
+  },
+  {
+    "idx": 101,
+    "doc_id": "NASA-STD-6001_p115_0",
+    "section": "115.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n116 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 116,
+    "text_length": 2127
+  },
+  {
+    "idx": 102,
+    "doc_id": "NASA-STD-6001_p116_0",
+    "section": "116.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n117 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 117,
+    "text_length": 1858
+  },
+  {
+    "idx": 103,
+    "doc_id": "NASA-STD-6001_p117_0",
+    "section": "117.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n118 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 118,
+    "text_length": 2002
+  },
+  {
+    "idx": 104,
+    "doc_id": "NASA-STD-6001_p118_0",
+    "section": "118.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n119 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 119,
+    "text_length": 2384
+  },
+  {
+    "idx": 105,
+    "doc_id": "NASA-STD-6001_p119_0",
+    "section": "119.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n120 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 120,
+    "text_length": 1765
+  },
+  {
+    "idx": 106,
+    "doc_id": "NASA-STD-6001_p121_0",
+    "section": "121.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n122 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 122,
+    "text_length": 2633
+  },
+  {
+    "idx": 107,
+    "doc_id": "NASA-STD-6001_p122_0",
+    "section": "122.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n123 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 123,
+    "text_length": 2565
+  },
+  {
+    "idx": 108,
+    "doc_id": "NASA-STD-6001_p123_0",
+    "section": "123.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n124 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 124,
+    "text_length": 1844
+  },
+  {
+    "idx": 109,
+    "doc_id": "NASA-STD-6001_p126_0",
+    "section": "126.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n127 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 127,
+    "text_length": 2576
+  },
+  {
+    "idx": 110,
+    "doc_id": "NASA-STD-6001_p127_0",
+    "section": "127.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n128 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 128,
+    "text_length": 1449
+  },
+  {
+    "idx": 111,
+    "doc_id": "NASA-STD-6001_p128_0",
+    "section": "128.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n129 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 129,
+    "text_length": 1741
+  },
+  {
+    "idx": 112,
+    "doc_id": "NASA-STD-6001_p129_0",
+    "section": "129.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n130 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 130,
+    "text_length": 2738
+  },
+  {
+    "idx": 113,
+    "doc_id": "NASA-STD-6001_p130_0",
+    "section": "130.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n131 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 131,
+    "text_length": 1868
+  },
+  {
+    "idx": 114,
+    "doc_id": "NASA-STD-6001_p131_0",
+    "section": "131.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n132 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 132,
+    "text_length": 2972
+  },
+  {
+    "idx": 115,
+    "doc_id": "NASA-STD-6001_p132_0",
+    "section": "132.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n133 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 133,
+    "text_length": 2849
+  },
+  {
+    "idx": 116,
+    "doc_id": "NASA-STD-6001_p133_0",
+    "section": "133.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n134 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 134,
+    "text_length": 2930
+  },
+  {
+    "idx": 117,
+    "doc_id": "NASA-STD-6001_p134_0",
+    "section": "134.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n135 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 135,
+    "text_length": 2569
+  },
+  {
+    "idx": 118,
+    "doc_id": "NASA-STD-6001_p135_0",
+    "section": "135.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n136 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 136,
+    "text_length": 1873
+  },
+  {
+    "idx": 119,
+    "doc_id": "NASA-STD-6001_p136_0",
+    "section": "136.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n137 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 137,
+    "text_length": 2581
+  },
+  {
+    "idx": 120,
+    "doc_id": "NASA-STD-6001_p137_0",
+    "section": "137.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n138 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 138,
+    "text_length": 2202
+  },
+  {
+    "idx": 121,
+    "doc_id": "NASA-STD-6001_p138_0",
+    "section": "138.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n139 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 139,
+    "text_length": 2080
+  },
+  {
+    "idx": 122,
+    "doc_id": "NASA-STD-6001_p140_0",
+    "section": "140.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n141 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 141,
+    "text_length": 2733
+  },
+  {
+    "idx": 123,
+    "doc_id": "NASA-STD-6001_p141_0",
+    "section": "141.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n142 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 142,
+    "text_length": 2290
+  },
+  {
+    "idx": 124,
+    "doc_id": "NASA-STD-6001_p142_0",
+    "section": "142.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n143 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 143,
+    "text_length": 2942
+  },
+  {
+    "idx": 125,
+    "doc_id": "NASA-STD-6001_p144_0",
+    "section": "144.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n145 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 145,
+    "text_length": 2762
+  },
+  {
+    "idx": 126,
+    "doc_id": "NASA-STD-6001_p145_0",
+    "section": "145.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n146 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 146,
+    "text_length": 3130
+  },
+  {
+    "idx": 127,
+    "doc_id": "NASA-STD-6001_p146_0",
+    "section": "146.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n147 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 147,
+    "text_length": 2937
+  },
+  {
+    "idx": 128,
+    "doc_id": "NASA-STD-6001_p147_0",
+    "section": "147.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n148 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 148,
+    "text_length": 2197
+  },
+  {
+    "idx": 129,
+    "doc_id": "NASA-STD-6001_p148_0",
+    "section": "148.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n149 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 149,
+    "text_length": 2340
+  },
+  {
+    "idx": 130,
+    "doc_id": "NASA-STD-6001_p149_0",
+    "section": "149.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n150 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 150,
+    "text_length": 1459
+  },
+  {
+    "idx": 131,
+    "doc_id": "NASA-STD-6001_p150_0",
+    "section": "150.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n151 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 151,
+    "text_length": 2827
+  },
+  {
+    "idx": 132,
+    "doc_id": "NASA-STD-6001_p151_0",
+    "section": "151.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n152 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 152,
+    "text_length": 2814
+  },
+  {
+    "idx": 133,
+    "doc_id": "NASA-STD-6001_p152_0",
+    "section": "152.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n153 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 153,
+    "text_length": 2908
+  },
+  {
+    "idx": 134,
+    "doc_id": "NASA-STD-6001_p153_0",
+    "section": "153.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n154 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 154,
+    "text_length": 2588
+  },
+  {
+    "idx": 135,
+    "doc_id": "NASA-STD-6001_p154_0",
+    "section": "154.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n155 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 155,
+    "text_length": 809
+  },
+  {
+    "idx": 136,
+    "doc_id": "NASA-STD-6001_p155_0",
+    "section": "155.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n156 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 156,
+    "text_length": 1429
+  },
+  {
+    "idx": 137,
+    "doc_id": "NASA-STD-6001_p156_0",
+    "section": "156.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n157 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 157,
+    "text_length": 3294
+  },
+  {
+    "idx": 138,
+    "doc_id": "NASA-STD-6001_p157_0",
+    "section": "157.0",
+    "title": "NASA-STD-6001B w/CHANGE 2 \n \n \nAPPROVED FOR PUBLIC RELEASE\u2014DISTRIBUTION IS UNLIMITED \n \n158 of 158 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6001",
+    "page_number": 158,
+    "text_length": 2021
+  },
+  {
+    "idx": 139,
+    "doc_id": "NASA-STD-6016_p0_0",
+    "section": "0.0",
+    "title": "This document represents the technical consensus of the \ndeveloping group but does not yet have fina...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 1,
+    "text_length": 533
+  },
+  {
+    "idx": 140,
+    "doc_id": "NASA-STD-6016_p3_0",
+    "section": "3.0",
+    "title": "NASA-STD-(I)-6016 \n \nThis document represents the technical consensus of the \ndeveloping group but d...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 4,
+    "text_length": 3495
+  },
+  {
+    "idx": 141,
+    "doc_id": "NASA-STD-6016_p4_0",
+    "section": "4.0",
+    "title": "NASA-STD-(I)-6016 \n \nThis document represents the technical consensus of the \ndeveloping group but d...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 5,
+    "text_length": 4502
+  },
+  {
+    "idx": 142,
+    "doc_id": "NASA-STD-6016_p5_0",
+    "section": "5.0",
+    "title": "NASA-STD-(I)-6016 \n \nThis document represents the technical consensus of the \ndeveloping group but d...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 6,
+    "text_length": 1924
+  },
+  {
+    "idx": 143,
+    "doc_id": "NASA-STD-6016_p6_0",
+    "section": "6.0",
+    "title": "NASA-STD-(I)-6016 \n \nThis document represents the technical consensus of the \ndeveloping group but d...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 7,
+    "text_length": 2521
+  },
+  {
+    "idx": 144,
+    "doc_id": "NASA-STD-6016_p7_0",
+    "section": "7.0",
+    "title": "NASA-STD-(I)-6016 \n \nThis document represents the technical consensus of the \ndeveloping group but d...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 8,
+    "text_length": 1940
+  },
+  {
+    "idx": 145,
+    "doc_id": "NASA-STD-6016_p8_0",
+    "section": "8.0",
+    "title": "NASA-STD-(I)-6016 \n \nThis document represents the technical consensus of the \ndeveloping group but d...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 9,
+    "text_length": 1975
+  },
+  {
+    "idx": 146,
+    "doc_id": "NASA-STD-6016_p9_0",
+    "section": "9.0",
+    "title": "NASA-STD-(I)-6016 \n \nThis document represents the technical consensus of the \ndeveloping group but d...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 10,
+    "text_length": 1477
+  },
+  {
+    "idx": 147,
+    "doc_id": "NASA-STD-6016_p10_0",
+    "section": "10.0",
+    "title": "NASA-STD-(I)-6016 \n \nThis document represents the technical consensus of the \ndeveloping group but d...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 11,
+    "text_length": 1329
+  },
+  {
+    "idx": 148,
+    "doc_id": "NASA-STD-6016_p11_0",
+    "section": "11.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 12,
+    "text_length": 1801
+  },
+  {
+    "idx": 149,
+    "doc_id": "NASA-STD-6016_p12_0",
+    "section": "12.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 13,
+    "text_length": 2000
+  },
+  {
+    "idx": 150,
+    "doc_id": "NASA-STD-6016_p13_0",
+    "section": "13.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 14,
+    "text_length": 990
+  },
+  {
+    "idx": 151,
+    "doc_id": "NASA-STD-6016_p14_0",
+    "section": "14.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 15,
+    "text_length": 3130
+  },
+  {
+    "idx": 152,
+    "doc_id": "NASA-STD-6016_p15_0",
+    "section": "15.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 16,
+    "text_length": 3293
+  },
+  {
+    "idx": 153,
+    "doc_id": "NASA-STD-6016_p16_0",
+    "section": "16.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 17,
+    "text_length": 3186
+  },
+  {
+    "idx": 154,
+    "doc_id": "NASA-STD-6016_p17_0",
+    "section": "17.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 18,
+    "text_length": 2063
+  },
+  {
+    "idx": 155,
+    "doc_id": "NASA-STD-6016_p18_0",
+    "section": "18.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 19,
+    "text_length": 2940
+  },
+  {
+    "idx": 156,
+    "doc_id": "NASA-STD-6016_p19_0",
+    "section": "19.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 20,
+    "text_length": 2976
+  },
+  {
+    "idx": 157,
+    "doc_id": "NASA-STD-6016_p20_0",
+    "section": "20.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 21,
+    "text_length": 2872
+  },
+  {
+    "idx": 158,
+    "doc_id": "NASA-STD-6016_p21_0",
+    "section": "21.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 22,
+    "text_length": 2624
+  },
+  {
+    "idx": 159,
+    "doc_id": "NASA-STD-6016_p22_0",
+    "section": "22.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 23,
+    "text_length": 3293
+  },
+  {
+    "idx": 160,
+    "doc_id": "NASA-STD-6016_p23_0",
+    "section": "23.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 24,
+    "text_length": 3128
+  },
+  {
+    "idx": 161,
+    "doc_id": "NASA-STD-6016_p24_0",
+    "section": "24.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 25,
+    "text_length": 3192
+  },
+  {
+    "idx": 162,
+    "doc_id": "NASA-STD-6016_p25_0",
+    "section": "25.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 26,
+    "text_length": 2932
+  },
+  {
+    "idx": 163,
+    "doc_id": "NASA-STD-6016_p26_0",
+    "section": "26.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 27,
+    "text_length": 3132
+  },
+  {
+    "idx": 164,
+    "doc_id": "NASA-STD-6016_p27_0",
+    "section": "27.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 28,
+    "text_length": 3063
+  },
+  {
+    "idx": 165,
+    "doc_id": "NASA-STD-6016_p28_0",
+    "section": "28.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 29,
+    "text_length": 2875
+  },
+  {
+    "idx": 166,
+    "doc_id": "NASA-STD-6016_p29_0",
+    "section": "29.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 30,
+    "text_length": 2875
+  },
+  {
+    "idx": 167,
+    "doc_id": "NASA-STD-6016_p30_0",
+    "section": "30.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 31,
+    "text_length": 3440
+  },
+  {
+    "idx": 168,
+    "doc_id": "NASA-STD-6016_p31_0",
+    "section": "31.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 32,
+    "text_length": 3275
+  },
+  {
+    "idx": 169,
+    "doc_id": "NASA-STD-6016_p32_0",
+    "section": "32.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 33,
+    "text_length": 3245
+  },
+  {
+    "idx": 170,
+    "doc_id": "NASA-STD-6016_p33_0",
+    "section": "33.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 34,
+    "text_length": 3110
+  },
+  {
+    "idx": 171,
+    "doc_id": "NASA-STD-6016_p34_0",
+    "section": "34.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 35,
+    "text_length": 3258
+  },
+  {
+    "idx": 172,
+    "doc_id": "NASA-STD-6016_p35_0",
+    "section": "35.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 36,
+    "text_length": 2974
+  },
+  {
+    "idx": 173,
+    "doc_id": "NASA-STD-6016_p36_0",
+    "section": "36.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 37,
+    "text_length": 2745
+  },
+  {
+    "idx": 174,
+    "doc_id": "NASA-STD-6016_p37_0",
+    "section": "37.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 38,
+    "text_length": 3521
+  },
+  {
+    "idx": 175,
+    "doc_id": "NASA-STD-6016_p38_0",
+    "section": "38.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 39,
+    "text_length": 2658
+  },
+  {
+    "idx": 176,
+    "doc_id": "NASA-STD-6016_p39_0",
+    "section": "39.0",
+    "title": "NASA-STD-(I)-6016 \n \n \nNOTE:  Per section  4.1.3:  The use of materials and processes that do not co...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 40,
+    "text_length": 808
+  },
+  {
+    "idx": 177,
+    "doc_id": "NASA-STD-6016_p40_0",
+    "section": "40.0",
+    "title": "NASA-STD-(I)-6016 \n \n41 of 56 \n \n5. \nGUIDANCE \n \n5.1 \nReference Documents \n \nThe documents in this p...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 41,
+    "text_length": 1193
+  },
+  {
+    "idx": 178,
+    "doc_id": "NASA-STD-6016_p41_0",
+    "section": "41.0",
+    "title": "NASA-STD-(I)-6016 \n \n42 of 56 \n \nAPPENDIX A  \nMUA FORM \n \n \n \n \n \n \n \n \n \n \n \n \n \nMATERIAL USAGE AGR...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 42,
+    "text_length": 690
+  },
+  {
+    "idx": 179,
+    "doc_id": "NASA-STD-6016_p42_0",
+    "section": "42.0",
+    "title": "NASA-STD-(I)-6016 \n \n43 of 56 \nAPPENDIX B  \nCATEGORY III MUA RATIONALE CODES \nFLAMMABILITY RATIONALE...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 43,
+    "text_length": 1979
+  },
+  {
+    "idx": 180,
+    "doc_id": "NASA-STD-6016_p43_0",
+    "section": "43.0",
+    "title": "NASA-STD-(I)-6016 \n \n44 of 56 \n \n \n \nTOXICITY (OFFGASSING) RATIONALE CODES \n \nCODE \nRATIONALE \n201 \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 44,
+    "text_length": 1406
+  },
+  {
+    "idx": 181,
+    "doc_id": "NASA-STD-6016_p44_0",
+    "section": "44.0",
+    "title": "NASA-STD-(I)-6016 \n \n45 of 56 \nSTRESS CORROSION CRACKING RATIONALE CODES \n \nCODE \nRATIONALE \n501 \nAp...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 45,
+    "text_length": 2248
+  },
+  {
+    "idx": 182,
+    "doc_id": "NASA-STD-6016_p45_0",
+    "section": "45.0",
+    "title": "NASA-STD-(I)-6016 \n \n46 of 56 \n \nAPPENDIX C \nRECOMMENDED DATA REQUIREMENTS DOCUMENTS \n \n \nRecommende...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 46,
+    "text_length": 621
+  },
+  {
+    "idx": 183,
+    "doc_id": "NASA-STD-6016_p46_0",
+    "section": "46.0",
+    "title": "NASA-STD-(I)-6016 \n \n47 of 56 \n \nDATA REQUIREMENTS DESCRIPTION (DRD) \n \n \n1. \nPROGRAM:  \n2. DRD NO.:...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 47,
+    "text_length": 2930
+  },
+  {
+    "idx": 184,
+    "doc_id": "NASA-STD-6016_p47_0",
+    "section": "47.0",
+    "title": "NASA-STD-(I)-6016 \n \n48 of 56 \nMaterials Usage Agreement (MUA) Procedures - Logic, procedures and do...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 48,
+    "text_length": 1687
+  },
+  {
+    "idx": 185,
+    "doc_id": "NASA-STD-6016_p48_0",
+    "section": "48.0",
+    "title": "NASA-STD-(I)-6016 \n \n49 of 56 \nDATA REQUIREMENTS DESCRIPTION (DRD) \n \n \n1. \nPROGRAM:  \n2. DRD NO.: \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 49,
+    "text_length": 2917
+  },
+  {
+    "idx": 186,
+    "doc_id": "NASA-STD-6016_p49_0",
+    "section": "49.0",
+    "title": "NASA-STD-(I)-6016 \n \n50 of 56 \n13.3 \nCONTENTS: \nThe MUA package shall include all technical informat...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 50,
+    "text_length": 796
+  },
+  {
+    "idx": 187,
+    "doc_id": "NASA-STD-6016_p50_0",
+    "section": "50.0",
+    "title": "NASA-STD-(I)-6016 \n \n51 of 56 \nDATA REQUIREMENTS DESCRIPTION (DRD) \n \n \n1. \nPROGRAM:  \n2. DRD NO.: \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 51,
+    "text_length": 2124
+  },
+  {
+    "idx": 188,
+    "doc_id": "NASA-STD-6016_p51_0",
+    "section": "51.0",
+    "title": "NASA-STD-(I)-6016 \n \n52 of 56 \n- Fluid type \n- Surface Area \n- Associate contractor number \n- Projec...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 52,
+    "text_length": 649
+  },
+  {
+    "idx": 189,
+    "doc_id": "NASA-STD-6016_p52_0",
+    "section": "52.0",
+    "title": "NASA-STD-(I)-6016 \n \n53 of 56 \nDATA REQUIREMENTS DESCRIPTION (DRD) \n \n \n1. \nPROGRAM:  \n2. DRD NO.: \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 53,
+    "text_length": 2579
+  },
+  {
+    "idx": 190,
+    "doc_id": "NASA-STD-6016_p54_0",
+    "section": "54.0",
+    "title": "NASA-STD-(I)-6016 \n \n55 of 56 \nDATA REQUIREMENTS DESCRIPTION (DRD) \n \n \n1. \nPROGRAM:  \n2. DRD NO.: \n...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "NASA-STD-6016",
+    "page_number": 55,
+    "text_length": 2822
+  },
+  {
+    "idx": 191,
+    "doc_id": "KSC-KTI-5210C_p0_0",
+    "section": "0.0",
+    "title": "KTI-5210 \nREVISION: C \n \n1 \n \nMATERIAL SELECTION LIST FOR OXYGEN SERVICE \n \n \n \nAPPROVED: __________...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "KSC-KTI-5210C",
+    "page_number": 1,
+    "text_length": 3296
+  },
+  {
+    "idx": 192,
+    "doc_id": "KSC-KTI-5210C_p1_0",
+    "section": "1.0",
+    "title": "KTI-5210 \nREVISION: C \n \n2 \n \nMaterials used in oxygen systems for the Shuttle program were typicall...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "KSC-KTI-5210C",
+    "page_number": 2,
+    "text_length": 3965
+  },
+  {
+    "idx": 193,
+    "doc_id": "KSC-KTI-5210C_p2_0",
+    "section": "2.0",
+    "title": "KTI-5210 \nREVISION: C \n \n3 \n  \n \nThe vendors and applicable specifications for the materials listed ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "KSC-KTI-5210C",
+    "page_number": 3,
+    "text_length": 2088
+  },
+  {
+    "idx": 194,
+    "doc_id": "KSC-KTI-5210C_p3_0",
+    "section": "3.0",
+    "title": "KTI-5210 \nREVISION: C \n \n4 \nLubricants \n \nPerfluoropolyether (PFPE)  \nChlorotrifluoroethylene (CTFE)...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "KSC-KTI-5210C",
+    "page_number": 4,
+    "text_length": 2628
+  },
+  {
+    "idx": 195,
+    "doc_id": "KSC-KTI-5210C_p4_0",
+    "section": "4.0",
+    "title": "KTI-5210 \nREVISION: C \n \n5 \n \n4. APPLICABLE DOCUMENTATION \n \n \n \nNASA-STD-5005 \nStandard for the Des...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific",
+      "flammability"
+    ],
+    "source_document": "KSC-KTI-5210C",
+    "page_number": 5,
+    "text_length": 1040
+  },
+  {
+    "idx": 196,
+    "doc_id": "KSC-KTI-5210C_p5_0",
+    "section": "5.0",
+    "title": "KTI-5210 \nREVISION: C \n \n6 \nCODE \nGENERIC NAME \nCHEMICAL \nCLASS \nFORMULATION \nNAME \nAIT \n(\u00b0C) \nAIT T...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "KSC-KTI-5210C",
+    "page_number": 6,
+    "text_length": 2894
+  },
+  {
+    "idx": 197,
+    "doc_id": "KSC-KTI-5210C_p7_0",
+    "section": "7.0",
+    "title": "KTI-5210 \nREVISION: C \n \n8 \nCODE \nGENERIC NAME \nCHEMICAL \nCLASS \nFORMULATION \nNAME \nAIT \n(\u00b0C) \nAIT T...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "KSC-KTI-5210C",
+    "page_number": 8,
+    "text_length": 2012
+  },
+  {
+    "idx": 198,
+    "doc_id": "KSC-KTI-5210C_p8_0",
+    "section": "8.0",
+    "title": "KTI-5210 \nREVISION: C \n \n9 \n \nCODE \nGENERIC NAME \nCHEMICAL \nCLASS \nFORMULATION \nNAME \nAIT \n(\u00b0C) \nAIT...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "KSC-KTI-5210C",
+    "page_number": 9,
+    "text_length": 2490
+  },
+  {
+    "idx": 199,
+    "doc_id": "KSC-KTI-5210C_p9_0",
+    "section": "9.0",
+    "title": "KTI-5210 \nREVISION: C \n \n10 \nCODE \nGENERIC NAME \nCHEMICAL \nCLASS \nFORMULATION \nNAME \nAIT \n(\u00b0C) \nAIT ...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility"
+    ],
+    "source_document": "KSC-KTI-5210C",
+    "page_number": 10,
+    "text_length": 1926
+  },
+  {
+    "idx": 200,
+    "doc_id": "KSC-KTI-5210C_p10_0",
+    "section": "10.0",
+    "title": "KTI-5210 \nREVISION: C \n \n11 \n \nCODE \nGENERIC NAME \nCHEMICAL \nCLASS \nFORMULATION \nNAME \nAIT \n(\u00b0C) \nAI...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "oxygen_specific"
+    ],
+    "source_document": "KSC-KTI-5210C",
+    "page_number": 11,
+    "text_length": 1019
+  },
+  {
+    "idx": 201,
+    "doc_id": "KSC-KTI-5210C_p11_0",
+    "section": "11.0",
+    "title": "KTI-5210 \nREVISION: C \n \n12 \n \n \nMATERIAL \n NUMBER \nPROMOTED \nIGNITION  \nLOWEST BURN \nPRESSURE (psia...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "KSC-KTI-5210C",
+    "page_number": 12,
+    "text_length": 2178
+  },
+  {
+    "idx": 202,
+    "doc_id": "KSC-KTI-5210C_p12_0",
+    "section": "12.0",
+    "title": "KTI-5210 \nREVISION: C \n \n13 \nMATERIAL \n NUMBER \nPROMOTED \nIGNITION  \nLOWEST BURN \nPRESSURE (psia) \nB...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "KSC-KTI-5210C",
+    "page_number": 13,
+    "text_length": 2263
+  },
+  {
+    "idx": 203,
+    "doc_id": "KSC-KTI-5210C_p13_0",
+    "section": "13.0",
+    "title": "KTI-5210 \nREVISION: C \n \n14 \nMATERIAL \n NUMBER \nPROMOTED \nIGNITION  \nLOWEST BURN \nPRESSURE (psia) \nB...",
+    "tags": [
+      "oxygen",
+      "o2_bok",
+      "safety",
+      "material_compatibility",
+      "flammability"
+    ],
+    "source_document": "KSC-KTI-5210C",
+    "page_number": 14,
+    "text_length": 2201
+  }
+]

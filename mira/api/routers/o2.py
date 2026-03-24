@@ -277,7 +277,10 @@ async def search_o2_bok(request: O2BOKSearchRequest) -> O2BOKSearchResponse:
         if not engine.o2_bok_index:
             raise HTTPException(
                 status_code=503,
-                detail="O2 BOK index not loaded. Run rebuild_o2_bok_hierarchical.py to build.",
+                detail=(
+                    "O2 BOK index not loaded. Ensure the dedicated O2 assets are packaged at "
+                    "mira/databases/o2_bok."
+                ),
             )
 
         # Perform search

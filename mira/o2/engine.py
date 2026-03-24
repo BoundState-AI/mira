@@ -568,7 +568,11 @@ class OxygenCompatibilityEngine:
                 return
 
             # OPTION 3: Warn if no O2 BOK found
-            LOGGER.warning(f"O2 BOK not found. Please run rebuild_o2_bok_hierarchical.py to build the index.")
+            LOGGER.warning(
+                "O2 BOK not found. Expected dedicated assets in mira/databases/o2_bok "
+                "(o2_bok_faiss.index, o2_bok_faiss_metadata.json, o2_bok_text_lookup.json) "
+                "or fallback corpus assets in databases/permanent_embeddings."
+            )
 
         except ImportError as e:
             LOGGER.warning(f"Cannot load O2 BOK - missing dependencies: {e}")
