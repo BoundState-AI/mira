@@ -41,30 +41,28 @@ class TestMIULHealth:
 
     def test_miul_router_accessible(self, client):
         """MIUL router is properly mounted."""
-        # Verify router responds to POST fast-extract (even without file)
-        response = client.post("/miul/fast-extract")
+        response = client.post("/miul/extract-dt")
         # Should get validation error (422) for missing files, not 404 (router not found)
         assert response.status_code == 422
 
 
 class TestMIULFastExtract:
-    """Tests for MIUL fast-extract endpoint (BOM extraction from PDFs)."""
+    """Tests for Drawing Tree extraction endpoint."""
 
     def test_fast_extract_requires_files(self, client):
-        """Fast extract requires PDF files."""
-        response = client.post("/miul/fast-extract")
+        """DT extraction requires an uploaded PDF."""
+        response = client.post("/miul/extract-dt")
         assert response.status_code == 422
 
     def test_fast_extract_rejects_non_pdf(self, client):
-        """Fast extract rejects non-PDF files."""
+        """DT extraction rejects non-PDF files."""
         # Create a fake text file
         fake_file = BytesIO(b"This is not a PDF")
         response = client.post(
-            "/miul/fast-extract",
-            files={"drawings": ("test.txt", fake_file, "text/plain")},
+            "/miul/extract-dt",
+            files={"dt_file": ("test.txt", fake_file, "text/plain")},
         )
-        # Should return 400 (bad request) for invalid file type
-        assert response.status_code in [400, 422]
+        assert response.status_code == 400
 
 
 class TestMIULEnrich:
@@ -96,21 +94,20 @@ class TestMIULGaps:
 
 
 class TestMIULMSFCExtract:
-    """Tests for MSFC drawing extraction endpoint."""
+    """Tests for current MIUL drawing-tree extraction endpoint."""
 
     def test_msfc_requires_files(self, client):
-        """MSFC extract requires at least one input."""
-        response = client.post("/miul/msfc-extract")
-        # Should require either DT or drawings
-        assert response.status_code in [400, 422]
+        """DT extract requires an uploaded file."""
+        response = client.post("/miul/extract-dt")
+        assert response.status_code == 422
 
 
 class TestMIULDMLLVExtract:
-    """Tests for DMLLV extraction endpoint."""
+    """Tests for MIUL DT extraction parameter validation."""
 
     def test_dmllv_requires_files(self, client):
-        """DMLLV extract requires PDF files."""
-        response = client.post("/miul/dmllv-extract")
+        """DT extraction requires the uploaded PDF even when optional form fields are omitted."""
+        response = client.post("/miul/extract-dt")
         assert response.status_code == 422
 
 
