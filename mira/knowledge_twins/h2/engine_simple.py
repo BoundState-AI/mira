@@ -680,7 +680,7 @@ class H2Engine:
         # =================================================================
         if not condition_specified and len(bands) > 1:
             # Check if we have multiple distinct conditions
-            condition_options, unresolved_count = self._extract_condition_options(matches, bands)
+            condition_options, unresolved_count, _unresolved_aliases = self._extract_condition_options(matches, bands)
 
             # Only ask for clarification if we have multiple condition options
             # with DIFFERENT HEE bands
@@ -767,7 +767,7 @@ class H2Engine:
         self,
         matches: list[MatchedEvidence],
         bands: dict[str, list[MatchedEvidence]],
-    ) -> tuple[list[ConditionOption], int]:
+    ) -> tuple[list[ConditionOption], int, list[dict]]:
         """Extract unique condition options from evidence matches.
 
         Groups evidence by condition and returns ConditionOption objects
@@ -786,6 +786,8 @@ class H2Engine:
         # Group by condition (including condition hints embedded in material_name)
         condition_groups: dict[str, list[MatchedEvidence]] = defaultdict(list)
         unresolved_count = 0
+        unresolved_aliases: list[dict] = []
+        seen_raw_keys: set[str] = set()
         for m in matches:
             resolved = self._resolve_condition(
                 m.record.condition or "",
@@ -795,6 +797,22 @@ class H2Engine:
             cond = resolved.display_label
             if resolved.needs_review:
                 unresolved_count += 1
+                if resolved.raw_key not in seen_raw_keys:
+                    seen_raw_keys.add(resolved.raw_key)
+                    unresolved_aliases.append({
+                        "raw_key": resolved.raw_key,
+                        "raw_text": resolved.raw_text,
+                        "canonical_condition": resolved.canonical_condition,
+                        "display_label": resolved.display_label,
+                        "is_condition": resolved.is_condition,
+                        "confidence": resolved.confidence,
+                        "resolver_provider": resolved.resolver_provider,
+                        "resolver_model": resolved.resolver_model,
+                        "needs_review": True,
+                        "human_verified": False,
+                        "source_document": m.record.source_document,
+                        "material_name": m.record.material_name,
+                    })
             condition_groups[cond].append(m)
 
         # Build condition options
@@ -829,7 +847,7 @@ class H2Engine:
         band_priority["unknown"] = len(HEE_BAND_ORDER)
         options.sort(key=lambda o: band_priority.get(o.hee_band, 999))
 
-        return options, unresolved_count
+        return options, unresolved_count, unresolved_aliases
 
     def _resolve_condition(
         self,
@@ -1098,7 +1116,7 @@ class H2Engine:
         for m in matches:
             bands[m.record.hee_band].append(m)
 
-        options, unresolved_count = self._extract_condition_options(matches, bands)
+        options, unresolved_count, unresolved_aliases = self._extract_condition_options(matches, bands)
         unique_bands = {opt.hee_band for opt in options}
         best_match = max(matches, key=lambda m: m.match_score)
         canonical = get_canonical_name(material)
@@ -1122,6 +1140,7 @@ class H2Engine:
             "band_distribution": {band: len(records) for band, records in bands.items()},
             "requires_clarification": len(options) > 1 and len(unique_bands) > 1,
             "unresolved_condition_count": unresolved_count,
+            "unresolved_aliases": unresolved_aliases,
         }
 
 

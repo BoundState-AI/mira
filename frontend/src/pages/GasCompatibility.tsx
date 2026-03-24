@@ -21,7 +21,6 @@ import {
   checkO2Compatibility,
   checkH2Compatibility,
   getH2Conditions,
-  getH2ConditionAliases,
   verifyH2ConditionAlias,
   o2Evaluate,
   o2SearchBOK,
@@ -197,8 +196,17 @@ export default function GasCompatibility() {
     return () => { cancelled = true; window.clearTimeout(timer); };
   }, [gasType, materialKey]);
 
-  // Alias review — loads when unresolved conditions are detected
-  const syncAliasDrafts = (rows: H2ConditionAliasRecord[]) => {
+  // Alias review — derived from condition lookup (no separate DB round-trip)
+  useEffect(() => {
+    if (gasType !== 'H2' || !conditionLookup) {
+      setAliasReviewRows([]);
+      setAliasReviewDrafts({});
+      setAliasReviewLoading(false);
+      return;
+    }
+
+    const rows = conditionLookup.unresolved_aliases || [];
+    setAliasReviewRows(rows);
     setAliasReviewDrafts((prev) => {
       const next: Record<string, { display: string; canonical: string }> = {};
       for (const row of rows) {
@@ -210,65 +218,8 @@ export default function GasCompatibility() {
       }
       return next;
     });
-  };
-
-  const loadAliasReview = async (material: string) => {
-    if (!material.trim()) {
-      setAliasReviewRows([]);
-      setAliasReviewDrafts({});
-      return;
-    }
-    setAliasReviewLoading(true);
-    try {
-      const data = await getH2ConditionAliases(material, true, 50);
-      const rows = data.aliases || [];
-      setAliasReviewRows(rows);
-      syncAliasDrafts(rows);
-    } catch {
-      setAliasReviewRows([]);
-      setAliasReviewDrafts({});
-    } finally {
-      setAliasReviewLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (gasType !== 'H2') {
-      setAliasReviewRows([]);
-      setAliasReviewDrafts({});
-      setAliasReviewLoading(false);
-      return;
-    }
-
-    const material = materialKey.trim();
-    const unresolved = conditionLookup?.unresolved_condition_count || 0;
-    if (!material || unresolved <= 0) {
-      setAliasReviewRows([]);
-      setAliasReviewDrafts({});
-      setAliasReviewLoading(false);
-      return;
-    }
-
-    let cancelled = false;
-    setAliasReviewLoading(true);
-    const timer = window.setTimeout(async () => {
-      try {
-        const data = await getH2ConditionAliases(material, true, 50);
-        if (cancelled) return;
-        const rows = data.aliases || [];
-        setAliasReviewRows(rows);
-        syncAliasDrafts(rows);
-      } catch {
-        if (cancelled) return;
-        setAliasReviewRows([]);
-        setAliasReviewDrafts({});
-      } finally {
-        if (!cancelled) setAliasReviewLoading(false);
-      }
-    }, 250);
-
-    return () => { cancelled = true; window.clearTimeout(timer); };
-  }, [gasType, materialKey, conditionLookup?.unresolved_condition_count]);
+    setAliasReviewLoading(false);
+  }, [gasType, conditionLookup]);
 
   const loadFamilies = async () => {
     setFamiliesLoading(true);
@@ -367,13 +318,14 @@ export default function GasCompatibility() {
         material_name: row.material_name || materialKey || undefined,
       });
 
+      // Refresh condition lookup — the useEffect on conditionLookup
+      // will automatically update alias review rows from the inline data
       const material = materialKey.trim();
       if (material) {
         try {
           const lookup = await getH2Conditions(material);
           setConditionLookup(lookup);
         } catch { /* refresh failed, non-critical */ }
-        await loadAliasReview(material);
       }
     } catch (error) {
       console.error('H2 alias verification failed:', error);

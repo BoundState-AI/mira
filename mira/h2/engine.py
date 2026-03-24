@@ -36,6 +36,7 @@ from mira.maptis.repository import _infer_family_from_key
 from .models import (
     H2CompatibilityRequest,
     H2CompatibilityResponse,
+    H2ConditionAliasRecord,
     H2ConditionLookupResponse,
     HydrogenPhase,
     ConditionOptionResponse,
@@ -382,6 +383,12 @@ def lookup_h2_conditions(material_key: str) -> H2ConditionLookupResponse:
             for item in payload.get("available_conditions", [])
             if isinstance(item, dict) and item.get("condition_name")
         ]
+        raw_aliases = payload.get("unresolved_aliases") or []
+        aliases = [
+            H2ConditionAliasRecord(**a)
+            for a in raw_aliases
+            if isinstance(a, dict)
+        ]
         return H2ConditionLookupResponse(
             material_key=material,
             canonical_material=payload.get("canonical_material"),
@@ -391,6 +398,7 @@ def lookup_h2_conditions(material_key: str) -> H2ConditionLookupResponse:
             available_conditions=options,
             band_distribution=payload.get("band_distribution") or {},
             unresolved_condition_count=int(payload.get("unresolved_condition_count") or 0),
+            unresolved_aliases=aliases,
             notes=(
                 f"{int(payload.get('unresolved_condition_count') or 0)} condition label(s) need review."
                 if int(payload.get("unresolved_condition_count") or 0) > 0

@@ -44,6 +44,7 @@ export interface H2ConditionLookupResponse {
   available_conditions: H2ConditionOption[];
   band_distribution?: Record<string, number> | null;
   unresolved_condition_count?: number;
+  unresolved_aliases?: H2ConditionAliasRecord[];
   notes?: string | null;
 }
 

@@ -179,6 +179,10 @@ class H2ConditionLookupResponse(BaseModel):
         default=0,
         description="Number of matched records whose condition label needs review.",
     )
+    unresolved_aliases: List[H2ConditionAliasRecord] = Field(
+        default_factory=list,
+        description="Condition alias records that need human review (inline, no DB round-trip).",
+    )
     notes: Optional[str] = Field(
         default=None,
         description="Optional informational note for the UI.",
