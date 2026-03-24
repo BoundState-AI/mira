@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -175,6 +175,17 @@ export default function ComponentEditorSheet({
     () => CONFIG_FIELDS.filter((field) => component && field.archetypes.includes(component.archetype)),
     [component],
   );
+  const editorDescription = useMemo(() => {
+    if (!component) {
+      return 'Review the selected component properties, update required details, and save the changes back to the system model.';
+    }
+
+    if (component.is_provisional || component.human_confirmed === false) {
+      return 'This component was imported as a provisional draft. Confirm the label, materials, and any missing configuration values before relying on the assessment.';
+    }
+
+    return 'Review the selected component properties, adjust materials or configuration as needed, and save the changes back to the system model.';
+  }, [component]);
 
   useEffect(() => {
     if (!component) {
@@ -239,12 +250,15 @@ export default function ComponentEditorSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="sm:max-w-xl px-0">
+        <SheetContent className="sm:max-w-xl px-0">
         <SheetHeader className="px-6 pb-2">
           <SheetTitle className="flex items-center gap-2 text-left">
             <Settings2 className="h-4 w-4" />
             Component Details
           </SheetTitle>
+          <SheetDescription className="text-left">
+            {editorDescription}
+          </SheetDescription>
         </SheetHeader>
 
         {component && (
