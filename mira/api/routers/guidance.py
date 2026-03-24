@@ -63,6 +63,9 @@ class GuidancePackVersionResponse(BaseModel):
     pack: GuidancePack | None = None
 
 
+GuidancePackVersionResponse.model_rebuild()
+
+
 def _get_pack_source(pack_id: str) -> dict[str, Path]:
     try:
         return _PACK_SOURCES[pack_id]

@@ -7,7 +7,11 @@
 
 # Dev/test/docs assets not needed at API runtime
 docs/
-frontend/
+frontend/*
+!frontend/src/
+frontend/src/*
+!frontend/src/data/
+!frontend/src/data/**
 miul_codex/
 tests/
 examples/

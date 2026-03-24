@@ -157,7 +157,9 @@ def _register_alias_routers(app: FastAPI) -> None:
     _include_with_api_alias(app, routers.h2_router, prefix="/mira", tags=["h2"])
 
     # OCA
-    _include_with_api_alias(app, routers.oca_router, prefix="/oca", tags=["oca"])
+    # The OCA router already owns the /oca prefix, so mount it directly and add
+    # only the /api alias here.
+    _include_with_api_alias(app, routers.oca_router, prefix="", tags=["oca"])
     _include_with_api_alias(app, routers.oca_systems_router, prefix="/oca/systems", tags=["oca-systems"])
 
     # MIUL/MUA/TOCR/FORGE/MP Plan
