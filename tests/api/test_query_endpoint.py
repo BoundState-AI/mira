@@ -18,6 +18,7 @@ Safety Critical: True
 
 import pytest
 from fastapi.testclient import TestClient
+from unittest.mock import patch
 
 
 @pytest.fixture
@@ -93,6 +94,20 @@ class TestQueryEndpoint:
         data = response.json()
         # Default is 25
         assert len(data["results"]) <= 25
+
+    def test_search_returns_coming_soon_when_semantic_unavailable(self, client):
+        """Search falls back to a graceful coming-soon payload when MAPTIS search is offline."""
+        with patch("mira.api.routers.ui_endpoints.get_semantic_search", return_value=None):
+            response = client.post(
+                "/api/search",
+                json={"query": "stainless steel", "top_k": 10}
+            )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["results"] == []
+        assert data["pipeline"] == "coming_soon"
+        assert "coming soon" in data["message"].lower()
 
 
 __safety_critical__ = True

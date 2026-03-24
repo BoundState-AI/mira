@@ -30,6 +30,8 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from mira.providers.llm_provider import resolve_bedrock_region, resolve_model
+
 from .ocr_correction import (
     correct_ocr_errors,
     extract_material_from_notes,
@@ -51,12 +53,12 @@ from .text_extract import (
 
 LOGGER = logging.getLogger(__name__)
 
-# API Configuration - Direct Anthropic API only
-# (Bedrock support commented out for now)
-# USE_BEDROCK = os.environ.get("USE_BEDROCK", "0").lower() in ("1", "true", "yes")
-# BEDROCK_REGION = os.environ.get("BEDROCK_REGION", "us-gov-west-1")
-# SONNET_MODEL_BEDROCK = "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0"
-SONNET_MODEL = "claude-sonnet-4-5-20250929"
+# API Configuration - Bedrock only
+BEDROCK_REGION = resolve_bedrock_region(
+    model_id=os.getenv("MIUL_V3_VISION_MODEL_BEDROCK") or resolve_model("sonnet"),
+    region_override=os.getenv("MIUL_V3_VISION_BEDROCK_REGION"),
+)
+SONNET_MODEL = os.getenv("MIUL_V3_VISION_MODEL_BEDROCK") or resolve_model("sonnet")
 
 
 # =============================================================================
@@ -272,20 +274,29 @@ Return ONLY valid JSON. No explanations outside the JSON."""
 # =============================================================================
 
 class VisionClient:
-    """Claude vision API client for drawing extraction (Direct Anthropic API)."""
+    """Claude vision API client for drawing extraction via AWS Bedrock."""
 
-    def __init__(self, api_key: str = None):
-        self.api_key = api_key or os.environ.get("ANTHROPIC_API_KEY")
+    def __init__(
+        self,
+        api_key: str | None = None,
+        *,
+        bedrock_region: str | None = None,
+        model: str | None = None,
+    ):
+        # ``api_key`` is kept only for backwards compatibility with older call sites.
+        self.api_key = api_key
         self._client = None
-        self.model = SONNET_MODEL
+        self.bedrock_region = bedrock_region or BEDROCK_REGION
+        self.model = model or SONNET_MODEL
 
     @property
     def client(self):
         """Lazy-load client."""
         if self._client is None:
-            from anthropic import Anthropic
-            self._client = Anthropic(api_key=self.api_key)
-            LOGGER.info("Using direct Anthropic API")
+            from anthropic import AnthropicBedrock
+
+            self._client = AnthropicBedrock(aws_region=self.bedrock_region)
+            LOGGER.info("Using Bedrock in %s", self.bedrock_region)
         return self._client
 
     def is_available(self) -> bool:

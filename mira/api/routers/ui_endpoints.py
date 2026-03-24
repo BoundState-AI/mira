@@ -29,8 +29,12 @@ LOGGER = logging.getLogger(__name__)
 # Semantic search - lazy loaded on first use
 _semantic_search = None
 _hybrid_search = None
+_semantic_search_attempted = False
 SEMANTIC_AVAILABLE = False
 HYBRID_AVAILABLE = False
+MAPTIS_SEARCH_COMING_SOON_MESSAGE = (
+    "MAPTIS material search is coming soon and is currently unavailable in this environment."
+)
 
 try:
     from mira.core.search_engine import SemanticSearchEngine
@@ -50,12 +54,13 @@ def get_semantic_search():
 
     P0 Fix: Now includes hybrid BM25+FAISS+RRF search for improved exact-match retrieval.
     """
-    global _semantic_search, _hybrid_search
+    global _semantic_search, _hybrid_search, _semantic_search_attempted
 
     if not SEMANTIC_AVAILABLE:
         return None
 
-    if _semantic_search is None:
+    if _semantic_search is None and not _semantic_search_attempted:
+        _semantic_search_attempted = True
         try:
             _semantic_search = SemanticSearchEngine()
             LOGGER.info("SemanticSearchEngine initialized")
@@ -125,6 +130,7 @@ class MaterialSearchResponse(BaseModel):
     total: int
     served_path: str = "/api/search"
     pipeline: str = "semantic"
+    message: Optional[str] = None
 
 
 class BOKSearchRequest(BaseModel):
@@ -169,12 +175,12 @@ async def material_search(request: MaterialSearchRequest):
     search = get_semantic_search()
 
     if search is None:
-        # Return empty results if search not available
-        LOGGER.warning("Semantic search not available, returning empty results")
+        LOGGER.warning("Semantic search not available, returning coming-soon response")
         return MaterialSearchResponse(
             results=[],
             total=0,
-            pipeline="unavailable"
+            pipeline="coming_soon",
+            message=MAPTIS_SEARCH_COMING_SOON_MESSAGE,
         )
 
     try:

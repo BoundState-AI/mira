@@ -152,6 +152,14 @@ interface HybridQueryResponse {
   error?: string
 }
 
+interface MaterialSearchResponse {
+  results?: Material[]
+  total?: number
+  served_path?: string
+  pipeline?: string
+  message?: string | null
+}
+
 export default function KnowledgeTwins() {
   const { t } = useTranslation('knowledgeTwins')
   const [mode, setMode] = useState<'browse' | 'ask'>('browse')
@@ -160,6 +168,7 @@ export default function KnowledgeTwins() {
   const [loading, setLoading] = useState(false)
   const [materials, setMaterials] = useState<Material[]>([])
   const [bokResults, setBokResults] = useState<BOKResult[]>([])
+  const [materialSearchNotice, setMaterialSearchNotice] = useState<string | null>(null)
   const [hybridResponse, setHybridResponse] = useState<HybridQueryResponse | null>(null)
   const [llmProvider, setLlmProvider] = useState<'ollama' | 'haiku'>('ollama')
   const [error, setError] = useState<string | null>(null)
@@ -221,6 +230,7 @@ export default function KnowledgeTwins() {
     setError(null)
     setMaterials([])
     setBokResults([])
+    setMaterialSearchNotice(null)
 
     try {
       // Call BOTH endpoints in parallel
@@ -250,13 +260,18 @@ export default function KnowledgeTwins() {
       }
 
       const bokData = await bokResponse.json()
-      const materialData = await materialResponse.json()
+      const materialData: MaterialSearchResponse = await materialResponse.json()
 
       console.log('BOK Response:', bokData)
       console.log('Material Response:', materialData)
 
       setBokResults(bokData.results || [])
       setMaterials(materialData.results || [])
+      setMaterialSearchNotice(
+        materialData.pipeline === 'coming_soon' || materialData.pipeline === 'unavailable'
+          ? materialData.message || 'Coming Soon! MAPTIS material search is currently unavailable in this environment.'
+          : null
+      )
 
     } catch (err) {
       setError(err instanceof Error ? err.message : t('errors.searchError', { defaultValue: 'Search failed' }))
@@ -274,6 +289,7 @@ export default function KnowledgeTwins() {
     setHybridResponse(null)
     setMaterials([])
     setBokResults([])
+    setMaterialSearchNotice(null)
 
     try {
       const response = await fetch(
@@ -677,8 +693,22 @@ export default function KnowledgeTwins() {
         )}
 
         {/* Browse Mode - Results */}
-        {mode === 'browse' && !loading && (materials.length > 0 || bokResults.length > 0) && (
+        {mode === 'browse' && !loading && (materials.length > 0 || bokResults.length > 0 || materialSearchNotice) && (
           <div className="space-y-8">
+
+            {materialSearchNotice && (
+              <Card className="border-2 border-amber-300 bg-amber-50/70">
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-3">
+                    <Sparkles className="mt-0.5 h-5 w-5 text-amber-700" />
+                    <div>
+                      <div className="font-bold text-amber-900">Coming Soon!</div>
+                      <div className="text-sm text-amber-900/80">{materialSearchNotice}</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* SECTION 1: RECOMMENDED MATERIALS */}
             {materials.length > 0 && (
@@ -842,7 +872,7 @@ export default function KnowledgeTwins() {
         )}
 
         {/* Empty State */}
-        {!loading && materials.length === 0 && bokResults.length === 0 && !hybridResponse && query && (
+        {!loading && materials.length === 0 && bokResults.length === 0 && !hybridResponse && !materialSearchNotice && query && (
           <Card>
             <CardContent className="pt-8 pb-8 text-center">
               <Search className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-50" />
