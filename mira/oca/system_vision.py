@@ -25,7 +25,7 @@ from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
-from mira.providers.llm_provider import resolve_model
+from mira.providers.llm_provider import resolve_bedrock_region, resolve_model
 
 from .system_models import (
     ComponentArchetype,
@@ -52,7 +52,10 @@ USE_BEDROCK = os.getenv("OCA_SYSTEM_VISION_USE_BEDROCK", os.getenv("USE_BEDROCK"
     "true",
     "yes",
 )
-BEDROCK_REGION = os.getenv("OCA_SYSTEM_VISION_BEDROCK_REGION", os.getenv("BEDROCK_REGION", "us-east-1"))
+BEDROCK_REGION = resolve_bedrock_region(
+    model_id=DEFAULT_MODEL_BEDROCK,
+    region_override=os.getenv("OCA_SYSTEM_VISION_BEDROCK_REGION"),
+)
 MAX_UPLOAD_BYTES = int(os.getenv("OCA_SYSTEM_VISION_MAX_UPLOAD_BYTES", str(10 * 1024 * 1024)))
 SUPPORTED_MEDIA_TYPES = {"image/png", "image/jpeg", "image/webp", "image/gif"}
 
@@ -539,4 +542,3 @@ def _assign_positions(
         for row_index, temp_id in enumerate(lanes[lane_index]):
             positions[temp_id] = (120.0 + (lane_index * 280.0), 120.0 + (row_index * 180.0))
     return positions
-
