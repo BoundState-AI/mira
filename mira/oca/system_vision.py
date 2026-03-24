@@ -15,6 +15,7 @@ Safety Critical: False
 from __future__ import annotations
 
 import base64
+import io
 import json
 import logging
 import os
@@ -24,6 +25,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 from pydantic import BaseModel, Field
+from PIL import Image, ImageOps, UnidentifiedImageError
 
 from mira.providers.llm_provider import resolve_bedrock_region, resolve_model
 
@@ -57,7 +59,12 @@ BEDROCK_REGION = resolve_bedrock_region(
     region_override=os.getenv("OCA_SYSTEM_VISION_BEDROCK_REGION"),
 )
 MAX_UPLOAD_BYTES = int(os.getenv("OCA_SYSTEM_VISION_MAX_UPLOAD_BYTES", str(10 * 1024 * 1024)))
+MAX_IMAGE_DIMENSION_PX = int(os.getenv("OCA_SYSTEM_VISION_MAX_DIMENSION_PX", "2048"))
 SUPPORTED_MEDIA_TYPES = {"image/png", "image/jpeg", "image/webp", "image/gif"}
+MEDIA_TYPE_ALIASES = {
+    "image/jpg": "image/jpeg",
+    "image/pjpeg": "image/jpeg",
+}
 
 
 class _VisionLLMComponent(BaseModel):
@@ -152,47 +159,80 @@ class OCASystemVisionService:
                 f"Uploaded file exceeds the {MAX_UPLOAD_BYTES // (1024 * 1024)} MB vision-import limit."
             )
 
-        normalized_media_type = (media_type or "").strip().lower() or _guess_media_type(filename)
-        if normalized_media_type not in SUPPORTED_MEDIA_TYPES:
-            raise ValueError(
-                "Unsupported file type for OCA vision import. Use PNG, JPEG, WEBP, or GIF."
-            )
+        prepared_image_bytes, normalized_media_type = _prepare_image_for_vision(
+            image_bytes=image_bytes,
+            media_type=media_type,
+            filename=filename,
+        )
 
         client = self._get_client()
-        prompt = _build_prompt(flow_direction_hint=flow_direction_hint, notes=notes, current_inputs=current_inputs)
-        image_b64 = base64.standard_b64encode(image_bytes).decode()
+        image_b64 = base64.standard_b64encode(prepared_image_bytes).decode()
 
         LOGGER.info(
-            "[OCA Vision] Generating mockup for %s from %s (%s bytes)",
+            "[OCA Vision] Generating mockup for %s from %s (%s bytes -> %s bytes, %s)",
             system_id,
             filename,
             len(image_bytes),
+            len(prepared_image_bytes),
+            normalized_media_type,
         )
 
-        response = client.messages.create(
-            model=self._model_id,
-            max_tokens=4096,
-            temperature=0,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": prompt},
+        parsed: Optional[_VisionLLMResponse] = None
+        last_parse_error: Optional[ValueError] = None
+        for attempt in range(2):
+            prompt = _build_prompt(
+                flow_direction_hint=flow_direction_hint,
+                notes=notes,
+                current_inputs=current_inputs,
+                strict_json=attempt > 0,
+            )
+            try:
+                response = client.messages.create(
+                    model=self._model_id,
+                    max_tokens=4096,
+                    temperature=0,
+                    messages=[
                         {
-                            "type": "image",
-                            "source": {
-                                "type": "base64",
-                                "media_type": normalized_media_type,
-                                "data": image_b64,
-                            },
-                        },
+                            "role": "user",
+                            "content": [
+                                {"type": "text", "text": prompt},
+                                {
+                                    "type": "image",
+                                    "source": {
+                                        "type": "base64",
+                                        "media_type": normalized_media_type,
+                                        "data": image_b64,
+                                    },
+                                },
+                            ],
+                        }
                     ],
-                }
-            ],
-        )
+                )
+            except Exception as exc:
+                if exc.__class__.__name__ == "BadRequestError" and "Could not process image" in str(exc):
+                    raise ValueError(
+                        "Uploaded image could not be processed. Export it as PNG or JPEG, or crop to the relevant diagram region, and try again."
+                    ) from exc
+                raise
 
-        raw_text = _collect_text_blocks(response.content)
-        parsed = _VisionLLMResponse(**_extract_json_object(raw_text))
+            raw_text = _collect_text_blocks(response.content)
+            try:
+                parsed = _VisionLLMResponse(**_extract_json_object(raw_text))
+                break
+            except ValueError as exc:
+                last_parse_error = exc
+                LOGGER.warning(
+                    "[OCA Vision] Non-JSON response for %s on attempt %s: %s",
+                    system_id,
+                    attempt + 1,
+                    raw_text[:500],
+                )
+
+        if parsed is None:
+            raise ValueError(
+                "Vision import produced an unreadable draft. Try a cleaner crop, simplify the image, or add a short flow-direction note and retry."
+            ) from last_parse_error
+
         positions = _assign_positions(parsed.components, parsed.connections)
         suggested_inputs_patch = _coerce_inputs_patch(parsed.suggested_inputs_patch, current_inputs)
 
@@ -290,14 +330,61 @@ def _guess_media_type(filename: str) -> str:
     suffix = Path(filename).suffix.lower()
     if suffix in {".jpg", ".jpeg"}:
         return "image/jpeg"
+    if suffix in {".jfif", ".pjpeg"}:
+        return "image/jpeg"
     if suffix == ".webp":
         return "image/webp"
     if suffix == ".gif":
         return "image/gif"
+    if suffix in {".bmp", ".dib"}:
+        return "image/bmp"
+    if suffix in {".tif", ".tiff"}:
+        return "image/tiff"
+    if suffix in {".heic", ".heif"}:
+        return "image/heic"
     return "image/png"
 
 
-def _build_prompt(*, flow_direction_hint: str, notes: str, current_inputs: Optional[SystemInputs]) -> str:
+def _canonical_media_type(media_type: str, filename: str) -> str:
+    candidate = (media_type or "").strip().lower() or _guess_media_type(filename)
+    return MEDIA_TYPE_ALIASES.get(candidate, candidate)
+
+
+def _prepare_image_for_vision(*, image_bytes: bytes, media_type: str, filename: str) -> tuple[bytes, str]:
+    normalized_media_type = _canonical_media_type(media_type, filename)
+    if not normalized_media_type.startswith("image/"):
+        raise ValueError("Unsupported file type for OCA vision import. Use PNG, JPEG, WEBP, or GIF.")
+
+    try:
+        with Image.open(io.BytesIO(image_bytes)) as source_image:
+            source_image.load()
+            image = ImageOps.exif_transpose(source_image)
+            if max(image.size) > MAX_IMAGE_DIMENSION_PX:
+                image.thumbnail((MAX_IMAGE_DIMENSION_PX, MAX_IMAGE_DIMENSION_PX), Image.Resampling.LANCZOS)
+
+            if image.mode in {"RGBA", "LA"} or (image.mode == "P" and "transparency" in image.info):
+                rgba_image = image.convert("RGBA")
+                background = Image.new("RGBA", rgba_image.size, (255, 255, 255, 255))
+                image = Image.alpha_composite(background, rgba_image).convert("RGB")
+            elif image.mode != "RGB":
+                image = image.convert("RGB")
+
+            output = io.BytesIO()
+            image.save(output, format="PNG", optimize=True)
+            return output.getvalue(), "image/png"
+    except (UnidentifiedImageError, OSError, ValueError) as exc:
+        raise ValueError(
+            "Unable to read the uploaded image. Export it as PNG or JPEG and try again."
+        ) from exc
+
+
+def _build_prompt(
+    *,
+    flow_direction_hint: str,
+    notes: str,
+    current_inputs: Optional[SystemInputs],
+    strict_json: bool = False,
+) -> str:
     current_inputs_json = json.dumps(current_inputs.model_dump() if current_inputs else {}, indent=2, default=str)
     library = _load_component_library()
     archetype_lines = []
@@ -310,6 +397,11 @@ def _build_prompt(*, flow_direction_hint: str, notes: str, current_inputs: Optio
         )
 
     notes_text = notes.strip() or "None"
+    strict_json_note = (
+        "\n10. Response must be a single valid JSON object. Do not include any prose before or after the JSON.\n"
+        if strict_json
+        else ""
+    )
     return f"""You are generating a provisional OCA system-builder graph from a single uploaded system image.
 
 Goal:
@@ -391,7 +483,7 @@ Rules:
 7. Keep components in approximate flow order.
 8. Return empty component and connection lists if the image is not usable.
 9. Return valid JSON only. No markdown fences.
-"""
+{strict_json_note}"""
 
 
 def _load_component_library() -> dict[str, Any]:

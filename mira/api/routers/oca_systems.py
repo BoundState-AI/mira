@@ -162,6 +162,7 @@ async def build_vision_mockup(
         system.updated_at = datetime.utcnow()
         return result
     except ValueError as exc:
+        LOGGER.warning(f"[OCA Systems] Vision mockup rejected: {exc}")
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except HTTPException:
         raise

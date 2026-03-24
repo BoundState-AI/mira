@@ -30,6 +30,7 @@ psycopg2-binary>=2.9.0
 pdfplumber>=0.11.0
 pymupdf>=1.24.0
 pypdf2>=3.0.0
+Pillow>=10.0.0
 
 # Data Processing
 pandas>=2.2.0
