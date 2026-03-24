@@ -25,8 +25,7 @@ import {
   Loader2,
   Sparkles
 } from 'lucide-react'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+import { apiUrl } from '@/lib/api-url'
 
 // Rating display configuration
 const RATING_CONFIG: Record<string, {
@@ -227,7 +226,7 @@ export default function KnowledgeTwins() {
       // Call BOTH endpoints in parallel
       const [bokResponse, materialResponse] = await Promise.all([
         // BOK standards search
-        fetch(`${API_URL}/api/v1/${activeFluid === 'oxygen' ? 'o2' : 'h2'}/search-bok`, {
+        fetch(apiUrl(`/api/v1/${activeFluid === 'oxygen' ? 'o2' : 'h2'}/search-bok`), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -236,7 +235,7 @@ export default function KnowledgeTwins() {
           })
         }),
         // Material search
-        fetch(`${API_URL}/api/search`, {
+        fetch(apiUrl('/api/search'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -278,7 +277,7 @@ export default function KnowledgeTwins() {
 
     try {
       const response = await fetch(
-        `${API_URL}/api/query/hybrid`,
+        apiUrl('/api/query/hybrid'),
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

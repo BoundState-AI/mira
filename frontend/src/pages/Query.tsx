@@ -35,8 +35,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+import { apiUrl } from "@/lib/api-url";
 
 const exampleQueries = [
   "Show me oxygen-compatible metals for cryogenic service",
@@ -90,7 +89,7 @@ export default function Query() {
 
     try {
       // Use simple MAPTIS semantic search
-      const response = await fetch(`${API_URL}/api/search`, {
+      const response = await fetch(apiUrl("/api/search"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -152,7 +151,7 @@ export default function Query() {
 
   const handleViewDetails = async (result: MaterialResult) => {
     try {
-      const response = await fetch(`${API_URL}/api/material/${result.materialkey}/summary`);
+      const response = await fetch(apiUrl(`/api/material/${result.materialkey}/summary`));
 
       if (!response.ok) {
         console.error("Failed to fetch material summary");

@@ -20,13 +20,12 @@ import {
 } from "@/components/TemporarilyUnavailableModule";
 import helpContent from "@/config/helpContent";
 import { isUnavailableModuleId } from "@/lib/moduleAvailability";
+import { apiUrl } from "@/lib/api-url";
 
 interface TestClass {
   slug: string;
   count: number;
 }
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 const TEST_CLASS_FALLBACK: Record<string, { name: string; description: string }> = {
   'tvs-outgassing': { name: "TVS Outgassing", description: "Total Mass Loss, Collected Volatile Condensable Material" },
@@ -112,7 +111,7 @@ export default function TestClasses() {
       return;
     }
 
-    fetch(`${API_URL}/api/materials/types`)
+    fetch(apiUrl("/api/materials/types"))
       .then(r => r.json())
       .then(data => setMaterialTypes(data.types || []))
       .catch(() => {});
@@ -127,7 +126,7 @@ export default function TestClasses() {
 
     const fetchTestClasses = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/test-classes/counts`);
+        const response = await fetch(apiUrl("/api/test-classes/counts"));
         const counts = await response.json();
 
         const testClassesArray: TestClass[] = Object.entries(counts).map(([slug, count]) => ({
@@ -171,7 +170,7 @@ export default function TestClasses() {
       if (ratingFilter && ratingFilter !== "all") {
         params.append("rating", ratingFilter);
       }
-      const response = await fetch(`${API_URL}/api/materials/search?${params}`);
+      const response = await fetch(apiUrl(`/api/materials/search?${params}`));
       const data: SearchResult = await response.json();
       setSearchResults(data);
     } catch (error) {

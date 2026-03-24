@@ -34,6 +34,7 @@ import {
   TemporarilyUnavailableNotice,
 } from "@/components/TemporarilyUnavailableModule";
 import { isUnavailableModuleId } from "@/lib/moduleAvailability";
+import { apiUrl } from "@/lib/api-url";
 
 interface TestRecord {
   id: string;
@@ -53,8 +54,6 @@ interface PaginationInfo {
   total_records: number;
   total_pages: number;
 }
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 const TEST_CLASS_FALLBACK: Record<string, { name: string; description: string }> = {
   'tvs-outgassing': { name: 'TVS Outgassing', description: 'Total Mass Loss, Collected Volatile Condensable Material' },
@@ -131,7 +130,7 @@ export default function TestClassDetail() {
       return;
     }
 
-    fetch(`${API_URL}/api/test-records/${testType}/ratings`)
+    fetch(apiUrl(`/api/test-records/${testType}/ratings`))
       .then(response => response.json())
       .then(data => {
         setAvailableRatings(data.ratings || []);
@@ -192,7 +191,7 @@ export default function TestClassDetail() {
         params.append("search", searchQuery);
       }
 
-      const response = await fetch(`${API_URL}/api/test-records/${testType}?${params}`);
+      const response = await fetch(apiUrl(`/api/test-records/${testType}?${params}`));
 
       if (!response.ok) {
         throw new Error(`Failed to fetch records: ${response.statusText}`);
@@ -231,7 +230,7 @@ export default function TestClassDetail() {
         params.append("search", searchQuery);
       }
 
-      const response = await fetch(`${API_URL}/api/test-records/${testType}/export?${params}`);
+      const response = await fetch(apiUrl(`/api/test-records/${testType}/export?${params}`));
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
