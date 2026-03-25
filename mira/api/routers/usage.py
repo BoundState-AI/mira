@@ -13,6 +13,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from mira.api.auth import get_request_user
 
 LOGGER = logging.getLogger("mira.usage")
+LOGGER.setLevel(logging.INFO)
 
 router = APIRouter()
 
@@ -78,4 +79,3 @@ async def record_usage_event(payload: UsageEventRequest, request: Request) -> di
     }
     LOGGER.info("MIRA_USAGE %s", json.dumps(event, separators=(",", ":"), sort_keys=True))
     return {"accepted": True}
-
