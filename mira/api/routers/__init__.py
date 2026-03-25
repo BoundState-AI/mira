@@ -45,6 +45,7 @@ from .h2 import router as h2_router
 from .guidance import router as guidance_router
 from .oca import router as oca_router
 from .oca_systems import router as oca_systems_router
+from .usage import router as usage_router
 try:
     from .tocr import router as tocr_router
 except ImportError:
@@ -78,6 +79,7 @@ __all__ = [
     "guidance_router",
     "oca_router",
     "oca_systems_router",
+    "usage_router",
     "tocr_router",
 ]
 

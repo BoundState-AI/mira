@@ -1,6 +1,7 @@
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { MiraChatDock } from '@/components/mira/MiraChatDock';
+import { UsageAnalyticsTracker } from '@/components/analytics/UsageAnalyticsTracker';
 import { useLocation } from 'react-router-dom';
 
 interface AppLayoutProps {
@@ -13,6 +14,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <SidebarProvider>
+      <UsageAnalyticsTracker />
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <main className="flex-1 overflow-auto">

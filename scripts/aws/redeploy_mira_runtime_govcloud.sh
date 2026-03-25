@@ -43,6 +43,7 @@ FRONTEND_TASK_FAMILY="${FRONTEND_TASK_FAMILY:-mira-prod-frontend-task}"
 
 BACKEND_TG_ARN="${BACKEND_TG_ARN:-arn:aws-us-gov:elasticloadbalancing:us-gov-west-1:574823419003:targetgroup/mira-prod-be-8080-tg/412b1d1aab416cad}"
 FRONTEND_TG_ARN="${FRONTEND_TG_ARN:-arn:aws-us-gov:elasticloadbalancing:us-gov-west-1:574823419003:targetgroup/mira-prod-fe-tg/4807e900d8b0dd14}"
+ALB_ARN="${ALB_ARN:-arn:aws-us-gov:elasticloadbalancing:us-gov-west-1:574823419003:loadbalancer/app/mira-prod-alb/9ec816e886a401b7}"
 
 PRIVATE_SUBNETS="${PRIVATE_SUBNETS:-subnet-01df5b02d7d7f65e8,subnet-0415246982e26c04f}"
 BACKEND_SECURITY_GROUP="${BACKEND_SECURITY_GROUP:-sg-0ecdc2af444ce6b45}"
@@ -75,6 +76,11 @@ OCA_CASE_TTL_HOURS="${OCA_CASE_TTL_HOURS:-168}"
 OCA_SYSTEM_STORE_BACKEND="${OCA_SYSTEM_STORE_BACKEND:-dynamodb}"
 OCA_SYSTEM_TABLE="${OCA_SYSTEM_TABLE:-mira-prod-oca-systems}"
 OCA_SYSTEM_TTL_HOURS="${OCA_SYSTEM_TTL_HOURS:-168}"
+CONTAINER_INSIGHTS_LEVEL="${CONTAINER_INSIGHTS_LEVEL:-enabled}"
+USAGE_LOG_BUCKET="${USAGE_LOG_BUCKET:-mira-prod-usage-logs-${ACCOUNT_ID}-${AWS_REGION}}"
+ALB_ACCESS_LOG_PREFIX="${ALB_ACCESS_LOG_PREFIX:-alb-access}"
+USAGE_DASHBOARD_NAME="${USAGE_DASHBOARD_NAME:-Mira-Prod-Usage}"
+ALB_LOG_RETENTION_DAYS="${ALB_LOG_RETENTION_DAYS:-90}"
 
 BACKEND_TASK_ROLE_ARN="${BACKEND_TASK_ROLE_ARN:-arn:aws-us-gov:iam::${ACCOUNT_ID}:role/mira-prod-ecs-task}"
 EXECUTION_ROLE_ARN="${EXECUTION_ROLE_ARN:-arn:aws-us-gov:iam::${ACCOUNT_ID}:role/mira-prod-ecs-execution}"
@@ -401,6 +407,21 @@ aws logs create-log-group --log-group-name /ecs/mira-prod-backend >/dev/null 2>&
 aws logs create-log-group --log-group-name /ecs/mira-prod-frontend >/dev/null 2>&1 || true
 aws logs put-retention-policy --log-group-name /ecs/mira-prod-backend --retention-in-days 30 >/dev/null
 aws logs put-retention-policy --log-group-name /ecs/mira-prod-frontend --retention-in-days 30 >/dev/null
+AWS_PROFILE="${AWS_PROFILE}" \
+AWS_REGION="${AWS_REGION}" \
+ACCOUNT_ID="${ACCOUNT_ID}" \
+CLUSTER="${CLUSTER}" \
+BACKEND_SERVICE="${BACKEND_SERVICE}" \
+FRONTEND_SERVICE="${FRONTEND_SERVICE}" \
+ALB_ARN="${ALB_ARN}" \
+BACKEND_LOG_GROUP="/ecs/mira-prod-backend" \
+FRONTEND_LOG_GROUP="/ecs/mira-prod-frontend" \
+CONTAINER_INSIGHTS_LEVEL="${CONTAINER_INSIGHTS_LEVEL}" \
+USAGE_LOG_BUCKET="${USAGE_LOG_BUCKET}" \
+ALB_ACCESS_LOG_PREFIX="${ALB_ACCESS_LOG_PREFIX}" \
+USAGE_DASHBOARD_NAME="${USAGE_DASHBOARD_NAME}" \
+ALB_LOG_RETENTION_DAYS="${ALB_LOG_RETENTION_DAYS}" \
+  bash "${BUILD_ROOT}/scripts/aws/ensure_mira_usage_observability.sh"
 ensure_oca_case_table
 ensure_oca_system_table
 ensure_oca_store_policy

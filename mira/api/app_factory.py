@@ -161,6 +161,7 @@ def _register_alias_routers(app: FastAPI) -> None:
     # only the /api alias here.
     _include_with_api_alias(app, routers.oca_router, prefix="", tags=["oca"])
     _include_with_api_alias(app, routers.oca_systems_router, prefix="/oca/systems", tags=["oca-systems"])
+    _include_with_api_alias(app, routers.usage_router, prefix="/usage", tags=["usage"])
 
     # MIUL/MUA/TOCR/FORGE/MP Plan
     _include_with_api_alias(app, routers.miul_router, prefix="/miul", tags=["miul"])
