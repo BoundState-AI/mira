@@ -64,6 +64,7 @@ RECEIPTS_DIR="${RECEIPTS_DIR:-${ROOT_DIR}/.deploy_receipts}"
 
 BACKEND_CPU="${BACKEND_CPU:-1024}"
 BACKEND_MEMORY="${BACKEND_MEMORY:-4096}"
+BACKEND_UVICORN_WORKERS="${BACKEND_UVICORN_WORKERS:-2}"
 FRONTEND_CPU="${FRONTEND_CPU:-256}"
 FRONTEND_MEMORY="${FRONTEND_MEMORY:-512}"
 
@@ -341,6 +342,8 @@ cat > "${BACKEND_TASK_JSON}" <<JSON
       "environment": [
         {"name": "PORT", "value": "8080"},
         {"name": "RELOAD", "value": "false"},
+        {"name": "UVICORN_WORKERS", "value": "${BACKEND_UVICORN_WORKERS}"},
+        {"name": "MIRA_OCA_CASE_STORE_DIR", "value": "/tmp/mira_oca_cases"},
         {"name": "ITAR_PATH_PREFIXES", "value": "/miul,/bom"},
         {"name": "ENVIRONMENT", "value": "production"},
         {"name": "MIRA_ENV", "value": "production"},

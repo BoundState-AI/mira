@@ -53,6 +53,7 @@ Co-Authored-By: Dr. Joseph Wilde, BoundState AI
 import json
 import logging
 import re
+import threading
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 import numpy as np
@@ -1185,6 +1186,7 @@ class OxygenCompatibilityEngine:
 
 # DETERMINISM FIX: Singleton instance for O2 engine to ensure consistent state
 _O2_ENGINE_INSTANCE: Optional[OxygenCompatibilityEngine] = None
+_O2_ENGINE_LOCK = threading.Lock()
 
 
 def get_o2_engine(maptis_metadata_path: Optional[Path] = None,
@@ -1208,11 +1210,13 @@ def get_o2_engine(maptis_metadata_path: Optional[Path] = None,
     global _O2_ENGINE_INSTANCE
 
     if _O2_ENGINE_INSTANCE is None or force_new:
-        _O2_ENGINE_INSTANCE = OxygenCompatibilityEngine(
-            maptis_metadata_path=maptis_metadata_path,
-            o2_bok_dir=o2_bok_dir,
-            safety_class=safety_class
-        )
-        LOGGER.info("[O2 ENGINE] Created new singleton instance")
+        with _O2_ENGINE_LOCK:
+            if _O2_ENGINE_INSTANCE is None or force_new:
+                _O2_ENGINE_INSTANCE = OxygenCompatibilityEngine(
+                    maptis_metadata_path=maptis_metadata_path,
+                    o2_bok_dir=o2_bok_dir,
+                    safety_class=safety_class
+                )
+                LOGGER.info("[O2 ENGINE] Created new singleton instance")
 
     return _O2_ENGINE_INSTANCE

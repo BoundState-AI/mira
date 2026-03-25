@@ -23,6 +23,7 @@ This router exposes O2 compatibility evaluation endpoints for:
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from datetime import datetime
 from typing import Any, Optional
@@ -216,7 +217,7 @@ async def evaluate_o2_compatibility(
 
         # Call O2 Knowledge Twin
         LOGGER.info(f"[O2 API] Evaluating: {request.material_key} at {request.pressure_psia} psia, {request.temperature_f}°F, {request.phase}")
-        result = _evaluate(internal_request)
+        result = await asyncio.to_thread(_evaluate, internal_request)
 
         # Convert evidence items
         evidence_items = [
@@ -272,7 +273,7 @@ async def search_o2_bok(request: O2BOKSearchRequest) -> O2BOKSearchResponse:
         from mira.o2.engine import get_o2_engine
 
         # Get O2 engine (singleton pattern)
-        engine = get_o2_engine()
+        engine = await asyncio.to_thread(get_o2_engine)
 
         if not engine.o2_bok_index:
             raise HTTPException(
@@ -285,7 +286,8 @@ async def search_o2_bok(request: O2BOKSearchRequest) -> O2BOKSearchResponse:
 
         # Perform search
         LOGGER.info(f"[O2 API] BOK search: '{request.query}', k={request.k}, hybrid={request.use_hybrid}")
-        results = engine.search_o2_bok(
+        results = await asyncio.to_thread(
+            engine.search_o2_bok,
             query=request.query,
             k=request.k,
             use_hybrid=request.use_hybrid,

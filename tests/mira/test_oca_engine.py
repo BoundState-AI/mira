@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from mira.oca.engine import create_case, get_case_decision, get_case_precheck
 from mira.oca.models import CreateOcaCaseRequest
 
@@ -60,3 +62,16 @@ def test_missing_service_context_sets_blocked_state() -> None:
 
     blocked_codes = {item.code.value for item in created.blocked_states}
     assert "SERVICE_ENVELOPE_INCOMPLETE" in blocked_codes
+
+
+def test_oca_case_store_persists_across_store_instances(tmp_path: Path) -> None:
+    from mira.oca.engine import _OcaCaseStore
+
+    store_a = _OcaCaseStore(tmp_path)
+    snapshot = store_a.create(_base_request("316L"))
+
+    store_b = _OcaCaseStore(tmp_path)
+    reloaded = store_b.get(snapshot.case_id)
+
+    assert reloaded.case_id == snapshot.case_id
+    assert reloaded.decision.final_disposition == snapshot.decision.final_disposition

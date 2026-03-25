@@ -1,8 +1,11 @@
-"""Deterministic Phase 1 OCA engine and in-process case store."""
+"""Deterministic Phase 1 OCA engine and file-backed case store."""
 
 from __future__ import annotations
 
 from datetime import datetime
+import os
+from pathlib import Path
+import tempfile
 from threading import RLock
 from typing import Optional
 from uuid import uuid4
@@ -73,23 +76,30 @@ def get_authority_manifest():
 
 
 class _OcaCaseStore:
-    def __init__(self) -> None:
+    def __init__(self, storage_dir: Optional[Path] = None) -> None:
         self._lock = RLock()
-        self._cases: dict[str, AssessmentSnapshot] = {}
+        default_dir = Path(tempfile.gettempdir()) / "mira_oca_cases"
+        self._storage_dir = Path(
+            os.getenv("MIRA_OCA_CASE_STORE_DIR", str(storage_dir or default_dir))
+        ).expanduser()
+        self._storage_dir.mkdir(parents=True, exist_ok=True)
+
+    def _path_for(self, case_id: str) -> Path:
+        return self._storage_dir / f"{case_id}.json"
 
     def create(self, request: CreateOcaCaseRequest) -> AssessmentSnapshot:
         with self._lock:
             case_id = f"oca-{uuid4().hex[:12]}"
             snapshot = _build_snapshot(case_id, request, 1)
-            self._cases[case_id] = snapshot
+            self._path_for(case_id).write_text(snapshot.model_dump_json(indent=2), encoding="utf-8")
             return snapshot
 
     def get(self, case_id: str) -> AssessmentSnapshot:
         with self._lock:
-            snapshot = self._cases.get(case_id)
-            if snapshot is None:
+            path = self._path_for(case_id)
+            if not path.exists():
                 raise KeyError(case_id)
-            return snapshot
+            return AssessmentSnapshot.model_validate_json(path.read_text(encoding="utf-8"))
 
 
 _STORE = _OcaCaseStore()
