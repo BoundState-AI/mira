@@ -12,7 +12,10 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from mira.api.auth import get_request_user
 
-LOGGER = logging.getLogger("mira.usage")
+# Uvicorn installs handlers on its own logger tree in ECS, while the root logger
+# may not have an INFO handler. Emit usage records through uvicorn's runtime
+# logger so they are always shipped to CloudWatch.
+LOGGER = logging.getLogger("uvicorn.error")
 LOGGER.setLevel(logging.INFO)
 
 router = APIRouter()
