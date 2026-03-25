@@ -1,12 +1,8 @@
-"""Deterministic Phase 1 OCA engine and file-backed case store."""
+"""Deterministic Phase 1 OCA engine and shared case store."""
 
 from __future__ import annotations
 
 from datetime import datetime
-import os
-from pathlib import Path
-import tempfile
-from threading import RLock
 from typing import Optional
 from uuid import uuid4
 
@@ -63,6 +59,7 @@ from .reference_pack import (
     get_requirement_binding,
     get_test_mapping,
 )
+from .store import get_oca_case_store
 
 
 IDENTITY_THRESHOLD = 0.75
@@ -75,38 +72,9 @@ def get_authority_manifest():
     return _get_authority_manifest()
 
 
-class _OcaCaseStore:
-    def __init__(self, storage_dir: Optional[Path] = None) -> None:
-        self._lock = RLock()
-        default_dir = Path(tempfile.gettempdir()) / "mira_oca_cases"
-        self._storage_dir = Path(
-            os.getenv("MIRA_OCA_CASE_STORE_DIR", str(storage_dir or default_dir))
-        ).expanduser()
-        self._storage_dir.mkdir(parents=True, exist_ok=True)
-
-    def _path_for(self, case_id: str) -> Path:
-        return self._storage_dir / f"{case_id}.json"
-
-    def create(self, request: CreateOcaCaseRequest) -> AssessmentSnapshot:
-        with self._lock:
-            case_id = f"oca-{uuid4().hex[:12]}"
-            snapshot = _build_snapshot(case_id, request, 1)
-            self._path_for(case_id).write_text(snapshot.model_dump_json(indent=2), encoding="utf-8")
-            return snapshot
-
-    def get(self, case_id: str) -> AssessmentSnapshot:
-        with self._lock:
-            path = self._path_for(case_id)
-            if not path.exists():
-                raise KeyError(case_id)
-            return AssessmentSnapshot.model_validate_json(path.read_text(encoding="utf-8"))
-
-
-_STORE = _OcaCaseStore()
-
-
 def create_case(request: CreateOcaCaseRequest) -> CreateOcaCaseResponse:
-    snapshot = _STORE.create(request)
+    snapshot = _build_snapshot(f"oca-{uuid4().hex[:12]}", request, 1)
+    get_oca_case_store().save(snapshot)
     return CreateOcaCaseResponse(
         case_id=snapshot.case_id,
         revision=snapshot.revision,
@@ -117,7 +85,7 @@ def create_case(request: CreateOcaCaseRequest) -> CreateOcaCaseResponse:
 
 
 def get_case_precheck(case_id: str) -> OcaPrecheckResponse:
-    snapshot = _STORE.get(case_id)
+    snapshot = get_oca_case_store().get(case_id)
     return OcaPrecheckResponse(
         case_id=case_id,
         revision=snapshot.revision,
@@ -128,7 +96,7 @@ def get_case_precheck(case_id: str) -> OcaPrecheckResponse:
 
 
 def get_case_evidence(case_id: str) -> OcaEvidenceResponse:
-    snapshot = _STORE.get(case_id)
+    snapshot = get_oca_case_store().get(case_id)
     gaps = sorted({gap for card in snapshot.evidence for gap in card.gaps})
     return OcaEvidenceResponse(
         case_id=case_id,
@@ -139,22 +107,22 @@ def get_case_evidence(case_id: str) -> OcaEvidenceResponse:
 
 
 def get_case_mechanisms(case_id: str) -> OcaMechanismsResponse:
-    snapshot = _STORE.get(case_id)
+    snapshot = get_oca_case_store().get(case_id)
     return OcaMechanismsResponse(case_id=case_id, revision=snapshot.revision, mechanisms=snapshot.mechanisms)
 
 
 def get_case_decision(case_id: str) -> OcaDecisionResponse:
-    snapshot = _STORE.get(case_id)
+    snapshot = get_oca_case_store().get(case_id)
     return OcaDecisionResponse(case_id=case_id, revision=snapshot.revision, decision=snapshot.decision)
 
 
 def get_case_requirements(case_id: str) -> OcaRequirementsResponse:
-    snapshot = _STORE.get(case_id)
+    snapshot = get_oca_case_store().get(case_id)
     return OcaRequirementsResponse(case_id=case_id, revision=snapshot.revision, requirements=snapshot.requirements)
 
 
 def get_case_lineage(case_id: str) -> OcaLineageResponse:
-    snapshot = _STORE.get(case_id)
+    snapshot = get_oca_case_store().get(case_id)
     return OcaLineageResponse(
         case_id=case_id,
         revision=snapshot.revision,
@@ -164,7 +132,7 @@ def get_case_lineage(case_id: str) -> OcaLineageResponse:
 
 
 def export_case_artifacts(case_id: str) -> OcaExportResponse:
-    snapshot = _STORE.get(case_id)
+    snapshot = get_oca_case_store().get(case_id)
     material_names = ", ".join(item.canonical_name for item in snapshot.normalized_input.materials)
     service = snapshot.normalized_input.service_context
     requirements = ", ".join(req.requirement_id for req in snapshot.requirements if req.triggered) or "none"

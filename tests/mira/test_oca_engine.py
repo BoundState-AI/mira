@@ -1,4 +1,5 @@
 from pathlib import Path
+from unittest.mock import Mock
 
 from mira.oca.engine import create_case, get_case_decision, get_case_precheck
 from mira.oca.models import CreateOcaCaseRequest
@@ -65,13 +66,39 @@ def test_missing_service_context_sets_blocked_state() -> None:
 
 
 def test_oca_case_store_persists_across_store_instances(tmp_path: Path) -> None:
-    from mira.oca.engine import _OcaCaseStore
+    from mira.oca.engine import _build_snapshot
+    from mira.oca.store import FileOcaCaseStore
 
-    store_a = _OcaCaseStore(tmp_path)
-    snapshot = store_a.create(_base_request("316L"))
+    snapshot = _build_snapshot("oca-test-file", _base_request("316L"), 1)
+    store_a = FileOcaCaseStore(tmp_path)
+    store_a.save(snapshot)
 
-    store_b = _OcaCaseStore(tmp_path)
+    store_b = FileOcaCaseStore(tmp_path)
     reloaded = store_b.get(snapshot.case_id)
 
     assert reloaded.case_id == snapshot.case_id
     assert reloaded.decision.final_disposition == snapshot.decision.final_disposition
+
+
+def test_oca_case_store_round_trips_through_dynamodb_payload_encoding() -> None:
+    from mira.oca.engine import _build_snapshot
+    from mira.oca.store import DynamoDbOcaCaseStore
+
+    snapshot = _build_snapshot("oca-test-ddb", _base_request("316L"), 1)
+    client = Mock()
+    client.get_item.return_value = {
+        "Item": {
+            "case_id": {"S": snapshot.case_id},
+            "payload": {"S": DynamoDbOcaCaseStore._encode_payload(snapshot)},
+            "payload_encoding": {"S": "gzip+base64"},
+        }
+    }
+
+    store = DynamoDbOcaCaseStore(table_name="mira-test-oca", client=client)
+    store.save(snapshot)
+    reloaded = store.get(snapshot.case_id)
+
+    client.put_item.assert_called_once()
+    client.get_item.assert_called_once()
+    assert reloaded.case_id == snapshot.case_id
+    assert reloaded.revision == snapshot.revision

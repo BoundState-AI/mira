@@ -38,7 +38,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Loader2, AlertTriangle, XCircle, Flame, Download, Zap, Info, Upload,
-  ChevronRight, LayoutGrid, Clock3,
+  ChevronRight, LayoutGrid, Clock3, RotateCcw,
 } from 'lucide-react';
 
 import ComponentNode, { type ComponentNodeData } from '@/components/oca-system/ComponentNode';
@@ -49,6 +49,7 @@ import PathInspectorPanel from '@/components/oca-system/PathInspectorPanel';
 
 import {
   ocaCreateSystem, ocaAddComponent, ocaAddConnection,
+  ocaDeleteSystem,
   ocaUpdateInputs, ocaUpdateComponent,
   ocaRemoveComponent, ocaRemoveConnection,
   ocaAssessSystem, ocaGetPathInspector, ocaExportSystem, ocaVisionMockup,
@@ -208,12 +209,14 @@ export default function OCASystemBuilder() {
   const [restoreNotice, setRestoreNotice] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
   const [visionDialogOpen, setVisionDialogOpen] = useState(false);
+  const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [visionFile, setVisionFile] = useState<File | null>(null);
   const [visionPreviewUrl, setVisionPreviewUrl] = useState<string | null>(null);
   const [visionNotes, setVisionNotes] = useState('');
   const [visionFlowDirectionHint, setVisionFlowDirectionHint] = useState('unknown');
   const [visionLoading, setVisionLoading] = useState(false);
   const [visionApplying, setVisionApplying] = useState(false);
+  const [resettingSystem, setResettingSystem] = useState(false);
   const [visionResult, setVisionResult] = useState<VisionMockupResult | null>(null);
 
   // React Flow
@@ -341,6 +344,25 @@ export default function OCASystemBuilder() {
     setVisionLoading(false);
     setVisionApplying(false);
     setVisionResult(null);
+  }, []);
+
+  const clearLocalBuilderState = useCallback(() => {
+    componentMap.current.clear();
+    nodeToComponentId.current.clear();
+    edgeToConnectionId.current.clear();
+    hasAutoFitRef.current = false;
+    setNodes([]);
+    setEdges([]);
+    setAssessment(null);
+    setPathResult(null);
+    setEditorComponentId(null);
+    setSelectedNodeComponentId(null);
+  }, [setEdges, setNodes]);
+
+  const createFreshSystem = useCallback(async (seedInputs: SystemInputs) => {
+    const response = await ocaCreateSystem('New O2 System', seedInputs);
+    setSystemId(response.system_id);
+    return response.system_id;
   }, []);
 
   const handleNodesChange: OnNodesChange = useCallback((changes) => {
@@ -504,12 +526,11 @@ export default function OCASystemBuilder() {
       setInputs(seedInputs);
 
       try {
-        const res = await ocaCreateSystem('New O2 System', seedInputs);
+        const nextSystemId = await createFreshSystem(seedInputs);
         if (cancelled) return;
-        setSystemId(res.system_id);
 
         if (draft) {
-          await restoreDraftRef.current(res.system_id, draft);
+          await restoreDraftRef.current(nextSystemId, draft);
         }
       } catch (err) {
         if (!cancelled) {
@@ -521,7 +542,7 @@ export default function OCASystemBuilder() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [createFreshSystem]);
 
   useEffect(() => {
     if (!systemId) return undefined;
@@ -774,17 +795,54 @@ export default function OCASystemBuilder() {
       await ocaRemoveComponent(systemId, componentId);
     }
 
-    componentMap.current.clear();
-    nodeToComponentId.current.clear();
-    edgeToConnectionId.current.clear();
-    hasAutoFitRef.current = false;
-    setNodes([]);
-    setEdges([]);
-    setAssessment(null);
-    setPathResult(null);
-    setEditorComponentId(null);
-    setSelectedNodeComponentId(null);
-  }, [setEdges, setNodes, systemId]);
+    clearLocalBuilderState();
+  }, [clearLocalBuilderState, systemId]);
+
+  const handleStartOver = useCallback(async () => {
+    const previousSystemId = systemId;
+    setResettingSystem(true);
+    setError(null);
+
+    try {
+      await createFreshSystem(DEFAULT_INPUTS);
+      clearLocalBuilderState();
+      setInputs(DEFAULT_INPUTS);
+      setActiveTab('canvas');
+      setIsDirty(false);
+      setDraftSavedAt(null);
+      setRestoreNotice('Started a new empty system.');
+      setVisionDialogOpen(false);
+      resetVisionDialogState();
+      lastDraftSignatureRef.current = JSON.stringify({
+        version: 1,
+        inputs: DEFAULT_INPUTS,
+        components: [],
+        connections: [],
+      });
+
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem(DRAFT_STORAGE_KEY);
+      }
+
+      if (previousSystemId) {
+        try {
+          await ocaDeleteSystem(previousSystemId);
+        } catch {
+          // Ignore cleanup errors after the new system is already ready.
+        }
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to start a new system');
+    } finally {
+      setResetDialogOpen(false);
+      setResettingSystem(false);
+    }
+  }, [
+    clearLocalBuilderState,
+    createFreshSystem,
+    resetVisionDialogState,
+    systemId,
+  ]);
 
   const handleGenerateVisionMockup = useCallback(async () => {
     if (!systemId || !visionFile) return;
@@ -1112,6 +1170,17 @@ export default function OCASystemBuilder() {
         <Button size="sm" variant="outline" onClick={handleExport} disabled={!assessment} className="gap-1.5" data-testid="oca-system-export">
           <Download className="h-3 w-3" />
           Export
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => setResetDialogOpen(true)}
+          disabled={!systemId || resettingSystem}
+          className="gap-1.5"
+          data-testid="oca-system-start-over"
+        >
+          {resettingSystem ? <Loader2 className="h-3 w-3 animate-spin" /> : <RotateCcw className="h-3 w-3" />}
+          Start Over
         </Button>
         <Button
           size="sm"
@@ -1474,6 +1543,26 @@ export default function OCASystemBuilder() {
                   Generate Mockup
                 </Button>
               )}
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Start Over</DialogTitle>
+              <DialogDescription>
+                Create a fresh OCA system, clear the current canvas and assessment, and remove the local draft for this builder.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setResetDialogOpen(false)} disabled={resettingSystem}>
+                Cancel
+              </Button>
+              <Button onClick={handleStartOver} disabled={resettingSystem}>
+                {resettingSystem ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                Start Over
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

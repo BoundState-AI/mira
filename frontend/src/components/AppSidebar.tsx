@@ -156,7 +156,7 @@ export function AppSidebar() {
       <SidebarHeader className="p-6 border-b border-sidebar-border">
         <div className="flex items-center justify-between">
           <span className="text-sidebar-primary font-medium tracking-widest uppercase text-[10px]">
-            {t('appName', { ns: 'common', defaultValue: 'MIRA V3' })}
+            {t('appName', { ns: 'common', defaultValue: 'MIRA V8' })}
           </span>
           <div className="flex items-center gap-1">
             <LanguageSelector />

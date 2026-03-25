@@ -65,11 +65,22 @@ RECEIPTS_DIR="${RECEIPTS_DIR:-${ROOT_DIR}/.deploy_receipts}"
 BACKEND_CPU="${BACKEND_CPU:-1024}"
 BACKEND_MEMORY="${BACKEND_MEMORY:-4096}"
 BACKEND_UVICORN_WORKERS="${BACKEND_UVICORN_WORKERS:-2}"
+BACKEND_DESIRED_COUNT="${BACKEND_DESIRED_COUNT:-2}"
 FRONTEND_CPU="${FRONTEND_CPU:-256}"
 FRONTEND_MEMORY="${FRONTEND_MEMORY:-512}"
+FRONTEND_DESIRED_COUNT="${FRONTEND_DESIRED_COUNT:-1}"
+OCA_CASE_STORE_BACKEND="${OCA_CASE_STORE_BACKEND:-dynamodb}"
+OCA_CASE_TABLE="${OCA_CASE_TABLE:-mira-prod-oca-cases}"
+OCA_CASE_TTL_HOURS="${OCA_CASE_TTL_HOURS:-168}"
+OCA_SYSTEM_STORE_BACKEND="${OCA_SYSTEM_STORE_BACKEND:-dynamodb}"
+OCA_SYSTEM_TABLE="${OCA_SYSTEM_TABLE:-mira-prod-oca-systems}"
+OCA_SYSTEM_TTL_HOURS="${OCA_SYSTEM_TTL_HOURS:-168}"
 
 BACKEND_TASK_ROLE_ARN="${BACKEND_TASK_ROLE_ARN:-arn:aws-us-gov:iam::${ACCOUNT_ID}:role/mira-prod-ecs-task}"
 EXECUTION_ROLE_ARN="${EXECUTION_ROLE_ARN:-arn:aws-us-gov:iam::${ACCOUNT_ID}:role/mira-prod-ecs-execution}"
+BACKEND_TASK_ROLE_NAME="${BACKEND_TASK_ROLE_ARN##*/}"
+OCA_CASE_TABLE_ARN="arn:aws-us-gov:dynamodb:${AWS_REGION}:${ACCOUNT_ID}:table/${OCA_CASE_TABLE}"
+OCA_SYSTEM_TABLE_ARN="arn:aws-us-gov:dynamodb:${AWS_REGION}:${ACCOUNT_ID}:table/${OCA_SYSTEM_TABLE}"
 
 require_bin() {
   command -v "$1" >/dev/null 2>&1 || {
@@ -136,6 +147,78 @@ ensure_service() {
   local service_name="$1"
   aws ecs describe-services --cluster "${CLUSTER}" --services "${service_name}" \
     --query 'services[0].status' --output text 2>/dev/null | rg -q 'ACTIVE'
+}
+
+ensure_oca_case_table() {
+  [ "${OCA_CASE_STORE_BACKEND}" = "dynamodb" ] || return 0
+
+  if ! aws dynamodb describe-table --table-name "${OCA_CASE_TABLE}" >/dev/null 2>&1; then
+    aws dynamodb create-table \
+      --table-name "${OCA_CASE_TABLE}" \
+      --attribute-definitions AttributeName=case_id,AttributeType=S \
+      --key-schema AttributeName=case_id,KeyType=HASH \
+      --billing-mode PAY_PER_REQUEST \
+      --tags "Key=Project,Value=mira" "Key=Environment,Value=prod" "Key=ManagedBy,Value=deploy-script" >/dev/null
+    aws dynamodb wait table-exists --table-name "${OCA_CASE_TABLE}"
+  fi
+
+  aws dynamodb update-time-to-live \
+    --table-name "${OCA_CASE_TABLE}" \
+    --time-to-live-specification "Enabled=true,AttributeName=expires_at" >/dev/null 2>&1 || true
+}
+
+ensure_oca_system_table() {
+  [ "${OCA_SYSTEM_STORE_BACKEND}" = "dynamodb" ] || return 0
+
+  if ! aws dynamodb describe-table --table-name "${OCA_SYSTEM_TABLE}" >/dev/null 2>&1; then
+    aws dynamodb create-table \
+      --table-name "${OCA_SYSTEM_TABLE}" \
+      --attribute-definitions AttributeName=system_id,AttributeType=S \
+      --key-schema AttributeName=system_id,KeyType=HASH \
+      --billing-mode PAY_PER_REQUEST \
+      --tags "Key=Project,Value=mira" "Key=Environment,Value=prod" "Key=ManagedBy,Value=deploy-script" >/dev/null
+    aws dynamodb wait table-exists --table-name "${OCA_SYSTEM_TABLE}"
+  fi
+
+  aws dynamodb update-time-to-live \
+    --table-name "${OCA_SYSTEM_TABLE}" \
+    --time-to-live-specification "Enabled=true,AttributeName=expires_at" >/dev/null 2>&1 || true
+}
+
+ensure_oca_store_policy() {
+  if [ "${OCA_CASE_STORE_BACKEND}" != "dynamodb" ] && [ "${OCA_SYSTEM_STORE_BACKEND}" != "dynamodb" ]; then
+    return 0
+  fi
+
+  local policy_doc
+  policy_doc="$(mktemp)"
+  cat > "${policy_doc}" <<JSON
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "MiraOcaCaseStore",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:DescribeTable",
+        "dynamodb:DeleteItem",
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem"
+      ],
+      "Resource": [
+        "${OCA_CASE_TABLE_ARN}",
+        "${OCA_SYSTEM_TABLE_ARN}"
+      ]
+    }
+  ]
+}
+JSON
+  aws iam put-role-policy \
+    --role-name "${BACKEND_TASK_ROLE_NAME}" \
+    --policy-name "mira-prod-ecs-oca-dynamodb" \
+    --policy-document "file://${policy_doc}" >/dev/null
+  rm -f "${policy_doc}"
 }
 
 prepare_snapshot_from_ref() {
@@ -318,6 +401,9 @@ aws logs create-log-group --log-group-name /ecs/mira-prod-backend >/dev/null 2>&
 aws logs create-log-group --log-group-name /ecs/mira-prod-frontend >/dev/null 2>&1 || true
 aws logs put-retention-policy --log-group-name /ecs/mira-prod-backend --retention-in-days 30 >/dev/null
 aws logs put-retention-policy --log-group-name /ecs/mira-prod-frontend --retention-in-days 30 >/dev/null
+ensure_oca_case_table
+ensure_oca_system_table
+ensure_oca_store_policy
 
 BACKEND_TASK_JSON="$(mktemp)"
 FRONTEND_TASK_JSON="$(mktemp)"
@@ -343,7 +429,14 @@ cat > "${BACKEND_TASK_JSON}" <<JSON
         {"name": "PORT", "value": "8080"},
         {"name": "RELOAD", "value": "false"},
         {"name": "UVICORN_WORKERS", "value": "${BACKEND_UVICORN_WORKERS}"},
+        {"name": "MIRA_OCA_CASE_STORE_BACKEND", "value": "${OCA_CASE_STORE_BACKEND}"},
+        {"name": "MIRA_OCA_DDB_TABLE", "value": "${OCA_CASE_TABLE}"},
+        {"name": "MIRA_OCA_CASE_TTL_HOURS", "value": "${OCA_CASE_TTL_HOURS}"},
         {"name": "MIRA_OCA_CASE_STORE_DIR", "value": "/tmp/mira_oca_cases"},
+        {"name": "MIRA_OCA_SYSTEM_STORE_BACKEND", "value": "${OCA_SYSTEM_STORE_BACKEND}"},
+        {"name": "MIRA_OCA_SYSTEM_DDB_TABLE", "value": "${OCA_SYSTEM_TABLE}"},
+        {"name": "MIRA_OCA_SYSTEM_TTL_HOURS", "value": "${OCA_SYSTEM_TTL_HOURS}"},
+        {"name": "MIRA_OCA_SYSTEM_STORE_DIR", "value": "/tmp/mira_oca_systems"},
         {"name": "ITAR_PATH_PREFIXES", "value": "/miul,/bom"},
         {"name": "ENVIRONMENT", "value": "production"},
         {"name": "MIRA_ENV", "value": "production"},
@@ -451,13 +544,13 @@ if ensure_service "${BACKEND_SERVICE}"; then
     --cluster "${CLUSTER}" \
     --service "${BACKEND_SERVICE}" \
     --task-definition "${BACKEND_TD_ARN}" \
-    --desired-count 1 >/dev/null
+    --desired-count "${BACKEND_DESIRED_COUNT}" >/dev/null
 else
   aws ecs create-service \
     --cluster "${CLUSTER}" \
     --service-name "${BACKEND_SERVICE}" \
     --task-definition "${BACKEND_TD_ARN}" \
-    --desired-count 1 \
+    --desired-count "${BACKEND_DESIRED_COUNT}" \
     --launch-type FARGATE \
     --health-check-grace-period-seconds 120 \
     --load-balancers "targetGroupArn=${BACKEND_TG_ARN},containerName=backend,containerPort=8080" \
@@ -469,13 +562,13 @@ if ensure_service "${FRONTEND_SERVICE}"; then
     --cluster "${CLUSTER}" \
     --service "${FRONTEND_SERVICE}" \
     --task-definition "${FRONTEND_TD_ARN}" \
-    --desired-count 1 >/dev/null
+    --desired-count "${FRONTEND_DESIRED_COUNT}" >/dev/null
 else
   aws ecs create-service \
     --cluster "${CLUSTER}" \
     --service-name "${FRONTEND_SERVICE}" \
     --task-definition "${FRONTEND_TD_ARN}" \
-    --desired-count 1 \
+    --desired-count "${FRONTEND_DESIRED_COUNT}" \
     --launch-type FARGATE \
     --health-check-grace-period-seconds 60 \
     --load-balancers "targetGroupArn=${FRONTEND_TG_ARN},containerName=frontend,containerPort=80" \

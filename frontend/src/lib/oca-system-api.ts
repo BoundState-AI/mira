@@ -276,6 +276,10 @@ export async function ocaGetSystem(systemId: string): Promise<Record<string, unk
   return fetchJSON(`${API_BASE}/oca/systems/${systemId}`);
 }
 
+export async function ocaDeleteSystem(systemId: string): Promise<{ status: string }> {
+  return fetchJSON(`${API_BASE}/oca/systems/${systemId}`, { method: 'DELETE' });
+}
+
 export async function ocaUpdateInputs(systemId: string, inputs: Partial<SystemInputs>): Promise<{ status: string }> {
   return fetchJSON(`${API_BASE}/oca/systems/${systemId}/inputs`, {
     method: 'PUT',

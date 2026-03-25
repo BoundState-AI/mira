@@ -9,15 +9,19 @@ from fastapi.testclient import TestClient
 
 
 @pytest.fixture
-def system_module():
+def system_module(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
+    monkeypatch.setenv("MIRA_OCA_SYSTEM_STORE_BACKEND", "file")
+    monkeypatch.setenv("MIRA_OCA_SYSTEM_STORE_DIR", str(tmp_path))
+    import mira.oca.system_store as system_store
+
+    system_store.reset_oca_system_store_for_tests()
     router_path = Path(__file__).resolve().parents[2] / "mira" / "api" / "routers" / "oca_systems.py"
     spec = spec_from_file_location("oca_systems_router_test_module", router_path)
     module = module_from_spec(spec)
     assert spec is not None and spec.loader is not None
     spec.loader.exec_module(module)
-    module._systems.clear()
     yield module
-    module._systems.clear()
+    system_store.reset_oca_system_store_for_tests()
 
 
 @pytest.fixture
@@ -174,6 +178,13 @@ def test_system_builder_endpoints_cover_crud_assessment_and_exports(client: Test
 
     locked_remove_connection = client.delete(f"/api/oca/systems/{system_id}/connections/{connection_id}")
     assert locked_remove_connection.status_code == 409
+
+    delete_system = client.delete(f"/api/oca/systems/{system_id}")
+    assert delete_system.status_code == 200
+    assert delete_system.json()["status"] == "deleted"
+
+    deleted_get = client.get(f"/api/oca/systems/{system_id}")
+    assert deleted_get.status_code == 404
 
 
 def test_system_builder_endpoints_surface_not_found_conditions(client: TestClient) -> None:
