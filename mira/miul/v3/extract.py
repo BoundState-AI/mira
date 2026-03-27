@@ -30,7 +30,7 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from mira.providers.llm_provider import resolve_bedrock_region, resolve_model
+from mira.providers.llm_provider import resolve_bedrock_region, resolve_model_for_provider
 
 from .ocr_correction import (
     correct_ocr_errors,
@@ -53,12 +53,71 @@ from .text_extract import (
 
 LOGGER = logging.getLogger(__name__)
 
+def _session_region_from_boto3() -> str | None:
+    """Use the active AWS session/profile region when no explicit env override exists."""
+    try:
+        import boto3
+    except Exception:
+        return None
+
+    try:
+        session = boto3.Session()
+    except Exception:
+        return None
+
+    region = (session.region_name or "").strip()
+    return region or None
+
+
+def _resolve_miul_v3_bedrock_region() -> str:
+    """Resolve the Bedrock region for MIUL vision calls."""
+    session_region = _session_region_from_boto3()
+    model_hint = (
+        os.getenv("MIUL_V3_VISION_MODEL_BEDROCK")
+        or resolve_model_for_provider(
+            "sonnet",
+            provider_name="bedrock-converse",
+            bedrock_region=session_region,
+        )
+    )
+    return resolve_bedrock_region(
+        model_id=model_hint,
+        region_override=os.getenv("MIUL_V3_VISION_BEDROCK_REGION") or session_region,
+    )
+
+
 # API Configuration - Bedrock only
-BEDROCK_REGION = resolve_bedrock_region(
-    model_id=os.getenv("MIUL_V3_VISION_MODEL_BEDROCK") or resolve_model("sonnet"),
-    region_override=os.getenv("MIUL_V3_VISION_BEDROCK_REGION"),
+BEDROCK_REGION = _resolve_miul_v3_bedrock_region()
+SONNET_MODEL = (
+    os.getenv("MIUL_V3_VISION_MODEL_BEDROCK")
+    or resolve_model_for_provider(
+        "sonnet",
+        provider_name="bedrock-converse",
+        bedrock_region=BEDROCK_REGION,
+    )
 )
-SONNET_MODEL = os.getenv("MIUL_V3_VISION_MODEL_BEDROCK") or resolve_model("sonnet")
+
+
+class VisionAuthError(RuntimeError):
+    """Raised when the Bedrock vision client cannot authenticate."""
+
+
+_AUTH_ERROR_MARKERS = (
+    "security token included in the request is invalid",
+    "the provided token has expired",
+    "expiredtoken",
+    "unable to locate credentials",
+    "unable to load credentials",
+    "unrecognizedclientexception",
+    "invalidsignatureexception",
+    "accessdeniedexception",
+    "access denied",
+)
+
+
+def _is_auth_error(exc: Exception) -> bool:
+    message = str(exc).strip().lower()
+    return any(marker in message for marker in _AUTH_ERROR_MARKERS)
 
 
 # =============================================================================
@@ -332,6 +391,16 @@ class VisionClient:
             )
             return self._parse_json_response(response.content[0].text)
         except Exception as e:
+            if _is_auth_error(e):
+                LOGGER.error(
+                    "Vision API auth error in %s for model %s: %s",
+                    self.bedrock_region,
+                    self.model,
+                    e,
+                )
+                raise VisionAuthError(
+                    f"Bedrock auth failed in {self.bedrock_region} for {self.model}: {e}"
+                ) from e
             LOGGER.error(f"Vision API error: {e}")
             return {}
 

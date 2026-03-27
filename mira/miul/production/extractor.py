@@ -37,7 +37,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import fitz
 
 # Reuse existing v3 infrastructure - no need to rebuild
-from mira.miul.v3.extract import VisionClient, pdf_to_images
+from mira.miul.v3.extract import VisionAuthError, VisionClient, pdf_to_images
 from mira.miul.v3.text_extract import extract_drawing as extract_ocr_text, has_text_layer
 
 LOGGER = logging.getLogger(__name__)
@@ -549,6 +549,8 @@ class MIULVisionExtractor:
         )
 
         results_by_idx: Dict[int, List[ExtractedMaterial]] = {}
+        auth_failures: List[str] = []
+        successful_calls = 0
 
         def _process_one(idx: int, page: BankedPage) -> Tuple[int, List[ExtractedMaterial]]:
             """Single Sonnet call for one banked page (runs in thread)."""
@@ -571,6 +573,7 @@ class MIULVisionExtractor:
                 idx, page = futures[future]
                 try:
                     _, materials = future.result()
+                    successful_calls += 1
                     if not materials:
                         fallback_materials = _fallback_epl_materials_from_page_text(
                             page_text=str((page.ocr_result or {}).get("page_text", "") or ""),
@@ -603,6 +606,19 @@ class MIULVisionExtractor:
                         f"-> {len(materials)} materials"
                     )
 
+                except VisionAuthError as e:
+                    LOGGER.error(
+                        f"[Phase2] Auth failed: {page.pdf_name} p{page.page_number}: {e}"
+                    )
+                    results_by_idx[idx] = []
+                    auth_failures.append(f"{page.pdf_name} p{page.page_number}: {e}")
+                    result.audit_trail.append({
+                        "event": "phase2_vision_auth_failed",
+                        "file": page.pdf_name,
+                        "page": page.page_number,
+                        "error": str(e),
+                        "timestamp": _now(),
+                    })
                 except Exception as e:
                     LOGGER.error(
                         f"[Phase2] Failed: {page.pdf_name} p{page.page_number}: {e}"
@@ -617,6 +633,11 @@ class MIULVisionExtractor:
                     })
 
         total_materials = sum(len(mats) for mats in results_by_idx.values())
+        if auth_failures and successful_calls == 0:
+            raise RuntimeError(
+                "MIUL Bedrock vision extraction could not authenticate before any page completed. "
+                f"First error: {auth_failures[0]}"
+            )
         LOGGER.info(f"[Phase2] Sonnet Bank complete: {total_materials} materials from {len(bank)} pages")
         result.audit_trail.append({
             "event": "phase2_complete",
@@ -989,6 +1010,7 @@ class MIULVisionExtractor:
             or name_upper.endswith("_DT")
             or "DRAWING_TREE" in name_upper
             or "DRAWINGTREE" in name_upper
+            or "DRAWING TREE" in name_upper
         )
 
 
