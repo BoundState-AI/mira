@@ -24,6 +24,7 @@ __safety_critical__ = True  # Class B/C: Configuration affects safety-critical o
 import os
 import json
 import logging
+import secrets
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -100,7 +101,7 @@ class AppConfig(BaseSettings):
     faiss_gpu_enabled: bool = Field(default=False, description="Enable GPU acceleration for FAISS")
     data_path: str = Field(default="./data", description="Data directory path")
 
-    # PostgreSQL Configuration
+    # PostgreSQL Configuration — dev defaults; production MUST use env vars
     postgres_user: str = Field(default="postgres", description="PostgreSQL username")
     postgres_password: str = Field(default="postgres", description="PostgreSQL password")
     postgres_db: str = Field(default="mira", description="PostgreSQL database name")
@@ -117,7 +118,10 @@ class AppConfig(BaseSettings):
     anthropic_api_key: Optional[str] = Field(default=None, description="Anthropic API key for Claude")
 
     # Security Configuration
-    jwt_secret_key: str = Field(default="change-me-in-production", description="JWT secret key")
+    jwt_secret_key: str = Field(
+        default_factory=lambda: os.environ.get("JWT_SECRET_KEY", secrets.token_hex(32)),
+        description="JWT secret key — MUST be set via JWT_SECRET_KEY env var in production",
+    )
     jwt_algorithm: str = Field(default="HS256", description="JWT algorithm")
     jwt_expiration_hours: int = Field(default=24, description="JWT token expiration in hours")
     api_key_header: str = Field(default="X-API-Key", description="API key header name")
@@ -325,8 +329,11 @@ class AppConfig(BaseSettings):
     @model_validator(mode='after')
     def validate_jwt_secret(self):
         """Validate JWT secret key for production."""
-        if self.environment == Environment.PRODUCTION and self.jwt_secret_key == "change-me-in-production":
-            raise ValueError("JWT secret key must be changed for production")
+        if self.environment == Environment.PRODUCTION and not os.environ.get("JWT_SECRET_KEY"):
+            raise ValueError(
+                "JWT_SECRET_KEY environment variable must be set in production. "
+                "Generate one with: python -c 'import secrets; print(secrets.token_hex(32))'"
+            )
         return self
         
     @model_validator(mode='after')
@@ -381,7 +388,16 @@ class AppConfig(BaseSettings):
                 raise ValueError("Debug endpoints must be disabled in production")
             if self.cors_origins == ["*"]:
                 raise ValueError("CORS origins must be explicitly set in production")
-                
+            # Fail fast if DB credentials are still at development defaults
+            if self.postgres_user == "postgres" and not os.environ.get("POSTGRES_USER"):
+                raise ValueError(
+                    "POSTGRES_USER must be set via environment variable in production"
+                )
+            if self.postgres_password == "postgres" and not os.environ.get("POSTGRES_PASSWORD"):
+                raise ValueError(
+                    "POSTGRES_PASSWORD must be set via environment variable in production"
+                )
+
         return self
         
     def get_absolute_path(self, path: str) -> Path:
