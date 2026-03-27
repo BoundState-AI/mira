@@ -26,7 +26,7 @@ def generate_app_py(
         includes.append(f"app.include_router({module_name}.router)")
 
     imports_str = "\n".join(imports)
-    includes_str = "\n".join(f"    {inc}" for inc in includes)
+    includes_str = "\n".join(includes)
 
     # Build quality stats for health endpoint
     quality_entries = []

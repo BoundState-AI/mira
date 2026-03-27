@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from mira.forge_claude.introspector.manifest import SchemaManifest, SemanticMap, TableInfo
 from mira.forge_claude.question_gen.patterns import is_date, is_numeric, is_text, is_boolean
 
@@ -27,8 +29,20 @@ def _python_type(col_type: str, nullable: bool) -> str:
     return base
 
 
+def _safe_py(name: str) -> str:
+    """Convert a schema-qualified name to a valid Python identifier."""
+    if "." in name:
+        name = name.rsplit(".", 1)[-1]
+    name = re.sub(r"[^a-zA-Z0-9_]", "_", name)
+    name = re.sub(r"_+", "_", name).strip("_")
+    if name and name[0].isdigit():
+        name = f"t_{name}"
+    return name or "unknown"
+
+
 def _pascal(name: str) -> str:
-    return "".join(word.capitalize() for word in name.split("_"))
+    safe = _safe_py(name)
+    return "".join(word.capitalize() for word in safe.split("_"))
 
 
 def _build_semantic_lookup(
