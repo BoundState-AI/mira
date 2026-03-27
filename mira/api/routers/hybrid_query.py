@@ -16,17 +16,21 @@ Compliance: NASA-CSET, SWE-013, SWE-032
 Safety Critical: True
 """
 
+import logging
+
 from fastapi import APIRouter, HTTPException, Query
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 # Import MIRA V2 query engine
 try:
     from mira.MIRA_V2.src.query_engine_v2 import EvidenceFirstQueryEngine
     MaterialConstraints = None  # Not used directly
 except ImportError as e:
-    print(f"WARNING: Could not import MIRA V2 query engine: {e}")
+    logger.warning("Could not import MIRA V2 query engine: %s", e)
     EvidenceFirstQueryEngine = None
     MaterialConstraints = None
 
@@ -252,9 +256,7 @@ async def hybrid_query(request: HybridQueryRequest):
         )
 
     except Exception as e:
-        print(f"[ERROR] Hybrid query failed: {e}")
-        import traceback
-        traceback.print_exc()
+        logger.error("Hybrid query failed: %s", e, exc_info=True)
 
         return HybridQueryResponse(
             status="error",
@@ -289,7 +291,7 @@ async def query_engine_health():
         try:
             engine.conn.cursor().execute("SELECT 1")
             db_status = "connected"
-        except:
+        except Exception:
             db_status = "disconnected"
 
         return {

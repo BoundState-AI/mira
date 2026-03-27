@@ -17,10 +17,13 @@ Safety Critical: False
 """
 
 import json
+import logging
 import os
 import numpy as np
 from typing import List, Dict, Any, Optional
 import re
+
+logger = logging.getLogger(__name__)
 
 try:
     import faiss
@@ -75,9 +78,9 @@ class RobustMAPTISFaissStore:
             index_file = os.path.join(self.index_path, "index.faiss")
             if os.path.exists(index_file):
                 self.index = faiss.read_index(index_file)
-                print(f"[SUCCESS] Loaded FAISS index with {self.index.ntotal} vectors")
+                logger.info("Loaded FAISS index with %d vectors", self.index.ntotal)
             else:
-                print(f"[ERROR] FAISS index not found: {index_file}")
+                logger.error("FAISS index not found: %s", index_file)
                 return False
             
             metadata_file = os.path.join(self.index_path, "metadata.json")
@@ -89,7 +92,7 @@ class RobustMAPTISFaissStore:
                     wrapped = self.metadata.get("metadata")
                     if isinstance(wrapped, list):
                         self.metadata = wrapped
-                print(f"[SUCCESS] Loaded metadata for {len(self.metadata) if isinstance(self.metadata, list) else 'unknown'} materials")
+                logger.info("Loaded metadata for %s materials", len(self.metadata) if isinstance(self.metadata, list) else "unknown")
             else:
                 # Fallback: construct metadata from available lookup and id mapping
                 lookup_file = os.path.join(self.index_path, "materials_lookup.json")
@@ -112,23 +115,24 @@ class RobustMAPTISFaissStore:
                             else:
                                 built.append({"material_id": mid, "name": mid})
                         self.metadata = built
-                        print(
-                            f"[WARN] metadata.json not found; built metadata from lookup + id map: {len(self.metadata)} entries"
+                        logger.warning(
+                            "metadata.json not found; built metadata from lookup + id map: %d entries",
+                            len(self.metadata),
                         )
                     except Exception as e:
-                        print(f"[ERROR] Failed to build metadata from fallbacks: {e}")
+                        logger.error("Failed to build metadata from fallbacks: %s", e)
                         return False
                 else:
-                    print(f"[ERROR] Metadata not found and no fallbacks present: {metadata_file}")
+                    logger.error("Metadata not found and no fallbacks present: %s", metadata_file)
                     return False
             
             self.model = SentenceTransformer("all-mpnet-base-v2")
-            print(f"[SUCCESS] Loaded embedding model")
-            
+            logger.info("Loaded embedding model")
+
             return True
-            
+
         except Exception as e:
-            print(f"[ERROR] Error loading index: {e}")
+            logger.error("Error loading index: %s", e)
             return False
     
     def classify_material_type(self, material_name: str, test_types: List[str] = None) -> str:

@@ -82,7 +82,10 @@ category_router = CategoryRouter()
 qualification_plan_generator = QualificationPlanGenerator()
 
 # In-progress investigation tracking (transient, not persisted).
-# Keyed by session_id.  Cleaned up after status is consumed.
+# Keyed by session_id.  Safe without locks because all access runs
+# inside the same asyncio event loop (single-threaded cooperative
+# multitasking).  Entries are cleaned up once a terminal status
+# ("complete" / "failed") is read by the polling endpoint.
 _investigation_progress: dict[str, dict] = {}
 
 # Minimum explicit human-review share across precedent decisions.
@@ -1490,7 +1493,7 @@ async def investigation_status_endpoint(
     progress = _investigation_progress.get(session_id)
 
     if progress is not None:
-        return InvestigationStatusResponse(
+        response = InvestigationStatusResponse(
             session_id=session_id,
             status=progress["status"],
             progress=progress.get("progress", 0),
@@ -1498,6 +1501,11 @@ async def investigation_status_endpoint(
             session_status=session_manager.get_status(session_id),
             error=progress.get("error"),
         )
+        # Clean up transient tracking once a terminal state has been
+        # delivered to the caller to prevent unbounded memory growth.
+        if progress["status"] in {"complete", "failed"}:
+            _investigation_progress.pop(session_id, None)
+        return response
 
     # No active tracking -- check if investigation was already completed.
     if session.investigation_result is not None:
