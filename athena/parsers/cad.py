@@ -272,7 +272,7 @@ class EnhancedCADParser(DocumentParser):
                 Content preview: {content[:200]}...
                 """
 
-            except:
+            except (UnicodeDecodeError, ValueError, OSError):
                 # Binary file
                 searchable_text = f"""
                 Engineering Data File: {filename}
@@ -303,7 +303,7 @@ class EnhancedCADParser(DocumentParser):
                 'modified_time': str(file_stat.st_mtime),
                 'created_time': str(file_stat.st_ctime) if hasattr(file_stat, 'st_ctime') else None
             }
-        except:
+        except OSError:
             return {}
 
     def _extract_solidworks_binary_metadata(self) -> Dict[str, str]:
@@ -322,7 +322,7 @@ class EnhancedCADParser(DocumentParser):
                     decoded = text_bytes.decode('ascii')
                     if any(keyword in decoded.lower() for keyword in ['material', 'steel', 'aluminum', 'description']):
                         decoded_strings.append(decoded)
-                except:
+                except UnicodeDecodeError:
                     continue
 
             # Extract specific metadata
@@ -358,7 +358,7 @@ class EnhancedCADParser(DocumentParser):
                 'component_count': len(components)
             }
 
-        except:
+        except OSError:
             return {}
 
     def _find_related_parts(self) -> List[str]:

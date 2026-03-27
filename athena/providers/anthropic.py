@@ -95,6 +95,7 @@ class AnthropicProvider:
             max_tokens=max_tokens,
             system=system_prompt,
             messages=[{"role": "user", "content": content}],
+            timeout=120,
         )
 
         latency_ms = int((datetime.utcnow() - start).total_seconds() * 1000)
@@ -138,6 +139,7 @@ class AnthropicProvider:
             max_tokens=max_tokens,
             system=system_prompt,
             messages=[{"role": "user", "content": [{"type": "text", "text": user_prompt}]}],
+            timeout=120,
         )
 
         latency_ms = int((datetime.utcnow() - start).total_seconds() * 1000)

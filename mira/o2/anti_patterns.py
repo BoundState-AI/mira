@@ -526,7 +526,7 @@ def check_conditions(
                         try:
                             thickness = float(replacement[prop])
                             break
-                        except:
+                        except (ValueError, TypeError):
                             pass
                 if thickness and thickness < threshold:
                     return True
@@ -542,7 +542,7 @@ def extract_max_temperature(material: Dict) -> float:
         if "temperature" in report.get("TestType", "").lower():
             try:
                 return float(report.get("Result", 0))
-            except:
+            except (ValueError, TypeError):
                 pass
     
     # Check direct properties
@@ -550,7 +550,7 @@ def extract_max_temperature(material: Dict) -> float:
         if key in material:
             try:
                 return float(material[key])
-            except:
+            except (ValueError, TypeError):
                 pass
     
     return None

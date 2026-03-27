@@ -295,6 +295,15 @@ def get_db_connection_params(
     return config.to_dict()
 
 
+def _default_statement_timeout_ms() -> int:
+    """Return the default per-statement timeout in milliseconds.
+
+    Configurable via ``MIRA_DB_STATEMENT_TIMEOUT_MS`` (default 30 000 ms).
+    Set to ``0`` to disable.
+    """
+    return int(os.environ.get("MIRA_DB_STATEMENT_TIMEOUT_MS", "30000"))
+
+
 def open_db_connection(
     host: Optional[str] = None,
     port: Optional[int] = None,
@@ -311,6 +320,13 @@ def open_db_connection(
     params = config.to_dict()
     if connect_timeout is not None:
         params["connect_timeout"] = connect_timeout
+
+    # Apply statement_timeout to prevent runaway queries
+    stmt_timeout = _default_statement_timeout_ms()
+    if stmt_timeout > 0:
+        existing = params.get("options", "")
+        timeout_opt = f"-c statement_timeout={stmt_timeout}"
+        params["options"] = f"{existing} {timeout_opt}".strip() if existing else timeout_opt
 
     if not _pool_enabled():
         return psycopg2.connect(**params)

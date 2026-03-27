@@ -541,7 +541,7 @@ class DocumentDiscoveryIndex:
                 if file.is_file():
                     total_size += file.stat().st_size
             return round(total_size / (1024 * 1024), 2)
-        except:
+        except OSError:
             return 0.0
 
     def save_index(self):

@@ -52,7 +52,7 @@ class EngineeringOCR:
         # Initialize EasyOCR for better handling of technical text
         try:
             self.easyocr_reader = easyocr.Reader(['en'], gpu=True)
-        except:
+        except (RuntimeError, OSError):
             logger.warning("GPU not available for EasyOCR, using CPU")
             self.easyocr_reader = easyocr.Reader(['en'], gpu=False)
 

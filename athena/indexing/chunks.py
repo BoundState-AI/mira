@@ -465,7 +465,7 @@ class SmartChunksIndex:
             for i in range(self.index.ntotal):
                 try:
                     vecs.append(self.index.reconstruct(i))
-                except:
+                except RuntimeError:
                     break
             return np.vstack(vecs) if vecs else np.zeros((0, self.dim), dtype=np.float32)
 

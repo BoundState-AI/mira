@@ -12,12 +12,14 @@ from __future__ import annotations
 import logging
 import os
 import sys
+import uuid
 from pathlib import Path
 from typing import Optional
 
 from dotenv import load_dotenv
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response as StarletteResponse
 
@@ -114,6 +116,63 @@ def _build_cors_origins() -> list[str]:
     return sorted(set(origins))
 
 
+# ---------------------------------------------------------------------------
+# Upload size limit — reject oversized payloads before reading into memory
+# ---------------------------------------------------------------------------
+_MAX_UPLOAD_BYTES = int(os.getenv("MIRA_MAX_UPLOAD_MB", "100")) * 1024 * 1024
+
+
+class UploadSizeLimitMiddleware(BaseHTTPMiddleware):
+    """Reject requests whose Content-Length exceeds the configured limit.
+
+    Prevents memory exhaustion from oversized file uploads.  The limit
+    defaults to 100 MB and is configurable via ``MIRA_MAX_UPLOAD_MB``.
+    """
+
+    async def dispatch(self, request: Request, call_next) -> StarletteResponse:
+        content_length = request.headers.get("content-length")
+        if content_length and int(content_length) > _MAX_UPLOAD_BYTES:
+            return JSONResponse(
+                status_code=413,
+                content={"detail": "Payload too large"},
+            )
+        return await call_next(request)
+
+
+# ---------------------------------------------------------------------------
+# Error sanitisation — hide internal details from production responses
+# ---------------------------------------------------------------------------
+
+
+class ErrorSanitisationMiddleware(BaseHTTPMiddleware):
+    """Catch unhandled 5xx responses and strip internal details in production.
+
+    In development the original body is passed through.  In production a
+    generic message with a correlation ID is returned so that operators can
+    match logs to user-reported failures without leaking stack traces.
+    """
+
+    async def dispatch(self, request: Request, call_next) -> StarletteResponse:
+        response = await call_next(request)
+        if (
+            os.getenv("MIRA_ENV", "development").lower() == "production"
+            and response.status_code >= 500
+        ):
+            error_id = uuid.uuid4().hex[:8]
+            logging.getLogger("mira.errors").error(
+                "Unhandled server error [%s] %s %s -> %d",
+                error_id,
+                request.method,
+                request.url.path,
+                response.status_code,
+            )
+            return JSONResponse(
+                status_code=response.status_code,
+                content={"detail": f"Internal server error (ref: {error_id})"},
+            )
+        return response
+
+
 # M1: Security headers middleware
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """Add standard security headers to all responses."""
@@ -196,13 +255,50 @@ def _register_direct_routers(app: FastAPI, chat_router: APIRouter | None) -> Non
 def _register_health_routes(app: FastAPI) -> None:
     @app.get("/health", tags=["system"])
     async def health() -> dict[str, str]:
-        """ALB/container health check endpoint."""
+        """ALB/container health check — lightweight, always fast."""
         return {"status": "ok"}
 
     @app.get("/api/health", tags=["system"])
     async def api_health() -> dict[str, str]:
         """Backward-compatible health endpoint for /api clients."""
         return {"status": "ok"}
+
+    @app.get("/health/ready", tags=["system"])
+    async def readiness() -> JSONResponse:
+        """Deep readiness probe — verifies downstream dependencies.
+
+        Returns 200 if all dependencies are reachable, 503 otherwise.
+        Suitable for load-balancer readiness checks that should only
+        route traffic to instances that can actually serve requests.
+        """
+        checks: dict[str, str] = {}
+
+        # --- Database ---
+        try:
+            import psycopg2
+            from mira.core.db_config import get_db_connection_params
+            params = get_db_connection_params()
+            params["connect_timeout"] = 3
+            conn = psycopg2.connect(**params)
+            conn.cursor().execute("SELECT 1")
+            conn.close()
+            checks["database"] = "ok"
+        except Exception as exc:
+            checks["database"] = f"error: {type(exc).__name__}"
+
+        # --- LLM provider (basic client init) ---
+        try:
+            from mira.providers.llm_provider import get_provider
+            get_provider()
+            checks["llm_provider"] = "ok"
+        except Exception as exc:
+            checks["llm_provider"] = f"error: {type(exc).__name__}"
+
+        all_ok = all(v == "ok" for v in checks.values())
+        return JSONResponse(
+            status_code=200 if all_ok else 503,
+            content={"status": "ready" if all_ok else "degraded", "checks": checks},
+        )
 
 
 def _log_startup_identity(app: FastAPI, *, app_identity_file: str) -> None:
@@ -249,6 +345,8 @@ def create_app(
 
     _validate_runtime_environment(chat_router=chat_router)
     app.add_middleware(SecurityHeadersMiddleware)  # M1: Security headers
+    app.add_middleware(ErrorSanitisationMiddleware)  # Strip internal details in prod
+    app.add_middleware(UploadSizeLimitMiddleware)  # Reject oversized uploads
     if rate_limit_enabled():
         app.add_middleware(
             ApiRateLimitMiddleware,

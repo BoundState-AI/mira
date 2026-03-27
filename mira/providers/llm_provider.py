@@ -163,8 +163,18 @@ class BedrockConverseProvider:
         if response_format and response_format.lower() == "json":
             sys_text = f"{system}\n\nYou MUST respond with valid JSON only."
 
+        # Apply per-request read timeout if the caller specified one.
+        # boto3 does not expose a per-call timeout on converse(), so we
+        # configure it on the underlying HTTP client via botocore config.
+        client = self._client
+        if timeout_s is not None:
+            import botocore.config
+            cfg = botocore.config.Config(read_timeout=int(timeout_s), retries={"max_attempts": 2})
+            import boto3
+            client = boto3.client("bedrock-runtime", region_name=self._region, config=cfg)
+
         t0 = time.monotonic()
-        response = self._client.converse(
+        response = client.converse(
             modelId=model_id,
             system=[{"text": sys_text}],
             messages=converse_msgs,
