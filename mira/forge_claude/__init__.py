@@ -16,10 +16,10 @@ __version__ = "0.1.0"
 
 __path__ = extend_path(__path__, __name__)
 
-_BOUNDSTATE_ROOT = Path(__file__).resolve().parents[3]
+_REPO_ROOT = Path(__file__).resolve().parents[2]
 _FORGE_SOURCE_CANDIDATES = (
-    _BOUNDSTATE_ROOT / "boundstate_forge" / "forge_claude",
-    _BOUNDSTATE_ROOT / "mira" / "boundstate_forge" / "forge_claude",
+    _REPO_ROOT.parent / "boundstate_forge" / "forge_claude",
+    _REPO_ROOT / "boundstate_forge" / "forge_claude",
 )
 for _forge_source in _FORGE_SOURCE_CANDIDATES:
     if _forge_source.exists():
