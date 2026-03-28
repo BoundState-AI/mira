@@ -6,9 +6,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { AuthProvider } from "@/auth/AuthContext";
 import { ProtectedRoute } from "@/auth/ProtectedRoute";
+import { TemporarilyUnavailableNotice } from "@/components/TemporarilyUnavailableModule";
 import KnowledgeTwins from "./pages/KnowledgeTwins";
-import TestClasses from "./pages/TestClasses";
-import TestClassDetail from "./pages/TestClassDetail";
 // import MIULBuilder from "./pages/MIULBuilder";  // Deprecated: replaced by V4 production builder
 import MPPlanGenerator from "./pages/MPPlanGenerator";
 import DTTreeEditor from "./pages/DTTreeEditor";
@@ -16,7 +15,6 @@ import MIULBuilderV4 from "./pages/MIULBuilderV4";
 import MiraChat from "./pages/MiraChat";
 import MiraV4Query from "./pages/MiraV4Query";
 import BSMHQuery from "./pages/BSMHQuery";
-import MUAV10 from "./pages/MUAV10";
 import GasCompatibility from "./pages/GasCompatibility";
 import GalvanicCompatibility from "./pages/GalvanicCompatibility";
 import FractureControl from "./pages/FractureControl";
@@ -26,6 +24,14 @@ import NotFound from "./pages/NotFound";
 import TOCR from "./pages/TOCR";
 
 const queryClient = new QueryClient();
+
+function InactiveModulePage({ moduleName }: { moduleName: string }) {
+  return (
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8">
+      <TemporarilyUnavailableNotice moduleName={moduleName} />
+    </div>
+  );
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -55,8 +61,14 @@ const App = () => (
                 <Route path="/oca" element={<Navigate to="/oca/workbench" replace />} />
                 <Route path="/oca/workbench" element={<OCAWorkbench />} />
                 <Route path="/oca/system-builder" element={<OCASystemBuilder />} />
-                <Route path="/test-classes" element={<TestClasses />} />
-                <Route path="/test-classes/:testType" element={<TestClassDetail />} />
+                <Route
+                  path="/test-classes"
+                  element={<InactiveModulePage moduleName="MAPTIS Search" />}
+                />
+                <Route
+                  path="/test-classes/:testType"
+                  element={<InactiveModulePage moduleName="MAPTIS Search" />}
+                />
                 <Route
                   path="/miul"
                   element={(
@@ -65,12 +77,12 @@ const App = () => (
                     </ProtectedRoute>
                   )}
                 />
-                <Route path="/mua" element={<Navigate to="/mua-v10" replace />} />
-                <Route path="/mua/v7" element={<Navigate to="/mua-v10" replace />} />
-                <Route path="/mua/v8" element={<Navigate to="/mua-v10" replace />} />
-                <Route path="/mua/v10" element={<Navigate to="/mua-v10" replace />} />
-                <Route path="/mua/matchmaker" element={<Navigate to="/mua-v10" replace />} />
-                <Route path="/mua/matchmaker/*" element={<Navigate to="/mua-v10" replace />} />
+                <Route path="/mua" element={<InactiveModulePage moduleName="MUA Writer" />} />
+                <Route path="/mua/v7" element={<InactiveModulePage moduleName="MUA Writer" />} />
+                <Route path="/mua/v8" element={<InactiveModulePage moduleName="MUA Writer" />} />
+                <Route path="/mua/v10" element={<InactiveModulePage moduleName="MUA Writer" />} />
+                <Route path="/mua/matchmaker" element={<InactiveModulePage moduleName="MUA Writer" />} />
+                <Route path="/mua/matchmaker/*" element={<InactiveModulePage moduleName="MUA Writer" />} />
                 <Route path="/compliance" element={<Navigate to="/query" replace />} />
                 <Route path="/mp-plan" element={<MPPlanGenerator />} />
                 <Route
@@ -83,9 +95,9 @@ const App = () => (
                 />
                 <Route path="/v4-query" element={<MiraV4Query />} />
                 <Route path="/bsmh" element={<Navigate to="/query" replace />} />
-                <Route path="/mua-v7" element={<Navigate to="/mua-v10" replace />} />
-                <Route path="/mua-v8" element={<Navigate to="/mua-v10" replace />} />
-                <Route path="/mua-v10" element={<MUAV10 />} />
+                <Route path="/mua-v7" element={<InactiveModulePage moduleName="MUA Writer" />} />
+                <Route path="/mua-v8" element={<InactiveModulePage moduleName="MUA Writer" />} />
+                <Route path="/mua-v10" element={<InactiveModulePage moduleName="MUA Writer" />} />
                 <Route path="/forge" element={<Navigate to="/" replace />} />
                 <Route path="/forge-explorer" element={<Navigate to="/" replace />} />
                 <Route path="/tocr" element={<TOCR />} />

@@ -14,6 +14,7 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
+from mira.api.module_controls import runtime_key_enabled
 from mira.guidance.models import AuthorityRegistryEntry, GuidancePack
 
 
@@ -67,6 +68,8 @@ GuidancePackVersionResponse.model_rebuild()
 
 
 def _get_pack_source(pack_id: str) -> dict[str, Path]:
+    if pack_id == "mira-mua-guidance" and not runtime_key_enabled("guidance:mua"):
+        raise HTTPException(status_code=404, detail=f"Unknown guidance pack '{pack_id}'.")
     try:
         return _PACK_SOURCES[pack_id]
     except KeyError as exc:

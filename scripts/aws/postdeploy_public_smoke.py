@@ -37,7 +37,6 @@ CRITICAL_ROUTE_CHECKS: tuple[RouteCheck, ...] = (
     RouteCheck("/api/tocr/ping", (200, 401, 403), "TOCR router mounted"),
     RouteCheck("/api/forge/ping", (200, 401, 403), "FORGE router mounted"),
     RouteCheck("/api/mp-plan/v2/ping", (200, 401, 403), "M&P Plan v2 router mounted"),
-    RouteCheck("/api/mua/v10/ping", (200, 401, 403), "MUA v10 router mounted"),
     RouteCheck(
         "/api/oca/ping",
         (200, 401, 403),
@@ -47,6 +46,18 @@ CRITICAL_ROUTE_CHECKS: tuple[RouteCheck, ...] = (
     RouteCheck("/api/mira/galvanic/ping", (200, 401, 403), "galvanic router mounted"),
     RouteCheck("/api/mira/fracture/ping", (200, 401, 403), "fracture router mounted"),
     RouteCheck("/api/mira/h2/ping", (200, 401, 403), "H2 router mounted"),
+)
+
+DISABLED_ROUTE_CHECKS: tuple[RouteCheck, ...] = (
+    RouteCheck("/api/mua/ping", (404,), "MUA router disabled"),
+    RouteCheck("/api/mua/matchmaker/ping", (404,), "MUA matchmaker router disabled"),
+    RouteCheck("/api/mua/v10/ping", (404,), "MUA v10 router disabled"),
+    RouteCheck("/api/test-classes/counts", (404,), "MAPTIS search router disabled"),
+    RouteCheck(
+        "/api/guidance/packs/mira-mua-guidance/version",
+        (404,),
+        "MUA guidance pack disabled",
+    ),
 )
 
 
@@ -143,6 +154,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         health_results = _run_checks(base_url, HEALTH_CHECKS, health=True)
         route_results = _run_checks(base_url, CRITICAL_ROUTE_CHECKS, health=False)
+        disabled_results = _run_checks(base_url, DISABLED_ROUTE_CHECKS, health=False)
     except Exception as exc:  # pragma: no cover - CLI guard
         if args.json_out:
             _write_json(
@@ -161,6 +173,7 @@ def main(argv: list[str] | None = None) -> int:
         "base_url": base_url,
         "health_checks": health_results,
         "critical_route_checks": route_results,
+        "disabled_route_checks": disabled_results,
     }
     if args.json_out:
         _write_json(args.json_out, summary)

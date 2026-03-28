@@ -133,14 +133,6 @@ REQUIRED_RUNTIME_ASSETS: tuple[RuntimeAsset, ...] = (
         notes="Universal guidance pack for the OCA module.",
     ),
     RuntimeAsset(
-        asset_id="mua_guidance_pack",
-        relative_path="frontend/src/data/mua-guidance-pack.json",
-        domain="guidance",
-        sha256="c685dcb1f97e47071f7a25806562feb5e67b9357a51e0d91c5f4015215c8c208",
-        required_by=("mira.api.routers.guidance",),
-        notes="Universal guidance pack for the MUA module.",
-    ),
-    RuntimeAsset(
         asset_id="miul_guidance_pack",
         relative_path="frontend/src/data/miul-guidance-pack.json",
         domain="guidance",

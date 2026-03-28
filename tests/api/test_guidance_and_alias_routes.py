@@ -6,7 +6,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from mira.api.app_factory import _register_alias_routers
+from mira.api.app_factory import _register_alias_routers, _register_direct_routers
 
 
 def _load_router_module(filename: str, module_name: str):
@@ -37,6 +37,20 @@ def test_guidance_version_and_authority_registry_endpoints() -> None:
     assert "auth-bs-spec-oca-001-rev1" in authority_payload
 
 
+def test_guidance_router_hides_disabled_mua_pack(monkeypatch) -> None:
+    monkeypatch.setenv("MIRA_DISABLED_RUNTIME_KEYS", "guidance:mua")
+    module = _load_router_module("guidance.py", "guidance_router_disabled_pack_test_module")
+    app = FastAPI()
+    app.include_router(module.router, prefix="/api/guidance")
+    client = TestClient(app)
+
+    hidden_response = client.get("/api/guidance/packs/mira-mua-guidance/version")
+    assert hidden_response.status_code == 404
+
+    visible_response = client.get("/api/guidance/packs/mira-oca-guidance/version")
+    assert visible_response.status_code == 200
+
+
 def test_app_factory_mounts_oca_without_double_prefix() -> None:
     app = FastAPI()
     _register_alias_routers(app)
@@ -48,3 +62,20 @@ def test_app_factory_mounts_oca_without_double_prefix() -> None:
 
     double_prefixed = client.get("/api/oca/oca/ping")
     assert double_prefixed.status_code == 404
+
+
+def test_app_factory_skips_disabled_inactive_routes(monkeypatch) -> None:
+    monkeypatch.setenv(
+        "MIRA_DISABLED_RUNTIME_KEYS",
+        "mua,mua-v6,mua-v7,mua-v10,mua-matchmaker,test-classes",
+    )
+    app = FastAPI()
+    _register_alias_routers(app)
+    _register_direct_routers(app, None)
+    client = TestClient(app)
+
+    assert client.get("/api/mua/ping").status_code == 404
+    assert client.get("/api/mua/matchmaker/ping").status_code == 404
+    assert client.get("/api/mua/v10/ping").status_code == 404
+    assert client.get("/api/test-classes/counts").status_code == 404
+    assert client.get("/api/oca/ping").status_code == 200

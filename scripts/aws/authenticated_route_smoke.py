@@ -64,7 +64,6 @@ AUTH_ROUTE_CHECKS: tuple[AuthRouteCheck, ...] = (
     AuthRouteCheck("/api/tocr/guidance", "TOCR guidance pack", _validate_tocr_guidance),
     AuthRouteCheck("/api/forge/ping", "FORGE authenticated ping", _validate_ping("forge")),
     AuthRouteCheck("/api/mp-plan/v2/ping", "M&P Plan v2 authenticated ping", _validate_ping("mp_plan_v2_codex")),
-    AuthRouteCheck("/api/mua/v10/ping", "MUA v10 authenticated ping", _validate_ping("mua-v10")),
     AuthRouteCheck("/api/mira/h2/materials", "H2 materials payload", _validate_h2_guidance),
 )
 
