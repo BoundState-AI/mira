@@ -302,6 +302,47 @@ export default function DTTreeEditor() {
     registerRouteModuleChatState("/dt-editor", drawingTreeChatLaunchState);
   }, [drawingTreeChatLaunchState]);
 
+  const getExtractionErrorMessage = useCallback(
+    async (response: Response): Promise<string> => {
+      const contentType = response.headers.get("content-type") || "";
+      const rawText = await response.text();
+
+      if (response.status === 503) {
+        return t("toast.error.serviceUnavailable", {
+          defaultValue: "Drawing Tree extraction is temporarily unavailable. Retry in a minute.",
+        });
+      }
+
+      if (response.status === 504) {
+        return t("toast.error.gatewayTimeout", {
+          defaultValue: "Drawing Tree extraction timed out. Retry with a smaller or cleaner PDF if this keeps happening.",
+        });
+      }
+
+      if (contentType.includes("application/json")) {
+        try {
+          const payload = JSON.parse(rawText) as { detail?: unknown };
+          if (typeof payload.detail === "string" && payload.detail.trim()) {
+            return payload.detail.trim();
+          }
+        } catch {
+          // Fall through to the generic message below.
+        }
+      }
+
+      const normalizedText = rawText.replace(/\s+/g, " ").trim();
+      if (!normalizedText || normalizedText.startsWith("<")) {
+        return t("toast.error.genericExtractionFailed", {
+          defaultValue: `Extraction failed (${response.status}). Retry and check the service health if it repeats.`,
+          status: response.status,
+        });
+      }
+
+      return normalizedText.slice(0, 240);
+    },
+    [t],
+  );
+
   // ============================================================================
   // File Operations
   // ============================================================================
@@ -434,8 +475,8 @@ export default function DTTreeEditor() {
         });
 
         if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Extraction failed: ${errorText}`);
+          const errorMessage = await getExtractionErrorMessage(response);
+          throw new Error(errorMessage);
         }
 
         setExtractionProgress(
@@ -491,7 +532,7 @@ export default function DTTreeEditor() {
         setExtractionProgress("");
       }
     },
-    [toast, t]
+    [getExtractionErrorMessage, toast, t]
   );
 
   const handleExport = useCallback(() => {
