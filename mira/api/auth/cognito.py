@@ -26,8 +26,22 @@ security = HTTPBearer(auto_error=False)
 _jwks_cache: TTLCache = TTLCache(maxsize=2, ttl=3600)
 
 
+def auth_mode() -> str:
+    value = os.getenv("MIRA_AUTH_MODE", "cognito").strip().lower()
+    return value or "cognito"
+
+
+def _is_production_environment() -> bool:
+    environment = (
+        os.getenv("MIRA_ENV")
+        or os.getenv("ENVIRONMENT")
+        or "development"
+    ).strip().lower()
+    return environment == "production"
+
+
 def auth_enabled() -> bool:
-    return os.getenv("MIRA_AUTH_MODE", "cognito").strip().lower() == "cognito"
+    return auth_mode() == "cognito"
 
 
 def _parse_prefixes(env_name: str, default: tuple[str, ...]) -> tuple[str, ...]:
@@ -45,6 +59,18 @@ def _parse_prefixes(env_name: str, default: tuple[str, ...]) -> tuple[str, ...]:
     return tuple(prefixes)
 
 
+def _parse_csv_values(env_name: str) -> tuple[str, ...]:
+    raw = os.getenv(env_name, "")
+    if not raw.strip():
+        return ()
+    values: list[str] = []
+    for item in raw.split(","):
+        cleaned = item.strip()
+        if cleaned:
+            values.append(cleaned)
+    return tuple(values)
+
+
 PUBLIC_EXACT_PATHS = {
     "/health",
     "/openapi.json",
@@ -57,6 +83,7 @@ PUBLIC_PREFIX_PATHS = (
 
 ITAR_PATH_PREFIXES = _parse_prefixes("ITAR_PATH_PREFIXES", ("/miul", "/bom"))
 ADMIN_PATH_PREFIXES = _parse_prefixes("ADMIN_PATH_PREFIXES", ())
+IC_AUTH_PATH_PREFIXES = _parse_prefixes("IC_AUTH_PATH_PREFIXES", ("/ic",))
 
 
 def _candidate_paths(path: str) -> tuple[str, ...]:
@@ -89,6 +116,13 @@ def requires_admin(path: str) -> bool:
     return False
 
 
+def is_ic_path(path: str) -> bool:
+    for candidate in _candidate_paths(path):
+        if any(candidate.startswith(prefix) for prefix in IC_AUTH_PATH_PREFIXES):
+            return True
+    return False
+
+
 def _get_cognito_config() -> dict[str, str]:
     region = os.getenv("COGNITO_REGION", "us-gov-west-1").strip()
     user_pool_id = (os.getenv("COGNITO_USER_POOL_ID") or "").strip()
@@ -112,7 +146,12 @@ def _get_cognito_config() -> dict[str, str]:
 
 
 def validate_auth_configuration() -> None:
-    if not auth_enabled():
+    mode = auth_mode()
+    if mode != "cognito":
+        if _is_production_environment():
+            raise RuntimeError(
+                f"MIRA_AUTH_MODE={mode!r} is not allowed in production; set MIRA_AUTH_MODE=cognito."
+            )
         LOGGER.warning("MIRA auth mode is disabled; API is running without Cognito enforcement.")
         return
     _get_cognito_config()
@@ -222,6 +261,17 @@ def _extract_bearer_token(authorization_header: str | None) -> str | None:
 
 
 async def verify_token_string(token: str) -> dict[str, Any]:
+    return await _verify_token_string(token)
+
+
+def _allowed_client_ids_for_path(path: str | None, primary_client_id: str) -> set[str]:
+    allowed = {primary_client_id}
+    if path and is_ic_path(path):
+        allowed.update(_parse_csv_values("IC_ALLOWED_CLIENT_IDS"))
+    return {value for value in allowed if value}
+
+
+async def _verify_token_string(token: str, *, path: str | None = None) -> dict[str, Any]:
     config = _get_cognito_config()
     keys = await _get_jwks(config["jwks_url"])
     key = _find_jwk_for_token(token, keys)
@@ -242,20 +292,21 @@ async def verify_token_string(token: str) -> dict[str, Any]:
         raise HTTPException(status_code=401, detail="Access token required")
 
     client_id = claims.get("client_id")
-    if client_id != config["client_id"]:
+    if client_id not in _allowed_client_ids_for_path(path, config["client_id"]):
         raise HTTPException(status_code=401, detail="Token audience mismatch")
 
     return claims
 
 
 async def verify_token(
+    request: Request,
     credentials: HTTPAuthorizationCredentials | None = Depends(security),
 ) -> dict[str, Any]:
     if not auth_enabled():
         raise HTTPException(status_code=503, detail="Authentication mode disabled")
     if credentials is None or credentials.scheme.lower() != "bearer":
         raise HTTPException(status_code=401, detail="Missing Bearer token")
-    return await verify_token_string(credentials.credentials)
+    return await _verify_token_string(credentials.credentials, path=request.url.path)
 
 
 async def get_current_user(
@@ -336,6 +387,12 @@ class CognitoAuthzMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
         if not auth_enabled():
+            if _is_production_environment():
+                LOGGER.error("Rejecting request because authentication is disabled in production.")
+                return JSONResponse(
+                    status_code=503,
+                    content={"detail": "Authentication is misconfigured for this runtime"},
+                )
             return await call_next(request)
 
         ip_address = _request_ip(request)
@@ -351,7 +408,7 @@ class CognitoAuthzMiddleware(BaseHTTPMiddleware):
             return JSONResponse(status_code=401, content={"detail": "Missing Bearer token"})
 
         try:
-            claims = await verify_token_string(token)
+            claims = await _verify_token_string(token, path=path)
             user = MIRAUser.from_claims(claims)
             request.state.user = user
         except HTTPException as exc:

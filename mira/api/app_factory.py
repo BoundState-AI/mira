@@ -27,6 +27,8 @@ if _ENV_FILE.exists():
 
 from . import routers  # noqa: E402
 from .auth import CognitoAuthzMiddleware, validate_auth_configuration  # noqa: E402
+from .ic_runtime import build_ic_router  # noqa: E402
+from .module_controls import disabled_runtime_keys, runtime_key_enabled  # noqa: E402
 from .rate_limit import (  # noqa: E402
     ApiRateLimitMiddleware,
     rate_limit_enabled,
@@ -166,16 +168,21 @@ def _register_alias_routers(app: FastAPI) -> None:
     # MIUL/MUA/TOCR/FORGE/MP Plan
     _include_with_api_alias(app, routers.miul_router, prefix="/miul", tags=["miul"])
     _include_with_api_alias(app, routers.bom_router, prefix="/bom", tags=["bom"])
-    _include_with_api_alias(app, routers.mua_router, prefix="/mua", tags=["mua"])
-    _include_with_api_alias(app, routers.mua_v6_router, prefix="/mua/v6", tags=["mua-v6"])
-    _include_with_api_alias(app, routers.mua_v7_router, prefix="/mua/v7", tags=["mua-v7"])
-    _include_with_api_alias(app, routers.mua_v10_router, prefix="/mua/v10", tags=["mua-v10"])
-    _include_with_api_alias(
-        app,
-        routers.matchmaker_router,
-        prefix="/mua/matchmaker",
-        tags=["mua-matchmaker-v8"],
-    )
+    if runtime_key_enabled("mua"):
+        _include_with_api_alias(app, routers.mua_router, prefix="/mua", tags=["mua"])
+    if runtime_key_enabled("mua-v6"):
+        _include_with_api_alias(app, routers.mua_v6_router, prefix="/mua/v6", tags=["mua-v6"])
+    if runtime_key_enabled("mua-v7"):
+        _include_with_api_alias(app, routers.mua_v7_router, prefix="/mua/v7", tags=["mua-v7"])
+    if runtime_key_enabled("mua-v10"):
+        _include_with_api_alias(app, routers.mua_v10_router, prefix="/mua/v10", tags=["mua-v10"])
+    if runtime_key_enabled("mua-matchmaker"):
+        _include_with_api_alias(
+            app,
+            routers.matchmaker_router,
+            prefix="/mua/matchmaker",
+            tags=["mua-matchmaker-v8"],
+        )
     _include_with_api_alias(app, routers.forge_router, prefix="/forge", tags=["forge"])
     if getattr(routers, "tocr_router", None) is not None:
         _include_with_api_alias(app, routers.tocr_router, prefix="/tocr", tags=["tocr"])
@@ -196,9 +203,13 @@ def _register_direct_routers(app: FastAPI, chat_router: APIRouter | None) -> Non
     # These routers already own their external prefixes.
     app.include_router(routers.hybrid_query_router, tags=["hybrid-query"])
     app.include_router(routers.ui_router, tags=["ui"])
-    app.include_router(routers.test_classes_router, tags=["test-classes"])
+    if runtime_key_enabled("test-classes"):
+        app.include_router(routers.test_classes_router, tags=["test-classes"])
     if chat_router is not None:
         app.include_router(chat_router, tags=["chat"])
+    ic_router = build_ic_router()
+    app.include_router(ic_router, tags=["ic"])
+    app.include_router(ic_router, prefix="/api", tags=["ic"])
 
 
 def _register_health_routes(app: FastAPI) -> None:
@@ -216,10 +227,11 @@ def _register_health_routes(app: FastAPI) -> None:
 def _log_startup_identity(app: FastAPI, *, app_identity_file: str) -> None:
     startup_log = logging.getLogger("mira.startup")
     startup_log.warning(
-        "APP IDENTITY  python=%s  app_module=%s  routes=%d  critical_routes=%s",
+        "APP IDENTITY  python=%s  app_module=%s  routes=%d  disabled_runtime_keys=%s  critical_routes=%s",
         sys.executable,
         app_identity_file,
         len([route for route in app.router.routes if hasattr(route, "path")]),
+        sorted(disabled_runtime_keys()),
         [
             route.path
             for route in app.router.routes

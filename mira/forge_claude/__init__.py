@@ -1,7 +1,22 @@
-"""FORGE — BoundState Database Intelligence Scaffolder.
+"""FORGE namespace exposed from MIRA.
 
-Point it at any database, it tells you what questions that database can answer,
-then scaffolds a production-ready MVP frontend connected to the BSMH pipeline.
+MIRA still carries a partial in-repo FORGE tree, but the standalone FORGE repo
+owns newer subpackages such as ``contracts`` and ``bsms_engine``. Extending the
+package path lets ``mira.forge_claude.*`` resolve locally first and fall
+through to ``boundstate_forge/forge_claude`` for modules that do not exist in
+this repo.
 """
 
+from __future__ import annotations
+
+from pathlib import Path
+from pkgutil import extend_path
+
 __version__ = "0.1.0"
+
+__path__ = extend_path(__path__, __name__)
+
+_BOUNDSTATE_ROOT = Path(__file__).resolve().parents[3]
+_STANDALONE_FORGE_SOURCE = _BOUNDSTATE_ROOT / "boundstate_forge" / "forge_claude"
+if _STANDALONE_FORGE_SOURCE.exists():
+    __path__.append(str(_STANDALONE_FORGE_SOURCE))

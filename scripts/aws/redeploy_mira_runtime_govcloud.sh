@@ -52,8 +52,12 @@ FRONTEND_SECURITY_GROUP="${FRONTEND_SECURITY_GROUP:-sg-04ed4a32c58123c21}"
 COGNITO_REGION="${COGNITO_REGION:-us-gov-west-1}"
 COGNITO_USER_POOL_ID="${COGNITO_USER_POOL_ID:-us-gov-west-1_nEpMTffMH}"
 COGNITO_CLIENT_ID="${COGNITO_CLIENT_ID:-1tklem8thjkg04ipupvcb1heal}"
-MIRA_AUTH_MODE="${MIRA_AUTH_MODE:-none}"
-VITE_AUTH_BYPASS="${VITE_AUTH_BYPASS:-true}"
+MIRA_AUTH_MODE="${MIRA_AUTH_MODE:-cognito}"
+VITE_AUTH_BYPASS="${VITE_AUTH_BYPASS:-false}"
+MIRA_DISABLED_RUNTIME_KEYS="${MIRA_DISABLED_RUNTIME_KEYS:-mua,mua-v6,mua-v7,mua-v10,mua-matchmaker,test-classes,guidance:mua}"
+IC_ALLOWED_CLIENT_IDS="${IC_ALLOWED_CLIENT_IDS:-31fitjugc832o0s5rdns95gkj6}"
+IC_AUTH_PATH_PREFIXES="${IC_AUTH_PATH_PREFIXES:-/ic}"
+IC_CANONICAL_DB_URL="${IC_CANONICAL_DB_URL:-sqlite:////tmp/boundstate_ic.db}"
 BASE_URL="${BASE_URL:-https://mira.boundstate.ai}"
 JWT_SECRET_KEY="${JWT_SECRET_KEY:-mira-runtime-${DATE_TAG}}"
 BEDROCK_MODEL_ID="${BEDROCK_MODEL_ID:-us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0}"
@@ -105,6 +109,29 @@ require_bin git
   exit 1
 }
 
+to_lower() {
+  printf '%s' "$1" | tr '[:upper:]' '[:lower:]'
+}
+
+is_truthy() {
+  case "$(to_lower "$1")" in
+    1|true|yes|on) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+enforce_secure_runtime_config() {
+  if [ "$(to_lower "${MIRA_AUTH_MODE}")" != "cognito" ]; then
+    echo "Refusing to deploy with MIRA_AUTH_MODE=${MIRA_AUTH_MODE}. Production runtime must enforce Cognito." >&2
+    exit 1
+  fi
+
+  if is_truthy "${VITE_AUTH_BYPASS}"; then
+    echo "Refusing to deploy with VITE_AUTH_BYPASS=${VITE_AUTH_BYPASS}. Hosted frontend auth bypass must stay disabled." >&2
+    exit 1
+  fi
+}
+
 cleanup() {
   if [ -n "${STAGING_DIR}" ] && [ -d "${STAGING_DIR}" ]; then
     rm -rf "${STAGING_DIR}"
@@ -127,6 +154,8 @@ cleanup() {
 }
 
 trap cleanup EXIT
+
+enforce_secure_runtime_config
 
 json_array_from_csv() {
   local csv="$1"
@@ -470,8 +499,12 @@ cat > "${BACKEND_TASK_JSON}" <<JSON
         {"name": "DEBUG", "value": "false"},
         {"name": "ALLOWED_ORIGINS", "value": "${BASE_URL}"},
         {"name": "MIRA_AUTH_MODE", "value": "${MIRA_AUTH_MODE}"},
+        {"name": "MIRA_DISABLED_RUNTIME_KEYS", "value": "${MIRA_DISABLED_RUNTIME_KEYS}"},
         {"name": "ADMIN_PATH_PREFIXES", "value": "/admin"},
         {"name": "COGNITO_REGION", "value": "${COGNITO_REGION}"},
+        {"name": "IC_ALLOWED_CLIENT_IDS", "value": "${IC_ALLOWED_CLIENT_IDS}"},
+        {"name": "IC_AUTH_PATH_PREFIXES", "value": "${IC_AUTH_PATH_PREFIXES}"},
+        {"name": "IC_CANONICAL_DB_URL", "value": "${IC_CANONICAL_DB_URL}"},
         {"name": "ENABLE_AUDIT_LOGGING", "value": "true"},
         {"name": "LLM_PROVIDER", "value": "bedrock-converse"},
         {"name": "LLM_SONNET_MODEL", "value": "${BEDROCK_MODEL_ID}"},

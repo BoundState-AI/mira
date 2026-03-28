@@ -102,7 +102,7 @@ full = [
 mira = "mira.cli:app"
 
 [tool.hatch.build.targets.wheel]
-packages = ["mira", "core", "services", "data", "sentinel"]
+packages = ["mira", "core", "services", "data", "sentinel", "unified"]
 
 [tool.uv]
 dev-dependencies = [
@@ -120,7 +120,7 @@ select = ["E", "F", "I", "W"]
 ignore = ["E501"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "unified/tests"]
 python_files = ["test_*.py"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
