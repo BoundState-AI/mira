@@ -49,14 +49,22 @@ CRITICAL_ROUTE_CHECKS: tuple[RouteCheck, ...] = (
 )
 
 DISABLED_ROUTE_CHECKS: tuple[RouteCheck, ...] = (
-    RouteCheck("/api/mua/ping", (404,), "MUA router disabled"),
-    RouteCheck("/api/mua/matchmaker/ping", (404,), "MUA matchmaker router disabled"),
-    RouteCheck("/api/mua/v10/ping", (404,), "MUA v10 router disabled"),
-    RouteCheck("/api/test-classes/counts", (404,), "MAPTIS search router disabled"),
+    RouteCheck("/api/mua/ping", (401, 403, 404), "MUA router not publicly reachable"),
+    RouteCheck(
+        "/api/mua/matchmaker/ping",
+        (401, 403, 404),
+        "MUA matchmaker router not publicly reachable",
+    ),
+    RouteCheck("/api/mua/v10/ping", (401, 403, 404), "MUA v10 router not publicly reachable"),
+    RouteCheck(
+        "/api/test-classes/counts",
+        (401, 403, 404),
+        "MAPTIS search router not publicly reachable",
+    ),
     RouteCheck(
         "/api/guidance/packs/mira-mua-guidance/version",
-        (404,),
-        "MUA guidance pack disabled",
+        (401, 403, 404),
+        "MUA guidance pack not publicly reachable",
     ),
 )
 
