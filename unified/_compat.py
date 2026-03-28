@@ -8,11 +8,29 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 BOUNDSTATE_ROOT = REPO_ROOT.parent
 SENTINEL_MAIN_ROOT = REPO_ROOT / "sentinel-main"
-FORGE_ROOT = BOUNDSTATE_ROOT / "boundstate_forge"
+
+
+def _candidate_forge_roots() -> tuple[Path, ...]:
+    return (
+        BOUNDSTATE_ROOT / "boundstate_forge",
+        REPO_ROOT / "boundstate_forge",
+    )
+
+
+def _import_first_available(*module_names: str):
+    last_error: ModuleNotFoundError | None = None
+    for module_name in module_names:
+        try:
+            return importlib.import_module(module_name)
+        except ModuleNotFoundError as exc:
+            last_error = exc
+    if last_error is not None:
+        raise last_error
+    raise ModuleNotFoundError("No module names provided")
 
 
 def ensure_external_paths() -> None:
-    for path in (SENTINEL_MAIN_ROOT, FORGE_ROOT):
+    for path in (SENTINEL_MAIN_ROOT, *_candidate_forge_roots()):
         path_str = str(path)
         if path.exists() and path_str not in sys.path:
             sys.path.insert(0, path_str)
@@ -72,22 +90,34 @@ def import_gptl_feature_extractor():
 def import_forge_contract_models():
     ensure_external_paths()
     bootstrap_forge_aliases()
-    return importlib.import_module("forge_claude.contracts.models")
+    return _import_first_available(
+        "forge_claude.contracts.models",
+        "mira.forge_claude.contracts.models",
+    )
 
 
 def import_forge_evidence_module():
     ensure_external_paths()
     bootstrap_forge_aliases()
-    return importlib.import_module("forge_claude.bsms_engine.evidence")
+    return _import_first_available(
+        "forge_claude.bsms_engine.evidence",
+        "mira.forge_claude.bsms_engine.evidence",
+    )
 
 
 def import_forge_bouncer_module():
     ensure_external_paths()
     bootstrap_forge_aliases()
-    return importlib.import_module("forge_claude.bsms_engine.bouncer")
+    return _import_first_available(
+        "forge_claude.bsms_engine.bouncer",
+        "mira.forge_claude.bsms_engine.bouncer",
+    )
 
 
 def import_forge_personality_module():
     ensure_external_paths()
     bootstrap_forge_aliases()
-    return importlib.import_module("forge_claude.chat.personality")
+    return _import_first_available(
+        "forge_claude.chat.personality",
+        "mira.forge_claude.chat.personality",
+    )

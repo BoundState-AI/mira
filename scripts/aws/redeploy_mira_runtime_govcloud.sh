@@ -9,6 +9,8 @@ PREDEPLOY_TEST_PYTHON="${PREDEPLOY_TEST_PYTHON:-/tmp/mira-mpplan-venv/bin/python
 export AWS_PROFILE AWS_REGION AWS_DEFAULT_REGION AWS_PAGER PREDEPLOY_TEST_PYTHON
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+BOUNDSTATE_ROOT="$(dirname "${ROOT_DIR}")"
+FORGE_ROOT="${FORGE_ROOT:-${BOUNDSTATE_ROOT}/boundstate_forge}"
 DOCKER_BIN="${DOCKER_BIN:-/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe}"
 DATE_TAG="$(date +%Y%m%d-%H%M%S)"
 IMAGE_TAG="${IMAGE_TAG:-runtime-${DATE_TAG}}"
@@ -260,6 +262,10 @@ prepare_snapshot_from_ref() {
   local source_ref="$1"
   STAGING_DIR="$(mktemp -d)"
   git -C "${ROOT_DIR}" archive "${source_ref}" | tar -xf - -C "${STAGING_DIR}"
+  if [ -d "${FORGE_ROOT}/.git" ]; then
+    mkdir -p "${STAGING_DIR}/boundstate_forge"
+    git -C "${FORGE_ROOT}" archive HEAD | tar -xf - -C "${STAGING_DIR}/boundstate_forge"
+  fi
   BUILD_ROOT="${STAGING_DIR}"
 }
 

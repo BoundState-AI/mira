@@ -20,9 +20,13 @@ from .models import ForgeCompileRequest, ForgeCompileResponse, ForgeGeneratedBun
 __path__ = extend_path(__path__, __name__)
 
 _BOUNDSTATE_ROOT = Path(__file__).resolve().parents[3]
-_STANDALONE_FORGE_SOURCE = _BOUNDSTATE_ROOT / "boundstate_forge" / "mira" / "forge"
-if _STANDALONE_FORGE_SOURCE.exists():
-    __path__.append(str(_STANDALONE_FORGE_SOURCE))
+_FORGE_SOURCE_CANDIDATES = (
+    _BOUNDSTATE_ROOT / "boundstate_forge" / "mira" / "forge",
+    _BOUNDSTATE_ROOT / "mira" / "boundstate_forge" / "mira" / "forge",
+)
+for _forge_source in _FORGE_SOURCE_CANDIDATES:
+    if _forge_source.exists():
+        __path__.append(str(_forge_source))
 
 __all__ = [
     "ForgeCompiler",

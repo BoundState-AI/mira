@@ -17,6 +17,10 @@ __version__ = "0.1.0"
 __path__ = extend_path(__path__, __name__)
 
 _BOUNDSTATE_ROOT = Path(__file__).resolve().parents[3]
-_STANDALONE_FORGE_SOURCE = _BOUNDSTATE_ROOT / "boundstate_forge" / "forge_claude"
-if _STANDALONE_FORGE_SOURCE.exists():
-    __path__.append(str(_STANDALONE_FORGE_SOURCE))
+_FORGE_SOURCE_CANDIDATES = (
+    _BOUNDSTATE_ROOT / "boundstate_forge" / "forge_claude",
+    _BOUNDSTATE_ROOT / "mira" / "boundstate_forge" / "forge_claude",
+)
+for _forge_source in _FORGE_SOURCE_CANDIDATES:
+    if _forge_source.exists():
+        __path__.append(str(_forge_source))
