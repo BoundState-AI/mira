@@ -26,7 +26,7 @@ class UsageEventRequest(BaseModel):
 
     model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
 
-    event_type: Literal["pageview"] = "pageview"
+    event_type: Literal["pageview", "signup_complete"] = "pageview"
     path: str = Field(..., min_length=1, max_length=256)
     module_id: str = Field(..., min_length=1, max_length=128)
     page_label: str | None = Field(default=None, max_length=160)

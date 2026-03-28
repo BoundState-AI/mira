@@ -38,6 +38,36 @@ def test_usage_event_endpoint_records_pageview(monkeypatch) -> None:
     assert '"client_ip":"203.0.113.42"' in logged_message
 
 
+def test_usage_event_endpoint_records_signup_complete(monkeypatch) -> None:
+    app = FastAPI()
+    app.include_router(router, prefix="/api/usage")
+    client = TestClient(app)
+
+    logger_info = Mock()
+    monkeypatch.setattr("mira.api.routers.usage.LOGGER.info", logger_info)
+
+    response = client.post(
+        "/api/usage/events",
+        json={
+            "event_type": "signup_complete",
+            "path": "/signup/complete",
+            "module_id": "auth",
+            "page_label": "Signup Complete",
+            "navigation_type": "unknown",
+            "client_session_id": "signup-session-12345678",
+            "referrer": None,
+        },
+        headers={"X-Forwarded-For": "203.0.113.50", "User-Agent": "pytest-agent"},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {"accepted": True}
+    logger_info.assert_called_once()
+    logged_message = logger_info.call_args.args[1]
+    assert '"event_type":"signup_complete"' in logged_message
+    assert '"path":"/signup/complete"' in logged_message
+
+
 def test_usage_event_endpoint_rejects_non_absolute_paths() -> None:
     app = FastAPI()
     app.include_router(router, prefix="/api/usage")

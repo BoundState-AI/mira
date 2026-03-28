@@ -8,7 +8,11 @@ export function LoginPage() {
     stage,
     pendingUsername,
     mfaSecret,
+    signupDelivery,
     passwordResetDelivery,
+    goToSignup,
+    signUp,
+    confirmSignUp,
     login,
     completeNewPassword,
     verifyMfa,
@@ -23,6 +27,7 @@ export function LoginPage() {
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [mfaCode, setMfaCode] = useState("");
+  const [signupCode, setSignupCode] = useState("");
   const [resetCode, setResetCode] = useState("");
   const [resetPassword, setResetPassword] = useState("");
   const [error, setError] = useState("");
@@ -77,6 +82,33 @@ export function LoginPage() {
       await login(username, password);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignUp = async (event: FormEvent) => {
+    event.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      await signUp(username, password);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Signup failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleConfirmSignUp = async (event: FormEvent) => {
+    event.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      await confirmSignUp(signupCode.trim());
+      setSignupCode("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Confirmation failed.");
     } finally {
       setLoading(false);
     }
@@ -155,6 +187,11 @@ export function LoginPage() {
     goToForgotPassword();
   };
 
+  const handleGoToSignup = () => {
+    setError("");
+    goToSignup();
+  };
+
   const handleGoToLogin = () => {
     setError("");
     goToLogin();
@@ -182,7 +219,7 @@ export function LoginPage() {
           <form onSubmit={handleLogin} className="space-y-3">
             <input
               className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
-              placeholder="Username"
+              placeholder="Username or email"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               autoComplete="username"
@@ -209,6 +246,85 @@ export function LoginPage() {
               className="w-full text-sm text-slate-600 underline underline-offset-2 hover:text-slate-900"
             >
               Forgot your password?
+            </button>
+            <button
+              type="button"
+              onClick={handleGoToSignup}
+              className="w-full text-sm text-slate-600 underline underline-offset-2 hover:text-slate-900"
+            >
+              Create account
+            </button>
+          </form>
+        )}
+
+        {stage === "signup" && (
+          <form onSubmit={handleSignUp} className="space-y-3">
+            <p className="text-sm text-slate-700">
+              Create your account with email verification. You&apos;ll set up authenticator MFA
+              after confirming your email.
+            </p>
+            <input
+              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+              placeholder="Email"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              autoComplete="email"
+              autoFocus
+            />
+            <input
+              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
+            />
+            <button
+              type="submit"
+              disabled={loading || !username.trim() || password.length < 12}
+              className="w-full rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+            >
+              {loading ? "Creating account..." : "Create account"}
+            </button>
+            <button
+              type="button"
+              onClick={handleGoToLogin}
+              className="w-full text-sm text-slate-600 underline underline-offset-2 hover:text-slate-900"
+            >
+              Back to sign in
+            </button>
+          </form>
+        )}
+
+        {stage === "signup-confirm" && (
+          <form onSubmit={handleConfirmSignUp} className="space-y-3">
+            <p className="text-sm text-slate-700">
+              {signupDelivery || "Enter the verification code sent to your email."}
+            </p>
+            <p className="text-xs text-slate-500">
+              Account: <span className="font-medium text-slate-700">{pendingUsername}</span>
+            </p>
+            <input
+              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+              placeholder="Verification code"
+              value={signupCode}
+              onChange={(e) => setSignupCode(e.target.value.replace(/\s+/g, ""))}
+              autoComplete="one-time-code"
+              autoFocus
+            />
+            <button
+              type="submit"
+              disabled={loading || !signupCode.trim()}
+              className="w-full rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+            >
+              {loading ? "Verifying..." : "Verify and continue"}
+            </button>
+            <button
+              type="button"
+              onClick={handleGoToLogin}
+              className="w-full text-sm text-slate-600 underline underline-offset-2 hover:text-slate-900"
+            >
+              Back to sign in
             </button>
           </form>
         )}

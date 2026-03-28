@@ -11,6 +11,7 @@ import React, {
 import {
   AuthenticationDetails,
   CognitoUser,
+  CognitoUserAttribute,
   CognitoUserPool,
   CognitoUserSession,
 } from "amazon-cognito-identity-js";
@@ -18,6 +19,8 @@ import { jwtDecode } from "jwt-decode";
 
 type AuthStage =
   | "login"
+  | "signup"
+  | "signup-confirm"
   | "new-password"
   | "mfa-setup"
   | "mfa-verify"
@@ -42,8 +45,12 @@ interface AuthContextValue {
   stage: AuthStage;
   pendingUsername: string;
   mfaSecret: string;
+  signupDelivery: string;
   passwordResetDelivery: string;
   authHeaders: Record<string, string>;
+  goToSignup: () => void;
+  signUp: (email: string, password: string) => Promise<void>;
+  confirmSignUp: (code: string) => Promise<void>;
   login: (username: string, password: string) => Promise<void>;
   completeNewPassword: (newPassword: string) => Promise<void>;
   verifyMfa: (code: string) => Promise<void>;
@@ -101,9 +108,8 @@ const CLIENT_ID_PATTERN = /^[A-Za-z0-9]+$/;
 const IS_VALID_USER_POOL_ID = USER_POOL_ID_PATTERN.test(USER_POOL_ID);
 const IS_VALID_CLIENT_ID = CLIENT_ID_PATTERN.test(CLIENT_ID);
 const HAS_VALID_COGNITO_CONFIG = IS_VALID_USER_POOL_ID && IS_VALID_CLIENT_ID;
-// Temporary deployment override: bypass Cognito unless explicitly disabled.
 const AUTH_BYPASS_ENABLED =
-  envFlagEnabled(import.meta.env.VITE_AUTH_BYPASS as string | undefined, true) ||
+  envFlagEnabled(import.meta.env.VITE_AUTH_BYPASS as string | undefined, false) ||
   (import.meta.env.DEV &&
     envFlagEnabled(import.meta.env.VITE_AUTH_BYPASS_LOCAL as string | undefined, true));
 const API_AUTH_HOSTS = (
@@ -153,6 +159,8 @@ const AUTH_BYPASS_USER: AuthUser = {
   isItarCleared: true,
   isAdmin: true,
 };
+
+const PENDING_SIGNUP_STORAGE_KEY = "boundstate:mira-pending-signup:v1";
 
 function parseGroups(rawGroups: AccessTokenClaims["cognito:groups"]): string[] {
   if (!rawGroups) return [];
@@ -244,12 +252,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [stage, setStage] = useState<AuthStage>("login");
   const [pendingUsername, setPendingUsername] = useState("");
   const [mfaSecret, setMfaSecret] = useState("");
+  const [signupDelivery, setSignupDelivery] = useState("");
+  const [signupTelemetryPending, setSignupTelemetryPending] = useState(false);
   const [challengeUser, setChallengeUser] = useState<CognitoUser | null>(null);
   const [passwordResetUser, setPasswordResetUser] = useState<CognitoUser | null>(null);
   const [passwordResetDelivery, setPasswordResetDelivery] = useState("");
   const [newPasswordAttributes, setNewPasswordAttributes] = useState<Record<string, string>>({});
+  const signupPasswordRef = useRef("");
   const tokenRef = useRef<string | null>(null);
   const logoutRef = useRef<() => void>(() => {});
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    try {
+      setSignupTelemetryPending(window.sessionStorage.getItem(PENDING_SIGNUP_STORAGE_KEY) === "1");
+    } catch {
+      setSignupTelemetryPending(false);
+    }
+  }, []);
 
   const beginSession = useCallback((session: CognitoUserSession) => {
     const accessToken = session.getAccessToken().getJwtToken();
@@ -259,8 +281,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setChallengeUser(null);
     setPasswordResetUser(null);
     setPasswordResetDelivery("");
+    setSignupDelivery("");
     setMfaSecret("");
     setNewPasswordAttributes({});
+    signupPasswordRef.current = "";
   }, []);
 
   const startMfaSetup = useCallback(
@@ -304,6 +328,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   }, [beginSession]);
 
+  useEffect(() => {
+    if (!signupTelemetryPending || !token || !user || typeof window === "undefined") {
+      return;
+    }
+
+    let cancelled = false;
+    void window
+      .fetch("/api/usage/events", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          event_type: "signup_complete",
+          path: "/signup/complete",
+          module_id: "auth",
+          page_label: "Signup Complete",
+          navigation_type: "unknown",
+          client_session_id: `signup-${user.username || user.email || "unknown"}`,
+          referrer: null,
+        }),
+        keepalive: true,
+      })
+      .finally(() => {
+        if (cancelled) {
+          return;
+        }
+        setSignupTelemetryPending(false);
+        try {
+          window.sessionStorage.removeItem(PENDING_SIGNUP_STORAGE_KEY);
+        } catch {
+          // Ignore storage failures; the event is best-effort telemetry.
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [signupTelemetryPending, token, user]);
+
   const logout = useCallback(() => {
     if (AUTH_BYPASS_ENABLED) {
       setUser(AUTH_BYPASS_USER);
@@ -322,8 +387,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setPasswordResetUser(null);
     setPasswordResetDelivery("");
     setPendingUsername("");
+    setSignupDelivery("");
     setMfaSecret("");
     setNewPasswordAttributes({});
+    signupPasswordRef.current = "";
+  }, []);
+
+  const goToSignup = useCallback(() => {
+    setStage("signup");
+    setChallengeUser(null);
+    setPasswordResetUser(null);
+    setPasswordResetDelivery("");
+    setSignupDelivery("");
+    setMfaSecret("");
+    setNewPasswordAttributes({});
+    signupPasswordRef.current = "";
   }, []);
 
   tokenRef.current = token;
@@ -417,6 +495,58 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [beginSession, startMfaSetup],
   );
 
+  const signUp = useCallback((email: string, password: string) => {
+    if (!userPool) {
+      return Promise.reject(
+        new Error("Cognito not configured. Set VITE_COGNITO_USER_POOL_ID and VITE_COGNITO_CLIENT_ID."),
+      );
+    }
+
+    const trimmedEmail = email.trim().toLowerCase();
+    if (!trimmedEmail) {
+      return Promise.reject(new Error("Email is required."));
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      return Promise.reject(new Error("Enter a valid email address."));
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      userPool.signUp(
+        trimmedEmail,
+        password,
+        [new CognitoUserAttribute({ Name: "email", Value: trimmedEmail })],
+        [],
+        (err, result) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+
+          const delivery = result?.codeDeliveryDetails?.Destination
+            ? `${result.codeDeliveryDetails.DeliveryMedium || "Code"} sent to ${result.codeDeliveryDetails.Destination}`
+            : "Verification code sent to your email.";
+
+          setPendingUsername(trimmedEmail);
+          setChallengeUser(
+            result?.user ||
+              new CognitoUser({
+                Username: trimmedEmail,
+                Pool: userPool,
+              }),
+          );
+          setPasswordResetUser(null);
+          setPasswordResetDelivery("");
+          setSignupDelivery(delivery);
+          setMfaSecret("");
+          setNewPasswordAttributes({});
+          signupPasswordRef.current = password;
+          setStage("signup-confirm");
+          resolve();
+        },
+      );
+    });
+  }, []);
+
   const completeNewPassword = useCallback(
     (newPassword: string) => {
       if (!challengeUser) {
@@ -469,6 +599,62 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [beginSession, challengeUser],
   );
 
+  const confirmSignUp = useCallback(
+    (code: string) => {
+      if (!userPool) {
+        return Promise.reject(
+          new Error("Cognito not configured. Set VITE_COGNITO_USER_POOL_ID and VITE_COGNITO_CLIENT_ID."),
+        );
+      }
+      if (!pendingUsername) {
+        return Promise.reject(new Error("No signup confirmation in progress."));
+      }
+
+      const targetUser =
+        challengeUser && challengeUser.getUsername() === pendingUsername
+          ? challengeUser
+          : new CognitoUser({
+              Username: pendingUsername,
+              Pool: userPool,
+            });
+
+      return new Promise<void>((resolve, reject) => {
+        targetUser.confirmRegistration(code.trim(), true, async (err) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+
+          setChallengeUser(null);
+          setSignupDelivery("");
+          setSignupTelemetryPending(true);
+          try {
+            window.sessionStorage.setItem(PENDING_SIGNUP_STORAGE_KEY, "1");
+          } catch {
+            // Ignore storage failures; signup telemetry will still work within this render lifecycle.
+          }
+
+          const signupPassword = signupPasswordRef.current;
+          signupPasswordRef.current = "";
+          if (!signupPassword) {
+            setStage("login");
+            resolve();
+            return;
+          }
+
+          try {
+            await login(pendingUsername, signupPassword);
+            resolve();
+          } catch {
+            setStage("login");
+            reject(new Error("Account verified. Sign in with your new credentials to continue."));
+          }
+        });
+      });
+    },
+    [challengeUser, login, pendingUsername],
+  );
+
   const verifyMfaSetup = useCallback(
     (code: string) => {
       if (!challengeUser) {
@@ -503,8 +689,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setChallengeUser(null);
     setPasswordResetUser(null);
     setPasswordResetDelivery("");
+    setSignupDelivery("");
     setMfaSecret("");
     setNewPasswordAttributes({});
+    signupPasswordRef.current = "";
   }, []);
 
   const requestPasswordReset = useCallback(
@@ -587,8 +775,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setChallengeUser(null);
     setPasswordResetUser(null);
     setPasswordResetDelivery("");
+    setSignupDelivery("");
     setMfaSecret("");
     setNewPasswordAttributes({});
+    signupPasswordRef.current = "";
   }, []);
 
   useEffect(() => {
@@ -628,8 +818,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       stage,
       pendingUsername,
       mfaSecret,
+      signupDelivery,
       passwordResetDelivery,
       authHeaders: token ? { Authorization: `Bearer ${token}` } : {},
+      goToSignup,
+      signUp,
+      confirmSignUp,
       login,
       completeNewPassword,
       verifyMfa,
@@ -647,7 +841,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       stage,
       pendingUsername,
       mfaSecret,
+      signupDelivery,
       passwordResetDelivery,
+      goToSignup,
+      signUp,
+      confirmSignUp,
       login,
       completeNewPassword,
       verifyMfa,
