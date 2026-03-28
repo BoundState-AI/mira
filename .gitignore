@@ -2,6 +2,11 @@
 # BoundState Backend - .gitignore
 # ============================================
 
+# --- TEMP / ARTIFACTS ---
+tmp_gfe/
+200
+404
+
 # --- SECRETS (NEVER COMMIT) ---
 .env
 .env.*

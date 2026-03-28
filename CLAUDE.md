@@ -1,133 +1,96 @@
-# Project Context
+# CLAUDE.md — boundstate_mira
 
-This project is primarily Python with TypeScript frontend components. The main language is Python (~22k lines). Always assume Python conventions unless the file is clearly TypeScript/frontend.
+## What This Repo Is
 
-## Debugging Rules
+The primary BoundState production codebase. Contains:
 
-When debugging or investigating errors, ALWAYS diagnose the root cause first before proposing any redesign or refactoring. Start by reproducing the error, reading the traceback, and checking for missing dependencies/endpoints. Do NOT plan architectural changes unless explicitly asked.
+- **MIRA platform** (`mira/`, `mira_v4/`, `frontend/`) — 14-engine aerospace M&P compliance platform. 431 files, 151K+ lines. React/TypeScript frontend, FastAPI/Python backend.
+- **GPTL/SENTINEL** (`sentinel-main/gptl/`) — Grounded Precision Translation Layer. 6-layer negative selection intelligence engine. The core IP.
+- **Data Laundering Pipeline** (`data_laundering/`) — 4-layer query pipeline: sanitize → reason → validate → present. Domain-agnostic via DomainPack.
+- **Athena** (`athena/`) — 123 files, 30K+ lines. Document extraction engine (PDF/DOCX/image → structured content).
+- **Intelligence Compiler** (`unified/`) — NEW. Unifies FORGE + GPTL into single entry point. See `unified/CLAUDE.md` for IC-specific instructions.
 
-When asked to fix a bug or investigate a crash:
-1. Reproduce the error
-2. Read the actual error message/traceback
-3. Identify the minimal fix
-4. Apply and verify
+## Architecture Invariants
 
-Do NOT skip to step 4 or propose large-scale changes.
+- **No MAPTIS data in production.** PostgreSQL on E: drive is validation oracle only.
+- **All engines run on public standards** — NASA-STD-6001B, 6016C, MMPDS, CMH-17, ASTM.
+- **Pydantic models with `extra="forbid"`** on all API contracts and pipeline models.
+- **`__safety_critical__: bool = True`** header on modules that touch compliance decisions.
+- **Four-level fallback ladder** — frontend declares competence, backend enforces.
 
----
+## Key Directories
 
-# Windows Development Environment
-
-## Python Execution
-
-### Conda Environment
-BoundState uses the `boundstate-intent` conda environment. When running Python:
-
-```bash
-# PREFERRED: Use conda run to ensure correct environment
-conda run -n boundstate-intent python script.py
-
-# OR: Activate first then run
-conda activate boundstate-intent && python script.py
-
-# OR: Use full path to conda Python
-/c/Users/jwilde2/.conda/envs/boundstate-intent/python.exe script.py
+```
+boundstate_mira/
+├── mira/                    # MIRA engines (H2, galvanic, flammability, MUA, etc.)
+│   ├── api/                 # FastAPI app + routers
+│   ├── bsmh/                # Bounded Smart Materials Helper (chat layer)
+│   ├── h2/                  # Hydrogen compatibility engine
+│   ├── mua/                 # MUA writer (classifier, synthesis, precedent)
+│   ├── providers/           # Bedrock, local LLM providers
+│   └── utils/               # Config, JSON extraction
+├── mira_v4/                 # v4 models and schemas
+├── frontend/                # React/TypeScript/Tailwind frontend
+├── athena/                  # Document extraction pipeline
+│   ├── extraction/          # Vision, OCR, standards extractors
+│   ├── chunking/            # Content chunking
+│   ├── indexing/             # FAISS indexing
+│   └── parsers/             # Format-specific parsers
+├── sentinel-main/           # GPTL standalone
+│   └── gptl/                # Core GPTL engine (see sentinel-main CLAUDE.md)
+├── data_laundering/         # 4-layer query pipeline
+├── unified/                 # Intelligence Compiler (IC) — NEW
+├── core/                    # Shared core (evidence, infra, models, query, RAG)
+├── scripts/                 # One-off scripts, importers, evaluators
+├── tests/                   # Test suite
+├── services/                # Service layer
+└── docs/                    # Documentation
 ```
 
-### Common Issues
+## Database Connections
 
-1. **Stale file shadowing Python**: If a file named `python` exists in the working directory, Git Bash will find it before the actual Python executable. Delete any such files.
+| Database | Port | Purpose |
+|----------|------|---------|
+| MIRA Materials | 55433 | Materials properties, test data, heritage |
+| IC Canonical Store | 55434 | Intelligence Compiler provenance graph |
+| PostgreSQL (system) | 5432 | General PostgreSQL |
 
-2. **Path translation**: Git Bash uses Unix-style paths. Use `/c/BoundState/` not `C:\BoundState\` in bash commands.
-
-3. **Inline Python (`python -c`)**: Complex multiline code often fails due to quote handling. Write a script file instead.
-
-### Running Scripts
-```bash
-# BEST: Use py launcher (always works on Windows)
-py /c/BoundState/scripts/my_script.py
-
-# Run pytest with py launcher
-py -m pytest /c/BoundState/tests/ -v
-
-# Run with output
-py -u /c/BoundState/scripts/my_script.py  # -u for unbuffered output
-```
-
-### The `py` Launcher (Recommended)
-On Windows, always prefer `py` over `python` in Git Bash:
-- `py` is the Windows Python Launcher - it always finds Python correctly
-- `python` depends on PATH which can be misconfigured in Git Bash
-- `py -3.11` to specify a version
-
-### Working Directory
-The default working directory is `C:\BoundState`. Always use absolute paths for reliability.
-
-## Path Conventions
-
-| Context | Format | Example |
-|---------|--------|---------|
-| Git Bash | Unix-style | `/c/BoundState/mira/` |
-| Python | Either works | `C:\\BoundState\\mira\\` or `C:/BoundState/mira/` |
-| Windows CMD | Backslashes | `C:\BoundState\mira\` |
-
-## File Operations
-
-### Reading Files
-Use the Read tool instead of `cat` - it handles Windows paths correctly.
-
-### Creating Files
-Use the Write tool instead of `echo >` or heredocs - avoids encoding issues.
-
-## Testing
+## Running Locally
 
 ```bash
-# Use the conda Python directly for pytest
-CONDA_PYTHON=/c/Users/jwilde2/.conda/envs/boundstate-intent/python.exe
+# Python
+PYTHON=/c/Users/Jnwil/.conda/envs/boundstate-intent/python.exe
 
-# Run all tests
-$CONDA_PYTHON -m pytest /c/BoundState/tests/ -v
+# API server
+$PYTHON -m uvicorn mira.api.app:app --reload --port 8000
 
-# Run specific test file
-$CONDA_PYTHON -m pytest /c/BoundState/tests/mira/test_h2_knowledge_twin_automated.py -v
+# Tests
+$PYTHON -m pytest tests/ -v --tb=short
 
-# Run with coverage
-$CONDA_PYTHON -m pytest /c/BoundState/tests/ --cov=mira --cov-report=term-missing
-
-# One-liner (copy-paste ready)
-/c/Users/jwilde2/.conda/envs/boundstate-intent/python.exe -m pytest /c/BoundState/tests/ -v --tb=short
+# Specific test
+$PYTHON -m pytest tests/mira/test_h2_engine.py -v
 ```
 
-## Common Commands
+## Import Rules
 
-```bash
-# Use conda Python for all commands
-CONDA_PYTHON=/c/Users/jwilde2/.conda/envs/boundstate-intent/python.exe
+- `mira/` may import from `core/`, `data_laundering/`, `athena/`
+- `unified/` may import from `sentinel-main/gptl/` and `boundstate_forge/` (cross-repo, via direct import for now)
+- `unified/` MUST NOT import from `mira/` application logic — strict decoupling for future extraction
+- `sentinel-main/gptl/` is self-contained — no imports from `mira/`
+- `data_laundering/` is self-contained — no imports from `mira/` application logic
 
-# Check Python version
-$CONDA_PYTHON --version
+## Before You Build
 
-# List conda environments
-conda env list
+1. Read `REPO_BOUNDARIES.md` — canonical ownership rules
+2. Check which directory owns the feature you're building
+3. If touching `unified/`, read `unified/CLAUDE.md` for IC-specific rules
+4. If touching `sentinel-main/gptl/`, read the GPTL schema carefully — 59 Pydantic models with `extra="forbid"`
+5. Run the relevant test suite before and after changes
 
-# Install package in environment
-$CONDA_PYTHON -m pip install package-name
+## MUA Writer Authority Boundary
 
-# Run a script
-$CONDA_PYTHON /c/BoundState/scripts/my_script.py
+If you are working on MUA-related code, this is non-negotiable:
 
-# Check what Python is being used
-which python  # Often wrong in Git Bash
-echo $CONDA_PYTHON  # Use this instead
-```
+> The system SHALL NOT infer new engineering allowables, approve alternative design-value methods, or convert precedent into acceptance authority. All outputs are draft artifacts pending responsible NASA M&P review, Program/Project approval, or any approval path defined by the governing M&P Plan and NASA-STD-6016C.
 
-## Known Issues
-
-### Git Bash PATH Problems
-The `python` command in Git Bash may not use the conda environment. Always use the full path:
-```bash
-/c/Users/jwilde2/.conda/envs/boundstate-intent/python.exe
-```
-
-### py Launcher Limitation
-The `py` launcher finds Python but may use a different environment (e.g., system Python 3.11 without packages). Use the conda path for tests requiring installed packages.
+This must appear in: bouncer rules, system prompt, response footer. Hardcoded, not configurable.
