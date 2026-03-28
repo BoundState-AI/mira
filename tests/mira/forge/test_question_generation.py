@@ -259,9 +259,10 @@ def test_execution_plan_annotation_adds_runtime_contract() -> None:
     annotated = annotate_question_map_with_execution_plans(question_map, manifest)
     question = annotated.all_questions()[0]
 
-    assert question.capability_id == "material_safety_ranking"
-    assert question.intent_family == "risk_ranking"
-    assert question.execution_plan["plan_type"] == "risk_ranking"
+    assert question.capability_id == "h2_knowledge.evidence_categorical_browse"
+    assert question.intent_family == "categorical_browse"
+    assert question.execution_plan["plan_type"] == "categorical_browse"
     assert question.execution_plan["entity_table"] == "h2_knowledge.evidence"
-    assert "hee_index" in question.execution_plan["metrics"]
+    assert "hee_index" in question.execution_plan["selected_columns"]
+    assert "hee_index" in question.execution_plan["filters"]
     assert "material_name" in question.execution_plan["group_by"]
