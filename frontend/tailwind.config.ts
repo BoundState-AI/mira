@@ -13,6 +13,10 @@ export default {
   		}
   	},
 	extend: {
+  		fontFamily: {
+  			sans: ['Inter', '"Segoe UI"', 'sans-serif'],
+  			serif: ['Inter', '"Segoe UI"', 'sans-serif']
+  		},
   		colors: {
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
