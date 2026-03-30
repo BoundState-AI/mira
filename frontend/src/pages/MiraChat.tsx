@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Bot, Compass, Loader2, RotateCcw, SendHorizonal, User2 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -7,54 +7,23 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import { fetchMiraChatPing, sendMiraChatMessage, type MiraChatMessage } from "@/lib/chat-api";
+import { fetchMiraChatPing } from "@/lib/chat-api";
 import {
-  conversationStorageKey,
   isMiraModuleChatLaunchState,
-  loadStoredConversation,
   loadPersistedModuleChatLaunchState,
   MIRA_CHAT_GLOBAL_SCOPE_KEY,
-  MIRA_CHAT_LEGACY_STORAGE_KEY,
   persistModuleChatLaunchState,
-  saveStoredConversation,
-  type MiraChatStoredConversation,
-  type MiraChatStoredMessage,
   type MiraModuleChatLaunchState,
 } from "@/lib/mira-chat-context";
 import { cn } from "@/lib/utils";
+import { useMiraChat, verdictVariant } from "@/hooks/useMiraChat";
 
-const MAX_HISTORY_MESSAGES = 10;
-const MAX_STORED_MESSAGES = 24;
 const GLOBAL_EXAMPLE_PROMPTS = [
   "Is 316L compatible with GOX at 3000 psi?",
   "What galvanic risk do I have between 7075-T73 and CRES 304 in seawater proxy?",
   "Can you compare hydrogen compatibility for Inconel 718 and A286?",
   "What MAPTIS evidence exists for Inconel 625 in aged versus cast condition?",
 ];
-
-type Verdict = "PASS" | "CONDITIONAL_PASS" | "FAIL" | "REFUSE" | "INSUFFICIENT_DATA" | "ERROR" | null;
-
-type ChatUiMessage = MiraChatStoredMessage & { verdict?: Verdict };
-
-function verdictVariant(verdict: Verdict): "default" | "secondary" | "destructive" | "outline" {
-  if (verdict === "PASS") return "default";
-  if (verdict === "FAIL" || verdict === "ERROR" || verdict === "REFUSE") return "destructive";
-  if (verdict === "CONDITIONAL_PASS") return "secondary";
-  return "outline";
-}
-
-function toHistoryMessages(messages: ChatUiMessage[]): MiraChatMessage[] {
-  return messages.slice(-MAX_HISTORY_MESSAGES).map((message) => ({
-    role: message.role,
-    content: message.content,
-    engine_used: message.engineUsed ?? undefined,
-    entities: message.entities,
-  }));
-}
-
-function messageId(prefix: "user" | "assistant"): string {
-  return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
-}
 
 function renderInlineText(text: string) {
   const matches = Array.from(text.matchAll(/\*\*(.+?)\*\*/g));
@@ -137,16 +106,6 @@ export default function MiraChat() {
   }, [location.state, scopeKeyFromQuery]);
   const isModuleChat = Boolean(activeModuleLaunchState);
   const scopeKey = activeModuleLaunchState?.scopeKey ?? MIRA_CHAT_GLOBAL_SCOPE_KEY;
-  const storageKey = useMemo(() => conversationStorageKey(scopeKey), [scopeKey]);
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<ChatUiMessage[]>([]);
-  const [draft, setDraft] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [isSending, setIsSending] = useState(false);
-  const [adapters, setAdapters] = useState<string[]>([]);
-  const [pingError, setPingError] = useState<string | null>(null);
-  const [conversationLoaded, setConversationLoaded] = useState(false);
-  const conversationEndRef = useRef<HTMLDivElement | null>(null);
   const starterPrompts = activeModuleLaunchState?.starterPrompts.length
     ? activeModuleLaunchState.starterPrompts
     : GLOBAL_EXAMPLE_PROMPTS;
@@ -154,35 +113,27 @@ export default function MiraChat() {
   const scopeDescription = activeModuleLaunchState?.description
     ?? "Ask one question, route into OCA, H2, galvanic, fracture, MAPTIS, BSMH, or compliance logic, and keep the conversation grounded with browser-held history.";
 
+  const {
+    messages,
+    sessionId,
+    draft,
+    setDraft,
+    error,
+    isSending,
+    streamingMessage,
+    conversationEndRef,
+    submitMessage,
+    clearConversation,
+  } = useMiraChat({ scopeKey, activeModuleLaunchState });
+
+  const [adapters, setAdapters] = useState<string[]>([]);
+  const [pingError, setPingError] = useState<string | null>(null);
+
   useEffect(() => {
     if (activeModuleLaunchState) {
       persistModuleChatLaunchState(activeModuleLaunchState);
     }
   }, [activeModuleLaunchState]);
-
-  useEffect(() => {
-    setConversationLoaded(false);
-    const storedConversation = loadStoredConversation(
-      storageKey,
-      scopeKey === MIRA_CHAT_GLOBAL_SCOPE_KEY ? [MIRA_CHAT_LEGACY_STORAGE_KEY] : [],
-    );
-    setSessionId(storedConversation.sessionId);
-    setMessages(storedConversation.messages);
-    setDraft("");
-    setError(null);
-    setConversationLoaded(true);
-  }, [scopeKey, storageKey]);
-
-  useEffect(() => {
-    if (!conversationLoaded) {
-      return;
-    }
-    saveStoredConversation(
-      storageKey,
-      { sessionId, messages } as MiraChatStoredConversation,
-      scopeKey === MIRA_CHAT_GLOBAL_SCOPE_KEY,
-    );
-  }, [conversationLoaded, messages, scopeKey, sessionId, storageKey]);
 
   useEffect(() => {
     let cancelled = false;
@@ -201,83 +152,6 @@ export default function MiraChat() {
       cancelled = true;
     };
   }, []);
-
-  useEffect(() => {
-    const endMarker = conversationEndRef.current;
-    if (!endMarker) {
-      return;
-    }
-    endMarker.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [messages, isSending]);
-
-  const clearConversation = () => {
-    setSessionId(null);
-    setMessages([]);
-    setDraft("");
-    setError(null);
-    saveStoredConversation(
-      storageKey,
-      { sessionId: null, messages: [] },
-      scopeKey === MIRA_CHAT_GLOBAL_SCOPE_KEY,
-    );
-  };
-
-  const submitMessage = async (rawMessage: string) => {
-    const message = rawMessage.trim();
-    if (!message || isSending) {
-      return;
-    }
-
-    const optimisticId = messageId("user");
-    setError(null);
-    setIsSending(true);
-    setDraft("");
-    setMessages((current) => [
-      ...current,
-      {
-        id: optimisticId,
-        role: "user",
-        content: message,
-        entities: {},
-      },
-    ]);
-
-    try {
-      const response = await sendMiraChatMessage({
-        message,
-        session_id: sessionId ?? undefined,
-        history: toHistoryMessages(messages),
-        module_context: activeModuleLaunchState?.moduleContext,
-      });
-
-      const turnEntities = response.entities ?? {};
-      setSessionId(response.session_id);
-      setMessages((current) => {
-        const updated = current.map((currentMessage) =>
-          currentMessage.id === optimisticId
-            ? { ...currentMessage, entities: turnEntities }
-            : currentMessage,
-        );
-        updated.push({
-          id: messageId("assistant"),
-          role: "assistant",
-          content: response.response,
-          engineUsed: response.engine_used ?? null,
-          verdict: (response.verdict as Verdict | undefined) ?? null,
-          auditId: response.audit_id ?? null,
-          followUps: response.follow_up_suggestions ?? [],
-          entities: turnEntities,
-        });
-        return updated.slice(-MAX_STORED_MESSAGES);
-      });
-    } catch (submitError: unknown) {
-      setMessages((current) => current.filter((currentMessage) => currentMessage.id !== optimisticId));
-      setDraft(message);
-      setError(submitError instanceof Error ? submitError.message : "Chat request failed.");
-    } finally {
-      setIsSending(false);
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -376,7 +250,7 @@ export default function MiraChat() {
             <div
               className="flex min-h-full flex-col gap-4 bg-[linear-gradient(180deg,rgba(248,250,252,0.95),rgba(241,245,249,0.95))] p-5"
             >
-              {!messages.length && (
+              {!messages.length && !streamingMessage && (
                 <div className="space-y-4 rounded-2xl border border-dashed border-border bg-background/80 p-5">
                   <div className="space-y-1">
                     <h3 className="font-medium">Starting points</h3>
@@ -467,7 +341,28 @@ export default function MiraChat() {
                 );
               })}
 
-              {isSending && (
+              {streamingMessage && (
+                <div className="flex justify-start">
+                  <div className="max-w-[92%] rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm 2xl:max-w-[88%] text-slate-900">
+                    <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-[0.18em] opacity-80">
+                      <Bot className="h-3.5 w-3.5" />
+                      MIRA
+                    </div>
+                    {streamingMessage.content ? (
+                      <div className="space-y-3 text-sm leading-6">
+                        {renderMessageContent(streamingMessage.content)}
+                      </div>
+                    ) : streamingMessage.thinking ? (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Reasoning through the domain logic
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              )}
+
+              {isSending && !streamingMessage && (
                 <div className="flex justify-start">
                   <div className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-muted-foreground shadow-sm">
                     <Loader2 className="h-4 w-4 animate-spin" />

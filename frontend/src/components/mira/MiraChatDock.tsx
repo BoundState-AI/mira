@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Bot, Compass, Expand, Loader2, MessageSquare, Minimize2, SendHorizonal, X } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -7,52 +7,22 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import { fetchMiraChatPing, sendMiraChatMessage, type MiraChatMessage } from "@/lib/chat-api";
+import { fetchMiraChatPing } from "@/lib/chat-api";
 import {
   buildChatScopeSearch,
-  conversationStorageKey,
   createModuleChatLaunchState,
   loadRouteModuleChatState,
-  loadStoredConversation,
   MIRA_CHAT_GLOBAL_SCOPE_KEY,
-  MIRA_CHAT_LEGACY_STORAGE_KEY,
   MIRA_CHAT_ROUTE_STATE_EVENT,
-  saveStoredConversation,
-  type MiraChatStoredConversation,
-  type MiraChatStoredMessage,
   type MiraModuleChatLaunchState,
 } from "@/lib/mira-chat-context";
 import { cn } from "@/lib/utils";
+import { useMiraChat, verdictVariant } from "@/hooks/useMiraChat";
 
-const MAX_HISTORY_MESSAGES = 10;
-const MAX_STORED_MESSAGES = 24;
 const GLOBAL_WIDGET_PROMPTS = [
   "Is 316L compatible with GOX at 3000 psi?",
   "What galvanic risk do I have between 7075-T73 and CRES 304?",
 ];
-
-type Verdict = "PASS" | "CONDITIONAL_PASS" | "FAIL" | "REFUSE" | "INSUFFICIENT_DATA" | "ERROR" | null;
-type ChatUiMessage = MiraChatStoredMessage & { verdict?: Verdict };
-
-function verdictVariant(verdict: Verdict): "default" | "secondary" | "destructive" | "outline" {
-  if (verdict === "PASS") return "default";
-  if (verdict === "FAIL" || verdict === "ERROR" || verdict === "REFUSE") return "destructive";
-  if (verdict === "CONDITIONAL_PASS") return "secondary";
-  return "outline";
-}
-
-function messageId(prefix: "user" | "assistant"): string {
-  return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
-}
-
-function toHistoryMessages(messages: ChatUiMessage[]): MiraChatMessage[] {
-  return messages.slice(-MAX_HISTORY_MESSAGES).map((message) => ({
-    role: message.role,
-    content: message.content,
-    engine_used: message.engineUsed ?? undefined,
-    entities: message.entities,
-  }));
-}
 
 function fallbackLaunchState(pathname: string): MiraModuleChatLaunchState | null {
   switch (pathname) {
@@ -111,24 +81,28 @@ export function MiraChatDock() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [routeStateVersion, setRouteStateVersion] = useState(0);
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<ChatUiMessage[]>([]);
-  const [draft, setDraft] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [isSending, setIsSending] = useState(false);
-  const [conversationLoaded, setConversationLoaded] = useState(false);
   const [serviceHealthy, setServiceHealthy] = useState(true);
-  const conversationEndRef = useRef<HTMLDivElement | null>(null);
 
   const activeModuleLaunchState = useMemo(
     () => loadRouteModuleChatState(location.pathname) ?? fallbackLaunchState(location.pathname),
     [location.pathname, routeStateVersion],
   );
   const scopeKey = activeModuleLaunchState?.scopeKey ?? MIRA_CHAT_GLOBAL_SCOPE_KEY;
-  const storageKey = useMemo(() => conversationStorageKey(scopeKey), [scopeKey]);
   const starterPrompts = activeModuleLaunchState?.starterPrompts.length
     ? activeModuleLaunchState.starterPrompts.slice(0, 2)
     : GLOBAL_WIDGET_PROMPTS;
+
+  const {
+    messages,
+    draft,
+    setDraft,
+    error,
+    isSending,
+    streamingMessage,
+    conversationEndRef,
+    submitMessage,
+    clearConversation,
+  } = useMiraChat({ scopeKey, activeModuleLaunchState });
 
   useEffect(() => {
     if (location.pathname === "/chat") {
@@ -151,40 +125,12 @@ export function MiraChatDock() {
     };
   }, [location.pathname]);
 
+  // Scroll into view when dock opens
   useEffect(() => {
-    setConversationLoaded(false);
-    const storedConversation = loadStoredConversation(
-      storageKey,
-      scopeKey === MIRA_CHAT_GLOBAL_SCOPE_KEY ? [MIRA_CHAT_LEGACY_STORAGE_KEY] : [],
-    );
-    setSessionId(storedConversation.sessionId);
-    setMessages(storedConversation.messages);
-    setDraft("");
-    setError(null);
-    setConversationLoaded(true);
-  }, [scopeKey, storageKey]);
-
-  useEffect(() => {
-    if (!conversationLoaded) {
-      return;
+    if (open) {
+      conversationEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
     }
-    saveStoredConversation(
-      storageKey,
-      { sessionId, messages } as MiraChatStoredConversation,
-      scopeKey === MIRA_CHAT_GLOBAL_SCOPE_KEY,
-    );
-  }, [conversationLoaded, messages, scopeKey, sessionId, storageKey]);
-
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-    const endMarker = conversationEndRef.current;
-    if (!endMarker) {
-      return;
-    }
-    endMarker.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [messages, open, isSending]);
+  }, [open, conversationEndRef]);
 
   useEffect(() => {
     let cancelled = false;
@@ -215,63 +161,6 @@ export function MiraChatDock() {
   if (location.pathname === "/chat") {
     return null;
   }
-
-  const submitMessage = async (rawMessage: string) => {
-    const message = rawMessage.trim();
-    if (!message || isSending) {
-      return;
-    }
-
-    const optimisticId = messageId("user");
-    setIsSending(true);
-    setError(null);
-    setDraft("");
-    setMessages((current) => [
-      ...current,
-      {
-        id: optimisticId,
-        role: "user",
-        content: message,
-        entities: {},
-      },
-    ]);
-
-    try {
-      const response = await sendMiraChatMessage({
-        message,
-        session_id: sessionId ?? undefined,
-        history: toHistoryMessages(messages),
-        module_context: activeModuleLaunchState?.moduleContext,
-      });
-
-      const turnEntities = response.entities ?? {};
-      setSessionId(response.session_id);
-      setMessages((current) => {
-        const updated = current.map((currentMessage) =>
-          currentMessage.id === optimisticId
-            ? { ...currentMessage, entities: turnEntities }
-            : currentMessage,
-        );
-        updated.push({
-          id: messageId("assistant"),
-          role: "assistant",
-          content: response.response,
-          engineUsed: response.engine_used ?? null,
-          verdict: (response.verdict as Verdict | undefined) ?? null,
-          auditId: response.audit_id ?? null,
-          followUps: response.follow_up_suggestions ?? [],
-          entities: turnEntities,
-        });
-        return updated.slice(-MAX_STORED_MESSAGES);
-      });
-    } catch (submitError: unknown) {
-      setMessages((current) => current.filter((currentMessage) => currentMessage.id !== optimisticId));
-      setDraft(message);
-      setError(submitError instanceof Error ? submitError.message : "Chat request failed.");
-    } finally {
-      setIsSending(false);
-    }
-  };
 
   return (
     <div className="pointer-events-none fixed bottom-5 right-5 z-50 flex max-w-[calc(100vw-1.5rem)] flex-col items-end gap-3">
@@ -330,7 +219,7 @@ export function MiraChatDock() {
 
           <ScrollArea className="flex-1 bg-[linear-gradient(180deg,rgba(248,250,252,0.98),rgba(241,245,249,0.96))]">
             <div className="flex min-h-full flex-col gap-3 p-4">
-              {!messages.length ? (
+              {!messages.length && !streamingMessage ? (
                 <div className="space-y-3 rounded-2xl border border-dashed border-border bg-background/85 p-4">
                   <div className="text-sm font-medium">Start here</div>
                   <div className="flex flex-wrap gap-2">
@@ -404,7 +293,27 @@ export function MiraChatDock() {
                 );
               })}
 
-              {isSending ? (
+              {streamingMessage && (
+                <div className="flex justify-start">
+                  <div className="max-w-[90%] rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm text-slate-900">
+                    <div className="mb-1 flex items-center gap-2 text-[10px] uppercase tracking-[0.14em] opacity-80">
+                      MIRA
+                    </div>
+                    {streamingMessage.content ? (
+                      <div className="whitespace-pre-wrap text-sm leading-5">
+                        {streamingMessage.content}
+                      </div>
+                    ) : streamingMessage.thinking ? (
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        Thinking
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              )}
+
+              {isSending && !streamingMessage ? (
                 <div className="flex justify-start">
                   <div className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs text-muted-foreground shadow-sm">
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -444,17 +353,7 @@ export function MiraChatDock() {
                   type="button"
                   variant="ghost"
                   size="sm"
-                  onClick={() => {
-                    setSessionId(null);
-                    setMessages([]);
-                    setDraft("");
-                    setError(null);
-                    saveStoredConversation(
-                      storageKey,
-                      { sessionId: null, messages: [] },
-                      scopeKey === MIRA_CHAT_GLOBAL_SCOPE_KEY,
-                    );
-                  }}
+                  onClick={clearConversation}
                 >
                   <X className="h-4 w-4" />
                   Clear
