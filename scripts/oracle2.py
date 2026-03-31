@@ -282,13 +282,18 @@ Output JSON:
 
 PROVIDER_TIMEOUT = int(os.environ.get("ORACLE_TIMEOUT_SECONDS", "120"))
 
-# Required fields per oracle role for schema validation
-REQUIRED_FIELDS: dict[str, list[str]] = {
-    "coordinator": ["revision_decisions", "revised_sections", "open_questions"],
-    "adversarial_logic": ["findings"],
-    "implementation_feasibility": ["findings"],
-    "contrarian": ["findings"],
-    "referee": ["normalized_issues"],
+# Required fields per oracle role — field name -> expected type
+REQUIRED_SCHEMA: dict[str, dict[str, type]] = {
+    "coordinator": {
+        "revision_decisions": list,
+        "revised_sections": list,
+        "open_questions": list,
+        "revised_draft": (str, type(None)),  # must be present, can be null
+    },
+    "adversarial_logic": {"findings": list},
+    "implementation_feasibility": {"findings": list},
+    "contrarian": {"findings": list},
+    "referee": {"normalized_issues": list},
 }
 
 
@@ -473,23 +478,48 @@ def call_oracle(config: OracleConfig, user_message: str) -> dict:
 
 
 def _validate_schema(result: dict, config: OracleConfig) -> str | None:
-    """Validate that the oracle response has required fields. Returns error string or None."""
-    required = REQUIRED_FIELDS.get(config.role, [])
-    missing = [f for f in required if f not in result]
-    if missing:
-        return f"Missing required fields: {missing}"
+    """Validate oracle response: required fields, types, and list item structure."""
+    schema = REQUIRED_SCHEMA.get(config.role, {})
 
-    # Validate issue_ids exist in normalized_issues
+    # Check field presence and type
+    for field_name, expected_type in schema.items():
+        if field_name not in result:
+            return f"Missing required field: {field_name}"
+        value = result[field_name]
+        if isinstance(expected_type, tuple):
+            # Union type (e.g., str | None)
+            if not isinstance(value, expected_type):
+                return f"{field_name}: expected {expected_type}, got {type(value).__name__}"
+        elif not isinstance(value, expected_type):
+            return f"{field_name}: expected {expected_type.__name__}, got {type(value).__name__}"
+
+    # Validate list item structure for key lists
     if config.role == "referee":
-        for issue in result.get("normalized_issues", []):
+        for i, issue in enumerate(result.get("normalized_issues", [])):
+            if not isinstance(issue, dict):
+                return f"normalized_issues[{i}]: expected dict, got {type(issue).__name__}"
             if not issue.get("issue_id"):
-                return "normalized_issues contains item without issue_id"
+                return f"normalized_issues[{i}]: missing issue_id"
+            if not issue.get("severity"):
+                return f"normalized_issues[{i}]: missing severity"
 
-    # Validate Beth's decisions reference issue_ids
     if config.role == "coordinator":
-        for dec in result.get("revision_decisions", []):
+        for i, dec in enumerate(result.get("revision_decisions", [])):
+            if not isinstance(dec, dict):
+                return f"revision_decisions[{i}]: expected dict, got {type(dec).__name__}"
             if not dec.get("issue_id"):
-                return "revision_decisions contains item without issue_id"
+                return f"revision_decisions[{i}]: missing issue_id"
+            if not dec.get("decision"):
+                return f"revision_decisions[{i}]: missing decision"
+
+    if config.role in ("adversarial_logic", "implementation_feasibility", "contrarian"):
+        for i, finding in enumerate(result.get("findings", [])):
+            if not isinstance(finding, dict):
+                return f"findings[{i}]: expected dict, got {type(finding).__name__}"
+            if not finding.get("title"):
+                return f"findings[{i}]: missing title"
+            if not finding.get("severity"):
+                return f"findings[{i}]: missing severity"
 
     return None
 
@@ -689,10 +719,13 @@ def _check_convergence(session: OracleSession) -> tuple[bool, str]:
             return False, f"Issue set unstable: {overlap:.0%} overlap ({len(current_ids)} vs {len(prev_ids)})"
     elif not current_ids and not prev_ids:
         overlap = 1.0  # Both empty = stable
+    elif not current_ids and prev_ids:
+        # All prior issues resolved — converge (critical/high already passed above)
+        overlap = 1.0
     else:
-        # One has issues, the other doesn't — not stable
+        # No prior issues but new ones appeared — not stable
         overlap = 0.0
-        return False, f"Issue set unstable: one round has issues, the other doesn't ({len(current_ids)} vs {len(prev_ids)})"
+        return False, f"Issue set unstable: new issues appeared ({len(current_ids)} vs {len(prev_ids)})"
 
     # 4. Same unresolved tradeoff repeats across valid rounds
     current_open = set(current.coordinator_decisions.get("open_questions", []))
