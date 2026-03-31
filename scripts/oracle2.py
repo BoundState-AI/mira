@@ -280,6 +280,18 @@ Output JSON:
 # LLM client abstraction
 # ---------------------------------------------------------------------------
 
+PROVIDER_TIMEOUT = int(os.environ.get("ORACLE_TIMEOUT_SECONDS", "120"))
+
+# Required fields per oracle role for schema validation
+REQUIRED_FIELDS: dict[str, list[str]] = {
+    "coordinator": ["revision_decisions", "revised_sections", "open_questions"],
+    "adversarial_logic": ["findings"],
+    "implementation_feasibility": ["findings"],
+    "contrarian": ["findings"],
+    "referee": ["normalized_issues"],
+}
+
+
 @dataclass
 class OracleConfig:
     """Configuration for one oracle."""
@@ -290,6 +302,7 @@ class OracleConfig:
     system_prompt: str
     temperature: float = 0.0
     max_tokens: int = 8192
+    timeout: int = PROVIDER_TIMEOUT
 
 
 # Default oracle roster
@@ -336,9 +349,13 @@ ORACLE_ROSTER: dict[str, OracleConfig] = {
 
 def _call_anthropic(config: OracleConfig, user_message: str) -> dict:
     """Call Anthropic Messages API (Beth / Sonnet)."""
+    import httpx
     from anthropic import Anthropic
 
-    client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+    client = Anthropic(
+        api_key=os.environ.get("ANTHROPIC_API_KEY"),
+        timeout=httpx.Timeout(config.timeout, connect=10.0),
+    )
     response = client.messages.create(
         model=config.model,
         max_tokens=config.max_tokens,
@@ -356,9 +373,13 @@ def _call_anthropic(config: OracleConfig, user_message: str) -> dict:
 
 def _call_openai(config: OracleConfig, user_message: str) -> dict:
     """Call OpenAI Chat Completions API (Fran / Codex)."""
+    import httpx
     from openai import OpenAI
 
-    client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+    client = OpenAI(
+        api_key=os.environ.get("OPENAI_API_KEY"),
+        timeout=httpx.Timeout(config.timeout, connect=10.0),
+    )
     response = client.chat.completions.create(
         model=config.model,
         temperature=config.temperature,
@@ -374,11 +395,13 @@ def _call_openai(config: OracleConfig, user_message: str) -> dict:
 
 def _call_xai(config: OracleConfig, user_message: str) -> dict:
     """Call xAI/Grok API (OpenAI-compatible endpoint)."""
+    import httpx
     from openai import OpenAI
 
     client = OpenAI(
         api_key=os.environ.get("XAI_API_KEY"),
         base_url="https://api.x.ai/v1",
+        timeout=httpx.Timeout(config.timeout, connect=10.0),
     )
     response = client.chat.completions.create(
         model=config.model,
@@ -429,6 +452,13 @@ def call_oracle(config: OracleConfig, user_message: str) -> dict:
                 last_error = result["error"]
                 continue
 
+            # Schema validation: check required fields for this oracle's role
+            schema_error = _validate_schema(result, config)
+            if schema_error:
+                LOGGER.warning(f"[{config.name}] Schema invalid: {schema_error}")
+                last_error = f"Schema: {schema_error}"
+                continue
+
             findings_count = len(result.get("findings", result.get("normalized_issues", [])))
             LOGGER.info(f"[{config.name}] Done in {elapsed:.1f}s — {findings_count} findings")
             return result
@@ -440,6 +470,28 @@ def call_oracle(config: OracleConfig, user_message: str) -> dict:
 
     # All retries exhausted
     raise RuntimeError(f"[{config.name}] Failed after {MAX_RETRIES} attempts: {last_error}")
+
+
+def _validate_schema(result: dict, config: OracleConfig) -> str | None:
+    """Validate that the oracle response has required fields. Returns error string or None."""
+    required = REQUIRED_FIELDS.get(config.role, [])
+    missing = [f for f in required if f not in result]
+    if missing:
+        return f"Missing required fields: {missing}"
+
+    # Validate issue_ids exist in normalized_issues
+    if config.role == "referee":
+        for issue in result.get("normalized_issues", []):
+            if not issue.get("issue_id"):
+                return "normalized_issues contains item without issue_id"
+
+    # Validate Beth's decisions reference issue_ids
+    if config.role == "coordinator":
+        for dec in result.get("revision_decisions", []):
+            if not dec.get("issue_id"):
+                return "revision_decisions contains item without issue_id"
+
+    return None
 
 
 def _parse_json(text: str, oracle_name: str) -> dict:
@@ -556,16 +608,21 @@ def _build_referee_message(
     draft: str,
     reviews: dict[str, dict],
     round_number: int,
-    prior_issue_ids: list[str] | None = None,
+    prior_issues: list[dict] | None = None,
 ) -> str:
     """Build the message for Sonnet referee."""
     msg = f"## Round {round_number}\n\n## Canonical Draft\n\n{draft}\n\n## Reviewer Outputs\n\n"
     for name, output in reviews.items():
         msg += f"### {name}\n```json\n{json.dumps(output, indent=2)}\n```\n\n"
-    if prior_issue_ids:
+    if prior_issues:
+        # Pass full prior issue metadata so Sonnet can match recurring issues
+        summary = [
+            {"issue_id": i.get("issue_id"), "title": i.get("title"), "severity": i.get("severity"), "category": i.get("category")}
+            for i in prior_issues if i.get("issue_id")
+        ]
         msg += (
-            f"## Prior Round Issue IDs (reuse for recurring issues)\n"
-            f"{json.dumps(prior_issue_ids)}\n\n"
+            f"## Prior Round Normalized Issues (reuse issue_id for recurring issues)\n"
+            f"```json\n{json.dumps(summary, indent=2)}\n```\n\n"
         )
     return msg
 
@@ -630,6 +687,12 @@ def _check_convergence(session: OracleSession) -> tuple[bool, str]:
         overlap = len(current_ids & prev_ids) / max(len(current_ids | prev_ids), 1)
         if overlap < 0.8:
             return False, f"Issue set unstable: {overlap:.0%} overlap ({len(current_ids)} vs {len(prev_ids)})"
+    elif not current_ids and not prev_ids:
+        overlap = 1.0  # Both empty = stable
+    else:
+        # One has issues, the other doesn't — not stable
+        overlap = 0.0
+        return False, f"Issue set unstable: one round has issues, the other doesn't ({len(current_ids)} vs {len(prev_ids)})"
 
     # 4. Same unresolved tradeoff repeats across valid rounds
     current_open = set(current.coordinator_decisions.get("open_questions", []))
@@ -670,13 +733,10 @@ def run_review(
         changed_sections = last_valid.coordinator_decisions.get("revised_sections", []) if last_valid else None
         prior_decisions = last_valid.coordinator_decisions if last_valid else None
 
-        # Collect prior issue IDs for Sonnet to reuse on recurring issues
-        prior_issue_ids = []
+        # Collect prior issue ledger for Sonnet to reuse IDs on recurring issues
+        prior_issues = []
         if last_valid:
-            prior_issue_ids = [
-                i.get("issue_id") for i in last_valid.normalized_issues.get("normalized_issues", [])
-                if i.get("issue_id")
-            ]
+            prior_issues = last_valid.normalized_issues.get("normalized_issues", [])
 
         # --- Round N: Blind review (Fran, Codex, Grok) ---
         review_msg = _build_review_message(session.canonical_draft, round_num, changed_sections)
@@ -711,7 +771,7 @@ def run_review(
         # --- Round N.5: Sonnet normalizes (required) ---
         referee_msg = _build_referee_message(
             session.canonical_draft, review_round.reviewer_outputs,
-            round_number=round_num, prior_issue_ids=prior_issue_ids,
+            round_number=round_num, prior_issues=prior_issues,
         )
         try:
             normalized = call_oracle(ORACLE_ROSTER["sonnet"], referee_msg)
