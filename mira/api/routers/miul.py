@@ -44,6 +44,7 @@ router = APIRouter()
 
 XLSX_MEDIA_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 XLSM_MEDIA_TYPE = "application/vnd.ms-excel.sheet.macroEnabled.12"
+DT_EDITOR_MAX_ITERATIONS = max(1, int(os.getenv("DT_EDITOR_MAX_ITERATIONS", "1")))
 
 
 def _get_workflow():
@@ -65,7 +66,7 @@ async def ping() -> dict:
 @router.post("/extract-dt")
 async def extract_drawing_tree_endpoint(
     dt_file: UploadFile = File(...),
-    max_iterations: int = Form(3),
+    max_iterations: int = Form(1),
 ) -> dict:
     """Extract Drawing Tree hierarchy from PDF.
 
@@ -77,7 +78,7 @@ async def extract_drawing_tree_endpoint(
 
     Args:
         dt_file: Drawing Tree PDF file
-        max_iterations: Max validation/correction iterations (default 3)
+        max_iterations: Max validation/correction iterations (interactive route clamps to 1)
 
     Returns:
         JSON with 'top_level' and 'tree' (flat format with parent pointers)
@@ -97,9 +98,17 @@ async def extract_drawing_tree_endpoint(
         pdf_path = temp_dir / dt_file.filename
         pdf_path.write_bytes(content)
 
+        effective_iterations = max(1, min(max_iterations, DT_EDITOR_MAX_ITERATIONS))
+        if effective_iterations != max_iterations:
+            LOGGER.info(
+                "[DT Extract] Clamping requested iterations from %s to %s for interactive editor responsiveness",
+                max_iterations,
+                effective_iterations,
+            )
+
         # Run v3 DT extraction
         client = VisionClient()
-        result = extract_drawing_tree(pdf_path, client, max_iterations=max_iterations)
+        result = extract_drawing_tree(pdf_path, client, max_iterations=effective_iterations)
 
         if not result or not result.get("tree"):
             raise HTTPException(
@@ -122,6 +131,114 @@ async def extract_drawing_tree_endpoint(
 
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def _require_pdf_upload(upload: UploadFile, *, field_name: str) -> None:
+    """Reject blank or non-PDF uploads on legacy MIUL aliases."""
+    if not upload.filename or not upload.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail=f"{field_name} must be a PDF")
+
+
+def _require_pdf_uploads(uploads: List[UploadFile], *, field_name: str) -> None:
+    """Reject non-PDF uploads and require at least one file."""
+    if not uploads:
+        raise HTTPException(status_code=400, detail=f"{field_name} requires at least one PDF")
+    for upload in uploads:
+        _require_pdf_upload(upload, field_name=field_name)
+
+
+@router.post("/fast-extract")
+async def fast_extract_miul(
+    drawings: List[UploadFile] = File(...),
+    project: str = Form(""),
+    min_pressure: str = Form("0"),
+    max_pressure: str = Form("14.7"),
+    min_temperature: str = Form("0"),
+    max_temperature: str = Form("120"),
+    o2_concentration: str = Form("20.9"),
+    service_media: str = Form("Air"),
+) -> StreamingResponse:
+    """Legacy alias for the fast multi-PDF MIUL extraction path."""
+    _require_pdf_uploads(drawings, field_name="drawings")
+    return await extract_miul_v3(
+        drawings=drawings,
+        drawing_tree=None,
+        nha_overrides=None,
+        project=project,
+        min_pressure=min_pressure,
+        max_pressure=max_pressure,
+        min_temperature=min_temperature,
+        max_temperature=max_temperature,
+        o2_concentration=o2_concentration,
+        service_media=service_media,
+        use_2phase=True,
+    )
+
+
+@router.post("/msfc-extract")
+async def msfc_extract_miul(
+    drawings: List[UploadFile] = File(None),
+    drawing_tree: UploadFile = File(None),
+    project: str = Form(""),
+    min_pressure: str = Form("0"),
+    max_pressure: str = Form("14.7"),
+    min_temperature: str = Form("0"),
+    max_temperature: str = Form("120"),
+    o2_concentration: str = Form("20.9"),
+    service_media: str = Form("Air"),
+) -> StreamingResponse:
+    """Legacy alias for MSFC-oriented MIUL extraction."""
+    drawing_list = list(drawings or [])
+    if drawing_tree is None and not drawing_list:
+        raise HTTPException(status_code=400, detail="Provide drawings or a drawing tree PDF")
+    if drawing_tree is not None:
+        _require_pdf_upload(drawing_tree, field_name="drawing_tree")
+        if not drawing_list:
+            drawing_list = [drawing_tree]
+            drawing_tree = None
+    if drawing_list:
+        _require_pdf_uploads(drawing_list, field_name="drawings")
+    return await extract_miul_v3(
+        drawings=drawing_list,
+        drawing_tree=drawing_tree,
+        nha_overrides=None,
+        project=project,
+        min_pressure=min_pressure,
+        max_pressure=max_pressure,
+        min_temperature=min_temperature,
+        max_temperature=max_temperature,
+        o2_concentration=o2_concentration,
+        service_media=service_media,
+        use_2phase=True,
+    )
+
+
+@router.post("/dmllv-extract")
+async def dmllv_extract_miul(
+    drawings: List[UploadFile] = File(...),
+    project: str = Form(""),
+    min_pressure: str = Form("0"),
+    max_pressure: str = Form("14.7"),
+    min_temperature: str = Form("0"),
+    max_temperature: str = Form("120"),
+    o2_concentration: str = Form("20.9"),
+    service_media: str = Form("Air"),
+) -> StreamingResponse:
+    """Legacy alias for DMLLV extraction callers."""
+    _require_pdf_uploads(drawings, field_name="drawings")
+    return await extract_miul_v3(
+        drawings=drawings,
+        drawing_tree=None,
+        nha_overrides=None,
+        project=project,
+        min_pressure=min_pressure,
+        max_pressure=max_pressure,
+        min_temperature=min_temperature,
+        max_temperature=max_temperature,
+        o2_concentration=o2_concentration,
+        service_media=service_media,
+        use_2phase=True,
+    )
 
 
 @router.post("/enrich")

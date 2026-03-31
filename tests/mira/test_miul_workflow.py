@@ -114,10 +114,12 @@ class TestLookupMaterialCodes:
         # Mock lookup service to avoid DB
         with patch("mira.miul.workflow.MATERIAL_LOOKUP_AVAILABLE", False):
             workflow._enrichment.find_material_code_by_designation.return_value = "99999"
-            result_df, count = workflow.lookup_material_codes(df)
+            result_df, count, quarantine = workflow.lookup_material_codes(df)
 
         # Should only have looked up the one without code
         assert result_df.at[0, "Material Code"] == "12345"  # Unchanged
+        assert count == 1
+        assert quarantine == []
 
     def test_counts_codes_found(self):
         """Should return count of codes found."""
@@ -138,9 +140,10 @@ class TestLookupMaterialCodes:
                 "67890",  # Found
                 None,     # Not found
             ]
-            _, count = workflow.lookup_material_codes(df)
+            _, count, quarantine = workflow.lookup_material_codes(df)
 
         assert count == 2
+        assert quarantine == []
 
 
 class TestFetchRatings:
