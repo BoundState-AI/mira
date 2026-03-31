@@ -102,7 +102,7 @@ You are Beth, the coordinator oracle in a multi-oracle review system.
 Your job:
 1. Write the initial draft when asked.
 2. Maintain the canonical version.
-3. After reviewers respond, classify each finding into:
+3. After reviewers respond, classify each finding by its issue_id into:
    - accepted_defect
    - rejected_claim
    - preference_only
@@ -116,6 +116,10 @@ When synthesizing reviews:
 - Reject comments that lack evidence or are merely stylistic.
 - Do not accept conflicting changes without resolving the underlying principle.
 - If two reviewers disagree, identify the governing tradeoff and decide.
+- Reference findings by their issue_id (e.g. ISSUE-001), not by title.
+
+CRITICAL: Include the full revised draft text in the "revised_draft" field.
+If no revision is needed, set "revised_draft" to null.
 
 Output JSON only:
 {
@@ -123,14 +127,15 @@ Output JSON only:
   "role": "coordinator",
   "revision_decisions": [
     {
-      "finding_title": "...",
+      "issue_id": "ISSUE-001",
       "decision": "accepted_defect|rejected_claim|preference_only|unresolved_question",
       "reason": "..."
     }
   ],
   "architectural_risks_remaining": ["..."],
   "revised_sections": ["..."],
-  "open_questions": ["..."]
+  "open_questions": ["..."],
+  "revised_draft": "Full revised document text here, or null if no changes needed"
 }\
 """
 
@@ -391,27 +396,52 @@ PROVIDER_DISPATCH = {
 }
 
 
+MAX_RETRIES = 3
+RETRY_BACKOFF = (2, 4, 8)  # seconds
+
+
 def call_oracle(config: OracleConfig, user_message: str) -> dict:
-    """Route to the correct provider and return parsed JSON."""
+    """Route to the correct provider with retries and backoff."""
     dispatch = PROVIDER_DISPATCH.get(config.provider)
     if not dispatch:
         raise ValueError(f"Unknown provider: {config.provider}")
-    LOGGER.info(f"[{config.name}] Calling {config.provider}/{config.model}...")
-    t0 = time.time()
-    result = dispatch(config, user_message)
-    elapsed = time.time() - t0
-    LOGGER.info(
-        f"[{config.name}] Done in {elapsed:.1f}s — "
-        f"{len(result.get('findings', result.get('normalized_issues', [])))} findings"
-    )
-    return result
+
+    last_error = None
+    for attempt in range(MAX_RETRIES):
+        if attempt > 0:
+            wait = RETRY_BACKOFF[min(attempt - 1, len(RETRY_BACKOFF) - 1)]
+            LOGGER.warning(f"[{config.name}] Retry {attempt}/{MAX_RETRIES} after {wait}s...")
+            time.sleep(wait)
+
+        LOGGER.info(f"[{config.name}] Calling {config.provider}/{config.model} (attempt {attempt + 1})...")
+        t0 = time.time()
+        try:
+            result = dispatch(config, user_message)
+            elapsed = time.time() - t0
+
+            # Validate: must have parsed successfully (no "error" key from _parse_json)
+            if "error" in result and "raw" in result:
+                LOGGER.warning(f"[{config.name}] Parse failed: {result['error']}")
+                last_error = result["error"]
+                continue
+
+            findings_count = len(result.get("findings", result.get("normalized_issues", [])))
+            LOGGER.info(f"[{config.name}] Done in {elapsed:.1f}s — {findings_count} findings")
+            return result
+
+        except Exception as e:
+            elapsed = time.time() - t0
+            LOGGER.error(f"[{config.name}] Failed in {elapsed:.1f}s: {e}")
+            last_error = str(e)
+
+    # All retries exhausted
+    raise RuntimeError(f"[{config.name}] Failed after {MAX_RETRIES} attempts: {last_error}")
 
 
 def _parse_json(text: str, oracle_name: str) -> dict:
-    """Extract JSON from LLM response, tolerating markdown fences."""
-    import re
-
+    """Extract the first balanced JSON object from LLM response."""
     text = text.strip()
+
     # Strip markdown fences
     if text.startswith("```"):
         lines = text.split("\n")
@@ -419,16 +449,51 @@ def _parse_json(text: str, oracle_name: str) -> dict:
             lines = lines[1:]
         if lines and lines[-1].strip() == "```":
             lines = lines[:-1]
-        text = "\n".join(lines)
+        text = "\n".join(lines).strip()
 
-    match = re.search(r"\{[\s\S]*\}", text)
-    if match:
-        try:
-            return json.loads(match.group())
-        except json.JSONDecodeError as e:
-            LOGGER.error(f"[{oracle_name}] JSON parse error: {e}")
-            LOGGER.debug(f"[{oracle_name}] Raw text: {text[:500]}")
-    return {"oracle_name": oracle_name, "error": "Failed to parse JSON", "raw": text[:2000]}
+    # Find the first '{' and extract the balanced JSON object
+    start = text.find("{")
+    if start == -1:
+        LOGGER.error(f"[{oracle_name}] No JSON object found in response")
+        return {"oracle_name": oracle_name, "error": "No JSON found", "raw": text[:2000]}
+
+    depth = 0
+    in_string = False
+    escape_next = False
+    end = start
+
+    for i in range(start, len(text)):
+        ch = text[i]
+        if escape_next:
+            escape_next = False
+            continue
+        if ch == "\\":
+            escape_next = True
+            continue
+        if ch == '"' and not escape_next:
+            in_string = not in_string
+            continue
+        if in_string:
+            continue
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                end = i + 1
+                break
+
+    if depth != 0:
+        LOGGER.error(f"[{oracle_name}] Unbalanced braces in response")
+        return {"oracle_name": oracle_name, "error": "Unbalanced JSON", "raw": text[:2000]}
+
+    candidate = text[start:end]
+    try:
+        return json.loads(candidate)
+    except json.JSONDecodeError as e:
+        LOGGER.error(f"[{oracle_name}] JSON parse error: {e}")
+        LOGGER.debug(f"[{oracle_name}] Candidate: {candidate[:500]}")
+        return {"oracle_name": oracle_name, "error": f"JSON parse error: {e}", "raw": text[:2000]}
 
 
 # ---------------------------------------------------------------------------
@@ -485,9 +550,10 @@ def _build_coordinator_message(
         f"## Current Canonical Draft\n\n{draft}\n\n"
         f"## Normalized Issue Ledger (Round {round_number})\n"
         f"```json\n{json.dumps(normalized, indent=2)}\n```\n\n"
-        f"Classify each finding and revise the draft for accepted defects.\n"
-        f"Return your revision decisions JSON AND the revised draft text.\n"
-        f"Format: JSON block first, then `---REVISED DRAFT---` marker, then full revised draft."
+        f"Classify each finding by its issue_id and revise the draft for accepted defects.\n"
+        f"Include the full revised draft in the `revised_draft` field of your JSON response.\n"
+        f"If no revision is needed, set `revised_draft` to null.\n"
+        f"Return a single JSON object only — no text outside the JSON."
     )
     if prior_decisions:
         msg += (
@@ -499,27 +565,33 @@ def _build_coordinator_message(
 
 
 def _check_convergence(session: OracleSession) -> tuple[bool, str]:
-    """Check if the review loop should stop."""
+    """Check if the review loop should stop.
+
+    Convergence criteria:
+    1. No critical findings remain
+    2. High findings <= 1
+    3. Accepted defect count delta < 10% vs prior round
+    4. Any single unresolved tradeoff appears in 2+ consecutive rounds
+    """
     if len(session.rounds) < 2:
-        return False, ""
+        return False, "Need at least 2 rounds"
 
     current = session.rounds[-1]
     previous = session.rounds[-2]
 
     issues = current.normalized_issues.get("normalized_issues", [])
-    prev_issues = previous.normalized_issues.get("normalized_issues", [])
 
-    # No new critical findings
+    # 1. No critical findings
     critical = [i for i in issues if i.get("severity") == "critical"]
     if critical:
         return False, f"{len(critical)} critical findings remain"
 
-    # New high findings <= 1
+    # 2. High findings <= 1
     high = [i for i in issues if i.get("severity") == "high"]
     if len(high) > 1:
         return False, f"{len(high)} high findings remain"
 
-    # Delta in accepted defects < 10%
+    # 3. Accepted defect delta < 10%
     current_accepted = sum(
         1 for d in current.coordinator_decisions.get("revision_decisions", [])
         if d.get("decision") == "accepted_defect"
@@ -528,21 +600,18 @@ def _check_convergence(session: OracleSession) -> tuple[bool, str]:
         1 for d in previous.coordinator_decisions.get("revision_decisions", [])
         if d.get("decision") == "accepted_defect"
     )
-    if prev_accepted > 0 and current_accepted / max(prev_accepted, 1) > 0.1:
-        return False, f"Accepted defect delta too high: {current_accepted} vs {prev_accepted}"
+    delta = abs(current_accepted - prev_accepted) / max(prev_accepted, 1)
+    if delta >= 0.1 and current_accepted > 0:
+        return False, f"Accepted defect delta {delta:.0%}: {current_accepted} vs {prev_accepted}"
 
-    # Same unresolved tradeoff repeats
-    current_open = set(
-        q for q in current.coordinator_decisions.get("open_questions", [])
-    )
-    prev_open = set(
-        q for q in previous.coordinator_decisions.get("open_questions", [])
-    )
+    # 4. Same unresolved tradeoff repeats across ANY 2 consecutive rounds
+    current_open = set(current.coordinator_decisions.get("open_questions", []))
+    prev_open = set(previous.coordinator_decisions.get("open_questions", []))
     repeated = current_open & prev_open
-    if len(repeated) >= 2:
-        return True, f"Same unresolved tradeoffs repeated: {repeated}"
+    if repeated:
+        return True, f"Converged (repeated tradeoffs: {repeated})"
 
-    return True, f"Converged: {len(high)} high, {current_accepted} accepted defects"
+    return True, f"Converged: {len(high)} high, {current_accepted} accepted, delta {delta:.0%}"
 
 
 def run_review(
@@ -575,40 +644,49 @@ def run_review(
         # --- Round N: Blind review (Fran, Codex, Grok in parallel) ---
         review_msg = _build_review_message(session.canonical_draft, round_num, changed_sections)
 
-        # Run reviewers sequentially (parallel via threads would be better but
-        # keeps the script simple — swap in concurrent.futures if needed)
-        for reviewer_key in ("fran", "codex", "grok"):
+        # Run reviewers — all three must succeed or round is invalid
+        required_reviewers = ("fran", "codex", "grok")
+        round_valid = True
+
+        for reviewer_key in required_reviewers:
             config = ORACLE_ROSTER[reviewer_key]
             try:
                 result = call_oracle(config, review_msg)
                 review_round.reviewer_outputs[config.name] = result
             except Exception as e:
-                LOGGER.error(f"[{config.name}] Failed: {e}")
+                LOGGER.error(f"[{config.name}] FAILED after retries: {e}")
                 review_round.reviewer_outputs[config.name] = {
                     "oracle_name": config.name,
                     "error": str(e),
                     "findings": [],
                 }
+                round_valid = False
 
         # Save reviewer outputs
         for name, output in review_round.reviewer_outputs.items():
             path = output_dir / f"round{round_num}_{name.lower()}.json"
             path.write_text(json.dumps(output, indent=2))
 
-        # --- Round N.5: Sonnet normalizes ---
+        if not round_valid:
+            LOGGER.error(f"Round {round_num} INVALID: required reviewer failed. Skipping convergence check.")
+            session.rounds.append(review_round)
+            continue
+
+        # --- Round N.5: Sonnet normalizes (required) ---
         referee_msg = _build_referee_message(session.canonical_draft, review_round.reviewer_outputs)
         try:
             normalized = call_oracle(ORACLE_ROSTER["sonnet"], referee_msg)
         except Exception as e:
-            LOGGER.error(f"[Sonnet] Failed: {e}")
-            normalized = {"oracle_name": "Sonnet", "error": str(e), "normalized_issues": []}
+            LOGGER.error(f"[Sonnet] FAILED after retries: {e}. Round invalid.")
+            session.rounds.append(review_round)
+            continue
 
         review_round.normalized_issues = normalized
         (output_dir / f"round{round_num}_sonnet_normalized.json").write_text(
             json.dumps(normalized, indent=2)
         )
 
-        # --- Round N+1: Beth classifies and revises ---
+        # --- Beth classifies and revises (required) ---
         prior_decisions = session.rounds[-1].coordinator_decisions if session.rounds else None
         coord_msg = _build_coordinator_message(
             session.canonical_draft, normalized, round_num,
@@ -617,20 +695,20 @@ def run_review(
         try:
             beth_response = call_oracle(ORACLE_ROSTER["beth"], coord_msg)
         except Exception as e:
-            LOGGER.error(f"[Beth] Failed: {e}")
-            beth_response = {"oracle_name": "Beth", "error": str(e), "revision_decisions": []}
+            LOGGER.error(f"[Beth] FAILED after retries: {e}. Round invalid.")
+            session.rounds.append(review_round)
+            continue
 
         review_round.coordinator_decisions = beth_response
 
-        # Extract revised draft if Beth included one
-        # Beth outputs JSON + "---REVISED DRAFT---" + text
-        # The JSON is already parsed; check raw for revised draft
-        if "raw" in beth_response:
-            raw = beth_response["raw"]
-            if "---REVISED DRAFT---" in raw:
-                _, revised = raw.split("---REVISED DRAFT---", 1)
-                session.canonical_draft = revised.strip()
-                review_round.revised_draft = session.canonical_draft
+        # Extract revised draft from Beth's JSON (strict schema, no mixed format)
+        revised = beth_response.get("revised_draft")
+        if revised and isinstance(revised, str) and revised.strip():
+            session.canonical_draft = revised.strip()
+            review_round.revised_draft = session.canonical_draft
+            LOGGER.info(f"[Beth] Draft revised ({len(session.canonical_draft)} chars)")
+        else:
+            LOGGER.info("[Beth] No revision to draft this round")
 
         (output_dir / f"round{round_num}_beth_decisions.json").write_text(
             json.dumps(beth_response, indent=2)
@@ -689,7 +767,20 @@ def run_review(
 # ---------------------------------------------------------------------------
 
 def compute_metrics(session: OracleSession) -> dict:
-    """Compute the QC scoring rubric for a completed review."""
+    """Compute the QC scoring rubric for a completed review.
+
+    Joins Beth's decisions to Sonnet's normalized issues by issue_id,
+    not by fuzzy title matching.
+    """
+    # Build issue_id → severity lookup from Sonnet's normalized issues
+    issue_severity: dict[str, str] = {}
+    for r in session.rounds:
+        for issue in r.normalized_issues.get("normalized_issues", []):
+            iid = issue.get("issue_id", "")
+            if iid:
+                issue_severity[iid] = issue.get("severity", "low")
+
+    # Classify Beth's decisions by joining on issue_id
     all_decisions = []
     for r in session.rounds:
         all_decisions.extend(r.coordinator_decisions.get("revision_decisions", []))
@@ -698,30 +789,19 @@ def compute_metrics(session: OracleSession) -> dict:
     rejected = [d for d in all_decisions if d.get("decision") == "rejected_claim"]
     preference = [d for d in all_decisions if d.get("decision") == "preference_only"]
 
-    all_issues = []
-    for r in session.rounds:
-        all_issues.extend(r.normalized_issues.get("normalized_issues", []))
+    # Count accepted by severity via issue_id join
+    accepted_ids = {d.get("issue_id") for d in accepted if d.get("issue_id")}
+    critical_accepted = sum(
+        1 for iid in accepted_ids if issue_severity.get(iid) == "critical"
+    )
+    high_accepted = sum(
+        1 for iid in accepted_ids if issue_severity.get(iid) == "high"
+    )
 
+    # Dropped findings from Sonnet
     dropped = []
     for r in session.rounds:
         dropped.extend(r.normalized_issues.get("dropped_findings", []))
-
-    critical_accepted = sum(
-        1 for i in all_issues
-        if i.get("severity") == "critical"
-        and any(
-            d.get("finding_title", "").lower() in i.get("title", "").lower()
-            for d in accepted
-        )
-    )
-    high_accepted = sum(
-        1 for i in all_issues
-        if i.get("severity") == "high"
-        and any(
-            d.get("finding_title", "").lower() in i.get("title", "").lower()
-            for d in accepted
-        )
-    )
 
     total_findings = sum(
         len(out.get("findings", []))
@@ -731,16 +811,23 @@ def compute_metrics(session: OracleSession) -> dict:
     duplicate_count = sum(1 for d in dropped if d.get("reason") == "duplicate")
     unsupported_count = sum(1 for d in dropped if d.get("reason") == "unsupported")
 
+    # Valid rounds (all required oracles succeeded)
+    valid_rounds = sum(
+        1 for r in session.rounds
+        if not any("error" in out for out in r.reviewer_outputs.values())
+    )
+
     return {
         "accepted_critical_count": critical_accepted,
         "accepted_high_count": high_accepted,
         "total_accepted_defects": len(accepted),
         "total_rejected_claims": len(rejected),
         "total_preference_only": len(preference),
-        "novel_issue_count": len(all_issues),
+        "novel_issue_count": len(issue_severity),
         "duplicate_rate": duplicate_count / max(total_findings, 1),
         "unsupported_claim_rate": unsupported_count / max(total_findings, 1),
         "rounds_to_stability": len(session.rounds),
+        "valid_rounds": valid_rounds,
         "converged": session.converged,
     }
 
