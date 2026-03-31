@@ -389,7 +389,12 @@ class VisionClient:
                     ],
                 }],
             )
-            return self._parse_json_response(response.content[0].text)
+            text = ""
+            for block in response.content:
+                if getattr(block, "type", None) == "text":
+                    text = block.text
+                    break
+            return self._parse_json_response(text)
         except Exception as e:
             if _is_auth_error(e):
                 LOGGER.error(
@@ -401,8 +406,8 @@ class VisionClient:
                 raise VisionAuthError(
                     f"Bedrock auth failed in {self.bedrock_region} for {self.model}: {e}"
                 ) from e
-            LOGGER.error(f"Vision API error: {e}")
-            return {}
+            LOGGER.error(f"Vision API error ({self.model}): {e}")
+            raise
 
     @staticmethod
     def _parse_json_response(text: str) -> Dict[str, Any]:
@@ -1293,7 +1298,12 @@ def _call_vision_with_pdf(
             api_kwargs["system"] = system_prompt
 
         response = client.client.messages.create(**api_kwargs)
-        return client._parse_json_response(response.content[0].text)
+        text = ""
+        for block in response.content:
+            if getattr(block, "type", None) == "text":
+                text = block.text
+                break
+        return client._parse_json_response(text) if text else {}
     except Exception as e:
         # Log full error details for debugging
         LOGGER.error(f"Direct PDF vision API error: {type(e).__name__}: {e}")
@@ -1378,7 +1388,11 @@ ISSUES:
             }],
         )
 
-        response_text = response.content[0].text.strip()
+        response_text = ""
+        for block in response.content:
+            if getattr(block, "type", None) == "text":
+                response_text = block.text.strip()
+                break
 
         # Parse validation result - handle both strict and verbose responses
         is_valid = None  # None = undetermined
@@ -1588,7 +1602,12 @@ def _call_vision_multi_page(
             temperature=0,
             messages=[{"role": "user", "content": content}],
         )
-        return client._parse_json_response(response.content[0].text)
+        text = ""
+        for block in response.content:
+            if getattr(block, "type", None) == "text":
+                text = block.text
+                break
+        return client._parse_json_response(text) if text else {}
     except Exception as e:
         LOGGER.error(f"Multi-page vision API error: {e}")
         return {}
