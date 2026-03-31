@@ -225,6 +225,7 @@ Your primary job is to normalize and score findings from other oracles.
 Input:
 - canonical draft
 - reviewer JSON outputs
+- current round number
 
 Tasks:
 1. Deduplicate overlapping findings.
@@ -233,12 +234,15 @@ Tasks:
 4. Flag unsupported or weak findings.
 5. Detect direct conflicts between reviewers.
 6. Produce a normalized issue ledger for the coordinator.
+7. If an issue was seen in prior rounds, REUSE the same issue_id so Beth
+   and the convergence checker can track continuity across rounds.
 
 Rules:
 - Do not invent new issues unless a cross-review contradiction reveals one.
 - Keep each merged issue atomic.
 - Preserve reviewer attribution.
 - Be conservative with severity inflation.
+- issue_id format: "R{round}-ISSUE-{N}" for new issues. Reuse prior IDs for recurring issues.
 
 Output JSON:
 {
@@ -246,7 +250,7 @@ Output JSON:
   "role": "referee",
   "normalized_issues": [
     {
-      "issue_id": "ISSUE-001",
+      "issue_id": "R1-ISSUE-001",
       "title": "...",
       "severity": "critical|high|medium|low",
       "category": "...",
@@ -508,6 +512,23 @@ class ReviewRound:
     normalized_issues: dict = field(default_factory=dict)
     coordinator_decisions: dict = field(default_factory=dict)
     revised_draft: str = ""
+    valid: bool = False  # True only if all required oracles succeeded
+
+
+def _last_valid_round(session: OracleSession) -> ReviewRound | None:
+    """Return the most recent valid round, or None."""
+    for r in reversed(session.rounds):
+        if r.valid:
+            return r
+    return None
+
+
+def _last_two_valid_rounds(session: OracleSession) -> tuple[ReviewRound | None, ReviewRound | None]:
+    """Return (previous_valid, current_valid) — the two most recent valid rounds."""
+    valid = [r for r in session.rounds if r.valid]
+    if len(valid) < 2:
+        return (None, None)
+    return (valid[-2], valid[-1])
 
 
 @dataclass
@@ -531,11 +552,21 @@ def _build_review_message(draft: str, round_number: int, changed_sections: list[
     return msg
 
 
-def _build_referee_message(draft: str, reviews: dict[str, dict]) -> str:
+def _build_referee_message(
+    draft: str,
+    reviews: dict[str, dict],
+    round_number: int,
+    prior_issue_ids: list[str] | None = None,
+) -> str:
     """Build the message for Sonnet referee."""
-    msg = f"## Canonical Draft\n\n{draft}\n\n## Reviewer Outputs\n\n"
+    msg = f"## Round {round_number}\n\n## Canonical Draft\n\n{draft}\n\n## Reviewer Outputs\n\n"
     for name, output in reviews.items():
         msg += f"### {name}\n```json\n{json.dumps(output, indent=2)}\n```\n\n"
+    if prior_issue_ids:
+        msg += (
+            f"## Prior Round Issue IDs (reuse for recurring issues)\n"
+            f"{json.dumps(prior_issue_ids)}\n\n"
+        )
     return msg
 
 
@@ -567,17 +598,17 @@ def _build_coordinator_message(
 def _check_convergence(session: OracleSession) -> tuple[bool, str]:
     """Check if the review loop should stop.
 
+    Only compares valid rounds. Invalid rounds are skipped entirely.
+
     Convergence criteria:
     1. No critical findings remain
     2. High findings <= 1
-    3. Accepted defect count delta < 10% vs prior round
-    4. Any single unresolved tradeoff appears in 2+ consecutive rounds
+    3. Issue set stability: >80% of issue_ids overlap between rounds
+    4. Any single unresolved tradeoff appears in 2+ consecutive valid rounds
     """
-    if len(session.rounds) < 2:
-        return False, "Need at least 2 rounds"
-
-    current = session.rounds[-1]
-    previous = session.rounds[-2]
+    previous, current = _last_two_valid_rounds(session)
+    if previous is None or current is None:
+        return False, "Need at least 2 valid rounds"
 
     issues = current.normalized_issues.get("normalized_issues", [])
 
@@ -591,27 +622,23 @@ def _check_convergence(session: OracleSession) -> tuple[bool, str]:
     if len(high) > 1:
         return False, f"{len(high)} high findings remain"
 
-    # 3. Accepted defect delta < 10%
-    current_accepted = sum(
-        1 for d in current.coordinator_decisions.get("revision_decisions", [])
-        if d.get("decision") == "accepted_defect"
-    )
-    prev_accepted = sum(
-        1 for d in previous.coordinator_decisions.get("revision_decisions", [])
-        if d.get("decision") == "accepted_defect"
-    )
-    delta = abs(current_accepted - prev_accepted) / max(prev_accepted, 1)
-    if delta >= 0.1 and current_accepted > 0:
-        return False, f"Accepted defect delta {delta:.0%}: {current_accepted} vs {prev_accepted}"
+    # 3. Issue set stability (by issue_id, not count)
+    current_ids = {i.get("issue_id") for i in issues if i.get("issue_id")}
+    prev_issues = previous.normalized_issues.get("normalized_issues", [])
+    prev_ids = {i.get("issue_id") for i in prev_issues if i.get("issue_id")}
+    if current_ids and prev_ids:
+        overlap = len(current_ids & prev_ids) / max(len(current_ids | prev_ids), 1)
+        if overlap < 0.8:
+            return False, f"Issue set unstable: {overlap:.0%} overlap ({len(current_ids)} vs {len(prev_ids)})"
 
-    # 4. Same unresolved tradeoff repeats across ANY 2 consecutive rounds
+    # 4. Same unresolved tradeoff repeats across valid rounds
     current_open = set(current.coordinator_decisions.get("open_questions", []))
     prev_open = set(previous.coordinator_decisions.get("open_questions", []))
     repeated = current_open & prev_open
     if repeated:
         return True, f"Converged (repeated tradeoffs: {repeated})"
 
-    return True, f"Converged: {len(high)} high, {current_accepted} accepted, delta {delta:.0%}"
+    return True, f"Converged: {len(high)} high, issue overlap {overlap:.0%}"
 
 
 def run_review(
@@ -637,16 +664,25 @@ def run_review(
         LOGGER.info(f"\n{'='*60}\nRound {round_num}\n{'='*60}")
 
         review_round = ReviewRound(round_number=round_num)
-        changed_sections = None
-        if round_num > 1 and session.rounds:
-            changed_sections = session.rounds[-1].coordinator_decisions.get("revised_sections", [])
 
-        # --- Round N: Blind review (Fran, Codex, Grok in parallel) ---
+        # Pull changed_sections and prior_decisions from last VALID round, not last round
+        last_valid = _last_valid_round(session)
+        changed_sections = last_valid.coordinator_decisions.get("revised_sections", []) if last_valid else None
+        prior_decisions = last_valid.coordinator_decisions if last_valid else None
+
+        # Collect prior issue IDs for Sonnet to reuse on recurring issues
+        prior_issue_ids = []
+        if last_valid:
+            prior_issue_ids = [
+                i.get("issue_id") for i in last_valid.normalized_issues.get("normalized_issues", [])
+                if i.get("issue_id")
+            ]
+
+        # --- Round N: Blind review (Fran, Codex, Grok) ---
         review_msg = _build_review_message(session.canonical_draft, round_num, changed_sections)
 
-        # Run reviewers — all three must succeed or round is invalid
         required_reviewers = ("fran", "codex", "grok")
-        round_valid = True
+        reviewer_failed = False
 
         for reviewer_key in required_reviewers:
             config = ORACLE_ROSTER[reviewer_key]
@@ -660,20 +696,23 @@ def run_review(
                     "error": str(e),
                     "findings": [],
                 }
-                round_valid = False
+                reviewer_failed = True
 
         # Save reviewer outputs
         for name, output in review_round.reviewer_outputs.items():
             path = output_dir / f"round{round_num}_{name.lower()}.json"
             path.write_text(json.dumps(output, indent=2))
 
-        if not round_valid:
-            LOGGER.error(f"Round {round_num} INVALID: required reviewer failed. Skipping convergence check.")
-            session.rounds.append(review_round)
+        if reviewer_failed:
+            LOGGER.error(f"Round {round_num} INVALID: required reviewer failed.")
+            session.rounds.append(review_round)  # valid=False (default)
             continue
 
         # --- Round N.5: Sonnet normalizes (required) ---
-        referee_msg = _build_referee_message(session.canonical_draft, review_round.reviewer_outputs)
+        referee_msg = _build_referee_message(
+            session.canonical_draft, review_round.reviewer_outputs,
+            round_number=round_num, prior_issue_ids=prior_issue_ids,
+        )
         try:
             normalized = call_oracle(ORACLE_ROSTER["sonnet"], referee_msg)
         except Exception as e:
@@ -687,7 +726,6 @@ def run_review(
         )
 
         # --- Beth classifies and revises (required) ---
-        prior_decisions = session.rounds[-1].coordinator_decisions if session.rounds else None
         coord_msg = _build_coordinator_message(
             session.canonical_draft, normalized, round_num,
             prior_decisions=[prior_decisions] if prior_decisions else None,
@@ -701,7 +739,7 @@ def run_review(
 
         review_round.coordinator_decisions = beth_response
 
-        # Extract revised draft from Beth's JSON (strict schema, no mixed format)
+        # Extract revised draft from Beth's JSON (strict schema)
         revised = beth_response.get("revised_draft")
         if revised and isinstance(revised, str) and revised.strip():
             session.canonical_draft = revised.strip()
@@ -709,6 +747,9 @@ def run_review(
             LOGGER.info(f"[Beth] Draft revised ({len(session.canonical_draft)} chars)")
         else:
             LOGGER.info("[Beth] No revision to draft this round")
+
+        # All 5 oracles succeeded — mark round as valid
+        review_round.valid = True
 
         (output_dir / f"round{round_num}_beth_decisions.json").write_text(
             json.dumps(beth_response, indent=2)
@@ -811,11 +852,8 @@ def compute_metrics(session: OracleSession) -> dict:
     duplicate_count = sum(1 for d in dropped if d.get("reason") == "duplicate")
     unsupported_count = sum(1 for d in dropped if d.get("reason") == "unsupported")
 
-    # Valid rounds (all required oracles succeeded)
-    valid_rounds = sum(
-        1 for r in session.rounds
-        if not any("error" in out for out in r.reviewer_outputs.values())
-    )
+    # Valid rounds = all 5 oracles succeeded (reviewer + Sonnet + Beth)
+    valid_rounds = sum(1 for r in session.rounds if r.valid)
 
     return {
         "accepted_critical_count": critical_accepted,
