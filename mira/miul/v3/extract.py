@@ -51,12 +51,11 @@ from .text_extract import (
 
 LOGGER = logging.getLogger(__name__)
 
-# API Configuration - Direct Anthropic API only
-# (Bedrock support commented out for now)
-# USE_BEDROCK = os.environ.get("USE_BEDROCK", "0").lower() in ("1", "true", "yes")
-# BEDROCK_REGION = os.environ.get("BEDROCK_REGION", "us-gov-west-1")
-# SONNET_MODEL_BEDROCK = "us-gov.anthropic.claude-sonnet-4-6-v1:0"
-SONNET_MODEL = os.environ.get("MIUL_VISION_MODEL") or "claude-sonnet-4-6"
+# API Configuration — Bedrock-aware (same pattern as OCA system_vision)
+USE_BEDROCK = os.environ.get("USE_BEDROCK", "0").lower() in ("1", "true", "yes")
+BEDROCK_REGION = os.environ.get("BEDROCK_REGION", "us-gov-west-1")
+SONNET_MODEL_DIRECT = "claude-sonnet-4-5-20250929"
+SONNET_MODEL_BEDROCK = os.environ.get("LLM_SONNET_MODEL") or "us-gov.anthropic.claude-sonnet-4-5-20250929-v1:0"
 
 
 # =============================================================================
@@ -272,20 +271,26 @@ Return ONLY valid JSON. No explanations outside the JSON."""
 # =============================================================================
 
 class VisionClient:
-    """Claude vision API client for drawing extraction (Direct Anthropic API)."""
+    """Claude vision API client for drawing extraction (Bedrock + direct API)."""
 
-    def __init__(self, api_key: str = None):
+    def __init__(self, api_key: str = None, use_bedrock: bool = None):
+        self._use_bedrock = USE_BEDROCK if use_bedrock is None else use_bedrock
         self.api_key = api_key or os.environ.get("ANTHROPIC_API_KEY")
         self._client = None
-        self.model = SONNET_MODEL
+        self.model = SONNET_MODEL_BEDROCK if self._use_bedrock else SONNET_MODEL_DIRECT
 
     @property
     def client(self):
         """Lazy-load client."""
         if self._client is None:
-            from anthropic import Anthropic
-            self._client = Anthropic(api_key=self.api_key)
-            LOGGER.info("Using direct Anthropic API")
+            if self._use_bedrock:
+                from anthropic import AnthropicBedrock
+                self._client = AnthropicBedrock(aws_region=BEDROCK_REGION)
+                LOGGER.info(f"Using Bedrock API ({BEDROCK_REGION}, model={self.model})")
+            else:
+                from anthropic import Anthropic
+                self._client = Anthropic(api_key=self.api_key)
+                LOGGER.info(f"Using direct Anthropic API (model={self.model})")
         return self._client
 
     def is_available(self) -> bool:
