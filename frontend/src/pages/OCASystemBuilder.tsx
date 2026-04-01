@@ -62,9 +62,11 @@ import {
 import { authorityRegistry, createOcaContext, ocaGuidancePack } from '@/lib/guidance/oca-pack';
 import type { GuidanceModeName } from '@/lib/guidance/types';
 import {
+  buildWorkflowContext,
   buildChatContextSummary,
   createModuleChatLaunchState,
   registerRouteModuleChatState,
+  resolveGuidanceFieldFromTarget,
 } from '@/lib/mira-chat-context';
 
 // ---------------------------------------------------------------------------
@@ -202,6 +204,7 @@ export default function OCASystemBuilder() {
   const [showKindling, setShowKindling] = useState(false);
   const [activeTab, setActiveTab] = useState('canvas');
   const [guidanceMode, setGuidanceMode] = useState<GuidanceModeName>('live');
+  const [activeChatField, setActiveChatField] = useState<{ fieldKey: string; label: string } | null>(null);
   const [selectedNodeComponentId, setSelectedNodeComponentId] = useState<string | null>(null);
   const [editorComponentId, setEditorComponentId] = useState<string | null>(null);
   const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
@@ -249,6 +252,54 @@ export default function OCASystemBuilder() {
     [editorComponentId, assessment],
   );
   const selectedMaterialName = selectedComponent?.materials[0]?.material.material_name ?? '';
+  const systemBuilderWorkflowContext = buildWorkflowContext({
+    currentStep: visionDialogOpen
+      ? 'vision_import'
+      : selectedComponent
+        ? 'edit_selected_component'
+        : assessment
+          ? 'review_system_assessment'
+          : systemId
+            ? 'build_system_topology'
+            : 'define_system_inputs',
+    activeField: activeChatField ?? (selectedComponent
+      ? { fieldKey: `component.${selectedComponent.component_id}`, label: `Selected Component: ${selectedComponent.label}` }
+      : { fieldKey: `tab.${activeTab}`, label: `Active Tab: ${activeTab}` }),
+    fieldStates: [
+      {
+        fieldKey: 'system_builder.project_name',
+        label: 'Project Name',
+        status: inputs.project_name?.trim() ? 'complete' : 'warning',
+        required: false,
+      },
+      {
+        fieldKey: 'system_builder.phase',
+        label: 'Oxygen Phase',
+        status: inputs.phase ? 'complete' : 'incomplete',
+        required: true,
+      },
+      {
+        fieldKey: 'system_builder.system_pressure_max_psia',
+        label: 'Max Pressure',
+        status: Number.isFinite(inputs.system_pressure_max_psia) ? 'complete' : 'incomplete',
+        required: true,
+      },
+      {
+        fieldKey: 'system_builder.selected_component',
+        label: 'Selected Component',
+        status: selectedComponent ? 'complete' : 'warning',
+        required: false,
+      },
+    ],
+    nextSteps: !systemId
+      ? ['Create the system and set the top-level oxygen service inputs.']
+      : selectedComponent
+        ? ['Edit the selected component materials and config, then re-run the assessment.']
+        : assessment
+          ? ['Inspect a component path or review the assessment tabs for the current topology.']
+          : ['Add components, connect the flow path, and run the system assessment.'],
+    blockers: !systemId ? ['System topology not initialized'] : [],
+  });
   const systemBuilderChatLaunchState = createModuleChatLaunchState({
     scopeKey: 'oca-system-builder',
     moduleLabel: 'OCA System Builder',
@@ -257,6 +308,7 @@ export default function OCASystemBuilder() {
       material: selectedMaterialName,
       environment: inputs.phase.toUpperCase(),
       pressure_psi: inputs.system_pressure_max_psia,
+      chat_workflow: systemBuilderWorkflowContext,
     },
     originPath: '/oca/system-builder',
     originTitle: 'OCA System Builder',
@@ -273,6 +325,9 @@ export default function OCASystemBuilder() {
   useEffect(() => {
     registerRouteModuleChatState('/oca/system-builder', systemBuilderChatLaunchState);
   }, [
+    activeChatField,
+    activeTab,
+    assessment,
     inputs.hardware_name,
     inputs.phase,
     inputs.project_name,
@@ -280,6 +335,7 @@ export default function OCASystemBuilder() {
     selectedComponent?.label,
     selectedMaterialName,
     systemId,
+    visionDialogOpen,
   ]);
 
   const handleOpenEditor = useCallback((componentId: string) => {
@@ -1011,7 +1067,13 @@ export default function OCASystemBuilder() {
       onModeChange={(newMode) => setGuidanceMode(newMode)}
       authorityRegistry={authorityRegistry}
     >
-      <div className="flex h-[calc(100vh-60px)] flex-col">
+      <div
+        className="flex h-[calc(100vh-60px)] flex-col"
+        onFocusCapture={(event) => {
+          const field = resolveGuidanceFieldFromTarget(event.target);
+          if (field) setActiveChatField(field);
+        }}
+      >
         {/* Page Header */}
         <div className="space-y-3 border-b px-4 py-2">
           <div className="flex items-center justify-between">

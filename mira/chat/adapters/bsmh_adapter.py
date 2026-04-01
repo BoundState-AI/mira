@@ -26,6 +26,9 @@ __version__ = "1.0.0"
 __safety_critical__ = False
 
 import logging
+import re
+from functools import lru_cache
+from pathlib import Path
 from typing import Any, Optional
 
 from mira.chat.engine_adapter import EngineAdapter
@@ -69,6 +72,80 @@ _INTENT_DESCRIPTIONS: dict[str, str] = {
     "mua_precedent": "MUA precedent search",
     "general": "General M&P question",
 }
+
+_MPR_PATTERN = re.compile(r"\bMPR[-\s]?(\d{1,3})\b", re.IGNORECASE)
+_MP_PLAN_PATTERN = re.compile(
+    r"\b(?:m[& ]?p\s+plan|materials?\s+(?:and|&)\s+process(?:es)?\s+plan)\b",
+    re.IGNORECASE,
+)
+_STATUS_FIELD_PATTERN = re.compile(
+    r"(?P<label>Status|What this means|Why flagged|Evidence on file|What you should do|Quick actions):\s*"
+    r"(?P<value>.*?)(?=(?:\n|\r|\s)+(?:Status|What this means|Why flagged|Evidence on file|"
+    r"What you should do|Quick actions):|$)",
+    re.IGNORECASE | re.DOTALL,
+)
+_POLYMER_PATTERN = re.compile(
+    r"\b(?:kapton|polyimide|ptfe|teflon|peek|vespel|viton|kalrez|epdm|silicone|"
+    r"fluorosilicone|kel-?f|nylon|delrin|ultem)\b",
+    re.IGNORECASE,
+)
+_METAL_PATTERN = re.compile(
+    r"\b(?:al(?:uminum|uminium)?|steel|stainless|cres|inconel|monel|hastelloy|haynes|"
+    r"titanium|ti-?\d|cda\s*\d|a-286|mp35n|\d{3,4}l?)\b",
+    re.IGNORECASE,
+)
+_TRIGGER_LABELS = {
+    "metallic_material": "metallic materials",
+    "composite_material": "composite materials",
+    "polymeric_material": "polymeric materials",
+    "nonmetallic_material": "nonmetallic materials",
+}
+
+
+@lru_cache(maxsize=1)
+def _load_mpr_records() -> dict[int, Any]:
+    from mira.compliance.models.mpr import create_mpr_index_from_yaml
+
+    yaml_path = Path(__file__).resolve().parents[2] / "compliance" / "data" / "mprs_6016c.yaml"
+    index = create_mpr_index_from_yaml(str(yaml_path))
+    return dict(index.records)
+
+
+def _extract_mpr_number(text: str) -> int | None:
+    match = _MPR_PATTERN.search(text)
+    if not match:
+        return None
+    try:
+        return int(match.group(1))
+    except ValueError:
+        return None
+
+
+def _extract_status_fields(text: str) -> dict[str, str]:
+    fields: dict[str, str] = {}
+    for match in _STATUS_FIELD_PATTERN.finditer(text):
+        label = match.group("label").strip().lower()
+        value = re.sub(r"\s+", " ", match.group("value").strip(" .\n\r\t"))
+        if value:
+            fields[label] = value
+    return fields
+
+
+def _infer_material_family(material: str | None) -> str | None:
+    if not material:
+        return None
+    if _POLYMER_PATTERN.search(material):
+        return "polymer"
+    if _METAL_PATTERN.search(material):
+        return "metal"
+    return None
+
+
+def _format_triggers(triggers: list[str]) -> str:
+    if not triggers:
+        return "not specified"
+    labels = [_TRIGGER_LABELS.get(trigger, trigger.replace("_", " ")) for trigger in triggers]
+    return ", ".join(labels)
 
 
 # ---------------------------------------------------------------------------
@@ -123,7 +200,7 @@ class BSMHAdapter(EngineAdapter):
             LOGGER.error("BSMH bouncer raised: %s", exc, exc_info=True)
             return self.wrap_error(exc=exc)
 
-        return self._adapt_bouncer_result(result, query, session_context)
+        return self._adapt_bouncer_result(result, query, parsed_input, session_context)
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -133,6 +210,7 @@ class BSMHAdapter(EngineAdapter):
         self,
         result: Any,  # BouncerResult
         query: str,
+        parsed_input: dict[str, Any],
         session_context: dict[str, Any],
     ) -> EngineEnvelope:
         """Map a BouncerResult to an EngineEnvelope."""
@@ -172,6 +250,10 @@ class BSMHAdapter(EngineAdapter):
             session_context["bsmh_environment"] = sq.environment
         if sq.intent:
             session_context["bsmh_intent"] = sq.intent
+
+        special_answer = self._maybe_build_grounded_answer(query, sq, parsed_input)
+        if special_answer is not None:
+            return special_answer
 
         # Build response text
         intent_label = _INTENT_DESCRIPTIONS.get(sq.intent, sq.intent)
@@ -238,4 +320,152 @@ class BSMHAdapter(EngineAdapter):
             missing_inputs=missing,
             recommended_actions=actions,
             domain_payload=domain_payload,
+        )
+
+    def _maybe_build_grounded_answer(
+        self,
+        query: str,
+        structured_query: Any,
+        parsed_input: dict[str, Any],
+    ) -> EngineEnvelope | None:
+        mp_plan_answer = self._maybe_build_mp_plan_answer(query)
+        if mp_plan_answer is not None:
+            return mp_plan_answer
+
+        mpr_answer = self._maybe_build_mpr_answer(query, structured_query, parsed_input)
+        if mpr_answer is not None:
+            return mpr_answer
+
+        return None
+
+    def _maybe_build_mp_plan_answer(self, query: str) -> EngineEnvelope | None:
+        if not _MP_PLAN_PATTERN.search(query):
+            return None
+
+        lines = [
+            "An M&P plan in MIRA is a five-step workflow.",
+            "",
+            "1. Create the session and set the program or vehicle context.",
+            "2. Add the service environment or environments you care about.",
+            "3. Add materials and map each one to a MAPTIS code if you have it.",
+            "4. Run compute and answer the blocking questions, especially tailoring, closure, quantity, and precedent prompts.",
+            "5. Generate the artifacts after the blockers are cleared.",
+            "",
+            "If you are looking at a requirement card, the practical next move is usually not to upload a random document. "
+            "Either answer the blocking question directly or attach the citation, analysis, or test evidence tied to the exact material and environment.",
+        ]
+
+        return self.wrap_envelope(
+            status=Status.PASS,
+            response_text="\n".join(lines),
+            authority_basis=["MIRA MP Plan workflow"],
+            citations=["MIRA MP Plan workflow"],
+            recommended_actions=[
+                "Start by defining the environment before adding materials.",
+                "Map each material to MAPTIS before treating the plan as review-ready.",
+                "Clear tailoring and closure blockers before generating artifacts.",
+            ],
+            domain_payload={
+                "answer_type": "mp_plan_workflow",
+            },
+        )
+
+    def _maybe_build_mpr_answer(
+        self,
+        query: str,
+        structured_query: Any,
+        parsed_input: dict[str, Any],
+    ) -> EngineEnvelope | None:
+        mpr_number = _extract_mpr_number(query)
+        if mpr_number is None:
+            return None
+
+        try:
+            record = _load_mpr_records().get(mpr_number)
+        except Exception as exc:
+            LOGGER.warning("Failed to load MPR index for BSMH answer: %s", exc)
+            return None
+
+        if record is None:
+            return None
+
+        fields = _extract_status_fields(query)
+        material = (
+            structured_query.material
+            or parsed_input.get("material_designation")
+            or parsed_input.get("material")
+        )
+        family = _infer_material_family(str(material) if material else None)
+        applies_to = _format_triggers(list(getattr(record, "applicability_triggers", []) or []))
+
+        lines = [
+            f"{record.mpr_id} is NASA-STD-6016C section {record.section}: {record.title}.",
+            str(record.shall_text).strip(),
+            f"This requirement is tagged for {applies_to}.",
+        ]
+
+        if fields:
+            status_value = fields.get("status")
+            meaning = fields.get("what this means")
+            why_flagged = fields.get("why flagged")
+            evidence = fields.get("evidence on file")
+            next_step = fields.get("what you should do")
+            quick_actions = fields.get("quick actions")
+
+            if status_value:
+                lines.append("")
+                lines.append(
+                    f'For the card you pasted, "{status_value}" means the engine did not close the requirement from the evidence currently attached.'
+                )
+            if meaning:
+                lines.append(meaning)
+            if why_flagged:
+                lines.append(f"Why it was flagged: {why_flagged}")
+            if evidence:
+                lines.append(f"Current authority on file: {evidence}")
+            if next_step:
+                lines.append(f"What to do next: {next_step}")
+            if quick_actions:
+                lines.append(f"Available closure paths: {quick_actions}")
+
+        if material:
+            lines.append("")
+            if family == "polymer" and "metallic_material" in list(record.applicability_triggers or []):
+                lines.append(
+                    f"Material check: {material} reads as a polymer/nonmetal. "
+                    f"Because {record.mpr_id} is keyed to metallic materials in the local requirement index, "
+                    "that suggests the requirement may be non-applicable to a Kapton-only part unless the card is really pointing at adjacent metallic structural hardware."
+                )
+            elif family == "metal":
+                lines.append(
+                    f"Material check: {material} reads as metallic, so {record.mpr_id} is at least directionally applicable and needs a real closure basis."
+                )
+
+        recommended_actions = [
+            "If the part is metallic structural hardware, attach alloy/condition-specific certs plus the cited analysis or test basis.",
+            "If the part is nonmetallic, document non-applicability or the tailoring/closure rationale instead of leaving the card unresolved.",
+        ]
+
+        return self.wrap_envelope(
+            status=Status.PASS,
+            response_text="\n".join(lines),
+            authority_basis=[f"NASA-STD-6016C §{record.section}", record.mpr_id],
+            citations=[f"NASA-STD-6016C §{record.section}", record.mpr_id],
+            evidence=[
+                {
+                    "source_id": record.mpr_id,
+                    "section": record.section,
+                    "title": record.title,
+                    "shall_text": record.shall_text,
+                }
+            ],
+            recommended_actions=recommended_actions,
+            domain_payload={
+                "answer_type": "mpr_lookup",
+                "mpr_id": record.mpr_id,
+                "section": record.section,
+                "material": material,
+                "material_family_inference": family,
+                "status_fields": fields,
+            },
         )

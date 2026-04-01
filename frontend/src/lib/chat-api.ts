@@ -31,6 +31,16 @@ export interface MiraChatPingResponse {
   adapters_loaded: string;
 }
 
+export interface MiraChatStreamEvent {
+  type: string;
+  [key: string]: unknown;
+}
+
+export interface MiraChatStreamCallbacks {
+  onEvent?: (event: MiraChatStreamEvent) => void;
+  signal?: AbortSignal;
+}
+
 function buildErrorMessage(statusText: string, detail: unknown): string {
   if (typeof detail === "string" && detail.trim()) {
     return detail;
@@ -65,4 +75,77 @@ export async function sendMiraChatMessage(payload: MiraChatRequest): Promise<Mir
   }
 
   return response.json();
+}
+
+function emitSseEvents(buffer: string, onEvent?: (event: MiraChatStreamEvent) => void): string {
+  const normalized = buffer.replace(/\r\n/g, "\n");
+  let cursor = 0;
+
+  while (true) {
+    const boundary = normalized.indexOf("\n\n", cursor);
+    if (boundary === -1) {
+      return normalized.slice(cursor);
+    }
+
+    const block = normalized.slice(cursor, boundary);
+    cursor = boundary + 2;
+
+    const dataLines = block
+      .split("\n")
+      .filter((line) => line.startsWith("data:"))
+      .map((line) => line.slice(5).trimStart());
+
+    if (!dataLines.length) {
+      continue;
+    }
+
+    const rawData = dataLines.join("\n");
+    const parsed = JSON.parse(rawData) as MiraChatStreamEvent;
+    onEvent?.(parsed);
+  }
+}
+
+export async function sendMiraChatStream(
+  payload: MiraChatRequest,
+  callbacks: MiraChatStreamCallbacks = {},
+): Promise<void> {
+  const response = await fetch(`${API_BASE}/stream`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "text/event-stream",
+    },
+    body: JSON.stringify(payload),
+    signal: callbacks.signal,
+  });
+
+  if (!response.ok) {
+    const detail = await response.json().catch(() => null);
+    throw new Error(buildErrorMessage(response.statusText, detail));
+  }
+
+  if (!response.body) {
+    throw new Error("Chat stream failed: response body unavailable.");
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) {
+      break;
+    }
+
+    buffer += decoder.decode(value, { stream: true });
+    buffer = emitSseEvents(buffer, callbacks.onEvent);
+  }
+
+  buffer += decoder.decode();
+  buffer = emitSseEvents(buffer, callbacks.onEvent);
+
+  if (buffer.trim()) {
+    throw new Error("Chat stream ended with an incomplete SSE event.");
+  }
 }

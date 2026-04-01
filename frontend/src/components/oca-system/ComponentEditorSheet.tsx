@@ -279,7 +279,11 @@ export default function ComponentEditorSheet({
                 )}
               </div>
 
-              <div className="space-y-2">
+              <div
+                className="space-y-2"
+                data-guidance-field={componentHelp('label')}
+                data-guidance-label="Component Label"
+              >
                 <OCAHelpLabel htmlFor="component-label" fieldId={componentHelp('label')}>
                   Label
                 </OCAHelpLabel>
@@ -291,7 +295,11 @@ export default function ComponentEditorSheet({
                 />
               </div>
 
-              <div className="space-y-2">
+              <div
+                className="space-y-2"
+                data-guidance-field={componentHelp('materials')}
+                data-guidance-label="Component Materials"
+              >
                 <OCAHelpLabel htmlFor="component-materials" fieldId={componentHelp('materials')}>
                   Materials
                 </OCAHelpLabel>
@@ -315,7 +323,12 @@ export default function ComponentEditorSheet({
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     {visibleFields.map((field) => (
-                      <div key={field.key} className="space-y-2">
+                      <div
+                        key={field.key}
+                        className="space-y-2"
+                        data-guidance-field={componentHelp(field.key)}
+                        data-guidance-label={field.label}
+                      >
                         <OCAHelpLabel htmlFor={field.key} fieldId={componentHelp(field.key)}>
                           {field.label}
                         </OCAHelpLabel>
@@ -342,28 +355,44 @@ export default function ComponentEditorSheet({
               <div className="space-y-3">
                 <div className="text-sm font-medium">MPR 53 Exemption Flags</div>
                 <div className="space-y-2 rounded-xl border border-border/70 bg-muted/20 p-4">
-                  <div className="flex items-center justify-between gap-3">
+                  <div
+                    className="flex items-center justify-between gap-3"
+                    data-guidance-field={componentHelp('is_rigid_metallic_tubing')}
+                    data-guidance-label="Rigid Metallic Tubing"
+                  >
                     <span className="flex items-center gap-1.5">
                       <Label htmlFor="rigid-tubing" className="text-sm">Rigid metallic tubing</Label>
                       <OCAInlineHelp fieldId={componentHelp('is_rigid_metallic_tubing')} />
                     </span>
                     <Switch id="rigid-tubing" checked={isRigidTubing} onCheckedChange={setIsRigidTubing} />
                   </div>
-                  <div className="flex items-center justify-between gap-3">
+                  <div
+                    className="flex items-center justify-between gap-3"
+                    data-guidance-field={componentHelp('is_metallic_flex_hose')}
+                    data-guidance-label="Metallic Flex Hose"
+                  >
                     <span className="flex items-center gap-1.5">
                       <Label htmlFor="metallic-flex" className="text-sm">Metallic flex hose</Label>
                       <OCAInlineHelp fieldId={componentHelp('is_metallic_flex_hose')} />
                     </span>
                     <Switch id="metallic-flex" checked={isMetallicFlexHose} onCheckedChange={setIsMetallicFlexHose} />
                   </div>
-                  <div className="flex items-center justify-between gap-3">
+                  <div
+                    className="flex items-center justify-between gap-3"
+                    data-guidance-field={componentHelp('is_all_metal_seal')}
+                    data-guidance-label="All-Metal Seal"
+                  >
                     <span className="flex items-center gap-1.5">
                       <Label htmlFor="all-metal-seal" className="text-sm">All-metal seal</Label>
                       <OCAInlineHelp fieldId={componentHelp('is_all_metal_seal')} />
                     </span>
                     <Switch id="all-metal-seal" checked={isAllMetalSeal} onCheckedChange={setIsAllMetalSeal} />
                   </div>
-                  <div className="flex items-center justify-between gap-3">
+                  <div
+                    className="flex items-center justify-between gap-3"
+                    data-guidance-field={componentHelp('is_metallic_pressure_vessel')}
+                    data-guidance-label="Metallic Pressure Vessel"
+                  >
                     <span className="flex items-center gap-1.5">
                       <Label htmlFor="metallic-vessel" className="text-sm">Metallic pressure vessel</Label>
                       <OCAInlineHelp fieldId={componentHelp('is_metallic_pressure_vessel')} />

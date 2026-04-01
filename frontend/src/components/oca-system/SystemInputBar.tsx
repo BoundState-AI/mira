@@ -21,7 +21,11 @@ export default function SystemInputBar({ inputs, onChange }: SystemInputBarProps
   return (
     <div className="flex flex-wrap items-end gap-3 p-3 bg-card rounded-lg border">
       {/* O2 Fraction */}
-      <div className="space-y-1 w-28">
+      <div
+        className="space-y-1 w-28"
+        data-guidance-field="system_builder.o2_fraction"
+        data-guidance-label="O2 Fraction"
+      >
         <OCAHelpLabel
           fieldId="system_builder.o2_fraction"
           className="gap-1"
@@ -37,7 +41,11 @@ export default function SystemInputBar({ inputs, onChange }: SystemInputBarProps
       </div>
 
       {/* Max Pressure */}
-      <div className="space-y-1 w-24">
+      <div
+        className="space-y-1 w-24"
+        data-guidance-field="system_builder.system_pressure_max_psia"
+        data-guidance-label="Max Pressure"
+      >
         <OCAHelpLabel
           fieldId="system_builder.system_pressure_max_psia"
           className="gap-1"
@@ -54,7 +62,11 @@ export default function SystemInputBar({ inputs, onChange }: SystemInputBarProps
       </div>
 
       {/* Phase */}
-      <div className="space-y-1 w-28">
+      <div
+        className="space-y-1 w-28"
+        data-guidance-field="system_builder.phase"
+        data-guidance-label="Phase"
+      >
         <OCAHelpLabel
           fieldId="system_builder.phase"
           className="gap-1"
@@ -74,7 +86,11 @@ export default function SystemInputBar({ inputs, onChange }: SystemInputBarProps
       </div>
 
       {/* Oxygen Phase */}
-      <div className="space-y-1 w-20">
+      <div
+        className="space-y-1 w-20"
+        data-guidance-field="system_builder.oxygen_phase"
+        data-guidance-label="State"
+      >
         <OCAHelpLabel
           fieldId="system_builder.oxygen_phase"
           className="gap-1"
@@ -92,7 +108,11 @@ export default function SystemInputBar({ inputs, onChange }: SystemInputBarProps
       </div>
 
       {/* Flow Rate */}
-      <div className="space-y-1 w-24">
+      <div
+        className="space-y-1 w-24"
+        data-guidance-field="system_builder.design_flow_rate_m3_s"
+        data-guidance-label="Flow"
+      >
         <OCAHelpLabel
           fieldId="system_builder.design_flow_rate_m3_s"
           className="gap-1"
@@ -110,7 +130,11 @@ export default function SystemInputBar({ inputs, onChange }: SystemInputBarProps
       </div>
 
       {/* Mission Phase */}
-      <div className="space-y-1 w-28">
+      <div
+        className="space-y-1 w-28"
+        data-guidance-field="system_builder.mission_phase"
+        data-guidance-label="Mission"
+      >
         <OCAHelpLabel
           fieldId="system_builder.mission_phase"
           className="gap-1"
@@ -130,7 +154,11 @@ export default function SystemInputBar({ inputs, onChange }: SystemInputBarProps
       </div>
 
       {/* Cleanliness */}
-      <div className="space-y-1 w-28">
+      <div
+        className="space-y-1 w-28"
+        data-guidance-field="system_builder.cleanliness_spec"
+        data-guidance-label="Cleaning Spec"
+      >
         <OCAHelpLabel
           fieldId="system_builder.cleanliness_spec"
           className="gap-1"
@@ -147,7 +175,11 @@ export default function SystemInputBar({ inputs, onChange }: SystemInputBarProps
       </div>
 
       {/* Bi-directional flow */}
-      <div className="flex items-center gap-1.5">
+      <div
+        className="flex items-center gap-1.5"
+        data-guidance-field="system_builder.bi_directional_flow_risk"
+        data-guidance-label="Bi-Directional Flow"
+      >
         <Switch
           checked={inputs.bi_directional_flow_risk}
           onCheckedChange={(v) => onChange({ bi_directional_flow_risk: v })}

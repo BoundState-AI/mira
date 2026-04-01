@@ -50,9 +50,11 @@ import {
 } from '@/lib/guidance/galvanic-pack';
 import type { GuidanceModeName } from '@/lib/guidance/types';
 import {
+  buildWorkflowContext,
   buildChatContextSummary,
   createModuleChatLaunchState,
   registerRouteModuleChatState,
+  resolveGuidanceFieldFromTarget,
 } from '@/lib/mira-chat-context';
 import { useAuth } from '@/auth/AuthContext';
 
@@ -244,6 +246,7 @@ function MaterialSuggestions({
 export default function GalvanicCompatibility() {
   const { authHeaders, loading: authLoading } = useAuth();
   const [guidanceMode, setGuidanceMode] = useState<GuidanceModeName>('live');
+  const [activeChatField, setActiveChatField] = useState<{ fieldKey: string; label: string } | null>(null);
   const [materialA, setMaterialA] = useState('Al 6061-T6');
   const [materialB, setMaterialB] = useState('316SS');
   const [environment, setEnvironment] = useState('seawater_proxy');
@@ -439,6 +442,28 @@ export default function GalvanicCompatibility() {
   const targetMarkerPosition = deltaMarkerPosition(targetDeltaMv, targetScaleMax);
   const targetSeverity = classifyDelta(targetDeltaMv);
   const targetPlan = result ? buildMitigationPlan(result, targetDeltaMv) : null;
+  const galvanicFieldStates = [
+    { fieldKey: 'inputs.material_a', label: 'Material A', status: materialA.trim() ? 'complete' : 'incomplete', required: true },
+    { fieldKey: 'inputs.material_b', label: 'Material B', status: materialB.trim() ? 'complete' : 'incomplete', required: true },
+    { fieldKey: 'inputs.environment', label: 'Environment', status: environment ? 'complete' : 'incomplete', required: true },
+    { fieldKey: 'inputs.application_type', label: 'Application', status: applicationType ? 'complete' : 'incomplete', required: true },
+    { fieldKey: 'inputs.joint_type', label: 'Joint Type', status: jointType ? 'complete' : 'incomplete', required: true },
+    { fieldKey: 'inputs.electrical_contact', label: 'Electrical Contact', status: electricalContact ? 'complete' : 'incomplete', required: true },
+  ] as const;
+  const galvanicBlockers = galvanicFieldStates
+    .filter((field) => field.status !== 'complete')
+    .map((field) => field.label);
+  const galvanicWorkflowContext = buildWorkflowContext({
+    currentStep: result ? 'review_galvanic_screen' : galvanicBlockers.length ? 'define_material_couple' : 'ready_to_run_galvanic_screen',
+    activeField: activeChatField,
+    fieldStates: galvanicFieldStates.map((field) => ({ ...field })),
+    nextSteps: galvanicBlockers.length
+      ? [`Complete ${galvanicBlockers[0]}.`]
+      : result
+        ? ['Review the effective delta, mitigation options, and target-state plan.']
+        : ['Run the galvanic assessment for the current couple.'],
+    blockers: galvanicBlockers,
+  });
   const galvanicChatLaunchState = createModuleChatLaunchState({
     scopeKey: 'galvanic-compatibility',
     moduleLabel: 'Galvanic Compatibility',
@@ -448,6 +473,7 @@ export default function GalvanicCompatibility() {
       material_a: materialA.trim(),
       material_b: materialB.trim(),
       environment,
+      chat_workflow: galvanicWorkflowContext,
     },
     originPath: '/galvanic-compatibility',
     originTitle: 'Galvanic Compatibility',
@@ -463,7 +489,7 @@ export default function GalvanicCompatibility() {
 
   useEffect(() => {
     registerRouteModuleChatState('/galvanic-compatibility', galvanicChatLaunchState);
-  }, [applicationType, environment, jointType, materialA, materialB, selectedEnvironment?.label]);
+  }, [activeChatField, applicationType, electricalContact, environment, jointType, materialA, materialB, result, selectedEnvironment?.label]);
 
   return (
     <GuidanceProvider
@@ -474,7 +500,13 @@ export default function GalvanicCompatibility() {
       onModeChange={(newMode) => setGuidanceMode(newMode)}
       authorityRegistry={authorityRegistry}
     >
-      <div className="space-y-8">
+      <div
+        className="space-y-8"
+        onFocusCapture={(event) => {
+          const field = resolveGuidanceFieldFromTarget(event.target);
+          if (field) setActiveChatField(field);
+        }}
+      >
         <PageHeader
           title="Galvanic Compatibility"
           description="Corrosion prevention screen for dissimilar material couples. The intrinsic EMF positions update as you type, and the right-side target box can be dragged toward green to see what protection scheme gets you there."

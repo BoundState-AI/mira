@@ -9,7 +9,11 @@ export function LoginPage() {
     pendingUsername,
     mfaSecret,
     passwordResetDelivery,
+    supportsPasswordLogin,
+    supportsFederatedLogin,
+    federatedLoginLabel,
     login,
+    loginWithFederation,
     completeNewPassword,
     verifyMfa,
     verifyMfaSetup,
@@ -78,6 +82,17 @@ export function LoginPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed.");
     } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFederatedLogin = async () => {
+    setError("");
+    setLoading(true);
+    try {
+      await loginWithFederation();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Federated login failed.");
       setLoading(false);
     }
   };
@@ -180,36 +195,68 @@ export function LoginPage() {
 
         {stage === "login" && (
           <form onSubmit={handleLogin} className="space-y-3">
-            <input
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              autoComplete="username"
-              autoFocus
-            />
-            <input
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-            />
-            <button
-              type="submit"
-              disabled={loading || !username || !password}
-              className="w-full rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-            >
-              {loading ? "Signing in..." : "Sign in"}
-            </button>
-            <button
-              type="button"
-              onClick={handleGoToForgotPassword}
-              className="w-full text-sm text-slate-600 underline underline-offset-2 hover:text-slate-900"
-            >
-              Forgot your password?
-            </button>
+            {supportsPasswordLogin ? (
+              <>
+                <input
+                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                  placeholder="Username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  autoComplete="username"
+                  autoFocus
+                />
+                <input
+                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                />
+                <button
+                  type="submit"
+                  disabled={loading || !username || !password}
+                  className="w-full rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+                >
+                  {loading ? "Signing in..." : "Sign in"}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleGoToForgotPassword}
+                  className="w-full text-sm text-slate-600 underline underline-offset-2 hover:text-slate-900"
+                >
+                  Forgot your password?
+                </button>
+              </>
+            ) : (
+              <div className="rounded-md border border-sky-200 bg-sky-50 px-3 py-2 text-sm text-sky-900">
+                This deployment requires federated PIV sign-in. Username/password login is disabled.
+              </div>
+            )}
+            {supportsFederatedLogin && (
+              <>
+                {supportsPasswordLogin && (
+                  <div className="flex items-center gap-3 py-1">
+                    <div className="h-px flex-1 bg-slate-200" />
+                    <span className="text-xs font-medium uppercase tracking-[0.16em] text-slate-400">
+                      Or
+                    </span>
+                    <div className="h-px flex-1 bg-slate-200" />
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={handleFederatedLogin}
+                  disabled={loading}
+                  className="w-full rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-900 disabled:opacity-60"
+                >
+                  {loading ? "Redirecting..." : federatedLoginLabel}
+                </button>
+                <p className="text-xs text-slate-500">
+                  Use this path for NASA or MAPTIS federated PIV access.
+                </p>
+              </>
+            )}
           </form>
         )}
 

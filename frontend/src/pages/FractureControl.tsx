@@ -39,9 +39,11 @@ import {
 } from '@/lib/guidance/fracture-pack';
 import type { GuidanceModeName } from '@/lib/guidance/types';
 import {
+  buildWorkflowContext,
   buildChatContextSummary,
   createModuleChatLaunchState,
   registerRouteModuleChatState,
+  resolveGuidanceFieldFromTarget,
 } from '@/lib/mira-chat-context';
 
 const MISSION_OPTIONS = [
@@ -153,6 +155,7 @@ function classificationIcon(classification: string) {
 
 export default function FractureControl() {
   const [guidanceMode, setGuidanceMode] = useState<GuidanceModeName>('live');
+  const [activeChatField, setActiveChatField] = useState<{ fieldKey: string; label: string } | null>(null);
   const [partName, setPartName] = useState('Primary Bracket');
   const [materialName, setMaterialName] = useState('Al 6061-T6');
   const [missionClass, setMissionClass] = useState('HUMAN_RATED');
@@ -314,6 +317,29 @@ export default function FractureControl() {
     { checked: approvedSourceDataAttached, setChecked: setApprovedSourceDataAttached, label: 'Approved source data attached', fieldId: 'approved_source_data_attached' },
     { checked: muaPresent, setChecked: setMuaPresent, label: 'MUA already present' },
   ];
+  const fractureFieldStates = [
+    { fieldKey: 'inputs.part_name', label: 'Part Name', status: partName.trim() ? 'complete' : 'incomplete', required: true },
+    { fieldKey: 'inputs.material_name', label: 'Material', status: materialName.trim() ? 'complete' : 'incomplete', required: true },
+    { fieldKey: 'inputs.mission_class', label: 'Mission Class', status: missionClass ? 'complete' : 'incomplete', required: true },
+    { fieldKey: 'inputs.hazard_consequence', label: 'Hazard Consequence', status: hazardConsequence ? 'complete' : 'incomplete', required: true },
+    { fieldKey: 'inputs.load_path_type', label: 'Load Path', status: loadPathType ? 'complete' : 'incomplete', required: true },
+    { fieldKey: 'inputs.material_system', label: 'Material System', status: materialSystem ? 'complete' : 'incomplete', required: true },
+    { fieldKey: 'inputs.specific_hardware_type', label: 'Specific Hardware Type', status: specificHardwareType ? 'complete' : 'incomplete', required: true },
+  ] as const;
+  const fractureBlockers = fractureFieldStates
+    .filter((field) => field.status !== 'complete')
+    .map((field) => field.label);
+  const fractureWorkflowContext = buildWorkflowContext({
+    currentStep: result ? 'review_classification' : fractureBlockers.length ? 'define_part_context' : 'ready_to_classify',
+    activeField: activeChatField,
+    fieldStates: fractureFieldStates.map((field) => ({ ...field })),
+    nextSteps: fractureBlockers.length
+      ? [`Complete ${fractureBlockers[0]}.`]
+      : result
+        ? ['Review the applicable requirements and material findings for the current classification.']
+        : ['Run the classifier for the current part context.'],
+    blockers: fractureBlockers,
+  });
   const fractureChatLaunchState = createModuleChatLaunchState({
     scopeKey: 'fracture-control',
     moduleLabel: 'Fracture Control',
@@ -322,6 +348,7 @@ export default function FractureControl() {
       material: materialName.trim(),
       part_name: partName.trim(),
       mission_class: missionClass,
+      chat_workflow: fractureWorkflowContext,
     },
     originPath: '/fracture-control',
     originTitle: 'Fracture Control',
@@ -337,7 +364,7 @@ export default function FractureControl() {
 
   useEffect(() => {
     registerRouteModuleChatState('/fracture-control', fractureChatLaunchState);
-  }, [lifecyclePhase, materialName, missionClass, partName, specificHardwareType]);
+  }, [activeChatField, lifecyclePhase, materialName, missionClass, partName, specificHardwareType]);
 
   return (
     <GuidanceProvider
@@ -348,7 +375,13 @@ export default function FractureControl() {
       onModeChange={(newMode) => setGuidanceMode(newMode)}
       authorityRegistry={authorityRegistry}
     >
-      <div className="space-y-8">
+      <div
+        className="space-y-8"
+        onFocusCapture={(event) => {
+          const field = resolveGuidanceFieldFromTarget(event.target);
+          if (field) setActiveChatField(field);
+        }}
+      >
         <PageHeader
           title="Fracture Control"
           description="Deterministic NASA-STD-5019A classifier for fracture-control routing. Define the part context, review applicable FCRs, and surface Phase 1 material findings with citations."

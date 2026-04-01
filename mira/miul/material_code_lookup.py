@@ -19,10 +19,15 @@ Safety Critical: True
 import logging
 import math
 import re
-import psycopg2
-from psycopg2.extras import DictCursor
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
+
+try:
+    import psycopg2
+    from psycopg2.extras import DictCursor
+except ImportError:  # pragma: no cover - exercised in lightweight test envs
+    psycopg2 = None
+    DictCursor = None
 
 # Try to import rapidfuzz for better fuzzy matching
 try:
@@ -200,6 +205,8 @@ class MaterialCodeLookupService:
 
     def _get_connection(self):
         """Get PostgreSQL database connection using centralized config."""
+        if psycopg2 is None:
+            raise RuntimeError("psycopg2 is not installed; material code lookup database access is unavailable")
         if self.conn is None or self.conn.closed:
             if self._conn_params is None:
                 try:

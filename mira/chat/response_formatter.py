@@ -120,10 +120,24 @@ RULES (non-negotiable):
 - If the result is a draft artifact, clearly label it as a draft requiring review and approval
 - Never invent a confidence number — only report what the engine provided
 - When the engine returns assumptions, surface them clearly so the engineer can confirm or correct them
+- If module workflow context is present, answer the current active field first before giving broader workflow guidance
+- Treat completed fields as already handled unless the engine result explicitly says they must be revisited
+- Use current_step, blockers, and next_steps to orient the engineer toward the next grounded action
 
 Mode: {mode}
 Engine: {engine_id}
 Turn: {turn_count}"""
+
+
+def _get_chat_workflow(session_context: dict[str, Any] | None) -> dict[str, Any]:
+    """Extract workflow context from the session when module-scoped chat is active."""
+    if not session_context:
+        return {}
+    module_context = session_context.get("module_context")
+    if not isinstance(module_context, dict):
+        return {}
+    workflow = module_context.get("chat_workflow")
+    return workflow if isinstance(workflow, dict) else {}
 
 
 def _stringify_profile_lines(value: Any, fallback: list[str]) -> list[str]:
@@ -216,6 +230,36 @@ def build_formatter_prompt(
         accumulated = session_context.get("accumulated_entities", {})
         if accumulated:
             sections.append(f"SESSION CONTEXT: {accumulated}")
+        module_context = session_context.get("module_context", {})
+        if module_context:
+            sections.append(f"MODULE CONTEXT: {module_context}")
+        workflow = _get_chat_workflow(session_context)
+        if workflow:
+            workflow_lines: list[str] = []
+            if workflow.get("current_step"):
+                workflow_lines.append(f"  - Current step: {workflow['current_step']}")
+            if workflow.get("active_field_label"):
+                workflow_lines.append(f"  - Active field: {workflow['active_field_label']}")
+            elif workflow.get("active_field"):
+                workflow_lines.append(f"  - Active field key: {workflow['active_field']}")
+            if workflow.get("completed_fields"):
+                workflow_lines.append(
+                    "  - Completed fields: " + ", ".join(str(field) for field in workflow["completed_fields"])
+                )
+            if workflow.get("incomplete_fields"):
+                workflow_lines.append(
+                    "  - Incomplete fields: " + ", ".join(str(field) for field in workflow["incomplete_fields"])
+                )
+            if workflow.get("blockers"):
+                workflow_lines.append(
+                    "  - Blockers: " + ", ".join(str(blocker) for blocker in workflow["blockers"])
+                )
+            if workflow.get("next_steps"):
+                workflow_lines.append(
+                    "  - Next steps: " + ", ".join(str(step) for step in workflow["next_steps"])
+                )
+            if workflow_lines:
+                sections.append("WORKFLOW CONTEXT:\n" + "\n".join(workflow_lines))
 
     if envelope.response_text:
         sections.append(f"\n--- Engine Response ---\n{envelope.response_text}")
@@ -408,6 +452,26 @@ def _fallback_format(
     if summary:
         lines.append("")
         lines.append(summary)
+
+    workflow = _get_chat_workflow(session_context)
+    workflow_note: list[str] = []
+    if workflow.get("active_field_label"):
+        workflow_note.append(f"Current field: {workflow['active_field_label']}")
+    if workflow.get("current_step"):
+        workflow_note.append(f"Workflow step: {workflow['current_step']}")
+    if workflow_note:
+        lines.append("")
+        lines.append(" | ".join(workflow_note))
+    if workflow.get("next_steps"):
+        lines.append("")
+        lines.append("**Next step in this module:**")
+        for step in workflow["next_steps"]:
+            lines.append(f"  - {step}")
+    if workflow.get("blockers"):
+        lines.append("")
+        lines.append("**Open blockers:**")
+        for blocker in workflow["blockers"]:
+            lines.append(f"  - {blocker}")
 
     # Draft warning
     if envelope.mode == TaskMode.DRAFT_ARTIFACT:

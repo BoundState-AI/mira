@@ -90,6 +90,14 @@ _DOMAIN_KEYWORDS = {
     "materials",
     "alloy",
     "compatibility",
+    "requirement",
+    "requirements",
+    "mpr",
+    "tailoring",
+    "mp plan",
+    "m&p plan",
+    "materials and process plan",
+    "materials and processes plan",
     "oxygen",
     "hydrogen",
     "lox",
@@ -234,7 +242,9 @@ def _looks_like_material(candidate: str) -> bool:
         return True
     # Common material-family nouns or polymer names.
     if re.search(
-        r"\b(STAINLESS|STEEL|ALLOY|ALUMINUM|ALUMINIUM|TITANIUM|INCONEL|MONEL|HASTELLOY|CRES|PTFE|PEEK|VITON|NYLON|POLY|EPOXY|COPPER|BRASS|RUBBER|KEL-F)\b",
+        r"\b(STAINLESS|STEEL|ALLOY|ALUMINUM|ALUMINIUM|TITANIUM|INCONEL|MONEL|HASTELLOY|CRES|"
+        r"PTFE|PEEK|VITON|NYLON|POLY|POLYIMIDE|EPOXY|COPPER|BRASS|RUBBER|KEL-F|"
+        r"KAPTON|VESPEL|TEFLON|DELRIN|ULTEM|KALREZ|EPDM|SILICONE|FLUOROSILICONE)\b",
         c,
     ):
         return True
@@ -314,6 +324,16 @@ def _extract_materials(query: str) -> list[str]:
         normalized = re.sub(r"\s*-\s*", "-", normalized)
         normalized = normalized.replace("PH", " PH")
         found_with_pos.append((match.start(), normalized.strip()))
+
+    # Common named polymers / nonmetals.
+    polymer_matches = re.finditer(
+        r"\b(kapton|polyimide|ptfe|teflon|peek|vespel|viton|kalrez|epdm|silicone|"
+        r"fluorosilicone|kel-?f|nylon|delrin|ultem)\b",
+        raw_query,
+        flags=re.IGNORECASE,
+    )
+    for match in polymer_matches:
+        _add_candidate(match.group(1), pos_hint=match.start())
 
     # Material-like noun phrase in common question stems.
     lead_stem_patterns = [

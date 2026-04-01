@@ -27,6 +27,20 @@ export function ProtectedRoute({
     return <LoginPage />;
   }
 
+  if (!user.isApproved) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="max-w-lg rounded-xl border border-red-300 bg-red-50 p-6 text-red-900">
+          <h2 className="text-xl font-semibold mb-2">MIRA Access Not Approved</h2>
+          <p className="text-sm">
+            Your identity authenticated successfully, but this account is not in an approved MIRA
+            user or group allowlist. Contact a MIRA administrator to request access.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (requireItar && !user.isItarCleared) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
@@ -54,4 +68,3 @@ export function ProtectedRoute({
 
   return <>{children}</>;
 }
-

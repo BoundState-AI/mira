@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
+import { ModuleChatButton } from '@/components/mira/ModuleChatButton';
 import {
   GuidanceContextIndicator,
   GuidanceField,
@@ -62,6 +63,13 @@ import {
   createMpPlanContext,
   mpPlanGuidancePack,
 } from '@/lib/guidance/mp-plan-pack';
+import {
+  buildWorkflowContext,
+  buildChatContextSummary,
+  createModuleChatLaunchState,
+  registerRouteModuleChatState,
+  resolveGuidanceFieldFromTarget,
+} from '@/lib/mira-chat-context';
 import type { GuidanceModeName } from '@/lib/guidance/types';
 
 type Step = 'setup' | 'environment' | 'materials' | 'analysis' | 'generate';
@@ -109,6 +117,7 @@ const QUESTION_TYPE_LABELS: Record<string, { label: string; color: string }> = {
 export default function MPPlanGenerator() {
   const { t } = useTranslation(['mpPlanGenerator', 'common']);
   const [guidanceMode, setGuidanceMode] = useState<GuidanceModeName>('live');
+  const [activeChatField, setActiveChatField] = useState<{ fieldKey: string; label: string } | null>(null);
   // Step state
   const [step, setStep] = useState<Step>('setup');
   const [loading, setLoading] = useState(false);
@@ -146,13 +155,6 @@ export default function MPPlanGenerator() {
   const [maptisSearchResults, setMaptisSearchResults] = useState<Record<string, MaptisSearchResult[]>>({});
   const [searchingMaptis, setSearchingMaptis] = useState<Record<string, boolean>>({});
   const searchTimeouts = useRef<Record<string, NodeJS.Timeout>>({});
-  const guidanceContext = createMpPlanContext({
-    user_mode: guidanceMode,
-    program: programName || undefined,
-    service_environment: envName || addedEnvironments[0]?.name,
-    pressure_regime:
-      Number(envPressure) >= 265 ? 'high' : Number(envPressure) >= 50 ? 'medium' : 'low',
-  });
 
   // Analysis state
   const [computeResult, setComputeResult] = useState<MPPlanComputeResult | null>(null);
@@ -161,6 +163,75 @@ export default function MPPlanGenerator() {
 
   // Generate state
   const [artifacts, setArtifacts] = useState<GeneratedMPArtifact[]>([]);
+
+  const primaryMaterial = materials.find((material) => material.name.trim())?.name.trim() ?? '';
+  const primaryEnvironment = envName || addedEnvironments[0]?.name || '';
+  const guidanceContext = createMpPlanContext({
+    user_mode: guidanceMode,
+    program: programName || undefined,
+    service_environment: primaryEnvironment || undefined,
+    pressure_regime:
+      Number(envPressure) >= 265 ? 'high' : Number(envPressure) >= 50 ? 'medium' : 'low',
+  });
+  const mpPlanFieldStates = [
+    { fieldKey: 'setup.program_name', label: 'Program Name', status: programName.trim() ? 'complete' : 'incomplete', required: true },
+    { fieldKey: 'setup.program_phase', label: 'Program Phase', status: programPhase.trim() ? 'complete' : 'warning', required: false },
+    { fieldKey: 'environment.name', label: 'Environment', status: (primaryEnvironment || addedEnvironments.length > 0) ? 'complete' : 'incomplete', required: true },
+    { fieldKey: 'materials.primary', label: 'Primary Material', status: primaryMaterial ? 'complete' : 'incomplete', required: true },
+  ] as const;
+  const mpPlanBlockers = [
+    ...mpPlanFieldStates.filter((field) => field.required && field.status !== 'complete').map((field) => field.label),
+    ...questions.map((question) => question.prompt),
+  ];
+  const mpPlanWorkflowContext = buildWorkflowContext({
+    currentStep: step,
+    activeField: activeChatField,
+    fieldStates: mpPlanFieldStates.map((field) => ({ ...field })),
+    nextSteps: questions.length
+      ? [`Answer the next blocking question: ${questions[0].prompt}`]
+      : !session
+        ? ['Create the plan session first.']
+        : step === 'environment'
+          ? ['Add at least one service environment.']
+          : step === 'materials'
+            ? ['Add materials and MAPTIS mappings, then run compute.']
+            : step === 'analysis'
+              ? ['Resolve the open blockers before generating artifacts.']
+              : ['Generate or export the plan artifacts.'],
+    blockers: mpPlanBlockers,
+  });
+  const mpPlanChatLaunchState = createModuleChatLaunchState({
+    scopeKey: 'mp-plan',
+    moduleLabel: 'M&P Plan',
+    moduleContext: {
+      module: 'bsmh',
+      material: primaryMaterial || undefined,
+      environment: primaryEnvironment || undefined,
+      standard_ref: 'NASA-STD-6016C',
+      program_name: programName || undefined,
+      program_phase: programPhase || undefined,
+      chat_workflow: mpPlanWorkflowContext,
+    },
+    originPath: '/mp-plan',
+    originTitle: 'M&P Plan Generator',
+    description: 'Ground the chat in the active M&P plan workflow, blockers, and current material/environment context.',
+    starterPrompts: [
+      'What does this blocker mean and what closes it?',
+      'How should I handle a tailoring decision in this M&P plan?',
+      'What evidence do you still need before this plan is ready to generate?',
+    ],
+    contextSummary: buildChatContextSummary([
+      { label: 'Program', value: programName || null },
+      { label: 'Phase', value: programPhase || null },
+      { label: 'Material', value: primaryMaterial || null },
+      { label: 'Environment', value: primaryEnvironment || null },
+      { label: 'Pressure', value: envPressure.trim() ? `${envPressure.trim()} psia` : null },
+    ]),
+  });
+
+  useEffect(() => {
+    registerRouteModuleChatState('/mp-plan', mpPlanChatLaunchState);
+  }, [activeChatField, envPressure, primaryEnvironment, primaryMaterial, programName, programPhase, questions, session, step]);
 
   // --------------------------------------------------------------------------
   // Setup handlers
@@ -447,7 +518,12 @@ export default function MPPlanGenerator() {
       onModeChange={(newMode) => setGuidanceMode(newMode)}
       authorityRegistry={authorityRegistry}
     >
-      <div>
+      <div
+        onFocusCapture={(event) => {
+          const field = resolveGuidanceFieldFromTarget(event.target);
+          if (field) setActiveChatField(field);
+        }}
+      >
         <PageHeader
           title={t('title', { ns: 'mpPlanGenerator', defaultValue: 'M&P Plan Generator' })}
           description={t('description', {
@@ -455,6 +531,7 @@ export default function MPPlanGenerator() {
             defaultValue: 'Generate Materials & Processes Plans with automated NASA-STD-6016C compliance analysis',
           })}
           helpContent={helpContent.mpPlan}
+          actions={<ModuleChatButton launchState={mpPlanChatLaunchState} />}
         />
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
           <GuidanceContextIndicator context={guidanceContext} />

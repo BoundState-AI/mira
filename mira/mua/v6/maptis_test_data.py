@@ -25,8 +25,12 @@ from concurrent.futures import ThreadPoolExecutor
 from enum import Enum
 from typing import Dict, List, Optional
 
-import psycopg2
-from psycopg2.extras import DictCursor
+try:
+    import psycopg2
+    from psycopg2.extras import DictCursor
+except ImportError:  # pragma: no cover - exercised in lightweight test envs
+    psycopg2 = None
+    DictCursor = None
 from pydantic import BaseModel, Field
 
 __all__ = [
@@ -213,6 +217,13 @@ def _sync_query_maptis_test_data(
     """
     params = conn_params or _get_db_params()
     result = TestDataStatus(material_code=material_code)
+
+    if psycopg2 is None or DictCursor is None:
+        LOGGER.warning(
+            "psycopg2 not available; returning empty MAPTIS flammability result for %s",
+            material_code,
+        )
+        return result
 
     try:
         conn = psycopg2.connect(**params)

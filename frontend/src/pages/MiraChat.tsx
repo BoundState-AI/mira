@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import { fetchMiraChatPing, sendMiraChatMessage, type MiraChatMessage } from "@/lib/chat-api";
+import { fetchMiraChatPing, sendMiraChatStream, type MiraChatMessage } from "@/lib/chat-api";
 import {
   conversationStorageKey,
   isMiraModuleChatLaunchState,
@@ -229,6 +229,9 @@ export default function MiraChat() {
     }
 
     const optimisticId = messageId("user");
+    const assistantId = messageId("assistant");
+    let sawDone = false;
+    let sawStreamContent = false;
     setError(null);
     setIsSending(true);
     setDraft("");
@@ -240,39 +243,99 @@ export default function MiraChat() {
         content: message,
         entities: {},
       },
+      {
+        id: assistantId,
+        role: "assistant",
+        content: "",
+        entities: {},
+      },
     ]);
 
     try {
-      const response = await sendMiraChatMessage({
+      await sendMiraChatStream({
         message,
         session_id: sessionId ?? undefined,
         history: toHistoryMessages(messages),
         module_context: activeModuleLaunchState?.moduleContext,
+      }, {
+        onEvent: (event) => {
+          switch (event.type) {
+            case "meta": {
+              setMessages((current) => current.map((currentMessage) => (
+                currentMessage.id === assistantId
+                  ? {
+                      ...currentMessage,
+                      engineUsed: typeof event.engine_id === "string" ? event.engine_id : null,
+                      verdict: (typeof event.verdict === "string" ? event.verdict : null) as Verdict,
+                    }
+                  : currentMessage
+              )));
+              break;
+            }
+            case "text": {
+              const delta = typeof event.content === "string" ? event.content : "";
+              if (!delta) {
+                break;
+              }
+              sawStreamContent = true;
+              setMessages((current) => current.map((currentMessage) => (
+                currentMessage.id === assistantId
+                  ? { ...currentMessage, content: `${currentMessage.content}${delta}` }
+                  : currentMessage
+              )));
+              break;
+            }
+            case "done": {
+              sawDone = true;
+              const turnEntities = event.entities && typeof event.entities === "object"
+                ? event.entities as Record<string, unknown>
+                : {};
+              const followUps = Array.isArray(event.follow_ups)
+                ? event.follow_ups.filter((item): item is string => typeof item === "string")
+                : [];
+              if (typeof event.session_id === "string" && event.session_id.trim()) {
+                setSessionId(event.session_id);
+              }
+              setMessages((current) => current.map((currentMessage) => {
+                if (currentMessage.id === optimisticId) {
+                  return { ...currentMessage, entities: turnEntities };
+                }
+                if (currentMessage.id === assistantId) {
+                  return {
+                    ...currentMessage,
+                    auditId: typeof event.audit_id === "string" ? event.audit_id : null,
+                    followUps,
+                    entities: turnEntities,
+                  };
+                }
+                return currentMessage;
+              }).slice(-MAX_STORED_MESSAGES));
+              break;
+            }
+            case "error":
+              break;
+            default:
+              break;
+          }
+        },
       });
-
-      const turnEntities = response.entities ?? {};
-      setSessionId(response.session_id);
-      setMessages((current) => {
-        const updated = current.map((currentMessage) =>
-          currentMessage.id === optimisticId
-            ? { ...currentMessage, entities: turnEntities }
-            : currentMessage,
-        );
-        updated.push({
-          id: messageId("assistant"),
-          role: "assistant",
-          content: response.response,
-          engineUsed: response.engine_used ?? null,
-          verdict: (response.verdict as Verdict | undefined) ?? null,
-          auditId: response.audit_id ?? null,
-          followUps: response.follow_up_suggestions ?? [],
-          entities: turnEntities,
-        });
-        return updated.slice(-MAX_STORED_MESSAGES);
-      });
+      if (!sawDone) {
+        throw new Error("Chat stream ended before the final done event.");
+      }
     } catch (submitError: unknown) {
-      setMessages((current) => current.filter((currentMessage) => currentMessage.id !== optimisticId));
-      setDraft(message);
+      setMessages((current) => {
+        const assistantMessage = current.find((currentMessage) => currentMessage.id === assistantId);
+        const hasAssistantContent = Boolean(assistantMessage?.content?.trim());
+        if (hasAssistantContent) {
+          return current;
+        }
+        return current.filter(
+          (currentMessage) => currentMessage.id !== optimisticId && currentMessage.id !== assistantId,
+        );
+      });
+      if (!sawStreamContent) {
+        setDraft(message);
+      }
       setError(submitError instanceof Error ? submitError.message : "Chat request failed.");
     } finally {
       setIsSending(false);
@@ -433,7 +496,14 @@ export default function MiraChat() {
                           </Badge>
                         )}
                       </div>
-                      <div className="space-y-3 text-sm leading-6">{renderMessageContent(message.content)}</div>
+                      <div className="space-y-3 text-sm leading-6">
+                        {isAssistant && !message.content && isSending ? (
+                          <span className="inline-flex items-center gap-2 text-muted-foreground">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Streaming response
+                          </span>
+                        ) : renderMessageContent(message.content)}
+                      </div>
 
                       {isAssistant && (message.auditId || message.followUps?.length) && (
                         <div className="mt-4 space-y-3 border-t border-slate-200 pt-3">

@@ -401,4 +401,21 @@ def extract_module_entities(module_context: dict[str, Any] | None) -> dict[str, 
             str(module_context["module"]),
         )
 
+    workflow = module_context.get("chat_workflow")
+    if isinstance(workflow, dict):
+        if workflow.get("current_step"):
+            entities["current_step"] = workflow["current_step"]
+        if workflow.get("active_field"):
+            entities["active_field"] = workflow["active_field"]
+        if workflow.get("active_field_label"):
+            entities["active_field_label"] = workflow["active_field_label"]
+        if workflow.get("completed_fields"):
+            entities["completed_fields"] = workflow["completed_fields"]
+        if workflow.get("incomplete_fields"):
+            entities["incomplete_fields"] = workflow["incomplete_fields"]
+        if workflow.get("next_steps"):
+            entities["next_steps"] = workflow["next_steps"]
+        if workflow.get("blockers"):
+            entities["workflow_blockers"] = workflow["blockers"]
+
     return entities

@@ -38,9 +38,11 @@ import helpContent from '@/config/helpContent';
 import { authorityRegistry, createH2Context, h2GuidancePack } from '@/lib/guidance/h2-pack';
 import type { GuidanceModeName } from '@/lib/guidance/types';
 import {
+  buildWorkflowContext,
   buildChatContextSummary,
   createModuleChatLaunchState,
   registerRouteModuleChatState,
+  resolveGuidanceFieldFromTarget,
 } from '@/lib/mira-chat-context';
 
 type GasType = 'O2' | 'H2';
@@ -94,6 +96,7 @@ function parseH2DecisionBand(result: CompatibilityResponse | null): {
 
 export default function GasCompatibility() {
   const [guidanceMode, setGuidanceMode] = useState<GuidanceModeName>('live');
+  const [activeChatField, setActiveChatField] = useState<{ fieldKey: string; label: string } | null>(null);
   const [gasType, setGasType] = useState<GasType>('O2');
   const [h2Condition, setH2Condition] = useState('');
   const [lastEvaluatedH2Condition, setLastEvaluatedH2Condition] = useState('');
@@ -125,6 +128,31 @@ export default function GasCompatibility() {
     pressure_regime:
       Number(pressure) >= 265 ? 'high' : Number(pressure) >= 50 ? 'medium' : 'low',
   });
+  const gasFieldStates = [
+    { fieldKey: 'inputs.material_key', label: 'Material', status: materialKey.trim() ? 'complete' : 'incomplete', required: true },
+    { fieldKey: 'inputs.pressure_psia', label: 'Pressure', status: pressure.trim() ? 'complete' : 'incomplete', required: true },
+    { fieldKey: 'inputs.temperature_k', label: 'Temperature', status: temperature.trim() ? 'complete' : 'incomplete', required: true },
+    {
+      fieldKey: 'inputs.condition',
+      label: gasType === 'O2' ? 'Service Condition' : 'Known Condition',
+      status: gasType === 'H2' && !h2Condition.trim() ? 'warning' : 'complete',
+      required: false,
+    },
+  ] as const;
+  const gasBlockers = gasFieldStates
+    .filter((field) => field.required && field.status !== 'complete')
+    .map((field) => field.label);
+  const gasWorkflowContext = buildWorkflowContext({
+    currentStep: result || o2Result ? 'review_compatibility_result' : gasBlockers.length ? 'complete_service_inputs' : 'ready_to_run_compatibility',
+    activeField: activeChatField,
+    fieldStates: gasFieldStates.map((field) => ({ ...field })),
+    nextSteps: gasBlockers.length
+      ? [`Complete ${gasBlockers[0]}.`]
+      : result || o2Result
+        ? ['Review the compatibility basis and any engineering follow-up from the current result.']
+        : ['Run the compatibility check for the current service inputs.'],
+    blockers: gasBlockers,
+  });
   const gasChatLaunchState = createModuleChatLaunchState({
     scopeKey: gasType === 'O2' ? 'gas-compatibility-o2' : 'gas-compatibility-h2',
     moduleLabel: gasType === 'O2' ? 'Oxygen Compatibility' : 'Hydrogen Compatibility',
@@ -133,6 +161,7 @@ export default function GasCompatibility() {
       material: materialKey.trim(),
       environment: gasType === 'O2' ? phase.toUpperCase() : 'HYDROGEN',
       pressure_psi: pressure.trim() ? Number(pressure) : undefined,
+      chat_workflow: gasWorkflowContext,
     },
     originPath: '/gas-compatibility',
     originTitle: 'Gas Compatibility',
@@ -151,7 +180,7 @@ export default function GasCompatibility() {
 
   useEffect(() => {
     registerRouteModuleChatState('/gas-compatibility', gasChatLaunchState);
-  }, [gasType, h2Condition, materialKey, phase, pressure]);
+  }, [activeChatField, gasType, h2Condition, materialKey, o2Result, phase, pressure, result, temperature]);
 
   // Load families on mount
   useEffect(() => {
@@ -451,7 +480,13 @@ export default function GasCompatibility() {
       onModeChange={(newMode) => setGuidanceMode(newMode)}
       authorityRegistry={authorityRegistry}
     >
-      <div className="space-y-4">
+      <div
+        className="space-y-4"
+        onFocusCapture={(event) => {
+          const field = resolveGuidanceFieldFromTarget(event.target);
+          if (field) setActiveChatField(field);
+        }}
+      >
         <PageHeader
           title="Gas Compatibility"
           description="Check material compatibility for oxygen or hydrogen service"

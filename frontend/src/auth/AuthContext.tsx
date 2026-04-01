@@ -24,6 +24,8 @@ type AuthStage =
   | "forgot-password-request"
   | "forgot-password-confirm";
 
+type SessionMode = "none" | "local" | "user-pool" | "hosted-ui";
+
 interface AuthUser {
   username: string;
   email: string;
@@ -33,6 +35,7 @@ interface AuthUser {
   usPersonVerified: boolean | null;
   isItarCleared: boolean;
   isAdmin: boolean;
+  isApproved: boolean;
 }
 
 interface AuthContextValue {
@@ -44,7 +47,12 @@ interface AuthContextValue {
   mfaSecret: string;
   passwordResetDelivery: string;
   authHeaders: Record<string, string>;
+  supportsPasswordLogin: boolean;
+  supportsFederatedLogin: boolean;
+  federatedLoginLabel: string;
   login: (username: string, password: string) => Promise<void>;
+  loginWithFederation: (returnTo?: string) => Promise<void>;
+  completeFederatedLogin: (callbackUrl?: string) => Promise<string>;
   completeNewPassword: (newPassword: string) => Promise<void>;
   verifyMfa: (code: string) => Promise<void>;
   verifyMfaSetup: (code: string) => Promise<void>;
@@ -72,12 +80,99 @@ type IdTokenClaims = {
   "custom:us_person_verified"?: string;
 };
 
+type HostedUiTokenResponse = {
+  access_token?: string;
+  id_token?: string;
+  refresh_token?: string;
+  expires_in?: number;
+  token_type?: string;
+  error?: string;
+  error_description?: string;
+};
+
+type HostedUiPkceState = {
+  state: string;
+  verifier: string;
+  returnTo: string;
+};
+
+type HostedUiSession = {
+  accessToken: string;
+  idToken: string;
+  refreshToken: string | null;
+  expiresAt: number;
+};
+
 function sanitizeEnvValue(value: string | undefined): string {
   const trimmed = (value || "").trim();
   if (!trimmed) return "";
   const lower = trimmed.toLowerCase();
   if (lower === "none" || lower === "null" || lower === "undefined") return "";
   return trimmed;
+}
+
+function envFlagEnabled(value: string | undefined, defaultValue = false): boolean {
+  const trimmed = sanitizeEnvValue(value);
+  if (!trimmed) return defaultValue;
+  return ["1", "true", "yes", "on"].includes(trimmed.toLowerCase());
+}
+
+function parseCsvEnv(value: string | undefined): string[] {
+  return sanitizeEnvValue(value)
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
+function normalizeUrlOrigin(value: string): string {
+  const trimmed = sanitizeEnvValue(value);
+  if (!trimmed) return "";
+  return trimmed.replace(/\/+$/, "");
+}
+
+function normalizeHostedUiDomain(value: string): string {
+  const trimmed = sanitizeEnvValue(value);
+  if (!trimmed) return "";
+  const withoutProtocol = trimmed.replace(/^https?:\/\//i, "");
+  return withoutProtocol.replace(/\/+$/, "");
+}
+
+function safeSessionStorage(): Storage | undefined {
+  if (typeof window === "undefined") return undefined;
+  return window.sessionStorage;
+}
+
+function base64UrlEncode(bytes: Uint8Array): string {
+  let binary = "";
+  bytes.forEach((value) => {
+    binary += String.fromCharCode(value);
+  });
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function randomUrlSafeString(byteLength = 32): string {
+  const bytes = new Uint8Array(byteLength);
+  crypto.getRandomValues(bytes);
+  return base64UrlEncode(bytes);
+}
+
+async function sha256Base64Url(value: string): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  return base64UrlEncode(new Uint8Array(digest));
+}
+
+function safeJsonParse<T>(value: string | null): T | null {
+  if (!value) return null;
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return null;
+  }
+}
+
+function formatOauthError(payload: HostedUiTokenResponse | null, fallback: string): string {
+  const description = payload?.error_description || payload?.error;
+  return description ? description.replace(/\+/g, " ") : fallback;
 }
 
 const RAW_USER_POOL_ID =
@@ -96,7 +191,7 @@ const CLIENT_ID_PATTERN = /^[A-Za-z0-9]+$/;
 const IS_VALID_USER_POOL_ID = USER_POOL_ID_PATTERN.test(USER_POOL_ID);
 const IS_VALID_CLIENT_ID = CLIENT_ID_PATTERN.test(CLIENT_ID);
 const HAS_VALID_COGNITO_CONFIG = IS_VALID_USER_POOL_ID && IS_VALID_CLIENT_ID;
-// Default to bypassing Cognito in local Vite dev unless explicitly disabled.
+
 const AUTH_BYPASS_LOCAL =
   import.meta.env.DEV &&
   !["0", "false", "no"].includes(
@@ -104,6 +199,7 @@ const AUTH_BYPASS_LOCAL =
       .trim()
       .toLowerCase(),
   );
+
 const API_AUTH_HOSTS = (
   (import.meta.env.VITE_API_AUTH_HOSTS as string | undefined) || "127.0.0.1:8000,localhost:8000"
 )
@@ -111,8 +207,44 @@ const API_AUTH_HOSTS = (
   .map((entry) => entry.trim())
   .filter(Boolean);
 
-const cognitoStorage =
-  typeof window !== "undefined" && window.sessionStorage ? window.sessionStorage : undefined;
+const HOSTED_UI_DOMAIN = normalizeHostedUiDomain(
+  import.meta.env.VITE_COGNITO_HOSTED_UI_DOMAIN as string | undefined,
+);
+const HOSTED_UI_REDIRECT_URI = normalizeUrlOrigin(
+  import.meta.env.VITE_COGNITO_REDIRECT_URI as string | undefined,
+);
+const HOSTED_UI_LOGOUT_URI = normalizeUrlOrigin(
+  import.meta.env.VITE_COGNITO_LOGOUT_URI as string | undefined,
+);
+const HOSTED_UI_SCOPE =
+  sanitizeEnvValue(import.meta.env.VITE_COGNITO_OAUTH_SCOPES as string | undefined) ||
+  "openid email aws.cognito.signin.user.admin";
+const HOSTED_UI_IDENTITY_PROVIDER = sanitizeEnvValue(
+  import.meta.env.VITE_COGNITO_IDENTITY_PROVIDER as string | undefined,
+);
+const HOSTED_UI_BUTTON_LABEL =
+  sanitizeEnvValue(import.meta.env.VITE_COGNITO_FEDERATED_BUTTON_LABEL as string | undefined) ||
+  "Sign in with NASA PIV";
+const PASSWORD_LOGIN_DISABLED = envFlagEnabled(
+  import.meta.env.VITE_COGNITO_PASSWORD_LOGIN_DISABLED as string | undefined,
+  false,
+);
+const PASSWORD_LOGIN_ENABLED = !PASSWORD_LOGIN_DISABLED;
+const APPROVED_GROUPS = parseCsvEnv(import.meta.env.VITE_MIRA_ALLOWED_GROUPS as string | undefined).map(
+  (group) => group.toLowerCase(),
+);
+const APPROVED_USERNAMES = parseCsvEnv(
+  import.meta.env.VITE_MIRA_ALLOWED_USERNAMES as string | undefined,
+).map((username) => username.toLowerCase());
+const APPROVED_EMAILS = parseCsvEnv(import.meta.env.VITE_MIRA_ALLOWED_EMAILS as string | undefined).map(
+  (email) => email.toLowerCase(),
+);
+const HAS_VALID_HOSTED_UI_CONFIG = Boolean(HOSTED_UI_DOMAIN && IS_VALID_CLIENT_ID);
+
+const HOSTED_UI_SESSION_KEY = "mira.auth.hosted-ui.session";
+const HOSTED_UI_PKCE_KEY = "mira.auth.hosted-ui.pkce";
+
+const cognitoStorage = safeSessionStorage();
 
 if (!AUTH_BYPASS_LOCAL && (USER_POOL_ID || CLIENT_ID) && !HAS_VALID_COGNITO_CONFIG) {
   console.error(
@@ -122,6 +254,12 @@ if (!AUTH_BYPASS_LOCAL && (USER_POOL_ID || CLIENT_ID) && !HAS_VALID_COGNITO_CONF
       hasClientId: Boolean(CLIENT_ID),
       userPoolIdPreview: USER_POOL_ID ? `${USER_POOL_ID.slice(0, 12)}...` : "",
     },
+  );
+}
+
+if (!AUTH_BYPASS_LOCAL && HOSTED_UI_DOMAIN && !HAS_VALID_HOSTED_UI_CONFIG) {
+  console.error(
+    "[auth] Invalid hosted UI configuration. Check VITE_COGNITO_HOSTED_UI_DOMAIN and VITE_COGNITO_CLIENT_ID.",
   );
 }
 
@@ -150,6 +288,7 @@ const LOCAL_DEV_USER: AuthUser = {
   usPersonVerified: true,
   isItarCleared: true,
   isAdmin: true,
+  isApproved: true,
 };
 
 function parseGroups(rawGroups: AccessTokenClaims["cognito:groups"]): string[] {
@@ -158,9 +297,7 @@ function parseGroups(rawGroups: AccessTokenClaims["cognito:groups"]): string[] {
   return [String(rawGroups)];
 }
 
-function parseUserFromSession(session: CognitoUserSession): AuthUser {
-  const accessToken = session.getAccessToken().getJwtToken();
-  const idToken = session.getIdToken().getJwtToken();
+function parseUserFromTokens(accessToken: string, idToken: string): AuthUser {
   const accessClaims = jwtDecode<AccessTokenClaims>(accessToken);
   const idClaims = jwtDecode<IdTokenClaims>(idToken);
 
@@ -169,20 +306,120 @@ function parseUserFromSession(session: CognitoUserSession): AuthUser {
   const usPersonVerified =
     usPersonRaw === undefined ? null : String(usPersonRaw).toLowerCase() === "true";
   const itarAccess = idClaims["custom:itar_access"] || "";
-  const groupBasedItar = groups.includes("mira-itar");
+  const normalizedGroups = groups.map((group) => group.toLowerCase());
+  const groupBasedItar = normalizedGroups.includes("mira-itar");
   const customUsPersonValid = usPersonVerified !== false;
   const customItarValid = !itarAccess || ["full", "read"].includes(itarAccess);
+  const username = idClaims["cognito:username"] || accessClaims.username || "";
+  const email = idClaims.email || "";
+  const approvalConfigured =
+    APPROVED_GROUPS.length > 0 || APPROVED_USERNAMES.length > 0 || APPROVED_EMAILS.length > 0;
+  const isApproved =
+    !approvalConfigured
+    || normalizedGroups.includes("mira-admin")
+    || normalizedGroups.some((group) => APPROVED_GROUPS.includes(group))
+    || (username ? APPROVED_USERNAMES.includes(username.toLowerCase()) : false)
+    || (email ? APPROVED_EMAILS.includes(email.toLowerCase()) : false);
 
   return {
-    username: idClaims["cognito:username"] || accessClaims.username || "",
-    email: idClaims.email || "",
+    username,
+    email,
     groups,
     role: idClaims["custom:role"] || "viewer",
     itarAccess,
     usPersonVerified,
     isItarCleared: groupBasedItar && customUsPersonValid && customItarValid,
-    isAdmin: groups.includes("mira-admin"),
+    isAdmin: normalizedGroups.includes("mira-admin"),
+    isApproved,
   };
+}
+
+function parseUserFromSession(session: CognitoUserSession): AuthUser {
+  return parseUserFromTokens(
+    session.getAccessToken().getJwtToken(),
+    session.getIdToken().getJwtToken(),
+  );
+}
+
+function hostedUiBaseUrl(): string {
+  if (!HOSTED_UI_DOMAIN) return "";
+  return `https://${HOSTED_UI_DOMAIN}`;
+}
+
+function hostedUiRedirectUri(): string {
+  if (HOSTED_UI_REDIRECT_URI) return HOSTED_UI_REDIRECT_URI;
+  if (typeof window === "undefined") return "";
+  return `${window.location.origin}/auth/callback`;
+}
+
+function hostedUiLogoutUri(): string {
+  if (HOSTED_UI_LOGOUT_URI) return HOSTED_UI_LOGOUT_URI;
+  if (typeof window === "undefined") return "";
+  return `${window.location.origin}/`;
+}
+
+function currentRelativePath(): string {
+  if (typeof window === "undefined") return "/";
+  const value = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  return value.startsWith("/auth/") ? "/" : value;
+}
+
+function readHostedUiSession(): HostedUiSession | null {
+  const storage = safeSessionStorage();
+  const session = safeJsonParse<HostedUiSession>(storage?.getItem(HOSTED_UI_SESSION_KEY) ?? null);
+  if (!session?.accessToken || !session?.idToken || !session?.expiresAt) {
+    return null;
+  }
+  return session;
+}
+
+function writeHostedUiSession(session: HostedUiSession): void {
+  safeSessionStorage()?.setItem(HOSTED_UI_SESSION_KEY, JSON.stringify(session));
+}
+
+function clearHostedUiSession(): void {
+  safeSessionStorage()?.removeItem(HOSTED_UI_SESSION_KEY);
+}
+
+function readPkceState(): HostedUiPkceState | null {
+  return safeJsonParse<HostedUiPkceState>(safeSessionStorage()?.getItem(HOSTED_UI_PKCE_KEY) ?? null);
+}
+
+function writePkceState(state: HostedUiPkceState): void {
+  safeSessionStorage()?.setItem(HOSTED_UI_PKCE_KEY, JSON.stringify(state));
+}
+
+function clearPkceState(): void {
+  safeSessionStorage()?.removeItem(HOSTED_UI_PKCE_KEY);
+}
+
+async function postHostedUiTokenRequest(
+  params: URLSearchParams,
+): Promise<HostedUiTokenResponse> {
+  const response = await fetch(`${hostedUiBaseUrl()}/oauth2/token`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: params,
+  });
+
+  let payload: HostedUiTokenResponse | null = null;
+  try {
+    payload = (await response.json()) as HostedUiTokenResponse;
+  } catch {
+    payload = null;
+  }
+
+  if (!response.ok) {
+    throw new Error(formatOauthError(payload, "Federated login failed."));
+  }
+
+  if (!payload?.access_token || !payload?.id_token || !payload.expires_in) {
+    throw new Error("Hosted UI token response is incomplete.");
+  }
+
+  return payload;
 }
 
 function shouldAttachAuthHeader(input: RequestInfo | URL, token: string): boolean {
@@ -246,20 +483,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [passwordResetUser, setPasswordResetUser] = useState<CognitoUser | null>(null);
   const [passwordResetDelivery, setPasswordResetDelivery] = useState("");
   const [newPasswordAttributes, setNewPasswordAttributes] = useState<Record<string, string>>({});
+  const [sessionMode, setSessionMode] = useState<SessionMode>("none");
   const tokenRef = useRef<string | null>(null);
   const logoutRef = useRef<() => void>(() => {});
 
-  const beginSession = useCallback((session: CognitoUserSession) => {
-    const accessToken = session.getAccessToken().getJwtToken();
-    setToken(accessToken);
-    setUser(parseUserFromSession(session));
+  const resetInteractiveState = useCallback(() => {
     setStage("login");
     setChallengeUser(null);
     setPasswordResetUser(null);
     setPasswordResetDelivery("");
+    setPendingUsername("");
     setMfaSecret("");
     setNewPasswordAttributes({});
   }, []);
+
+  const beginSession = useCallback(
+    (session: CognitoUserSession) => {
+      clearHostedUiSession();
+      const accessToken = session.getAccessToken().getJwtToken();
+      setToken(accessToken);
+      setUser(parseUserFromSession(session));
+      setSessionMode("user-pool");
+      resetInteractiveState();
+    },
+    [resetInteractiveState],
+  );
+
+  const beginHostedUiSession = useCallback(
+    (payload: HostedUiTokenResponse) => {
+      if (!payload.access_token || !payload.id_token || !payload.expires_in) {
+        throw new Error("Hosted UI token response is incomplete.");
+      }
+      const expiresAt = Date.now() + payload.expires_in * 1000;
+      writeHostedUiSession({
+        accessToken: payload.access_token,
+        idToken: payload.id_token,
+        refreshToken: payload.refresh_token ?? readHostedUiSession()?.refreshToken ?? null,
+        expiresAt,
+      });
+      setToken(payload.access_token);
+      setUser(parseUserFromTokens(payload.access_token, payload.id_token));
+      setSessionMode("hosted-ui");
+      resetInteractiveState();
+    },
+    [resetInteractiveState],
+  );
 
   const startMfaSetup = useCallback(
     (targetUser: CognitoUser, resolve: () => void, reject: (reason?: unknown) => void) => {
@@ -280,20 +548,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (AUTH_BYPASS_LOCAL) {
       setUser(LOCAL_DEV_USER);
       setToken(null);
+      setSessionMode("local");
       setLoading(false);
       return;
     }
+
+    const hostedUiSession = readHostedUiSession();
+    if (hostedUiSession && hostedUiSession.expiresAt > Date.now()) {
+      setUser(parseUserFromTokens(hostedUiSession.accessToken, hostedUiSession.idToken));
+      setToken(hostedUiSession.accessToken);
+      setSessionMode("hosted-ui");
+      setLoading(false);
+      return;
+    }
+    clearHostedUiSession();
+
     if (!userPool) {
+      setSessionMode("none");
       setLoading(false);
       return;
     }
+
     const currentUser = userPool.getCurrentUser();
     if (!currentUser) {
+      setSessionMode("none");
       setLoading(false);
       return;
     }
+
     currentUser.getSession((err: Error | null, session: CognitoUserSession | null) => {
       if (err || !session || !session.isValid()) {
+        setSessionMode("none");
         setLoading(false);
         return;
       }
@@ -303,26 +588,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [beginSession]);
 
   const logout = useCallback(() => {
+    clearHostedUiSession();
+    clearPkceState();
+
     if (AUTH_BYPASS_LOCAL) {
       setUser(LOCAL_DEV_USER);
       setToken(null);
+      setSessionMode("local");
       setLoading(false);
       return;
     }
+
     const currentUser = userPool?.getCurrentUser();
     if (currentUser) {
       currentUser.signOut();
     }
+
     setUser(null);
     setToken(null);
-    setStage("login");
-    setChallengeUser(null);
-    setPasswordResetUser(null);
-    setPasswordResetDelivery("");
-    setPendingUsername("");
-    setMfaSecret("");
-    setNewPasswordAttributes({});
-  }, []);
+    setSessionMode("none");
+    resetInteractiveState();
+  }, [resetInteractiveState]);
 
   tokenRef.current = token;
   logoutRef.current = logout;
@@ -368,6 +654,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(
     (username: string, password: string) => {
+      if (!PASSWORD_LOGIN_ENABLED) {
+        return Promise.reject(
+          new Error("Password login is disabled for this MIRA deployment. Use the PIV sign-in path."),
+        );
+      }
       if (!userPool) {
         return Promise.reject(
           new Error("Cognito not configured. Set VITE_COGNITO_USER_POOL_ID and VITE_COGNITO_CLIENT_ID."),
@@ -396,8 +687,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           },
           onFailure: reject,
           newPasswordRequired: () => {
-            // Do not echo existing attributes (for example email) back to Cognito here.
-            // For NEW_PASSWORD_REQUIRED, Cognito rejects attempts to modify already-set values.
             setNewPasswordAttributes({});
             setStage("new-password");
             resolve();
@@ -413,6 +702,85 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     },
     [beginSession, startMfaSetup],
+  );
+
+  const loginWithFederation = useCallback(async (returnTo?: string) => {
+    if (!HAS_VALID_HOSTED_UI_CONFIG) {
+      throw new Error(
+        "Hosted UI is not configured. Set VITE_COGNITO_HOSTED_UI_DOMAIN and VITE_COGNITO_CLIENT_ID.",
+      );
+    }
+
+    const verifier = randomUrlSafeString(64);
+    const state = randomUrlSafeString(32);
+    const codeChallenge = await sha256Base64Url(verifier);
+    const targetPath = returnTo?.trim() || currentRelativePath();
+
+    writePkceState({
+      state,
+      verifier,
+      returnTo: targetPath.startsWith("/") ? targetPath : "/",
+    });
+
+    const params = new URLSearchParams({
+      client_id: CLIENT_ID,
+      response_type: "code",
+      scope: HOSTED_UI_SCOPE,
+      redirect_uri: hostedUiRedirectUri(),
+      state,
+      code_challenge_method: "S256",
+      code_challenge: codeChallenge,
+    });
+
+    if (HOSTED_UI_IDENTITY_PROVIDER) {
+      params.set("identity_provider", HOSTED_UI_IDENTITY_PROVIDER);
+    }
+
+    window.location.assign(`${hostedUiBaseUrl()}/oauth2/authorize?${params.toString()}`);
+  }, []);
+
+  const completeFederatedLogin = useCallback(
+    async (callbackUrl?: string) => {
+      if (!HAS_VALID_HOSTED_UI_CONFIG) {
+        throw new Error(
+          "Hosted UI is not configured. Set VITE_COGNITO_HOSTED_UI_DOMAIN and VITE_COGNITO_CLIENT_ID.",
+        );
+      }
+
+      const url = new URL(callbackUrl || window.location.href);
+      const oauthError = url.searchParams.get("error_description") || url.searchParams.get("error");
+      if (oauthError) {
+        clearPkceState();
+        throw new Error(oauthError.replace(/\+/g, " "));
+      }
+
+      const code = url.searchParams.get("code");
+      const state = url.searchParams.get("state");
+      if (!code || !state) {
+        throw new Error("Hosted UI callback is missing the authorization code.");
+      }
+
+      const pkce = readPkceState();
+      if (!pkce || pkce.state !== state) {
+        clearPkceState();
+        throw new Error("Hosted UI state validation failed.");
+      }
+
+      const payload = await postHostedUiTokenRequest(
+        new URLSearchParams({
+          grant_type: "authorization_code",
+          client_id: CLIENT_ID,
+          code,
+          redirect_uri: hostedUiRedirectUri(),
+          code_verifier: pkce.verifier,
+        }),
+      );
+
+      beginHostedUiSession(payload);
+      clearPkceState();
+      return pkce.returnTo || "/";
+    },
+    [beginHostedUiSession],
   );
 
   const completeNewPassword = useCallback(
@@ -505,59 +873,56 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setNewPasswordAttributes({});
   }, []);
 
-  const requestPasswordReset = useCallback(
-    (username: string) => {
-      if (!userPool) {
-        return Promise.reject(
-          new Error("Cognito not configured. Set VITE_COGNITO_USER_POOL_ID and VITE_COGNITO_CLIENT_ID."),
-        );
-      }
+  const requestPasswordReset = useCallback((username: string) => {
+    if (!userPool) {
+      return Promise.reject(
+        new Error("Cognito not configured. Set VITE_COGNITO_USER_POOL_ID and VITE_COGNITO_CLIENT_ID."),
+      );
+    }
 
-      const trimmedUsername = username.trim();
-      if (!trimmedUsername) {
-        return Promise.reject(new Error("Username is required."));
-      }
+    const trimmedUsername = username.trim();
+    if (!trimmedUsername) {
+      return Promise.reject(new Error("Username is required."));
+    }
 
-      return new Promise<void>((resolve, reject) => {
-        let settled = false;
-        const cognitoUser = new CognitoUser({
-          Username: trimmedUsername,
-          Pool: userPool,
-        });
+    return new Promise<void>((resolve, reject) => {
+      let settled = false;
+      const cognitoUser = new CognitoUser({
+        Username: trimmedUsername,
+        Pool: userPool,
+      });
 
-        setPendingUsername(trimmedUsername);
-        setPasswordResetUser(cognitoUser);
-        setPasswordResetDelivery("");
+      setPendingUsername(trimmedUsername);
+      setPasswordResetUser(cognitoUser);
+      setPasswordResetDelivery("");
 
-        cognitoUser.forgotPassword({
-          onSuccess: () => {
-            if (!settled) {
-              settled = true;
-              setStage("forgot-password-confirm");
-              resolve();
-            }
-          },
-          onFailure: (err) => {
-            if (!settled) {
-              settled = true;
-              reject(err);
-            }
-          },
-          inputVerificationCode: (data?: { DeliveryMedium?: string; Destination?: string }) => {
-            if (settled) return;
+      cognitoUser.forgotPassword({
+        onSuccess: () => {
+          if (!settled) {
             settled = true;
-            const delivery = data?.Destination
-              ? `${data.DeliveryMedium || "Code"} sent to ${data.Destination}`
-              : "Verification code sent.";
-            setPasswordResetDelivery(delivery);
             setStage("forgot-password-confirm");
             resolve();
-          },
-        });
+          }
+        },
+        onFailure: (err) => {
+          if (!settled) {
+            settled = true;
+            reject(err);
+          }
+        },
+        inputVerificationCode: (data?: { DeliveryMedium?: string; Destination?: string }) => {
+          if (settled) return;
+          settled = true;
+          const delivery = data?.Destination
+            ? `${data.DeliveryMedium || "Code"} sent to ${data.Destination}`
+            : "Verification code sent.";
+          setPasswordResetDelivery(delivery);
+          setStage("forgot-password-confirm");
+          resolve();
+        },
       });
-    },
-    [],
-  );
+    });
+  }, []);
 
   const confirmPasswordReset = useCallback(
     (code: string, newPassword: string) => {
@@ -589,9 +954,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setNewPasswordAttributes({});
   }, []);
 
+  const refreshHostedUiSession = useCallback(
+    async (refreshToken: string) => {
+      const payload = await postHostedUiTokenRequest(
+        new URLSearchParams({
+          grant_type: "refresh_token",
+          client_id: CLIENT_ID,
+          refresh_token: refreshToken,
+        }),
+      );
+      beginHostedUiSession({
+        ...payload,
+        refresh_token: payload.refresh_token ?? refreshToken,
+      });
+    },
+    [beginHostedUiSession],
+  );
+
   useEffect(() => {
-    if (!token || !userPool) return;
-    const claims = jwtDecode<AccessTokenClaims>(token);
+    if (!token) return;
+
+    let claims: AccessTokenClaims;
+    try {
+      claims = jwtDecode<AccessTokenClaims>(token);
+    } catch {
+      logout();
+      return;
+    }
+
     if (!claims.exp) return;
 
     const msUntilRefresh = claims.exp * 1000 - Date.now() - 300000;
@@ -601,6 +991,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     const refreshTimer = window.setTimeout(() => {
+      if (sessionMode === "hosted-ui") {
+        const session = readHostedUiSession();
+        if (!session?.refreshToken) {
+          logout();
+          return;
+        }
+        void refreshHostedUiSession(session.refreshToken).catch(() => logout());
+        return;
+      }
+
+      if (sessionMode !== "user-pool" || !userPool) {
+        return;
+      }
+
       const currentUser = userPool.getCurrentUser();
       if (!currentUser) {
         logout();
@@ -616,7 +1020,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, msUntilRefresh);
 
     return () => window.clearTimeout(refreshTimer);
-  }, [beginSession, logout, token]);
+  }, [beginSession, logout, refreshHostedUiSession, sessionMode, token]);
 
   const value = useMemo<AuthContextValue>(
     () => ({
@@ -628,7 +1032,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       mfaSecret,
       passwordResetDelivery,
       authHeaders: token ? { Authorization: `Bearer ${token}` } : {},
+      supportsPasswordLogin: PASSWORD_LOGIN_ENABLED,
+      supportsFederatedLogin: HAS_VALID_HOSTED_UI_CONFIG,
+      federatedLoginLabel: HOSTED_UI_BUTTON_LABEL,
       login,
+      loginWithFederation,
+      completeFederatedLogin,
       completeNewPassword,
       verifyMfa,
       verifyMfaSetup,
@@ -646,7 +1055,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       pendingUsername,
       mfaSecret,
       passwordResetDelivery,
+      PASSWORD_LOGIN_ENABLED,
       login,
+      loginWithFederation,
+      completeFederatedLogin,
       completeNewPassword,
       verifyMfa,
       verifyMfaSetup,

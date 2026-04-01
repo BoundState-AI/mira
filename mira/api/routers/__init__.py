@@ -18,68 +18,66 @@ Safety Critical: True
 
 from __future__ import annotations
 
-from .search import router as search_router
-from .mira import router as mira_router
-from .aegis import router as aegis_router
-from .miul import router as miul_router
-from .bom import router as bom_router
-from .mua import router as mua_router
-from .mua_v6 import router as mua_v6_router
-from .mua_v10 import router as mua_v10_router
-from .hybrid_query import router as hybrid_query_router
-from .ui_endpoints import router as ui_router
-from .test_classes import router as test_classes_router
-from .compliance import router as compliance_router
-from .mp_plan import router as mp_plan_router
-from .mp_plan_v2_codex import router as mp_plan_v2_codex_router
-from .o2 import router as o2_router
-from .mira_v4 import router as mira_v4_router
-from .mua_v7 import router as mua_v7_router
-from .matchmaker import router as matchmaker_router
-from .bsmh import router as bsmh_router
-from .query import router as query_router
-from .forge import router as forge_router
-from .galvanic import router as galvanic_router
-from .fracture import router as fracture_router
-from .h2 import router as h2_router
-from .guidance import router as guidance_router
-from .oca import router as oca_router
-from .oca_systems import router as oca_systems_router
-try:
-    from .tocr import router as tocr_router
-except ImportError:
-    tocr_router = None
+from importlib import import_module
+from typing import Any
 
-__all__ = [
-    "search_router",
-    "mira_router",
-    "aegis_router",
-    "miul_router",
-    "bom_router",
-    "mua_router",
-    "mua_v6_router",
-    "mua_v7_router",
-    "mua_v10_router",
-    "hybrid_query_router",
-    "ui_router",
-    "test_classes_router",
-    "compliance_router",
-    "mp_plan_router",
-    "mp_plan_v2_codex_router",
-    "o2_router",
-    "mira_v4_router",
-    "matchmaker_router",
-    "bsmh_router",
-    "query_router",
-    "forge_router",
-    "galvanic_router",
-    "fracture_router",
-    "h2_router",
-    "guidance_router",
-    "oca_router",
-    "oca_systems_router",
-    "tocr_router",
-]
+from fastapi import APIRouter
+
+_ROUTER_MODULES = {
+    "search_router": ".search",
+    "mira_router": ".mira",
+    "aegis_router": ".aegis",
+    "miul_router": ".miul",
+    "bom_router": ".bom",
+    "mua_router": ".mua",
+    "mua_v6_router": ".mua_v6",
+    "mua_v7_router": ".mua_v7",
+    "mua_v10_router": ".mua_v10",
+    "hybrid_query_router": ".hybrid_query",
+    "ui_router": ".ui_endpoints",
+    "test_classes_router": ".test_classes",
+    "compliance_router": ".compliance",
+    "mp_plan_router": ".mp_plan",
+    "mp_plan_v2_codex_router": ".mp_plan_v2_codex",
+    "o2_router": ".o2",
+    "mira_v4_router": ".mira_v4",
+    "matchmaker_router": ".matchmaker",
+    "bsmh_router": ".bsmh",
+    "query_router": ".query",
+    "forge_router": ".forge",
+    "galvanic_router": ".galvanic",
+    "fracture_router": ".fracture",
+    "h2_router": ".h2",
+    "guidance_router": ".guidance",
+    "oca_router": ".oca",
+    "oca_systems_router": ".oca_systems",
+    "tocr_router": ".tocr",
+}
+
+__all__ = list(_ROUTER_MODULES)
+_EMPTY_ROUTER = APIRouter()
+_OPTIONAL_EMPTY_ROUTERS = {"forge_router", "mp_plan_v2_codex_router"}
+_OPTIONAL_NONE_ROUTERS = {"tocr_router"}
+
+
+def __getattr__(name: str) -> Any:
+    module_name = _ROUTER_MODULES.get(name)
+    if not module_name:
+        raise AttributeError(name)
+    try:
+        module = import_module(module_name, __name__)
+    except ImportError:
+        if name in _OPTIONAL_NONE_ROUTERS:
+            value = None
+            globals()[name] = value
+            return value
+        if name in _OPTIONAL_EMPTY_ROUTERS:
+            globals()[name] = _EMPTY_ROUTER
+            return _EMPTY_ROUTER
+        raise
+    value = getattr(module, "router")
+    globals()[name] = value
+    return value
 
 
 __safety_critical__ = True  # NASA SWE-032 compliance

@@ -12,8 +12,14 @@ import time
 from datetime import datetime, timezone
 from typing import Any, Optional
 
-import boto3
-from botocore.exceptions import ClientError
+try:
+    import boto3
+    from botocore.exceptions import ClientError
+except ImportError:  # pragma: no cover - exercised in lightweight test envs
+    boto3 = None
+
+    class ClientError(Exception):
+        """Fallback exception type when botocore is unavailable."""
 
 LOGGER = logging.getLogger("mira.audit")
 
@@ -30,10 +36,13 @@ ENABLE_AUDIT_LOGGING = os.getenv("ENABLE_AUDIT_LOGGING", "true").strip().lower()
 
 _cw_client = None
 _sequence_tokens: dict[str, str] = {}
+_warned_boto3_missing = False
 
 
 def _get_cw_client():
     global _cw_client
+    if boto3 is None:
+        raise RuntimeError("boto3 is not installed; audit logging is unavailable")
     if _cw_client is None:
         _cw_client = boto3.client("logs", region_name=REGION)
         _ensure_log_group(_cw_client)
@@ -86,7 +95,13 @@ def _extract_expected_sequence_token(exc: ClientError) -> Optional[str]:
 
 
 def _put_log_event(payload: dict[str, Any]) -> None:
+    global _warned_boto3_missing
     if not ENABLE_AUDIT_LOGGING:
+        return
+    if boto3 is None:
+        if not _warned_boto3_missing:
+            LOGGER.warning("Audit logging is enabled but boto3 is not installed; skipping CloudWatch audit events.")
+            _warned_boto3_missing = True
         return
 
     try:
@@ -226,4 +241,3 @@ def log_admin_action(
     }
     _put_log_event(event)
     LOGGER.info("ADMIN action=%s target=%s user=%s", action, target, username)
-

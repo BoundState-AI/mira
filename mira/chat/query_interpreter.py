@@ -605,7 +605,16 @@ _DRAFT_VERBS = re.compile(
     r"\b(?:write|draft|generate|build|create|produce|compose|prepare)\b", re.I
 )
 _REVIEW_VERBS = re.compile(
-    r"\b(?:check|review|evaluate|verify|validate|audit|is\s+this\s+compliant|assess)\b",
+    r"\b(?:check|review|evaluate|verify|validate|audit|assess)\b",
+    re.I,
+)
+_ANSWER_ONLY_PATTERNS = re.compile(
+    r"\b(?:what\s+does\s+this\s+mean|what\s+is|what's|how\s+do\s+i|how\s+do\s+we|"
+    r"explain|tell\s+me\s+about|walk\s+me\s+through)\b",
+    re.I,
+)
+_ARTIFACT_REVIEW_HINTS = re.compile(
+    r"\b(?:document|artifact|file|pdf|report|drawing|spec(?:ification)?|attachment|upload)\b",
     re.I,
 )
 _QUESTION_MARKERS = re.compile(
@@ -617,7 +626,11 @@ def _classify_task_mode(text: str) -> TaskMode:
     """Determine task mode from verb patterns in the query text."""
     if _DRAFT_VERBS.search(text):
         return TaskMode.DRAFT_ARTIFACT
-    if _REVIEW_VERBS.search(text):
+    # Explanatory questions often embed page text such as "Review this requirement..."
+    # and should stay answer-oriented unless the user is clearly asking to inspect an artifact.
+    if _ANSWER_ONLY_PATTERNS.search(text) and not _ARTIFACT_REVIEW_HINTS.search(text):
+        return TaskMode.ANSWER_ONLY
+    if _REVIEW_VERBS.search(text) and _ARTIFACT_REVIEW_HINTS.search(text):
         return TaskMode.REVIEW_EXISTING
     # Questions and anything ambiguous default to answer_only
     return TaskMode.ANSWER_ONLY

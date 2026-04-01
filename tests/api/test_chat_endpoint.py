@@ -1,5 +1,21 @@
 from __future__ import annotations
 
+import json
+
+
+def _parse_sse_events(raw_stream: str) -> list[dict]:
+    events: list[dict] = []
+    for block in raw_stream.replace("\r\n", "\n").split("\n\n"):
+        data_lines = [
+            line[len("data:"):].strip()
+            for line in block.split("\n")
+            if line.startswith("data:")
+        ]
+        if not data_lines:
+            continue
+        events.append(json.loads("\n".join(data_lines)))
+    return events
+
 
 def test_chat_ping_reports_expected_adapters(api_client):
     response = api_client.get("/api/chat/ping")
@@ -155,3 +171,65 @@ def test_chat_module_context_allows_explicit_cross_domain_override(api_client):
     assert payload["engine_used"] == "h2"
     assert payload["entities"]["material_designation"] == "316L"
     assert payload["entities"]["gas_service"] == "hydrogen"
+
+
+def test_chat_stream_returns_sse_events(api_client):
+    with api_client.stream(
+        "POST",
+        "/api/chat/stream",
+        json={"message": "Is 316L compatible with GOX at 3000 psi?"},
+    ) as response:
+        assert response.status_code == 200
+        assert response.headers["content-type"].startswith("text/event-stream")
+        raw_stream = "".join(response.iter_text())
+
+    events = _parse_sse_events(raw_stream)
+    assert events
+    assert events[0]["type"] == "meta"
+    assert events[0]["engine_id"] == "oca"
+    assert any(event["type"] == "text" for event in events)
+
+    done_event = next(event for event in events if event["type"] == "done")
+    assert done_event["session_id"]
+    assert done_event["entities"]["material_designation"] == "316L"
+    assert done_event["entities"]["gas_service"] == "oxygen"
+
+
+def test_chat_stream_can_resume_from_frontend_history(api_client):
+    first_response = api_client.post(
+        "/api/chat/",
+        json={"message": "Is 316L compatible with GOX at 3000 psi?"},
+    )
+    assert first_response.status_code == 200
+    first_payload = first_response.json()
+
+    history = [
+        {
+            "role": "user",
+            "content": "Is 316L compatible with GOX at 3000 psi?",
+            "entities": first_payload["entities"],
+        },
+        {
+            "role": "assistant",
+            "content": first_payload["response"],
+            "engine_used": first_payload["engine_used"],
+            "entities": first_payload["entities"],
+        },
+    ]
+
+    with api_client.stream(
+        "POST",
+        "/api/chat/stream",
+        json={
+            "session_id": "frontend-history-only-stream",
+            "message": "What about at 1500 psi?",
+            "history": history,
+        },
+    ) as response:
+        assert response.status_code == 200
+        raw_stream = "".join(response.iter_text())
+
+    events = _parse_sse_events(raw_stream)
+    done_event = next(event for event in events if event["type"] == "done")
+    assert done_event["entities"]["material_designation"] == "316L"
+    assert done_event["entities"]["pressure_value"] == 1500.0

@@ -3,6 +3,18 @@ export interface MiraChatContextSummaryItem {
   value: string;
 }
 
+export interface MiraChatActiveField {
+  fieldKey: string;
+  label: string;
+}
+
+export interface MiraChatWorkflowFieldState {
+  fieldKey: string;
+  label: string;
+  status: "complete" | "incomplete" | "warning" | "blocked";
+  required?: boolean;
+}
+
 export interface MiraModuleChatLaunchState {
   kind: "module";
   scopeKey: string;
@@ -95,6 +107,45 @@ export function buildChatContextSummary(
     if (typeof entry.value === "string" && entry.value.trim().length === 0) return [];
     return [{ label: entry.label, value: String(entry.value) }];
   });
+}
+
+export function resolveGuidanceFieldFromTarget(target: EventTarget | null): MiraChatActiveField | null {
+  if (!(target instanceof Element)) return null;
+  const container = target.closest("[data-guidance-field]");
+  if (!(container instanceof HTMLElement)) return null;
+
+  const fieldKey = container.dataset.guidanceField?.trim();
+  const label = container.dataset.guidanceLabel?.trim();
+  if (!fieldKey || !label) return null;
+
+  return { fieldKey, label };
+}
+
+export function buildWorkflowContext(args: {
+  currentStep: string;
+  activeField?: MiraChatActiveField | null;
+  fieldStates?: MiraChatWorkflowFieldState[];
+  nextSteps?: string[];
+  blockers?: string[];
+}): Record<string, unknown> {
+  const fieldStates = args.fieldStates ?? [];
+  const completedFields = fieldStates
+    .filter((field) => field.status === "complete")
+    .map((field) => field.label);
+  const incompleteFields = fieldStates
+    .filter((field) => field.status !== "complete")
+    .map((field) => field.label);
+
+  return {
+    current_step: args.currentStep,
+    active_field: args.activeField?.fieldKey,
+    active_field_label: args.activeField?.label,
+    field_states: fieldStates,
+    completed_fields: completedFields,
+    incomplete_fields: incompleteFields,
+    next_steps: args.nextSteps ?? [],
+    blockers: args.blockers ?? [],
+  };
 }
 
 export function createModuleChatLaunchState(args: {

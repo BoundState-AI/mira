@@ -38,9 +38,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { authorityRegistry, createOcaContext, ocaGuidancePack } from '@/lib/guidance/oca-pack';
 import type { GuidanceModeName } from '@/lib/guidance/types';
 import {
+  buildWorkflowContext,
   buildChatContextSummary,
   createModuleChatLaunchState,
   registerRouteModuleChatState,
+  resolveGuidanceFieldFromTarget,
 } from '@/lib/mira-chat-context';
 import {
   ocaAssessMechanisms,
@@ -215,6 +217,7 @@ export default function OCAWorkbench() {
   const [exportLoading, setExportLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [guidanceMode, setGuidanceMode] = useState<GuidanceModeName>('live');
+  const [activeChatField, setActiveChatField] = useState<{ fieldKey: string; label: string } | null>(null);
 
   const [materialName, setMaterialName] = useState('316L');
   const [spec, setSpec] = useState('');
@@ -420,6 +423,31 @@ export default function OCAWorkbench() {
     { name: 'workbench.temp_max_c', label: 'Max temperature', required: true, valid: Number.isFinite(Number(tempMax)) && tempMax.trim() !== '', hasWarnings: false },
     { name: 'workbench.o2_fraction', label: 'O2 fraction', required: true, valid: Number.isFinite(Number(o2Fraction)) && o2Fraction.trim() !== '', hasWarnings: false },
   ];
+  const incompleteCompletionFields = completionFields.filter((field) => !field.valid);
+  const ocaWorkflowContext = buildWorkflowContext({
+    currentStep: decision
+      ? 'review_decision'
+      : createdCase
+        ? 'review_precheck'
+        : incompleteCompletionFields.length
+          ? 'complete_required_inputs'
+          : 'ready_to_run_screening',
+    activeField: activeChatField,
+    fieldStates: completionFields.map((field) => ({
+      fieldKey: field.name,
+      label: field.label,
+      status: field.valid ? 'complete' : field.hasWarnings ? 'warning' : 'incomplete',
+      required: field.required,
+    })),
+    nextSteps: incompleteCompletionFields.length
+      ? [`Complete ${incompleteCompletionFields[0].label}.`]
+      : !createdCase
+        ? ['Run the OCA screening to create or update the case.']
+        : !decision
+          ? ['Review the triggered requirements and mechanism credibility, then run the decision step.']
+          : ['Review the downstream actions and export the package if you need a handoff artifact.'],
+    blockers: incompleteCompletionFields.map((field) => field.label),
+  });
   const ocaChatLaunchState = createModuleChatLaunchState({
     scopeKey: 'oca-workbench',
     moduleLabel: 'OCA Workbench',
@@ -430,6 +458,7 @@ export default function OCAWorkbench() {
       environment: oxidizerType.toUpperCase(),
       pressure_psi: pressureMax.trim() ? Number(pressureMax) : undefined,
       temperature: tempMax.trim() ? Number(tempMax) : undefined,
+      chat_workflow: ocaWorkflowContext,
     },
     originPath: '/oca/workbench',
     originTitle: 'OCA Workbench',
@@ -445,7 +474,7 @@ export default function OCAWorkbench() {
 
   useEffect(() => {
     registerRouteModuleChatState('/oca/workbench', ocaChatLaunchState);
-  }, [componentClass, createdCase?.case_id, materialName, oxidizerType, pressureMax, tempMax]);
+  }, [activeChatField, componentClass, createdCase?.case_id, materialName, oxidizerType, pressureMax, tempMax]);
 
   return (
     <GuidanceProvider
@@ -456,7 +485,13 @@ export default function OCAWorkbench() {
       onModeChange={(newMode) => setGuidanceMode(newMode)}
       authorityRegistry={authorityRegistry}
     >
-      <div className="space-y-6">
+      <div
+        className="space-y-6"
+        onFocusCapture={(event) => {
+          const field = resolveGuidanceFieldFromTarget(event.target);
+          if (field) setActiveChatField(field);
+        }}
+      >
         <div className="space-y-3">
           <PageHeader
             title="OCA Workbench"

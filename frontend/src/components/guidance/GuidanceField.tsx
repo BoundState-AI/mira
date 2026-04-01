@@ -85,7 +85,11 @@ export function GuidanceField({
   const lowConfidence = (heritageConfidence ?? 100) < 80;
 
   return (
-    <div className={cn('space-y-1.5', enhanced && mode === 'training' && 'ring-1 ring-primary/20 rounded-md p-2', className)}>
+    <div
+      className={cn('space-y-1.5', enhanced && mode === 'training' && 'ring-1 ring-primary/20 rounded-md p-2', className)}
+      data-guidance-field={name}
+      data-guidance-label={displayLabel}
+    >
       {/* Label row with guidance popover */}
       <div className="flex items-center gap-1.5">
         <Label htmlFor={htmlFor} className={cn(required && "after:ml-0.5 after:text-destructive after:content-['*']")}>

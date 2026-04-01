@@ -245,6 +245,8 @@ async def chat(request: ChatRequest) -> ChatResponse:
         "accumulated_entities": dict(session["accumulated_entities"]),
         **session["engine_context"],  # Includes oca_case_id etc. from prior turns
     }
+    if request.module_context:
+        session_context["module_context"] = dict(request.module_context)
 
     # ------------------------------------------------------------------
     # 2. Parse query
@@ -567,6 +569,8 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
             "accumulated_entities": dict(session["accumulated_entities"]),
             **session["engine_context"],
         }
+        if request.module_context:
+            session_context["module_context"] = dict(request.module_context)
 
         # --------------------------------------------------------------
         # 2. Parse query

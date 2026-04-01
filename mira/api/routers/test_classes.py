@@ -21,8 +21,12 @@ import logging
 from io import StringIO
 from typing import Optional
 
-import psycopg2
-from psycopg2.extras import RealDictCursor
+try:
+    import psycopg2
+    from psycopg2.extras import RealDictCursor
+except ImportError:  # pragma: no cover - exercised in lightweight test envs
+    psycopg2 = None
+    RealDictCursor = None
 from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import StreamingResponse
 
@@ -233,6 +237,8 @@ def get_db_connection():
         return open_db_connection()
     except ImportError:
         # Fallback if db_config not available
+        if psycopg2 is None:
+            raise RuntimeError("psycopg2 is not installed; database access is unavailable")
         import os
         return psycopg2.connect(
             host=os.environ.get('POSTGRES_HOST', 'localhost'),
