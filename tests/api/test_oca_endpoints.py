@@ -15,7 +15,7 @@ def client():
     router = module.router
 
     app = FastAPI()
-    app.include_router(router, prefix="/api")
+    app.include_router(router, prefix="/api/oca")
     return TestClient(app)
 
 

@@ -33,7 +33,7 @@ from mira.oca.models import (
 from mira.oca.reference_pack import get_material_catalog
 
 
-router = APIRouter(prefix="/oca")
+router = APIRouter()
 
 
 @router.get("/ping")
