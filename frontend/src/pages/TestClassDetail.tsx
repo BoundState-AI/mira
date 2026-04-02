@@ -29,6 +29,11 @@ import {
 } from "@/components/ui/dialog";
 import { ArrowLeft, ChevronLeft, ChevronRight, Search, Download, Copy, FileText, Code, Printer } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  ModuleAvailabilityGate,
+  TemporarilyUnavailableNotice,
+} from "@/components/TemporarilyUnavailableModule";
+import { isUnavailableModuleId } from "@/lib/moduleAvailability";
 
 interface TestRecord {
   id: string;
@@ -116,6 +121,7 @@ export default function TestClassDetail() {
     : null;
   const isKnownTestType = !!(testType && (translatedName || TEST_CLASS_FALLBACK[testType]));
   const isFluidCompatibility = testType === 'fluid-compatibility';
+  const isTemporarilyUnavailable = isUnavailableModuleId("test-classes");
 
   // Fetch available ratings for this test type
   useEffect(() => {
@@ -244,6 +250,10 @@ export default function TestClassDetail() {
 
   return (
     <div className="min-h-full p-6 space-y-6">
+      {isTemporarilyUnavailable ? (
+        <TemporarilyUnavailableNotice moduleName="MAPTIS Search" />
+      ) : null}
+      <ModuleAvailabilityGate unavailable={isTemporarilyUnavailable}>
       {/* Header */}
       <div>
         <Button
@@ -589,6 +599,7 @@ export default function TestClassDetail() {
           )}
         </DialogContent>
       </Dialog>
+      </ModuleAvailabilityGate>
     </div>
   );
 }

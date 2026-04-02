@@ -36,6 +36,23 @@ type Verdict = "PASS" | "CONDITIONAL_PASS" | "FAIL" | "REFUSE" | "INSUFFICIENT_D
 
 type ChatUiMessage = MiraChatStoredMessage & { verdict?: Verdict };
 
+const ENGINE_LABELS: Record<string, string> = {
+  knowledge_twins: "Knowledge Twins",
+  miul: "MIUL Builder",
+  mua: "MUA Writer",
+  mp_plan: "M&P Plan",
+  galvanic: "Galvanic",
+  fracture: "Fracture Control",
+  h2: "Hydrogen",
+  oca: "Oxygen Compatibility",
+  gpcm: "GPCM",
+  maptis_search: "MAPTIS Search",
+  forge_build: "FORGE Build",
+  forge_explorer: "FORGE Explorer",
+  tocr: "TOCR Review",
+  bsmh: "MIRA",
+};
+
 function verdictVariant(verdict: Verdict): "default" | "secondary" | "destructive" | "outline" {
   if (verdict === "PASS") return "default";
   if (verdict === "FAIL" || verdict === "ERROR" || verdict === "REFUSE") return "destructive";
@@ -54,6 +71,19 @@ function toHistoryMessages(messages: ChatUiMessage[]): MiraChatMessage[] {
 
 function messageId(prefix: "user" | "assistant"): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
+}
+
+function assistantScopeLabel(
+  activeModuleLaunchState: MiraModuleChatLaunchState | null,
+  engineUsed?: string | null,
+): string {
+  if (activeModuleLaunchState?.moduleLabel) {
+    return activeModuleLaunchState.moduleLabel;
+  }
+  if (engineUsed && ENGINE_LABELS[engineUsed]) {
+    return ENGINE_LABELS[engineUsed];
+  }
+  return "MIRA";
 }
 
 function renderInlineText(text: string) {
@@ -484,13 +514,13 @@ export default function MiraChat() {
                     >
                       <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-[0.18em] opacity-80">
                         {isAssistant ? <Bot className="h-3.5 w-3.5" /> : <User2 className="h-3.5 w-3.5" />}
-                        {isAssistant ? "MIRA" : "Engineer"}
-                        {isAssistant && message.engineUsed && (
+                        {isAssistant ? assistantScopeLabel(activeModuleLaunchState, message.engineUsed) : "Engineer"}
+                        {isAssistant && message.engineUsed && message.content.trim() && (
                           <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-medium text-slate-600">
                             {message.engineUsed}
                           </span>
                         )}
-                        {isAssistant && message.verdict && (
+                        {isAssistant && message.verdict && message.content.trim() && (
                           <Badge variant={verdictVariant(message.verdict)} className="ml-auto">
                             {message.verdict}
                           </Badge>
@@ -500,7 +530,7 @@ export default function MiraChat() {
                         {isAssistant && !message.content && isSending ? (
                           <span className="inline-flex items-center gap-2 text-muted-foreground">
                             <Loader2 className="h-4 w-4 animate-spin" />
-                            Streaming response
+                            {activeModuleLaunchState ? `Running ${activeModuleLaunchState.moduleLabel}` : "Streaming response"}
                           </span>
                         ) : renderMessageContent(message.content)}
                       </div>

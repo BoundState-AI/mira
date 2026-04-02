@@ -6,6 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  ModuleAvailabilityGate,
+  TemporarilyUnavailableNotice,
+} from "@/components/TemporarilyUnavailableModule";
+import { isUnavailableModuleId } from "@/lib/moduleAvailability";
 
 import {
   bsmhQuery,
@@ -63,6 +68,7 @@ export default function BSMHQuery({
     ns: "query",
     defaultValue: "Evidence-first queries with transparent confidence scoring and NASA-compliant audit trails",
   });
+  const isTemporarilyUnavailable = endpoint === "query" && isUnavailableModuleId("query");
 
   useEffect(() => {
     if (!loading) {
@@ -105,6 +111,12 @@ export default function BSMHQuery({
 
   return (
     <div className="min-h-full bg-background">
+      {isTemporarilyUnavailable ? (
+        <div className="mx-auto max-w-5xl px-6 pt-6">
+          <TemporarilyUnavailableNotice moduleName="MIRA Query" />
+        </div>
+      ) : null}
+      <ModuleAvailabilityGate unavailable={isTemporarilyUnavailable}>
       <div className="bg-card border-b border-border">
         <div className="max-w-5xl mx-auto px-6 py-10">
           <h1 className="text-4xl font-serif font-bold mb-2 flex items-center gap-3">
@@ -358,6 +370,7 @@ export default function BSMHQuery({
           </>
         )}
       </div>
+      </ModuleAvailabilityGate>
     </div>
   );
 }

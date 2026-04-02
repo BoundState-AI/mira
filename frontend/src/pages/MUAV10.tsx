@@ -10,6 +10,10 @@ import {
 
 import { PageHeader } from '@/components/PageHeader';
 import {
+  ModuleAvailabilityGate,
+  TemporarilyUnavailableNotice,
+} from '@/components/TemporarilyUnavailableModule';
+import {
   GuidanceContextIndicator,
   GuidanceField,
   GuidanceInlineHelp,
@@ -35,6 +39,7 @@ import {
 } from '@/lib/mua-v10-api';
 import { authorityRegistry, createMuaContext, muaGuidancePack } from '@/lib/guidance/mua-pack';
 import type { GuidanceModeName } from '@/lib/guidance/types';
+import { isUnavailableModuleId } from '@/lib/moduleAvailability';
 
 const ISSUE_COLUMNS = ['FLAM', 'FS', 'TOX', 'TVS', 'SCC', 'CORR'] as const;
 
@@ -116,6 +121,7 @@ function normalizeRating(value: string): string {
 }
 
 export default function MUAV10() {
+  const isTemporarilyUnavailable = isUnavailableModuleId('mua-v10');
   const [guidanceMode, setGuidanceMode] = useState<GuidanceModeName>('live');
   // Step 1
   const [maptisCode, setMaptisCode] = useState('');
@@ -537,6 +543,10 @@ export default function MUAV10() {
       authorityRegistry={authorityRegistry}
     >
       <div className="space-y-6">
+      {isTemporarilyUnavailable ? (
+        <TemporarilyUnavailableNotice moduleName="MUA Writer" />
+      ) : null}
+      <ModuleAvailabilityGate unavailable={isTemporarilyUnavailable}>
       <div className="flex items-center justify-between gap-3">
         <div className="space-y-3">
           <PageHeader
@@ -1221,6 +1231,7 @@ export default function MUAV10() {
           </CardContent>
         </Card>
       ) : null}
+      </ModuleAvailabilityGate>
       </div>
     </GuidanceProvider>
   );

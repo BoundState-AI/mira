@@ -14,7 +14,12 @@ import {
 } from "@/components/ui/select";
 import { FlaskConical, ChevronRight, Search, X, Loader2 } from "lucide-react";
 import { PageHelp } from "@/components/PageHelp";
+import {
+  ModuleAvailabilityGate,
+  TemporarilyUnavailableNotice,
+} from "@/components/TemporarilyUnavailableModule";
 import helpContent from "@/config/helpContent";
+import { isUnavailableModuleId } from "@/lib/moduleAvailability";
 
 interface TestClass {
   slug: string;
@@ -99,6 +104,7 @@ export default function TestClasses() {
   const [testClassFilter, setTestClassFilter] = useState<string>("all");
   const [ratingFilter, setRatingFilter] = useState<string>("all");
   const [materialTypes, setMaterialTypes] = useState<{ name: string; count: number }[]>([]);
+  const isTemporarilyUnavailable = isUnavailableModuleId("test-classes");
 
   useEffect(() => {
     fetch(`${API_URL}/api/materials/types`)
@@ -178,6 +184,10 @@ export default function TestClasses() {
 
   return (
     <div className="min-h-full p-6 space-y-6">
+      {isTemporarilyUnavailable ? (
+        <TemporarilyUnavailableNotice moduleName="MAPTIS Search" />
+      ) : null}
+      <ModuleAvailabilityGate unavailable={isTemporarilyUnavailable}>
       {/* Header */}
       <div>
         <h1 className="text-2xl font-serif font-bold mb-1 flex items-center gap-3">
@@ -416,6 +426,7 @@ export default function TestClasses() {
           </Card>
         </>
       )}
+      </ModuleAvailabilityGate>
     </div>
   );
 }

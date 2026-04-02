@@ -591,6 +591,54 @@ def _plain_language_summary(envelope: EngineEnvelope) -> str:
         if envelope.status == Status.FAIL:
             return "The available MAPTIS evidence does not support the requested conclusion."
 
+    if envelope.engine_id == "knowledge_twins":
+        if envelope.status == Status.PASS:
+            return "The visible Knowledge Twins evidence supports proceeding with this material pairing as stated."
+        if envelope.status == Status.CONDITIONAL_PASS:
+            return "Knowledge Twins found a plausible path here, but the visible evidence still leaves conditions or heritage gaps to clear."
+        if envelope.status == Status.FAIL:
+            return "Knowledge Twins does not support this pairing with the currently visible evidence."
+
+    if envelope.engine_id == "miul":
+        if envelope.status == Status.PASS:
+            return "From the MIUL workflow standpoint, the current extraction and review state supports moving forward."
+        if envelope.status == Status.CONDITIONAL_PASS:
+            return "The MIUL workflow is on track, but there are still review conditions or missing confirmations to close first."
+        if envelope.status == Status.FAIL:
+            return "The current MIUL workflow state is not ready to proceed without correction."
+
+    if envelope.engine_id == "mua":
+        if envelope.status == Status.PASS:
+            return "From the MUA workflow standpoint, the current material case supports the draft as stated."
+        if envelope.status == Status.CONDITIONAL_PASS:
+            return "The MUA can proceed only if the listed conditions, precedents, or test assumptions are carried through."
+        if envelope.status == Status.FAIL:
+            return "The current MUA case does not support approval as stated."
+
+    if envelope.engine_id == "forge_build":
+        if envelope.status == Status.PASS:
+            return "The current FORGE build state is healthy and the requested compile action completed as expected."
+        if envelope.status == Status.CONDITIONAL_PASS:
+            return "The FORGE build is partly successful, but there are still compile conditions or follow-up actions to address."
+        if envelope.status == Status.FAIL:
+            return "The requested FORGE build action did not complete successfully."
+
+    if envelope.engine_id == "forge_explorer":
+        if envelope.status == Status.PASS:
+            return "FORGE Explorer returned grounded results from the current compiled workspace."
+        if envelope.status == Status.CONDITIONAL_PASS:
+            return "FORGE Explorer found relevant workspace evidence, but the answer still needs interpretation or more compiled coverage."
+        if envelope.status == Status.FAIL:
+            return "The current compiled FORGE workspace does not support the requested answer."
+
+    if envelope.engine_id == "tocr":
+        if envelope.status == Status.PASS:
+            return "From the TOCR review standpoint, the current package supports the requested action as stated."
+        if envelope.status == Status.CONDITIONAL_PASS:
+            return "The TOCR review is directionally acceptable, but there are still compliance gaps or review conditions to close."
+        if envelope.status == Status.FAIL:
+            return "The TOCR review does not support proceeding as stated."
+
     if envelope.engine_id == "bsmh":
         structured = envelope.domain_payload.get("structured_query", {})
         intent = str(structured.get("intent") or "").replace("_", " ").strip()
