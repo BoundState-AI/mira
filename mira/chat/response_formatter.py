@@ -534,6 +534,66 @@ def _fallback_format(
 
 def _plain_language_summary(envelope: EngineEnvelope) -> str:
     """Return a short plain-language lead-in for deterministic fallback mode."""
+    if envelope.engine_id == "knowledge_twins":
+        if envelope.status == Status.PASS:
+            return "From a Knowledge Twins standpoint, the active fluid, mode, and evidence support the current path."
+        if envelope.status == Status.CONDITIONAL_PASS:
+            return "From a Knowledge Twins standpoint, the current evidence is useful, but the next browse or ask step still matters."
+        if envelope.status == Status.FAIL:
+            return "From a Knowledge Twins standpoint, the loaded evidence does not support proceeding as stated."
+        if envelope.status == Status.INSUFFICIENT_DATA:
+            return "From a Knowledge Twins standpoint, I need more grounded evidence from the active workspace before I can answer this cleanly."
+
+    if envelope.engine_id == "miul":
+        if envelope.status == Status.PASS:
+            return "From a MIUL workflow standpoint, the active build state supports moving forward as stated."
+        if envelope.status == Status.CONDITIONAL_PASS:
+            return "From a MIUL workflow standpoint, this path is workable only if the remaining review items and rating gaps are handled as described."
+        if envelope.status == Status.FAIL:
+            return "From a MIUL workflow standpoint, the active build state does not support proceeding as stated."
+        if envelope.status == Status.INSUFFICIENT_DATA:
+            return "From a MIUL workflow standpoint, the current page is still missing the drawing, identity, or rating context needed for a grounded answer."
+
+    if envelope.engine_id == "mua":
+        if envelope.status == Status.PASS:
+            return "From an MUA workflow standpoint, the current classification path supports proceeding as stated."
+        if envelope.status == Status.CONDITIONAL_PASS:
+            return "From an MUA workflow standpoint, this case is workable only if the listed flag logic, applicability calls, and follow-on actions hold."
+        if envelope.status == Status.FAIL:
+            return "From an MUA workflow standpoint, the current flags and evidence do not support proceeding as stated."
+        if envelope.status == Status.INSUFFICIENT_DATA:
+            return "From an MUA workflow standpoint, I still need the missing material, environment, or rating inputs before I can ground the decision."
+
+    if envelope.engine_id == "forge_build":
+        if envelope.status == Status.PASS:
+            return "From a FORGE build standpoint, the current compile state and artifacts look ready to use."
+        if envelope.status == Status.CONDITIONAL_PASS:
+            return "From a FORGE build standpoint, the compile is usable only if the listed warnings or artifact gaps are addressed."
+        if envelope.status == Status.FAIL:
+            return "From a FORGE build standpoint, the current compile state does not support trusting the output yet."
+        if envelope.status == Status.INSUFFICIENT_DATA:
+            return "From a FORGE build standpoint, I need more compile context or artifact state before I can answer this."
+
+    if envelope.engine_id == "forge_explorer":
+        if envelope.status == Status.PASS:
+            return "From a FORGE explorer standpoint, the current workspace can answer this cleanly from the compiled question surface."
+        if envelope.status == Status.CONDITIONAL_PASS:
+            return "From a FORGE explorer standpoint, the workspace has useful coverage here, but the answer still has important caveats."
+        if envelope.status == Status.FAIL:
+            return "From a FORGE explorer standpoint, the current workspace does not support the requested conclusion."
+        if envelope.status == Status.INSUFFICIENT_DATA:
+            return "From a FORGE explorer standpoint, I need more workspace coverage or a narrower question to answer this cleanly."
+
+    if envelope.engine_id == "tocr":
+        if envelope.status == Status.PASS:
+            return "From a TOCR review standpoint, the current result supports moving forward as stated."
+        if envelope.status == Status.CONDITIONAL_PASS:
+            return "From a TOCR review standpoint, the current result is workable only if the listed review conditions hold."
+        if envelope.status == Status.FAIL:
+            return "From a TOCR review standpoint, the current findings do not support proceeding as stated."
+        if envelope.status == Status.INSUFFICIENT_DATA:
+            return "From a TOCR review standpoint, I still need more report or revision context before I can answer this cleanly."
+
     if envelope.engine_id == "h2":
         if envelope.status == Status.PASS:
             return "From a hydrogen-compatibility standpoint, the current material and condition screen as acceptable as stated."

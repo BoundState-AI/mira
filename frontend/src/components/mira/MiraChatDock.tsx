@@ -24,6 +24,36 @@ const GLOBAL_WIDGET_PROMPTS = [
   "What galvanic risk do I have between 7075-T73 and CRES 304?",
 ];
 
+const ENGINE_LABELS: Record<string, string> = {
+  knowledge_twins: "Knowledge Twins",
+  miul: "MIUL Builder",
+  mua: "MUA Writer",
+  mp_plan: "M&P Plan",
+  galvanic: "Galvanic",
+  fracture: "Fracture Control",
+  h2: "Hydrogen",
+  oca: "Oxygen Compatibility",
+  gpcm: "GPCM",
+  maptis_search: "MAPTIS Search",
+  forge_build: "FORGE Build",
+  forge_explorer: "FORGE Explorer",
+  tocr: "TOCR Review",
+  bsmh: "MIRA",
+};
+
+function assistantScopeLabel(
+  activeModuleLaunchState: MiraModuleChatLaunchState | null,
+  engineUsed?: string | null,
+): string {
+  if (activeModuleLaunchState?.moduleLabel) {
+    return activeModuleLaunchState.moduleLabel;
+  }
+  if (engineUsed && ENGINE_LABELS[engineUsed]) {
+    return ENGINE_LABELS[engineUsed];
+  }
+  return "MIRA";
+}
+
 function resizeComposer(textarea: HTMLTextAreaElement | null, minHeight: number, maxHeight: number) {
   if (!textarea) {
     return;
@@ -253,9 +283,9 @@ export function MiraChatDock() {
   }
 
   return (
-    <div className="pointer-events-none fixed bottom-5 right-5 z-50 flex max-w-[calc(100vw-1.5rem)] flex-col items-end gap-3">
+    <div className="pointer-events-none fixed bottom-5 left-3 right-3 z-50 flex flex-col items-stretch gap-3 sm:left-auto sm:right-5 sm:max-w-[calc(100vw-1.5rem)] sm:items-end">
       {open ? (
-        <Card className="pointer-events-auto flex h-[40rem] max-h-[calc(100vh-6.5rem)] w-[28rem] max-w-[calc(100vw-1rem)] flex-col overflow-hidden border-border/80 shadow-2xl">
+        <Card className="pointer-events-auto flex h-[40rem] max-h-[calc(100vh-6.5rem)] w-full max-w-full flex-col overflow-hidden border-border/80 shadow-2xl sm:w-[28rem] sm:max-w-[calc(100vw-1.5rem)]">
           <div className="border-b border-border/70 bg-[radial-gradient(circle_at_top_left,_rgba(15,118,110,0.14),_transparent_40%),linear-gradient(135deg,_rgba(8,47,73,0.98),_rgba(15,23,42,0.98))] px-4 py-3 text-slate-50">
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1">
@@ -308,7 +338,7 @@ export function MiraChatDock() {
           </div>
 
           <ScrollArea className="min-h-0 flex-1 bg-[linear-gradient(180deg,rgba(248,250,252,0.98),rgba(241,245,249,0.96))]">
-            <div className="flex min-h-full flex-col gap-3 pb-4 pl-4 pr-7 pt-4">
+            <div className="flex min-h-full flex-col gap-3 p-4 sm:pr-5">
               {!messages.length && !streamingMessage ? (
                 <div className="space-y-3 rounded-2xl border border-dashed border-border bg-background/85 p-4">
                   <div className="text-sm font-medium">Start here</div>
@@ -336,12 +366,12 @@ export function MiraChatDock() {
                 return (
                   <div
                     key={message.id}
-                    className={cn("flex min-w-0", isAssistant ? "justify-start" : "justify-end pl-4 pr-5")}
+                    className={cn("flex min-w-0", isAssistant ? "justify-start" : "justify-end")}
                   >
                     <div
                       className={cn(
                         "min-w-0 rounded-2xl border shadow-sm",
-                        isAssistant ? "max-w-[94%] px-3 py-2" : "max-w-[80%] px-4 py-3",
+                        isAssistant ? "max-w-[96%] px-3 py-2" : "max-w-[90%] px-4 py-3 sm:max-w-[80%]",
                         isAssistant
                           ? "border-slate-200 bg-white text-slate-900"
                           : "border-teal-700 bg-teal-700 text-white",
@@ -349,16 +379,11 @@ export function MiraChatDock() {
                     >
                       {isAssistant ? (
                         <div className="mb-1 flex flex-wrap items-center gap-1.5 text-[10px] uppercase tracking-[0.14em] opacity-80">
-                          {"MIRA"}
+                          {assistantScopeLabel(activeModuleLaunchState, message.engineUsed)}
                           {message.engineUsed ? (
                           <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[9px] font-medium text-slate-600">
                             {message.engineUsed}
                           </span>
-                          ) : null}
-                          {message.verdict ? (
-                            <Badge variant={verdictVariant(message.verdict)} className="text-[10px] sm:ml-auto">
-                              {message.verdict}
-                            </Badge>
                           ) : null}
                         </div>
                       ) : null}
@@ -390,7 +415,7 @@ export function MiraChatDock() {
                 <div className="flex justify-start">
                   <div className="max-w-[94%] rounded-2xl border border-slate-200 bg-white px-3 py-2 text-slate-900 shadow-sm">
                     <div className="mb-1 flex flex-wrap items-center gap-1.5 text-[10px] uppercase tracking-[0.14em] opacity-80">
-                      {"MIRA"}
+                      {assistantScopeLabel(activeModuleLaunchState)}
                     </div>
                     {streamingMessage.content ? (
                       <div className="whitespace-pre-wrap break-words text-sm leading-5">
@@ -410,7 +435,7 @@ export function MiraChatDock() {
                 <div className="flex justify-start">
                   <div className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs text-muted-foreground shadow-sm">
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    Running the engine
+                    {activeModuleLaunchState ? `Running ${activeModuleLaunchState.moduleLabel}` : "Running the engine"}
                   </div>
                 </div>
               ) : null}

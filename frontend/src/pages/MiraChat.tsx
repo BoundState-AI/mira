@@ -25,6 +25,36 @@ const GLOBAL_EXAMPLE_PROMPTS = [
   "What MAPTIS evidence exists for Inconel 625 in aged versus cast condition?",
 ];
 
+const ENGINE_LABELS: Record<string, string> = {
+  knowledge_twins: "Knowledge Twins",
+  miul: "MIUL Builder",
+  mua: "MUA Writer",
+  mp_plan: "M&P Plan",
+  galvanic: "Galvanic",
+  fracture: "Fracture Control",
+  h2: "Hydrogen",
+  oca: "Oxygen Compatibility",
+  gpcm: "GPCM",
+  maptis_search: "MAPTIS Search",
+  forge_build: "FORGE Build",
+  forge_explorer: "FORGE Explorer",
+  tocr: "TOCR Review",
+  bsmh: "MIRA",
+};
+
+function assistantScopeLabel(
+  activeModuleLaunchState: MiraModuleChatLaunchState | null,
+  engineUsed?: string | null,
+): string {
+  if (activeModuleLaunchState?.moduleLabel) {
+    return activeModuleLaunchState.moduleLabel;
+  }
+  if (engineUsed && ENGINE_LABELS[engineUsed]) {
+    return ENGINE_LABELS[engineUsed];
+  }
+  return "MIRA";
+}
+
 function resizeComposer(textarea: HTMLTextAreaElement | null, minHeight: number, maxHeight: number) {
   if (!textarea) {
     return;
@@ -307,7 +337,7 @@ export default function MiraChat() {
                     >
                       <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-[0.18em] opacity-80">
                         {isAssistant ? <Bot className="h-3.5 w-3.5" /> : <User2 className="h-3.5 w-3.5" />}
-                        {isAssistant ? "MIRA" : "Engineer"}
+                        {isAssistant ? assistantScopeLabel(activeModuleLaunchState, message.engineUsed) : "Engineer"}
                         {isAssistant && message.engineUsed && (
                           <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-medium text-slate-600">
                             {message.engineUsed}
@@ -358,7 +388,7 @@ export default function MiraChat() {
                   <div className="max-w-[92%] rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm 2xl:max-w-[88%]">
                     <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-[0.18em] opacity-80">
                       <Bot className="h-3.5 w-3.5" />
-                      MIRA
+                      {assistantScopeLabel(activeModuleLaunchState)}
                     </div>
                     {streamingMessage.content ? (
                       <div className="space-y-3 text-sm leading-6">
@@ -378,7 +408,7 @@ export default function MiraChat() {
                 <div className="flex justify-start">
                   <div className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-muted-foreground shadow-sm">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Running domain engine and formatter
+                    {isModuleChat ? `Running ${scopeLabel}` : "Running domain engine and formatter"}
                   </div>
                 </div>
               )}
