@@ -15,6 +15,7 @@ Safety Critical: False
 from __future__ import annotations
 
 import base64
+import contextlib
 import json
 import logging
 import os
@@ -166,27 +167,31 @@ class OCASystemVisionService:
             len(image_bytes),
         )
 
-        response = client.messages.create(
-            model=self._model_id,
-            max_tokens=4096,
-            temperature=0,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": prompt},
-                        {
-                            "type": "image",
-                            "source": {
-                                "type": "base64",
-                                "media_type": normalized_media_type,
-                                "data": image_b64,
+        from mira.core.bedrock_semaphore import bedrock_limiter_sync
+
+        limiter = bedrock_limiter_sync("vision") if self._use_bedrock else contextlib.nullcontext()
+        with limiter:
+            response = client.messages.create(
+                model=self._model_id,
+                max_tokens=4096,
+                temperature=0,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": prompt},
+                            {
+                                "type": "image",
+                                "source": {
+                                    "type": "base64",
+                                    "media_type": normalized_media_type,
+                                    "data": image_b64,
+                                },
                             },
-                        },
-                    ],
-                }
-            ],
-        )
+                        ],
+                    }
+                ],
+            )
 
         raw_text = _collect_text_blocks(response.content)
         parsed = _VisionLLMResponse(**_extract_json_object(raw_text))
@@ -539,4 +544,3 @@ def _assign_positions(
         for row_index, temp_id in enumerate(lanes[lane_index]):
             positions[temp_id] = (120.0 + (lane_index * 280.0), 120.0 + (row_index * 180.0))
     return positions
-

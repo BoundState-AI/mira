@@ -90,12 +90,12 @@ def _get_manager():
     return get_session_manager()
 
 
-def _require_session_for_request(
+async def _require_session_for_request(
     session_id: str,
     http_request: Request,
     manager: Any,
 ):
-    session = manager.get_session(session_id)
+    session = await manager.aget_session(session_id)
     if not session:
         raise HTTPException(status_code=404, detail=f"Session not found: {session_id}")
     authorize_owner_or_admin(http_request, session.owner_username, resource_label="mp plan session")
@@ -215,14 +215,13 @@ async def create_session(
     manager=Depends(_get_manager),
 ) -> dict[str, Any]:
     actor = get_request_user(http_request)
-    session = manager.create_session(
+    session = await manager.acreate_session(
         program_name=request.program_name,
         program_phase=request.program_phase,
         policy_pack_id=request.policy_pack_id,
         vehicle_preset=request.vehicle_preset,
         owner_username=actor.username if actor else None,
     )
-    manager.update_session(session)
     return {
         "session_id": session.session_id,
         "program_name": session.program_name,
@@ -237,19 +236,19 @@ async def get_session(
     http_request: Request,
     manager=Depends(_get_manager),
 ) -> dict[str, Any]:
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
     return session.model_dump()
 
 
 @router.get("/sessions")
 async def list_sessions(http_request: Request, manager=Depends(_get_manager)) -> dict[str, Any]:
-    sessions = manager.list_sessions()
+    sessions = await manager.alist_sessions()
     actor = get_request_user(http_request)
     if actor is not None and not actor.is_admin:
         actor_name = (actor.username or actor.email or "").strip().lower()
         filtered: list[dict[str, Any]] = []
         for summary in sessions:
-            session = manager.get_session(summary["session_id"])
+            session = await manager.aget_session(summary["session_id"])
             if session and (session.owner_username or "").strip().lower() == actor_name:
                 filtered.append(summary)
         sessions = filtered
@@ -262,8 +261,8 @@ async def delete_session(
     http_request: Request,
     manager=Depends(_get_manager),
 ) -> dict[str, Any]:
-    _require_session_for_request(session_id, http_request, manager)
-    if not manager.delete_session(session_id):
+    await _require_session_for_request(session_id, http_request, manager)
+    if not await manager.adelete_session(session_id):
         raise HTTPException(status_code=404, detail=f"Session not found: {session_id}")
     return {"status": "deleted", "session_id": session_id}
 
@@ -275,8 +274,8 @@ async def add_environment(
     http_request: Request,
     manager=Depends(_get_manager),
 ) -> dict[str, Any]:
-    _require_session_for_request(session_id, http_request, manager)
-    env = manager.add_environment(
+    await _require_session_for_request(session_id, http_request, manager)
+    env = await manager.aadd_environment(
         session_id=session_id,
         name=request.name,
         o2_pct=request.o2_pct,
@@ -298,11 +297,11 @@ async def add_materials(
     http_request: Request,
     manager=Depends(_get_manager),
 ) -> dict[str, Any]:
-    _require_session_for_request(session_id, http_request, manager)
+    await _require_session_for_request(session_id, http_request, manager)
 
     created = []
     for item in request.materials:
-        material = manager.add_material(
+        material = await manager.aadd_material(
             session_id=session_id,
             name=item.name,
             application=item.application,
@@ -323,10 +322,10 @@ async def run_compute(
     http_request: Request,
     manager=Depends(_get_manager),
 ) -> dict[str, Any]:
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     session = run_compute_loop_codex(session, max_iterations=1)
-    manager.update_session(session)
+    await manager.aupdate_session(session)
 
     can_generate, blockers = can_generate_codex(session)
     hitl_required = sum(1 for d in session.mpr_determinations if d.get("hitl_required"))
@@ -350,10 +349,10 @@ async def get_blocking_questions(
     http_request: Request,
     manager=Depends(_get_manager),
 ) -> dict[str, Any]:
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     session.blocking_questions = generate_blocking_questions_codex(session)
-    manager.update_session(session)
+    await manager.aupdate_session(session)
     return {
         "questions": [q.model_dump() for q in session.blocking_questions],
         "count": len(session.blocking_questions),
@@ -370,7 +369,7 @@ async def get_citation_helper(
     """
     Return one-click citation helper payload for a determination.
     """
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     det = next(
         (d for d in session.mpr_determinations if d.get("determination_id") == determination_id),
@@ -415,7 +414,7 @@ async def submit_answer(
     http_request: Request,
     manager=Depends(_get_manager),
 ) -> dict[str, Any]:
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     question = next(
         (q for q in session.blocking_questions if q.question_id == request.question_id),
@@ -435,7 +434,7 @@ async def submit_answer(
     )
     apply_user_decision_codex(session, question, request.answer, request.rationale)
     session = run_compute_loop_codex(session, max_iterations=1)
-    manager.update_session(session)
+    await manager.aupdate_session(session)
 
     can_generate, blockers = can_generate_codex(session)
     return {
@@ -453,7 +452,7 @@ async def submit_closure(
     http_request: Request,
     manager=Depends(_get_manager),
 ) -> dict[str, Any]:
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     nc = next((n for n in session.nonconformances if n.nonconformance_id == request.gap_id), None)
     if not nc:
@@ -471,7 +470,7 @@ async def submit_closure(
             source="api",
         )
     )
-    manager.update_session(session)
+    await manager.aupdate_session(session)
     can_generate, blockers = can_generate_codex(session)
     return {
         "status": "closure_recorded",
@@ -488,7 +487,7 @@ async def accept_open_gap(
     http_request: Request,
     manager=Depends(_get_manager),
 ) -> dict[str, Any]:
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     nc = next((n for n in session.nonconformances if n.nonconformance_id == request.gap_id), None)
     if not nc:
@@ -513,7 +512,7 @@ async def accept_open_gap(
             risk_statement=request.risk_statement or "Risk accepted pending closure package.",
         )
     )
-    manager.update_session(session)
+    await manager.aupdate_session(session)
     can_generate, blockers = can_generate_codex(session)
     return {
         "status": "accepted_open",
@@ -535,7 +534,7 @@ async def reopen_gap(
     """
     Reopen a previously closed/accepted gap so users can return recursively.
     """
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     before_closure = len(session.closure_decisions)
     before_accept = len(session.accepted_open_gaps)
@@ -556,7 +555,7 @@ async def reopen_gap(
         det["hitl_required"] = True
         det.pop("human_review", None)
 
-    manager.update_session(session)
+    await manager.aupdate_session(session)
     return {
         "status": "reopened",
         "gap_id": gap_id,
@@ -572,7 +571,7 @@ async def generate_artifacts(
     http_request: Request,
     manager=Depends(_get_manager),
 ) -> dict[str, Any]:
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     can_generate, blockers = can_generate_codex(session)
     if not can_generate:
@@ -615,7 +614,7 @@ async def generate_artifacts(
                 }
             )
 
-    manager.update_session(session)
+    await manager.aupdate_session(session)
     return {"status": "generated", "artifacts": artifacts}
 
 
@@ -626,7 +625,7 @@ async def download_artifact(
     http_request: Request,
     manager=Depends(_get_manager),
 ) -> StreamingResponse:
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     artifact = next((a for a in session.generated_artifacts if a.artifact_id == artifact_id), None)
     if not artifact or artifact.content_bytes is None:
@@ -651,5 +650,5 @@ async def export_mp_plan_json(
     http_request: Request,
     manager=Depends(_get_manager),
 ) -> dict[str, Any]:
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
     return generate_mp_plan_json_codex(session)

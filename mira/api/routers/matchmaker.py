@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 
 from mira.api.auth import authorize_owner_or_admin, get_request_user
 from mira.mua.matchmaker.adapters import resolve_material
-from mira.mua.matchmaker.batch import bulk_apply_cat3_code, parse_miul_upload
+from mira.mua.matchmaker.batch import abulk_apply_cat3_code, parse_miul_upload
 from mira.mua.matchmaker.matcher import (
     auto_detect_issues,
     determine_category,
@@ -126,19 +126,19 @@ async def create_session(request: CreateSessionRequest, http_request: Request) -
         request,
         owner_username=(actor.username if actor else None) or request.user,
     )
-    _STORE.create(session)
+    await _STORE.acreate(session)
     return session
 
 
 @router.get("/sessions", response_model=SessionListResponse)
 async def list_sessions(http_request: Request) -> SessionListResponse:
     actor = get_request_user(http_request)
-    sessions = _STORE.list()
+    sessions = await _STORE.alist()
     if actor is not None and not actor.is_admin:
         filtered_sessions: list[SessionSummary] = []
         actor_name = (actor.username or actor.email or "").strip().lower()
         for summary in sessions:
-            session = _STORE.get(summary.session_id)
+            session = await _STORE.aget(summary.session_id)
             if session and (session.owner_username or "").strip().lower() == actor_name:
                 filtered_sessions.append(summary)
         sessions = filtered_sessions
@@ -151,13 +151,13 @@ async def list_sessions(http_request: Request) -> SessionListResponse:
 
 @router.get("/sessions/{sid}", response_model=MatchmakerSession)
 async def get_session(sid: str, http_request: Request) -> MatchmakerSession:
-    return _require_session(sid, http_request)
+    return await _require_session(sid, http_request)
 
 
 @router.delete("/sessions/{sid}")
 async def delete_session(sid: str, http_request: Request) -> dict[str, Any]:
-    session = _require_session(sid, http_request)
-    deleted = _STORE.delete(session.session_id)
+    session = await _require_session(sid, http_request)
+    deleted = await _STORE.adelete(session.session_id)
     if not deleted:
         raise HTTPException(status_code=404, detail=f"Session not found: {sid}")
     return {"session_id": sid, "deleted": True}
@@ -165,7 +165,7 @@ async def delete_session(sid: str, http_request: Request) -> dict[str, Any]:
 
 @router.get("/sessions/{sid}/issues/{issue}/questions", response_model=IssueQuestionResponse)
 async def get_issue_questions(sid: str, issue: str, http_request: Request) -> IssueQuestionResponse:
-    session = _require_session(sid, http_request)
+    session = await _require_session(sid, http_request)
     state, issue_key = _require_issue(session, issue)
     return _build_issue_question_response(issue_key, state)
 
@@ -177,7 +177,7 @@ async def submit_issue_answer(
     request: IssueAnswerRequest,
     http_request: Request,
 ) -> IssueQuestionResponse:
-    session = _require_session(sid, http_request)
+    session = await _require_session(sid, http_request)
     state, issue_key = _require_issue(session, issue)
     if state.out_of_scope:
         raise HTTPException(status_code=400, detail="Issue is manual_required and does not accept tree answers.")
@@ -211,13 +211,13 @@ async def submit_issue_answer(
     _apply_evaluation(issue_key, state, selected_code=request.selected_code, session=session)
     session.issues[issue_key] = state
     _refresh_category(session)
-    _STORE.save(session)
+    await _STORE.asave(session)
     return _build_issue_question_response(issue_key, state)
 
 
 @router.post("/sessions/{sid}/issues/{issue}/match", response_model=MatchResponse)
 async def run_issue_match(sid: str, issue: str, http_request: Request) -> MatchResponse:
-    session = _require_session(sid, http_request)
+    session = await _require_session(sid, http_request)
     state, issue_key = _require_issue(session, issue)
     if state.out_of_scope:
         raise HTTPException(status_code=400, detail="Cannot run matching for manual_required issue.")
@@ -242,7 +242,7 @@ async def run_issue_match(sid: str, issue: str, http_request: Request) -> MatchR
         )
     )
     session.issues[issue_key] = state
-    _STORE.save(session)
+    await _STORE.asave(session)
 
     return MatchResponse(
         issue=issue_key,
@@ -260,7 +260,7 @@ async def save_issue_rationale(
     request: RationaleRequest,
     http_request: Request,
 ) -> IssueState:
-    session = _require_session(sid, http_request)
+    session = await _require_session(sid, http_request)
     state, issue_key = _require_issue(session, issue)
 
     if state.out_of_scope:
@@ -279,7 +279,7 @@ async def save_issue_rationale(
             )
         )
         session.issues[issue_key] = state
-        _STORE.save(session)
+        await _STORE.asave(session)
         return state
 
     parts: list[str] = []
@@ -304,7 +304,7 @@ async def save_issue_rationale(
     )
     session.issues[issue_key] = state
     _refresh_category(session)
-    _STORE.save(session)
+    await _STORE.asave(session)
     return state
 
 
@@ -322,12 +322,12 @@ async def import_miul(http_request: Request, file: UploadFile = File(...)) -> Ba
             application_description="; ".join(group.get("sample_descriptions") or []),
         )
         created = _build_session(payload, owner_username=actor.username if actor else None)
-        _STORE.create(created)
+        await _STORE.acreate(created)
         trigger_signature = str(group.get("trigger_signature") or "").strip()
         if trigger_signature:
             if _auto_seed_from_trigger_signature(created, trigger_signature):
                 _refresh_category(created)
-                _STORE.save(created)
+                await _STORE.asave(created)
         created_ids.append(created.session_id)
 
     return BatchImportResponse(
@@ -342,9 +342,9 @@ async def bulk_apply(request: BulkApplyRequest, http_request: Request) -> dict[s
     if not request.session_ids:
         raise HTTPException(status_code=400, detail="session_ids is required")
     for session_id in request.session_ids:
-        _require_session(session_id, http_request)
+        await _require_session(session_id, http_request)
     try:
-        result = bulk_apply_cat3_code(
+        result = await abulk_apply_cat3_code(
             store=_STORE,
             session_ids=request.session_ids,
             issue=request.issue,
@@ -363,9 +363,9 @@ async def export_session(
     http_request: Request,
     mode: ExportMode = Query(default=ExportMode.DRAFT),
 ) -> dict[str, Any]:
-    session = _require_session(sid, http_request)
+    session = await _require_session(sid, http_request)
     _refresh_category(session)
-    _STORE.save(session)
+    await _STORE.asave(session)
 
     validation = _validate_export(session, mode)
     response = validation.model_dump(mode="json")
@@ -424,8 +424,8 @@ def _build_session(request: CreateSessionRequest, *, owner_username: str | None)
     return session
 
 
-def _require_session(sid: str, http_request: Request | None = None) -> MatchmakerSession:
-    session = _STORE.get(sid)
+async def _require_session(sid: str, http_request: Request | None = None) -> MatchmakerSession:
+    session = await _STORE.aget(sid)
     if session is None:
         raise HTTPException(status_code=404, detail=f"Session not found: {sid}")
     if http_request is not None:
@@ -436,7 +436,7 @@ def _require_session(sid: str, http_request: Request | None = None) -> Matchmake
         changed = True
     if changed:
         _refresh_category(session)
-        _STORE.save(session)
+        await _STORE.asave(session)
     return session
 
 

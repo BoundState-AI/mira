@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 """
 Module: Session Manager
-Purpose: Session CRUD and persistence for M&P Plan Generator V2
+Purpose: Session CRUD and persistence for M&P Plan Generator V2.
+
+Persists session state through the shared ``SessionStore`` from
+``mira.core.session_store``.  All data is serialized via
+``PlanGeneratorSession.model_dump(mode="json")`` and deserialized
+via ``model_validate()`` on every read.
 
 BoundState AI 2026
 Version: 2.0.0
@@ -13,12 +18,11 @@ Safety Critical: False
 
 from __future__ import annotations
 
-import json
+import asyncio
 import logging
 import uuid
 from datetime import datetime
-from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from .models import (
     EnvironmentDefinition,
@@ -33,34 +37,66 @@ LOGGER = logging.getLogger(__name__)
 __version__ = "2.0.0"
 __safety_critical__ = False
 
+_MODULE = "mp_plan"
+
 
 class SessionManager:
     """
     Manages M&P Plan Generator sessions.
 
-    Provides CRUD operations and persistence for sessions.
+    Provides CRUD operations with persistence through the shared
+    ``SessionStore``.  Async methods (``acreate_session``, etc.) are
+    the primary API for FastAPI handlers.  Sync wrappers are available
+    for tests and non-async callers.
     """
 
     def __init__(
         self,
-        storage_dir: Optional[Path] = None,
         default_policy_pack: Optional[PolicyPack] = None,
+        storage_dir: Any | None = None,
     ):
-        """
-        Initialize session manager.
-
-        Args:
-            storage_dir: Directory for session persistence (None for in-memory only).
-            default_policy_pack: Default policy pack for new sessions.
-        """
-        self._sessions: dict[str, PlanGeneratorSession] = {}
-        self._storage_dir = storage_dir
+        from mira.core.session_store import get_session_store
+        self._store = get_session_store()
         self._default_policy = default_policy_pack or create_default_policy_pack()
+        if storage_dir is not None:
+            LOGGER.warning(
+                "SessionManager(storage_dir=...) is deprecated and ignored; "
+                "MP Plan sessions now persist through SessionStore."
+            )
 
-        if storage_dir:
-            storage_dir.mkdir(parents=True, exist_ok=True)
+    # -- sync/async bridge --------------------------------------------------
 
-    def create_session(
+    @staticmethod
+    def _run_sync(coro: Any) -> Any:
+        """Execute an async coroutine synchronously for non-async callers."""
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            return asyncio.run(coro)
+        raise RuntimeError(
+            "SessionManager sync methods cannot be used inside a running event loop. "
+            "Use the async SessionManager methods instead."
+        )
+
+    # -- internal store helpers ---------------------------------------------
+
+    async def _save_async(self, session: PlanGeneratorSession) -> None:
+        from mira.core.session_store import save_model
+        await save_model(_MODULE, session.session_id, session, self._store)
+
+    async def _load_async(self, session_id: str) -> Optional[PlanGeneratorSession]:
+        from mira.core.session_store import load_model
+        return await load_model(_MODULE, session_id, PlanGeneratorSession, self._store)
+
+    async def _delete_async(self, session_id: str) -> bool:
+        return await self._store.delete_module_data(_MODULE, session_id)
+
+    async def _list_keys_async(self) -> list[str]:
+        return await self._store.list_module_keys(_MODULE)
+
+    # -- async CRUD ---------------------------------------------------------
+
+    async def acreate_session(
         self,
         program_name: Optional[str] = None,
         program_phase: Optional[str] = None,
@@ -68,18 +104,7 @@ class SessionManager:
         vehicle_preset: Optional[str] = None,
         owner_username: Optional[str] = None,
     ) -> PlanGeneratorSession:
-        """
-        Create a new session.
-
-        Args:
-            program_name: Optional program name.
-            program_phase: Optional program phase.
-            policy_pack_id: Optional policy pack ID.
-            vehicle_preset: Optional vehicle preset to auto-add environment.
-
-        Returns:
-            New PlanGeneratorSession.
-        """
+        """Create a new session and persist it."""
         session_id = str(uuid.uuid4())[:8]
 
         session = PlanGeneratorSession(
@@ -108,118 +133,36 @@ class SessionManager:
             session.environments.append(env)
             LOGGER.info(f"Auto-added environment: {env.name}")
 
-        self._sessions[session_id] = session
-
-        # Persist to disk if storage configured
-        if self._storage_dir:
-            self._save_session(session)
-
+        await self._save_async(session)
         LOGGER.info(f"Created session: {session_id}")
-
         return session
 
-    def get_session(self, session_id: str) -> Optional[PlanGeneratorSession]:
-        """
-        Get session by ID.
+    async def aget_session(self, session_id: str) -> Optional[PlanGeneratorSession]:
+        """Get session by ID, or None if not found."""
+        return await self._load_async(session_id)
 
-        Args:
-            session_id: Session identifier.
-
-        Returns:
-            Session if found, None otherwise.
-        """
-        # Check in-memory first
-        if session_id in self._sessions:
-            return self._sessions[session_id]
-
-        # Try loading from disk
-        if self._storage_dir:
-            session = self._load_session(session_id)
-            if session:
-                self._sessions[session_id] = session
-                return session
-
-        return None
-
-    def update_session(self, session: PlanGeneratorSession) -> None:
-        """
-        Update a session.
-
-        Args:
-            session: Session to update.
-        """
+    async def aupdate_session(self, session: PlanGeneratorSession) -> None:
+        """Persist updated session state.  Bumps ``updated_at``."""
         session.updated_at = datetime.now()
-        self._sessions[session.session_id] = session
+        await self._save_async(session)
 
-        # Persist if storage configured
-        if self._storage_dir:
-            self._save_session(session)
-
-    def delete_session(self, session_id: str) -> bool:
-        """
-        Delete a session.
-
-        Args:
-            session_id: Session identifier.
-
-        Returns:
-            True if deleted, False if not found.
-        """
-        if session_id in self._sessions:
-            del self._sessions[session_id]
-
-            # Remove from disk
-            if self._storage_dir:
-                path = self._storage_dir / f"{session_id}.json"
-                if path.exists():
-                    path.unlink()
-
+    async def adelete_session(self, session_id: str) -> bool:
+        """Delete a session.  Returns True if it existed."""
+        existed = await self._delete_async(session_id)
+        if existed:
             LOGGER.info(f"Deleted session: {session_id}")
-            return True
+        return existed
 
-        return False
-
-    def list_sessions(self) -> list[dict]:
-        """
-        List all sessions.
-
-        Returns:
-            List of session summaries.
-        """
+    async def alist_sessions(self) -> list[dict]:
+        """List all sessions as summary dicts."""
         summaries = []
-
-        # In-memory sessions
-        for session in self._sessions.values():
-            summaries.append(self._session_summary(session))
-
-        # Disk sessions not in memory
-        if self._storage_dir:
-            for path in self._storage_dir.glob("*.json"):
-                session_id = path.stem
-                if session_id not in self._sessions:
-                    session = self._load_session(session_id)
-                    if session:
-                        summaries.append(self._session_summary(session))
-
+        for key in await self._list_keys_async():
+            session = await self._load_async(key)
+            if session is not None:
+                summaries.append(self._session_summary(session))
         return summaries
 
-    def _session_summary(self, session: PlanGeneratorSession) -> dict:
-        """Create session summary dict."""
-        can_generate, blockers = session.can_generate()
-        return {
-            "session_id": session.session_id,
-            "program_name": session.program_name,
-            "created_at": session.created_at.isoformat(),
-            "updated_at": session.updated_at.isoformat(),
-            "material_count": len(session.materials),
-            "environment_count": len(session.environments),
-            "nonconformance_count": len(session.nonconformances),
-            "blocking_question_count": len(session.blocking_questions),
-            "can_generate": can_generate,
-            "blockers": blockers,
-        }
-
-    def add_material(
+    async def aadd_material(
         self,
         session_id: str,
         name: str,
@@ -229,22 +172,8 @@ class SessionManager:
         mass_g: Optional[float] = None,
         surface_area_cm2: Optional[float] = None,
     ) -> Optional[MaterialEntry]:
-        """
-        Add a material to a session.
-
-        Args:
-            session_id: Session identifier.
-            name: Material name.
-            application: Material application.
-            quantity: Item quantity.
-            maptis_code: Optional MAPTIS code.
-            mass_g: Optional mass in grams.
-            surface_area_cm2: Optional surface area.
-
-        Returns:
-            Created MaterialEntry, or None if session not found.
-        """
-        session = self.get_session(session_id)
+        """Add a material to a session."""
+        session = await self._load_async(session_id)
         if not session:
             return None
 
@@ -269,12 +198,11 @@ class SessionManager:
             )
             session.material_environment_usages.append(usage)
 
-        self.update_session(session)
+        await self.aupdate_session(session)
         LOGGER.info(f"Added material to session {session_id}: {name}")
-
         return material
 
-    def add_environment(
+    async def aadd_environment(
         self,
         session_id: str,
         name: str,
@@ -285,23 +213,8 @@ class SessionManager:
         vacuum_exposure: bool = False,
         lunar_dust: bool = False,
     ) -> Optional[EnvironmentDefinition]:
-        """
-        Add an environment to a session.
-
-        Args:
-            session_id: Session identifier.
-            name: Environment name.
-            o2_pct: Oxygen percentage.
-            pressure_psia: Pressure in psia.
-            temp_range_c: Temperature range (min, max) in Celsius.
-            habitable: Whether habitable.
-            vacuum_exposure: Whether exposed to vacuum.
-            lunar_dust: Whether exposed to lunar dust.
-
-        Returns:
-            Created EnvironmentDefinition, or None if session not found.
-        """
-        session = self.get_session(session_id)
+        """Add an environment to a session."""
+        session = await self._load_async(session_id)
         if not session:
             return None
 
@@ -327,50 +240,60 @@ class SessionManager:
             )
             session.material_environment_usages.append(usage)
 
-        self.update_session(session)
+        await self.aupdate_session(session)
         LOGGER.info(f"Added environment to session {session_id}: {name}")
-
         return env
 
-    def _save_session(self, session: PlanGeneratorSession) -> None:
-        """Save session to disk."""
-        if not self._storage_dir:
-            return
+    # -- sync wrappers (for tests / non-async callers) ----------------------
 
-        path = self._storage_dir / f"{session.session_id}.json"
-        with open(path, "w") as f:
-            f.write(session.model_dump_json(indent=2))
+    def create_session(self, **kwargs) -> PlanGeneratorSession:
+        return self._run_sync(self.acreate_session(**kwargs))
 
-    def _load_session(self, session_id: str) -> Optional[PlanGeneratorSession]:
-        """Load session from disk."""
-        if not self._storage_dir:
-            return None
+    def get_session(self, session_id: str) -> Optional[PlanGeneratorSession]:
+        return self._run_sync(self.aget_session(session_id))
 
-        path = self._storage_dir / f"{session_id}.json"
-        if not path.exists():
-            return None
+    def update_session(self, session: PlanGeneratorSession) -> None:
+        self._run_sync(self.aupdate_session(session))
 
-        try:
-            with open(path, "r") as f:
-                data = json.load(f)
-            return PlanGeneratorSession(**data)
-        except Exception as e:
-            LOGGER.error(f"Error loading session {session_id}: {e}")
-            return None
+    def delete_session(self, session_id: str) -> bool:
+        return self._run_sync(self.adelete_session(session_id))
+
+    def list_sessions(self) -> list[dict]:
+        return self._run_sync(self.alist_sessions())
+
+    def add_material(self, session_id: str, **kwargs) -> Optional[MaterialEntry]:
+        return self._run_sync(self.aadd_material(session_id, **kwargs))
+
+    def add_environment(self, session_id: str, **kwargs) -> Optional[EnvironmentDefinition]:
+        return self._run_sync(self.aadd_environment(session_id, **kwargs))
+
+    # -- helpers ------------------------------------------------------------
+
+    def _session_summary(self, session: PlanGeneratorSession) -> dict:
+        """Create session summary dict."""
+        can_generate, blockers = session.can_generate()
+        return {
+            "session_id": session.session_id,
+            "program_name": session.program_name,
+            "created_at": session.created_at.isoformat(),
+            "updated_at": session.updated_at.isoformat(),
+            "material_count": len(session.materials),
+            "environment_count": len(session.environments),
+            "nonconformance_count": len(session.nonconformances),
+            "blocking_question_count": len(session.blocking_questions),
+            "can_generate": can_generate,
+            "blockers": blockers,
+        }
 
 
 # Global session manager instance
 _session_manager: Optional[SessionManager] = None
 
-# Default storage directory for sessions (persists across server restarts)
-_DEFAULT_STORAGE_DIR = Path(__file__).parent.parent.parent.parent / "data" / "mp_plan_sessions"
-
 
 def get_session_manager() -> SessionManager:
-    """Get the global session manager instance with persistent storage."""
+    """Get the global session manager instance."""
     global _session_manager
     if _session_manager is None:
-        # Use persistent storage so sessions survive server restarts
-        _session_manager = SessionManager(storage_dir=_DEFAULT_STORAGE_DIR)
-        LOGGER.info(f"Session manager initialized with storage: {_DEFAULT_STORAGE_DIR}")
+        _session_manager = SessionManager()
+        LOGGER.info("Session manager initialized with shared SessionStore backend")
     return _session_manager

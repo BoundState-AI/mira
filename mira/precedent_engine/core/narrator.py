@@ -147,19 +147,22 @@ class NarratorLLM:
         )
 
         # Call Bedrock
+        from mira.core.bedrock_semaphore import bedrock_limiter_sync
+
         client = self._get_client()
-        response = client.invoke_model(
-            modelId=self.config.bedrock_model_id,
-            body=json.dumps(
-                {
-                    "anthropic_version": "bedrock-2023-05-31",
-                    "max_tokens": 2048,
-                    "temperature": 0.0,
-                    "system": NARRATOR_SYSTEM_PROMPT,
-                    "messages": [{"role": "user", "content": user_prompt}],
-                }
-            ),
-        )
+        with bedrock_limiter_sync("sonnet"):
+            response = client.invoke_model(
+                modelId=self.config.bedrock_model_id,
+                body=json.dumps(
+                    {
+                        "anthropic_version": "bedrock-2023-05-31",
+                        "max_tokens": 2048,
+                        "temperature": 0.0,
+                        "system": NARRATOR_SYSTEM_PROMPT,
+                        "messages": [{"role": "user", "content": user_prompt}],
+                    }
+                ),
+            )
 
         response_body = json.loads(response["body"].read())
         raw_text = response_body["content"][0]["text"]

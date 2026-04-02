@@ -229,24 +229,29 @@ class MAPTISPDFExtractor:
 
         self.logger.info(f"Extracting from {pdf_path.name} via vision...")
 
-        response = client.messages.create(
-            model=self._model,
-            max_tokens=16384,  # Large for multi-page tables
-            messages=[{
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": "Extract all data from this MAPTIS report. Be thorough - extract every row from every page."},
-                    {
-                        "type": "document",
-                        "source": {
-                            "type": "base64",
-                            "media_type": "application/pdf",
-                            "data": pdf_data
-                        }
-                    },
-                    {"type": "text", "text": prompt}
-                ]
-            }]
+        import contextlib
+        from mira.core.bedrock_semaphore import bedrock_limiter_sync
+
+        limiter = bedrock_limiter_sync("vision") if self.use_bedrock else contextlib.nullcontext()
+        with limiter:
+            response = client.messages.create(
+                model=self._model,
+                max_tokens=16384,  # Large for multi-page tables
+                messages=[{
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": "Extract all data from this MAPTIS report. Be thorough - extract every row from every page."},
+                        {
+                            "type": "document",
+                            "source": {
+                                "type": "base64",
+                                "media_type": "application/pdf",
+                                "data": pdf_data
+                            }
+                        },
+                        {"type": "text", "text": prompt}
+                    ]
+                }]
         )
 
         # Parse JSON response (same cleanup as MUAParserV6)

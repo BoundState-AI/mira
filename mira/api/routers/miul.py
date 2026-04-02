@@ -889,10 +889,24 @@ def _get_v4_session(extraction_id: str):
     return _V4Session(extraction_id)
 
 
-def _authorize_v4_session(http_request: Request, session) -> None:
+async def _run_v4_session_call(callable_obj, *args, **kwargs):
+    """Run synchronous MIUL v4 session operations off the event loop."""
+    return await asyncio.to_thread(callable_obj, *args, **kwargs)
+
+
+async def _v4_session_exists(session) -> bool:
+    return await asyncio.to_thread(lambda: session.exists)
+
+
+async def _v4_session_is_approved(session) -> bool:
+    return await asyncio.to_thread(lambda: session.is_approved)
+
+
+async def _authorize_v4_session(http_request: Request, session) -> None:
+    owner_username = await _run_v4_session_call(session.get_owner_username)
     authorize_owner_or_admin(
         http_request,
-        session.get_owner_username(),
+        owner_username,
         resource_label="miul extraction session",
     )
 
@@ -1142,14 +1156,18 @@ def _run_extraction_background(
 async def list_v4_sessions(http_request: Request, limit: int = 20) -> dict:
     """List recent v4 extraction sessions for session resume UI."""
     from mira.miul.production.session import list_sessions
-    sessions = list_sessions(limit=limit)
+    sessions = await asyncio.to_thread(list_sessions, limit)
     actor = get_request_user(http_request)
     if actor is not None and not actor.is_admin:
         actor_name = (actor.username or actor.email or "").strip().lower()
-        sessions = [
-            item for item in sessions
-            if (_get_v4_session(item["extraction_id"]).get_owner_username() or "").strip().lower() == actor_name
-        ]
+        filtered_sessions = []
+        for item in sessions:
+            owner_username = await _run_v4_session_call(
+                _get_v4_session(item["extraction_id"]).get_owner_username
+            )
+            if (owner_username or "").strip().lower() == actor_name:
+                filtered_sessions.append(item)
+        sessions = filtered_sessions
     return {"sessions": sessions}
 
 
@@ -1160,18 +1178,13 @@ async def delete_v4_session(extraction_id: str, http_request: Request) -> dict:
     Removes all session files (extraction, review, audit, status).
     Used when the user toggled 'sensitive build' to prevent data persistence.
     """
-    from mira.miul.production.session import get_session_root
-
     session = _get_v4_session(extraction_id)
-    _authorize_v4_session(http_request, session)
+    await _authorize_v4_session(http_request, session)
 
-    session_dir = get_session_root() / extraction_id
-    if not session_dir.exists():
+    if not await _v4_session_exists(session):
         raise HTTPException(status_code=404, detail="Session not found")
-    try:
-        shutil.rmtree(session_dir)
-    except OSError as e:
-        raise HTTPException(status_code=500, detail=f"Failed to delete session: {e}")
+    if not await _run_v4_session_call(session.delete):
+        raise HTTPException(status_code=500, detail="Failed to delete session")
     return {"deleted": True, "extraction_id": extraction_id}
 
 
@@ -1211,8 +1224,8 @@ async def extract_miul_v4(
     from mira.miul.production.session import V4Session
     session = V4Session(extraction_id)
     actor = get_request_user(http_request)
-    session.set_owner_username(actor.username if actor else None)
-    session.set_status("uploading", "Receiving files...", progress=1)
+    await _run_v4_session_call(session.set_owner_username, actor.username if actor else None)
+    await _run_v4_session_call(session.set_status, "uploading", "Receiving files...", 1)
 
     # Save files to a persistent temp dir (NOT cleaned up until background worker finishes)
     temp_dir = Path(tempfile.mkdtemp())
@@ -1247,22 +1260,47 @@ async def extract_miul_v4(
 
         LOGGER.info(f"[MIUL-V4] Saved {len(pdf_paths)} drawing PDFs to {temp_dir}")
 
-        session.set_status("extracting", "Starting Sonnet Vision extraction...", progress=5)
+        # Try SQS first; fall back to in-process thread if not configured
+        from mira.miul.queue import enqueue_extraction
 
-        # Fire off extraction in background thread -- returns immediately
-        asyncio.get_event_loop().run_in_executor(
-            None,  # default ThreadPoolExecutor
-            _run_extraction_background,
-            extraction_id,
-            pdf_paths,
-            dt_json,
-            temp_dir,
+        enqueued = enqueue_extraction(
+            extraction_id=extraction_id,
+            pdf_filenames=[p.name for p in pdf_paths],
+            dt_json=dt_json,
+            temp_dir=str(temp_dir),
+            project=project,
         )
+
+        if enqueued:
+            await _run_v4_session_call(
+                session.set_status,
+                "queued",
+                "Queued for extraction...",
+                5,
+            )
+            LOGGER.info("[MIUL-V4] Extraction %s enqueued to SQS", extraction_id)
+        else:
+            # Dev fallback: run in background thread (same process)
+            await _run_v4_session_call(
+                session.set_status,
+                "extracting",
+                "Starting Sonnet Vision extraction...",
+                5,
+            )
+            LOGGER.info("[MIUL-V4] No SQS configured; running extraction in-process")
+            asyncio.get_event_loop().run_in_executor(
+                None,
+                _run_extraction_background,
+                extraction_id,
+                pdf_paths,
+                dt_json,
+                temp_dir,
+            )
 
         return {
             "extraction_id": extraction_id,
             "project": project,
-            "status": "extracting",
+            "status": "queued" if enqueued else "extracting",
             "dt_mode": "with_tree" if dt_json.get("tree") else "no_tree",
         }
 
@@ -1287,20 +1325,21 @@ async def get_v4_extraction_status(extraction_id: str, http_request: Request) ->
         error: (only when failed) error message
     """
     session = _get_v4_session(extraction_id)
-    _authorize_v4_session(http_request, session)
-    return session.get_status()
+    await _authorize_v4_session(http_request, session)
+    return await _run_v4_session_call(session.get_status)
 
 
 @router.get("/v4/extract/{extraction_id}")
 async def get_v4_extraction(extraction_id: str, http_request: Request) -> dict:
     """Get v4 extraction result by ID."""
     session = _get_v4_session(extraction_id)
-    _authorize_v4_session(http_request, session)
-    if not session.exists:
+    await _authorize_v4_session(http_request, session)
+    if not await _v4_session_exists(session):
         raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
 
-    result = session.load_extraction()
-    review = session.load_review()
+    result = await _run_v4_session_call(session.load_extraction)
+    review = await _run_v4_session_call(session.load_review)
+    status_data = await _run_v4_session_call(session.get_status)
 
     # Normalize summary keys: old sessions used "total_rows", frontend expects "total_materials"
     review_summary = review.get("summary", {}) if review else {}
@@ -1311,7 +1350,7 @@ async def get_v4_extraction(extraction_id: str, http_request: Request) -> dict:
         "extraction_id": extraction_id,
         "summary": result.summary if result else {},
         "review_summary": review_summary,
-        "status": review.get("status", "unknown") if review else "unknown",
+        "status": review.get("status", status_data.get("status", "unknown")) if review else status_data.get("status", "unknown"),
     }
 
 
@@ -1332,17 +1371,18 @@ async def get_v4_review_items(
         status: Filter by status ("open", "corrected", "accepted")
     """
     session = _get_v4_session(extraction_id)
-    _authorize_v4_session(http_request, session)
-    if not session.exists:
+    await _authorize_v4_session(http_request, session)
+    if not await _v4_session_exists(session):
         raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
 
-    items = session.get_review_items(
+    items = await _run_v4_session_call(
+        session.get_review_items,
         confidence_filter=confidence,
         field_filter=field,
         status_filter=status,
     )
 
-    review = session.load_review()
+    review = await _run_v4_session_call(session.load_review)
 
     # Normalize summary keys: old sessions used "total_rows", frontend expects "total_materials"
     raw_summary = review.get("summary", {}) if review else {}
@@ -1367,11 +1407,11 @@ async def get_v4_material_list(extraction_id: str, http_request: Request) -> dic
     it shows up once in the list.
     """
     session = _get_v4_session(extraction_id)
-    _authorize_v4_session(http_request, session)
-    if not session.exists:
+    await _authorize_v4_session(http_request, session)
+    if not await _v4_session_exists(session):
         raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
 
-    result = session.load_extraction()
+    result = await _run_v4_session_call(session.load_extraction)
     if not result:
         return {"extraction_id": extraction_id, "materials": {}}
 
@@ -1440,11 +1480,11 @@ async def get_v4_material_list(extraction_id: str, http_request: Request) -> dic
 async def get_v4_drawing_list(extraction_id: str, http_request: Request) -> dict:
     """Get extracted drawing packages for the review-stage remove flow."""
     session = _get_v4_session(extraction_id)
-    _authorize_v4_session(http_request, session)
-    if not session.exists:
+    await _authorize_v4_session(http_request, session)
+    if not await _v4_session_exists(session):
         raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
 
-    drawings = session.list_drawings()
+    drawings = await _run_v4_session_call(session.list_drawings)
     return {
         "extraction_id": extraction_id,
         "count": len(drawings),
@@ -1462,21 +1502,26 @@ async def remove_v4_drawing(
 ) -> dict:
     """Remove a drawing from an extracted session and regenerate review data."""
     session = _get_v4_session(extraction_id)
-    _authorize_v4_session(http_request, session)
-    if not session.exists:
+    await _authorize_v4_session(http_request, session)
+    if not await _v4_session_exists(session):
         raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
 
-    result = session.remove_drawing(drawing_id=drawing_id, reviewer=reviewer, reason=reason)
+    result = await _run_v4_session_call(
+        session.remove_drawing,
+        drawing_id=drawing_id,
+        reviewer=reviewer,
+        reason=reason,
+    )
     if not result.get("removed"):
         detail = result.get("error") or f"Drawing {drawing_id} not found"
         raise HTTPException(status_code=404, detail=detail)
 
-    review = session.load_review() or {}
+    review = await _run_v4_session_call(session.load_review) or {}
     review_summary = review.get("summary", {})
     if "total_rows" in review_summary and "total_materials" not in review_summary:
         review_summary["total_materials"] = review_summary.pop("total_rows")
 
-    drawings = session.list_drawings()
+    drawings = await _run_v4_session_call(session.list_drawings)
     return {
         "extraction_id": extraction_id,
         "drawing_id": drawing_id,
@@ -1498,21 +1543,26 @@ async def remove_v4_part(
 ) -> dict:
     """Remove a part from an extracted session and regenerate review data."""
     session = _get_v4_session(extraction_id)
-    _authorize_v4_session(http_request, session)
-    if not session.exists:
+    await _authorize_v4_session(http_request, session)
+    if not await _v4_session_exists(session):
         raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
 
-    result = session.remove_part(part_number=part_number, reviewer=reviewer, reason=reason)
+    result = await _run_v4_session_call(
+        session.remove_part,
+        part_number=part_number,
+        reviewer=reviewer,
+        reason=reason,
+    )
     if not result.get("removed"):
         detail = result.get("error") or f"Part {part_number} not found"
         raise HTTPException(status_code=404, detail=detail)
 
-    review = session.load_review() or {}
+    review = await _run_v4_session_call(session.load_review) or {}
     review_summary = review.get("summary", {})
     if "total_rows" in review_summary and "total_materials" not in review_summary:
         review_summary["total_materials"] = review_summary.pop("total_rows")
 
-    drawings = session.list_drawings()
+    drawings = await _run_v4_session_call(session.list_drawings)
     return {
         "extraction_id": extraction_id,
         "part_number": part_number,
@@ -1543,14 +1593,14 @@ async def submit_v4_correction(
         reviewer: Who made the correction
     """
     session = _get_v4_session(extraction_id)
-    _authorize_v4_session(http_request, session)
-    if not session.exists:
+    await _authorize_v4_session(http_request, session)
+    if not await _v4_session_exists(session):
         raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
 
     if not corrections:
         raise HTTPException(status_code=400, detail="No corrections provided")
 
-    item = session.submit_correction(part_number, corrections, reviewer)
+    item = await _run_v4_session_call(session.submit_correction, part_number, corrections, reviewer)
     if item is None:
         raise HTTPException(status_code=404, detail=f"Part {part_number} not found in review")
 
@@ -1574,11 +1624,11 @@ async def accept_v4_item(
         reviewer: Who accepted
     """
     session = _get_v4_session(extraction_id)
-    _authorize_v4_session(http_request, session)
-    if not session.exists:
+    await _authorize_v4_session(http_request, session)
+    if not await _v4_session_exists(session):
         raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
 
-    item = session.accept_item(part_number, reviewer, reason)
+    item = await _run_v4_session_call(session.accept_item, part_number, reviewer, reason)
     if item is None:
         raise HTTPException(status_code=404, detail=f"Part {part_number} not found in review")
 
@@ -1601,11 +1651,11 @@ async def approve_v4_build(
         reviewer: Who is approving the build
     """
     session = _get_v4_session(extraction_id)
-    _authorize_v4_session(http_request, session)
-    if not session.exists:
+    await _authorize_v4_session(http_request, session)
+    if not await _v4_session_exists(session):
         raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
 
-    approval = session.approve_build(reviewer)
+    approval = await _run_v4_session_call(session.approve_build, reviewer)
     if not approval.get("approved"):
         return {
             "approved": False,
@@ -1658,11 +1708,11 @@ async def build_miul_v4(
         MAPTIS-compliant Excel file (base MIUL, no enrichment).
     """
     session = _get_v4_session(extraction_id)
-    _authorize_v4_session(http_request, session)
-    if not session.exists:
+    await _authorize_v4_session(http_request, session)
+    if not await _v4_session_exists(session):
         raise HTTPException(status_code=404, detail=f"Extraction {extraction_id} not found")
 
-    if not session.is_approved:
+    if not await _v4_session_is_approved(session):
         raise HTTPException(
             status_code=409,
             detail="Extraction not yet approved. Review all items and call /v4/extract/{id}/approve first."
@@ -1679,7 +1729,7 @@ async def build_miul_v4(
             validate_miul_tree_against_dt,
         )
 
-        result = session.load_extraction()
+        result = await _run_v4_session_call(session.load_extraction)
         if not result:
             raise HTTPException(status_code=500, detail="Could not load extraction data")
 
@@ -1691,7 +1741,7 @@ async def build_miul_v4(
                 extraction_id,
             )
 
-        review = session.load_review() or {}
+        review = await _run_v4_session_call(session.load_review) or {}
         pair_rows = build_pair_rows_from_v4_extraction(result, review, dt_json=dt_json)
 
         if not project:

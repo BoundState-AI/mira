@@ -123,3 +123,38 @@ def test_board_ready_export_blocks_when_incomplete() -> None:
     assert payload["mode"] == "board_ready"
     assert payload["export_ready"] is False
     assert payload["blockers"] or payload["missing_fields"]
+
+
+def test_bulk_apply_updates_sessions_across_requests() -> None:
+    client = TestClient(create_app())
+
+    first = client.post("/mua/matchmaker/sessions", json=_session_payload())
+    second = client.post("/mua/matchmaker/sessions", json=_session_payload())
+    assert first.status_code == 200
+    assert second.status_code == 200
+
+    first_id = first.json()["session_id"]
+    second_id = second.json()["session_id"]
+
+    applied = client.post(
+        "/mua/matchmaker/batch/bulk-apply",
+        json={
+            "session_ids": [first_id, second_id],
+            "issue": "FLAM",
+            "code": "103",
+            "confirmation": "approved for batch apply",
+        },
+    )
+    assert applied.status_code == 200
+    payload = applied.json()
+    assert payload["updated_count"] == 2
+
+    first_session = client.get(f"/mua/matchmaker/sessions/{first_id}")
+    second_session = client.get(f"/mua/matchmaker/sessions/{second_id}")
+    assert first_session.status_code == 200
+    assert second_session.status_code == 200
+
+    for body in (first_session.json(), second_session.json()):
+        flam = body["issues"]["FLAM"]
+        assert flam["selected_code"] == "103"
+        assert flam["status"] == "done"

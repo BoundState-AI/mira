@@ -1,9 +1,15 @@
 """
 Module: MIRA Chat — Router Integration Helpers
 Purpose: Drop-in replacement functions for the in-memory session logic
-         in router.py.  These delegate to SessionManager (PostgreSQL) but
-         preserve the exact same caller interface so the router can switch
-         with minimal diff.
+         in router.py.  These delegate to the shared ``SessionStore``
+         abstraction in ``mira.core.session_store`` so the router can
+         switch with minimal diff.
+
+         When ``MIRA_SESSION_BACKEND=memory`` (default), the core
+         ``MemorySessionStore`` is used directly. When a chat database
+         URL is configured and the backend is not pinned elsewhere, the
+         shared store factory selects the Postgres adapter over the
+         existing chat ``SessionManager``.
 
 Usage in router.py::
 
@@ -30,9 +36,8 @@ from __future__ import annotations
 import logging
 from typing import Any
 
+from ...core.session_store import SessionData, get_session_store
 from ..models import ChatMessage
-from .audit_writer import AuditWriter
-from .session_manager import SessionManager
 
 logger = logging.getLogger(__name__)
 
@@ -40,30 +45,66 @@ logger = logging.getLogger(__name__)
 # Module-level singletons (initialized once, used by all requests)
 # ---------------------------------------------------------------------------
 
-_session_manager: SessionManager | None = None
-_audit_writer: AuditWriter | None = None
+_audit_writer = None
 
 
-def _get_session_manager() -> SessionManager:
-    global _session_manager
-    if _session_manager is None:
-        _session_manager = SessionManager()
-    return _session_manager
+def get_audit_writer():
+    """Public accessor for the singleton AuditWriter.
 
-
-def _get_audit_writer() -> AuditWriter:
+    Used by the router to replace ``write_audit_record()`` calls.
+    Lazily imports AuditWriter to avoid pulling in sqlalchemy at
+    module load time.
+    """
     global _audit_writer
     if _audit_writer is None:
+        from .audit_writer import AuditWriter
         _audit_writer = AuditWriter()
     return _audit_writer
 
 
-def get_audit_writer() -> AuditWriter:
-    """Public accessor for the singleton AuditWriter.
+# ---------------------------------------------------------------------------
+# Helpers — convert between SessionData and the dict the router expects
+# ---------------------------------------------------------------------------
 
-    Used by the router to replace ``write_audit_record()`` calls.
+
+def _session_data_to_dict(data: SessionData) -> dict[str, Any]:
+    """Convert a ``SessionData`` to the dict shape the router uses.
+
+    The router mutates the dict in place during the request, then
+    ``save_session_state`` persists the mutations back.
     """
-    return _get_audit_writer()
+    return {
+        "session_id": data.session_id,
+        "engine_context": dict(data.engine_context),
+        "accumulated_entities": dict(data.accumulated_entities),
+        "history": [
+            ChatMessage(**entry) if isinstance(entry, dict) else entry
+            for entry in data.history
+        ],
+        "turn_count": data.turn_count,
+        "last_assessment": data.last_assessment,
+    }
+
+
+def _dict_to_session_data(session_id: str, session: dict[str, Any]) -> SessionData:
+    """Convert the router's mutated session dict back to ``SessionData``."""
+    history_raw: list[dict[str, Any]] = []
+    for entry in session.get("history", []):
+        if isinstance(entry, ChatMessage):
+            history_raw.append(entry.model_dump(mode="json"))
+        elif isinstance(entry, dict):
+            history_raw.append(entry)
+        else:
+            history_raw.append(dict(entry))
+
+    return SessionData(
+        session_id=session_id,
+        engine_context=session.get("engine_context", {}),
+        accumulated_entities=session.get("accumulated_entities", {}),
+        history=history_raw,
+        turn_count=session.get("turn_count", 0),
+        last_assessment=session.get("last_assessment"),
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -83,14 +124,16 @@ async def get_or_create_session(
     - ``session_id``
     - ``engine_context``  (dict)
     - ``accumulated_entities``  (dict)
+    - ``history``  (list[ChatMessage])
     - ``turn_count``  (int)
     - ``last_assessment``  (dict | None)
 
-    The dict is *not* a live reference to the DB row — callers must
+    The dict is *not* a live reference to the store — callers must
     call ``save_session_state`` to persist mutations.
     """
-    mgr = _get_session_manager()
-    session = await mgr.get_session(session_id, module_context=module_context)
+    store = get_session_store()
+    data = await store.get(session_id)
+    session = _session_data_to_dict(data)
 
     # Ensure the shape matches what the router expects (Phase 1 compat)
     session.setdefault("engine_context", {})
@@ -103,19 +146,14 @@ async def get_or_create_session(
 
 
 async def save_session_state(session_id: str, session: dict[str, Any]) -> None:
-    """Persist the mutated session dict back to the database.
+    """Persist the mutated session dict back to the store.
 
     Call this after the router has modified engine_context,
     accumulated_entities, turn_count, or last_assessment.
     """
-    mgr = _get_session_manager()
-    await mgr.update_session(
-        session_id,
-        engine_context=session.get("engine_context", {}),
-        accumulated_entities=session.get("accumulated_entities", {}),
-        turn_count=session.get("turn_count", 0),
-        last_assessment=session.get("last_assessment"),
-    )
+    store = get_session_store()
+    data = _dict_to_session_data(session_id, session)
+    await store.save(session_id, data)
 
 
 async def append_history(
@@ -126,19 +164,30 @@ async def append_history(
     entities: dict[str, Any],
     envelope: dict[str, Any] | None = None,
 ) -> None:
-    """Record a conversation turn to chat_turns and bump the session.
+    """Record a conversation turn and persist to the store.
 
     Replaces ``_append_session_history(session, ...)`` in the Phase 1 router.
     """
-    mgr = _get_session_manager()
-    await mgr.append_turn(
-        session_id=session_id,
-        user_msg=user_msg,
-        assistant_msg=assistant_msg,
-        engine_used=engine_used,
-        entities=entities,
-        envelope=envelope,
+    store = get_session_store()
+    data = await store.get(session_id)
+
+    from ...core.session_store import _MAX_HISTORY_MESSAGES
+
+    data.history.append(
+        ChatMessage(role="user", content=user_msg, entities=entities).model_dump(mode="json")
     )
+    data.history.append(
+        ChatMessage(
+            role="assistant",
+            content=assistant_msg,
+            engine_used=engine_used,
+            entities=entities,
+        ).model_dump(mode="json")
+    )
+    # Cap history
+    data.history = data.history[-_MAX_HISTORY_MESSAGES:]
+
+    await store.save(session_id, data)
 
 
 async def get_effective_history(
@@ -150,7 +199,7 @@ async def get_effective_history(
 
     Priority:
       1. Explicit frontend history (if non-empty) — capped to *max_messages*
-      2. Server-side history from chat_turns (PostgreSQL or memory)
+      2. Server-side history from the session store
 
     This replaces ``_resolve_effective_history(request.history, session["history"])``
     in the Phase 1 router.
@@ -158,7 +207,12 @@ async def get_effective_history(
     if frontend_history:
         return frontend_history[-max_messages:]
 
-    mgr = _get_session_manager()
-    max_turns = max_messages // 2  # Each turn is 2 messages
-    history = await mgr.get_history(session_id, max_turns=max_turns)
-    return history[-max_messages:]
+    store = get_session_store()
+    data = await store.get(session_id)
+    messages: list[ChatMessage] = []
+    for entry in data.history[-max_messages:]:
+        if isinstance(entry, ChatMessage):
+            messages.append(entry)
+        elif isinstance(entry, dict):
+            messages.append(ChatMessage(**entry))
+    return messages

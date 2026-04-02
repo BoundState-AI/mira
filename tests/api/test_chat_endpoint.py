@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import uuid
 
 
 def _parse_sse_events(raw_stream: str) -> list[dict]:
@@ -86,6 +87,35 @@ def test_chat_can_resume_from_frontend_history_without_server_session(api_client
     assert second_response.status_code == 200
     second_payload = second_response.json()
 
+    assert second_payload["engine_used"] == "oca"
+    assert second_payload["entities"]["material_designation"] == "316L"
+    assert second_payload["entities"]["pressure_value"] == 1500.0
+
+
+def test_chat_can_resume_from_server_side_session_without_frontend_history(api_client):
+    session_id = f"server-side-{uuid.uuid4().hex}"
+
+    first_response = api_client.post(
+        "/api/chat/",
+        json={
+            "session_id": session_id,
+            "message": "Is 316L compatible with GOX at 3000 psi?",
+        },
+    )
+    assert first_response.status_code == 200
+    first_payload = first_response.json()
+    assert first_payload["entities"]["material_designation"] == "316L"
+
+    second_response = api_client.post(
+        "/api/chat/",
+        json={
+            "session_id": session_id,
+            "message": "What about at 1500 psi?",
+        },
+    )
+
+    assert second_response.status_code == 200
+    second_payload = second_response.json()
     assert second_payload["engine_used"] == "oca"
     assert second_payload["entities"]["material_designation"] == "316L"
     assert second_payload["entities"]["pressure_value"] == 1500.0

@@ -307,6 +307,32 @@ class TestGeneration:
         assert "session_id" in data
         assert "key_findings" in data
 
+    def test_download_generated_artifact_survives_persistence_round_trip(self, client):
+        """Generated artifact bytes must survive session persistence across requests."""
+        from mira.mp_plan.models.artifacts import ArtifactType, GeneratedArtifact
+        from mira.mp_plan.session_manager import get_session_manager
+
+        create_response = client.post(
+            "/mp-plan/sessions",
+            json={"program_name": "Artifact Test"},
+        )
+        session_id = create_response.json()["session_id"]
+
+        manager = get_session_manager()
+        session = manager.get_session(session_id)
+        artifact = GeneratedArtifact(
+            artifact_type=ArtifactType.MP_PLAN_DOCX,
+            format="docx",
+            content_bytes=b"test-artifact-content",
+            source="test",
+        )
+        session.generated_artifacts.append(artifact)
+        manager.update_session(session)
+
+        response = client.get(f"/mp-plan/sessions/{session_id}/download/{artifact.artifact_id}")
+        assert response.status_code == 200
+        assert response.content == b"test-artifact-content"
+
 
 class TestReferenceData:
     """Tests for reference data endpoints."""

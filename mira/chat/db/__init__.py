@@ -17,10 +17,28 @@ Safety Critical: True
 Deployment: AWS GovCloud West (FedRAMP High, ITAR)
 """
 
-from .audit_writer import AuditWriter
-from .connection import get_db_session, get_engine, init_db, shutdown_db
-from .migrations import run_migrations
-from .session_manager import SessionManager
+
+def __getattr__(name: str):
+    """Lazy imports — avoid pulling in sqlalchemy at package init time.
+
+    This allows ``from .db.router_integration import ...`` in the chat
+    router without requiring sqlalchemy to be installed (it is only
+    needed when the PostgreSQL backend is actually used).
+    """
+    if name == "AuditWriter":
+        from .audit_writer import AuditWriter
+        return AuditWriter
+    if name == "SessionManager":
+        from .session_manager import SessionManager
+        return SessionManager
+    if name in ("get_db_session", "get_engine", "init_db", "shutdown_db"):
+        from . import connection
+        return getattr(connection, name)
+    if name == "run_migrations":
+        from .migrations import run_migrations
+        return run_migrations
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
 
 __all__ = [
     "AuditWriter",

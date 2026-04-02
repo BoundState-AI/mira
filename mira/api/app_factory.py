@@ -249,13 +249,13 @@ def create_app(
 
     _validate_runtime_environment(chat_router=chat_router)
     app.add_middleware(SecurityHeadersMiddleware)  # M1: Security headers
+    app.add_middleware(CognitoAuthzMiddleware)
     if rate_limit_enabled():
         app.add_middleware(
             ApiRateLimitMiddleware,
             max_requests=rate_limit_requests(),
             window_seconds=rate_limit_window_seconds(),
         )
-    app.add_middleware(CognitoAuthzMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=_build_cors_origins(),

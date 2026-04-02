@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import re
 from io import BytesIO
@@ -240,6 +241,35 @@ def bulk_apply_cat3_code(
     confirmation: str,
     rule_pack_version: str,
 ) -> dict[str, Any]:
+    """Sync wrapper for non-async callers."""
+
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        return asyncio.run(
+            abulk_apply_cat3_code(
+                store=store,
+                session_ids=session_ids,
+                issue=issue,
+                code=code,
+                confirmation=confirmation,
+                rule_pack_version=rule_pack_version,
+            )
+        )
+    raise RuntimeError(
+        "bulk_apply_cat3_code() cannot be used inside a running event loop. "
+        "Use abulk_apply_cat3_code() instead."
+    )
+
+
+async def abulk_apply_cat3_code(
+    store: MatchmakerSessionStore,
+    session_ids: list[str],
+    issue: str,
+    code: str,
+    confirmation: str,
+    rule_pack_version: str,
+) -> dict[str, Any]:
     """Apply a Cat III code across multiple sessions with explicit confirmation."""
 
     issue_code = normalize_issue_code(issue)
@@ -247,7 +277,7 @@ def bulk_apply_cat3_code(
     skipped: list[dict[str, str]] = []
 
     for sid in session_ids:
-        session = store.get(sid)
+        session = await store.aget(sid)
         if session is None:
             skipped.append({"session_id": sid, "reason": "session_not_found"})
             continue
@@ -272,7 +302,7 @@ def bulk_apply_cat3_code(
                 rule_pack_version=rule_pack_version,
             )
         )
-        store.save(session)
+        await store.asave(session)
         updated.append(sid)
 
     return {

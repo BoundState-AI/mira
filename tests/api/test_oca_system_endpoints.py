@@ -7,17 +7,19 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
+from mira.core.session_store import MemorySessionStore, reset_session_store
+
 
 @pytest.fixture
 def system_module():
+    reset_session_store()
     router_path = Path(__file__).resolve().parents[2] / "mira" / "api" / "routers" / "oca_systems.py"
     spec = spec_from_file_location("oca_systems_router_test_module", router_path)
     module = module_from_spec(spec)
     assert spec is not None and spec.loader is not None
     spec.loader.exec_module(module)
-    module._systems.clear()
     yield module
-    module._systems.clear()
+    reset_session_store()
 
 
 @pytest.fixture
@@ -285,3 +287,69 @@ def test_system_builder_vision_mockup_preview_endpoint(client: TestClient, monke
     assert payload["components"][0]["label"] == "Imported Filter"
     assert payload["questions"][0]["severity"] == "blocking"
     assert payload["warnings"] == ["Preview only"]
+
+
+# ---------------------------------------------------------------------------
+# Phase 2a: Cross-request persistence tests
+# ---------------------------------------------------------------------------
+
+
+def test_oca_system_persists_across_separate_requests(client: TestClient) -> None:
+    """Verify state survives multiple requests via the shared store, not local dict."""
+    system_id = _create_system(client)
+
+    # Add a component in one request
+    valve_id = _add_component(client, system_id, "valve", "Persistence Test Valve")
+
+    # Fetch the system in a separate request and verify component is there
+    get_resp = client.get(f"/api/oca/systems/{system_id}")
+    assert get_resp.status_code == 200
+    components = get_resp.json()["components"]
+    assert len(components) == 1
+    assert components[0]["component_id"] == valve_id
+    assert components[0]["label"] == "Persistence Test Valve"
+
+
+def test_oca_system_mutation_persists_after_update(client: TestClient) -> None:
+    """Verify that update_inputs persists through a subsequent fetch."""
+    system_id = _create_system(client)
+
+    # Mutate inputs
+    client.put(
+        f"/api/oca/systems/{system_id}/inputs",
+        json={"design_flow_rate_m3_s": 0.05},
+    )
+
+    # Fetch again — should see the updated inputs
+    get_resp = client.get(f"/api/oca/systems/{system_id}")
+    assert get_resp.status_code == 200
+    assert get_resp.json()["inputs"]["design_flow_rate_m3_s"] == 0.05
+
+
+def test_oca_system_lock_persists_across_requests(client: TestClient) -> None:
+    """Lock state survives a round-trip through the store."""
+    system_id = _create_system(client)
+
+    lock_resp = client.post(f"/api/oca/systems/{system_id}/lock")
+    assert lock_resp.status_code == 200
+
+    # Verify locked state persisted — attempt mutation should 409
+    add_resp = client.post(
+        f"/api/oca/systems/{system_id}/components",
+        json={"archetype": "valve", "label": "Should Fail"},
+    )
+    assert add_resp.status_code == 409
+
+
+def test_oca_system_audit_log_grows_across_requests(client: TestClient) -> None:
+    """Audit log entries accumulate across multiple requests."""
+    system_id = _create_system(client)
+
+    _add_component(client, system_id, "valve", "V1")
+    _add_component(client, system_id, "filter", "F1")
+
+    get_resp = client.get(f"/api/oca/systems/{system_id}")
+    assert get_resp.status_code == 200
+    audit_log = get_resp.json()["audit_log"]
+    add_actions = [e for e in audit_log if e["action"] == "add_component"]
+    assert len(add_actions) == 2

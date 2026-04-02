@@ -13,11 +13,12 @@ Safety Critical: False
 
 from __future__ import annotations
 
+import base64
 from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_serializer, field_validator
 
 __version__ = "2.0.0"
 __safety_critical__ = False
@@ -111,14 +112,31 @@ class GeneratedArtifact(BaseModel):
     model_config = {
         "extra": "forbid",
         "populate_by_name": True,
-        # Exclude bytes from JSON serialization
-        "json_encoders": {bytes: lambda v: None},
     }
 
+    @field_validator("content_bytes", mode="before")
+    @classmethod
+    def decode_content_bytes(cls, value):
+        """Decode persisted JSON/base64 content back into raw bytes."""
+        if value is None or isinstance(value, bytes):
+            return value
+        if isinstance(value, str):
+            try:
+                return base64.b64decode(value.encode("ascii"))
+            except Exception:
+                return value.encode()
+        return value
+
+    @field_serializer("content_bytes", when_used="json")
+    def serialize_content_bytes(self, value: Optional[bytes]) -> Optional[str]:
+        """Persist binary artifact content as base64 in JSON mode."""
+        if value is None:
+            return None
+        return base64.b64encode(value).decode("ascii")
+
     def model_dump(self, **kwargs):
-        """Override to exclude content_bytes from dict output."""
+        """Hide raw bytes from routine API dumps, but preserve them for storage."""
         data = super().model_dump(**kwargs)
-        # Don't serialize bytes to JSON
-        if "content_bytes" in data:
+        if kwargs.get("mode") != "json" and "content_bytes" in data:
             data["content_bytes"] = None
         return data

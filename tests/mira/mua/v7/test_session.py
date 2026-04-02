@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 
 import pytest
 
+from mira.core.session_store import reset_session_store
 from mira.mua.v7.session import (
     SessionManager,
     MuaSessionState,
@@ -39,8 +40,11 @@ from mira.mua.v7.models import (
 
 @pytest.fixture
 def manager():
-    """Return an in-memory SessionManager for testing (no database)."""
-    return SessionManager()
+    """Return a SessionManager backed by a fresh MemorySessionStore."""
+    reset_session_store()
+    mgr = SessionManager()
+    yield mgr
+    reset_session_store()
 
 
 @pytest.fixture
@@ -103,7 +107,7 @@ def _populate_for_advance(manager: SessionManager, session: MuaSessionState, to_
     each intermediate step.
     """
     steps_needing_data = {
-        StepName.INVESTIGATE: lambda s: _set_define_data(s),
+        StepName.INVESTIGATE: lambda s: _set_define_data(manager, s),
         StepName.REVIEW: lambda s: _set_investigate_data(manager, s),
         StepName.DRAFT: lambda s: _set_review_data(manager, s),
         StepName.FINALIZE: lambda s: _set_draft_data(manager, s),
@@ -130,10 +134,17 @@ def _step_index(step: StepName) -> int:
     return order.index(step)
 
 
-def _set_define_data(session: MuaSessionState) -> None:
-    """Populate Step 1 (DEFINE) prerequisite fields."""
-    session.material_resolution = _make_material_resolution()
-    session.environment = _make_environment_spec()
+def _set_define_data(manager: SessionManager, session: MuaSessionState) -> None:
+    """Populate Step 1 (DEFINE) prerequisite fields and persist."""
+    manager.store_define_inputs(
+        session.session_id,
+        material_resolution=_make_material_resolution(),
+        environment=_make_environment_spec(),
+    )
+    # Refresh the local reference so callers see the update
+    refreshed = manager.get_session(session.session_id)
+    session.material_resolution = refreshed.material_resolution
+    session.environment = refreshed.environment
 
 
 def _set_investigate_data(manager: SessionManager, session: MuaSessionState) -> None:
@@ -206,7 +217,7 @@ class TestStepAdvancement:
         sid = active_session.session_id
 
         # Even with all prerequisite data, skipping steps is not allowed
-        _set_define_data(active_session)
+        _set_define_data(manager, active_session)
         with pytest.raises(StepValidationError):
             manager.advance_step(sid, StepName.DRAFT)
 
@@ -215,7 +226,7 @@ class TestStepAdvancement:
         sid = active_session.session_id
 
         # Advance to INVESTIGATE
-        _set_define_data(active_session)
+        _set_define_data(manager, active_session)
         manager.advance_step(sid, StepName.INVESTIGATE)
 
         # Go back to DEFINE -- should succeed
@@ -255,7 +266,7 @@ def _populate_gate_data(manager: SessionManager, session: MuaSessionState, targe
     """Populate just the gate data needed to advance to ``target_step`` (assumes
     the session is currently one step behind)."""
     if target_step == StepName.INVESTIGATE:
-        _set_define_data(session)
+        _set_define_data(manager, session)
     elif target_step == StepName.REVIEW:
         _set_investigate_data(manager, session)
     elif target_step == StepName.DRAFT:
@@ -275,7 +286,7 @@ class TestRetrieval:
         sid = active_session.session_id
 
         # Populate and advance to INVESTIGATE
-        _set_define_data(active_session)
+        _set_define_data(manager, active_session)
         manager.advance_step(sid, StepName.INVESTIGATE)
 
         # Store investigation data
@@ -369,7 +380,7 @@ class TestAbandonment:
     def test_cannot_advance_abandoned_session(self, manager, active_session):
         """An abandoned session must not be advanceable."""
         sid = active_session.session_id
-        _set_define_data(active_session)
+        _set_define_data(manager, active_session)
         manager.abandon_session(sid)
 
         with pytest.raises(ValueError):
@@ -425,7 +436,7 @@ class TestTimestamps:
         original_updated = active_session.updated_at
 
         # Populate and advance the step which should update the timestamp
-        _set_define_data(active_session)
+        _set_define_data(manager, active_session)
         updated_session = manager.advance_step(sid, StepName.INVESTIGATE)
 
         assert updated_session.updated_at >= original_updated
@@ -440,9 +451,9 @@ class TestCleanupStaleSessions:
         """Sessions inactive beyond the threshold are auto-abandoned."""
         session = manager.create_session(created_by="engineer@nasa.gov")
 
-        # Manually backdate the updated_at to simulate staleness
+        # Backdate updated_at to simulate staleness and persist
         session.updated_at = datetime.utcnow() - timedelta(days=31)
-        manager._sessions[session.session_id] = session
+        manager._save(session)
 
         count = manager.cleanup_stale_sessions(max_age_days=30)
         assert count == 1
@@ -459,10 +470,10 @@ class TestCleanupStaleSessions:
         _populate_for_advance(manager, active_session, StepName.FINALIZE)
         manager.advance_step(sid, StepName.FINALIZE)
 
-        # Backdate
+        # Backdate and persist
         session = manager.get_session(sid)
         session.updated_at = datetime.utcnow() - timedelta(days=31)
-        manager._sessions[sid] = session
+        manager._save(session)
 
         count = manager.cleanup_stale_sessions(max_age_days=30)
         assert count == 0

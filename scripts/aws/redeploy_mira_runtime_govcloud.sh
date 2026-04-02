@@ -60,10 +60,35 @@ NO_DATA_RUNTIME="${NO_DATA_RUNTIME:-1}"
 SKIP_AUTHENTICATED_SMOKE="${SKIP_AUTHENTICATED_SMOKE:-0}"
 RECEIPTS_DIR="${RECEIPTS_DIR:-${ROOT_DIR}/.deploy_receipts}"
 
-BACKEND_CPU="${BACKEND_CPU:-1024}"
-BACKEND_MEMORY="${BACKEND_MEMORY:-4096}"
+BACKEND_CPU="${BACKEND_CPU:-2048}"
+BACKEND_MEMORY="${BACKEND_MEMORY:-8192}"
 FRONTEND_CPU="${FRONTEND_CPU:-256}"
 FRONTEND_MEMORY="${FRONTEND_MEMORY:-512}"
+BACKEND_DESIRED_COUNT="${BACKEND_DESIRED_COUNT:-2}"
+BACKEND_MIN_TASKS="${BACKEND_MIN_TASKS:-2}"
+BACKEND_MAX_TASKS="${BACKEND_MAX_TASKS:-6}"
+BACKEND_TARGET_CPU_PERCENT="${BACKEND_TARGET_CPU_PERCENT:-60}"
+BACKEND_SCALE_IN_COOLDOWN="${BACKEND_SCALE_IN_COOLDOWN:-300}"
+BACKEND_SCALE_OUT_COOLDOWN="${BACKEND_SCALE_OUT_COOLDOWN:-120}"
+BACKEND_DEREGISTRATION_DELAY="${BACKEND_DEREGISTRATION_DELAY:-30}"
+ENABLE_AUTOSCALING="${ENABLE_AUTOSCALING:-1}"
+BACKEND_DEPLOYMENT_CONFIGURATION="${BACKEND_DEPLOYMENT_CONFIGURATION:-minimumHealthyPercent=50,maximumPercent=200}"
+
+# Runtime env vars (multi-worker / multi-task)
+MIRA_WORKERS="${MIRA_WORKERS:-3}"
+POSTGRES_HOST="${POSTGRES_HOST:-mira-prod-rds-proxy.proxy-cid.us-gov-west-1.rds.amazonaws.com}"
+POSTGRES_PORT="${POSTGRES_PORT:-5432}"
+POSTGRES_DB="${POSTGRES_DB:-mira_h2}"
+POSTGRES_USER="${POSTGRES_USER:-mira_app}"
+POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-}"
+MIRA_SESSION_BACKEND="${MIRA_SESSION_BACKEND:-postgres}"
+MIRA_DB_POOL_MAX_CONNECTIONS="${MIRA_DB_POOL_MAX_CONNECTIONS:-5}"
+MIRA_BEDROCK_SONNET_CONCURRENCY="${MIRA_BEDROCK_SONNET_CONCURRENCY:-6}"
+MIRA_BEDROCK_VISION_CONCURRENCY="${MIRA_BEDROCK_VISION_CONCURRENCY:-4}"
+MIUL_EXTRACTION_QUEUE_URL="${MIUL_EXTRACTION_QUEUE_URL:-}"
+MIRA_RATE_LIMIT_ENABLED="${MIRA_RATE_LIMIT_ENABLED:-true}"
+MIRA_RATE_LIMIT_REQUESTS="${MIRA_RATE_LIMIT_REQUESTS:-40}"
+MIRA_RATE_LIMIT_WINDOW_SECONDS="${MIRA_RATE_LIMIT_WINDOW_SECONDS:-60}"
 
 BACKEND_TASK_ROLE_ARN="${BACKEND_TASK_ROLE_ARN:-arn:aws-us-gov:iam::${ACCOUNT_ID}:role/mira-prod-ecs-task}"
 EXECUTION_ROLE_ARN="${EXECUTION_ROLE_ARN:-arn:aws-us-gov:iam::${ACCOUNT_ID}:role/mira-prod-ecs-execution}"
@@ -84,6 +109,18 @@ require_bin git
   echo "Docker binary not found: ${DOCKER_BIN}" >&2
   exit 1
 }
+
+if [ "${ENABLE_AUTOSCALING}" = "1" ]; then
+  if [ "${BACKEND_MIN_TASKS}" -gt "${BACKEND_MAX_TASKS}" ]; then
+    echo "Invalid autoscaling bounds: BACKEND_MIN_TASKS (${BACKEND_MIN_TASKS}) > BACKEND_MAX_TASKS (${BACKEND_MAX_TASKS})" >&2
+    exit 1
+  fi
+
+  if [ "${BACKEND_DESIRED_COUNT}" -lt "${BACKEND_MIN_TASKS}" ] || [ "${BACKEND_DESIRED_COUNT}" -gt "${BACKEND_MAX_TASKS}" ]; then
+    echo "Invalid desired count: BACKEND_DESIRED_COUNT (${BACKEND_DESIRED_COUNT}) must be within autoscaling bounds ${BACKEND_MIN_TASKS}-${BACKEND_MAX_TASKS}" >&2
+    exit 1
+  fi
+fi
 
 cleanup() {
   if [ -n "${STAGING_DIR}" ] && [ -d "${STAGING_DIR}" ]; then
@@ -361,11 +398,20 @@ cat > "${BACKEND_TASK_JSON}" <<JSON
         {"name": "MIRA_CHAT_AUDIT_PATH", "value": "${MIRA_CHAT_AUDIT_PATH}"},
         {"name": "MIRA_DISABLE_HERITAGE_DB", "value": "${NO_DATA_RUNTIME}"},
         {"name": "MIRA_NO_DATA_RUNTIME", "value": "${NO_DATA_RUNTIME}"},
-        {"name": "POSTGRES_HOST", "value": "localhost"},
-        {"name": "POSTGRES_PORT", "value": "5432"},
-        {"name": "POSTGRES_DB", "value": "mira_h2"},
-        {"name": "POSTGRES_USER", "value": "restored"},
-        {"name": "POSTGRES_PASSWORD", "value": "restored"}
+        {"name": "POSTGRES_HOST", "value": "${POSTGRES_HOST}"},
+        {"name": "POSTGRES_PORT", "value": "${POSTGRES_PORT}"},
+        {"name": "POSTGRES_DB", "value": "${POSTGRES_DB}"},
+        {"name": "POSTGRES_USER", "value": "${POSTGRES_USER}"},
+        {"name": "POSTGRES_PASSWORD", "value": "${POSTGRES_PASSWORD}"},
+        {"name": "MIRA_WORKERS", "value": "${MIRA_WORKERS}"},
+        {"name": "MIRA_SESSION_BACKEND", "value": "${MIRA_SESSION_BACKEND}"},
+        {"name": "MIRA_DB_POOL_MAX_CONNECTIONS", "value": "${MIRA_DB_POOL_MAX_CONNECTIONS}"},
+        {"name": "MIRA_BEDROCK_SONNET_CONCURRENCY", "value": "${MIRA_BEDROCK_SONNET_CONCURRENCY}"},
+        {"name": "MIRA_BEDROCK_VISION_CONCURRENCY", "value": "${MIRA_BEDROCK_VISION_CONCURRENCY}"},
+        {"name": "MIUL_EXTRACTION_QUEUE_URL", "value": "${MIUL_EXTRACTION_QUEUE_URL}"},
+        {"name": "MIRA_RATE_LIMIT_ENABLED", "value": "${MIRA_RATE_LIMIT_ENABLED}"},
+        {"name": "MIRA_RATE_LIMIT_REQUESTS", "value": "${MIRA_RATE_LIMIT_REQUESTS}"},
+        {"name": "MIRA_RATE_LIMIT_WINDOW_SECONDS", "value": "${MIRA_RATE_LIMIT_WINDOW_SECONDS}"}
       ],
       "logConfiguration": {
         "logDriver": "awslogs",
@@ -439,14 +485,16 @@ if ensure_service "${BACKEND_SERVICE}"; then
     --cluster "${CLUSTER}" \
     --service "${BACKEND_SERVICE}" \
     --task-definition "${BACKEND_TD_ARN}" \
-    --desired-count 1 >/dev/null
+    --deployment-configuration "${BACKEND_DEPLOYMENT_CONFIGURATION}" \
+    --desired-count "${BACKEND_DESIRED_COUNT}" >/dev/null
 else
   aws ecs create-service \
     --cluster "${CLUSTER}" \
     --service-name "${BACKEND_SERVICE}" \
     --task-definition "${BACKEND_TD_ARN}" \
-    --desired-count 1 \
+    --desired-count "${BACKEND_DESIRED_COUNT}" \
     --launch-type FARGATE \
+    --deployment-configuration "${BACKEND_DEPLOYMENT_CONFIGURATION}" \
     --health-check-grace-period-seconds 120 \
     --load-balancers "targetGroupArn=${BACKEND_TG_ARN},containerName=backend,containerPort=8080" \
     --network-configuration "awsvpcConfiguration={subnets=[${SUBNET_JSON}],securityGroups=[\"${BACKEND_SECURITY_GROUP}\"],assignPublicIp=DISABLED}" >/dev/null
@@ -468,6 +516,49 @@ else
     --health-check-grace-period-seconds 60 \
     --load-balancers "targetGroupArn=${FRONTEND_TG_ARN},containerName=frontend,containerPort=80" \
     --network-configuration "awsvpcConfiguration={subnets=[${SUBNET_JSON}],securityGroups=[\"${FRONTEND_SECURITY_GROUP}\"],assignPublicIp=DISABLED}" >/dev/null
+fi
+
+echo
+echo "== ALB target group tuning =="
+aws elbv2 modify-target-group-attributes \
+  --target-group-arn "${BACKEND_TG_ARN}" \
+  --attributes "Key=deregistration_delay.timeout_seconds,Value=${BACKEND_DEREGISTRATION_DELAY}" >/dev/null 2>&1 || \
+  echo "  (could not update deregistration delay - verify target group ARN)"
+
+if [ "${ENABLE_AUTOSCALING}" = "1" ]; then
+  echo
+  echo "== Backend autoscaling =="
+
+  SCALABLE_DIMENSION="ecs:service:DesiredCount"
+  RESOURCE_ID="service/${CLUSTER}/${BACKEND_SERVICE}"
+
+  aws application-autoscaling register-scalable-target \
+    --service-namespace ecs \
+    --resource-id "${RESOURCE_ID}" \
+    --scalable-dimension "${SCALABLE_DIMENSION}" \
+    --min-capacity "${BACKEND_MIN_TASKS}" \
+    --max-capacity "${BACKEND_MAX_TASKS}" >/dev/null 2>&1 || \
+    echo "  (scalable target may already exist)"
+
+  aws application-autoscaling put-scaling-policy \
+    --service-namespace ecs \
+    --resource-id "${RESOURCE_ID}" \
+    --scalable-dimension "${SCALABLE_DIMENSION}" \
+    --policy-name "mira-backend-cpu-tracking" \
+    --policy-type TargetTrackingScaling \
+    --target-tracking-scaling-policy-configuration "{
+      \"TargetValue\": ${BACKEND_TARGET_CPU_PERCENT},
+      \"PredefinedMetricSpecification\": {
+        \"PredefinedMetricType\": \"ECSServiceAverageCPUUtilization\"
+      },
+      \"ScaleInCooldown\": ${BACKEND_SCALE_IN_COOLDOWN},
+      \"ScaleOutCooldown\": ${BACKEND_SCALE_OUT_COOLDOWN}
+    }" >/dev/null
+
+  echo "  Autoscaling: ${BACKEND_MIN_TASKS}-${BACKEND_MAX_TASKS} tasks, target CPU ${BACKEND_TARGET_CPU_PERCENT}%"
+else
+  echo
+  echo "== Autoscaling skipped (ENABLE_AUTOSCALING=0) =="
 fi
 
 echo

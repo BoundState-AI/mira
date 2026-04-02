@@ -1,10 +1,18 @@
 #!/usr/bin/env python3
 """
 Module: V4 Session
-Purpose: File-based session management for MIUL v4 extraction + HITL review.
+Purpose: Session management for MIUL v4 extraction + HITL review.
 
-Stores extraction results, review state, and audit trail as JSON files
-in a per-session directory under temp/miul_sessions/{extraction_id}/.
+Persists extraction results, review state, and audit trail through
+the shared ``SessionStore`` from ``mira.core.session_store``.
+
+Each session stores five logical documents as separate keys under
+the ``miul_v4`` module namespace:
+  {extraction_id}/extraction — raw ExtractionResult from vision extractor
+  {extraction_id}/review     — review items, corrections, approval state
+  {extraction_id}/audit      — append-only audit trail
+  {extraction_id}/status     — status polling data
+  {extraction_id}/metadata   — owner/creation metadata
 
 BoundState AI 2025
 Version: 4.0.0
@@ -19,27 +27,60 @@ Safety Critical: False
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import re
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from .extractor import ExtractionResult, identify_review_items
+if TYPE_CHECKING:
+    from .extractor import ExtractionResult
 
 LOGGER = logging.getLogger(__name__)
 
-# Default session storage root
-_SESSION_ROOT = Path("C:/BoundState/temp/miul_sessions")
+_MODULE = "miul_v4"
 _DRAWING_VARIANT_SUFFIX_RE = re.compile(r"^(?:[A-Z]|[A-Z]?\d+(?:/\d+)?)$")
 _DRAWING_TOKEN_RE = re.compile(r"[A-Z0-9]+(?:[-/][A-Z0-9]+)+")
 
 
+def _identify_review_items(result: "ExtractionResult") -> Dict[str, Any]:
+    from .extractor import identify_review_items
+
+    return identify_review_items(result)
+
+
+def _extraction_result_from_dict(data: Dict[str, Any]) -> "ExtractionResult":
+    from .extractor import ExtractionResult
+
+    return ExtractionResult.from_dict(data)
+
+
 def get_session_root() -> Path:
-    """Return session storage root, creating if needed."""
-    _SESSION_ROOT.mkdir(parents=True, exist_ok=True)
-    return _SESSION_ROOT
+    """Deprecated. Returns a placeholder path for backward compatibility."""
+    LOGGER.warning("get_session_root() is deprecated; MIUL sessions use shared SessionStore.")
+    root = Path("C:/BoundState/temp/miul_sessions")
+    root.mkdir(parents=True, exist_ok=True)
+    return root
+
+
+def _run_sync(coro: Any) -> Any:
+    """Execute an async coroutine synchronously."""
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        return asyncio.run(coro)
+    # Inside a running event loop — drive the non-suspending coroutine.
+    try:
+        coro.send(None)
+    except StopIteration as exc:
+        return exc.value
+    raise RuntimeError(
+        "MIUL session store coroutine suspended unexpectedly. "
+        "Only non-suspending backends (e.g. MemorySessionStore) are supported "
+        "in synchronous call paths."
+    )
 
 
 def _norm_token(value: Any) -> str:
@@ -227,42 +268,24 @@ def _review_item_keys(item: Dict[str, Any]) -> set[str]:
 
 class V4Session:
     """
-    File-backed MIUL v4 session.
+    MIUL v4 session backed by the shared ``SessionStore``.
 
-    Stores three files per session:
-      extraction.json  - raw ExtractionResult from vision extractor
-      review.json      - review items, corrections, and approval state
-      audit.json       - append-only audit trail
+    Stores five logical documents per session as separate keys under
+    the ``miul_v4`` module namespace.
     """
 
     def __init__(self, extraction_id: str):
         self.extraction_id = extraction_id
-        self._dir = get_session_root() / extraction_id
-        self._dir.mkdir(parents=True, exist_ok=True)
+        from mira.core.session_store import get_session_store
+        self._store = get_session_store()
 
-    @property
-    def extraction_path(self) -> Path:
-        return self._dir / "extraction.json"
-
-    @property
-    def review_path(self) -> Path:
-        return self._dir / "review.json"
-
-    @property
-    def audit_path(self) -> Path:
-        return self._dir / "audit.json"
-
-    @property
-    def status_path(self) -> Path:
-        return self._dir / "status.json"
-
-    @property
-    def metadata_path(self) -> Path:
-        return self._dir / "metadata.json"
+    def _key(self, doc_type: str) -> str:
+        """Build the store key for a document type."""
+        return f"{self.extraction_id}/{doc_type}"
 
     @property
     def exists(self) -> bool:
-        return self._dir.exists()
+        return _run_sync(self._store.get_module_data(_MODULE, self._key("metadata"))) is not None
 
     # ----- Status tracking -----
 
@@ -281,15 +304,15 @@ class V4Session:
             data["summary"] = summary
         if error:
             data["error"] = error
-        self._write(self.status_path, data)
+        self._write("status", data)
 
     def get_status(self) -> Dict[str, Any]:
         """Read current extraction status."""
-        data = self._read(self.status_path)
+        data = self._read("status")
         if data:
             return data
-        # Fallback: if no status file, check if extraction exists
-        if self.extraction_path.exists():
+        # Fallback: if no status, check if extraction exists
+        if self._read("extraction") is not None:
             return {
                 "extraction_id": self.extraction_id,
                 "status": "complete",
@@ -306,16 +329,16 @@ class V4Session:
     def set_owner_username(self, owner_username: str | None) -> None:
         """Persist the authenticated owner for authorization checks."""
         normalized = (owner_username or "").strip() or None
-        metadata = self._read(self.metadata_path) or {}
+        metadata = self._read("metadata") or {}
         metadata["owner_username"] = normalized
         metadata.setdefault("extraction_id", self.extraction_id)
         metadata.setdefault("created_at", _now())
         metadata["updated_at"] = _now()
-        self._write(self.metadata_path, metadata)
+        self._write("metadata", metadata)
 
     def get_owner_username(self) -> Optional[str]:
         """Return the stored owner username, if any."""
-        metadata = self._read(self.metadata_path) or {}
+        metadata = self._read("metadata") or {}
         raw = metadata.get("owner_username")
         if raw is None:
             return None
@@ -324,16 +347,16 @@ class V4Session:
 
     # ----- Extraction -----
 
-    def save_extraction(self, result: ExtractionResult) -> None:
+    def save_extraction(self, result: "ExtractionResult") -> None:
         """Save extraction result and generate initial review state."""
-        self._write(self.extraction_path, result.to_dict())
+        self._write("extraction", result.to_dict())
 
         # Generate review items from extraction
-        review_data = identify_review_items(result)
+        review_data = _identify_review_items(result)
         review_data["status"] = "in_review"
         review_data["approved_at"] = None
         review_data["approved_by"] = None
-        self._write(self.review_path, review_data)
+        self._write("review", review_data)
 
         # Initialize audit trail
         self._append_audit("extraction_saved", {
@@ -343,18 +366,18 @@ class V4Session:
             "auto_approved": review_data["summary"]["auto_approved"],
         })
 
-    def load_extraction(self) -> Optional[ExtractionResult]:
-        """Load extraction result from disk."""
-        data = self._read(self.extraction_path)
+    def load_extraction(self) -> Optional["ExtractionResult"]:
+        """Load extraction result from shared store."""
+        data = self._read("extraction")
         if data is None:
             return None
-        return ExtractionResult.from_dict(data)
+        return _extraction_result_from_dict(data)
 
     # ----- Review -----
 
     def load_review(self) -> Optional[Dict[str, Any]]:
         """Load review state."""
-        return self._read(self.review_path)
+        return self._read("review")
 
     def list_drawings(self) -> List[Dict[str, Any]]:
         """List drawing packages available in this extraction session."""
@@ -597,17 +620,17 @@ class V4Session:
         extraction.materials = filtered_materials
         extraction.drawing_packages = kept_packages
         extraction.compute_summary()
-        self._write(self.extraction_path, extraction.to_dict())
+        self._write("extraction", extraction.to_dict())
 
         previous_review = self.load_review() or {}
-        review_data = identify_review_items(extraction)
+        review_data = _identify_review_items(extraction)
         self._carry_review_status_forward(review_data, previous_review)
 
         # Any drawing removal re-opens the review gate and clears prior approval.
         review_data["status"] = "in_review"
         review_data["approved_at"] = None
         review_data["approved_by"] = None
-        self._write(self.review_path, review_data)
+        self._write("review", review_data)
 
         removed_materials = original_material_count - len(filtered_materials)
         removed_drawings = [
@@ -726,16 +749,16 @@ class V4Session:
 
         extraction.materials = filtered_materials
         extraction.compute_summary()
-        self._write(self.extraction_path, extraction.to_dict())
+        self._write("extraction", extraction.to_dict())
 
-        review_data = identify_review_items(extraction)
+        review_data = _identify_review_items(extraction)
         self._carry_review_status_forward(review_data, previous_review)
 
         # Part removal re-opens the review gate and clears prior approval.
         review_data["status"] = "in_review"
         review_data["approved_at"] = None
         review_data["approved_by"] = None
-        self._write(self.review_path, review_data)
+        self._write("review", review_data)
 
         canonical_part = str((matched_item or {}).get("part_number") or target)
         removed_aliases = sorted(remove_keys)
@@ -840,7 +863,7 @@ class V4Session:
         self._apply_correction_to_extraction(part_number, corrections)
 
         # Save
-        self._write(self.review_path, review)
+        self._write("review", review)
         self._append_audit("correction_submitted", {
             "part_number": part_number,
             "fields_corrected": list(corrections.keys()),
@@ -880,7 +903,7 @@ class V4Session:
         item["accepted_by"] = reviewer
         item["accept_reason"] = reason
 
-        self._write(self.review_path, review)
+        self._write("review", review)
         self._append_audit("item_accepted", {
             "part_number": part_number,
             "reviewer": reviewer,
@@ -918,7 +941,7 @@ class V4Session:
         review["status"] = "approved"
         review["approved_at"] = _now()
         review["approved_by"] = reviewer
-        self._write(self.review_path, review)
+        self._write("review", review)
 
         self._append_audit("build_approved", {
             "reviewer": reviewer,
@@ -942,13 +965,13 @@ class V4Session:
         self, part_number: str, corrections: Dict[str, str]
     ) -> None:
         """Update the extraction JSON with human corrections."""
-        data = self._read(self.extraction_path)
+        data = self._read("extraction")
         if not data:
             return
 
         # Path parameter may be item_id; find actual part_number from review state.
         actual_part_number = part_number
-        review = self._read(self.review_path) or {}
+        review = self._read("review") or {}
         for item in review.get("review_items", []):
             if item.get("item_id") == part_number:
                 actual_part_number = str(item.get("part_number") or part_number)
@@ -972,7 +995,7 @@ class V4Session:
                     if "confidence" in mat and field_name in mat["confidence"]:
                         mat["confidence"][field_name] = 1.0
 
-        self._write(self.extraction_path, data)
+        self._write("extraction", data)
 
     def _carry_review_status_forward(
         self,
@@ -1025,64 +1048,57 @@ class V4Session:
 
     def _append_audit(self, event: str, details: Dict[str, Any]) -> None:
         """Append an event to the audit trail."""
-        trail = self._read(self.audit_path) or []
+        trail = self._read("audit") or []
         trail.append({
             "event": event,
             "timestamp": _now(),
             "extraction_id": self.extraction_id,
             **details,
         })
-        self._write(self.audit_path, trail)
+        self._write("audit", trail)
 
-    def _write(self, path: Path, data: Any) -> None:
-        path.write_text(json.dumps(data, indent=2, default=str), encoding="utf-8")
+    def _write(self, doc_type: str, data: Any) -> None:
+        """Write a document to the shared store."""
+        # Ensure data is JSON-serializable (handle datetime etc.)
+        serialized = json.loads(json.dumps(data, default=str))
+        _run_sync(self._store.save_module_data(_MODULE, self._key(doc_type), serialized))
 
-    def _read(self, path: Path) -> Optional[Any]:
-        if not path.exists():
-            return None
-        try:
-            return json.loads(path.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError) as e:
-            LOGGER.error(f"[V4Session] Failed to read {path}: {e}")
-            return None
+    def _read(self, doc_type: str) -> Optional[Any]:
+        """Read a document from the shared store."""
+        return _run_sync(self._store.get_module_data(_MODULE, self._key(doc_type)))
 
     def load_audit(self) -> List[Dict[str, Any]]:
         """Load audit trail."""
-        return self._read(self.audit_path) or []
+        return self._read("audit") or []
 
     def delete(self) -> bool:
-        """Delete session directory and all data (sensitive-build purge)."""
-        import shutil
-        if self._dir.exists():
-            try:
-                shutil.rmtree(self._dir)
-                LOGGER.info(f"[V4Session] Purged session {self.extraction_id}")
-                return True
-            except OSError as e:
-                LOGGER.error(f"[V4Session] Failed to purge {self.extraction_id}: {e}")
-                return False
-        return False
+        """Delete all session data (sensitive-build purge)."""
+        doc_types = ("extraction", "review", "audit", "status", "metadata")
+        deleted_any = False
+        for doc_type in doc_types:
+            result = _run_sync(self._store.delete_module_data(_MODULE, self._key(doc_type)))
+            if result:
+                deleted_any = True
+        if deleted_any:
+            LOGGER.info(f"[V4Session] Purged session {self.extraction_id}")
+        return deleted_any
 
     def get_created_at(self) -> Optional[str]:
         """Get session creation timestamp from extraction data or audit trail."""
-        # Try extraction data first (has timestamp)
-        data = self._read(self.extraction_path)
+        data = self._read("extraction")
         if data and "timestamp" in data:
             return data["timestamp"]
-        # Try audit trail (first event)
-        audit = self._read(self.audit_path)
+        audit = self._read("audit")
         if audit and len(audit) > 0:
             return audit[0].get("timestamp")
-        # Fall back to directory mtime
-        try:
-            mtime = self._dir.stat().st_mtime
-            return datetime.fromtimestamp(mtime, tz=timezone.utc).isoformat()
-        except OSError:
-            return None
+        metadata = self._read("metadata")
+        if metadata and "created_at" in metadata:
+            return metadata["created_at"]
+        return None
 
     def get_project_name(self) -> Optional[str]:
         """Try to extract project name from stored data."""
-        data = self._read(self.extraction_path)
+        data = self._read("extraction")
         if data:
             dt_context = data.get("dt_context")
             if not isinstance(dt_context, dict):
@@ -1097,41 +1113,39 @@ class V4Session:
 
 def list_sessions(limit: int = 20) -> List[Dict[str, Any]]:
     """List all v4 extraction sessions with summary info, sorted newest first."""
-    root = get_session_root()
-    sessions = []
-    if not root.exists():
-        return sessions
+    from mira.core.session_store import get_session_store
 
-    # Sort by directory modification time (newest first)
-    dirs = []
-    for d in root.iterdir():
-        if d.is_dir() and (d / "extraction.json").exists():
-            try:
-                mtime = d.stat().st_mtime
-            except OSError:
-                mtime = 0
-            dirs.append((mtime, d))
+    store = get_session_store()
+    all_keys = _run_sync(store.list_module_keys(_MODULE))
 
-    dirs.sort(key=lambda x: x[0], reverse=True)
+    # Find unique extraction IDs from keys like "{id}/metadata"
+    extraction_ids: set[str] = set()
+    for key in all_keys:
+        if "/" in key:
+            eid = key.split("/", 1)[0]
+            extraction_ids.add(eid)
 
-    for _, d in dirs[:limit]:
-        session = V4Session(d.name)
+    sessions: list[Dict[str, Any]] = []
+    for eid in extraction_ids:
+        session = V4Session(eid)
         review = session.load_review()
-        extraction = session._read(session.extraction_path)
+        status_data = session.get_status()
 
-        status_str = "unknown"
-        if review:
-            status_str = review.get("status", "unknown")
+        status_str = status_data.get("status", "unknown")
+        if review and review.get("status"):
+            status_str = review.get("status", status_str)
 
         sessions.append({
-            "extraction_id": d.name,
+            "extraction_id": eid,
             "status": status_str,
             "summary": review.get("summary", {}) if review else {},
             "created_at": session.get_created_at(),
             "project": session.get_project_name(),
         })
 
-    return sessions
+    # Sort by created_at descending (newest first)
+    sessions.sort(key=lambda s: s.get("created_at") or "", reverse=True)
+    return sessions[:limit]
 
 
 def get_session(extraction_id: str) -> V4Session:

@@ -60,19 +60,22 @@ def create_bedrock_llm_call(
 
     def call_sync(prompt: str) -> str:
         """Synchronous Bedrock call."""
+        from mira.core.bedrock_semaphore import bedrock_limiter_sync
+
         bedrock = get_client()
 
-        response = bedrock.invoke_model(
-            modelId=config.bedrock_model_id,
-            body=json.dumps(
-                {
-                    "anthropic_version": "bedrock-2023-05-31",
-                    "max_tokens": 1024,
-                    "temperature": 0.0,
-                    "messages": [{"role": "user", "content": prompt}],
-                }
-            ),
-        )
+        with bedrock_limiter_sync("sonnet"):
+            response = bedrock.invoke_model(
+                modelId=config.bedrock_model_id,
+                body=json.dumps(
+                    {
+                        "anthropic_version": "bedrock-2023-05-31",
+                        "max_tokens": 1024,
+                        "temperature": 0.0,
+                        "messages": [{"role": "user", "content": prompt}],
+                    }
+                ),
+            )
 
         response_body = json.loads(response["body"].read())
         return response_body["content"][0]["text"]

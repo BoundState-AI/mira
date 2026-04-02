@@ -307,8 +307,8 @@ def _open_maptis_connection():
     return open_db_connection(options="-c search_path=maptis,public")
 
 
-def _require_owned_session(session_id: str, http_request: Request):
-    session = session_manager.get_session(session_id)
+async def _require_owned_session(session_id: str, http_request: Request):
+    session = await session_manager.aget_session(session_id)
     if session is None:
         raise HTTPException(
             status_code=404,
@@ -1317,20 +1317,20 @@ async def investigate_endpoint(
     actor = get_request_user(http_request)
     actor_name = (actor.username if actor else None) or getattr(request, "created_by", None)
     if not session_id:
-        session = session_manager.create_session(
+        session = await session_manager.acreate_session(
             created_by=actor_name,
             center=request.center,
         )
         session_id = session.session_id
     else:
-        session = session_manager.get_session(session_id)
+        session = await session_manager.aget_session(session_id)
         if session is None:
             # Stale session ID (e.g. server restarted) -- create a fresh one.
             logger.warning(
                 "Session '%s' not found (stale?). Creating new session.",
                 session_id,
             )
-            session = session_manager.create_session(
+            session = await session_manager.acreate_session(
                 created_by=actor_name,
                 center=request.center,
             )
@@ -1342,7 +1342,7 @@ async def investigate_endpoint(
                 resource_label="mua v7 session",
             )
 
-    current_step = session_manager.get_current_step(session_id)
+    current_step = await session_manager.aget_current_step(session_id)
     if current_step not in (StepName.DEFINE, StepName.INVESTIGATE):
         raise HTTPException(
             status_code=400,
@@ -1361,7 +1361,7 @@ async def investigate_endpoint(
     )
 
     # Store define inputs so the step gate passes.
-    session_manager.store_define_inputs(
+    await session_manager.astore_define_inputs(
         session_id,
         material_resolution=resolution,
         environment=request.environment,
@@ -1433,8 +1433,8 @@ async def _run_investigation_background(
         )
 
         # Store results and advance session step.
-        session_manager.store_investigation(session_id, investigation_result)
-        session_manager.advance_step(session_id, StepName.INVESTIGATE)
+        await session_manager.astore_investigation(session_id, investigation_result)
+        await session_manager.aadvance_step(session_id, StepName.INVESTIGATE)
 
         _investigation_progress[session_id] = {
             "status": "complete",
@@ -1485,7 +1485,7 @@ async def investigation_status_endpoint(
     returns.  Returns ``status='complete'`` once the investigation
     pipeline finishes and results are stored on the session.
     """
-    session = _require_owned_session(session_id, http_request)
+    session = await _require_owned_session(session_id, http_request)
 
     progress = _investigation_progress.get(session_id)
 
@@ -1494,8 +1494,8 @@ async def investigation_status_endpoint(
             session_id=session_id,
             status=progress["status"],
             progress=progress.get("progress", 0),
-            current_step=session_manager.get_current_step(session_id),
-            session_status=session_manager.get_status(session_id),
+            current_step=await session_manager.aget_current_step(session_id),
+            session_status=await session_manager.aget_status(session_id),
             error=progress.get("error"),
         )
 
@@ -1505,16 +1505,16 @@ async def investigation_status_endpoint(
             session_id=session_id,
             status="complete",
             progress=100,
-            current_step=session_manager.get_current_step(session_id),
-            session_status=session_manager.get_status(session_id),
+            current_step=await session_manager.aget_current_step(session_id),
+            session_status=await session_manager.aget_status(session_id),
         )
 
     return InvestigationStatusResponse(
         session_id=session_id,
         status="idle",
         progress=0,
-        current_step=session_manager.get_current_step(session_id),
-        session_status=session_manager.get_status(session_id),
+        current_step=await session_manager.aget_current_step(session_id),
+        session_status=await session_manager.aget_status(session_id),
     )
 
 
@@ -1543,9 +1543,9 @@ async def review_decisions_endpoint(
     )
 
     # Validate session state.
-    session = _require_owned_session(request.session_id, http_request)
+    session = await _require_owned_session(request.session_id, http_request)
 
-    current_step = session_manager.get_current_step(request.session_id)
+    current_step = await session_manager.aget_current_step(request.session_id)
     if current_step not in (StepName.INVESTIGATE, StepName.REVIEW):
         raise HTTPException(
             status_code=400,
@@ -1556,7 +1556,7 @@ async def review_decisions_endpoint(
         )
 
     # Retrieve the investigation to validate completeness.
-    investigation = session_manager.get_investigation(request.session_id)
+    investigation = await session_manager.aget_investigation(request.session_id)
     if investigation is None:
         raise HTTPException(
             status_code=400,
@@ -1705,8 +1705,8 @@ async def review_decisions_endpoint(
         )
 
     # Store decisions and advance step.
-    session_manager.store_review_decisions(request.session_id, decisions)
-    session_manager.advance_step(request.session_id, StepName.REVIEW)
+    await session_manager.astore_review_decisions(request.session_id, decisions)
+    await session_manager.aadvance_step(request.session_id, StepName.REVIEW)
 
     can_generate_draft = all_items_reviewed
 
@@ -1752,9 +1752,9 @@ async def generate_draft_endpoint(
     )
 
     # Validate session state.
-    session = _require_owned_session(request.session_id, http_request)
+    session = await _require_owned_session(request.session_id, http_request)
 
-    current_step = session_manager.get_current_step(request.session_id)
+    current_step = await session_manager.aget_current_step(request.session_id)
     if current_step != StepName.REVIEW:
         raise HTTPException(
             status_code=400,
@@ -1765,7 +1765,7 @@ async def generate_draft_endpoint(
         )
 
     # All items must be reviewed before draft generation.
-    review_decisions = session_manager.get_review_decisions(request.session_id)
+    review_decisions = await session_manager.aget_review_decisions(request.session_id)
     if review_decisions is None:
         raise HTTPException(
             status_code=400,
@@ -1781,7 +1781,7 @@ async def generate_draft_endpoint(
             ),
         )
 
-    investigation = session_manager.get_investigation(request.session_id)
+    investigation = await session_manager.aget_investigation(request.session_id)
     if investigation is None:
         raise HTTPException(
             status_code=400,
@@ -1797,7 +1797,7 @@ async def generate_draft_endpoint(
             material_resolution=investigation.material,
             engineer_notes=investigation.environment.application or "",
             approved_appendix_b_codes=(
-                session_manager.get_approved_cat3_codes(request.session_id)
+                await session_manager.aget_approved_cat3_codes(request.session_id)
             ),
         )
     except Exception:
@@ -1873,9 +1873,9 @@ async def generate_draft_endpoint(
         )
 
     # Store draft and advance step.
-    session_manager.store_draft(request.session_id, draft)
-    session_manager.advance_step(request.session_id, StepName.DRAFT)
-    session_manager.update_status(
+    await session_manager.astore_draft(request.session_id, draft)
+    await session_manager.aadvance_step(request.session_id, StepName.DRAFT)
+    await session_manager.aupdate_status(
         request.session_id, SessionStatus.DRAFT_SAVED
     )
 
@@ -1921,9 +1921,9 @@ async def finalize_endpoint(
     )
 
     # Validate session state.
-    session = _require_owned_session(request.session_id, http_request)
+    session = await _require_owned_session(request.session_id, http_request)
 
-    current_step = session_manager.get_current_step(request.session_id)
+    current_step = await session_manager.aget_current_step(request.session_id)
     if current_step != StepName.DRAFT:
         raise HTTPException(
             status_code=400,
@@ -1934,9 +1934,9 @@ async def finalize_endpoint(
         )
 
     # Gather all session artifacts.
-    investigation = session_manager.get_investigation(request.session_id)
-    review_decisions = session_manager.get_review_decisions(request.session_id)
-    draft = session_manager.get_draft(request.session_id)
+    investigation = await session_manager.aget_investigation(request.session_id)
+    review_decisions = await session_manager.aget_review_decisions(request.session_id)
+    draft = await session_manager.aget_draft(request.session_id)
 
     if investigation is None or review_decisions is None or draft is None:
         raise HTTPException(
@@ -1997,9 +1997,9 @@ async def finalize_endpoint(
             )
 
     # Advance step and mark session as finalized.
-    session_manager.store_finalized_mua(request.session_id, finalized_mua)
-    session_manager.advance_step(request.session_id, StepName.FINALIZE)
-    session_manager.update_status(
+    await session_manager.astore_finalized_mua(request.session_id, finalized_mua)
+    await session_manager.aadvance_step(request.session_id, StepName.FINALIZE)
+    await session_manager.aupdate_status(
         request.session_id, SessionStatus.FINALIZED
     )
 
@@ -2031,22 +2031,22 @@ async def get_session_endpoint(session_id: str, http_request: Request) -> Sessio
     """Retrieve full session state for resuming an in-progress MUA workflow."""
     logger.info("GET session: session_id=%s", session_id)
 
-    session = _require_owned_session(session_id, http_request)
+    session = await _require_owned_session(session_id, http_request)
 
     return SessionDetailResponse(
         session_id=session_id,
-        current_step=session_manager.get_current_step(session_id),
-        status=session_manager.get_status(session_id),
-        material_input=session_manager.get_material_input(session_id),
-        center=session_manager.get_center(session_id),
-        created_by=session_manager.get_created_by(session_id),
-        created_at=session_manager.get_created_at(session_id),
-        updated_at=session_manager.get_updated_at(session_id),
-        approved_cat3_codes=session_manager.get_approved_cat3_codes(session_id),
-        investigation=session_manager.get_investigation(session_id),
-        review_decisions=session_manager.get_review_decisions(session_id),
-        draft=session_manager.get_draft(session_id),
-        finalized_mua=session_manager.get_finalized_mua(session_id),
+        current_step=await session_manager.aget_current_step(session_id),
+        status=await session_manager.aget_status(session_id),
+        material_input=await session_manager.aget_material_input(session_id),
+        center=await session_manager.aget_center(session_id),
+        created_by=await session_manager.aget_created_by(session_id),
+        created_at=await session_manager.aget_created_at(session_id),
+        updated_at=await session_manager.aget_updated_at(session_id),
+        approved_cat3_codes=await session_manager.aget_approved_cat3_codes(session_id),
+        investigation=await session_manager.aget_investigation(session_id),
+        review_decisions=await session_manager.aget_review_decisions(session_id),
+        draft=await session_manager.aget_draft(session_id),
+        finalized_mua=await session_manager.aget_finalized_mua(session_id),
     )
 
 
@@ -2077,7 +2077,7 @@ async def list_sessions_endpoint(
         created_by = (actor.username or actor.email or "").strip() or created_by
 
     try:
-        sessions = session_manager.list_sessions(
+        sessions = await session_manager.alist_sessions(
             created_by=created_by, status=status
         )
     except Exception:
@@ -2120,9 +2120,9 @@ async def delete_session_endpoint(
     """
     logger.info("DELETE session: session_id=%s", session_id)
 
-    session = _require_owned_session(session_id, http_request)
+    session = await _require_owned_session(session_id, http_request)
 
-    current_status = session_manager.get_status(session_id)
+    current_status = await session_manager.aget_status(session_id)
     if current_status == SessionStatus.FINALIZED:
         raise HTTPException(
             status_code=400,
@@ -2135,7 +2135,7 @@ async def delete_session_endpoint(
             detail="Session is already abandoned.",
         )
 
-    session_manager.update_status(session_id, SessionStatus.ABANDONED)
+    await session_manager.aupdate_status(session_id, SessionStatus.ABANDONED)
 
     logger.info("Session '%s' marked as ABANDONED.", session_id)
 
@@ -2212,7 +2212,7 @@ async def stats_endpoint() -> StatsResponse:
     logger.info("GET stats")
 
     try:
-        raw_stats = session_manager.get_stats()
+        raw_stats = await session_manager.aget_stats()
     except Exception:
         logger.exception("Failed to retrieve stats")
         raise HTTPException(

@@ -163,16 +163,19 @@ class BedrockConverseProvider:
         if response_format and response_format.lower() == "json":
             sys_text = f"{system}\n\nYou MUST respond with valid JSON only."
 
+        from mira.core.bedrock_semaphore import bedrock_limiter_sync
+
         t0 = time.monotonic()
-        response = self._client.converse(
-            modelId=model_id,
-            system=[{"text": sys_text}],
-            messages=converse_msgs,
-            inferenceConfig={
-                "maxTokens": max_tokens,
-                "temperature": temperature,
-            },
-        )
+        with bedrock_limiter_sync("sonnet"):
+            response = self._client.converse(
+                modelId=model_id,
+                system=[{"text": sys_text}],
+                messages=converse_msgs,
+                inferenceConfig={
+                    "maxTokens": max_tokens,
+                    "temperature": temperature,
+                },
+            )
         latency_ms = (time.monotonic() - t0) * 1000
 
         text = _extract_converse_text(response)

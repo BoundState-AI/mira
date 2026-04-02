@@ -27,7 +27,6 @@ from __future__ import annotations
 import hashlib
 import logging
 import re
-import threading
 import traceback
 from datetime import datetime, timezone
 from typing import Any
@@ -52,43 +51,16 @@ from .query_interpreter import ParsedQuery, interpret
 from .rate_limiter import get_rate_limiter
 from .response_formatter import extract_follow_ups, format_response
 from .streaming import _sse_event, stream_formatter_response
+from .db.router_integration import (
+    get_or_create_session,
+    save_session_state,
+    append_history,
+    get_effective_history,
+)
 
 LOGGER = logging.getLogger(__name__)
 
-
-# ---------------------------------------------------------------------------
-# In-memory session store (Phase 1)
-# ---------------------------------------------------------------------------
-# Persists engine context (OCA case_id, accumulated entities, etc.) across
-# turns within the same session_id. Client-supplied history remains the
-# continuity source of truth so multi-turn chat still works if the process
-# recycles between requests. Phase 2 migrates to server-side SessionManager
-# backed by Redis or PostgreSQL.
-
-_session_store: dict[str, dict[str, Any]] = {}
-_session_lock = threading.Lock()
-
-# Cap the number of sessions to prevent unbounded memory growth.
-_MAX_SESSIONS = 500
 _MAX_HISTORY_MESSAGES = 10
-
-
-def _get_session(session_id: str) -> dict[str, Any]:
-    """Return (or create) the session dict for *session_id*."""
-    with _session_lock:
-        if session_id not in _session_store:
-            # Evict oldest sessions if at capacity
-            if len(_session_store) >= _MAX_SESSIONS:
-                oldest = next(iter(_session_store))
-                del _session_store[oldest]
-            _session_store[session_id] = {
-                "engine_context": {},  # per-engine state (e.g. oca_case_id)
-                "accumulated_entities": {},  # entities seen so far in this session
-                "history": [],  # last 5 turns = up to 10 messages
-                "last_assessment": None,
-                "turn_count": 0,
-            }
-        return _session_store[session_id]
 
 
 # ---------------------------------------------------------------------------
@@ -226,9 +198,9 @@ async def chat(request: ChatRequest) -> ChatResponse:
     # ------------------------------------------------------------------
     # 1. Restore session
     # ------------------------------------------------------------------
-    session = _get_session(session_id)
+    session = await get_or_create_session(session_id)
     session["turn_count"] += 1
-    effective_history = _resolve_effective_history(request.history, session["history"])
+    effective_history = await get_effective_history(session_id, request.history)
 
     _prime_session_from_history(session, effective_history)
 
@@ -313,13 +285,8 @@ async def chat(request: ChatRequest) -> ChatResponse:
             "What document would you like me to review? "
             "Please upload or identify the artifact."
         )
-        _append_session_history(
-            session,
-            user_message=request.message,
-            assistant_message=review_prompt,
-            engine_used=None,
-            entities=turn_entities,
-        )
+        await save_session_state(session_id, session)
+        await append_history(session_id, request.message, review_prompt, None, turn_entities)
         return ChatResponse(
             response=review_prompt,
             session_id=session_id,
@@ -344,13 +311,8 @@ async def chat(request: ChatRequest) -> ChatResponse:
                 "I can draft that, but I need an assessed material and service context first. "
                 "Run the compatibility question, then ask me to draft the MUA."
             )
-            _append_session_history(
-                session,
-                user_message=request.message,
-                assistant_message=message,
-                engine_used=None,
-                entities=turn_entities,
-            )
+            await save_session_state(session_id, session)
+            await append_history(session_id, request.message, message, None, turn_entities)
             return ChatResponse(
                 response=message,
                 session_id=session_id,
@@ -475,13 +437,8 @@ async def chat(request: ChatRequest) -> ChatResponse:
     # ------------------------------------------------------------------
     # 9. Return with entities for multi-turn continuity
     # ------------------------------------------------------------------
-    _append_session_history(
-        session,
-        user_message=request.message,
-        assistant_message=formatted,
-        engine_used=engine_id,
-        entities=turn_entities,
-    )
+    await save_session_state(session_id, session)
+    await append_history(session_id, request.message, formatted, engine_id, turn_entities)
 
     return ChatResponse(
         response=formatted,
@@ -551,9 +508,9 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
         # --------------------------------------------------------------
         # 1. Restore session
         # --------------------------------------------------------------
-        session = _get_session(session_id)
+        session = await get_or_create_session(session_id)
         session["turn_count"] += 1
-        effective_history = _resolve_effective_history(request.history, session["history"])
+        effective_history = await get_effective_history(session_id, request.history)
 
         _prime_session_from_history(session, effective_history)
 
@@ -649,13 +606,8 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
                 "What document would you like me to review? "
                 "Please upload or identify the artifact."
             )
-            _append_session_history(
-                session,
-                user_message=request.message,
-                assistant_message=review_prompt,
-                engine_used=None,
-                entities=turn_entities,
-            )
+            await save_session_state(session_id, session)
+            await append_history(session_id, request.message, review_prompt, None, turn_entities)
             yield _sse_event({
                 "type": "meta",
                 "engine_id": None,
@@ -687,13 +639,8 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
                     "I can draft that, but I need an assessed material and service context first. "
                     "Run the compatibility question, then ask me to draft the MUA."
                 )
-                _append_session_history(
-                    session,
-                    user_message=request.message,
-                    assistant_message=message,
-                    engine_used=None,
-                    entities=turn_entities,
-                )
+                await save_session_state(session_id, session)
+                await append_history(session_id, request.message, message, None, turn_entities)
                 yield _sse_event({
                     "type": "meta",
                     "engine_id": None,
@@ -840,13 +787,8 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
         # --------------------------------------------------------------
         # 9. Session history + done event
         # --------------------------------------------------------------
-        _append_session_history(
-            session,
-            user_message=request.message,
-            assistant_message=formatted,
-            engine_used=engine_id,
-            entities=turn_entities,
-        )
+        await save_session_state(session_id, session)
+        await append_history(session_id, request.message, formatted, engine_id, turn_entities)
 
         yield _sse_event({
             "type": "done",
@@ -995,39 +937,6 @@ def _error_response(
         mode=None,
         entities=entities or {},
     )
-
-
-def _resolve_effective_history(
-    request_history: list[ChatMessage],
-    session_history: list[ChatMessage],
-) -> list[ChatMessage]:
-    """Prefer explicit frontend history, otherwise fall back to session history."""
-    history = request_history if request_history else session_history
-    return history[-_MAX_HISTORY_MESSAGES:]
-
-
-def _append_session_history(
-    session: dict[str, Any],
-    *,
-    user_message: str,
-    assistant_message: str,
-    engine_used: str | None,
-    entities: dict[str, Any],
-) -> None:
-    """Persist the latest user/assistant exchange in the in-memory session."""
-    history: list[ChatMessage] = session.setdefault("history", [])
-    history.extend(
-        [
-            ChatMessage(role="user", content=user_message, entities=entities),
-            ChatMessage(
-                role="assistant",
-                content=assistant_message,
-                engine_used=engine_used,
-                entities=entities,
-            ),
-        ]
-    )
-    session["history"] = history[-_MAX_HISTORY_MESSAGES:]
 
 
 def _prime_session_from_history(

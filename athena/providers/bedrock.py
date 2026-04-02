@@ -16,6 +16,7 @@ Compliance: SWE-013, NASA-STD-8739.8B
 Safety Critical: False
 """
 
+import asyncio
 from datetime import datetime
 
 from athena.models.cost import BEDROCK_PRICING
@@ -88,12 +89,15 @@ class BedrockProvider:
 
         model = self.models.get(model_key, self.models["extract"])
 
-        response = self.client.messages.create(
-            model=model,
-            max_tokens=max_tokens,
-            system=system_prompt,
-            messages=[{"role": "user", "content": content}],
-        )
+        from mira.core.bedrock_semaphore import bedrock_limiter
+        async with bedrock_limiter("vision"):
+            response = await asyncio.to_thread(
+                self.client.messages.create,
+                model=model,
+                max_tokens=max_tokens,
+                system=system_prompt,
+                messages=[{"role": "user", "content": content}],
+            )
 
         latency_ms = int((datetime.utcnow() - start).total_seconds() * 1000)
         cost = self._calculate_cost(
@@ -131,12 +135,15 @@ class BedrockProvider:
 
         model = self.models.get(model_key, self.models["extract"])
 
-        response = self.client.messages.create(
-            model=model,
-            max_tokens=max_tokens,
-            system=system_prompt,
-            messages=[{"role": "user", "content": user_prompt}],
-        )
+        from mira.core.bedrock_semaphore import bedrock_limiter
+        async with bedrock_limiter("sonnet"):
+            response = await asyncio.to_thread(
+                self.client.messages.create,
+                model=model,
+                max_tokens=max_tokens,
+                system=system_prompt,
+                messages=[{"role": "user", "content": user_prompt}],
+            )
 
         latency_ms = int((datetime.utcnow() - start).total_seconds() * 1000)
         cost = self._calculate_cost(

@@ -282,13 +282,16 @@ def _invoke_bedrock(
         ],
     }
 
+    from mira.core.bedrock_semaphore import bedrock_limiter_sync
+
     t0 = time.monotonic()
-    response = client.invoke_model(
-        modelId=model_id,
-        contentType="application/json",
-        accept="application/json",
-        body=json.dumps(request_body),
-    )
+    with bedrock_limiter_sync("sonnet"):
+        response = client.invoke_model(
+            modelId=model_id,
+            contentType="application/json",
+            accept="application/json",
+            body=json.dumps(request_body),
+        )
     latency_ms = int((time.monotonic() - t0) * 1000)
 
     raw_body = response.get("body")

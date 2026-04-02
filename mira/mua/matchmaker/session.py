@@ -1,93 +1,74 @@
-"""Session persistence for MUA Matchmaker v8."""
+"""Session persistence for MUA Matchmaker v8.
+
+Persists session state through the shared ``SessionStore`` from
+``mira.core.session_store``.  All data is serialized via
+``MatchmakerSession.model_dump(mode="json")`` and deserialized
+via ``model_validate()`` on every read.
+"""
 
 from __future__ import annotations
 
-import json
-import os
-import shutil
-import tempfile
-import threading
+import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from .models import IssueStatus, MatchmakerEvent, MatchmakerSession, SessionSummary
 
+logger = logging.getLogger(__name__)
 
-def _default_session_dir() -> Path:
-    base = Path(os.getenv("MIRA_DATA_DIR", "data")).resolve()
-    return base / "matchmaker_sessions"
+_MODULE = "matchmaker"
 
 
 class MatchmakerSessionStore:
-    """Disk-backed session store with atomic writes and crash recovery."""
+    """Session store backed by the shared ``SessionStore``.
+
+    Provides both async methods (``aget``, ``asave``, etc.) for use
+    in FastAPI handlers, and sync wrappers (``get``, ``save``, etc.)
+    for tests and non-async callers.
+    """
 
     def __init__(self, session_dir: Path | None = None) -> None:
-        self._session_dir = session_dir or _default_session_dir()
-        self._session_dir.mkdir(parents=True, exist_ok=True)
-        self._locks: dict[str, threading.Lock] = {}
-        self._locks_guard = threading.Lock()
+        from mira.core.session_store import get_session_store
+        self._store = get_session_store()
+        if session_dir is not None:
+            logger.warning(
+                "MatchmakerSessionStore(session_dir=...) is deprecated and ignored; "
+                "sessions now persist through the shared SessionStore."
+            )
 
-    @property
-    def session_dir(self) -> Path:
-        return self._session_dir
+    # -- async primary API --------------------------------------------------
 
-    def create(self, session: MatchmakerSession) -> MatchmakerSession:
-        self.save(session)
+    async def acreate(self, session: MatchmakerSession) -> MatchmakerSession:
+        await self.asave(session)
         return session
 
-    def get(self, session_id: str) -> Optional[MatchmakerSession]:
-        path = self._session_path(session_id)
-        if not path.exists():
-            return None
+    async def aget(self, session_id: str) -> Optional[MatchmakerSession]:
+        from mira.core.session_store import load_model
+        return await load_model(_MODULE, session_id, MatchmakerSession, self._store)
 
-        with self._lock_for(session_id):
-            payload = self._load_payload(path)
-            if payload is None:
-                return None
-            return MatchmakerSession.model_validate(payload)
-
-    def save(self, session: MatchmakerSession) -> None:
+    async def asave(self, session: MatchmakerSession) -> None:
+        from mira.core.session_store import save_model
         session.updated_at = datetime.utcnow()
-        path = self._session_path(session.session_id)
-        payload = session.model_dump(mode="json")
+        await save_model(_MODULE, session.session_id, session, self._store)
 
-        with self._lock_for(session.session_id):
-            if path.exists():
-                shutil.copy2(path, self._backup_path(path))
-            self._atomic_write(path, payload)
+    async def adelete(self, session_id: str) -> bool:
+        return await self._store.delete_module_data(_MODULE, session_id)
 
-    def delete(self, session_id: str) -> bool:
-        path = self._session_path(session_id)
-        backup = self._backup_path(path)
-        deleted = False
-        with self._lock_for(session_id):
-            if path.exists():
-                path.unlink()
-                deleted = True
-            if backup.exists():
-                backup.unlink()
-        return deleted
+    async def alist(self) -> list[SessionSummary]:
+        from mira.core.session_store import load_model
 
-    def list(self) -> list[SessionSummary]:
-        sessions: list[SessionSummary] = []
-        for path in sorted(self._session_dir.glob("*.json")):
-            if path.name.endswith(".json.backup"):
+        summaries: list[SessionSummary] = []
+        for key in await self._store.list_module_keys(_MODULE):
+            session = await load_model(_MODULE, key, MatchmakerSession, self._store)
+            if session is None:
                 continue
-            payload = self._load_payload(path)
-            if payload is None:
-                continue
-            try:
-                session = MatchmakerSession.model_validate(payload)
-            except Exception:
-                continue
-
             issue_values = list(session.issues.values())
             done_count = len([i for i in issue_values if i.status == IssueStatus.DONE])
             manual_count = len(
                 [i for i in issue_values if i.status == IssueStatus.MANUAL_REQUIRED]
             )
-            sessions.append(
+            summaries.append(
                 SessionSummary(
                     session_id=session.session_id,
                     material_input=session.material_input,
@@ -98,58 +79,49 @@ class MatchmakerSessionStore:
                     category=session.category,
                 )
             )
+        summaries.sort(key=lambda s: s.updated_at, reverse=True)
+        return summaries
 
-        sessions.sort(key=lambda s: s.updated_at, reverse=True)
-        return sessions
+    async def aappend_event(self, session: MatchmakerSession, event: MatchmakerEvent) -> None:
+        session.events.append(event)
+        await self.asave(session)
+
+    # -- sync wrappers (tests / non-async callers) --------------------------
+
+    @staticmethod
+    def _run_sync(coro: Any) -> Any:
+        import asyncio
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            return asyncio.run(coro)
+        raise RuntimeError(
+            "MatchmakerSessionStore sync methods cannot be used inside a running "
+            "event loop. Use the async methods (aget, asave, etc.) instead."
+        )
+
+    def create(self, session: MatchmakerSession) -> MatchmakerSession:
+        return self._run_sync(self.acreate(session))
+
+    def get(self, session_id: str) -> Optional[MatchmakerSession]:
+        return self._run_sync(self.aget(session_id))
+
+    def save(self, session: MatchmakerSession) -> None:
+        self._run_sync(self.asave(session))
+
+    def delete(self, session_id: str) -> bool:
+        return self._run_sync(self.adelete(session_id))
+
+    def list(self) -> list[SessionSummary]:
+        return self._run_sync(self.alist())
 
     def append_event(self, session: MatchmakerSession, event: MatchmakerEvent) -> None:
-        session.events.append(event)
-        self.save(session)
+        self._run_sync(self.aappend_event(session, event))
 
-    def _session_path(self, session_id: str) -> Path:
-        return self._session_dir / f"{session_id}.json"
+    # -- backward compat (deprecated) --------------------------------------
 
-    @staticmethod
-    def _backup_path(path: Path) -> Path:
-        return path.with_suffix(".json.backup")
-
-    def _lock_for(self, session_id: str) -> threading.Lock:
-        with self._locks_guard:
-            lock = self._locks.get(session_id)
-            if lock is None:
-                lock = threading.Lock()
-                self._locks[session_id] = lock
-            return lock
-
-    def _load_payload(self, path: Path) -> dict | None:
-        try:
-            with open(path, "r", encoding="utf-8") as handle:
-                return json.load(handle)
-        except (json.JSONDecodeError, OSError):
-            backup = self._backup_path(path)
-            if backup.exists():
-                try:
-                    with open(backup, "r", encoding="utf-8") as handle:
-                        payload = json.load(handle)
-                    self._atomic_write(path, payload)
-                    return payload
-                except (json.JSONDecodeError, OSError):
-                    return None
-            return None
-
-    @staticmethod
-    def _atomic_write(filepath: Path, data: dict) -> None:
-        dir_path = filepath.parent
-        fd, tmp_path = tempfile.mkstemp(dir=str(dir_path), suffix=".tmp")
-        try:
-            with os.fdopen(fd, "w", encoding="utf-8") as handle:
-                json.dump(data, handle, indent=2, default=str)
-                handle.flush()
-                os.fsync(handle.fileno())
-            os.replace(tmp_path, str(filepath))
-        except Exception:
-            try:
-                os.unlink(tmp_path)
-            except OSError:
-                pass
-            raise
+    @property
+    def session_dir(self) -> Path:
+        """Deprecated. Returns a placeholder path for backward compatibility."""
+        logger.warning("MatchmakerSessionStore.session_dir is deprecated.")
+        return Path("data") / "matchmaker_sessions"

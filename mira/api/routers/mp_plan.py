@@ -63,12 +63,12 @@ def _get_manager():
     return get_session_manager()
 
 
-def _require_session_for_request(
+async def _require_session_for_request(
     session_id: str,
     http_request: Request,
     manager: Any,
 ):
-    session = manager.get_session(session_id)
+    session = await manager.aget_session(session_id)
     if not session:
         raise HTTPException(status_code=404, detail=f"Session not found: {session_id}")
     authorize_owner_or_admin(http_request, session.owner_username, resource_label="mp plan session")
@@ -232,7 +232,7 @@ async def create_session(
         Session summary.
     """
     actor = get_request_user(http_request)
-    session = manager.create_session(
+    session = await manager.acreate_session(
         program_name=request.program_name,
         program_phase=request.program_phase,
         policy_pack_id=request.policy_pack_id,
@@ -272,7 +272,7 @@ async def get_session(
     Returns:
         Full session state.
     """
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
     return session.model_dump()
 
 
@@ -292,13 +292,13 @@ async def delete_session(
     Returns:
         Deletion confirmation.
     """
-    session = manager.get_session(session_id)
+    session = await manager.aget_session(session_id)
     if not session:
         raise HTTPException(status_code=404, detail=f"Session not found: {session_id}")
 
     authorize_owner_or_admin(http_request, session.owner_username, resource_label="mp plan session")
 
-    if manager.delete_session(session_id):
+    if await manager.adelete_session(session_id):
         return {"status": "deleted", "session_id": session_id}
     raise HTTPException(status_code=404, detail=f"Session not found: {session_id}")
 
@@ -317,13 +317,13 @@ async def list_sessions(
     Returns:
         List of session summaries.
     """
-    summaries = manager.list_sessions()
+    summaries = await manager.alist_sessions()
     actor = get_request_user(http_request)
     if actor is not None and not actor.is_admin:
         actor_name = (actor.username or actor.email or "").strip().lower()
         filtered: list[dict[str, Any]] = []
         for summary in summaries:
-            session = manager.get_session(summary["session_id"])
+            session = await manager.aget_session(summary["session_id"])
             if session and (session.owner_username or "").strip().lower() == actor_name:
                 filtered.append(summary)
         summaries = filtered
@@ -353,8 +353,8 @@ async def add_environment(
     Returns:
         Created environment.
     """
-    _require_session_for_request(session_id, http_request, manager)
-    env = manager.add_environment(
+    await _require_session_for_request(session_id, http_request, manager)
+    env = await manager.aadd_environment(
         session_id=session_id,
         name=request.name,
         o2_pct=request.o2_pct,
@@ -389,10 +389,10 @@ async def add_materials(
     Returns:
         Created materials.
     """
-    _require_session_for_request(session_id, http_request, manager)
+    await _require_session_for_request(session_id, http_request, manager)
     created = []
     for mat_req in request.materials:
-        material = manager.add_material(
+        material = await manager.aadd_material(
             session_id=session_id,
             name=mat_req.name,
             application=mat_req.application,
@@ -428,12 +428,12 @@ async def resolve_materials(
     """
     from mira.mp_plan.engines import DataAcquisitionEngine
 
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     engine = DataAcquisitionEngine()
     try:
         resolutions, deficiencies, mappings = engine.run(session)
-        manager.update_session(session)
+        await manager.aupdate_session(session)
 
         return {
             "resolved": len(resolutions),
@@ -467,11 +467,11 @@ async def get_blocking_questions(
     """
     from mira.mp_plan.compute_loop import generate_blocking_questions
 
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     questions = generate_blocking_questions(session)
     session.blocking_questions = questions
-    manager.update_session(session)
+    await manager.aupdate_session(session)
 
     return {
         "questions": [q.model_dump() for q in questions],
@@ -500,7 +500,7 @@ async def submit_answer(
     from mira.mp_plan.compute_loop import apply_user_decision
     from mira.mp_plan.models import UserDecision
 
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     # Find the question
     question = next(
@@ -525,7 +525,7 @@ async def submit_answer(
 
     # Apply decision
     apply_user_decision(session, question, request.answer, request.rationale)
-    manager.update_session(session)
+    await manager.aupdate_session(session)
 
     can_generate, blockers = session.can_generate()
 
@@ -556,7 +556,7 @@ async def submit_closure(
     """
     from mira.mp_plan.models import ClosureDecision
 
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     # Verify gap exists
     nc = next(
@@ -578,7 +578,7 @@ async def submit_closure(
         source="api",
     )
     session.closure_decisions.append(closure)
-    manager.update_session(session)
+    await manager.aupdate_session(session)
 
     can_generate, blockers = session.can_generate()
 
@@ -612,7 +612,7 @@ async def accept_open_gap(
     from datetime import date, timedelta
     from mira.mp_plan.models import AcceptedOpenGap
 
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     # Verify gap exists
     nc = next(
@@ -644,7 +644,7 @@ async def accept_open_gap(
         risk_statement=request.risk_statement,
     )
     session.accepted_open_gaps.append(accepted)
-    manager.update_session(session)
+    await manager.aupdate_session(session)
 
     can_generate, blockers = session.can_generate()
 
@@ -679,11 +679,11 @@ async def run_compute(
     """
     from mira.mp_plan.compute_loop import run_compute_loop
 
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     # Run compute loop (without callback - will return at first blocking question)
     session = run_compute_loop(session, max_iterations=1)
-    manager.update_session(session)
+    await manager.aupdate_session(session)
 
     can_generate, blockers = session.can_generate()
 
@@ -727,7 +727,7 @@ async def generate_artifacts(
     )
     from mira.mp_plan.models import GeneratedArtifact, ArtifactType
 
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     can_generate, blockers = session.can_generate()
     if not can_generate:
@@ -797,7 +797,7 @@ async def generate_artifacts(
                 "error": str(e),
             })
 
-    manager.update_session(session)
+    await manager.aupdate_session(session)
 
     return {
         "status": "generated",
@@ -823,7 +823,7 @@ async def download_artifact(
     Returns:
         Artifact file stream.
     """
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     # Find artifact
     artifact = next(
@@ -869,7 +869,7 @@ async def get_review_packet(
     """
     from mira.mp_plan.generation import generate_review_packet
 
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     packet = generate_review_packet(session)
     return packet.model_dump()
@@ -981,7 +981,7 @@ async def get_closure_options(
     """
     from mira.mp_plan.gap_resolution import check_all_paths
 
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     # Find the gap
     gap = next(
@@ -1039,7 +1039,7 @@ async def get_applicability_matrix(
     Returns:
         Applicability matrix data.
     """
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     # Build matrix from determinations
     matrix_rows = []
@@ -1106,7 +1106,7 @@ async def get_gap_register(
     Returns:
         Gap register data.
     """
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     deficiencies = []
     for d in session.deficiencies:
@@ -1200,7 +1200,7 @@ async def download_applicability_matrix(
     """
     from mira.mp_plan.generation import generate_applicability_matrix_xlsx
 
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     content = generate_applicability_matrix_xlsx(session)
     filename = f"applicability_matrix_{session_id[:8]}.xlsx"
@@ -1230,7 +1230,7 @@ async def download_gap_register(
     """
     from mira.mp_plan.generation import generate_gap_register_xlsx
 
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     content = generate_gap_register_xlsx(session)
     filename = f"gap_register_{session_id[:8]}.xlsx"
@@ -1260,7 +1260,7 @@ async def download_manifest(
     """
     from mira.mp_plan.generation import generate_manifest_json
 
-    session = _require_session_for_request(session_id, http_request, manager)
+    session = await _require_session_for_request(session_id, http_request, manager)
 
     content = generate_manifest_json(session)
     filename = f"session_manifest_{session_id[:8]}.json"
