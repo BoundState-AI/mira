@@ -7,6 +7,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { AuthProvider } from "@/auth/AuthContext";
 import { ProtectedRoute } from "@/auth/ProtectedRoute";
 import { TemporarilyUnavailableNotice } from "@/components/TemporarilyUnavailableModule";
+import MiraLanding from "./pages/MiraLanding";
 import KnowledgeTwins from "./pages/KnowledgeTwins";
 // import MIULBuilder from "./pages/MIULBuilder";  // Deprecated: replaced by V4 production builder
 import MPPlanGenerator from "./pages/MPPlanGenerator";
@@ -43,7 +44,7 @@ const App = () => (
           <ProtectedRoute>
             <AppLayout>
               <Routes>
-                <Route path="/" element={<KnowledgeTwins />} />
+                <Route path="/" element={<MiraLanding />} />
                 <Route path="/chat" element={<MiraChat />} />
                 <Route
                   path="/query"
@@ -101,7 +102,7 @@ const App = () => (
                 <Route path="/forge" element={<Navigate to="/" replace />} />
                 <Route path="/forge-explorer" element={<Navigate to="/" replace />} />
                 <Route path="/tocr" element={<TOCR />} />
-                <Route path="/knowledge-twins" element={<Navigate to="/" replace />} />
+                <Route path="/knowledge-twins" element={<KnowledgeTwins />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </AppLayout>
