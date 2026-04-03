@@ -38,6 +38,9 @@ from sqlalchemy.ext.asyncio import (
 
 logger = logging.getLogger(__name__)
 
+_PLACEHOLDER_VALUES = {"", "restored", "placeholder", "changeme", "none", "null", "undefined"}
+_LOCALHOST_VALUES = {"localhost", "127.0.0.1", "::1"}
+
 # ---------------------------------------------------------------------------
 # Module-level singletons
 # ---------------------------------------------------------------------------
@@ -61,6 +64,11 @@ def _resolve_database_url() -> str | None:
 
     Returns None if no database is configured.
     """
+    session_backend = os.environ.get("MIRA_SESSION_BACKEND", "").strip().lower()
+    if session_backend == "memory":
+        logger.info("[CHAT-DB] Session backend pinned to memory; chat database disabled.")
+        return None
+
     # Primary: dedicated chat database URL
     url = os.environ.get("MIRA_CHAT_DATABASE_URL", "").strip()
     if url:
@@ -69,14 +77,25 @@ def _resolve_database_url() -> str | None:
             url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
         return url
 
-    # Secondary: build from standard MIRA env vars if host is set
+    # Secondary: build from standard MIRA env vars only when postgres mode is active.
+    if session_backend != "postgres":
+        return None
+
     pg_host = os.environ.get("POSTGRES_HOST", "").strip()
-    if pg_host:
-        pg_port = os.environ.get("POSTGRES_PORT", "5432")
-        pg_db = os.environ.get("POSTGRES_DB", "mira")
-        pg_user = os.environ.get("POSTGRES_USER", "postgres")
-        pg_pass = os.environ.get("POSTGRES_PASSWORD", "postgres")
-        return f"postgresql+asyncpg://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}"
+    pg_pass = os.environ.get("POSTGRES_PASSWORD", "").strip()
+    if not pg_host or pg_host.lower() in _PLACEHOLDER_VALUES | _LOCALHOST_VALUES:
+        logger.warning("[CHAT-DB] Postgres backend requested without a usable host; falling back to memory.")
+        return None
+    if not pg_pass or pg_pass.lower() in _PLACEHOLDER_VALUES:
+        logger.warning(
+            "[CHAT-DB] Postgres backend requested without a usable password; falling back to memory."
+        )
+        return None
+
+    pg_port = os.environ.get("POSTGRES_PORT", "5432")
+    pg_db = os.environ.get("POSTGRES_DB", "mira")
+    pg_user = os.environ.get("POSTGRES_USER", "postgres")
+    return f"postgresql+asyncpg://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}"
 
     return None
 

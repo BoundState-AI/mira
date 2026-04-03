@@ -15,8 +15,19 @@ from cachetools import TTLCache
 from fastapi import Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jose import JWTError, jwt
 from starlette.middleware.base import BaseHTTPMiddleware
+
+try:
+    from jose import JWTError, jwt
+except ImportError:  # pragma: no cover - exercised in lightweight test envs
+    class JWTError(Exception):
+        """Fallback JWT exception when python-jose is unavailable."""
+
+    class _MissingJoseModule:
+        def __getattr__(self, name: str):
+            raise RuntimeError("python-jose is not installed; JWT verification is unavailable")
+
+    jwt = _MissingJoseModule()
 
 from .audit import log_auth_event, log_itar_access
 
@@ -155,6 +166,13 @@ def validate_auth_configuration() -> None:
         LOGGER.warning("MIRA auth mode is disabled; API is running without Cognito enforcement.")
         return
     _get_cognito_config()
+    if approval_controls_enabled():
+        LOGGER.info(
+            "MIRA approved-user enforcement enabled (groups=%s usernames=%s emails=%s).",
+            ",".join(allowed_groups()) or "-",
+            ",".join(allowed_usernames()) or "-",
+            ",".join(allowed_emails()) or "-",
+        )
     LOGGER.info("Cognito auth enforcement enabled for MIRA API.")
 
 
@@ -242,6 +260,50 @@ class MIRAUser:
         return True
 
 
+def allowed_groups() -> tuple[str, ...]:
+    return tuple(value.lower() for value in _parse_csv_values("MIRA_ALLOWED_GROUPS"))
+
+
+def allowed_usernames() -> tuple[str, ...]:
+    return tuple(value.lower() for value in _parse_csv_values("MIRA_ALLOWED_USERNAMES"))
+
+
+def allowed_emails() -> tuple[str, ...]:
+    return tuple(value.lower() for value in _parse_csv_values("MIRA_ALLOWED_EMAILS"))
+
+
+def approval_controls_enabled() -> bool:
+    return bool(allowed_groups() or allowed_usernames() or allowed_emails())
+
+
+def user_is_approved(user: MIRAUser) -> bool:
+    if not approval_controls_enabled():
+        return True
+    if user.is_admin:
+        return True
+
+    normalized_groups = {group.strip().lower() for group in user.groups if group.strip()}
+    normalized_username = (user.username or "").strip().lower()
+    normalized_email = (user.email or "").strip().lower()
+
+    if normalized_groups & set(allowed_groups()):
+        return True
+    if normalized_username and normalized_username in set(allowed_usernames()):
+        return True
+    if normalized_email and normalized_email in set(allowed_emails()):
+        return True
+    return False
+
+
+def enforce_user_access(user: MIRAUser) -> None:
+    if user_is_approved(user):
+        return
+    raise HTTPException(
+        status_code=403,
+        detail="Authenticated identity is not approved for MIRA access",
+    )
+
+
 def _request_ip(request: Request) -> str:
     forwarded = request.headers.get("X-Forwarded-For")
     if forwarded:
@@ -317,6 +379,7 @@ async def get_current_user(
     if cached_user:
         return cached_user
     user = MIRAUser.from_claims(claims)
+    enforce_user_access(user)
     request.state.user = user
     return user
 
@@ -407,17 +470,20 @@ class CognitoAuthzMiddleware(BaseHTTPMiddleware):
             )
             return JSONResponse(status_code=401, content={"detail": "Missing Bearer token"})
 
+        user: MIRAUser | None = None
         try:
             claims = await _verify_token_string(token, path=path)
             user = MIRAUser.from_claims(claims)
+            enforce_user_access(user)
             request.state.user = user
         except HTTPException as exc:
+            rejection_reason = "invalid_token" if exc.status_code == 401 else "not_approved"
             log_auth_event(
                 event_type="AUTH_FAILURE",
-                username="unknown",
+                username=user.username if user and user.username else "unknown",
                 success=False,
                 ip_address=ip_address,
-                details={"path": path, "reason": "invalid_token", "status": exc.status_code},
+                details={"path": path, "reason": rejection_reason, "status": exc.status_code},
             )
             return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
         except Exception as exc:  # pragma: no cover
@@ -482,11 +548,16 @@ __all__ = [
     "CognitoAuthzMiddleware",
     "MIRAUser",
     "auth_enabled",
+    "allowed_emails",
+    "allowed_groups",
+    "allowed_usernames",
+    "approval_controls_enabled",
     "get_current_user",
     "require_itar_user",
     "require_admin_user",
     "get_request_user",
     "authorize_owner_or_admin",
+    "enforce_user_access",
     "verify_token",
     "validate_auth_configuration",
 ]

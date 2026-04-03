@@ -15,7 +15,11 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+except ImportError:  # pragma: no cover - lightweight test environments
+    def load_dotenv(*args, **kwargs):  # type: ignore[no-redef]
+        return False
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -268,13 +272,13 @@ def create_app(
 
     _validate_runtime_environment(chat_router=chat_router)
     app.add_middleware(SecurityHeadersMiddleware)  # M1: Security headers
+    app.add_middleware(CognitoAuthzMiddleware)
     if rate_limit_enabled():
         app.add_middleware(
             ApiRateLimitMiddleware,
             max_requests=rate_limit_requests(),
             window_seconds=rate_limit_window_seconds(),
         )
-    app.add_middleware(CognitoAuthzMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=_build_cors_origins(),

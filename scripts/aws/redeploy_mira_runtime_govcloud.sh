@@ -57,6 +57,9 @@ COGNITO_CLIENT_ID="${COGNITO_CLIENT_ID:-1tklem8thjkg04ipupvcb1heal}"
 MIRA_AUTH_MODE="${MIRA_AUTH_MODE:-cognito}"
 VITE_AUTH_BYPASS="${VITE_AUTH_BYPASS:-false}"
 MIRA_DISABLED_RUNTIME_KEYS="${MIRA_DISABLED_RUNTIME_KEYS:-mua,mua-v6,mua-v7,mua-v10,mua-matchmaker,test-classes,guidance:mua}"
+MIRA_ALLOWED_GROUPS="${MIRA_ALLOWED_GROUPS:-mira-admin,mira-standard,mira-itar}"
+MIRA_ALLOWED_USERNAMES="${MIRA_ALLOWED_USERNAMES:-}"
+MIRA_ALLOWED_EMAILS="${MIRA_ALLOWED_EMAILS:-}"
 IC_ALLOWED_CLIENT_IDS="${IC_ALLOWED_CLIENT_IDS:-31fitjugc832o0s5rdns95gkj6}"
 IC_AUTH_PATH_PREFIXES="${IC_AUTH_PATH_PREFIXES:-/ic}"
 IC_CANONICAL_DB_URL="${IC_CANONICAL_DB_URL:-sqlite:////tmp/boundstate_ic.db}"
@@ -92,16 +95,6 @@ POSTGRES_DB="${POSTGRES_DB:-mira_h2}"
 POSTGRES_USER="${POSTGRES_USER:-mira_app}"
 POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-}"
 MIRA_SESSION_BACKEND="${MIRA_SESSION_BACKEND:-}"
-if [ -z "${MIRA_SESSION_BACKEND}" ]; then
-  if [ -n "${POSTGRES_PASSWORD}" ]; then
-    MIRA_SESSION_BACKEND="postgres"
-  else
-    MIRA_SESSION_BACKEND="memory"
-  fi
-elif [ "${MIRA_SESSION_BACKEND}" = "postgres" ] && [ -z "${POSTGRES_PASSWORD}" ]; then
-  echo "[WARN] POSTGRES_PASSWORD is empty; falling back to MIRA_SESSION_BACKEND=memory for this deploy." >&2
-  MIRA_SESSION_BACKEND="memory"
-fi
 MIRA_DB_POOL_MAX_CONNECTIONS="${MIRA_DB_POOL_MAX_CONNECTIONS:-5}"
 MIRA_BEDROCK_SONNET_CONCURRENCY="${MIRA_BEDROCK_SONNET_CONCURRENCY:-6}"
 MIRA_BEDROCK_VISION_CONCURRENCY="${MIRA_BEDROCK_VISION_CONCURRENCY:-4}"
@@ -155,6 +148,38 @@ is_truthy() {
     *) return 1 ;;
   esac
 }
+
+is_placeholder_value() {
+  case "$(to_lower "${1:-}")" in
+    ""|restored|placeholder|changeme|null|none|undefined) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+has_usable_postgres_config() {
+  local host_lc
+  host_lc="$(to_lower "${POSTGRES_HOST:-}")"
+  if is_placeholder_value "${POSTGRES_PASSWORD:-}"; then
+    return 1
+  fi
+  case "${host_lc}" in
+    ""|localhost|127.0.0.1|::1|restored|placeholder|changeme|null|none|undefined)
+      return 1
+      ;;
+  esac
+  return 0
+}
+
+if [ -z "${MIRA_SESSION_BACKEND}" ]; then
+  if has_usable_postgres_config; then
+    MIRA_SESSION_BACKEND="postgres"
+  else
+    MIRA_SESSION_BACKEND="memory"
+  fi
+elif [ "${MIRA_SESSION_BACKEND}" = "postgres" ] && ! has_usable_postgres_config; then
+  echo "[WARN] Postgres credentials are incomplete or placeholder; falling back to MIRA_SESSION_BACKEND=memory for this deploy." >&2
+  MIRA_SESSION_BACKEND="memory"
+fi
 
 enforce_secure_runtime_config() {
   if [ "$(to_lower "${MIRA_AUTH_MODE}")" != "cognito" ]; then
@@ -519,6 +544,7 @@ cat > "${BACKEND_TASK_JSON}" <<JSON
         {"name": "PORT", "value": "8080"},
         {"name": "RELOAD", "value": "false"},
         {"name": "UVICORN_WORKERS", "value": "${BACKEND_UVICORN_WORKERS}"},
+        {"name": "MIRA_WORKERS", "value": "${MIRA_WORKERS}"},
         {"name": "MIRA_OCA_CASE_STORE_BACKEND", "value": "${OCA_CASE_STORE_BACKEND}"},
         {"name": "MIRA_OCA_DDB_TABLE", "value": "${OCA_CASE_TABLE}"},
         {"name": "MIRA_OCA_CASE_TTL_HOURS", "value": "${OCA_CASE_TTL_HOURS}"},
@@ -540,6 +566,9 @@ cat > "${BACKEND_TASK_JSON}" <<JSON
         {"name": "ALLOWED_ORIGINS", "value": "${BASE_URL}"},
         {"name": "MIRA_AUTH_MODE", "value": "${MIRA_AUTH_MODE}"},
         {"name": "MIRA_DISABLED_RUNTIME_KEYS", "value": "${MIRA_DISABLED_RUNTIME_KEYS}"},
+        {"name": "MIRA_ALLOWED_GROUPS", "value": "${MIRA_ALLOWED_GROUPS}"},
+        {"name": "MIRA_ALLOWED_USERNAMES", "value": "${MIRA_ALLOWED_USERNAMES}"},
+        {"name": "MIRA_ALLOWED_EMAILS", "value": "${MIRA_ALLOWED_EMAILS}"},
         {"name": "ADMIN_PATH_PREFIXES", "value": "/admin"},
         {"name": "COGNITO_REGION", "value": "${COGNITO_REGION}"},
         {"name": "IC_ALLOWED_CLIENT_IDS", "value": "${IC_ALLOWED_CLIENT_IDS}"},
@@ -560,11 +589,18 @@ cat > "${BACKEND_TASK_JSON}" <<JSON
         {"name": "MIRA_CHAT_AUDIT_PATH", "value": "${MIRA_CHAT_AUDIT_PATH}"},
         {"name": "MIRA_DISABLE_HERITAGE_DB", "value": "${NO_DATA_RUNTIME}"},
         {"name": "MIRA_NO_DATA_RUNTIME", "value": "${NO_DATA_RUNTIME}"},
-        {"name": "POSTGRES_HOST", "value": "localhost"},
-        {"name": "POSTGRES_PORT", "value": "5432"},
-        {"name": "POSTGRES_DB", "value": "mira_h2"},
-        {"name": "POSTGRES_USER", "value": "restored"},
-        {"name": "POSTGRES_PASSWORD", "value": "restored"}
+        {"name": "MIRA_SESSION_BACKEND", "value": "${MIRA_SESSION_BACKEND}"},
+        {"name": "MIRA_DB_POOL_MAX_CONNECTIONS", "value": "${MIRA_DB_POOL_MAX_CONNECTIONS}"},
+        {"name": "MIRA_BEDROCK_SONNET_CONCURRENCY", "value": "${MIRA_BEDROCK_SONNET_CONCURRENCY}"},
+        {"name": "MIRA_BEDROCK_VISION_CONCURRENCY", "value": "${MIRA_BEDROCK_VISION_CONCURRENCY}"},
+        {"name": "MIRA_RATE_LIMIT_ENABLED", "value": "${MIRA_RATE_LIMIT_ENABLED}"},
+        {"name": "MIRA_RATE_LIMIT_REQUESTS", "value": "${MIRA_RATE_LIMIT_REQUESTS}"},
+        {"name": "MIRA_RATE_LIMIT_WINDOW_SECONDS", "value": "${MIRA_RATE_LIMIT_WINDOW_SECONDS}"},
+        {"name": "POSTGRES_HOST", "value": "${POSTGRES_HOST}"},
+        {"name": "POSTGRES_PORT", "value": "${POSTGRES_PORT}"},
+        {"name": "POSTGRES_DB", "value": "${POSTGRES_DB}"},
+        {"name": "POSTGRES_USER", "value": "${POSTGRES_USER}"},
+        {"name": "POSTGRES_PASSWORD", "value": "${POSTGRES_PASSWORD}"}
       ],
       "logConfiguration": {
         "logDriver": "awslogs",

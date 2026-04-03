@@ -7,6 +7,7 @@ Three tables:
   chat_sessions  — session lifecycle and accumulated state
   chat_turns     — full conversation history (one row per exchange)
   chat_audit     — engineering audit record (Section 10.1)
+  module_state   — generic module payloads keyed by module + id
 
 Retention: 24 months per spec.  The ``purge_before`` utilities in
 SessionManager and AuditWriter honour this default.
@@ -38,6 +39,7 @@ from sqlalchemy import (
     String,
     Table,
     Text,
+    UniqueConstraint,
     text,
 )
 from sqlalchemy.dialects.postgresql import JSONB
@@ -111,6 +113,34 @@ chat_turns = Table(
     ),
     # Composite index for efficient history retrieval
     Index("ix_chat_turns_session_turn", "session_id", "turn_number"),
+)
+
+# ---------------------------------------------------------------------------
+# module_state
+# ---------------------------------------------------------------------------
+
+module_state = Table(
+    "module_state",
+    metadata,
+    Column("id", BigInteger, primary_key=True, autoincrement=True),
+    Column("module", String(64), nullable=False),
+    Column("state_key", String(128), nullable=False),
+    Column("payload", JSONB, nullable=False, server_default=text("'{}'::jsonb")),
+    Column(
+        "created_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("now()"),
+    ),
+    Column(
+        "updated_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("now()"),
+    ),
+    UniqueConstraint("module", "state_key", name="uq_module_state_module_key"),
+    Index("ix_module_state_module", "module"),
+    Index("ix_module_state_module_key", "module", "state_key"),
 )
 
 # ---------------------------------------------------------------------------

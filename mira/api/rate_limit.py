@@ -9,6 +9,7 @@ it should be paired with edge/WAF throttling for fleet-wide enforcement.
 
 from __future__ import annotations
 
+import hashlib
 import os
 import threading
 import time
@@ -50,6 +51,25 @@ def rate_limit_window_seconds() -> float:
         return max(1.0, float(raw))
     except ValueError:
         return 60.0
+
+
+def _rate_limit_key(request: Request) -> str:
+    user = getattr(request.state, "user", None)
+    if user is not None and getattr(user, "sub", ""):
+        return f"user:{user.sub}"
+
+    auth_header = request.headers.get("Authorization", "").strip()
+    if auth_header.lower().startswith("bearer "):
+        token = auth_header[7:].strip()
+        if token:
+            token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()[:16]
+            return f"token:{token_hash}"
+
+    forwarded = request.headers.get("X-Forwarded-For", "")
+    ip = forwarded.split(",")[0].strip() if forwarded else ""
+    if not ip and request.client and request.client.host:
+        ip = request.client.host
+    return f"ip:{ip or 'unknown'}"
 
 
 class GlobalRateLimiter:
@@ -96,19 +116,12 @@ class ApiRateLimitMiddleware(BaseHTTPMiddleware):
         path = request.url.path
         if path in {"/health", "/api/health", "/favicon.ico"}:
             return await call_next(request)
+        if path.endswith("/ping"):
+            return await call_next(request)
         if path.startswith("/docs") or path.startswith("/redoc") or path.startswith("/openapi.json"):
             return await call_next(request)
 
-        user = getattr(request.state, "user", None)
-        if user is not None and getattr(user, "sub", ""):
-            key = f"user:{user.sub}"
-        else:
-            forwarded = request.headers.get("X-Forwarded-For", "")
-            ip = forwarded.split(",")[0].strip() if forwarded else ""
-            if not ip and request.client and request.client.host:
-                ip = request.client.host
-            key = f"ip:{ip or 'unknown'}"
-
+        key = _rate_limit_key(request)
         allowed, remaining, retry_after = self._limiter.check(key)
         if not allowed:
             return JSONResponse(
@@ -125,4 +138,3 @@ class ApiRateLimitMiddleware(BaseHTTPMiddleware):
         response.headers["X-RateLimit-Limit"] = str(self._limit)
         response.headers["X-RateLimit-Remaining"] = str(remaining)
         return response
-

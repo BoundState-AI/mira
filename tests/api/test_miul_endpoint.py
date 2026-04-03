@@ -85,6 +85,14 @@ class TestMIULFastExtract:
         assert response.status_code == 200
         assert captured["max_iterations"] == 1
 
+    def test_fast_extract_alias_rejects_non_pdf(self, client):
+        fake_file = BytesIO(b"not a pdf")
+        response = client.post(
+            "/miul/fast-extract",
+            files=[("drawings", ("test.txt", fake_file, "text/plain"))],
+        )
+        assert response.status_code == 400
+
 
 class TestMIULEnrich:
     """Tests for MIUL enrichment endpoint."""
@@ -118,17 +126,15 @@ class TestMIULMSFCExtract:
     """Tests for current MIUL drawing-tree extraction endpoint."""
 
     def test_msfc_requires_files(self, client):
-        """DT extract requires an uploaded file."""
-        response = client.post("/miul/extract-dt")
-        assert response.status_code == 422
+        response = client.post("/miul/msfc-extract")
+        assert response.status_code == 400
 
 
 class TestMIULDMLLVExtract:
     """Tests for MIUL DT extraction parameter validation."""
 
     def test_dmllv_requires_files(self, client):
-        """DT extraction requires the uploaded PDF even when optional form fields are omitted."""
-        response = client.post("/miul/extract-dt")
+        response = client.post("/miul/dmllv-extract")
         assert response.status_code == 422
 
 
