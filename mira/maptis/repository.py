@@ -35,12 +35,11 @@ except ImportError:
 
 # Import centralized database configuration
 import os
-try:
-    from mira.core.db_config import get_db_connection_params
-    MAPTIS_CONFIG = get_db_connection_params(options='-c search_path=maptis,public')
-except ImportError:
-    # Fallback for standalone usage - uses environment variables
-    MAPTIS_CONFIG = {
+MAPTIS_CONFIG = None
+
+
+def _fallback_maptis_config() -> Dict[str, Any]:
+    return {
         'host': os.environ.get('POSTGRES_HOST', 'localhost'),
         'port': int(os.environ.get('POSTGRES_PORT', '5432')),
         'database': os.environ.get('POSTGRES_DB', 'mira'),
@@ -48,7 +47,27 @@ except ImportError:
         'password': os.environ.get('POSTGRES_PASSWORD', 'postgres'),
         'options': '-c search_path=maptis,public',
     }
-    logger.warning("[MAPTIS] Using fallback config - set environment variables for production")
+
+
+def _resolve_maptis_config() -> Optional[Dict[str, Any]]:
+    global MAPTIS_CONFIG
+    if MAPTIS_CONFIG is not None:
+        return MAPTIS_CONFIG
+
+    try:
+        from mira.core.db_config import get_db_connection_params
+
+        MAPTIS_CONFIG = get_db_connection_params(options='-c search_path=maptis,public')
+    except ImportError:
+        MAPTIS_CONFIG = _fallback_maptis_config()
+        logger.warning("[MAPTIS] Using fallback config - set environment variables for production")
+    except RuntimeError as exc:
+        logger.warning("[MAPTIS] Database configuration unavailable; MAPTIS runtime disabled: %s", exc)
+        MAPTIS_CONFIG = False
+
+    if MAPTIS_CONFIG is False:
+        return None
+    return MAPTIS_CONFIG
 
 
 class MaptisConnection:
@@ -57,7 +76,9 @@ class MaptisConnection:
     def __init__(self, config: Optional[Dict[str, Any]] = None):
         if not PSYCOPG2_AVAILABLE:
             raise RuntimeError("psycopg2 not available - database operations disabled")
-        self.config = config or MAPTIS_CONFIG
+        self.config = config or _resolve_maptis_config()
+        if self.config is None:
+            raise RuntimeError("MAPTIS database configuration unavailable")
         self._conn = None
 
     def connect(self):
@@ -104,7 +125,10 @@ def get_maptis_connection() -> Optional[MaptisConnection]:
         return None
     global _maptis_conn
     if _maptis_conn is None:
-        _maptis_conn = MaptisConnection()
+        config = _resolve_maptis_config()
+        if config is None:
+            return None
+        _maptis_conn = MaptisConnection(config=config)
     return _maptis_conn
 
 

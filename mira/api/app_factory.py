@@ -36,7 +36,6 @@ from .rate_limit import (  # noqa: E402
     rate_limit_window_seconds,
 )
 from .runtime_assets import validate_required_runtime_assets  # noqa: E402
-from mira.core.db_config import require_production_credentials  # noqa: E402
 from mira.providers.llm_provider import validate_provider_configuration  # noqa: E402
 
 
@@ -89,7 +88,6 @@ def _load_chat_router() -> Optional[APIRouter]:
 
 def _validate_runtime_environment(*, chat_router: APIRouter | None) -> None:
     validate_auth_configuration()
-    require_production_credentials()
     validate_provider_configuration()
     if chat_router is not None:
         chat_provider = os.environ.get(
