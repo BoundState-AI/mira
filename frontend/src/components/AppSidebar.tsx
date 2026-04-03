@@ -51,7 +51,7 @@ const DEFAULT_NAV_ITEMS: NavItem[] = [
   { id: 'forge', title: 'FORGE Build Console', navKey: 'forge', url: '/forge', icon: Database },
   { id: 'forge-explorer', title: 'FORGE Explorer', navKey: 'forgeExplorer', url: '/forge-explorer', icon: Search },
   { id: 'tocr', title: 'TOCR Review', navKey: 'tocr', url: '/tocr', icon: ScrollText },
-  { id: 'knowledge-twins', title: 'Knowledge Twins', navKey: 'knowledgeTwins', url: '/', icon: Brain },
+  { id: 'knowledge-twins', title: 'Knowledge Twins', navKey: 'knowledgeTwins', url: '/knowledge-twins', icon: Brain },
 ];
 
 const VISIBLE_NAV_ITEMS = DEFAULT_NAV_ITEMS.filter((item) => !isHiddenModuleId(item.id));

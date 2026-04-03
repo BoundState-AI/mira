@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { AuthProvider } from "@/auth/AuthContext";
 import { ProtectedRoute } from "@/auth/ProtectedRoute";
+import MiraLanding from "./pages/MiraLanding";
 import KnowledgeTwins from "./pages/KnowledgeTwins";
 import TestClasses from "./pages/TestClasses";
 import TestClassDetail from "./pages/TestClassDetail";
@@ -39,7 +40,7 @@ const App = () => (
           <ProtectedRoute>
             <AppLayout>
               <Routes>
-                <Route path="/" element={<KnowledgeTwins />} />
+                <Route path="/" element={<MiraLanding />} />
                 <Route path="/chat" element={<MiraChat />} />
                 <Route
                   path="/query"
@@ -90,7 +91,7 @@ const App = () => (
                 <Route path="/forge" element={<FORGE />} />
                 <Route path="/forge-explorer" element={<FORGEExplorer />} />
                 <Route path="/tocr" element={<TOCR />} />
-                <Route path="/knowledge-twins" element={<Navigate to="/" replace />} />
+                <Route path="/knowledge-twins" element={<KnowledgeTwins />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </AppLayout>

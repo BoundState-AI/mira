@@ -10,6 +10,11 @@ interface AppLayoutProps {
 export function AppLayout({ children }: AppLayoutProps) {
   const location = useLocation();
   const isWideWorkspace = location.pathname === '/chat';
+  const isLanding = location.pathname === '/';
+
+  if (isLanding) {
+    return <main className="min-h-screen w-full">{children}</main>;
+  }
 
   return (
     <SidebarProvider>
