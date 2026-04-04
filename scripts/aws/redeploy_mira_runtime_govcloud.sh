@@ -94,6 +94,7 @@ POSTGRES_PORT="${POSTGRES_PORT:-5432}"
 POSTGRES_DB="${POSTGRES_DB:-mira_h2}"
 POSTGRES_USER="${POSTGRES_USER:-mira_app}"
 POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-}"
+POSTGRES_PASSWORD_SECRET_ARN="${POSTGRES_PASSWORD_SECRET_ARN:-}"
 MIRA_SESSION_BACKEND="${MIRA_SESSION_BACKEND:-}"
 MIRA_DB_POOL_MAX_CONNECTIONS="${MIRA_DB_POOL_MAX_CONNECTIONS:-5}"
 MIRA_BEDROCK_SONNET_CONCURRENCY="${MIRA_BEDROCK_SONNET_CONCURRENCY:-6}"
@@ -118,6 +119,7 @@ ALB_LOG_RETENTION_DAYS="${ALB_LOG_RETENTION_DAYS:-90}"
 BACKEND_TASK_ROLE_ARN="${BACKEND_TASK_ROLE_ARN:-arn:aws-us-gov:iam::${ACCOUNT_ID}:role/mira-prod-ecs-task}"
 EXECUTION_ROLE_ARN="${EXECUTION_ROLE_ARN:-arn:aws-us-gov:iam::${ACCOUNT_ID}:role/mira-prod-ecs-execution}"
 BACKEND_TASK_ROLE_NAME="${BACKEND_TASK_ROLE_ARN##*/}"
+EXECUTION_ROLE_NAME="${EXECUTION_ROLE_ARN##*/}"
 OCA_CASE_TABLE_ARN="arn:aws-us-gov:dynamodb:${AWS_REGION}:${ACCOUNT_ID}:table/${OCA_CASE_TABLE}"
 OCA_SYSTEM_TABLE_ARN="arn:aws-us-gov:dynamodb:${AWS_REGION}:${ACCOUNT_ID}:table/${OCA_SYSTEM_TABLE}"
 
@@ -313,6 +315,33 @@ JSON
   aws iam put-role-policy \
     --role-name "${BACKEND_TASK_ROLE_NAME}" \
     --policy-name "mira-prod-ecs-oca-dynamodb" \
+    --policy-document "file://${policy_doc}" >/dev/null
+  rm -f "${policy_doc}"
+}
+
+ensure_postgres_password_secret_policy() {
+  [ -n "${POSTGRES_PASSWORD_SECRET_ARN}" ] || return 0
+
+  local policy_doc
+  policy_doc="$(mktemp)"
+  cat > "${policy_doc}" <<JSON
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowMiraPostgresPasswordSecret",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue"
+      ],
+      "Resource": "${POSTGRES_PASSWORD_SECRET_ARN}"
+    }
+  ]
+}
+JSON
+  aws iam put-role-policy \
+    --role-name "${EXECUTION_ROLE_NAME}" \
+    --policy-name "mira-prod-ecs-postgres-secret" \
     --policy-document "file://${policy_doc}" >/dev/null
   rm -f "${policy_doc}"
 }
@@ -519,6 +548,22 @@ ALB_LOG_RETENTION_DAYS="${ALB_LOG_RETENTION_DAYS}" \
 ensure_oca_case_table
 ensure_oca_system_table
 ensure_oca_store_policy
+ensure_postgres_password_secret_policy
+
+BACKEND_POSTGRES_PASSWORD_ENV_JSON="$(cat <<JSON
+        {"name": "POSTGRES_PASSWORD", "value": "${POSTGRES_PASSWORD}"}
+JSON
+)"
+BACKEND_SECRETS_JSON=""
+if [ -n "${POSTGRES_PASSWORD_SECRET_ARN}" ]; then
+  BACKEND_POSTGRES_PASSWORD_ENV_JSON=""
+  BACKEND_SECRETS_JSON="$(cat <<JSON
+      "secrets": [
+        {"name": "POSTGRES_PASSWORD", "valueFrom": "${POSTGRES_PASSWORD_SECRET_ARN}"}
+      ],
+JSON
+)"
+fi
 
 BACKEND_TASK_JSON="$(mktemp)"
 FRONTEND_TASK_JSON="$(mktemp)"
@@ -599,9 +644,10 @@ cat > "${BACKEND_TASK_JSON}" <<JSON
         {"name": "POSTGRES_HOST", "value": "${POSTGRES_HOST}"},
         {"name": "POSTGRES_PORT", "value": "${POSTGRES_PORT}"},
         {"name": "POSTGRES_DB", "value": "${POSTGRES_DB}"},
-        {"name": "POSTGRES_USER", "value": "${POSTGRES_USER}"},
-        {"name": "POSTGRES_PASSWORD", "value": "${POSTGRES_PASSWORD}"}
+        {"name": "POSTGRES_USER", "value": "${POSTGRES_USER}"}${BACKEND_POSTGRES_PASSWORD_ENV_JSON:+,
+${BACKEND_POSTGRES_PASSWORD_ENV_JSON}}
       ],
+${BACKEND_SECRETS_JSON}\
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
