@@ -48,6 +48,7 @@ class UnifiedPipeline:
                     "bouncer_verdict": bouncer.verdict,
                     "matched_contracts": bouncer.matched_contracts,
                     "intent": bouncer.intent,
+                    "guidance": bouncer.guidance,
                     "cache_hit": False,
                 },
             )
@@ -69,4 +70,3 @@ class UnifiedPipeline:
             }
         )
         return result
-

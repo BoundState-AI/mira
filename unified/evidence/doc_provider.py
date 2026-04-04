@@ -17,20 +17,50 @@ class DocumentEvidenceProvider:
         store: CanonicalStore | None = None,
         documents: list[ICDocument] | None = None,
         chunks: list[ICChunk] | None = None,
+        compilation_id: str | None = None,
+        module_name: str | None = None,
     ) -> None:
         self._store = store
         self._documents = documents or []
         self._chunks = chunks or []
+        self._compilation_id = compilation_id
+        self._module_name = module_name
 
     def _load_documents(self) -> tuple[dict[str, ICDocument], list[ICChunk]]:
         if self._store is not None:
+            loaded_documents = self._store.list_records("document")
+            loaded_chunks = self._store.list_records("chunk")
             documents = {
                 document.doc_id: document
-                for document in self._store.list_records("document")
+                for document in loaded_documents
+                if self._matches_scope(document.module_name, document.compilation_id)
             }
-            chunks = self._store.list_records("chunk")
+            chunks = [
+                chunk
+                for chunk in loaded_chunks
+                if self._matches_scope(chunk.module_name, chunk.compilation_id)
+                and chunk.doc_id in documents
+            ]
             return documents, chunks
-        return {document.doc_id: document for document in self._documents}, list(self._chunks)
+        documents = {
+            document.doc_id: document
+            for document in self._documents
+            if self._matches_scope(document.module_name, document.compilation_id)
+        }
+        chunks = [
+            chunk
+            for chunk in self._chunks
+            if self._matches_scope(chunk.module_name, chunk.compilation_id)
+            and chunk.doc_id in documents
+        ]
+        return documents, chunks
+
+    def _matches_scope(self, module_name: str | None, compilation_id: str | None) -> bool:
+        if self._compilation_id is not None and compilation_id != self._compilation_id:
+            return False
+        if self._module_name is not None and module_name != self._module_name:
+            return False
+        return True
 
     def get_evidence(self, query: str, limit: int = 20, intent: str | None = None) -> list[ICEvidenceItem]:
         query_terms = set(_tokenize(query))
@@ -54,7 +84,7 @@ class DocumentEvidenceProvider:
                 ICEvidenceItem(
                     evidence_id=f"doc:{chunk.chunk_id}",
                     source_type=EvidenceSourceType.DOC,
-                    source_label=document.source_path if document else chunk.doc_id,
+                    source_label=document.doc_id if document else chunk.doc_id,
                     source_id=chunk.chunk_id,
                     doc_id=chunk.doc_id,
                     chunk_id=chunk.chunk_id,
@@ -74,10 +104,13 @@ class DocumentEvidenceProvider:
                     ),
                     claim_key=(chunk.location or chunk.content_type),
                     claim_value=chunk.content_text[:80],
-                    metadata={"intent": intent, "doc_hash": document.doc_hash if document else None},
+                    metadata={
+                        "intent": intent,
+                        "doc_hash": document.doc_hash if document else None,
+                        "source_path": document.source_path if document else None,
+                    },
                 )
             )
 
         evidence.sort(key=lambda item: item.score, reverse=True)
         return evidence[:limit]
-

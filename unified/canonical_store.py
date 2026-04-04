@@ -10,7 +10,16 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.pool import StaticPool
 
 from unified.audit.merkle import MerkleAuditManager, register_merkle_tables
-from unified.schema import ICChunk, ICDocument, ICEntity, ICMeasurement, ICProvenanceEdge
+from unified.schema import (
+    CompilationArtifactRecord,
+    CompileRequest,
+    CompileResult,
+    ICChunk,
+    ICDocument,
+    ICEntity,
+    ICMeasurement,
+    ICProvenanceEdge,
+)
 
 
 metadata = MetaData()
@@ -22,6 +31,8 @@ ic_documents = Table(
     Column("doc_hash", String(255), nullable=False),
     Column("source_path", String(2048), nullable=False),
     Column("source_type", String(32), nullable=False),
+    Column("module_name", String(255), nullable=True),
+    Column("compilation_id", String(255), nullable=True),
     Column("ingested_at", DateTime, nullable=False),
     Column("features", JSON, nullable=True),
     Column("content_hash", String(64), nullable=False),
@@ -33,6 +44,8 @@ ic_chunks = Table(
     metadata,
     Column("chunk_id", String(255), primary_key=True),
     Column("doc_id", String(255), nullable=False),
+    Column("module_name", String(255), nullable=True),
+    Column("compilation_id", String(255), nullable=True),
     Column("page", String(64), nullable=True),
     Column("location", String(512), nullable=True),
     Column("content_text", String, nullable=False),
@@ -87,6 +100,18 @@ ic_provenance_edges = Table(
     Column("metadata", JSON, nullable=False, default=dict),
     Column("content_hash", String(64), nullable=False),
     Column("is_superseded", Boolean, nullable=False, default=False),
+)
+
+ic_compilations = Table(
+    "ic_compilations",
+    metadata,
+    Column("compilation_id", String(255), primary_key=True),
+    Column("module_name", String(255), nullable=False, index=True),
+    Column("workspace_version", String(255), nullable=False),
+    Column("source", String(32), nullable=False),
+    Column("compiled_at", DateTime, nullable=False, index=True),
+    Column("request", JSON, nullable=False),
+    Column("result", JSON, nullable=False),
 )
 
 ic_merkle_nodes, ic_merkle_meta = register_merkle_tables(metadata)
@@ -228,6 +253,80 @@ class CanonicalStore:
             ).mappings().all()
         return [ICProvenanceEdge.model_validate(dict(row)) for row in rows]
 
+    def save_compilation_artifact(
+        self,
+        request: CompileRequest | dict[str, Any],
+        result: CompileResult | dict[str, Any],
+    ) -> CompilationArtifactRecord:
+        parsed_request = CompileRequest.model_validate(request)
+        parsed_result = CompileResult.model_validate(result)
+        row = {
+            "compilation_id": parsed_result.compilation_id,
+            "module_name": parsed_result.module_name,
+            "workspace_version": parsed_result.workspace_version,
+            "source": parsed_result.source.value,
+            "compiled_at": parsed_result.compiled_at,
+            "request": self._json_ready(parsed_request),
+            "result": self._json_ready(parsed_result),
+        }
+        with self.engine.begin() as connection:
+            existing = connection.execute(
+                select(ic_compilations.c.compilation_id).where(
+                    ic_compilations.c.compilation_id == parsed_result.compilation_id
+                )
+            ).scalar_one_or_none()
+            if existing is None:
+                connection.execute(ic_compilations.insert().values(**row))
+            else:
+                connection.execute(
+                    ic_compilations.update()
+                    .where(ic_compilations.c.compilation_id == parsed_result.compilation_id)
+                    .values(**row)
+                )
+        return CompilationArtifactRecord(
+            compilation_id=parsed_result.compilation_id,
+            module_name=parsed_result.module_name,
+            workspace_version=parsed_result.workspace_version,
+            source=parsed_result.source,
+            compiled_at=parsed_result.compiled_at,
+            request=parsed_request,
+            result=parsed_result,
+        )
+
+    def fetch_compilation_artifact(self, compilation_id: str) -> CompilationArtifactRecord | None:
+        with self.engine.begin() as connection:
+            row = connection.execute(
+                select(ic_compilations).where(ic_compilations.c.compilation_id == compilation_id)
+            ).mappings().first()
+        if row is None:
+            return None
+        return self._hydrate_compilation_artifact(row)
+
+    def latest_compilation_artifact(self, module_name: str | None = None) -> CompilationArtifactRecord | None:
+        stmt = select(ic_compilations)
+        if module_name is not None:
+            stmt = stmt.where(ic_compilations.c.module_name == module_name)
+        stmt = stmt.order_by(ic_compilations.c.compiled_at.desc())
+        with self.engine.begin() as connection:
+            row = connection.execute(stmt.limit(1)).mappings().first()
+        if row is None:
+            return None
+        return self._hydrate_compilation_artifact(row)
+
+    def list_compilation_artifacts(
+        self,
+        *,
+        module_name: str | None = None,
+        limit: int = 20,
+    ) -> list[CompilationArtifactRecord]:
+        stmt = select(ic_compilations)
+        if module_name is not None:
+            stmt = stmt.where(ic_compilations.c.module_name == module_name)
+        stmt = stmt.order_by(ic_compilations.c.compiled_at.desc()).limit(max(1, min(limit, 100)))
+        with self.engine.begin() as connection:
+            rows = connection.execute(stmt).mappings().all()
+        return [self._hydrate_compilation_artifact(row) for row in rows]
+
     def audit_status(self) -> dict[str, Any]:
         with self.engine.begin() as connection:
             return self.merkle.cached_root(connection)
@@ -250,3 +349,17 @@ class CanonicalStore:
             if key in row and row[key] is not None:
                 row[key] = self._json_ready(row[key])
         return row
+
+    @staticmethod
+    def _hydrate_compilation_artifact(row: dict[str, Any]) -> CompilationArtifactRecord:
+        request = CompileRequest.model_validate(row["request"])
+        result = CompileResult.model_validate(row["result"])
+        return CompilationArtifactRecord(
+            compilation_id=row["compilation_id"],
+            module_name=row["module_name"],
+            workspace_version=row["workspace_version"],
+            source=row["source"],
+            compiled_at=row["compiled_at"],
+            request=request,
+            result=result,
+        )

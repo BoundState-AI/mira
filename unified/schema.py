@@ -91,6 +91,8 @@ class ICDocument(HashedRecord):
     doc_hash: str
     source_path: str
     source_type: Literal["pdf", "docx", "image", "db_record", "api"]
+    module_name: str | None = None
+    compilation_id: str | None = None
     ingested_at: datetime = Field(default_factory=datetime.utcnow)
     features: DocFeatures | dict[str, Any] | None = None
     is_superseded: bool = False
@@ -99,6 +101,8 @@ class ICDocument(HashedRecord):
 class ICChunk(HashedRecord):
     chunk_id: str
     doc_id: str
+    module_name: str | None = None
+    compilation_id: str | None = None
     page: int | None = None
     location: str | None = None
     content_text: str
@@ -244,6 +248,9 @@ class QueryRequest(BaseModel):
     query: str
     source: QuerySource = QuerySource.HYBRID
     intent: str | IntentCategory | None = None
+    compilation_id: str | None = None
+    workspace_version: str | None = None
+    module_name: str | None = None
     limit: int = Field(default=10, ge=1, le=100)
     include_superseded: bool = False
     metadata: dict[str, Any] = Field(default_factory=dict)
@@ -279,10 +286,26 @@ class CompileResult(BaseModel):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
     source: QuerySource
+    compilation_id: str = ""
+    workspace_version: str = ""
+    module_name: str = "default"
     compiled_at: datetime = Field(default_factory=datetime.utcnow)
     canonical_record_count: int = 0
     materialized_db_url: str | None = None
     capabilities: dict[str, Any] = Field(default_factory=dict)
+    workspace_summary: dict[str, Any] = Field(default_factory=dict)
+    capability_families: list[dict[str, Any]] = Field(default_factory=list)
     evaluation: dict[str, Any] = Field(default_factory=dict)
     status: str = "ok"
 
+
+class CompilationArtifactRecord(BaseModel):
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    compilation_id: str
+    module_name: str
+    workspace_version: str
+    source: QuerySource
+    compiled_at: datetime
+    request: CompileRequest
+    result: CompileResult
