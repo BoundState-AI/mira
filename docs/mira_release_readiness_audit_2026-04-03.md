@@ -12,10 +12,23 @@ MIRA is in substantially better shape than it was before the recent scaling work
 - OCA public routing regressions were fixed
 - Guidance runtime assets are validated at startup
 - Bedrock concurrency gating is in place across the active runtime paths that were audited
-- MIUL v4 state is no longer sourced from the old local session directory
+- MIUL v4 now has a code path for queue/worker execution with shared artifact storage instead of assuming local task disk
 - Gunicorn, ECS sizing, autoscaling hooks, and rate-limit enablement are in repo
 
-The repo is close to release-ready, but not fully there for scaled AWS operation. The remaining risks are concentrated in MIUL deployment topology and one fail-open behavior in the shared session layer.
+The repo is close to release-ready, but not fully there for scaled AWS operation. The remaining risks are concentrated in MIUL deployment topology and the durable shared-state layer.
+
+### Strengthened finding
+
+The shared-session problem is stronger than a simple "could fall back to memory" concern:
+
+- In live GovCloud, the configured MIRA Postgres proxy host does not currently exist
+- So durable runtime state is not merely misconfigured; the production endpoint/proxy is missing
+- The real blocker is therefore: no valid MIRA Postgres endpoint/proxy plus any remaining fail-open behavior
+
+Separately:
+
+- localhost fallbacks remain Medium only while they stay out of active production runtime paths
+- items 6-8 are watch items, not must-fix blockers for the next hardening slice
 
 ## Overall Assessment
 
@@ -29,17 +42,18 @@ Reason:
 
 ## Must Fix Before Scaled AWS Deploy
 
-### 1. MIUL worker is not deployed by the AWS rollout script
+Note: items 1-3 below are now addressed in repo code and deploy wiring, but they still require staged AWS validation before this can be considered closed operationally.
+
+### 1. MIUL worker must be deployed and validated as a first-class service
 
 Severity: High  
 Impact: MIUL jobs will either pile up in SQS with no consumer or silently fall back to in-process execution
 
 Evidence:
 
-- Backend enqueues jobs when `MIUL_EXTRACTION_QUEUE_URL` is set in [miul.py](d:/mira-main/mira/api/routers/miul.py#L1266)
-- Queue URL is wired into the backend task definition in [redeploy_mira_runtime_govcloud.sh](d:/mira-main/scripts/aws/redeploy_mira_runtime_govcloud.sh#L411)
-- The deploy script only creates/updates backend and frontend ECS services in [redeploy_mira_runtime_govcloud.sh](d:/mira-main/scripts/aws/redeploy_mira_runtime_govcloud.sh#L484) and [redeploy_mira_runtime_govcloud.sh](d:/mira-main/scripts/aws/redeploy_mira_runtime_govcloud.sh#L504)
-- Worker entrypoint exists in [worker.py](d:/mira-main/mira/miul/worker.py), but no ECS service/task wiring exists for it
+- Queue-backed MIUL v4 extraction is routed from [mira/api/routers/miul.py](../mira/api/routers/miul.py)
+- Worker entrypoint exists in [mira/miul/worker.py](../mira/miul/worker.py)
+- Deploy wiring now registers a dedicated MIUL worker task and ECS service in [scripts/aws/redeploy_mira_runtime_govcloud.sh](../scripts/aws/redeploy_mira_runtime_govcloud.sh)
 
 Why this matters:
 
@@ -61,17 +75,17 @@ Suggested acceptance criteria:
 - Worker logs are visible in CloudWatch
 - API tasks no longer need to run extraction inline in production
 
-### 2. MIUL still depends on shared filesystem access for uploaded PDFs
+### 2. MIUL inputs and v4 session artifacts must stay off task-local disk
 
 Severity: High  
 Impact: MIUL is not truly node-independent across separate ECS tasks unless storage is shared
 
 Evidence:
 
-- API writes uploaded PDFs to a temp directory in [miul.py](d:/mira-main/mira/api/routers/miul.py#L1231)
-- Queue payload sends `temp_dir` plus filenames in [queue.py](d:/mira-main/mira/miul/queue.py#L80)
-- Worker reconstructs file paths from that temp dir in [worker.py](d:/mira-main/mira/miul/worker.py#L79)
-- Worker fails the job if those files are missing in [worker.py](d:/mira-main/mira/miul/worker.py#L84)
+- Shared MIUL input and session artifact storage now lives in [mira/miul/production/storage.py](../mira/miul/production/storage.py)
+- MIUL v4 session state now routes through that shared storage layer in [mira/miul/production/session.py](../mira/miul/production/session.py)
+- API staging and queue submission now happen in [mira/api/routers/miul.py](../mira/api/routers/miul.py)
+- Worker downloads staged inputs and runs extraction in [mira/miul/worker.py](../mira/miul/worker.py)
 
 Why this matters:
 
@@ -92,20 +106,23 @@ Suggested acceptance criteria:
 - Redelivered jobs can still access input documents
 - Worker cleanup no longer risks deleting the only copy of inputs
 
-### 3. Shared session store can silently fall back to process-local memory
+### 3. Shared session store must fail closed in production
 
 Severity: High  
 Impact: Multi-worker/task state sharing can fail without making the app obviously unhealthy
 
 Evidence:
 
-- `PostgresSessionStore` falls back to memory if chat `SessionManager` import/init fails in [session_store.py](d:/mira-main/mira/core/session_store.py#L270)
-- Several module-data paths fall back when `get_engine()` is `None`, for example [session_store.py](d:/mira-main/mira/core/session_store.py#L374), [session_store.py](d:/mira-main/mira/core/session_store.py#L409), and [session_store.py](d:/mira-main/mira/core/session_store.py#L512)
+- Shared-session factory and startup validation now live in [mira/core/session_store.py](../mira/core/session_store.py)
+- Chat DB resolution remains in [mira/chat/db/connection.py](../mira/chat/db/connection.py)
+- Session-manager fallback behavior is controlled in [mira/chat/db/session_manager.py](../mira/chat/db/session_manager.py)
+- App startup now validates the requested session backend in [mira/api/app_factory.py](../mira/api/app_factory.py)
 
 Why this matters:
 
 - In development, fail-open to memory is convenient
 - In scaled production, fail-open to memory can break cross-worker continuity while the service still looks healthy
+- In live GovCloud today, there is also no valid MIRA Postgres proxy/endpoint, so durable runtime state is blocked at the infrastructure layer, not just by fallback code
 
 Proposed fix:
 
@@ -140,6 +157,11 @@ Proposed fix:
 2. In active runtime modules, prefer central DB config helpers
 3. In production mode, fail fast when required DB env is absent
 
+Qualification:
+
+- This stays Medium only if these paths are outside the active production request path
+- If any of them are exercised by the deployed runtime, raise this to High immediately
+
 ### 5. MIUL still has older non-v4 routes with temp-file and local-path behavior
 
 Severity: Medium  
@@ -158,6 +180,8 @@ Proposed fix:
 3. Bring remaining active routes onto the same storage/runtime rules as v4
 
 ## Watch In Production
+
+These are watch items for rollout tuning, not must-fix blockers for the next hardening slice.
 
 ### 6. Per-process rate limiting is acceptable, but should be monitored
 

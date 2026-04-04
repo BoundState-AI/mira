@@ -33,6 +33,12 @@ from fastapi import APIRouter, Body, Depends, File, Form, HTTPException, Request
 from fastapi.responses import Response, StreamingResponse
 
 from mira.api.auth import authorize_owner_or_admin, get_request_user
+from mira.miul.production.storage import (
+    MIULArtifactStore,
+    enqueue_extraction_job,
+    ensure_queue_storage_configuration,
+    queue_enabled as miul_queue_enabled,
+)
 
 # Lazy imports for enrichment workflow - only loaded when /enrich or /gaps called
 MIULWorkflow = None
@@ -919,6 +925,10 @@ def _env_flag(name: str, default: bool) -> bool:
     return str(raw).strip().lower() in {"1", "true", "yes", "on"}
 
 
+def _sanitize_upload_name(upload: UploadFile) -> str:
+    return Path(upload.filename or "").name.strip()
+
+
 def _normalize_v4_part_number(part_number: Any) -> str:
     """Normalize OCR part numbers for dedupe and matching."""
     pn = str(part_number or "").strip().upper()
@@ -1221,10 +1231,9 @@ async def extract_miul_v4(
     session.set_owner_username(actor.username if actor else None)
     session.set_status("uploading", "Receiving files...", progress=1)
 
-    # Save files to a persistent temp dir (NOT cleaned up until background worker finishes)
-    temp_dir = Path(tempfile.mkdtemp())
-
     try:
+        artifact_store = MIULArtifactStore(extraction_id)
+
         # Load DT JSON if provided; allow no-DT mode for degraded hierarchy builds.
         dt_json: Dict[str, Any] = {}
         if drawing_tree_json and drawing_tree_json.filename:
@@ -1242,23 +1251,69 @@ async def extract_miul_v4(
                 "[MIUL-V4] No DT JSON provided; extraction will continue in degraded hierarchy mode."
             )
 
-        # Save drawing PDFs to temp directory
+        if miul_queue_enabled():
+            ensure_queue_storage_configuration()
+
+            staged_inputs: list[dict[str, str]] = []
+            for drawing in drawings:
+                filename = _sanitize_upload_name(drawing)
+                if not filename or not filename.lower().endswith(".pdf"):
+                    continue
+                content = await drawing.read()
+                key = artifact_store.upload_input_bytes(
+                    filename,
+                    content,
+                    content_type=drawing.content_type or "application/pdf",
+                )
+                staged_inputs.append({"filename": filename, "key": key})
+
+            if not staged_inputs:
+                raise HTTPException(status_code=400, detail="No PDF files provided")
+
+            dt_json_key = ""
+            if dt_json:
+                dt_json_key = artifact_store.upload_input_json("drawing_tree.json", dt_json)
+
+            queue_result = enqueue_extraction_job(
+                {
+                    "extraction_id": extraction_id,
+                    "project": project,
+                    "pdf_inputs": staged_inputs,
+                    "dt_json_key": dt_json_key or None,
+                    "dt_mode": "with_tree" if dt_json.get("tree") else "no_tree",
+                }
+            )
+            session.set_status("queued", "Queued for MIUL worker extraction...", progress=3)
+            return {
+                "extraction_id": extraction_id,
+                "project": project,
+                "status": "queued",
+                "queued_at": queue_result.get("queued_at"),
+                "dt_mode": "with_tree" if dt_json.get("tree") else "no_tree",
+            }
+
+        # Dev/test fallback: keep the existing in-process background extraction path.
+        temp_dir = Path(tempfile.mkdtemp())
         pdf_paths = []
         for drawing in drawings:
-            if not drawing.filename or not drawing.filename.lower().endswith(".pdf"):
+            filename = _sanitize_upload_name(drawing)
+            if not filename or not filename.lower().endswith(".pdf"):
                 continue
             content = await drawing.read()
-            file_path = temp_dir / drawing.filename
+            file_path = temp_dir / filename
             file_path.write_bytes(content)
             pdf_paths.append(file_path)
+
+        if not pdf_paths:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+            raise HTTPException(status_code=400, detail="No PDF files provided")
 
         LOGGER.info(f"[MIUL-V4] Saved {len(pdf_paths)} drawing PDFs to {temp_dir}")
 
         session.set_status("extracting", "Starting Sonnet Vision extraction...", progress=5)
 
-        # Fire off extraction in background thread -- returns immediately
         asyncio.get_event_loop().run_in_executor(
-            None,  # default ThreadPoolExecutor
+            None,
             _run_extraction_background,
             extraction_id,
             pdf_paths,
@@ -1274,10 +1329,8 @@ async def extract_miul_v4(
         }
 
     except HTTPException:
-        shutil.rmtree(temp_dir, ignore_errors=True)
         raise
     except Exception as e:
-        shutil.rmtree(temp_dir, ignore_errors=True)
         LOGGER.error(f"[MIUL-V4] Extraction setup failed: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"MIUL v4 extraction failed: {e}")
 

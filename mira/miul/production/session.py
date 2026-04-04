@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """
 Module: V4 Session
-Purpose: File-based session management for MIUL v4 extraction + HITL review.
+Purpose: Shared session management for MIUL v4 extraction + HITL review.
 
-Stores extraction results, review state, and audit trail as JSON files
-in a per-session directory under temp/miul_sessions/{extraction_id}/.
+Stores extraction results, review state, and audit trail as JSON artifacts.
+When ``MIUL_EXTRACTION_BUCKET`` is configured those artifacts live in S3;
+otherwise they fall back to the historical local session directory for
+development and single-node operation.
 
 BoundState AI 2025
 Version: 4.0.0
@@ -27,19 +29,21 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from .extractor import ExtractionResult, identify_review_items
+from .storage import (
+    MIULArtifactStore,
+    get_session_root as _get_local_session_root,
+    list_session_ids,
+)
 
 LOGGER = logging.getLogger(__name__)
 
-# Default session storage root
-_SESSION_ROOT = Path("C:/BoundState/temp/miul_sessions")
 _DRAWING_VARIANT_SUFFIX_RE = re.compile(r"^(?:[A-Z]|[A-Z]?\d+(?:/\d+)?)$")
 _DRAWING_TOKEN_RE = re.compile(r"[A-Z0-9]+(?:[-/][A-Z0-9]+)+")
 
 
 def get_session_root() -> Path:
-    """Return session storage root, creating if needed."""
-    _SESSION_ROOT.mkdir(parents=True, exist_ok=True)
-    return _SESSION_ROOT
+    """Return the local fallback session root."""
+    return _get_local_session_root()
 
 
 def _norm_token(value: Any) -> str:
@@ -227,9 +231,9 @@ def _review_item_keys(item: Dict[str, Any]) -> set[str]:
 
 class V4Session:
     """
-    File-backed MIUL v4 session.
+    Shared MIUL v4 session.
 
-    Stores three files per session:
+    Stores three JSON artifacts per session:
       extraction.json  - raw ExtractionResult from vision extractor
       review.json      - review items, corrections, and approval state
       audit.json       - append-only audit trail
@@ -237,8 +241,8 @@ class V4Session:
 
     def __init__(self, extraction_id: str):
         self.extraction_id = extraction_id
-        self._dir = get_session_root() / extraction_id
-        self._dir.mkdir(parents=True, exist_ok=True)
+        self._store = MIULArtifactStore(extraction_id)
+        self._dir = self._store.local_dir
 
     @property
     def extraction_path(self) -> Path:
@@ -262,7 +266,7 @@ class V4Session:
 
     @property
     def exists(self) -> bool:
-        return self._dir.exists()
+        return self._store.session_exists()
 
     # ----- Status tracking -----
 
@@ -289,7 +293,7 @@ class V4Session:
         if data:
             return data
         # Fallback: if no status file, check if extraction exists
-        if self.extraction_path.exists():
+        if self._artifact_exists("extraction.json"):
             return {
                 "extraction_id": self.extraction_id,
                 "status": "complete",
@@ -1034,34 +1038,28 @@ class V4Session:
         })
         self._write(self.audit_path, trail)
 
+    def _artifact_exists(self, name: str) -> bool:
+        return self._store.session_object_exists(name)
+
     def _write(self, path: Path, data: Any) -> None:
-        path.write_text(json.dumps(data, indent=2, default=str), encoding="utf-8")
+        self._store.write_session_json(path.name, data)
 
     def _read(self, path: Path) -> Optional[Any]:
-        if not path.exists():
-            return None
-        try:
-            return json.loads(path.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError) as e:
-            LOGGER.error(f"[V4Session] Failed to read {path}: {e}")
-            return None
+        return self._store.read_session_json(path.name)
 
     def load_audit(self) -> List[Dict[str, Any]]:
         """Load audit trail."""
         return self._read(self.audit_path) or []
 
     def delete(self) -> bool:
-        """Delete session directory and all data (sensitive-build purge)."""
-        import shutil
-        if self._dir.exists():
-            try:
-                shutil.rmtree(self._dir)
-                LOGGER.info(f"[V4Session] Purged session {self.extraction_id}")
-                return True
-            except OSError as e:
-                LOGGER.error(f"[V4Session] Failed to purge {self.extraction_id}: {e}")
-                return False
-        return False
+        """Delete session artifacts and queued inputs (sensitive-build purge)."""
+        try:
+            self._store.delete()
+            LOGGER.info("[V4Session] Purged session %s", self.extraction_id)
+            return True
+        except OSError as exc:
+            LOGGER.error("[V4Session] Failed to purge %s: %s", self.extraction_id, exc)
+            return False
 
     def get_created_at(self) -> Optional[str]:
         """Get session creation timestamp from extraction data or audit trail."""
@@ -1075,10 +1073,12 @@ class V4Session:
             return audit[0].get("timestamp")
         # Fall back to directory mtime
         try:
-            mtime = self._dir.stat().st_mtime
-            return datetime.fromtimestamp(mtime, tz=timezone.utc).isoformat()
+            if self._dir.exists():
+                mtime = self._dir.stat().st_mtime
+                return datetime.fromtimestamp(mtime, tz=timezone.utc).isoformat()
         except OSError:
-            return None
+            pass
+        return None
 
     def get_project_name(self) -> Optional[str]:
         """Try to extract project name from stored data."""
@@ -1097,25 +1097,9 @@ class V4Session:
 
 def list_sessions(limit: int = 20) -> List[Dict[str, Any]]:
     """List all v4 extraction sessions with summary info, sorted newest first."""
-    root = get_session_root()
     sessions = []
-    if not root.exists():
-        return sessions
-
-    # Sort by directory modification time (newest first)
-    dirs = []
-    for d in root.iterdir():
-        if d.is_dir() and (d / "extraction.json").exists():
-            try:
-                mtime = d.stat().st_mtime
-            except OSError:
-                mtime = 0
-            dirs.append((mtime, d))
-
-    dirs.sort(key=lambda x: x[0], reverse=True)
-
-    for _, d in dirs[:limit]:
-        session = V4Session(d.name)
+    for session_id in list_session_ids(limit=limit):
+        session = V4Session(session_id)
         review = session.load_review()
         extraction = session._read(session.extraction_path)
 
@@ -1124,7 +1108,7 @@ def list_sessions(limit: int = 20) -> List[Dict[str, Any]]:
             status_str = review.get("status", "unknown")
 
         sessions.append({
-            "extraction_id": d.name,
+            "extraction_id": session_id,
             "status": status_str,
             "summary": review.get("summary", {}) if review else {},
             "created_at": session.get_created_at(),

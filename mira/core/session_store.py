@@ -55,6 +55,22 @@ def _has_usable_postgres_configuration() -> bool:
     return _looks_real_secret(password) and _looks_real_host(host)
 
 
+def _runtime_environment() -> str:
+    return (
+        _normalized_env("MIRA_ENV")
+        or _normalized_env("ENVIRONMENT")
+        or "development"
+    ).lower()
+
+
+def _production_like_environment() -> bool:
+    return _runtime_environment() not in {"development", "dev", "test", "testing", "ci", "local"}
+
+
+def _postgres_fail_closed() -> bool:
+    return _normalized_env("MIRA_SESSION_BACKEND").lower() == "postgres" and _production_like_environment()
+
+
 class SessionData(BaseModel):
     """The canonical session shape shared by all MIRA modules."""
 
@@ -199,6 +215,29 @@ class PostgresSessionStore:
         self._memory_fallback = MemorySessionStore()
         self._init_lock = asyncio.Lock()
         self._db_initialized = False
+        self._fail_closed = _postgres_fail_closed()
+
+    def _raise_or_memory(self, message: str) -> MemorySessionStore:
+        if self._fail_closed:
+            raise RuntimeError(message)
+        logger.warning("%s Falling back to memory session store.", message)
+        return self._memory_fallback
+
+    async def preflight(self) -> None:
+        await self._ensure_db_initialized()
+        mgr = await self._get_manager()
+        if not mgr:
+            raise RuntimeError("Postgres session backend is unavailable during startup preflight.")
+
+        from sqlalchemy import text
+
+        from ..chat.db.connection import get_db_session, get_engine
+
+        if get_engine() is None:
+            raise RuntimeError("Chat PostgreSQL engine did not initialize for postgres session backend.")
+
+        async with get_db_session() as session:
+            await session.execute(text("SELECT 1"))
 
     async def _get_manager(self):
         if self._manager is None:
@@ -206,11 +245,11 @@ class PostgresSessionStore:
                 from ..chat.db.session_manager import SessionManager
 
                 self._manager = SessionManager()
-            except Exception:
-                logger.exception(
-                    "[SESSION] Failed to import chat SessionManager; "
-                    "PostgresSessionStore will use memory fallback."
-                )
+            except Exception as exc:
+                message = "[SESSION] Failed to import chat SessionManager for postgres backend."
+                if self._fail_closed:
+                    raise RuntimeError(message) from exc
+                logger.exception("%s PostgresSessionStore will use memory fallback.", message)
                 self._manager = False
         return self._manager
 
@@ -230,11 +269,11 @@ class PostgresSessionStore:
                     engine = await init_db()
                     if engine is not None:
                         await run_migrations(engine)
-            except Exception:
-                logger.exception(
-                    "[SESSION] Failed to initialize chat PostgreSQL backend; "
-                    "SessionManager will use its in-memory fallback."
-                )
+            except Exception as exc:
+                message = "[SESSION] Failed to initialize chat PostgreSQL backend."
+                if self._fail_closed:
+                    raise RuntimeError(message) from exc
+                logger.exception("%s SessionManager will use its in-memory fallback.", message)
             finally:
                 self._db_initialized = True
 
@@ -242,7 +281,9 @@ class PostgresSessionStore:
         await self._ensure_db_initialized()
         mgr = await self._get_manager()
         if not mgr:
-            return await self._memory_fallback.get(session_id)
+            return await self._raise_or_memory(
+                "[SESSION] Postgres session manager unavailable during get()."
+            ).get(session_id)
         session = await mgr.get_session(session_id)
         history = await mgr.get_history(session_id, max_turns=max(1, _MAX_HISTORY_MESSAGES // 2))
         return SessionData(
@@ -261,7 +302,9 @@ class PostgresSessionStore:
         await self._ensure_db_initialized()
         mgr = await self._get_manager()
         if not mgr:
-            await self._memory_fallback.save(session_id, data)
+            await self._raise_or_memory(
+                "[SESSION] Postgres session manager unavailable during save()."
+            ).save(session_id, data)
             return
 
         existing_history = await mgr.get_history(
@@ -302,7 +345,9 @@ class PostgresSessionStore:
         await self._ensure_db_initialized()
         mgr = await self._get_manager()
         if not mgr:
-            return await self._memory_fallback.delete(session_id)
+            return await self._raise_or_memory(
+                "[SESSION] Postgres session manager unavailable during delete()."
+            ).delete(session_id)
 
         try:
             from sqlalchemy import delete
@@ -311,6 +356,8 @@ class PostgresSessionStore:
             from ..chat.db.schema import chat_sessions
 
             if get_engine() is None:
+                if self._fail_closed:
+                    raise RuntimeError("Postgres session backend lost its database engine during delete().")
                 mem = getattr(mgr, "_memory_store", None)
                 if isinstance(mem, dict):
                     return mem.pop(session_id, None) is not None
@@ -329,7 +376,9 @@ class PostgresSessionStore:
         await self._ensure_db_initialized()
         mgr = await self._get_manager()
         if not mgr:
-            return await self._memory_fallback.exists(session_id)
+            return await self._raise_or_memory(
+                "[SESSION] Postgres session manager unavailable during exists()."
+            ).exists(session_id)
         session = await mgr.get_session(session_id)
         return bool(session and session.get("session_id") == session_id)
 
@@ -337,7 +386,9 @@ class PostgresSessionStore:
         await self._ensure_db_initialized()
         mgr = await self._get_manager()
         if not mgr:
-            return await self._memory_fallback.get_module_data(module, key)
+            return await self._raise_or_memory(
+                "[SESSION] Postgres session manager unavailable during get_module_data()."
+            ).get_module_data(module, key)
 
         try:
             from sqlalchemy import select
@@ -346,6 +397,10 @@ class PostgresSessionStore:
             from ..chat.db.schema import module_state
 
             if get_engine() is None:
+                if self._fail_closed:
+                    raise RuntimeError(
+                        "Postgres session backend lost its database engine during get_module_data()."
+                    )
                 return await self._memory_fallback.get_module_data(module, key)
 
             async with get_db_session() as session:
@@ -370,7 +425,9 @@ class PostgresSessionStore:
         await self._ensure_db_initialized()
         mgr = await self._get_manager()
         if not mgr:
-            await self._memory_fallback.save_module_data(module, key, data)
+            await self._raise_or_memory(
+                "[SESSION] Postgres session manager unavailable during save_module_data()."
+            ).save_module_data(module, key, data)
             return
 
         try:
@@ -381,6 +438,10 @@ class PostgresSessionStore:
             from ..chat.db.schema import module_state
 
             if get_engine() is None:
+                if self._fail_closed:
+                    raise RuntimeError(
+                        "Postgres session backend lost its database engine during save_module_data()."
+                    )
                 await self._memory_fallback.save_module_data(module, key, data)
                 return
 
@@ -406,7 +467,9 @@ class PostgresSessionStore:
         await self._ensure_db_initialized()
         mgr = await self._get_manager()
         if not mgr:
-            return await self._memory_fallback.delete_module_data(module, key)
+            return await self._raise_or_memory(
+                "[SESSION] Postgres session manager unavailable during delete_module_data()."
+            ).delete_module_data(module, key)
 
         try:
             from sqlalchemy import delete
@@ -415,6 +478,10 @@ class PostgresSessionStore:
             from ..chat.db.schema import module_state
 
             if get_engine() is None:
+                if self._fail_closed:
+                    raise RuntimeError(
+                        "Postgres session backend lost its database engine during delete_module_data()."
+                    )
                 return await self._memory_fallback.delete_module_data(module, key)
 
             async with get_db_session() as session:
@@ -437,7 +504,9 @@ class PostgresSessionStore:
         await self._ensure_db_initialized()
         mgr = await self._get_manager()
         if not mgr:
-            return await self._memory_fallback.list_module_keys(module)
+            return await self._raise_or_memory(
+                "[SESSION] Postgres session manager unavailable during list_module_keys()."
+            ).list_module_keys(module)
 
         try:
             from sqlalchemy import select
@@ -446,6 +515,10 @@ class PostgresSessionStore:
             from ..chat.db.schema import module_state
 
             if get_engine() is None:
+                if self._fail_closed:
+                    raise RuntimeError(
+                        "Postgres session backend lost its database engine during list_module_keys()."
+                    )
                 return await self._memory_fallback.list_module_keys(module)
 
             async with get_db_session() as session:
@@ -494,6 +567,32 @@ _store_instance: SessionStore | None = None
 _store_lock = threading.Lock()
 
 
+def validate_session_backend_configuration() -> None:
+    """Fail startup when production explicitly requires postgres but it is not ready."""
+
+    backend = _normalized_env("MIRA_SESSION_BACKEND").lower()
+    if backend != "postgres":
+        return
+
+    if not _has_usable_postgres_configuration():
+        if _postgres_fail_closed():
+            raise RuntimeError(
+                "MIRA_SESSION_BACKEND=postgres but no usable PostgreSQL configuration is available."
+            )
+        return
+
+    store = get_session_store()
+    if not isinstance(store, PostgresSessionStore):
+        raise RuntimeError("MIRA postgres session backend requested but store factory returned a different backend.")
+
+    try:
+        asyncio.run(store.preflight())
+    except RuntimeError:
+        raise
+    except Exception as exc:  # pragma: no cover - defensive wrapper
+        raise RuntimeError("Postgres session backend failed startup preflight.") from exc
+
+
 def get_session_store() -> SessionStore:
     """Return the singleton ``SessionStore`` chosen by environment."""
 
@@ -510,6 +609,10 @@ def get_session_store() -> SessionStore:
             backend = "memory"
 
         if backend == "postgres" and not _has_usable_postgres_configuration():
+            if _postgres_fail_closed():
+                raise RuntimeError(
+                    "Requested postgres session backend without usable credentials in a production-like environment."
+                )
             logger.warning(
                 "[SESSION] Requested postgres session backend without usable credentials; "
                 "falling back to memory."

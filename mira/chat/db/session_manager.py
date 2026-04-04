@@ -21,6 +21,7 @@ Deployment: AWS GovCloud West (FedRAMP High, ITAR)
 from __future__ import annotations
 
 import logging
+import os
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
@@ -37,6 +38,21 @@ logger = logging.getLogger(__name__)
 _DEFAULT_RETENTION_MONTHS = 24
 
 
+def _runtime_environment() -> str:
+    return (
+        os.environ.get("MIRA_ENV", "").strip()
+        or os.environ.get("ENVIRONMENT", "").strip()
+        or "development"
+    ).lower()
+
+
+def _postgres_fail_closed() -> bool:
+    return (
+        os.environ.get("MIRA_SESSION_BACKEND", "").strip().lower() == "postgres"
+        and _runtime_environment() not in {"development", "dev", "test", "testing", "ci", "local"}
+    )
+
+
 class SessionManager:
     """Server-side session manager backed by PostgreSQL.
 
@@ -48,6 +64,7 @@ class SessionManager:
         # In-memory fallback (mirrors Phase 1 _session_store)
         self._memory_store: dict[str, dict[str, Any]] = {}
         self._max_memory_sessions = 500
+        self._fail_closed = _postgres_fail_closed()
 
     # ------------------------------------------------------------------
     # Helpers
@@ -59,6 +76,10 @@ class SessionManager:
 
     def _get_memory_session(self, session_id: str) -> dict[str, Any]:
         """Phase 1 in-memory fallback."""
+        if self._fail_closed:
+            raise RuntimeError(
+                f"Postgres session backend is unavailable for session {session_id}; refusing in-memory fallback."
+            )
         if session_id not in self._memory_store:
             if len(self._memory_store) >= self._max_memory_sessions:
                 oldest = next(iter(self._memory_store))
@@ -135,6 +156,8 @@ class SessionManager:
 
         except Exception:
             logger.exception("[SESSION] DB read failed for session %s, falling back to memory", session_id)
+            if self._fail_closed:
+                raise
             return self._get_memory_session(session_id)
 
     # ------------------------------------------------------------------
@@ -175,6 +198,8 @@ class SessionManager:
                 )
         except Exception:
             logger.exception("[SESSION] DB update failed for session %s", session_id)
+            if self._fail_closed:
+                raise
             # Silent fallback — next read will re-fetch from DB or memory
             mem = self._get_memory_session(session_id)
             for key, value in updates.items():
@@ -254,6 +279,8 @@ class SessionManager:
 
         except Exception:
             logger.exception("[SESSION] append_turn DB write failed for session %s", session_id)
+            if self._fail_closed:
+                raise
             # Fall back to memory so the current request still works
             mem = self._get_memory_session(session_id)
             history = mem.setdefault("history", [])
@@ -325,6 +352,8 @@ class SessionManager:
 
         except Exception:
             logger.exception("[SESSION] get_history DB read failed for session %s", session_id)
+            if self._fail_closed:
+                raise
             mem = self._get_memory_session(session_id)
             return mem.get("history", [])[-(max_turns * 2) :]
 
@@ -369,4 +398,6 @@ class SessionManager:
 
         except Exception:
             logger.exception("[SESSION] purge_before failed")
+            if self._fail_closed:
+                raise
             return 0

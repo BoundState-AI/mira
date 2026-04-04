@@ -17,6 +17,7 @@ Safety Critical: True
 """
 
 import pytest
+import os
 from fastapi.testclient import TestClient
 from io import BytesIO
 from unittest.mock import patch
@@ -136,6 +137,58 @@ class TestMIULDMLLVExtract:
     def test_dmllv_requires_files(self, client):
         response = client.post("/miul/dmllv-extract")
         assert response.status_code == 422
+
+
+class TestMIULV4Extract:
+    """Tests for queued MIUL v4 extraction."""
+
+    def test_v4_extract_queues_job_when_worker_mode_enabled(self, client, monkeypatch):
+        written_artifacts: dict[tuple[str, str], object] = {}
+        queued_payload: dict[str, object] = {}
+
+        monkeypatch.setenv("MIUL_EXTRACTION_QUEUE_URL", "https://example.com/queue")
+        monkeypatch.setenv("MIUL_EXTRACTION_BUCKET", "test-miul-bucket")
+
+        from mira.api.routers import miul as miul_router
+
+        def _fake_write(self, name, data):
+            written_artifacts[(self.extraction_id, name)] = data
+
+        def _fake_upload_bytes(self, name, payload, *, content_type="application/pdf"):
+            return f"inputs/{self.extraction_id}/{name}"
+
+        def _fake_upload_json(self, name, data):
+            return f"inputs/{self.extraction_id}/{name}"
+
+        def _fake_enqueue(payload):
+            queued_payload.update(payload)
+            return {"message_id": "msg-1", "queued_at": "2026-04-04T00:00:00Z"}
+
+        monkeypatch.setattr(miul_router.MIULArtifactStore, "write_session_json", _fake_write)
+        monkeypatch.setattr(miul_router.MIULArtifactStore, "upload_input_bytes", _fake_upload_bytes)
+        monkeypatch.setattr(miul_router.MIULArtifactStore, "upload_input_json", _fake_upload_json)
+        monkeypatch.setattr(miul_router, "enqueue_extraction_job", _fake_enqueue)
+
+        drawing = BytesIO(b"%PDF-1.4 queued drawing\n")
+        drawing_tree = BytesIO(b'{"top_level":"MER07540-001","tree":[]}')
+
+        response = client.post(
+            "/miul/v4/extract",
+            data={"project": "MER07540"},
+            files=[
+                ("drawings", ("A-1.pdf", drawing, "application/pdf")),
+                ("drawing_tree_json", ("dt.json", drawing_tree, "application/json")),
+            ],
+        )
+
+        assert response.status_code == 200
+        payload = response.json()
+        assert payload["status"] == "queued"
+        assert queued_payload["project"] == "MER07540"
+        assert len(queued_payload["pdf_inputs"]) == 1
+        assert queued_payload["dt_json_key"] == f"inputs/{payload['extraction_id']}/drawing_tree.json"
+        assert written_artifacts[(payload["extraction_id"], "status.json")]["status"] == "queued"
+        assert written_artifacts[(payload["extraction_id"], "metadata.json")]["owner_username"] is None
 
 
 __safety_critical__ = True

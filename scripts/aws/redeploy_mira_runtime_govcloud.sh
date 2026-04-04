@@ -20,6 +20,7 @@ BUILD_ROOT="${ROOT_DIR}"
 STAGING_DIR=""
 BACKEND_TASK_JSON=""
 FRONTEND_TASK_JSON=""
+WORKER_TASK_JSON=""
 RESOLVED_DEPLOY_REF=""
 IS_DIRTY_DEPLOY=0
 PREDEPLOY_CHECKS_JSON=""
@@ -34,6 +35,7 @@ REGISTRY="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 CLUSTER="${CLUSTER:-mira-prod-cluster}"
 BACKEND_SERVICE="${BACKEND_SERVICE:-mira-prod-backend}"
 FRONTEND_SERVICE="${FRONTEND_SERVICE:-mira-prod-frontend}"
+MIUL_WORKER_SERVICE="${MIUL_WORKER_SERVICE:-mira-prod-miul-worker}"
 BACKEND_REPO="${BACKEND_REPO:-mira-backend}"
 FRONTEND_REPO="${FRONTEND_REPO:-mira-frontend}"
 
@@ -42,6 +44,7 @@ FRONTEND_IMAGE="${REGISTRY}/${FRONTEND_REPO}:${IMAGE_TAG}"
 
 BACKEND_TASK_FAMILY="${BACKEND_TASK_FAMILY:-mira-prod-backend-task}"
 FRONTEND_TASK_FAMILY="${FRONTEND_TASK_FAMILY:-mira-prod-frontend-task}"
+MIUL_WORKER_TASK_FAMILY="${MIUL_WORKER_TASK_FAMILY:-mira-prod-miul-worker-task}"
 
 BACKEND_TG_ARN="${BACKEND_TG_ARN:-arn:aws-us-gov:elasticloadbalancing:us-gov-west-1:574823419003:targetgroup/mira-prod-be-8080-tg/412b1d1aab416cad}"
 FRONTEND_TG_ARN="${FRONTEND_TG_ARN:-arn:aws-us-gov:elasticloadbalancing:us-gov-west-1:574823419003:targetgroup/mira-prod-fe-tg/4807e900d8b0dd14}"
@@ -89,17 +92,25 @@ FRONTEND_MEMORY="${FRONTEND_MEMORY:-512}"
 FRONTEND_DESIRED_COUNT="${FRONTEND_DESIRED_COUNT:-1}"
 
 MIRA_WORKERS="${MIRA_WORKERS:-3}"
-POSTGRES_HOST="${POSTGRES_HOST:-mira-prod-rds-proxy.proxy-cid.us-gov-west-1.rds.amazonaws.com}"
+MIRA_DB_PROXY_NAME="${MIRA_DB_PROXY_NAME:-mira-prod-rds-proxy}"
+POSTGRES_HOST="${POSTGRES_HOST:-}"
 POSTGRES_PORT="${POSTGRES_PORT:-5432}"
 POSTGRES_DB="${POSTGRES_DB:-mira_h2}"
 POSTGRES_USER="${POSTGRES_USER:-mira_app}"
 POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-}"
 POSTGRES_PASSWORD_SECRET_ARN="${POSTGRES_PASSWORD_SECRET_ARN:-}"
+POSTGRES_PASSWORD_SECRET_NAME="${POSTGRES_PASSWORD_SECRET_NAME:-mira/prod/postgres-password}"
 MIRA_SESSION_BACKEND="${MIRA_SESSION_BACKEND:-}"
 MIRA_DB_POOL_MAX_CONNECTIONS="${MIRA_DB_POOL_MAX_CONNECTIONS:-5}"
 MIRA_BEDROCK_SONNET_CONCURRENCY="${MIRA_BEDROCK_SONNET_CONCURRENCY:-6}"
 MIRA_BEDROCK_VISION_CONCURRENCY="${MIRA_BEDROCK_VISION_CONCURRENCY:-4}"
 MIUL_EXTRACTION_QUEUE_URL="${MIUL_EXTRACTION_QUEUE_URL:-}"
+MIUL_EXTRACTION_QUEUE_NAME="${MIUL_EXTRACTION_QUEUE_NAME:-mira-prod-miul-extraction}"
+MIUL_EXTRACTION_BUCKET="${MIUL_EXTRACTION_BUCKET:-mira-prod-miul-${ACCOUNT_ID}-${AWS_REGION}}"
+MIUL_EXTRACTION_PREFIX="${MIUL_EXTRACTION_PREFIX:-miul/v4}"
+MIUL_WORKER_CPU="${MIUL_WORKER_CPU:-1024}"
+MIUL_WORKER_MEMORY="${MIUL_WORKER_MEMORY:-4096}"
+MIUL_WORKER_DESIRED_COUNT="${MIUL_WORKER_DESIRED_COUNT:-1}"
 MIRA_RATE_LIMIT_ENABLED="${MIRA_RATE_LIMIT_ENABLED:-true}"
 MIRA_RATE_LIMIT_REQUESTS="${MIRA_RATE_LIMIT_REQUESTS:-40}"
 MIRA_RATE_LIMIT_WINDOW_SECONDS="${MIRA_RATE_LIMIT_WINDOW_SECONDS:-60}"
@@ -158,10 +169,42 @@ is_placeholder_value() {
   esac
 }
 
+resolve_secret_arn_by_name() {
+  local secret_name="$1"
+  aws secretsmanager describe-secret \
+    --region "${AWS_REGION}" \
+    --secret-id "${secret_name}" \
+    --query 'ARN' \
+    --output text 2>/dev/null || true
+}
+
+discover_proxy_endpoint() {
+  local proxy_name="$1"
+  aws rds describe-db-proxies \
+    --region "${AWS_REGION}" \
+    --db-proxy-name "${proxy_name}" \
+    --query 'DBProxies[0].Endpoint' \
+    --output text 2>/dev/null || true
+}
+
+if [ -z "${POSTGRES_PASSWORD_SECRET_ARN}" ] && [ -n "${POSTGRES_PASSWORD_SECRET_NAME}" ]; then
+  resolved_secret_arn="$(resolve_secret_arn_by_name "${POSTGRES_PASSWORD_SECRET_NAME}")"
+  if [ -n "${resolved_secret_arn}" ] && [ "${resolved_secret_arn}" != "None" ]; then
+    POSTGRES_PASSWORD_SECRET_ARN="${resolved_secret_arn}"
+  fi
+fi
+
+if is_placeholder_value "${POSTGRES_HOST}" || [ -z "${POSTGRES_HOST}" ]; then
+  discovered_proxy_endpoint="$(discover_proxy_endpoint "${MIRA_DB_PROXY_NAME}")"
+  if [ -n "${discovered_proxy_endpoint}" ] && [ "${discovered_proxy_endpoint}" != "None" ]; then
+    POSTGRES_HOST="${discovered_proxy_endpoint}"
+  fi
+fi
+
 has_usable_postgres_config() {
   local host_lc
   host_lc="$(to_lower "${POSTGRES_HOST:-}")"
-  if is_placeholder_value "${POSTGRES_PASSWORD:-}"; then
+  if is_placeholder_value "${POSTGRES_PASSWORD:-}" && [ -z "${POSTGRES_PASSWORD_SECRET_ARN:-}" ]; then
     return 1
   fi
   case "${host_lc}" in
@@ -204,6 +247,9 @@ cleanup() {
   fi
   if [ -n "${FRONTEND_TASK_JSON}" ] && [ -f "${FRONTEND_TASK_JSON}" ]; then
     rm -f "${FRONTEND_TASK_JSON}"
+  fi
+  if [ -n "${WORKER_TASK_JSON}" ] && [ -f "${WORKER_TASK_JSON}" ]; then
+    rm -f "${WORKER_TASK_JSON}"
   fi
   if [ -n "${PREDEPLOY_CHECKS_JSON}" ] && [ -f "${PREDEPLOY_CHECKS_JSON}" ]; then
     rm -f "${PREDEPLOY_CHECKS_JSON}"
@@ -342,6 +388,94 @@ JSON
   aws iam put-role-policy \
     --role-name "${EXECUTION_ROLE_NAME}" \
     --policy-name "mira-prod-ecs-postgres-secret" \
+    --policy-document "file://${policy_doc}" >/dev/null
+  rm -f "${policy_doc}"
+}
+
+ensure_miul_bucket() {
+  [ -n "${MIUL_EXTRACTION_BUCKET}" ] || return 0
+
+  if ! aws s3api head-bucket --bucket "${MIUL_EXTRACTION_BUCKET}" >/dev/null 2>&1; then
+    aws s3api create-bucket \
+      --bucket "${MIUL_EXTRACTION_BUCKET}" \
+      --create-bucket-configuration "LocationConstraint=${AWS_REGION}" >/dev/null
+  fi
+
+  aws s3api put-bucket-encryption \
+    --bucket "${MIUL_EXTRACTION_BUCKET}" \
+    --server-side-encryption-configuration '{
+      "Rules": [{
+        "ApplyServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}
+      }]
+    }' >/dev/null
+}
+
+ensure_miul_queue() {
+  if [ -n "${MIUL_EXTRACTION_QUEUE_URL}" ]; then
+    return 0
+  fi
+
+  aws sqs create-queue \
+    --queue-name "${MIUL_EXTRACTION_QUEUE_NAME}" \
+    --attributes VisibilityTimeout=1800,ReceiveMessageWaitTimeSeconds=20 >/dev/null
+
+  MIUL_EXTRACTION_QUEUE_URL="$(
+    aws sqs get-queue-url \
+      --queue-name "${MIUL_EXTRACTION_QUEUE_NAME}" \
+      --query 'QueueUrl' \
+      --output text
+  )"
+}
+
+ensure_miul_runtime_policy() {
+  local queue_arn bucket_arn policy_doc
+
+  queue_arn="$(
+    aws sqs get-queue-attributes \
+      --queue-url "${MIUL_EXTRACTION_QUEUE_URL}" \
+      --attribute-names QueueArn \
+      --query 'Attributes.QueueArn' \
+      --output text
+  )"
+  bucket_arn="arn:aws-us-gov:s3:::${MIUL_EXTRACTION_BUCKET}"
+
+  policy_doc="$(mktemp)"
+  cat > "${policy_doc}" <<JSON
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "MiraMiulQueueAccess",
+      "Effect": "Allow",
+      "Action": [
+        "sqs:DeleteMessage",
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:ReceiveMessage",
+        "sqs:SendMessage"
+      ],
+      "Resource": "${queue_arn}"
+    },
+    {
+      "Sid": "MiraMiulS3Access",
+      "Effect": "Allow",
+      "Action": [
+        "s3:DeleteObject",
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:PutObject"
+      ],
+      "Resource": [
+        "${bucket_arn}",
+        "${bucket_arn}/*"
+      ]
+    }
+  ]
+}
+JSON
+  aws iam put-role-policy \
+    --role-name "${BACKEND_TASK_ROLE_NAME}" \
+    --policy-name "mira-prod-ecs-miul-runtime" \
     --policy-document "file://${policy_doc}" >/dev/null
   rm -f "${policy_doc}"
 }
@@ -528,8 +662,10 @@ aws ecs describe-clusters --clusters "${CLUSTER}" --query 'clusters[0].status' -
   aws ecs create-cluster --cluster-name "${CLUSTER}" >/dev/null
 aws logs create-log-group --log-group-name /ecs/mira-prod-backend >/dev/null 2>&1 || true
 aws logs create-log-group --log-group-name /ecs/mira-prod-frontend >/dev/null 2>&1 || true
+aws logs create-log-group --log-group-name /ecs/mira-prod-miul-worker >/dev/null 2>&1 || true
 aws logs put-retention-policy --log-group-name /ecs/mira-prod-backend --retention-in-days 30 >/dev/null
 aws logs put-retention-policy --log-group-name /ecs/mira-prod-frontend --retention-in-days 30 >/dev/null
+aws logs put-retention-policy --log-group-name /ecs/mira-prod-miul-worker --retention-in-days 30 >/dev/null
 AWS_PROFILE="${AWS_PROFILE}" \
 AWS_REGION="${AWS_REGION}" \
 ACCOUNT_ID="${ACCOUNT_ID}" \
@@ -549,6 +685,9 @@ ensure_oca_case_table
 ensure_oca_system_table
 ensure_oca_store_policy
 ensure_postgres_password_secret_policy
+ensure_miul_bucket
+ensure_miul_queue
+ensure_miul_runtime_policy
 
 BACKEND_POSTGRES_PASSWORD_ENV_JSON="$(cat <<JSON
         {"name": "POSTGRES_PASSWORD", "value": "${POSTGRES_PASSWORD}"}
@@ -567,6 +706,7 @@ fi
 
 BACKEND_TASK_JSON="$(mktemp)"
 FRONTEND_TASK_JSON="$(mktemp)"
+WORKER_TASK_JSON="$(mktemp)"
 
 cat > "${BACKEND_TASK_JSON}" <<JSON
 {
@@ -638,6 +778,11 @@ cat > "${BACKEND_TASK_JSON}" <<JSON
         {"name": "MIRA_DB_POOL_MAX_CONNECTIONS", "value": "${MIRA_DB_POOL_MAX_CONNECTIONS}"},
         {"name": "MIRA_BEDROCK_SONNET_CONCURRENCY", "value": "${MIRA_BEDROCK_SONNET_CONCURRENCY}"},
         {"name": "MIRA_BEDROCK_VISION_CONCURRENCY", "value": "${MIRA_BEDROCK_VISION_CONCURRENCY}"},
+        {"name": "MIUL_V3_VISION_MODEL_BEDROCK", "value": "${BEDROCK_MODEL_ID}"},
+        {"name": "MIUL_V3_VISION_BEDROCK_REGION", "value": "${AWS_REGION}"},
+        {"name": "MIUL_EXTRACTION_QUEUE_URL", "value": "${MIUL_EXTRACTION_QUEUE_URL}"},
+        {"name": "MIUL_EXTRACTION_BUCKET", "value": "${MIUL_EXTRACTION_BUCKET}"},
+        {"name": "MIUL_EXTRACTION_PREFIX", "value": "${MIUL_EXTRACTION_PREFIX}"},
         {"name": "MIRA_RATE_LIMIT_ENABLED", "value": "${MIRA_RATE_LIMIT_ENABLED}"},
         {"name": "MIRA_RATE_LIMIT_REQUESTS", "value": "${MIRA_RATE_LIMIT_REQUESTS}"},
         {"name": "MIRA_RATE_LIMIT_WINDOW_SECONDS", "value": "${MIRA_RATE_LIMIT_WINDOW_SECONDS}"},
@@ -704,12 +849,65 @@ cat > "${FRONTEND_TASK_JSON}" <<JSON
 }
 JSON
 
+cat > "${WORKER_TASK_JSON}" <<JSON
+{
+  "family": "${MIUL_WORKER_TASK_FAMILY}",
+  "taskRoleArn": "${BACKEND_TASK_ROLE_ARN}",
+  "executionRoleArn": "${EXECUTION_ROLE_ARN}",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "${MIUL_WORKER_CPU}",
+  "memory": "${MIUL_WORKER_MEMORY}",
+  "containerDefinitions": [
+    {
+      "name": "miul-worker",
+      "image": "${BACKEND_IMAGE}",
+      "essential": true,
+      "command": ["python3", "-m", "mira.miul.worker"],
+      "environment": [
+        {"name": "ENVIRONMENT", "value": "production"},
+        {"name": "MIRA_ENV", "value": "production"},
+        {"name": "AWS_REGION", "value": "${AWS_REGION}"},
+        {"name": "AWS_DEFAULT_REGION", "value": "${AWS_REGION}"},
+        {"name": "BEDROCK_REGION", "value": "${AWS_REGION}"},
+        {"name": "LLM_PROVIDER", "value": "bedrock-converse"},
+        {"name": "LLM_SONNET_MODEL", "value": "${BEDROCK_MODEL_ID}"},
+        {"name": "USE_BEDROCK", "value": "1"},
+        {"name": "BEDROCK_MODEL_ID", "value": "${BEDROCK_MODEL_ID}"},
+        {"name": "MIUL_V3_VISION_MODEL_BEDROCK", "value": "${BEDROCK_MODEL_ID}"},
+        {"name": "MIUL_V3_VISION_BEDROCK_REGION", "value": "${AWS_REGION}"},
+        {"name": "MIRA_SESSION_BACKEND", "value": "${MIRA_SESSION_BACKEND}"},
+        {"name": "POSTGRES_HOST", "value": "${POSTGRES_HOST}"},
+        {"name": "POSTGRES_PORT", "value": "${POSTGRES_PORT}"},
+        {"name": "POSTGRES_DB", "value": "${POSTGRES_DB}"},
+        {"name": "POSTGRES_USER", "value": "${POSTGRES_USER}"}${BACKEND_POSTGRES_PASSWORD_ENV_JSON:+,
+${BACKEND_POSTGRES_PASSWORD_ENV_JSON}},
+        {"name": "MIUL_EXTRACTION_QUEUE_URL", "value": "${MIUL_EXTRACTION_QUEUE_URL}"},
+        {"name": "MIUL_EXTRACTION_BUCKET", "value": "${MIUL_EXTRACTION_BUCKET}"},
+        {"name": "MIUL_EXTRACTION_PREFIX", "value": "${MIUL_EXTRACTION_PREFIX}"}
+      ],
+${BACKEND_SECRETS_JSON}\
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/mira-prod-miul-worker",
+          "awslogs-region": "${AWS_REGION}",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}
+JSON
+
 echo
 echo "== Register task definitions =="
 BACKEND_TD_ARN="$(aws ecs register-task-definition --cli-input-json "file://${BACKEND_TASK_JSON}" --query 'taskDefinition.taskDefinitionArn' --output text)"
 FRONTEND_TD_ARN="$(aws ecs register-task-definition --cli-input-json "file://${FRONTEND_TASK_JSON}" --query 'taskDefinition.taskDefinitionArn' --output text)"
+WORKER_TD_ARN="$(aws ecs register-task-definition --cli-input-json "file://${WORKER_TASK_JSON}" --query 'taskDefinition.taskDefinitionArn' --output text)"
 echo "Backend task:  ${BACKEND_TD_ARN}"
 echo "Frontend task: ${FRONTEND_TD_ARN}"
+echo "Worker task:   ${WORKER_TD_ARN}"
 
 SUBNET_JSON="$(json_array_from_csv "${PRIVATE_SUBNETS}")"
 
@@ -747,13 +945,29 @@ else
     --desired-count "${FRONTEND_DESIRED_COUNT}" \
     --launch-type FARGATE \
     --health-check-grace-period-seconds 60 \
-    --load-balancers "targetGroupArn=${FRONTEND_TG_ARN},containerName=frontend,containerPort=80" \
-    --network-configuration "awsvpcConfiguration={subnets=[${SUBNET_JSON}],securityGroups=[\"${FRONTEND_SECURITY_GROUP}\"],assignPublicIp=DISABLED}" >/dev/null
+      --load-balancers "targetGroupArn=${FRONTEND_TG_ARN},containerName=frontend,containerPort=80" \
+      --network-configuration "awsvpcConfiguration={subnets=[${SUBNET_JSON}],securityGroups=[\"${FRONTEND_SECURITY_GROUP}\"],assignPublicIp=DISABLED}" >/dev/null
+fi
+
+if ensure_service "${MIUL_WORKER_SERVICE}"; then
+  aws ecs update-service \
+    --cluster "${CLUSTER}" \
+    --service "${MIUL_WORKER_SERVICE}" \
+    --task-definition "${WORKER_TD_ARN}" \
+    --desired-count "${MIUL_WORKER_DESIRED_COUNT}" >/dev/null
+else
+  aws ecs create-service \
+    --cluster "${CLUSTER}" \
+    --service-name "${MIUL_WORKER_SERVICE}" \
+    --task-definition "${WORKER_TD_ARN}" \
+    --desired-count "${MIUL_WORKER_DESIRED_COUNT}" \
+    --launch-type FARGATE \
+    --network-configuration "awsvpcConfiguration={subnets=[${SUBNET_JSON}],securityGroups=[\"${BACKEND_SECURITY_GROUP}\"],assignPublicIp=DISABLED}" >/dev/null
 fi
 
 echo
 echo "== Wait for steady state =="
-aws ecs wait services-stable --cluster "${CLUSTER}" --services "${BACKEND_SERVICE}" "${FRONTEND_SERVICE}"
+aws ecs wait services-stable --cluster "${CLUSTER}" --services "${BACKEND_SERVICE}" "${FRONTEND_SERVICE}" "${MIUL_WORKER_SERVICE}"
 
 run_postdeploy_smoke
 run_postdeploy_audit

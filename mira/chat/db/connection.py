@@ -41,6 +41,18 @@ logger = logging.getLogger(__name__)
 _PLACEHOLDER_VALUES = {"", "restored", "placeholder", "changeme", "none", "null", "undefined"}
 _LOCALHOST_VALUES = {"localhost", "127.0.0.1", "::1"}
 
+
+def _runtime_environment() -> str:
+    return (
+        os.environ.get("MIRA_ENV", "").strip()
+        or os.environ.get("ENVIRONMENT", "").strip()
+        or "development"
+    ).lower()
+
+
+def _production_like_environment() -> bool:
+    return _runtime_environment() not in {"development", "dev", "test", "testing", "ci", "local"}
+
 # ---------------------------------------------------------------------------
 # Module-level singletons
 # ---------------------------------------------------------------------------
@@ -84,9 +96,17 @@ def _resolve_database_url() -> str | None:
     pg_host = os.environ.get("POSTGRES_HOST", "").strip()
     pg_pass = os.environ.get("POSTGRES_PASSWORD", "").strip()
     if not pg_host or pg_host.lower() in _PLACEHOLDER_VALUES | _LOCALHOST_VALUES:
+        if _production_like_environment():
+            raise RuntimeError(
+                "MIRA_SESSION_BACKEND=postgres requires a usable POSTGRES_HOST in production-like environments."
+            )
         logger.warning("[CHAT-DB] Postgres backend requested without a usable host; falling back to memory.")
         return None
     if not pg_pass or pg_pass.lower() in _PLACEHOLDER_VALUES:
+        if _production_like_environment():
+            raise RuntimeError(
+                "MIRA_SESSION_BACKEND=postgres requires a usable POSTGRES_PASSWORD in production-like environments."
+            )
         logger.warning(
             "[CHAT-DB] Postgres backend requested without a usable password; falling back to memory."
         )

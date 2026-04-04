@@ -13,6 +13,7 @@ from mira.core.session_store import (
     SessionStore,
     get_session_store,
     reset_session_store,
+    validate_session_backend_configuration,
 )
 
 
@@ -98,7 +99,9 @@ class TestSessionStoreFactory:
     def teardown_method(self):
         reset_session_store()
         for name in (
+            "ENVIRONMENT",
             "MIRA_SESSION_BACKEND",
+            "MIRA_ENV",
             "MIRA_CHAT_DATABASE_URL",
             "POSTGRES_HOST",
             "POSTGRES_PASSWORD",
@@ -133,6 +136,17 @@ class TestSessionStoreFactory:
         os.environ["POSTGRES_HOST"] = "db.internal"
         os.environ["POSTGRES_PASSWORD"] = "restored"
         assert isinstance(get_session_store(), MemorySessionStore)
+
+    def test_postgres_without_usable_credentials_raises_in_production(self):
+        os.environ["MIRA_SESSION_BACKEND"] = "postgres"
+        os.environ["MIRA_ENV"] = "production"
+        os.environ["POSTGRES_HOST"] = "db.internal"
+        with pytest.raises(RuntimeError):
+            get_session_store()
+
+    def test_validate_session_backend_configuration_is_noop_for_memory(self):
+        os.environ["MIRA_SESSION_BACKEND"] = "memory"
+        validate_session_backend_configuration()
 
     def test_dynamodb_scaffolded(self):
         os.environ["MIRA_SESSION_BACKEND"] = "dynamodb"
