@@ -12,7 +12,6 @@ frontend/*
 frontend/src/*
 !frontend/src/data/
 !frontend/src/data/**
-frontend/src/data/mua-guidance-pack.json
 miul_codex/
 tests/
 examples/
