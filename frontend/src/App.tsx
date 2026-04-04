@@ -34,6 +34,76 @@ function InactiveModulePage({ moduleName }: { moduleName: string }) {
   );
 }
 
+function ProtectedWorkspaceRoutes() {
+  return (
+    <ProtectedRoute>
+      <AppLayout>
+        <Routes>
+          <Route path="/chat" element={<MiraChat />} />
+          <Route
+            path="/query"
+            element={(
+              <BSMHQuery
+                endpoint="query"
+                isTemporarilyUnavailable
+                showPipelineBlurb
+              />
+            )}
+          />
+          <Route path="/gas-compatibility" element={<GasCompatibility />} />
+          <Route path="/galvanic-compatibility" element={<GalvanicCompatibility />} />
+          <Route path="/fracture-control" element={<FractureControl />} />
+          <Route path="/oca" element={<Navigate to="/oca/workbench" replace />} />
+          <Route path="/oca/workbench" element={<OCAWorkbench />} />
+          <Route path="/oca/system-builder" element={<OCASystemBuilder />} />
+          <Route
+            path="/test-classes"
+            element={<InactiveModulePage moduleName="MAPTIS Search" />}
+          />
+          <Route
+            path="/test-classes/:testType"
+            element={<InactiveModulePage moduleName="MAPTIS Search" />}
+          />
+          <Route
+            path="/miul"
+            element={(
+              <ProtectedRoute requireItar>
+                <MIULBuilderV4 />
+              </ProtectedRoute>
+            )}
+          />
+          <Route path="/mua" element={<InactiveModulePage moduleName="MUA Writer" />} />
+          <Route path="/mua/v7" element={<InactiveModulePage moduleName="MUA Writer" />} />
+          <Route path="/mua/v8" element={<InactiveModulePage moduleName="MUA Writer" />} />
+          <Route path="/mua/v10" element={<InactiveModulePage moduleName="MUA Writer" />} />
+          <Route path="/mua/matchmaker" element={<InactiveModulePage moduleName="MUA Writer" />} />
+          <Route path="/mua/matchmaker/*" element={<InactiveModulePage moduleName="MUA Writer" />} />
+          <Route path="/compliance" element={<Navigate to="/query" replace />} />
+          <Route path="/mp-plan" element={<MPPlanGenerator />} />
+          <Route
+            path="/dt-editor"
+            element={(
+              <ProtectedRoute requireItar>
+                <DTTreeEditor />
+              </ProtectedRoute>
+            )}
+          />
+          <Route path="/v4-query" element={<MiraV4Query />} />
+          <Route path="/bsmh" element={<Navigate to="/query" replace />} />
+          <Route path="/mua-v7" element={<InactiveModulePage moduleName="MUA Writer" />} />
+          <Route path="/mua-v8" element={<InactiveModulePage moduleName="MUA Writer" />} />
+          <Route path="/mua-v10" element={<InactiveModulePage moduleName="MUA Writer" />} />
+          <Route path="/forge" element={<Navigate to="/" replace />} />
+          <Route path="/forge-explorer" element={<Navigate to="/" replace />} />
+          <Route path="/tocr" element={<TOCR />} />
+          <Route path="/knowledge-twins" element={<KnowledgeTwins />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </AppLayout>
+    </ProtectedRoute>
+  );
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -41,72 +111,10 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <ProtectedRoute>
-            <AppLayout>
-              <Routes>
-                <Route path="/" element={<MiraLanding />} />
-                <Route path="/chat" element={<MiraChat />} />
-                <Route
-                  path="/query"
-                  element={(
-                    <BSMHQuery
-                      endpoint="query"
-                      isTemporarilyUnavailable
-                      showPipelineBlurb
-                    />
-                  )}
-                />
-                <Route path="/gas-compatibility" element={<GasCompatibility />} />
-                <Route path="/galvanic-compatibility" element={<GalvanicCompatibility />} />
-                <Route path="/fracture-control" element={<FractureControl />} />
-                <Route path="/oca" element={<Navigate to="/oca/workbench" replace />} />
-                <Route path="/oca/workbench" element={<OCAWorkbench />} />
-                <Route path="/oca/system-builder" element={<OCASystemBuilder />} />
-                <Route
-                  path="/test-classes"
-                  element={<InactiveModulePage moduleName="MAPTIS Search" />}
-                />
-                <Route
-                  path="/test-classes/:testType"
-                  element={<InactiveModulePage moduleName="MAPTIS Search" />}
-                />
-                <Route
-                  path="/miul"
-                  element={(
-                    <ProtectedRoute requireItar>
-                      <MIULBuilderV4 />
-                    </ProtectedRoute>
-                  )}
-                />
-                <Route path="/mua" element={<InactiveModulePage moduleName="MUA Writer" />} />
-                <Route path="/mua/v7" element={<InactiveModulePage moduleName="MUA Writer" />} />
-                <Route path="/mua/v8" element={<InactiveModulePage moduleName="MUA Writer" />} />
-                <Route path="/mua/v10" element={<InactiveModulePage moduleName="MUA Writer" />} />
-                <Route path="/mua/matchmaker" element={<InactiveModulePage moduleName="MUA Writer" />} />
-                <Route path="/mua/matchmaker/*" element={<InactiveModulePage moduleName="MUA Writer" />} />
-                <Route path="/compliance" element={<Navigate to="/query" replace />} />
-                <Route path="/mp-plan" element={<MPPlanGenerator />} />
-                <Route
-                  path="/dt-editor"
-                  element={(
-                    <ProtectedRoute requireItar>
-                      <DTTreeEditor />
-                    </ProtectedRoute>
-                  )}
-                />
-                <Route path="/v4-query" element={<MiraV4Query />} />
-                <Route path="/bsmh" element={<Navigate to="/query" replace />} />
-                <Route path="/mua-v7" element={<InactiveModulePage moduleName="MUA Writer" />} />
-                <Route path="/mua-v8" element={<InactiveModulePage moduleName="MUA Writer" />} />
-                <Route path="/mua-v10" element={<InactiveModulePage moduleName="MUA Writer" />} />
-                <Route path="/forge" element={<Navigate to="/" replace />} />
-                <Route path="/forge-explorer" element={<Navigate to="/" replace />} />
-                <Route path="/tocr" element={<TOCR />} />
-                <Route path="/knowledge-twins" element={<KnowledgeTwins />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </AppLayout>
-          </ProtectedRoute>
+          <Routes>
+            <Route path="/" element={<MiraLanding />} />
+            <Route path="*" element={<ProtectedWorkspaceRoutes />} />
+          </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
