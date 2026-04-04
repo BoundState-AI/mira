@@ -5,6 +5,7 @@ import os
 
 import pytest
 
+import mira.core.session_store as session_store_module
 from mira.core.session_store import (
     DynamoDBSessionStore,
     MemorySessionStore,
@@ -147,6 +148,31 @@ class TestSessionStoreFactory:
     def test_validate_session_backend_configuration_is_noop_for_memory(self):
         os.environ["MIRA_SESSION_BACKEND"] = "memory"
         validate_session_backend_configuration()
+
+    def test_validate_session_backend_configuration_supports_running_event_loop(self, monkeypatch):
+        os.environ["MIRA_SESSION_BACKEND"] = "postgres"
+        os.environ["POSTGRES_HOST"] = "db.internal"
+        os.environ["POSTGRES_PASSWORD"] = "real-secret"
+
+        store = PostgresSessionStore()
+        called = {"count": 0}
+
+        async def fake_preflight():
+            called["count"] += 1
+
+        monkeypatch.setattr(store, "preflight", fake_preflight)
+        monkeypatch.setattr(session_store_module, "get_session_store", lambda: store)
+        monkeypatch.setattr(
+            session_store_module,
+            "_has_usable_postgres_configuration",
+            lambda: True,
+        )
+
+        async def _run():
+            validate_session_backend_configuration()
+
+        asyncio.run(_run())
+        assert called["count"] == 1
 
     def test_dynamodb_scaffolded(self):
         os.environ["MIRA_SESSION_BACKEND"] = "dynamodb"

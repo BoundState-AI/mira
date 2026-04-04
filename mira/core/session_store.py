@@ -567,6 +567,41 @@ _store_instance: SessionStore | None = None
 _store_lock = threading.Lock()
 
 
+def _run_preflight_sync(store: PostgresSessionStore) -> None:
+    """Run async postgres preflight from sync startup code.
+
+    Uvicorn may import the app while an event loop is already running inside a
+    worker process, so ``asyncio.run`` is not always legal here.
+    """
+
+    async def _preflight() -> None:
+        await store.preflight()
+
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        asyncio.run(_preflight())
+        return
+
+    error: list[BaseException] = []
+
+    def _runner() -> None:
+        try:
+            asyncio.run(_preflight())
+        except BaseException as exc:  # pragma: no cover - thread handoff
+            error.append(exc)
+
+    thread = threading.Thread(
+        target=_runner,
+        name="mira-postgres-preflight",
+        daemon=True,
+    )
+    thread.start()
+    thread.join()
+    if error:
+        raise error[0]
+
+
 def validate_session_backend_configuration() -> None:
     """Fail startup when production explicitly requires postgres but it is not ready."""
 
@@ -586,7 +621,7 @@ def validate_session_backend_configuration() -> None:
         raise RuntimeError("MIRA postgres session backend requested but store factory returned a different backend.")
 
     try:
-        asyncio.run(store.preflight())
+        _run_preflight_sync(store)
     except RuntimeError:
         raise
     except Exception as exc:  # pragma: no cover - defensive wrapper
