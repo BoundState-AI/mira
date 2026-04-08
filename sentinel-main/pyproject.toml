@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.11,<3.13"
 license = { text = "Apache-2.0" }
 authors = [
-    { name = "Dr. Joseph Wilde", email = "joe@boundstate.ai" },
+    { name = "Dr. Joseph Wilde", email = "jnwilde@pm.me" },
     { name = "Claude Opus 4.5", email = "noreply@anthropic.com" },
 ]
 
