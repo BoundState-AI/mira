@@ -31,6 +31,26 @@ export interface MiraChatPingResponse {
   adapters_loaded: string;
 }
 
+export interface OraclePackSummary {
+  pack_id: string;
+  standard_id: string;
+  standard_title: string;
+  short_code?: string | null;
+  rule_count: number;
+  obligation_types: string[];
+}
+
+export interface OraclePackCatalogResponse {
+  status: string;
+  packs: OraclePackSummary[];
+}
+
+export interface OraclePackMutationResponse {
+  status: string;
+  slug: string;
+  packs: OraclePackSummary[];
+}
+
 export interface MiraChatStreamEvent {
   type: string;
   [key: string]: unknown;
@@ -58,6 +78,68 @@ export async function fetchMiraChatPing(): Promise<MiraChatPingResponse> {
   const response = await fetch(`${API_BASE}/ping`);
   if (!response.ok) {
     throw new Error(`Chat ping failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+export async function fetchOraclePackCatalog(): Promise<OraclePackCatalogResponse> {
+  const response = await fetch(`${API_BASE}/oracle/packs`);
+  if (!response.ok) {
+    throw new Error(`Oracle pack catalog failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+export async function refreshOraclePackCatalog(): Promise<OraclePackCatalogResponse> {
+  const response = await fetch(`${API_BASE}/oracle/refresh`, { method: "POST" });
+  if (!response.ok) {
+    throw new Error(`Oracle pack refresh failed: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+export async function importOraclePack(file: File): Promise<OraclePackMutationResponse> {
+  const form = new FormData();
+  form.append("pack_file", file);
+  form.append("overwrite", "true");
+  form.append("allow_partial", "true");
+
+  const response = await fetch(`${API_BASE}/oracle/import-pack`, {
+    method: "POST",
+    body: form,
+  });
+  if (!response.ok) {
+    const detail = await response.json().catch(() => null);
+    throw new Error(buildErrorMessage(response.statusText, detail));
+  }
+  return response.json();
+}
+
+export async function ingestOraclePdf(args: {
+  file: File;
+  standardName?: string;
+  forceType?: string;
+  useVision?: boolean;
+}): Promise<OraclePackMutationResponse> {
+  const form = new FormData();
+  form.append("source_file", args.file);
+  form.append("overwrite", "true");
+  form.append("allow_partial", "true");
+  form.append("use_vision", args.useVision ? "true" : "false");
+  if (args.standardName?.trim()) {
+    form.append("standard_name", args.standardName.trim());
+  }
+  if (args.forceType?.trim()) {
+    form.append("force_type", args.forceType.trim());
+  }
+
+  const response = await fetch(`${API_BASE}/oracle/ingest`, {
+    method: "POST",
+    body: form,
+  });
+  if (!response.ok) {
+    const detail = await response.json().catch(() => null);
+    throw new Error(buildErrorMessage(response.statusText, detail));
   }
   return response.json();
 }

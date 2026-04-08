@@ -99,6 +99,7 @@ _MODULE_TO_ROUTING: dict[str, str] = {
     "fracture": "fracture",
     "gpcm": "gpcm",
     "compliance": "gpcm",
+    "oracle": "oracle",
     "maptis": "maptis_search",
     "maptis_search": "maptis_search",
     "bsmh": "bsmh",
@@ -348,7 +349,7 @@ def _resolve_module_specific(
     # OCA / H2: case_id already handled above; nothing extra needed
 
     # GPCM: standard reference
-    elif module_name in ("gpcm", "compliance"):
+    elif module_name in ("gpcm", "compliance", "oracle"):
         standard_ref = module_context.get("standard_ref")
         if standard_ref and not parsed.standard_ref:
             parsed.standard_ref = str(standard_ref)

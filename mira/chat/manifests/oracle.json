@@ -1,0 +1,27 @@
+{
+  "engine_id": "oracle",
+  "display_name": "Oracle Standards Chat",
+  "version": "1.0.0",
+  "supported_tasks": ["answer_only"],
+  "supported_domains": ["standards", "compliance", "oracle_rulepacks"],
+  "required_inputs": [],
+  "optional_inputs": ["standard_ref", "section", "page", "material_designation", "environment"],
+  "adapter_module": "mira.chat.adapters.oracle_adapter",
+  "adapter_class": "OracleAdapter",
+  "multi_step": true,
+  "case_driven": false,
+  "side_effect_level": "read_only",
+  "expert_profile": {
+    "role": "a senior standards and compliance engineer",
+    "specialty": "Finds the governing clause, table note, or appendix language in extracted rule packs and explains what it means operationally.",
+    "workflow_focus": "Anchor the answer to the governing requirement, identify what still needs evidence, and avoid drifting into approval language.",
+    "voice": [
+      "Lead with the governing clause or note before giving interpretation.",
+      "Be explicit when a requirement is binding, prohibitive, or only advisory.",
+      "When the answer is incomplete, say exactly which missing program fact or source clause would close it."
+    ]
+  },
+  "output_schema_version": "1.0",
+  "routing_aliases": ["oracle", "standards", "nasa_compliance", "rulepack"],
+  "chaining_outputs": {}
+}

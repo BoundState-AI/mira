@@ -35,6 +35,8 @@ export interface MiraChatStoredMessage {
   verdict?: string | null;
   auditId?: string | null;
   followUps?: string[];
+  citations?: string[];
+  advisoryOnly?: boolean;
   entities: Record<string, unknown>;
 }
 
@@ -81,6 +83,11 @@ const MODULE_PROMPTS: Record<string, string[]> = {
     "Which NASA-STD-6016C requirement is actually governing this case?",
     "Walk me through what is still missing for a clean compliance closure.",
     "What is the most conservative reading of this requirement?",
+  ],
+  oracle: [
+    "What does NASA-STD-5009C say about tin whiskers?",
+    "Show me the governing clause for pure tin finishes in MSFC-STD-3012A.",
+    "Compare NASA-STD-5009C and MSFC-STD-3012A on this topic.",
   ],
   bsmh: [
     "Help me sort this into the right engineering workflow.",

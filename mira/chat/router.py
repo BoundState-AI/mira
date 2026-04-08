@@ -24,18 +24,26 @@ Safety Critical: True
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
+import importlib
+import json
 import logging
+import os
 import re
+import sys
+from pathlib import Path
 import traceback
 from datetime import datetime, timezone
 from typing import Any
 from uuid import uuid4
 
-from fastapi import APIRouter
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
 
 from .audit import generate_audit_id, write_audit_record
+from .adapters.oracle_adapter import OracleAdapter
+from .capability_registry import get_adapter_info, get_engine_for_routing, list_engines
 from .engine_adapter import EngineAdapter
 from .models import (
     AuditRecord,
@@ -63,6 +71,34 @@ LOGGER = logging.getLogger(__name__)
 _MAX_HISTORY_MESSAGES = 10
 
 
+def _repo_root() -> Path:
+    return Path(__file__).resolve().parents[2]
+
+
+def _oracle_library_dir() -> Path:
+    env_override = os.environ.get("ORACLE_CHAT_LIBRARY_DIR", "").strip()
+    target = Path(env_override) if env_override else _repo_root() / "oracle_packs"
+    target.mkdir(parents=True, exist_ok=True)
+    return target
+
+
+def _oracle_workspace_dir() -> Path:
+    target = _repo_root() / ".oracle_ingest"
+    target.mkdir(parents=True, exist_ok=True)
+    return target
+
+
+def _load_oracle_cli_module():
+    oracle_repo_root = _repo_root() / ".tmp_oracle_main"
+    if not oracle_repo_root.exists():
+        raise RuntimeError("Oracle source repository is not available at .tmp_oracle_main.")
+    oracle_repo_root_str = str(oracle_repo_root)
+    if oracle_repo_root_str not in sys.path:
+        sys.path.insert(0, oracle_repo_root_str)
+    import oracle.cli as oracle_cli  # type: ignore[import-not-found]
+    return oracle_cli
+
+
 # ---------------------------------------------------------------------------
 # Adapter registry
 # ---------------------------------------------------------------------------
@@ -88,41 +124,22 @@ def _load_adapters() -> dict[str, EngineAdapter]:
         except Exception:
             LOGGER.warning("Chat adapter failed to load: %s", name, exc_info=True)
 
-    def _oca():
-        from .adapters.oca_adapter import OcaAdapter
-        return OcaAdapter()
+    for engine in list_engines():
+        engine_id = str(engine.get("engine_id") or "").strip()
+        if not engine_id:
+            continue
+        adapter_info = get_adapter_info(engine_id)
+        if not adapter_info:
+            LOGGER.warning("Chat adapter metadata missing for engine: %s", engine_id)
+            continue
+        adapter_module, adapter_class = adapter_info
 
-    def _h2():
-        from .adapters.h2_adapter import H2Adapter
-        return H2Adapter()
+        def _factory(module_name: str = adapter_module, class_name: str = adapter_class):  # type: ignore[no-untyped-def]
+            module = importlib.import_module(module_name)
+            cls = getattr(module, class_name)
+            return cls()
 
-    def _maptis():
-        from .adapters.maptis_adapter import MAPTISAdapter
-        return MAPTISAdapter()
-
-    def _bsmh():
-        from .adapters.bsmh_adapter import BSMHAdapter
-        return BSMHAdapter()
-
-    def _galvanic():
-        from .adapters.galvanic_adapter import GalvanicAdapter
-        return GalvanicAdapter()
-
-    def _fracture():
-        from .adapters.fracture_adapter import FractureAdapter
-        return FractureAdapter()
-
-    def _gpcm():
-        from .adapters.gpcm_adapter import GPCMAdapter
-        return GPCMAdapter()
-
-    _try_load("oca", _oca)
-    _try_load("h2", _h2)
-    _try_load("maptis_search", _maptis)
-    _try_load("bsmh", _bsmh)
-    _try_load("galvanic", _galvanic)
-    _try_load("fracture", _fracture)
-    _try_load("gpcm", _gpcm)
+        _try_load(engine_id, _factory)
 
     return _adapter_cache
 
@@ -130,7 +147,8 @@ def _load_adapters() -> dict[str, EngineAdapter]:
 def get_adapter(engine_id: str) -> EngineAdapter | None:
     """Return the adapter for *engine_id*, or ``None`` if unavailable."""
     adapters = _load_adapters()
-    return adapters.get(engine_id)
+    canonical_engine = get_engine_for_routing(engine_id) or engine_id
+    return adapters.get(canonical_engine)
 
 
 # ---------------------------------------------------------------------------
@@ -150,6 +168,118 @@ async def ping() -> dict[str, str]:
         "status": "ok",
         "domain": "chat",
         "adapters_loaded": ",".join(sorted(adapters.keys())),
+    }
+
+
+@router.get("/oracle/packs")
+async def oracle_packs() -> dict[str, Any]:
+    """Expose loaded Oracle rule-pack metadata for the shared chat UI."""
+    adapter = get_adapter("oracle")
+    if not isinstance(adapter, OracleAdapter):
+        return {"status": "unavailable", "packs": []}
+
+    packs = adapter.list_pack_summaries()
+    return {
+        "status": "ok",
+        "packs": packs,
+    }
+
+
+@router.post("/oracle/refresh")
+async def oracle_refresh() -> dict[str, Any]:
+    """Refresh the Oracle in-memory pack catalog without restarting the server."""
+    adapter = get_adapter("oracle")
+    if not isinstance(adapter, OracleAdapter):
+        return {"status": "unavailable", "packs": []}
+
+    packs = adapter.refresh_packs()
+    return {
+        "status": "ok",
+        "packs": packs,
+    }
+
+
+@router.post("/oracle/import-pack")
+async def oracle_import_pack(
+    pack_file: UploadFile = File(...),
+    name: str | None = Form(None),
+    description: str | None = Form(None),
+    allow_partial: bool = Form(True),
+    overwrite: bool = Form(True),
+) -> dict[str, Any]:
+    """Import a pre-generated Oracle rule-pack JSON into the managed library."""
+    if not pack_file.filename or not pack_file.filename.lower().endswith(".json"):
+        raise HTTPException(status_code=400, detail="Oracle import expects a .json rule-pack file.")
+
+    workspace_dir = _oracle_workspace_dir() / f"import-{uuid4().hex[:8]}"
+    workspace_dir.mkdir(parents=True, exist_ok=True)
+    upload_path = workspace_dir / Path(pack_file.filename).name
+    upload_path.write_bytes(await pack_file.read())
+
+    try:
+        oracle_cli = _load_oracle_cli_module()
+        slug = oracle_cli.register_pack(
+            upload_path,
+            _oracle_library_dir(),
+            name=name,
+            description=description,
+            allow_partial=allow_partial,
+            overwrite=overwrite,
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"Oracle import failed: {exc}") from exc
+
+    adapter = get_adapter("oracle")
+    packs = adapter.refresh_packs() if isinstance(adapter, OracleAdapter) else []
+    return {
+        "status": "ok",
+        "slug": slug,
+        "packs": packs,
+    }
+
+
+@router.post("/oracle/ingest")
+async def oracle_ingest(
+    source_file: UploadFile = File(...),
+    standard_name: str | None = Form(None),
+    force_type: str | None = Form(None),
+    use_vision: bool = Form(False),
+    allow_partial: bool = Form(True),
+    overwrite: bool = Form(True),
+) -> dict[str, Any]:
+    """Generate and register a new Oracle rule pack from an uploaded standards PDF."""
+    if not source_file.filename or not source_file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Oracle ingest expects a .pdf standards document.")
+
+    workspace_dir = _oracle_workspace_dir() / f"ingest-{uuid4().hex[:8]}"
+    workspace_dir.mkdir(parents=True, exist_ok=True)
+    source_path = workspace_dir / Path(source_file.filename).name
+    source_path.write_bytes(await source_file.read())
+
+    try:
+        oracle_cli = _load_oracle_cli_module()
+        slug = await asyncio.to_thread(
+            oracle_cli.generate_pack,
+            source_path,
+            standard_name,
+            workspace_dir,
+            _oracle_library_dir(),
+            use_vision,
+            force_type,
+            True,
+            allow_partial,
+            overwrite,
+            True,
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"Oracle ingest failed: {exc}") from exc
+
+    adapter = get_adapter("oracle")
+    packs = adapter.refresh_packs() if isinstance(adapter, OracleAdapter) else []
+    return {
+        "status": "ok",
+        "slug": slug,
+        "packs": packs,
     }
 
 
@@ -796,6 +926,8 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
             "session_id": session_id,
             "entities": turn_entities,
             "follow_ups": follow_up_labels,
+            "citations": list(envelope.citations),
+            "advisory_only": bool(envelope.domain_payload.get("advisory_only")),
         })
 
     return StreamingResponse(

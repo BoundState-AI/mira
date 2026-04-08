@@ -582,6 +582,15 @@ def _plain_language_summary(envelope: EngineEnvelope) -> str:
             return "From a standards-compliance standpoint, this can close only if the listed requirement gaps are resolved."
         if envelope.status == Status.FAIL:
             return "From a standards-compliance standpoint, the current case does not close against the governing requirements."
+    if envelope.engine_id == "oracle":
+        if envelope.status == Status.PASS:
+            return "Oracle found governing standards language that directly addresses the question as asked."
+        if envelope.status == Status.CONDITIONAL_PASS:
+            return "Oracle found relevant standards language, but the answer still depends on narrowing the governing clause or program context."
+        if envelope.status == Status.FAIL:
+            return "Oracle found governing standards language that does not support proceeding as stated."
+        if envelope.status == Status.INSUFFICIENT_DATA:
+            return "Oracle needs a tighter standard reference, section, or topic to anchor the answer."
 
     if envelope.engine_id == "maptis_search":
         if envelope.status == Status.PASS:
