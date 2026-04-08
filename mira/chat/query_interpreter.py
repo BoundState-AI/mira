@@ -121,7 +121,6 @@ _MODULE_ENGINE_ALIASES: Dict[str, str] = {
     "fracture": "fracture",
     "gpcm": "gpcm",
     "compliance": "gpcm",
-    "oracle": "oracle",
     "maptis": "maptis_search",
     "maptis_search": "maptis_search",
     "bsmh": "bsmh",
@@ -149,10 +148,6 @@ _EXPLICIT_ENGINE_PATTERNS: Dict[str, re.Pattern] = {
     ),
     "gpcm": re.compile(
         r"\b(?:gpcm|nasa-std-6016|6016c|materials?\s+and\s+process(?:es)?\s+plan|mpr\b)\b",
-        re.IGNORECASE,
-    ),
-    "oracle": re.compile(
-        r"\b(?:oracle|rule\s+pack|table\s+note|appendix|shall\s+extract(?:or|ion)|msfc-std|nasa-std-5009|3012a)\b",
         re.IGNORECASE,
     ),
 }
@@ -342,11 +337,7 @@ _TEMPERATURE_PATTERN = re.compile(
 
 # Standard reference extraction
 _STANDARD_PATTERN = re.compile(
-    r"\b("
-    r"(?:NASA|MSFC|MIL|ASTM|SAE|AMS|ISO)[-\s]?(?:STD[-\s]?)?[A-Z0-9][-A-Z0-9.]*"
-    r"(?:\s*(?:Rev|REV)\s*[A-Z0-9]+)?"
-    r"|(?:FAR|NFS|DFARS)\s+(?:Part\s+)?\d+(?:\.\d+)*"
-    r")\b",
+    r"\b((?:NASA|MIL|ASTM|SAE|AMS|ISO)[-\s]?(?:STD[-\s]?)?[A-Z0-9][-A-Z0-9.]*(?:\s*(?:Rev|REV)\s*[A-Z0-9]+)?)\b",
     re.I,
 )
 
@@ -539,11 +530,6 @@ def _determine_fine_routing(
 
     # Document lookup
     if coarse_intent == "document_lookup":
-        normalized_standard = (standard_ref or "").upper()
-        if normalized_standard:
-            if "NASA-STD-6016" in normalized_standard or "6016C" in normalized_standard:
-                return "gpcm", 0.85
-            return "oracle", 0.92
         return "bsmh", 0.80
 
     # Test report

@@ -7,7 +7,6 @@ import {
   FileStack,
   LayoutGrid,
   Search,
-  ScrollText,
   Shield,
   ShieldAlert,
   ShieldCheck,
@@ -92,7 +91,6 @@ const PRIMARY_PATHS = [
 
 const QUICK_LINKS = [
   { title: 'MIRA Chat', href: '/chat', icon: Bot, blurb: 'Module-aware chat across the workspace.' },
-  { title: 'Oracle Standards', href: '/oracle', icon: ScrollText, blurb: 'Clause-grounded standards chat with Oracle packs.' },
   { title: 'Gas Compatibility', href: '/gas-compatibility', icon: Wind, blurb: 'Hydrogen and oxygen screening.' },
   { title: 'Galvanic', href: '/galvanic-compatibility', icon: ShieldAlert, blurb: 'Pairing risk and mitigation.' },
   { title: 'Fracture Control', href: '/fracture-control', icon: ShieldCheck, blurb: 'FCR-backed decisions.' },

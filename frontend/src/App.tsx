@@ -18,7 +18,6 @@ import MiraChat from "./pages/MiraChat";
 import MiraV4Query from "./pages/MiraV4Query";
 import BSMHQuery from "./pages/BSMHQuery";
 import MUAV10 from "./pages/MUAV10";
-import OracleStandards from "./pages/OracleStandards";
 import GasCompatibility from "./pages/GasCompatibility";
 import GalvanicCompatibility from "./pages/GalvanicCompatibility";
 import FractureControl from "./pages/FractureControl";
@@ -43,7 +42,6 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<MiraLanding />} />
                 <Route path="/chat" element={<MiraChat />} />
-                <Route path="/oracle" element={<OracleStandards />} />
                 <Route
                   path="/query"
                   element={(

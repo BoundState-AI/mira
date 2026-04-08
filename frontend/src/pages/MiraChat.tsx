@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Bot, Compass, Loader2, RotateCcw, SendHorizonal } from "lucide-react";
+import { ArrowLeft, Bot, Compass, Loader2, RotateCcw, SendHorizonal, User2 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { MiraChatMessageBubble } from "@/components/mira/MiraChatMessageBubble";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { fetchMiraChatPing, sendMiraChatStream, type MiraChatMessage } from "@/lib/chat-api";
@@ -22,6 +21,7 @@ import {
   type MiraChatStoredMessage,
   type MiraModuleChatLaunchState,
 } from "@/lib/mira-chat-context";
+import { cn } from "@/lib/utils";
 
 const MAX_HISTORY_MESSAGES = 10;
 const MAX_STORED_MESSAGES = 24;
@@ -30,7 +30,6 @@ const GLOBAL_EXAMPLE_PROMPTS = [
   "What galvanic risk do I have between 7075-T73 and CRES 304 in seawater proxy?",
   "Can you compare hydrogen compatibility for Inconel 718 and A286?",
   "What MAPTIS evidence exists for Inconel 625 in aged versus cast condition?",
-  "What does NASA-STD-5009C say about tin whiskers?",
 ];
 
 type Verdict = "PASS" | "CONDITIONAL_PASS" | "FAIL" | "REFUSE" | "INSUFFICIENT_DATA" | "ERROR" | null;
@@ -51,9 +50,15 @@ const ENGINE_LABELS: Record<string, string> = {
   forge_build: "FORGE Build",
   forge_explorer: "FORGE Explorer",
   tocr: "TOCR Review",
-  oracle: "Oracle Standards",
   bsmh: "MIRA",
 };
+
+function verdictVariant(verdict: Verdict): "default" | "secondary" | "destructive" | "outline" {
+  if (verdict === "PASS") return "default";
+  if (verdict === "FAIL" || verdict === "ERROR" || verdict === "REFUSE") return "destructive";
+  if (verdict === "CONDITIONAL_PASS") return "secondary";
+  return "outline";
+}
 
 function toHistoryMessages(messages: ChatUiMessage[]): MiraChatMessage[] {
   return messages.slice(-MAX_HISTORY_MESSAGES).map((message) => ({
@@ -79,6 +84,69 @@ function assistantScopeLabel(
     return ENGINE_LABELS[engineUsed];
   }
   return "MIRA";
+}
+
+function renderInlineText(text: string) {
+  const matches = Array.from(text.matchAll(/\*\*(.+?)\*\*/g));
+  if (!matches.length) {
+    return text;
+  }
+
+  const nodes: Array<string | JSX.Element> = [];
+  let cursor = 0;
+
+  matches.forEach((match, index) => {
+    const start = match.index ?? 0;
+    const end = start + match[0].length;
+    if (start > cursor) {
+      nodes.push(text.slice(cursor, start));
+    }
+    nodes.push(
+      <strong key={`strong-${index}`} className="font-semibold text-inherit">
+        {match[1]}
+      </strong>,
+    );
+    cursor = end;
+  });
+
+  if (cursor < text.length) {
+    nodes.push(text.slice(cursor));
+  }
+
+  return nodes;
+}
+
+function renderMessageContent(text: string) {
+  const blocks = text
+    .split(/\n\s*\n/)
+    .map((block) => block.trim())
+    .filter(Boolean);
+
+  return blocks.map((block, blockIndex) => {
+    const lines = block.split("\n").map((line) => line.trimEnd());
+    const bulletLines = lines.filter((line) => /^[-*]\s+/.test(line.trim()));
+
+    if (bulletLines.length === lines.length) {
+      return (
+        <ul key={`list-${blockIndex}`} className="list-disc space-y-1 pl-5 marker:text-slate-400">
+          {bulletLines.map((line, lineIndex) => (
+            <li key={`item-${blockIndex}-${lineIndex}`}>{renderInlineText(line.replace(/^[-*]\s+/, ""))}</li>
+          ))}
+        </ul>
+      );
+    }
+
+    return (
+      <p key={`paragraph-${blockIndex}`} className="whitespace-pre-wrap">
+        {lines.map((line, lineIndex) => (
+          <span key={`line-${blockIndex}-${lineIndex}`}>
+            {renderInlineText(line)}
+            {lineIndex < lines.length - 1 ? <br /> : null}
+          </span>
+        ))}
+      </p>
+    );
+  });
 }
 
 export default function MiraChat() {
@@ -255,10 +323,6 @@ export default function MiraChat() {
               const followUps = Array.isArray(event.follow_ups)
                 ? event.follow_ups.filter((item): item is string => typeof item === "string")
                 : [];
-              const citations = Array.isArray(event.citations)
-                ? event.citations.filter((item): item is string => typeof item === "string")
-                : [];
-              const advisoryOnly = event.advisory_only === true;
               if (typeof event.session_id === "string" && event.session_id.trim()) {
                 setSessionId(event.session_id);
               }
@@ -271,8 +335,6 @@ export default function MiraChat() {
                     ...currentMessage,
                     auditId: typeof event.audit_id === "string" ? event.audit_id : null,
                     followUps,
-                    citations,
-                    advisoryOnly,
                     entities: turnEntities,
                   };
                 }
@@ -436,17 +498,72 @@ export default function MiraChat() {
               )}
 
               {messages.map((message) => {
+                const isAssistant = message.role === "assistant";
                 return (
-                  <MiraChatMessageBubble
+                  <div
                     key={message.id}
-                    message={message}
-                    assistantLabel={assistantScopeLabel(activeModuleLaunchState, message.engineUsed)}
-                    isSending={isSending}
-                    showAuditId
-                    onFollowUp={(followUp) => {
-                      void submitMessage(followUp);
-                    }}
-                  />
+                    className={cn("flex", isAssistant ? "justify-start" : "justify-end")}
+                  >
+                    <div
+                      className={cn(
+                        "max-w-[92%] rounded-2xl border px-4 py-3 shadow-sm 2xl:max-w-[88%]",
+                        isAssistant
+                          ? "border-slate-200 bg-white text-slate-900"
+                          : "border-teal-700 bg-teal-700 text-white",
+                      )}
+                    >
+                      <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-[0.18em] opacity-80">
+                        {isAssistant ? <Bot className="h-3.5 w-3.5" /> : <User2 className="h-3.5 w-3.5" />}
+                        {isAssistant ? assistantScopeLabel(activeModuleLaunchState, message.engineUsed) : "Engineer"}
+                        {isAssistant && message.engineUsed && message.content.trim() && (
+                          <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-medium text-slate-600">
+                            {message.engineUsed}
+                          </span>
+                        )}
+                        {isAssistant && message.verdict && message.content.trim() && (
+                          <Badge variant={verdictVariant(message.verdict)} className="ml-auto">
+                            {message.verdict}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="space-y-3 text-sm leading-6">
+                        {isAssistant && !message.content && isSending ? (
+                          <span className="inline-flex items-center gap-2 text-muted-foreground">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            {activeModuleLaunchState ? `Running ${activeModuleLaunchState.moduleLabel}` : "Streaming response"}
+                          </span>
+                        ) : renderMessageContent(message.content)}
+                      </div>
+
+                      {isAssistant && (message.auditId || message.followUps?.length) && (
+                        <div className="mt-4 space-y-3 border-t border-slate-200 pt-3">
+                          {message.auditId && (
+                            <div className="text-xs text-muted-foreground">
+                              Audit ID: <span className="font-mono">{message.auditId}</span>
+                            </div>
+                          )}
+                          {!!message.followUps?.length && (
+                            <div className="flex flex-wrap gap-2">
+                              {message.followUps.map((followUp) => (
+                                <Button
+                                  key={`${message.id}-${followUp}`}
+                                  type="button"
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-auto px-3 py-1.5"
+                                  onClick={() => {
+                                    void submitMessage(followUp);
+                                  }}
+                                >
+                                  {followUp}
+                                </Button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 );
               })}
 

@@ -38,7 +38,6 @@ interface NavItem {
 const DEFAULT_NAV_ITEMS: NavItem[] = [
   { id: 'mp-plan', title: 'M&P Plan', navKey: 'mpPlan', url: '/mp-plan', icon: ClipboardList },
   { id: 'chat', title: 'MIRA Chat', navKey: 'chat', url: '/chat', icon: Bot },
-  { id: 'oracle', title: 'Oracle Standards', navKey: 'oracle', url: '/oracle', icon: ScrollText },
   { id: 'query', title: 'MIRA Query', navKey: 'query', url: '/query', icon: Zap },
   { id: 'gas-compatibility', title: 'Gas Compatibility', navKey: 'gasCompatibility', url: '/gas-compatibility', icon: Wind },
   { id: 'galvanic-compatibility', title: 'Galvanic Compatibility', navKey: 'galvanicCompatibility', url: '/galvanic-compatibility', icon: ShieldAlert },

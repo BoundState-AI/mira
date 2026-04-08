@@ -2,9 +2,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Bot, Compass, Expand, Loader2, MessageSquare, Minimize2, SendHorizonal, X } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { MiraChatMessageBubble } from "@/components/mira/MiraChatMessageBubble";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { fetchMiraChatPing, sendMiraChatStream, type MiraChatMessage } from "@/lib/chat-api";
@@ -22,13 +22,13 @@ import {
   type MiraChatStoredMessage,
   type MiraModuleChatLaunchState,
 } from "@/lib/mira-chat-context";
+import { cn } from "@/lib/utils";
 
 const MAX_HISTORY_MESSAGES = 10;
 const MAX_STORED_MESSAGES = 24;
 const GLOBAL_WIDGET_PROMPTS = [
   "Is 316L compatible with GOX at 3000 psi?",
   "What galvanic risk do I have between 7075-T73 and CRES 304?",
-  "What does NASA-STD-5009C say about tin whiskers?",
 ];
 
 type Verdict = "PASS" | "CONDITIONAL_PASS" | "FAIL" | "REFUSE" | "INSUFFICIENT_DATA" | "ERROR" | null;
@@ -48,9 +48,15 @@ const ENGINE_LABELS: Record<string, string> = {
   forge_build: "FORGE Build",
   forge_explorer: "FORGE Explorer",
   tocr: "TOCR Review",
-  oracle: "Oracle Standards",
   bsmh: "MIRA",
 };
+
+function verdictVariant(verdict: Verdict): "default" | "secondary" | "destructive" | "outline" {
+  if (verdict === "PASS") return "default";
+  if (verdict === "FAIL" || verdict === "ERROR" || verdict === "REFUSE") return "destructive";
+  if (verdict === "CONDITIONAL_PASS") return "secondary";
+  return "outline";
+}
 
 function messageId(prefix: "user" | "assistant"): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
@@ -178,15 +184,6 @@ function fallbackLaunchState(pathname: string): MiraModuleChatLaunchState | null
         originPath: pathname,
         originTitle: "FORGE Explorer",
         description: "Answer only from the active FORGE explorer state and BSMS query results.",
-      });
-    case "/oracle":
-      return createModuleChatLaunchState({
-        scopeKey: "oracle-standards",
-        moduleLabel: "Oracle Standards",
-        moduleContext: { module: "oracle", standard_ref: "NASA-STD-5009C" },
-        originPath: pathname,
-        originTitle: "Oracle Standards",
-        description: "Ground the chat in Oracle rule packs for clause lookup, applicability, and standards comparison.",
       });
     case "/tocr":
       return createModuleChatLaunchState({
@@ -393,10 +390,6 @@ export function MiraChatDock() {
               const followUps = Array.isArray(event.follow_ups)
                 ? event.follow_ups.filter((item): item is string => typeof item === "string")
                 : [];
-              const citations = Array.isArray(event.citations)
-                ? event.citations.filter((item): item is string => typeof item === "string")
-                : [];
-              const advisoryOnly = event.advisory_only === true;
               if (typeof event.session_id === "string" && event.session_id.trim()) {
                 setSessionId(event.session_id);
               }
@@ -409,8 +402,6 @@ export function MiraChatDock() {
                     ...currentMessage,
                     auditId: typeof event.audit_id === "string" ? event.audit_id : null,
                     followUps,
-                    citations,
-                    advisoryOnly,
                     entities: turnEntities,
                   };
                 }
@@ -528,17 +519,62 @@ export function MiraChatDock() {
               ) : null}
 
               {messages.map((message) => {
+                const isAssistant = message.role === "assistant";
                 return (
-                  <MiraChatMessageBubble
+                  <div
                     key={message.id}
-                    message={message}
-                    assistantLabel={assistantScopeLabel(activeModuleLaunchState, message.engineUsed)}
-                    isSending={isSending}
-                    compact
-                    onFollowUp={(followUp) => {
-                      void submitMessage(followUp);
-                    }}
-                  />
+                    className={cn("flex min-w-0", isAssistant ? "justify-start" : "justify-end")}
+                  >
+                    <div
+                      className={cn(
+                        "min-w-0 rounded-2xl border shadow-sm",
+                        isAssistant ? "max-w-[96%] px-3 py-2" : "max-w-[90%] px-4 py-3 sm:max-w-[80%]",
+                        isAssistant
+                          ? "border-slate-200 bg-white text-slate-900"
+                          : "border-teal-700 bg-teal-700 text-white",
+                      )}
+                    >
+                      <div className="mb-1 flex flex-wrap items-center gap-1.5 text-[10px] uppercase tracking-[0.14em] opacity-80">
+                        {isAssistant ? assistantScopeLabel(activeModuleLaunchState, message.engineUsed) : "You"}
+                        {isAssistant && message.engineUsed && message.content.trim() ? (
+                          <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[9px] font-medium text-slate-600">
+                            {message.engineUsed}
+                          </span>
+                        ) : null}
+                        {isAssistant && message.verdict && message.content.trim() ? (
+                          <Badge variant={verdictVariant(message.verdict)} className="ml-auto text-[10px]">
+                            {message.verdict}
+                          </Badge>
+                        ) : null}
+                      </div>
+                      <div className="whitespace-pre-wrap break-words text-sm leading-5">
+                        {isAssistant && !message.content && isSending ? (
+                          <span className="inline-flex items-center gap-2 text-muted-foreground">
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            {activeModuleLaunchState ? `Running ${activeModuleLaunchState.moduleLabel}` : "Streaming response"}
+                          </span>
+                        ) : message.content}
+                      </div>
+                      {isAssistant && message.followUps?.length ? (
+                        <div className="mt-2 flex flex-wrap gap-1.5 border-t border-slate-200 pt-2">
+                          {message.followUps.slice(0, 2).map((followUp) => (
+                            <Button
+                              key={`${message.id}-${followUp}`}
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              className="h-auto px-2 py-1 text-[11px]"
+                              onClick={() => {
+                                void submitMessage(followUp);
+                              }}
+                            >
+                              {followUp}
+                            </Button>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
                 );
               })}
 
