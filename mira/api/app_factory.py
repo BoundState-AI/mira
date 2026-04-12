@@ -15,7 +15,11 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+except ModuleNotFoundError:  # pragma: no cover - optional local dev dependency
+    def load_dotenv(*_args, **_kwargs) -> bool:
+        return False
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware

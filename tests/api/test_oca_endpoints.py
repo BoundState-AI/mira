@@ -4,6 +4,15 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
+from mira.core.session_store import reset_session_store
+
+
+@pytest.fixture(autouse=True)
+def _reset_session_store_fixture():
+    reset_session_store()
+    yield
+    reset_session_store()
+
 
 @pytest.fixture
 def client():

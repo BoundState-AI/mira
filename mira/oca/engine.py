@@ -1,11 +1,12 @@
-"""Deterministic Phase 1 OCA engine and in-process case store."""
+"""Deterministic Phase 1 OCA engine with shared persisted case snapshots."""
 
 from __future__ import annotations
 
 from datetime import datetime
-from threading import RLock
 from typing import Optional
 from uuid import uuid4
+
+from mira.core.session_store import load_model, save_model
 
 from .maptis_stub import get_material_for_o2, get_o2_family_rule
 
@@ -68,35 +69,27 @@ PARTIAL_EVIDENCE_THRESHOLD = 0.50
 WEAK_EVIDENCE_THRESHOLD = 0.25
 
 
+_OCA_CASES_MODULE = "oca_cases"
+
+
 def get_authority_manifest():
     return _get_authority_manifest()
 
-
-class _OcaCaseStore:
-    def __init__(self) -> None:
-        self._lock = RLock()
-        self._cases: dict[str, AssessmentSnapshot] = {}
-
-    def create(self, request: CreateOcaCaseRequest) -> AssessmentSnapshot:
-        with self._lock:
-            case_id = f"oca-{uuid4().hex[:12]}"
-            snapshot = _build_snapshot(case_id, request, 1)
-            self._cases[case_id] = snapshot
-            return snapshot
-
-    def get(self, case_id: str) -> AssessmentSnapshot:
-        with self._lock:
-            snapshot = self._cases.get(case_id)
-            if snapshot is None:
-                raise KeyError(case_id)
-            return snapshot
+async def _load_snapshot(case_id: str) -> AssessmentSnapshot:
+    snapshot = await load_model(_OCA_CASES_MODULE, case_id, AssessmentSnapshot)
+    if snapshot is None:
+        raise KeyError(case_id)
+    return snapshot
 
 
-_STORE = _OcaCaseStore()
+async def _save_snapshot(snapshot: AssessmentSnapshot) -> None:
+    await save_model(_OCA_CASES_MODULE, snapshot.case_id, snapshot)
 
 
-def create_case(request: CreateOcaCaseRequest) -> CreateOcaCaseResponse:
-    snapshot = _STORE.create(request)
+async def create_case(request: CreateOcaCaseRequest) -> CreateOcaCaseResponse:
+    case_id = f"oca-{uuid4().hex[:12]}"
+    snapshot = _build_snapshot(case_id, request, 1)
+    await _save_snapshot(snapshot)
     return CreateOcaCaseResponse(
         case_id=snapshot.case_id,
         revision=snapshot.revision,
@@ -106,8 +99,8 @@ def create_case(request: CreateOcaCaseRequest) -> CreateOcaCaseResponse:
     )
 
 
-def get_case_precheck(case_id: str) -> OcaPrecheckResponse:
-    snapshot = _STORE.get(case_id)
+async def get_case_precheck(case_id: str) -> OcaPrecheckResponse:
+    snapshot = await _load_snapshot(case_id)
     return OcaPrecheckResponse(
         case_id=case_id,
         revision=snapshot.revision,
@@ -117,8 +110,8 @@ def get_case_precheck(case_id: str) -> OcaPrecheckResponse:
     )
 
 
-def get_case_evidence(case_id: str) -> OcaEvidenceResponse:
-    snapshot = _STORE.get(case_id)
+async def get_case_evidence(case_id: str) -> OcaEvidenceResponse:
+    snapshot = await _load_snapshot(case_id)
     gaps = sorted({gap for card in snapshot.evidence for gap in card.gaps})
     return OcaEvidenceResponse(
         case_id=case_id,
@@ -128,23 +121,23 @@ def get_case_evidence(case_id: str) -> OcaEvidenceResponse:
     )
 
 
-def get_case_mechanisms(case_id: str) -> OcaMechanismsResponse:
-    snapshot = _STORE.get(case_id)
+async def get_case_mechanisms(case_id: str) -> OcaMechanismsResponse:
+    snapshot = await _load_snapshot(case_id)
     return OcaMechanismsResponse(case_id=case_id, revision=snapshot.revision, mechanisms=snapshot.mechanisms)
 
 
-def get_case_decision(case_id: str) -> OcaDecisionResponse:
-    snapshot = _STORE.get(case_id)
+async def get_case_decision(case_id: str) -> OcaDecisionResponse:
+    snapshot = await _load_snapshot(case_id)
     return OcaDecisionResponse(case_id=case_id, revision=snapshot.revision, decision=snapshot.decision)
 
 
-def get_case_requirements(case_id: str) -> OcaRequirementsResponse:
-    snapshot = _STORE.get(case_id)
+async def get_case_requirements(case_id: str) -> OcaRequirementsResponse:
+    snapshot = await _load_snapshot(case_id)
     return OcaRequirementsResponse(case_id=case_id, revision=snapshot.revision, requirements=snapshot.requirements)
 
 
-def get_case_lineage(case_id: str) -> OcaLineageResponse:
-    snapshot = _STORE.get(case_id)
+async def get_case_lineage(case_id: str) -> OcaLineageResponse:
+    snapshot = await _load_snapshot(case_id)
     return OcaLineageResponse(
         case_id=case_id,
         revision=snapshot.revision,
@@ -153,8 +146,8 @@ def get_case_lineage(case_id: str) -> OcaLineageResponse:
     )
 
 
-def export_case_artifacts(case_id: str) -> OcaExportResponse:
-    snapshot = _STORE.get(case_id)
+async def export_case_artifacts(case_id: str) -> OcaExportResponse:
+    snapshot = await _load_snapshot(case_id)
     material_names = ", ".join(item.canonical_name for item in snapshot.normalized_input.materials)
     service = snapshot.normalized_input.service_context
     requirements = ", ".join(req.requirement_id for req in snapshot.requirements if req.triggered) or "none"

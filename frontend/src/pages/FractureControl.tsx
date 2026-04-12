@@ -1,4 +1,4 @@
-import { useDeferredValue, useEffect, useState, type FormEvent } from 'react';
+import { useDeferredValue, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { AlertTriangle, CheckCircle2, Loader2, ShieldAlert, ShieldCheck, ShieldX } from 'lucide-react';
 
 import { PageHeader } from '@/components/PageHeader';
@@ -243,6 +243,38 @@ export default function FractureControl() {
     };
   }, [deferredMaterialName]);
 
+  const fractureMaterialContext = useMemo(
+    () => ({
+      low_risk_candidate: lowRiskCandidate,
+      additive_manufactured: additiveManufactured,
+      chloride_exposure: chlorideExposure,
+      sustained_load_expected: sustainedLoadExpected,
+      approved_source_data_attached: approvedSourceDataAttached,
+      mua_present: muaPresent,
+      nasa_std_6016_qualified:
+        qualificationState === 'unknown'
+          ? null
+          : qualificationState === 'qualified',
+      kic_fty_ratio: kicFtyRatio.trim() ? Number(kicFtyRatio) : null,
+      ftu_ksi: ftuKsi.trim() ? Number(ftuKsi) : null,
+      short_transverse_dimension_in: shortTransverseDimension.trim()
+        ? Number(shortTransverseDimension)
+        : null,
+    }),
+    [
+      additiveManufactured,
+      approvedSourceDataAttached,
+      chlorideExposure,
+      ftuKsi,
+      kicFtyRatio,
+      lowRiskCandidate,
+      muaPresent,
+      qualificationState,
+      shortTransverseDimension,
+      sustainedLoadExpected,
+    ],
+  );
+
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setLoading(true);
@@ -277,23 +309,7 @@ export default function FractureControl() {
         process_controls_used: processControlsUsed,
         detected_flaw_accepted_for_flight: detectedFlawAcceptedForFlight,
         corrosion_iccp_recommended: corrosionIccpRecommended,
-        material_context: {
-          low_risk_candidate: lowRiskCandidate,
-          additive_manufactured: additiveManufactured,
-          chloride_exposure: chlorideExposure,
-          sustained_load_expected: sustainedLoadExpected,
-          approved_source_data_attached: approvedSourceDataAttached,
-          mua_present: muaPresent,
-          nasa_std_6016_qualified:
-            qualificationState === 'unknown'
-              ? null
-              : qualificationState === 'qualified',
-          kic_fty_ratio: kicFtyRatio.trim() ? Number(kicFtyRatio) : null,
-          ftu_ksi: ftuKsi.trim() ? Number(ftuKsi) : null,
-          short_transverse_dimension_in: shortTransverseDimension.trim()
-            ? Number(shortTransverseDimension)
-            : null,
-        },
+        material_context: fractureMaterialContext,
       });
       setResult(response);
     } catch (submitError) {
@@ -317,54 +333,161 @@ export default function FractureControl() {
     { checked: approvedSourceDataAttached, setChecked: setApprovedSourceDataAttached, label: 'Approved source data attached', fieldId: 'approved_source_data_attached' },
     { checked: muaPresent, setChecked: setMuaPresent, label: 'MUA already present' },
   ];
-  const fractureFieldStates = [
-    { fieldKey: 'inputs.part_name', label: 'Part Name', status: partName.trim() ? 'complete' : 'incomplete', required: true },
-    { fieldKey: 'inputs.material_name', label: 'Material', status: materialName.trim() ? 'complete' : 'incomplete', required: true },
-    { fieldKey: 'inputs.mission_class', label: 'Mission Class', status: missionClass ? 'complete' : 'incomplete', required: true },
-    { fieldKey: 'inputs.hazard_consequence', label: 'Hazard Consequence', status: hazardConsequence ? 'complete' : 'incomplete', required: true },
-    { fieldKey: 'inputs.load_path_type', label: 'Load Path', status: loadPathType ? 'complete' : 'incomplete', required: true },
-    { fieldKey: 'inputs.material_system', label: 'Material System', status: materialSystem ? 'complete' : 'incomplete', required: true },
-    { fieldKey: 'inputs.specific_hardware_type', label: 'Specific Hardware Type', status: specificHardwareType ? 'complete' : 'incomplete', required: true },
-  ] as const;
-  const fractureBlockers = fractureFieldStates
-    .filter((field) => field.status !== 'complete')
-    .map((field) => field.label);
-  const fractureWorkflowContext = buildWorkflowContext({
-    currentStep: result ? 'review_classification' : fractureBlockers.length ? 'define_part_context' : 'ready_to_classify',
-    activeField: activeChatField,
-    fieldStates: fractureFieldStates.map((field) => ({ ...field })),
-    nextSteps: fractureBlockers.length
-      ? [`Complete ${fractureBlockers[0]}.`]
+  const fractureFieldStates = useMemo(
+    () => ([
+      { fieldKey: 'inputs.part_name', label: 'Part Name', status: partName.trim() ? 'complete' : 'incomplete', required: true },
+      { fieldKey: 'inputs.material_name', label: 'Material', status: materialName.trim() ? 'complete' : 'incomplete', required: true },
+      { fieldKey: 'inputs.mission_class', label: 'Mission Class', status: missionClass ? 'complete' : 'incomplete', required: true },
+      { fieldKey: 'inputs.hazard_consequence', label: 'Hazard Consequence', status: hazardConsequence ? 'complete' : 'incomplete', required: true },
+      { fieldKey: 'inputs.load_path_type', label: 'Load Path', status: loadPathType ? 'complete' : 'incomplete', required: true },
+      { fieldKey: 'inputs.lifecycle_phase', label: 'Lifecycle Phase', status: lifecyclePhase ? 'complete' : 'incomplete', required: true },
+      { fieldKey: 'inputs.structural_role', label: 'Structural Role', status: structuralRole ? 'complete' : 'incomplete', required: true },
+      { fieldKey: 'inputs.material_system', label: 'Material System', status: materialSystem ? 'complete' : 'incomplete', required: true },
+      { fieldKey: 'inputs.specific_hardware_type', label: 'Specific Hardware Type', status: specificHardwareType ? 'complete' : 'incomplete', required: true },
+    ] as const),
+    [
+      hazardConsequence,
+      lifecyclePhase,
+      loadPathType,
+      materialName,
+      materialSystem,
+      missionClass,
+      partName,
+      specificHardwareType,
+      structuralRole,
+    ],
+  );
+  const fractureBlockers = useMemo(
+    () => fractureFieldStates
+      .filter((field) => field.status !== 'complete')
+      .map((field) => field.label),
+    [fractureFieldStates],
+  );
+  const fractureCurrentStep = result ? 'review_classification' : fractureBlockers.length ? 'define_part_context' : 'ready_to_classify';
+  const fractureCurrentStepLabel = result ? 'Classification review' : fractureBlockers.length ? 'Part context definition' : 'Ready to classify';
+  const fractureNextSteps = fractureBlockers.length
+    ? [`Complete ${fractureBlockers[0]}.`]
+    : result
+      ? ['Review the applicable requirements and material findings for the current classification.']
+      : ['Run the classifier for the current part context.'];
+  const fractureFocusSummary = activeChatField
+    ? `Currently editing ${activeChatField.label}.`
+    : fractureBlockers.length
+      ? `Still missing ${fractureBlockers.join(', ')} before classification.`
       : result
-        ? ['Review the applicable requirements and material findings for the current classification.']
-        : ['Run the classifier for the current part context.'],
-    blockers: fractureBlockers,
-  });
-  const fractureChatLaunchState = createModuleChatLaunchState({
-    scopeKey: 'fracture-control',
-    moduleLabel: 'Fracture Control',
-    moduleContext: {
-      module: 'fracture',
-      material: materialName.trim(),
-      part_name: partName.trim(),
-      mission_class: missionClass,
-      chat_workflow: fractureWorkflowContext,
-    },
-    originPath: '/fracture-control',
-    originTitle: 'Fracture Control',
-    description: 'Ground the chat in the current part, mission class, and fracture-screen inputs.',
-    contextSummary: buildChatContextSummary([
+        ? `Current classification is ${result.classification} on baseline ${result.baseline_key}.`
+        : 'Part context is defined and ready for fracture classification.';
+  const fractureResultSummary = useMemo(
+    () => [
+      result ? `Classification: ${result.classification}.` : null,
+      result ? `Baseline: ${result.baseline_key}.` : null,
+      result?.applicable_fcrs.length ? `Applicable FCRs: ${result.applicable_fcrs.join(', ')}.` : null,
+      result?.required_actions.length ? `${result.required_actions.length} required actions identified.` : null,
+      result?.unresolved_inputs.length ? `${result.unresolved_inputs.length} unresolved inputs remain.` : null,
+    ].filter((item): item is string => Boolean(item)),
+    [result],
+  );
+  const fractureWorkflowContext = useMemo(
+    () => buildWorkflowContext({
+      currentStep: fractureCurrentStep,
+      currentStepLabel: fractureCurrentStepLabel,
+      activeField: activeChatField,
+      fieldStates: fractureFieldStates.map((field) => ({ ...field })),
+      nextSteps: fractureNextSteps,
+      blockers: fractureBlockers,
+      focusSummary: fractureFocusSummary,
+      resultSummary: fractureResultSummary,
+    }),
+    [activeChatField, fractureBlockers, fractureCurrentStep, fractureCurrentStepLabel, fractureFieldStates, fractureFocusSummary, fractureNextSteps, fractureResultSummary],
+  );
+  const fractureContextSummary = useMemo(
+    () => buildChatContextSummary([
       { label: 'Part', value: partName.trim() },
       { label: 'Material', value: materialName.trim() },
       { label: 'Mission', value: missionClass.replaceAll('_', ' ') },
       { label: 'Lifecycle', value: lifecyclePhase.replaceAll('_', ' ') },
       { label: 'Hardware', value: specificHardwareType.replaceAll('_', ' ') },
+      { label: 'Step', value: fractureCurrentStepLabel },
+      { label: 'Classification', value: result?.classification },
     ]),
-  });
+    [fractureCurrentStepLabel, lifecyclePhase, materialName, missionClass, partName, result?.classification, specificHardwareType],
+  );
+  const fractureChatLaunchState = useMemo(
+    () => createModuleChatLaunchState({
+      scopeKey: 'fracture-control',
+      moduleLabel: 'Fracture Control',
+      moduleContext: {
+        module: 'fracture',
+        material: materialName.trim(),
+        part_name: partName.trim(),
+        mission_class: missionClass,
+        hazard_consequence: hazardConsequence,
+        load_path_type: loadPathType,
+        lifecycle_phase: lifecyclePhase,
+        structural_role: structuralRole,
+        material_system: materialSystem,
+        specific_hardware_type: specificHardwareType,
+        pressure_boundary: pressureBoundary,
+        optional_approach_requested: optionalApproachRequested,
+        proof_test_used: proofTestUsed,
+        process_controls_used: processControlsUsed,
+        detected_flaw_accepted_for_flight: detectedFlawAcceptedForFlight,
+        corrosion_iccp_recommended: corrosionIccpRecommended,
+        low_risk_candidate: lowRiskCandidate,
+        additive_manufactured: additiveManufactured,
+        chloride_exposure: chlorideExposure,
+        sustained_load_expected: sustainedLoadExpected,
+        approved_source_data_attached: approvedSourceDataAttached,
+        mua_present: muaPresent,
+        nasa_std_6016_qualified: fractureMaterialContext.nasa_std_6016_qualified,
+        kic_fty_ratio: fractureMaterialContext.kic_fty_ratio,
+        ftu_ksi: fractureMaterialContext.ftu_ksi,
+        short_transverse_dimension_in: fractureMaterialContext.short_transverse_dimension_in,
+        classification: result?.classification,
+        applicable_fcrs: result?.applicable_fcrs,
+        unresolved_inputs: result?.unresolved_inputs,
+        material_context: fractureMaterialContext,
+        chat_workflow: fractureWorkflowContext,
+      },
+      originPath: '/fracture-control',
+      originTitle: 'Fracture Control',
+      description: 'Ground the chat in the current fracture-screen inputs, workflow step, and classification state.',
+      contextSummary: fractureContextSummary,
+    }),
+    [
+      additiveManufactured,
+      approvedSourceDataAttached,
+      chlorideExposure,
+      corrosionIccpRecommended,
+      detectedFlawAcceptedForFlight,
+      fractureContextSummary,
+      fractureMaterialContext,
+      fractureWorkflowContext,
+      hazardConsequence,
+      lifecyclePhase,
+      loadPathType,
+      lowRiskCandidate,
+      materialName,
+      materialSystem,
+      missionClass,
+      muaPresent,
+      optionalApproachRequested,
+      partName,
+      pressureBoundary,
+      processControlsUsed,
+      proofTestUsed,
+      result?.applicable_fcrs,
+      result?.classification,
+      result?.unresolved_inputs,
+      specificHardwareType,
+      structuralRole,
+      sustainedLoadExpected,
+    ],
+  );
 
   useEffect(() => {
     registerRouteModuleChatState('/fracture-control', fractureChatLaunchState);
-  }, [activeChatField, lifecyclePhase, materialName, missionClass, partName, specificHardwareType]);
+  }, [fractureChatLaunchState]);
 
   return (
     <GuidanceProvider

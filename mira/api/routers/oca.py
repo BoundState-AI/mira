@@ -80,13 +80,13 @@ async def authority() -> OcaAuthorityManifest:
 
 @router.post("/cases", response_model=CreateOcaCaseResponse)
 async def cases(request: CreateOcaCaseRequest) -> CreateOcaCaseResponse:
-    return create_case(request)
+    return await create_case(request)
 
 
 @router.post("/cases/{case_id}/precheck", response_model=OcaPrecheckResponse)
 async def precheck(case_id: str) -> OcaPrecheckResponse:
     try:
-        return get_case_precheck(case_id)
+        return await get_case_precheck(case_id)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail="OCA case not found") from exc
 
@@ -94,7 +94,7 @@ async def precheck(case_id: str) -> OcaPrecheckResponse:
 @router.post("/cases/{case_id}/evidence", response_model=OcaEvidenceResponse)
 async def evidence(case_id: str) -> OcaEvidenceResponse:
     try:
-        return get_case_evidence(case_id)
+        return await get_case_evidence(case_id)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail="OCA case not found") from exc
 
@@ -102,7 +102,7 @@ async def evidence(case_id: str) -> OcaEvidenceResponse:
 @router.post("/cases/{case_id}/mechanisms", response_model=OcaMechanismsResponse)
 async def mechanisms(case_id: str) -> OcaMechanismsResponse:
     try:
-        return get_case_mechanisms(case_id)
+        return await get_case_mechanisms(case_id)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail="OCA case not found") from exc
 
@@ -110,7 +110,7 @@ async def mechanisms(case_id: str) -> OcaMechanismsResponse:
 @router.post("/cases/{case_id}/decision", response_model=OcaDecisionResponse)
 async def decision(case_id: str) -> OcaDecisionResponse:
     try:
-        return get_case_decision(case_id)
+        return await get_case_decision(case_id)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail="OCA case not found") from exc
 
@@ -118,7 +118,7 @@ async def decision(case_id: str) -> OcaDecisionResponse:
 @router.post("/cases/{case_id}/export", response_model=OcaExportResponse)
 async def export(case_id: str) -> OcaExportResponse:
     try:
-        return export_case_artifacts(case_id)
+        return await export_case_artifacts(case_id)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail="OCA case not found") from exc
 
@@ -126,7 +126,7 @@ async def export(case_id: str) -> OcaExportResponse:
 @router.get("/cases/{case_id}/requirements", response_model=OcaRequirementsResponse)
 async def requirements(case_id: str) -> OcaRequirementsResponse:
     try:
-        return get_case_requirements(case_id)
+        return await get_case_requirements(case_id)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail="OCA case not found") from exc
 
@@ -134,6 +134,6 @@ async def requirements(case_id: str) -> OcaRequirementsResponse:
 @router.get("/cases/{case_id}/lineage", response_model=OcaLineageResponse)
 async def lineage(case_id: str) -> OcaLineageResponse:
     try:
-        return get_case_lineage(case_id)
+        return await get_case_lineage(case_id)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail="OCA case not found") from exc

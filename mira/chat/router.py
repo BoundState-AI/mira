@@ -849,6 +849,7 @@ def _build_parsed_input(parsed: ParsedQuery) -> dict[str, Any]:
     For OCA, also builds the structured service_context/materials dicts
     that the OCA adapter's _build_case_request expects.
     """
+    inherited = parsed.inherited_entities or {}
     base = {
         "raw_query": parsed.raw_query,
         "coarse_intent": parsed.coarse_intent,
@@ -866,22 +867,77 @@ def _build_parsed_input(parsed: ParsedQuery) -> dict[str, Any]:
         "dissimilar_metals": parsed.dissimilar_metals,
         "fracture_context": parsed.fracture_context,
         "routing_confidence": parsed.routing_confidence,
-        "inherited_entities": parsed.inherited_entities,
+        "inherited_entities": inherited,
     }
 
-    # OCA needs structured input — build it from flat entities
-    if parsed.fine_routing == "oca" and parsed.material_designation:
-        base["service_context"] = _build_oca_service_context(parsed)
-        base["materials"] = [{"material_name": parsed.material_designation}]
-        base["components"] = [
-            {
-                "component_class": "line",
-                "geometry_class": "bulk",
-                "design_function": "pressure_boundary",
-                "pressure_boundary_material": parsed.material_designation,
-                "is_rigid_metallic_tubing": True,
-            }
-        ]
+    # OCA needs structured input — prefer the active module state when present.
+    if parsed.fine_routing == "oca":
+        if inherited.get("case_id"):
+            base["case_id"] = inherited["case_id"]
+
+        inherited_service_context = inherited.get("service_context")
+        inherited_materials = inherited.get("materials")
+        inherited_components = inherited.get("components")
+        inherited_ignition_context = inherited.get("ignition_context")
+
+        if isinstance(inherited_service_context, dict) and isinstance(inherited_materials, list) and inherited_materials:
+            service_context = dict(inherited_service_context)
+            if parsed.pressure_value is not None:
+                service_context["total_pressure_min_psia"] = parsed.pressure_value
+                service_context["total_pressure_max_psia"] = parsed.pressure_value
+                if parsed.gas_service == "oxygen":
+                    service_context["oxygen_partial_pressure_psia"] = parsed.pressure_value
+
+            temperature_c = _temperature_celsius(parsed.temperature)
+            if temperature_c is not None:
+                service_context["temp_min_c"] = temperature_c
+                service_context["temp_max_c"] = temperature_c
+
+            materials = [
+                dict(item)
+                for item in inherited_materials
+                if isinstance(item, dict)
+            ]
+            if materials and parsed.material_designation:
+                materials[0] = {
+                    **materials[0],
+                    "material_name": parsed.material_designation,
+                }
+
+            base["service_context"] = service_context
+            base["materials"] = materials
+
+            if isinstance(inherited_components, list) and inherited_components:
+                base["components"] = [
+                    dict(item)
+                    for item in inherited_components
+                    if isinstance(item, dict)
+                ]
+            elif parsed.material_designation:
+                base["components"] = [
+                    {
+                        "component_class": "line",
+                        "geometry_class": "bulk",
+                        "design_function": "pressure_boundary",
+                        "pressure_boundary_material": parsed.material_designation,
+                        "is_rigid_metallic_tubing": True,
+                    }
+                ]
+
+            if isinstance(inherited_ignition_context, dict):
+                base["ignition_context"] = dict(inherited_ignition_context)
+        elif parsed.material_designation:
+            base["service_context"] = _build_oca_service_context(parsed)
+            base["materials"] = [{"material_name": parsed.material_designation}]
+            base["components"] = [
+                {
+                    "component_class": "line",
+                    "geometry_class": "bulk",
+                    "design_function": "pressure_boundary",
+                    "pressure_boundary_material": parsed.material_designation,
+                    "is_rigid_metallic_tubing": True,
+                }
+            ]
         base["free_text_intake"] = parsed.raw_query
 
     # H2 needs material + pressure + query
@@ -909,8 +965,30 @@ def _build_parsed_input(parsed: ParsedQuery) -> dict[str, Any]:
 
     # Fracture needs part_name + material
     if parsed.fine_routing == "fracture":
-        base["part_name"] = parsed.inherited_entities.get("part_name", "")
-        base["mission_class"] = parsed.inherited_entities.get("mission_class")
+        base["part_name"] = inherited.get("part_name", "")
+        for field_name in (
+            "mission_class",
+            "hazard_consequence",
+            "load_path_type",
+            "pressure_boundary",
+            "structural_role",
+            "material_system",
+            "specific_hardware_type",
+            "optional_approach_requested",
+            "proof_test_used",
+            "process_controls_used",
+            "detected_flaw_accepted_for_flight",
+            "corrosion_iccp_recommended",
+            "low_risk_candidate",
+            "additive_manufactured",
+            "chloride_exposure",
+            "sustained_load_expected",
+            "mua_present",
+            "kic_fty_ratio",
+            "ftu_ksi",
+        ):
+            if field_name in inherited:
+                base[field_name] = inherited[field_name]
 
     # GPCM needs material + gas_service
     if parsed.fine_routing == "gpcm":

@@ -105,6 +105,29 @@ _MODULE_TO_ROUTING: dict[str, str] = {
 }
 
 
+def _has_context_value(value: Any) -> bool:
+    """Return True when a module-context value is worth carrying forward."""
+    if value is None:
+        return False
+    if isinstance(value, str):
+        return bool(value.strip())
+    if isinstance(value, (list, tuple, set, dict)):
+        return bool(value)
+    return True
+
+
+def _copy_present_values(
+    source: dict[str, Any],
+    target: dict[str, Any],
+    field_names: tuple[str, ...],
+) -> None:
+    """Copy non-empty values from source into target without renaming."""
+    for field_name in field_names:
+        value = source.get(field_name)
+        if _has_context_value(value):
+            target[field_name] = value
+
+
 # ---------------------------------------------------------------------------
 # Core resolution function
 # ---------------------------------------------------------------------------
@@ -336,16 +359,65 @@ def _resolve_module_specific(
 
     # Fracture: part name, mission class
     elif module_name == "fracture":
-        part_name = module_context.get("part_name")
-        if part_name:
-            parsed.inherited_entities["part_name"] = part_name
-        mission_class = module_context.get("mission_class")
-        if mission_class:
-            parsed.inherited_entities["mission_class"] = mission_class
+        _copy_present_values(
+            module_context,
+            parsed.inherited_entities,
+            (
+                "part_name",
+                "mission_class",
+                "hazard_consequence",
+                "load_path_type",
+                "lifecycle_phase",
+                "structural_role",
+                "material_system",
+                "specific_hardware_type",
+                "pressure_boundary",
+                "optional_approach_requested",
+                "proof_test_used",
+                "process_controls_used",
+                "detected_flaw_accepted_for_flight",
+                "corrosion_iccp_recommended",
+                "low_risk_candidate",
+                "additive_manufactured",
+                "chloride_exposure",
+                "sustained_load_expected",
+                "approved_source_data_attached",
+                "mua_present",
+                "nasa_std_6016_qualified",
+                "kic_fty_ratio",
+                "ftu_ksi",
+                "short_transverse_dimension_in",
+                "classification",
+                "applicable_fcrs",
+                "unresolved_inputs",
+                "material_context",
+            ),
+        )
         # Set fracture_context flag
         parsed.fracture_context = True
 
-    # OCA / H2: case_id already handled above; nothing extra needed
+    elif module_name == "oca":
+        _copy_present_values(
+            module_context,
+            parsed.inherited_entities,
+            (
+                "case_revision",
+                "component_class",
+                "geometry_class",
+                "design_function",
+                "mission_phase",
+                "phase",
+                "flow_regime",
+                "pressure_min_psi",
+                "decision_disposition",
+                "service_context",
+                "materials",
+                "components",
+                "ignition_context",
+            ),
+        )
+
+    # H2: case_id already handled above; nothing extra needed
 
     # GPCM: standard reference
     elif module_name in ("gpcm", "compliance"):
@@ -405,6 +477,8 @@ def extract_module_entities(module_context: dict[str, Any] | None) -> dict[str, 
     if isinstance(workflow, dict):
         if workflow.get("current_step"):
             entities["current_step"] = workflow["current_step"]
+        if workflow.get("current_step_label"):
+            entities["current_step_label"] = workflow["current_step_label"]
         if workflow.get("active_field"):
             entities["active_field"] = workflow["active_field"]
         if workflow.get("active_field_label"):
@@ -413,9 +487,49 @@ def extract_module_entities(module_context: dict[str, Any] | None) -> dict[str, 
             entities["completed_fields"] = workflow["completed_fields"]
         if workflow.get("incomplete_fields"):
             entities["incomplete_fields"] = workflow["incomplete_fields"]
+        if workflow.get("completed_field_count") is not None:
+            entities["completed_field_count"] = workflow["completed_field_count"]
+        if workflow.get("total_field_count") is not None:
+            entities["total_field_count"] = workflow["total_field_count"]
         if workflow.get("next_steps"):
             entities["next_steps"] = workflow["next_steps"]
         if workflow.get("blockers"):
             entities["workflow_blockers"] = workflow["blockers"]
+        if workflow.get("focus_summary"):
+            entities["workflow_focus_summary"] = workflow["focus_summary"]
+        if workflow.get("result_summary"):
+            entities["workflow_result_summary"] = workflow["result_summary"]
+
+    module_name = str(module_context.get("module", "")).lower()
+    if module_name == "fracture":
+        _copy_present_values(
+            module_context,
+            entities,
+            (
+                "part_name",
+                "mission_class",
+                "hazard_consequence",
+                "load_path_type",
+                "lifecycle_phase",
+                "structural_role",
+                "material_system",
+                "specific_hardware_type",
+                "classification",
+            ),
+        )
+    elif module_name == "oca":
+        _copy_present_values(
+            module_context,
+            entities,
+            (
+                "case_revision",
+                "component_class",
+                "design_function",
+                "mission_phase",
+                "phase",
+                "flow_regime",
+                "decision_disposition",
+            ),
+        )
 
     return entities

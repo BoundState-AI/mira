@@ -236,12 +236,16 @@ def build_formatter_prompt(
         workflow = _get_chat_workflow(session_context)
         if workflow:
             workflow_lines: list[str] = []
+            if workflow.get("current_step_label"):
+                workflow_lines.append(f"  - Current step label: {workflow['current_step_label']}")
             if workflow.get("current_step"):
                 workflow_lines.append(f"  - Current step: {workflow['current_step']}")
             if workflow.get("active_field_label"):
                 workflow_lines.append(f"  - Active field: {workflow['active_field_label']}")
             elif workflow.get("active_field"):
                 workflow_lines.append(f"  - Active field key: {workflow['active_field']}")
+            if workflow.get("focus_summary"):
+                workflow_lines.append(f"  - Focus summary: {workflow['focus_summary']}")
             if workflow.get("completed_fields"):
                 workflow_lines.append(
                     "  - Completed fields: " + ", ".join(str(field) for field in workflow["completed_fields"])
@@ -257,6 +261,10 @@ def build_formatter_prompt(
             if workflow.get("next_steps"):
                 workflow_lines.append(
                     "  - Next steps: " + ", ".join(str(step) for step in workflow["next_steps"])
+                )
+            if workflow.get("result_summary"):
+                workflow_lines.append(
+                    "  - Result summary: " + "; ".join(str(item) for item in workflow["result_summary"])
                 )
             if workflow_lines:
                 sections.append("WORKFLOW CONTEXT:\n" + "\n".join(workflow_lines))
@@ -457,11 +465,20 @@ def _fallback_format(
     workflow_note: list[str] = []
     if workflow.get("active_field_label"):
         workflow_note.append(f"Current field: {workflow['active_field_label']}")
+    if workflow.get("current_step_label"):
+        workflow_note.append(f"Step label: {workflow['current_step_label']}")
     if workflow.get("current_step"):
         workflow_note.append(f"Workflow step: {workflow['current_step']}")
+    if workflow.get("focus_summary"):
+        workflow_note.append(f"Focus: {workflow['focus_summary']}")
     if workflow_note:
         lines.append("")
         lines.append(" | ".join(workflow_note))
+    if workflow.get("result_summary"):
+        lines.append("")
+        lines.append("**Current module state:**")
+        for item in workflow["result_summary"]:
+            lines.append(f"  - {item}")
     if workflow.get("next_steps"):
         lines.append("")
         lines.append("**Next step in this module:**")

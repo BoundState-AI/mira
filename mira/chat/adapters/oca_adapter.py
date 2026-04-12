@@ -22,7 +22,6 @@ Co-Authored-By: Dr. Joseph Wilde, BoundState AI
 
 from __future__ import annotations
 
-import asyncio
 from typing import Any, Optional
 
 from mira.oca import (
@@ -123,22 +122,22 @@ class OcaAdapter(EngineAdapter):
 
         try:
             # --- Step 1: Create case ---
-            create_resp = await self._run_sync(create_case, request)
+            create_resp = await create_case(request)
 
             case_id = create_resp.case_id
 
             # --- Step 2: Precheck ---
-            precheck_resp = await self._run_sync(get_case_precheck, case_id)
+            precheck_resp = await get_case_precheck(case_id)
 
             # If any blocked state has severity "red" we refuse immediately
             if self._has_blocking_refusal(precheck_resp):
                 return self._build_refusal_envelope(case_id, precheck_resp)
 
             # --- Step 3: Evidence ---
-            evidence_resp = await self._run_sync(get_case_evidence, case_id)
+            evidence_resp = await get_case_evidence(case_id)
 
             # --- Step 4: Decision ---
-            decision_resp = await self._run_sync(get_case_decision, case_id)
+            decision_resp = await get_case_decision(case_id)
 
             # --- Step 5: Persist case_id in session for follow-ups ---
             # Case records are engine-internal operational state, not user artifacts.
@@ -180,9 +179,9 @@ class OcaAdapter(EngineAdapter):
             )
 
         try:
-            precheck_resp = await self._run_sync(get_case_precheck, case_id)
-            evidence_resp = await self._run_sync(get_case_evidence, case_id)
-            decision_resp = await self._run_sync(get_case_decision, case_id)
+            precheck_resp = await get_case_precheck(case_id)
+            evidence_resp = await get_case_evidence(case_id)
+            decision_resp = await get_case_decision(case_id)
 
             return self._build_success_envelope(
                 case_id=case_id,
@@ -398,18 +397,3 @@ class OcaAdapter(EngineAdapter):
             },
         )
 
-    # ------------------------------------------------------------------
-    # Internal: sync-to-async bridge
-    # ------------------------------------------------------------------
-
-    @staticmethod
-    async def _run_sync(func, *args, **kwargs):
-        """
-        Run a synchronous OCA engine function in the default executor.
-
-        The OCA engine functions (create_case, get_case_precheck, etc.)
-        are synchronous and use an RLock internally.  We offload them to
-        a thread so we don't block the async event loop.
-        """
-        loop = asyncio.get_running_loop()
-        return await loop.run_in_executor(None, lambda: func(*args, **kwargs))

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from mira.core.session_store import reset_session_store
 from mira.oca.engine import (
     _build_legacy_normalized_input,
     _hazard_control_recommendation,
@@ -42,6 +43,13 @@ from mira.oca.models import (
     TriggeredRequirement,
     CreateOcaCaseRequest,
 )
+
+
+@pytest.fixture(autouse=True)
+def _reset_session_store_fixture():
+    reset_session_store()
+    yield
+    reset_session_store()
 
 
 def _context() -> OxygenServiceContext:
@@ -180,8 +188,9 @@ def test_legacy_shim_generates_mechanisms_evidence_controls_and_seed() -> None:
     assert _hazard_control_recommendation("mystery") == "Apply configuration-specific controls and document closure evidence."
 
 
-def test_partial_external_mechanism_signal_mappings_are_applied() -> None:
-    created = create_case(
+@pytest.mark.anyio
+async def test_partial_external_mechanism_signal_mappings_are_applied() -> None:
+    created = await create_case(
         CreateOcaCaseRequest(
             service_context={
                 "oxidizer_type": "gox",
@@ -212,7 +221,7 @@ def test_partial_external_mechanism_signal_mappings_are_applied() -> None:
     )
     mechanisms = {
         item.mechanism_name.value: item
-        for item in get_case_mechanisms(created.case_id).mechanisms
+        for item in (await get_case_mechanisms(created.case_id)).mechanisms
     }
 
     assert mechanisms["welding"].credible_status == CredibleStatus.CREDIBLE

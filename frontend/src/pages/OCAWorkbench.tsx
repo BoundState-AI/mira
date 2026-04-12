@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -298,6 +298,118 @@ export default function OCAWorkbench() {
     };
   }, []);
 
+  const ocaServiceContext = useMemo(
+    () => ({
+      oxidizer_type: oxidizerType,
+      o2_fraction: Number(o2Fraction),
+      total_pressure_min_psia: Number(pressureMin),
+      total_pressure_max_psia: Number(pressureMax),
+      phase,
+      temp_min_c: tempMin ? Number(tempMin) : null,
+      temp_max_c: tempMax ? Number(tempMax) : null,
+      flow_regime: flowRegime,
+      velocity_m_s: velocity ? Number(velocity) : null,
+      cleanliness_verified: cleanlinessVerified,
+      contamination_notes: contaminationNotes || null,
+      mission_phase: missionPhase,
+      application: designFunction,
+    }),
+    [
+      cleanlinessVerified,
+      contaminationNotes,
+      designFunction,
+      flowRegime,
+      missionPhase,
+      o2Fraction,
+      oxidizerType,
+      phase,
+      pressureMax,
+      pressureMin,
+      tempMax,
+      tempMin,
+      velocity,
+    ],
+  );
+
+  const ocaMaterialInputs = useMemo(
+    () => ([
+      {
+        material_name: materialName.trim(),
+        spec: spec || null,
+        grade: grade || null,
+        temper: temper || null,
+        product_form: productForm || null,
+        coating: coating || null,
+        surface_condition: surfaceCondition || null,
+        role_in_component: roleInComponent || null,
+      },
+    ]),
+    [coating, grade, materialName, productForm, roleInComponent, spec, surfaceCondition, temper],
+  );
+
+  const ocaComponentInputs = useMemo(
+    () => ([
+      {
+        component_id: 'cmp-1',
+        component_class: componentClass,
+        geometry_class: geometryClass,
+        design_function: designFunction,
+        dynamic_contact_flag: dynamicContact,
+        is_rigid_metallic_tubing: rigidTubing,
+        is_metallic_flex_hose: metallicFlexHose,
+        is_all_metal_seal: allMetalSeal,
+        is_metallic_pressure_vessel: metallicPressureVessel,
+        seal_type: sealType,
+        pressure_boundary_material: pressureBoundaryMaterial || null,
+      },
+    ]),
+    [
+      allMetalSeal,
+      componentClass,
+      designFunction,
+      dynamicContact,
+      geometryClass,
+      metallicFlexHose,
+      metallicPressureVessel,
+      pressureBoundaryMaterial,
+      rigidTubing,
+      sealType,
+    ],
+  );
+
+  const ocaIgnitionContext = useMemo(
+    () => ({
+      entrainable_particles_present: entrainableParticles,
+      rapid_pressurization_time_ms: rapidPressurizationMs ? Number(rapidPressurizationMs) : null,
+      dead_end_configuration: deadEndConfiguration,
+      nonmetal_exposed_to_flow: nonmetalInFlow,
+      vibration_or_erosion_present: vibrationPresent,
+      acoustic_cavity_present: acousticCavity,
+      mechanical_impact_risk: mechanicalImpactRisk,
+      isolated_surface_present: isolatedSurface,
+      dry_gas_environment: dryGas,
+      electrical_power_present: electricalPower,
+      reactive_chemical_pair_present: reactiveChemicalPair,
+      porous_media_present: porousMedia,
+      open_flame_or_hot_work_present: openFlame,
+    }),
+    [
+      acousticCavity,
+      deadEndConfiguration,
+      dryGas,
+      electricalPower,
+      entrainableParticles,
+      isolatedSurface,
+      mechanicalImpactRisk,
+      nonmetalInFlow,
+      openFlame,
+      porousMedia,
+      rapidPressurizationMs,
+      reactiveChemicalPair,
+      vibrationPresent,
+    ],
+  );
+
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setLoading(true);
@@ -307,63 +419,10 @@ export default function OCAWorkbench() {
     try {
       const request: OCACreateCaseRequest = {
         case_name: `${materialName} ${componentClass}`.trim(),
-        service_context: {
-          oxidizer_type: oxidizerType,
-          o2_fraction: Number(o2Fraction),
-          total_pressure_min_psia: Number(pressureMin),
-          total_pressure_max_psia: Number(pressureMax),
-          phase,
-          temp_min_c: tempMin ? Number(tempMin) : null,
-          temp_max_c: tempMax ? Number(tempMax) : null,
-          flow_regime: flowRegime,
-          velocity_m_s: velocity ? Number(velocity) : null,
-          cleanliness_verified: cleanlinessVerified,
-          contamination_notes: contaminationNotes || null,
-          mission_phase: missionPhase,
-          application: designFunction,
-        },
-        materials: [
-          {
-            material_name: materialName.trim(),
-            spec: spec || null,
-            grade: grade || null,
-            temper: temper || null,
-            product_form: productForm || null,
-            coating: coating || null,
-            surface_condition: surfaceCondition || null,
-            role_in_component: roleInComponent || null,
-          },
-        ],
-        components: [
-          {
-            component_id: 'cmp-1',
-            component_class: componentClass,
-            geometry_class: geometryClass,
-            design_function: designFunction,
-            dynamic_contact_flag: dynamicContact,
-            is_rigid_metallic_tubing: rigidTubing,
-            is_metallic_flex_hose: metallicFlexHose,
-            is_all_metal_seal: allMetalSeal,
-            is_metallic_pressure_vessel: metallicPressureVessel,
-            seal_type: sealType,
-            pressure_boundary_material: pressureBoundaryMaterial || null,
-          },
-        ],
-        ignition_context: {
-          entrainable_particles_present: entrainableParticles,
-          rapid_pressurization_time_ms: rapidPressurizationMs ? Number(rapidPressurizationMs) : null,
-          dead_end_configuration: deadEndConfiguration,
-          nonmetal_exposed_to_flow: nonmetalInFlow,
-          vibration_or_erosion_present: vibrationPresent,
-          acoustic_cavity_present: acousticCavity,
-          mechanical_impact_risk: mechanicalImpactRisk,
-          isolated_surface_present: isolatedSurface,
-          dry_gas_environment: dryGas,
-          electrical_power_present: electricalPower,
-          reactive_chemical_pair_present: reactiveChemicalPair,
-          porous_media_present: porousMedia,
-          open_flame_or_hot_work_present: openFlame,
-        },
+        service_context: ocaServiceContext,
+        materials: ocaMaterialInputs,
+        components: ocaComponentInputs,
+        ignition_context: ocaIgnitionContext,
       };
 
       const created = await ocaCreateCase(request);
@@ -413,68 +472,181 @@ export default function OCAWorkbench() {
   })).filter((entry) => entry.items.length > 0);
   const displayedRequirements = requirements?.requirements ?? precheck?.triggered_requirements ?? [];
   const displayedMechanisms = mechanisms?.mechanisms ?? [];
-  const completionFields = [
-    { name: 'workbench.material_name', label: 'Material', required: true, valid: Boolean(materialName.trim()), hasWarnings: false },
-    { name: 'workbench.component_class', label: 'Component class', required: true, valid: Boolean(componentClass), hasWarnings: false },
-    { name: 'workbench.design_function', label: 'Design function', required: true, valid: Boolean(designFunction.trim()), hasWarnings: false },
-    { name: 'workbench.oxidizer_type', label: 'Oxidizer', required: true, valid: Boolean(oxidizerType), hasWarnings: false },
-    { name: 'workbench.total_pressure_max_psia', label: 'Max pressure', required: true, valid: Number.isFinite(Number(pressureMax)) && pressureMax.trim() !== '', hasWarnings: false },
-    { name: 'workbench.total_pressure_min_psia', label: 'Min pressure', required: true, valid: Number.isFinite(Number(pressureMin)) && pressureMin.trim() !== '', hasWarnings: false },
-    { name: 'workbench.temp_max_c', label: 'Max temperature', required: true, valid: Number.isFinite(Number(tempMax)) && tempMax.trim() !== '', hasWarnings: false },
-    { name: 'workbench.o2_fraction', label: 'O2 fraction', required: true, valid: Number.isFinite(Number(o2Fraction)) && o2Fraction.trim() !== '', hasWarnings: false },
-  ];
-  const incompleteCompletionFields = completionFields.filter((field) => !field.valid);
-  const ocaWorkflowContext = buildWorkflowContext({
-    currentStep: decision
-      ? 'review_decision'
-      : createdCase
-        ? 'review_precheck'
-        : incompleteCompletionFields.length
-          ? 'complete_required_inputs'
-          : 'ready_to_run_screening',
-    activeField: activeChatField,
-    fieldStates: completionFields.map((field) => ({
-      fieldKey: field.name,
-      label: field.label,
-      status: field.valid ? 'complete' : field.hasWarnings ? 'warning' : 'incomplete',
-      required: field.required,
-    })),
-    nextSteps: incompleteCompletionFields.length
+  const completionFields = useMemo(
+    () => ([
+      { name: 'workbench.material_name', label: 'Material', required: true, valid: Boolean(materialName.trim()), hasWarnings: false },
+      { name: 'workbench.component_class', label: 'Component class', required: true, valid: Boolean(componentClass), hasWarnings: false },
+      { name: 'workbench.design_function', label: 'Design function', required: true, valid: Boolean(designFunction.trim()), hasWarnings: false },
+      { name: 'workbench.oxidizer_type', label: 'Oxidizer', required: true, valid: Boolean(oxidizerType), hasWarnings: false },
+      { name: 'workbench.total_pressure_max_psia', label: 'Max pressure', required: true, valid: Number.isFinite(Number(pressureMax)) && pressureMax.trim() !== '', hasWarnings: false },
+      { name: 'workbench.total_pressure_min_psia', label: 'Min pressure', required: true, valid: Number.isFinite(Number(pressureMin)) && pressureMin.trim() !== '', hasWarnings: false },
+      { name: 'workbench.temp_max_c', label: 'Max temperature', required: true, valid: Number.isFinite(Number(tempMax)) && tempMax.trim() !== '', hasWarnings: false },
+      { name: 'workbench.o2_fraction', label: 'O2 fraction', required: true, valid: Number.isFinite(Number(o2Fraction)) && o2Fraction.trim() !== '', hasWarnings: false },
+    ]),
+    [componentClass, designFunction, materialName, o2Fraction, oxidizerType, pressureMax, pressureMin, tempMax],
+  );
+  const incompleteCompletionFields = useMemo(
+    () => completionFields.filter((field) => !field.valid),
+    [completionFields],
+  );
+  const credibleMechanismCount = displayedMechanisms.filter((item) => item.credible_status === 'CREDIBLE').length;
+  const indeterminateMechanismCount = displayedMechanisms.filter((item) => item.credible_status === 'INDETERMINATE').length;
+  const ocaCurrentStep = decision
+    ? 'review_decision'
+    : createdCase
+      ? 'review_precheck'
+      : incompleteCompletionFields.length
+        ? 'complete_required_inputs'
+        : 'ready_to_run_screening';
+  const ocaCurrentStepLabel = decision
+    ? 'Decision review'
+    : createdCase
+      ? 'Precheck and evidence review'
+      : incompleteCompletionFields.length
+        ? 'Required input completion'
+        : 'Ready to run screening';
+  const ocaNextSteps = useMemo(
+    () => incompleteCompletionFields.length
       ? [`Complete ${incompleteCompletionFields[0].label}.`]
       : !createdCase
         ? ['Run the OCA screening to create or update the case.']
         : !decision
           ? ['Review the triggered requirements and mechanism credibility, then run the decision step.']
           : ['Review the downstream actions and export the package if you need a handoff artifact.'],
-    blockers: incompleteCompletionFields.map((field) => field.label),
-  });
-  const ocaChatLaunchState = createModuleChatLaunchState({
-    scopeKey: 'oca-workbench',
-    moduleLabel: 'OCA Workbench',
-    moduleContext: {
-      module: 'oca',
-      case_id: createdCase?.case_id,
-      material: materialName.trim(),
-      environment: oxidizerType.toUpperCase(),
-      pressure_psi: pressureMax.trim() ? Number(pressureMax) : undefined,
-      temperature: tempMax.trim() ? Number(tempMax) : undefined,
-      chat_workflow: ocaWorkflowContext,
-    },
-    originPath: '/oca/workbench',
-    originTitle: 'OCA Workbench',
-    description: 'Ground the chat in the active oxygen compatibility workbench inputs and case.',
-    contextSummary: buildChatContextSummary([
+    [createdCase, decision, incompleteCompletionFields],
+  );
+  const ocaFocusSummary = activeChatField
+    ? `Currently editing ${activeChatField.label}.`
+    : incompleteCompletionFields.length
+      ? `Missing ${incompleteCompletionFields.map((field) => field.label).join(', ')} before screening.`
+      : decision
+        ? `Current disposition is ${DISPOSITION_META[decision.final_disposition]?.label ?? decision.final_disposition}.`
+        : createdCase
+          ? 'Review the current case evidence, requirements, and mechanism credibility.'
+          : 'Inputs are complete and the workbench is ready to run screening.';
+  const ocaResultSummary = useMemo(
+    () => [
+      createdCase ? `Case ${createdCase.case_id} revision ${createdCase.revision}.` : null,
+      decision ? `Disposition: ${DISPOSITION_META[decision.final_disposition]?.label ?? decision.final_disposition}.` : null,
+      displayedRequirements.length ? `${displayedRequirements.length} triggered requirements in view.` : null,
+      displayedMechanisms.length
+        ? `${displayedMechanisms.length} mechanisms screened; ${credibleMechanismCount} credible and ${indeterminateMechanismCount} indeterminate.`
+        : null,
+      precheck?.blocked_states.length ? `${precheck.blocked_states.length} blocked states still need attention.` : null,
+      decision?.unresolved_gaps.length ? `${decision.unresolved_gaps.length} unresolved gaps remain.` : null,
+      exports.length ? `${exports.length} export artifacts are ready.` : null,
+    ].filter((item): item is string => Boolean(item)),
+    [
+      createdCase,
+      credibleMechanismCount,
+      decision,
+      displayedMechanisms.length,
+      displayedRequirements.length,
+      exports.length,
+      indeterminateMechanismCount,
+      precheck?.blocked_states.length,
+    ],
+  );
+  const ocaWorkflowContext = useMemo(
+    () => buildWorkflowContext({
+      currentStep: ocaCurrentStep,
+      currentStepLabel: ocaCurrentStepLabel,
+      activeField: activeChatField,
+      fieldStates: completionFields.map((field) => ({
+        fieldKey: field.name,
+        label: field.label,
+        status: field.valid ? 'complete' : field.hasWarnings ? 'warning' : 'incomplete',
+        required: field.required,
+      })),
+      nextSteps: ocaNextSteps,
+      blockers: incompleteCompletionFields.map((field) => field.label),
+      focusSummary: ocaFocusSummary,
+      resultSummary: ocaResultSummary,
+    }),
+    [activeChatField, completionFields, incompleteCompletionFields, ocaCurrentStep, ocaCurrentStepLabel, ocaFocusSummary, ocaNextSteps, ocaResultSummary],
+  );
+  const ocaContextSummary = useMemo(
+    () => buildChatContextSummary([
       { label: 'Case', value: createdCase?.case_id },
       { label: 'Material', value: materialName.trim() },
       { label: 'Oxidizer', value: oxidizerType.toUpperCase() },
       { label: 'Max Pressure', value: pressureMax.trim() ? `${pressureMax.trim()} psia` : null },
       { label: 'Component', value: componentClass },
+      { label: 'Step', value: ocaCurrentStepLabel },
+      { label: 'Disposition', value: decision ? DISPOSITION_META[decision.final_disposition]?.label ?? decision.final_disposition : null },
     ]),
-  });
+    [componentClass, createdCase?.case_id, decision, materialName, ocaCurrentStepLabel, oxidizerType, pressureMax],
+  );
+  const ocaChatLaunchState = useMemo(
+    () => createModuleChatLaunchState({
+      scopeKey: 'oca-workbench',
+      moduleLabel: 'OCA Workbench',
+      moduleContext: {
+        module: 'oca',
+        case_id: createdCase?.case_id,
+        case_revision: createdCase?.revision,
+        material: materialName.trim(),
+        spec: spec || undefined,
+        grade: grade || undefined,
+        temper: temper || undefined,
+        product_form: productForm || undefined,
+        component_class: componentClass,
+        geometry_class: geometryClass,
+        design_function: designFunction,
+        environment: oxidizerType.toUpperCase(),
+        mission_phase: missionPhase,
+        phase,
+        flow_regime: flowRegime,
+        pressure_psi: pressureMax.trim() ? Number(pressureMax) : undefined,
+        pressure_min_psi: pressureMin.trim() ? Number(pressureMin) : undefined,
+        temperature: tempMax.trim() ? Number(tempMax) : undefined,
+        temperature_min_c: tempMin.trim() ? Number(tempMin) : undefined,
+        o2_fraction: o2Fraction.trim() ? Number(o2Fraction) : undefined,
+        decision_disposition: decision?.final_disposition,
+        service_context: ocaServiceContext,
+        materials: ocaMaterialInputs,
+        components: ocaComponentInputs,
+        ignition_context: ocaIgnitionContext,
+        chat_workflow: ocaWorkflowContext,
+      },
+      originPath: '/oca/workbench',
+      originTitle: 'OCA Workbench',
+      description: 'Ground the chat in the active oxygen compatibility workbench inputs, current step, and case state.',
+      contextSummary: ocaContextSummary,
+    }),
+    [
+      componentClass,
+      createdCase?.case_id,
+      createdCase?.revision,
+      decision?.final_disposition,
+      designFunction,
+      flowRegime,
+      geometryClass,
+      grade,
+      materialName,
+      missionPhase,
+      o2Fraction,
+      ocaComponentInputs,
+      ocaContextSummary,
+      ocaIgnitionContext,
+      ocaMaterialInputs,
+      ocaServiceContext,
+      ocaWorkflowContext,
+      oxidizerType,
+      phase,
+      pressureMax,
+      pressureMin,
+      productForm,
+      spec,
+      tempMax,
+      tempMin,
+      temper,
+    ],
+  );
 
   useEffect(() => {
     registerRouteModuleChatState('/oca/workbench', ocaChatLaunchState);
-  }, [activeChatField, componentClass, createdCase?.case_id, materialName, oxidizerType, pressureMax, tempMax]);
+  }, [ocaChatLaunchState]);
 
   return (
     <GuidanceProvider

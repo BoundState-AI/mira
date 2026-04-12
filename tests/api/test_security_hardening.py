@@ -14,6 +14,7 @@ from mira.api.auth.cognito import (
 from mira.api.routers.test_classes import build_rating_filter
 from mira.chat.module_context import extract_module_entities
 from mira.chat.models import EngineEnvelope, Status, TaskMode
+from mira.chat.query_interpreter import ParsedQuery
 from mira.chat.response_formatter import (
     _fallback_format,
     _plain_language_summary,
@@ -21,6 +22,7 @@ from mira.chat.response_formatter import (
     build_formatter_system_prompt,
     get_formatter_profile,
 )
+from mira.chat.router import _build_parsed_input
 from mira.providers.llm_provider import validate_provider_configuration
 
 
@@ -233,11 +235,14 @@ def test_build_formatter_prompt_includes_module_workflow_context():
             "module": "gpcm",
             "chat_workflow": {
                 "current_step": "tailoring_review",
+                "current_step_label": "Tailoring Review",
                 "active_field_label": "Tailoring",
                 "completed_fields": ["Program", "Part Name"],
                 "incomplete_fields": ["Tailoring"],
+                "focus_summary": "Tailoring rationale is the current gap.",
                 "next_steps": ["Attach the governing closure artifact."],
                 "blockers": ["No tailoring rationale attached"],
+                "result_summary": ["One closure artifact is still missing."],
             },
         },
     }
@@ -245,11 +250,14 @@ def test_build_formatter_prompt_includes_module_workflow_context():
     prompt = build_formatter_prompt(envelope, session_context)
 
     assert "WORKFLOW CONTEXT:" in prompt
+    assert "Current step label: Tailoring Review" in prompt
     assert "Current step: tailoring_review" in prompt
     assert "Active field: Tailoring" in prompt
+    assert "Focus summary: Tailoring rationale is the current gap." in prompt
     assert "Completed fields: Program, Part Name" in prompt
     assert "Next steps: Attach the governing closure artifact." in prompt
     assert "Blockers: No tailoring rationale attached" in prompt
+    assert "Result summary: One closure artifact is still missing." in prompt
 
 
 def test_extract_module_entities_flattens_workflow_context():
@@ -259,12 +267,17 @@ def test_extract_module_entities_flattens_workflow_context():
             "material": "Kapton",
             "chat_workflow": {
                 "current_step": "tailoring_review",
+                "current_step_label": "Tailoring Review",
                 "active_field": "inputs.tailoring",
                 "active_field_label": "Tailoring",
                 "completed_fields": ["Program", "Part Name"],
                 "incomplete_fields": ["Tailoring"],
+                "completed_field_count": 2,
+                "total_field_count": 3,
+                "focus_summary": "Tailoring rationale is the current gap.",
                 "next_steps": ["Attach the governing closure artifact."],
                 "blockers": ["No tailoring rationale attached"],
+                "result_summary": ["One closure artifact is still missing."],
             },
         }
     )
@@ -272,12 +285,119 @@ def test_extract_module_entities_flattens_workflow_context():
     assert entities["engine_used"] == "gpcm"
     assert entities["material_designation"] == "Kapton"
     assert entities["current_step"] == "tailoring_review"
+    assert entities["current_step_label"] == "Tailoring Review"
     assert entities["active_field"] == "inputs.tailoring"
     assert entities["active_field_label"] == "Tailoring"
     assert entities["completed_fields"] == ["Program", "Part Name"]
     assert entities["incomplete_fields"] == ["Tailoring"]
+    assert entities["completed_field_count"] == 2
+    assert entities["total_field_count"] == 3
     assert entities["next_steps"] == ["Attach the governing closure artifact."]
     assert entities["workflow_blockers"] == ["No tailoring rationale attached"]
+    assert entities["workflow_focus_summary"] == "Tailoring rationale is the current gap."
+    assert entities["workflow_result_summary"] == ["One closure artifact is still missing."]
+
+
+def test_extract_module_entities_keeps_fracture_context_fields():
+    entities = extract_module_entities(
+        {
+            "module": "fracture",
+            "material": "Al 6061-T6",
+            "part_name": "Primary Bracket",
+            "mission_class": "HUMAN_RATED",
+            "hazard_consequence": "CATASTROPHIC",
+            "load_path_type": "SINGLE",
+            "lifecycle_phase": "NEW_BUILD",
+            "structural_role": "PRIMARY",
+            "material_system": "METALLIC",
+            "specific_hardware_type": "GENERAL",
+            "classification": "FC",
+        }
+    )
+
+    assert entities["engine_used"] == "fracture"
+    assert entities["material_designation"] == "Al 6061-T6"
+    assert entities["part_name"] == "Primary Bracket"
+    assert entities["mission_class"] == "HUMAN_RATED"
+    assert entities["hazard_consequence"] == "CATASTROPHIC"
+    assert entities["load_path_type"] == "SINGLE"
+    assert entities["lifecycle_phase"] == "NEW_BUILD"
+    assert entities["structural_role"] == "PRIMARY"
+    assert entities["material_system"] == "METALLIC"
+    assert entities["specific_hardware_type"] == "GENERAL"
+    assert entities["classification"] == "FC"
+
+
+def test_build_parsed_input_prefers_oca_module_state():
+    parsed = ParsedQuery(
+        raw_query="What about this material at 1500 psi?",
+        fine_routing="oca",
+        material_designation="316L",
+        gas_service="oxygen",
+        pressure="1500 psi",
+        pressure_value=1500.0,
+        inherited_entities={
+            "case_id": "oca-123",
+            "service_context": {
+                "oxidizer_type": "gox",
+                "o2_fraction": 1.0,
+                "total_pressure_min_psia": 3000.0,
+                "total_pressure_max_psia": 3000.0,
+                "phase": "gas",
+            },
+            "materials": [{"material_name": "316L", "product_form": "bar"}],
+            "components": [{"component_class": "valve", "geometry_class": "bulk"}],
+            "ignition_context": {"dead_end_configuration": True},
+        },
+    )
+
+    payload = _build_parsed_input(parsed)
+
+    assert payload["case_id"] == "oca-123"
+    assert payload["service_context"]["total_pressure_min_psia"] == 1500.0
+    assert payload["service_context"]["total_pressure_max_psia"] == 1500.0
+    assert payload["materials"][0]["material_name"] == "316L"
+    assert payload["components"][0]["component_class"] == "valve"
+    assert payload["ignition_context"]["dead_end_configuration"] is True
+
+
+def test_build_parsed_input_keeps_fracture_module_fields():
+    parsed = ParsedQuery(
+        raw_query="Walk me through this fracture path.",
+        fine_routing="fracture",
+        material_designation="Al 6061-T6",
+        inherited_entities={
+            "part_name": "Primary Bracket",
+            "mission_class": "HUMAN_RATED",
+            "hazard_consequence": "CATASTROPHIC",
+            "load_path_type": "SINGLE",
+            "pressure_boundary": True,
+            "structural_role": "PRIMARY",
+            "material_system": "METALLIC",
+            "specific_hardware_type": "GENERAL",
+            "proof_test_used": True,
+            "process_controls_used": False,
+            "low_risk_candidate": True,
+            "kic_fty_ratio": 0.41,
+            "ftu_ksi": 190.0,
+        },
+    )
+
+    payload = _build_parsed_input(parsed)
+
+    assert payload["part_name"] == "Primary Bracket"
+    assert payload["mission_class"] == "HUMAN_RATED"
+    assert payload["hazard_consequence"] == "CATASTROPHIC"
+    assert payload["load_path_type"] == "SINGLE"
+    assert payload["pressure_boundary"] is True
+    assert payload["structural_role"] == "PRIMARY"
+    assert payload["material_system"] == "METALLIC"
+    assert payload["specific_hardware_type"] == "GENERAL"
+    assert payload["proof_test_used"] is True
+    assert payload["process_controls_used"] is False
+    assert payload["low_risk_candidate"] is True
+    assert payload["kic_fty_ratio"] == 0.41
+    assert payload["ftu_ksi"] == 190.0
 
 
 def test_fallback_format_surfaces_active_field_and_next_steps():
@@ -294,7 +414,10 @@ def test_fallback_format_surfaces_active_field_and_next_steps():
             "module": "gpcm",
             "chat_workflow": {
                 "current_step": "tailoring_review",
+                "current_step_label": "Tailoring Review",
                 "active_field_label": "Tailoring",
+                "focus_summary": "Tailoring rationale is the current gap.",
+                "result_summary": ["One closure artifact is still missing."],
                 "next_steps": ["Attach the governing closure artifact."],
                 "blockers": ["No tailoring rationale attached"],
             },
@@ -304,7 +427,11 @@ def test_fallback_format_surfaces_active_field_and_next_steps():
     formatted = _fallback_format(envelope, session_context)
 
     assert "Current field: Tailoring" in formatted
+    assert "Step label: Tailoring Review" in formatted
     assert "Workflow step: tailoring_review" in formatted
+    assert "Focus: Tailoring rationale is the current gap." in formatted
+    assert "**Current module state:**" in formatted
+    assert "One closure artifact is still missing." in formatted
     assert "**Next step in this module:**" in formatted
     assert "Attach the governing closure artifact." in formatted
     assert "**Open blockers:**" in formatted

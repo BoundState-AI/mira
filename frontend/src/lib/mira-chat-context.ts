@@ -123,10 +123,13 @@ export function resolveGuidanceFieldFromTarget(target: EventTarget | null): Mira
 
 export function buildWorkflowContext(args: {
   currentStep: string;
+  currentStepLabel?: string;
   activeField?: MiraChatActiveField | null;
   fieldStates?: MiraChatWorkflowFieldState[];
   nextSteps?: string[];
   blockers?: string[];
+  focusSummary?: string;
+  resultSummary?: string[];
 }): Record<string, unknown> {
   const fieldStates = args.fieldStates ?? [];
   const completedFields = fieldStates
@@ -138,13 +141,18 @@ export function buildWorkflowContext(args: {
 
   return {
     current_step: args.currentStep,
+    current_step_label: args.currentStepLabel,
     active_field: args.activeField?.fieldKey,
     active_field_label: args.activeField?.label,
     field_states: fieldStates,
     completed_fields: completedFields,
     incomplete_fields: incompleteFields,
+    completed_field_count: completedFields.length,
+    total_field_count: fieldStates.length,
     next_steps: args.nextSteps ?? [],
     blockers: args.blockers ?? [],
+    focus_summary: args.focusSummary,
+    result_summary: args.resultSummary ?? [],
   };
 }
 
