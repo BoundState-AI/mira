@@ -61,31 +61,40 @@ def recommend_mitigations(
             return
         selected[mitigation_id] = _build_recommendation(entries[mitigation_id], reason)
 
+    # NASA-STD-6012A CPR 39: Dissimilar metal couples require separation
+    # barriers, electrolyte exclusion, or barrier coatings depending on
+    # severity and application.
     if severity in {"CAUTION", "INCOMPATIBLE"}:
-        add("physical_isolation", "Dissimilar couple requires a primary separation barrier.")
-        add("seal_faying_surfaces", "Electrolyte exclusion is required or strongly preferred for this couple.")
-        add("cathodic_barrier_coating", "Barrier coating can reduce galvanic attack when isolation is not feasible.")
+        add("physical_isolation", "Dissimilar couple requires a primary separation barrier per CPR 39.")
+        add("seal_faying_surfaces", "Electrolyte exclusion required per CPR 39 for dissimilar couples.")
+        add("cathodic_barrier_coating", "Barrier coating per CPR 39 when isolation is not feasible.")
 
+    # CPR 39 §4.3.1: Fastener joints require wet-install sealant.
     if joint_type == "FASTENER":
-        add("wet_install_fasteners", "Fastener joint selected; wet-install protection applies.")
+        add("wet_install_fasteners", "Fastener joint selected; wet-install protection applies per CPR 39 §4.3.1.")
 
+    # CPR 40: Graphite/CFRP contacts require sealing and isolation.
     if contains_carbon:
         add("seal_faying_surfaces", "Graphite/CFRP contacts must be sealed per CPR 40.")
-        add("physical_isolation", "Conductive carbon should be isolated from metals where feasible.")
+        add("physical_isolation", "Conductive carbon should be isolated from metals per CPR 40.")
         if joint_type == "FASTENER":
-            add("titanium_fasteners_for_cfrp", "Titanium fasteners are the preferred CFRP joint hardware.")
-            add("wet_install_fasteners", "Titanium fasteners in graphite joints must be wet installed.")
+            add("titanium_fasteners_for_cfrp", "Titanium fasteners preferred for CFRP joints per CPR 40 §4.4.")
+            add("wet_install_fasteners", "Titanium fasteners in graphite joints must be wet installed per CPR 40.")
 
+    # CPR 39 §4.2: Magnesium is the most anodic common structural metal;
+    # requires maximum feasible protection in any dissimilar couple.
     if contains_magnesium:
-        add("physical_isolation", "Magnesium requires maximum feasible protection.")
+        add("physical_isolation", "Magnesium requires maximum feasible protection per CPR 39 §4.2.")
         if wet_environment and app_type != "FLIGHT_HARDWARE":
             add("sacrificial_anode_gacp", "Wet service plus magnesium may justify sacrificial protection.")
 
+    # CPR 39 §4.1: Anodizing is baseline corrosion control for aluminum alloys.
     if contains_aluminum:
-        add("anodize_aluminum", "Aluminum alloy present; anodize is a baseline corrosion control option.")
+        add("anodize_aluminum", "Aluminum alloy present; anodize is baseline per CPR 39 §4.1.")
 
+    # ASTM A967: Stainless steel fasteners should be passivated.
     if contains_stainless and joint_type == "FASTENER":
-        add("passivate_stainless_fasteners", "Stainless fasteners should be passivated.")
+        add("passivate_stainless_fasteners", "Stainless fasteners should be passivated per ASTM A967.")
 
     if contains_steel:
         add("zinc_nickel_plating_for_steel", "Steel surface protection is recommended for galvanic service.")
