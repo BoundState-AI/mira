@@ -41,7 +41,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 
-from mira.mua.v7.material_database import MATERIAL_DATABASE, _ALIASES
+from mira.mua.v7.material_database import MATERIAL_DATABASE, _ALIASES, _SPEC_MAP
 
 
 # Precomputed normalised lookup for fast matching.  Built once at import time.
