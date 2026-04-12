@@ -172,6 +172,146 @@ ensure_service() {
     --query 'services[0].status' --output text 2>/dev/null | rg -q 'ACTIVE'
 }
 
+resolve_service_task_definition() {
+  local service_name="$1"
+  python3 - "${CLUSTER}" "$service_name" <<'PY'
+import json
+import os
+import subprocess
+import sys
+
+cluster_name, service_name = sys.argv[1:3]
+env = os.environ.copy()
+raw = subprocess.check_output(
+    [
+        "aws",
+        "ecs",
+        "describe-services",
+        "--cluster",
+        cluster_name,
+        "--services",
+        service_name,
+        "--output",
+        "json",
+    ],
+    env=env,
+    text=True,
+)
+services = json.loads(raw).get("services", [])
+if not services:
+    raise SystemExit(1)
+
+service = services[0]
+deployments = service.get("deployments", [])
+
+for deployment in deployments:
+    if deployment.get("status") == "PRIMARY" and deployment.get("rolloutState") == "COMPLETED":
+        print(deployment["taskDefinition"])
+        raise SystemExit(0)
+
+completed = [
+    deployment
+    for deployment in deployments
+    if deployment.get("rolloutState") == "COMPLETED" and deployment.get("runningCount", 0) > 0
+]
+if completed:
+    completed.sort(key=lambda item: item.get("runningCount", 0), reverse=True)
+    print(completed[0]["taskDefinition"])
+    raise SystemExit(0)
+
+task_definition = service.get("taskDefinition")
+if not task_definition:
+    raise SystemExit(1)
+print(task_definition)
+PY
+}
+
+render_task_definition_from_base() {
+  local source_task_definition="$1"
+  local container_name="$2"
+  local image_uri="$3"
+  local output_path="$4"
+
+  python3 - "$source_task_definition" "$container_name" "$image_uri" "$output_path" <<'PY'
+import json
+import os
+import subprocess
+import sys
+
+source_task_definition, container_name, image_uri, output_path = sys.argv[1:5]
+env = os.environ.copy()
+raw = subprocess.check_output(
+    [
+        "aws",
+        "ecs",
+        "describe-task-definition",
+        "--task-definition",
+        source_task_definition,
+        "--output",
+        "json",
+    ],
+    env=env,
+    text=True,
+)
+task_definition = json.loads(raw)["taskDefinition"]
+for key in (
+    "compatibilities",
+    "registeredAt",
+    "registeredBy",
+    "requiresAttributes",
+    "revision",
+    "status",
+    "taskDefinitionArn",
+):
+    task_definition.pop(key, None)
+
+matched = False
+for container in task_definition.get("containerDefinitions", []):
+    if container.get("name") == container_name:
+        container["image"] = image_uri
+        matched = True
+        break
+
+if not matched:
+    raise SystemExit(
+        f"container {container_name!r} not found in task definition {source_task_definition!r}"
+    )
+
+with open(output_path, "w", encoding="utf-8") as fh:
+    json.dump(task_definition, fh, indent=2)
+    fh.write("\n")
+PY
+}
+
+render_updated_task_definition() {
+  local service_name="$1"
+  local family="$2"
+  local container_name="$3"
+  local image_uri="$4"
+  local output_path="$5"
+  local source_task_definition=""
+
+  if ensure_service "${service_name}"; then
+    source_task_definition="$(resolve_service_task_definition "${service_name}")"
+  else
+    source_task_definition="$(aws ecs describe-task-definition \
+      --task-definition "${family}" \
+      --query 'taskDefinition.taskDefinitionArn' \
+      --output text)"
+  fi
+
+  if [ -z "${source_task_definition}" ] || [ "${source_task_definition}" = "None" ]; then
+    echo "Unable to resolve base task definition for ${service_name}/${family}" >&2
+    exit 1
+  fi
+
+  render_task_definition_from_base \
+    "${source_task_definition}" \
+    "${container_name}" \
+    "${image_uri}" \
+    "${output_path}"
+}
+
 prepare_snapshot_from_ref() {
   local source_ref="$1"
   STAGING_DIR="$(mktemp -d)"
@@ -351,123 +491,19 @@ aws logs put-retention-policy --log-group-name /ecs/mira-prod-frontend --retenti
 BACKEND_TASK_JSON="$(mktemp)"
 FRONTEND_TASK_JSON="$(mktemp)"
 
-cat > "${BACKEND_TASK_JSON}" <<JSON
-{
-  "family": "${BACKEND_TASK_FAMILY}",
-  "taskRoleArn": "${BACKEND_TASK_ROLE_ARN}",
-  "executionRoleArn": "${EXECUTION_ROLE_ARN}",
-  "networkMode": "awsvpc",
-  "requiresCompatibilities": ["FARGATE"],
-  "cpu": "${BACKEND_CPU}",
-  "memory": "${BACKEND_MEMORY}",
-  "containerDefinitions": [
-    {
-      "name": "backend",
-      "image": "${BACKEND_IMAGE}",
-      "essential": true,
-      "portMappings": [
-        {"containerPort": 8080, "hostPort": 8080, "protocol": "tcp"}
-      ],
-      "environment": [
-        {"name": "PORT", "value": "8080"},
-        {"name": "RELOAD", "value": "false"},
-        {"name": "ITAR_PATH_PREFIXES", "value": "/miul,/bom"},
-        {"name": "ENVIRONMENT", "value": "production"},
-        {"name": "MIRA_ENV", "value": "production"},
-        {"name": "AWS_DEFAULT_REGION", "value": "${AWS_REGION}"},
-        {"name": "CORS_EXTRA_ORIGINS", "value": "${BASE_URL}"},
-        {"name": "ENABLE_DEBUG_ENDPOINTS", "value": "false"},
-        {"name": "COGNITO_USER_POOL_ID", "value": "${COGNITO_USER_POOL_ID}"},
-        {"name": "DEBUG", "value": "false"},
-        {"name": "ALLOWED_ORIGINS", "value": "${BASE_URL}"},
-        {"name": "MIRA_AUTH_MODE", "value": "cognito"},
-        {"name": "ADMIN_PATH_PREFIXES", "value": "/admin"},
-        {"name": "COGNITO_REGION", "value": "${COGNITO_REGION}"},
-        {"name": "ENABLE_AUDIT_LOGGING", "value": "true"},
-        {"name": "LLM_PROVIDER", "value": "bedrock-converse"},
-        {"name": "LLM_SONNET_MODEL", "value": "${BEDROCK_MODEL_ID}"},
-        {"name": "USE_BEDROCK", "value": "1"},
-        {"name": "BEDROCK_MODEL_ID", "value": "${BEDROCK_MODEL_ID}"},
-        {"name": "BSMH_SONNET_MODEL", "value": "${BEDROCK_MODEL_ID}"},
-        {"name": "BSMH_SONNET_BEDROCK_MODEL", "value": "${BEDROCK_MODEL_ID}"},
-        {"name": "MIRA_CHAT_LLM_PROVIDER", "value": "bedrock-converse"},
-        {"name": "MIRA_CHAT_FORMATTER_MODEL", "value": "${BEDROCK_MODEL_ID}"},
-        {"name": "COGNITO_CLIENT_ID", "value": "${COGNITO_CLIENT_ID}"},
-        {"name": "JWT_SECRET_KEY", "value": "${JWT_SECRET_KEY}"},
-        {"name": "MIRA_REQUIRE_CHAT", "value": "${MIRA_REQUIRE_CHAT}"},
-        {"name": "MIRA_CHAT_AUDIT_PATH", "value": "${MIRA_CHAT_AUDIT_PATH}"},
-        {"name": "MIRA_DISABLE_HERITAGE_DB", "value": "${NO_DATA_RUNTIME}"},
-        {"name": "MIRA_NO_DATA_RUNTIME", "value": "${NO_DATA_RUNTIME}"},
-        {"name": "POSTGRES_HOST", "value": "${POSTGRES_HOST}"},
-        {"name": "POSTGRES_PORT", "value": "${POSTGRES_PORT}"},
-        {"name": "POSTGRES_DB", "value": "${POSTGRES_DB}"},
-        {"name": "POSTGRES_USER", "value": "${POSTGRES_USER}"},
-        {"name": "POSTGRES_PASSWORD", "value": "${POSTGRES_PASSWORD}"},
-        {"name": "MIRA_WORKERS", "value": "${MIRA_WORKERS}"},
-        {"name": "MIRA_SESSION_BACKEND", "value": "${MIRA_SESSION_BACKEND}"},
-        {"name": "MIRA_DB_POOL_MAX_CONNECTIONS", "value": "${MIRA_DB_POOL_MAX_CONNECTIONS}"},
-        {"name": "MIRA_BEDROCK_SONNET_CONCURRENCY", "value": "${MIRA_BEDROCK_SONNET_CONCURRENCY}"},
-        {"name": "MIRA_BEDROCK_VISION_CONCURRENCY", "value": "${MIRA_BEDROCK_VISION_CONCURRENCY}"},
-        {"name": "MIUL_EXTRACTION_QUEUE_URL", "value": "${MIUL_EXTRACTION_QUEUE_URL}"},
-        {"name": "MIRA_RATE_LIMIT_ENABLED", "value": "${MIRA_RATE_LIMIT_ENABLED}"},
-        {"name": "MIRA_RATE_LIMIT_REQUESTS", "value": "${MIRA_RATE_LIMIT_REQUESTS}"},
-        {"name": "MIRA_RATE_LIMIT_WINDOW_SECONDS", "value": "${MIRA_RATE_LIMIT_WINDOW_SECONDS}"}
-      ],
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/mira-prod-backend",
-          "awslogs-region": "${AWS_REGION}",
-          "awslogs-stream-prefix": "ecs"
-        }
-      },
-      "healthCheck": {
-        "command": ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"],
-        "interval": 30,
-        "timeout": 5,
-        "retries": 3,
-        "startPeriod": 60
-      }
-    }
-  ]
-}
-JSON
+render_updated_task_definition \
+  "${BACKEND_SERVICE}" \
+  "${BACKEND_TASK_FAMILY}" \
+  "backend" \
+  "${BACKEND_IMAGE}" \
+  "${BACKEND_TASK_JSON}"
 
-cat > "${FRONTEND_TASK_JSON}" <<JSON
-{
-  "family": "${FRONTEND_TASK_FAMILY}",
-  "executionRoleArn": "${EXECUTION_ROLE_ARN}",
-  "networkMode": "awsvpc",
-  "requiresCompatibilities": ["FARGATE"],
-  "cpu": "${FRONTEND_CPU}",
-  "memory": "${FRONTEND_MEMORY}",
-  "containerDefinitions": [
-    {
-      "name": "frontend",
-      "image": "${FRONTEND_IMAGE}",
-      "essential": true,
-      "portMappings": [
-        {"containerPort": 80, "hostPort": 80, "protocol": "tcp"}
-      ],
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/mira-prod-frontend",
-          "awslogs-region": "${AWS_REGION}",
-          "awslogs-stream-prefix": "ecs"
-        }
-      },
-      "healthCheck": {
-        "command": ["CMD-SHELL", "curl -f http://localhost:80/ || exit 1"],
-        "interval": 30,
-        "timeout": 5,
-        "retries": 3,
-        "startPeriod": 30
-      }
-    }
-  ]
-}
-JSON
+render_updated_task_definition \
+  "${FRONTEND_SERVICE}" \
+  "${FRONTEND_TASK_FAMILY}" \
+  "frontend" \
+  "${FRONTEND_IMAGE}" \
+  "${FRONTEND_TASK_JSON}"
 
 echo
 echo "== Register task definitions =="
