@@ -413,7 +413,7 @@ def cache_key_wrapper(
         @wraps(func)
         async def wrapper(*args, **kwargs):
             # Skip caching if disabled
-            if not config.cache_enabled:
+            if not get_config().cache_enabled:
                 return await func(*args, **kwargs)
             
             # Generate cache key
@@ -492,7 +492,7 @@ async def warmup_cache(materials_db, search_engine):
                 "search",
                 query,
                 results,
-                ttl=config.cache_warmup_ttl
+                ttl=get_config().cache_warmup_ttl
             )
             
         except Exception as e:

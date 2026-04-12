@@ -1,18 +1,30 @@
-"""MUA v7 API Router.
+#!/usr/bin/env python3
+"""
+Module: MUA v7 API Router
+Purpose: FastAPI router for the NASA MUA v7 five-step wizard workflow.
 
-FastAPI router for the NASA Material Usage Agreement (MUA) v7 generation
-pipeline.  Implements a five-step wizard workflow:
+BoundState AI 2026
+Version: 7.0.0
+Classification: BoundState Proprietary
 
-    Step 1 -- Resolve Material   (POST /resolve-material)
-    Step 2 -- Investigate        (POST /investigate)
-    Step 3 -- Review Decisions   (POST /review-decisions)
-    Step 4 -- Generate Draft     (POST /generate-draft)
-    Step 5 -- Finalize           (POST /finalize)
+Co-Authored-By: Claude "Atlas" <noreply@anthropic.com>
+Co-Authored-By: Dr. Joseph Wilde, BoundState AI
 
-Plus session management (GET/DELETE), a qualification-plan generator for
-novel materials, and a usage-analytics endpoint.
+Compliance: NASA-STD-8739.8B, SWE-013, SWE-032
+Safety Critical: True
 
-Co-Authored-By: Atlas (OpenAI GPT-5) <noreply@openai.com>
+Endpoints:
+    POST /resolve-material    Step 1: Resolve free-text material
+    POST /investigate          Step 2: Evidence gathering (async)
+    POST /review-decisions     Step 3: Engineer review
+    POST /generate-draft       Step 4: Draft MUA document
+    POST /finalize             Step 5: Finalize and export
+
+Plus session management, qualification-plan generator, material intel,
+preview issues, MIUL import, and usage analytics.
+
+Models extracted to mua_v7_models.py.
+Helpers extracted to mua_v7_helpers.py.
 """
 
 from __future__ import annotations
