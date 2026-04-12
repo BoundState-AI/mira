@@ -154,6 +154,10 @@ class MaterialDecider:
                 )
 
             # Multiple primary MUAs → APPROVED
+            # WHY confidence 0.88: Two independent approved precedents in matching
+            # environment is strong evidence, but not 0.95+ because MUA conditions
+            # may differ from the current application. 0.88 signals "high confidence,
+            # verify envelope match" to the reviewing engineer.
             if len(primary_muas) >= 2:
                 approved_primary = [m for m in primary_muas if m['determination'] == 'APPROVED']
                 if approved_primary:
@@ -166,6 +170,9 @@ class MaterialDecider:
                     )
 
             # Single primary MUA → CONDITIONAL (needs engineering review)
+            # WHY confidence 0.70: A single precedent is suggestive but not
+            # definitive — the material passed once in a similar environment,
+            # but edge cases (different temper, pressure, duration) may apply.
             if len(primary_muas) == 1:
                 mua = primary_muas[0]
                 if mua['determination'] == 'APPROVED':
@@ -193,8 +200,10 @@ class MaterialDecider:
             # Count high-authority evidence
             tier_1_evidence = [e for e in test_evidence if e.get('authority_tier') == 1]
 
+            # WHY confidence 0.80: Test data is objective (not precedent-based),
+            # but test conditions may not exactly match the application envelope.
+            # 0.80 signals "strong evidence, verify test conditions apply."
             if len(tier_1_evidence) >= 2:
-                # Sufficient NASA test data
                 sources = [e['source'] for e in tier_1_evidence[:3]]
                 return MaterialDecision(
                     material_name=material_name,
@@ -204,7 +213,8 @@ class MaterialDecider:
                     confidence=0.80
                 )
             elif test_evidence:
-                # Some evidence but not sufficient
+                # WHY confidence 0.60: Limited test evidence — the material
+                # has been tested but not comprehensively enough to be definitive.
                 sources = [e['source'] for e in test_evidence[:3]]
                 return MaterialDecision(
                     material_name=material_name,
@@ -215,7 +225,10 @@ class MaterialDecider:
                     confidence=0.60
                 )
 
-        # Priority 3: No evidence found
+        # Priority 3: No evidence found.
+        # WHY confidence 0.0: Zero evidence = zero confidence. The system
+        # refuses to guess — this is the conservative-under-uncertainty
+        # principle from the design doc.
         return MaterialDecision(
             material_name=material_name,
             decision='REQUIRES_TESTING',

@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import threading
 import time
 from datetime import datetime, timezone
 from typing import Any, Optional
@@ -34,9 +35,13 @@ ENABLE_AUDIT_LOGGING = os.getenv("ENABLE_AUDIT_LOGGING", "true").strip().lower()
     "on",
 }
 
+# CloudWatch client and sequence tokens are module-level singletons.
+# Protected by _cw_lock because uvicorn worker threads may call
+# _get_cw_client() concurrently during startup.
 _cw_client = None
 _sequence_tokens: dict[str, str] = {}
 _warned_boto3_missing = False
+_cw_lock = threading.Lock()
 
 
 def _get_cw_client():
@@ -44,8 +49,10 @@ def _get_cw_client():
     if boto3 is None:
         raise RuntimeError("boto3 is not installed; audit logging is unavailable")
     if _cw_client is None:
-        _cw_client = boto3.client("logs", region_name=REGION)
-        _ensure_log_group(_cw_client)
+        with _cw_lock:
+            if _cw_client is None:
+                _cw_client = boto3.client("logs", region_name=REGION)
+                _ensure_log_group(_cw_client)
     return _cw_client
 
 

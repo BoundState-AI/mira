@@ -173,7 +173,7 @@ class RedisCache:
         # Create hash for consistent key length
         key_hash = hashlib.md5(key_str.encode()).hexdigest()[:12]
         
-        return f"{config.cache_prefix}:{namespace}:{key_hash}"
+        return f"{get_config().cache_prefix}:{namespace}:{key_hash}"
     
     @track_performance(operation_name="cache_get")
     async def get(self, namespace: str, key: Union[str, dict]) -> Optional[Any]:
@@ -189,9 +189,9 @@ class RedisCache:
             
         Compliance: SWE-055, SWE-134
         """
-        if not self.initialized or not config.cache_enabled:
+        if not self.initialized or not get_config().cache_enabled:
             return None
-            
+
         cache_key = self._generate_key(namespace, key)
         
         try:
@@ -238,11 +238,11 @@ class RedisCache:
             
         Compliance: SWE-055, SWE-032
         """
-        if not self.initialized or not config.cache_enabled:
+        if not self.initialized or not get_config().cache_enabled:
             return False
-            
+
         cache_key = self._generate_key(namespace, key)
-        ttl = ttl or config.cache_ttl_seconds
+        ttl = ttl or get_config().cache_ttl_seconds
         
         try:
             # Serialize to JSON
@@ -304,7 +304,7 @@ class RedisCache:
         if not self.initialized:
             return 0
             
-        pattern = f"{config.cache_prefix}:{namespace}:*"
+        pattern = f"{get_config().cache_prefix}:{namespace}:*"
         
         try:
             # Use SCAN for memory efficiency with large datasets
@@ -413,7 +413,7 @@ def cache_key_wrapper(
         @wraps(func)
         async def wrapper(*args, **kwargs):
             # Skip caching if disabled
-            if not config.cache_enabled:
+            if not get_config().cache_enabled:
                 return await func(*args, **kwargs)
             
             # Generate cache key
@@ -492,7 +492,7 @@ async def warmup_cache(materials_db, search_engine):
                 "search",
                 query,
                 results,
-                ttl=config.cache_warmup_ttl
+                ttl=get_config().cache_warmup_ttl
             )
             
         except Exception as e:

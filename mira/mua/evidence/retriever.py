@@ -21,7 +21,7 @@ LOGGER = logging.getLogger(__name__)
 
 try:  # pragma: no cover - optional dependency behavior
     import psycopg2
-except Exception:  # pragma: no cover
+except (ImportError, ModuleNotFoundError):  # pragma: no cover
     psycopg2 = None
 
 
@@ -160,8 +160,8 @@ def _lookup_exemplars(
     finally:
         try:
             conn.close()
-        except Exception:
-            pass
+        except Exception as close_exc:
+            LOGGER.debug("Connection close error (non-critical): %s", close_exc)
 
 
 def _query_ring(

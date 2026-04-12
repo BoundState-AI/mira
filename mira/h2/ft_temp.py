@@ -787,98 +787,65 @@ def _maybe_rewrite_rationale(
         return rationale, f"H2 temp haiku narrative unavailable; baseline response returned ({exc})."
 
 
-def evaluate_h2_temp_compatibility(request: H2CompatibilityRequest) -> H2CompatibilityResponse:
+def _check_material_gate(
+    material: str, question: str, model_id: str,
+) -> Optional[H2CompatibilityResponse]:
+    """Refuse model call if material is not in the curated evidence index.
+
+    WHY: The fine-tuned model was trained on indexed materials only.
+    Querying it for unknown materials risks hallucinated compatibility
+    claims — a safety-critical failure mode. This gate ensures we
+    fail safe with UNKNOWN before any LLM invocation.
+
+    Returns None if the material passes (is known), or a refusal
+    response if the material is not indexed.
     """
-    Evaluate H2 compatibility through deterministic-gated fine-tuned model path.
-
-    Falls back to baseline H2 engine if model call is unavailable.
-    """
-    provider = _get_nlg_provider()
-    provider_model_id = _get_haiku_model_id() if provider == "haiku" else _get_model_id()
-
-    material = request.material_key.strip()
-    question = (request.question or f"Is {material} compatible with hydrogen service?").strip()
-    model_id = provider_model_id
-
     known, canonical_hit = _get_material_index().contains(material)
-    if not known:
-        _log_coverage_gap(material=material, question=question, model_id=model_id)
-        rationale = _fail_safe_rationale(material)
-        return H2CompatibilityResponse(
-            classification=AnswerSeverity.UNKNOWN,
-            rationale=rationale,
-            evidence=[
-                EvidenceItem(
-                    source_id="deterministic_material_gate",
-                    location="evidence_index",
-                    summary="Material not found in curated H2 evidence index.",
-                )
-            ],
-            embrittlement_risk=None,
-            h2_score=None,
-            notes="H2 temp gate refused model call due to missing material evidence.",
-        )
+    if known:
+        return None  # Gate passed — caller proceeds
 
-    # Deterministic baseline always runs for known materials and is used as
-    # the safety anchor for final classification.
-    baseline = evaluate_h2_compatibility(request)
-    ratio_class, ratio_note = _ratio_screen(material, request.condition)
-    screened_class = _combine_with_ratio_screen(baseline.classification, ratio_class)
-
-    # If evidence is condition-dependent, avoid model assertions and ask for
-    # clarification first unless ratio-screen gives a stricter deterministic
-    # verdict.
-    if baseline.needs_clarification:
-        if screened_class != baseline.classification:
-            deterministic_rationale = baseline.rationale
-            if ratio_note:
-                deterministic_rationale = f"{deterministic_rationale} {ratio_note}"
-            deterministic_rationale, rewrite_note = _maybe_rewrite_rationale(
-                provider=provider,
-                material=material,
-                condition=request.condition,
-                classification=screened_class,
-                rationale=deterministic_rationale,
-                pressure_psia=request.pressure_psia,
-                temperature_k=request.temperature_k,
+    _log_coverage_gap(material=material, question=question, model_id=model_id)
+    return H2CompatibilityResponse(
+        classification=AnswerSeverity.UNKNOWN,
+        rationale=_fail_safe_rationale(material),
+        evidence=[
+            EvidenceItem(
+                source_id="deterministic_material_gate",
+                location="evidence_index",
+                summary="Material not found in curated H2 evidence index.",
             )
-            deterministic_note = (
-                f"H2 temp mode active; model={model_id}; "
-                f"material_index_hit={canonical_hit or material}; "
-                f"deterministic ratio screen applied ({baseline.classification.value}->{screened_class.value}) "
-                "during clarification path."
-            )
-            if rewrite_note:
-                deterministic_note = f"{deterministic_note}; {rewrite_note}"
-            return H2CompatibilityResponse(
-                classification=screened_class,
-                rationale=deterministic_rationale,
-                evidence=baseline.evidence,
-                embrittlement_risk=baseline.embrittlement_risk,
-                h2_score=baseline.h2_score,
-                notes=f"{baseline.notes}; {deterministic_note}" if baseline.notes else deterministic_note,
-                needs_clarification=False if screened_class == AnswerSeverity.PROHIBITED else baseline.needs_clarification,
-                clarification_prompt=baseline.clarification_prompt,
-                available_conditions=baseline.available_conditions,
-                band_distribution=baseline.band_distribution,
-            )
+        ],
+        embrittlement_risk=None,
+        h2_score=None,
+        notes="H2 temp gate refused model call due to missing material evidence.",
+    )
 
-        clarification_note = (
-            f"H2 temp mode active; model={model_id}; "
-            f"material_index_hit={canonical_hit or material}; "
-            "temp model bypassed pending heat-treatment clarification."
-        )
-        if ratio_note:
-            clarification_note = f"{clarification_note}; {ratio_note}"
-        baseline.notes = f"{baseline.notes}; {clarification_note}" if baseline.notes else clarification_note
-        return baseline
 
-    # If ratio screen tightens the baseline verdict, return deterministic
-    # result without model text to avoid contradictory rationale.
+def _handle_clarification_needed(
+    *,
+    baseline: H2CompatibilityResponse,
+    screened_class: AnswerSeverity,
+    ratio_note: Optional[str],
+    provider: str,
+    material: str,
+    request: H2CompatibilityRequest,
+    model_id: str,
+    canonical_hit: Optional[str],
+) -> H2CompatibilityResponse:
+    """Handle the case where baseline evidence is condition-dependent.
+
+    WHY: When multiple heat-treat conditions exist for the same alloy
+    (e.g., Inconel 718 aged vs solution-annealed), the evidence may
+    differ drastically. We avoid model assertions and ask the engineer
+    to clarify — UNLESS the ratio screen gives a stricter deterministic
+    verdict that doesn't require condition disambiguation.
+    """
+    # If ratio screen tightens the verdict, apply it deterministically
+    # even during the clarification path.
     if screened_class != baseline.classification:
         deterministic_rationale = baseline.rationale
         if ratio_note:
-            deterministic_rationale = f"{baseline.rationale} {ratio_note}"
+            deterministic_rationale = f"{deterministic_rationale} {ratio_note}"
         deterministic_rationale, rewrite_note = _maybe_rewrite_rationale(
             provider=provider,
             material=material,
@@ -891,7 +858,8 @@ def evaluate_h2_temp_compatibility(request: H2CompatibilityRequest) -> H2Compati
         deterministic_note = (
             f"H2 temp mode active; model={model_id}; "
             f"material_index_hit={canonical_hit or material}; "
-            f"deterministic ratio screen applied ({baseline.classification.value}->{screened_class.value})."
+            f"deterministic ratio screen applied ({baseline.classification.value}->{screened_class.value}) "
+            "during clarification path."
         )
         if rewrite_note:
             deterministic_note = f"{deterministic_note}; {rewrite_note}"
@@ -902,12 +870,96 @@ def evaluate_h2_temp_compatibility(request: H2CompatibilityRequest) -> H2Compati
             embrittlement_risk=baseline.embrittlement_risk,
             h2_score=baseline.h2_score,
             notes=f"{baseline.notes}; {deterministic_note}" if baseline.notes else deterministic_note,
-            needs_clarification=baseline.needs_clarification,
+            needs_clarification=False if screened_class == AnswerSeverity.PROHIBITED else baseline.needs_clarification,
             clarification_prompt=baseline.clarification_prompt,
             available_conditions=baseline.available_conditions,
             band_distribution=baseline.band_distribution,
         )
 
+    # No ratio override — pass through clarification prompt to engineer.
+    clarification_note = (
+        f"H2 temp mode active; model={model_id}; "
+        f"material_index_hit={canonical_hit or material}; "
+        "temp model bypassed pending heat-treatment clarification."
+    )
+    if ratio_note:
+        clarification_note = f"{clarification_note}; {ratio_note}"
+    baseline.notes = f"{baseline.notes}; {clarification_note}" if baseline.notes else clarification_note
+    return baseline
+
+
+def _handle_ratio_screen_override(
+    *,
+    baseline: H2CompatibilityResponse,
+    screened_class: AnswerSeverity,
+    ratio_note: Optional[str],
+    provider: str,
+    material: str,
+    request: H2CompatibilityRequest,
+    model_id: str,
+    canonical_hit: Optional[str],
+) -> H2CompatibilityResponse:
+    """Apply deterministic ratio screen when it tightens the baseline verdict.
+
+    WHY: The H2/He ratio screen is a deterministic safety rule based on
+    NASA/Sandia data. When it produces a stricter classification than
+    the evidence-based baseline, we use it directly — no model call —
+    to avoid contradictory rationale between model text and the
+    deterministic verdict.
+    """
+    deterministic_rationale = baseline.rationale
+    if ratio_note:
+        deterministic_rationale = f"{baseline.rationale} {ratio_note}"
+    deterministic_rationale, rewrite_note = _maybe_rewrite_rationale(
+        provider=provider,
+        material=material,
+        condition=request.condition,
+        classification=screened_class,
+        rationale=deterministic_rationale,
+        pressure_psia=request.pressure_psia,
+        temperature_k=request.temperature_k,
+    )
+    deterministic_note = (
+        f"H2 temp mode active; model={model_id}; "
+        f"material_index_hit={canonical_hit or material}; "
+        f"deterministic ratio screen applied ({baseline.classification.value}->{screened_class.value})."
+    )
+    if rewrite_note:
+        deterministic_note = f"{deterministic_note}; {rewrite_note}"
+    return H2CompatibilityResponse(
+        classification=screened_class,
+        rationale=deterministic_rationale,
+        evidence=baseline.evidence,
+        embrittlement_risk=baseline.embrittlement_risk,
+        h2_score=baseline.h2_score,
+        notes=f"{baseline.notes}; {deterministic_note}" if baseline.notes else deterministic_note,
+        needs_clarification=baseline.needs_clarification,
+        clarification_prompt=baseline.clarification_prompt,
+        available_conditions=baseline.available_conditions,
+        band_distribution=baseline.band_distribution,
+    )
+
+
+def _get_nlg_response(
+    *,
+    baseline: H2CompatibilityResponse,
+    ratio_note: Optional[str],
+    provider: str,
+    material: str,
+    request: H2CompatibilityRequest,
+    model_id: str,
+    canonical_hit: Optional[str],
+    question: str,
+) -> H2CompatibilityResponse:
+    """Generate natural-language response via haiku rewrite or model call.
+
+    WHY two paths:
+    - Haiku path: Uses the deterministic baseline rationale and rewrites
+      it for readability. Cheaper, safer (no new claims generated).
+    - Model path: Queries the fine-tuned H2 model for a full answer.
+      Model output is validated against baseline classification —
+      disagreements are suppressed to prevent safety-critical errors.
+    """
     if provider == "haiku":
         deterministic_rationale = baseline.rationale
         if ratio_note:
@@ -947,6 +999,7 @@ def evaluate_h2_temp_compatibility(request: H2CompatibilityRequest) -> H2Compati
             band_distribution=baseline.band_distribution,
         )
 
+    # Fine-tuned model path: query, validate, return (or fall back).
     try:
         answer = _query_temp_model(question)
     except Exception as exc:
@@ -956,6 +1009,9 @@ def evaluate_h2_temp_compatibility(request: H2CompatibilityRequest) -> H2Compati
         baseline.notes = f"{baseline.notes}; {fallback_note}" if baseline.notes else fallback_note
         return baseline
 
+    # Suppress model output if it disagrees with deterministic baseline.
+    # WHY: The baseline is evidence-anchored; model disagreement likely
+    # indicates a training-data edge case, not a genuine correction.
     model_class = _classify_answer(answer)
     if model_class != baseline.classification:
         mismatch_note = (
@@ -976,7 +1032,6 @@ def evaluate_h2_temp_compatibility(request: H2CompatibilityRequest) -> H2Compati
         return baseline
 
     evidence = _extract_evidence(answer)
-
     notes = (
         f"H2 temp mode active; model={model_id}; "
         f"material_index_hit={canonical_hit or material}."
@@ -990,6 +1045,57 @@ def evaluate_h2_temp_compatibility(request: H2CompatibilityRequest) -> H2Compati
         embrittlement_risk=None,
         h2_score=None,
         notes=notes,
+    )
+
+
+def evaluate_h2_temp_compatibility(request: H2CompatibilityRequest) -> H2CompatibilityResponse:
+    """Evaluate H2 compatibility through deterministic-gated fine-tuned model path.
+
+    Decision flow (each step is a named function for testability):
+    1. Material gate — refuse if not in evidence index (_check_material_gate)
+    2. Baseline — run deterministic H2 engine as safety anchor
+    3. Ratio screen — apply H2/He ratio rule if it tightens verdict
+    4. Clarification — if baseline needs heat-treat clarification, handle it
+    5. NLG response — haiku rewrite or fine-tuned model call (_get_nlg_response)
+    """
+    provider = _get_nlg_provider()
+    model_id = _get_haiku_model_id() if provider == "haiku" else _get_model_id()
+    material = request.material_key.strip()
+    question = (request.question or f"Is {material} compatible with hydrogen service?").strip()
+
+    # Step 1: Material gate — refuse model call for unknown materials.
+    gate_response = _check_material_gate(material, question, model_id)
+    if gate_response is not None:
+        return gate_response
+
+    _, canonical_hit = _get_material_index().contains(material)
+
+    # Step 2: Deterministic baseline — always runs, used as safety anchor.
+    baseline = evaluate_h2_compatibility(request)
+    ratio_class, ratio_note = _ratio_screen(material, request.condition)
+    screened_class = _combine_with_ratio_screen(baseline.classification, ratio_class)
+
+    # Step 3: Clarification path — baseline needs heat-treat disambiguation.
+    if baseline.needs_clarification:
+        return _handle_clarification_needed(
+            baseline=baseline, screened_class=screened_class,
+            ratio_note=ratio_note, provider=provider, material=material,
+            request=request, model_id=model_id, canonical_hit=canonical_hit,
+        )
+
+    # Step 4: Ratio screen override — deterministic rule tightens verdict.
+    if screened_class != baseline.classification:
+        return _handle_ratio_screen_override(
+            baseline=baseline, screened_class=screened_class,
+            ratio_note=ratio_note, provider=provider, material=material,
+            request=request, model_id=model_id, canonical_hit=canonical_hit,
+        )
+
+    # Step 5: NLG response — haiku rewrite or model call.
+    return _get_nlg_response(
+        baseline=baseline, ratio_note=ratio_note, provider=provider,
+        material=material, request=request, model_id=model_id,
+        canonical_hit=canonical_hit, question=question,
     )
 
 

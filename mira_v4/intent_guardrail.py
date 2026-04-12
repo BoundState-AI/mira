@@ -32,12 +32,16 @@ from __future__ import annotations
 
 import logging
 import sys
+from pathlib import Path
 from typing import Optional, Tuple
 
 # ---------------------------------------------------------------------------
-# Import the existing deterministic IntentClassifier from mira.nlp
+# Import the existing deterministic IntentClassifier from mira.nlp.
+# Resolve repo root relative to this file so imports work on any machine.
 # ---------------------------------------------------------------------------
-sys.path.insert(0, r"C:\BoundState")
+_REPO_ROOT = str(Path(__file__).resolve().parents[1])
+if _REPO_ROOT not in sys.path:
+    sys.path.insert(0, _REPO_ROOT)
 from mira.nlp.intent_classifier import IntentClassifier, IntentClassificationResult
 
 from .models import IntentDisagreement

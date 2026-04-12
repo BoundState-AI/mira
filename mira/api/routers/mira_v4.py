@@ -32,6 +32,7 @@ import os
 import re
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
+import threading
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, HTTPException
@@ -39,13 +40,33 @@ from pydantic import BaseModel, Field
 
 from mira.providers.llm_provider import complete as llm_complete, resolve_model
 from mira.utils.json_extract import ExtractionError, extract_json
+from mira.api.routers.mira_v4_models import (
+    V4QueryRequest,
+    V4PenaltyDetailResponse,
+    V4ConfidenceResponse,
+    V4BatchGateResponse,
+    V4DirtyDataResponse,
+    V4HeritageVetoResponse,
+    V4IntentDisagreementResponse,
+    V4MaterialResponse,
+    V4QueryResponse,
+    V4BatchQueryRequest,
+    V4BatchQueryResponse,
+    V4HeritageOverrideRequest,
+    V4HeritageOverrideResponse,
+    V4SchemaValidationResponse,
+)
 
 LOGGER = logging.getLogger(__name__)
 router = APIRouter()
 
 # Thread pool for blocking Bedrock calls
 _executor = ThreadPoolExecutor(max_workers=4)
+
+# Heritage table initialization flag.  Protected by _heritage_lock so
+# concurrent requests don't race through table creation.
 _heritage_table_checked = False
+_heritage_lock = threading.Lock()
 
 
 def _ensure_heritage_table_ready() -> bool:
@@ -58,204 +79,29 @@ def _ensure_heritage_table_ready() -> bool:
     global _heritage_table_checked
     if _heritage_table_checked:
         return True
-    if os.getenv("MIRA_DISABLE_HERITAGE_DB", "").strip().lower() in {"1", "true", "yes"}:
-        LOGGER.info("[MIRA_V4] Heritage DB disabled; skipping table ensure.")
-        return False
 
-    try:
-        from mira.api.models.heritage_db import ensure_table as _ensure_heritage_table
+    with _heritage_lock:
+        if _heritage_table_checked:
+            return True
 
-        _ensure_heritage_table()
-        _heritage_table_checked = True
-        return True
-    except Exception as exc:
-        LOGGER.warning("[MIRA_V4] Heritage DB unavailable; override flow disabled: %s", exc)
-        return False
+        if os.getenv("MIRA_DISABLE_HERITAGE_DB", "").strip().lower() in {"1", "true", "yes"}:
+            LOGGER.info("[MIRA_V4] Heritage DB disabled; skipping table ensure.")
+            return False
+
+        try:
+            from mira.api.models.heritage_db import ensure_table as _ensure_heritage_table
+
+            _ensure_heritage_table()
+            _heritage_table_checked = True
+            return True
+        except Exception as exc:
+            LOGGER.warning("[MIRA_V4] Heritage DB unavailable; override flow disabled: %s", exc)
+            return False
 
 
 # =============================================================================
-# Request / Response Models
+# Request / Response Models — extracted to mira_v4_models.py
 # =============================================================================
-
-
-class V4QueryRequest(BaseModel):
-    """Request for the full MIRA v4 decision lineage pipeline."""
-
-    query: str = Field(..., min_length=1, description="Natural language query")
-    batch_mode: bool = Field(False, description="Enable batch mode safety gate")
-    material_key: Optional[str] = Field(None, description="Target material identifier")
-    temperature_c: Optional[float] = Field(None, description="Temperature in Celsius")
-    pressure_kpa: Optional[float] = Field(None, ge=0, description="Pressure in kPa")
-    o2_pct: Optional[float] = Field(None, ge=0, le=100, description="O2 concentration %")
-    fluid_medium: Optional[str] = Field(None, description="Fluid medium (LOX, GOX, LH2, etc.)")
-    duration_hr: Optional[float] = Field(None, ge=0, description="Exposure duration hours")
-    cycles: Optional[int] = Field(None, ge=0, description="Thermal/pressure cycles")
-    llm_model: Optional[str] = Field(
-        None,
-        description="Requested response model hint (kept for UI backward compatibility)",
-    )
-
-    model_config = {"extra": "forbid"}
-
-
-class V4PenaltyDetailResponse(BaseModel):
-    """Single penalty breakdown entry."""
-
-    penalty_type: str
-    penalty_value: float
-    explanation: str
-
-
-class V4ConfidenceResponse(BaseModel):
-    """Confidence calculation result."""
-
-    score: float
-    penalties: Dict[str, float]
-    penalty_details: List[V4PenaltyDetailResponse]
-    gate_action: str
-    safety_critical: bool
-    explanation: str
-
-
-class V4BatchGateResponse(BaseModel):
-    """Batch safety gate result."""
-
-    action: str
-    penalty: float
-    missing_fields: List[str]
-    safety_context: str
-    reason: str
-
-
-class V4DirtyDataResponse(BaseModel):
-    """Dirty data tier classification."""
-
-    tier: str
-    dirty_fraction: float
-    total_records: int
-    dirty_records: int
-    user_message: Optional[str] = None
-
-
-class V4HeritageVetoResponse(BaseModel):
-    """Heritage veto check result."""
-
-    vetoed: bool
-    veto_type: Optional[str] = None
-    heritage_failure_ids: List[str] = Field(default_factory=list)
-    requires_acknowledgment: bool = False
-    rank_penalty: float = 0.0
-    envelope_match_details: Dict[str, Any] = Field(default_factory=dict)
-
-
-class V4IntentDisagreementResponse(BaseModel):
-    """Intent classifier disagreement record."""
-
-    sonnet_intent: str
-    heuristic_intent: str
-    chosen_intent: str
-    penalty_applied: float
-    explanation: str
-
-
-class V4MaterialResponse(BaseModel):
-    """Enriched material result with test data summary."""
-
-    material_key: Any  # int from DB
-    material_code: Optional[Any] = None
-    designation: str = ""
-    composition: Optional[str] = None
-    material_type_key: Optional[int] = None
-    material_type_name: Optional[str] = None
-    use_temp_min_f: Optional[float] = None
-    use_temp_max_f: Optional[float] = None
-    use_temp_min_c: Optional[float] = None
-    use_temp_max_c: Optional[float] = None
-    test_counts: Dict[str, int] = Field(default_factory=dict)
-    total_tests: int = 0
-    latest_test_year: Optional[int] = None
-    mua_count: int = 0
-    has_mua_precedent: bool = False
-    oxygen_compatible: bool = False
-    similarity_score: Optional[float] = None
-
-
-class V4QueryResponse(BaseModel):
-    """Full decision lineage response."""
-
-    lineage_id: str
-    query_hash: str
-    snapshot_hash: str
-    confidence: V4ConfidenceResponse
-    gate_action: str
-    batch_gate: Optional[V4BatchGateResponse] = None
-    dirty_data: Optional[V4DirtyDataResponse] = None
-    heritage_veto: Optional[V4HeritageVetoResponse] = None
-    intent_disagreement: Optional[V4IntentDisagreementResponse] = None
-    answer: str = ""
-    materials: List[Dict[str, Any]] = Field(default_factory=list)
-    all_materials: List[Dict[str, Any]] = Field(default_factory=list)
-    all_material_count: int = 0
-    materials_focus_applied: bool = False
-    material_families: List[str] = Field(default_factory=list)
-    search_source: str = ""
-    parsed_query: Dict[str, Any] = Field(default_factory=dict)
-    schema_version: str = ""
-    timestamp: str = ""
-    total_test_records: int = 0
-    materials_with_tests: int = 0
-    materials_with_mua: int = 0
-
-
-class V4BatchQueryRequest(BaseModel):
-    """Batch mode request with multiple queries."""
-
-    queries: List[V4QueryRequest] = Field(..., min_length=1, max_length=100)
-
-    model_config = {"extra": "forbid"}
-
-
-class V4BatchQueryResponse(BaseModel):
-    """Batch mode response."""
-
-    results: List[V4QueryResponse]
-    total: int
-    refused_count: int
-
-
-class V4HeritageOverrideRequest(BaseModel):
-    """Engineer acknowledgment for heritage veto."""
-
-    material_key: str = Field(..., min_length=1, description="Material identifier")
-    heritage_failure_id: str = Field(..., min_length=1, description="Heritage failure record ID")
-    failure_environment: Dict[str, Any] = Field(..., description="Failure environment (EnvironmentSpec-compatible)")
-    query_environment: Dict[str, Any] = Field(..., description="Query environment (EnvironmentSpec-compatible)")
-    engineer_name: str = Field(..., min_length=1, description="Engineer name")
-    engineer_rationale: str = Field(..., min_length=10, description="Rationale for override (min 10 chars)")
-    lineage_hash: str = Field(..., min_length=64, max_length=64, description="Parent decision lineage query_hash")
-
-    model_config = {"extra": "forbid"}
-
-
-class V4HeritageOverrideResponse(BaseModel):
-    """Created heritage override record."""
-
-    override_id: str
-    material_key: str
-    heritage_failure_id: str
-    engineer_name: str
-    timestamp: str
-    acknowledged: bool
-
-
-class V4SchemaValidationResponse(BaseModel):
-    """Schema validation result for CI."""
-
-    passed: bool
-    schema_version: str
-    changes: List[Dict[str, Any]] = Field(default_factory=list)
-    requires_faiss_rebuild: bool = False
-    requires_regression: bool = False
 
 
 # =============================================================================
@@ -1709,7 +1555,10 @@ async def query_v4_laundered(request: V4QueryRequest) -> Dict[str, Any]:
     Compliance: SWE-013, SWE-033, NASA-STD-8739.8B
     """
     import sys
-    sys.path.insert(0, r"C:\BoundState")
+    from pathlib import Path
+    _repo_root = str(Path(__file__).resolve().parents[3])
+    if _repo_root not in sys.path:
+        sys.path.insert(0, _repo_root)
 
     try:
         from data_laundering.pipeline import DataLaunderingPipeline

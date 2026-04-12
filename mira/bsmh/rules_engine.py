@@ -401,10 +401,14 @@ def build_rule_decision(
     )
 
     # Deterministic output guard: low confidence cannot be presented as COMPATIBLE.
+    # WHY 0.5: Below 50% confidence the evidence is too weak to assert
+    # compatibility — downgrade to CONDITIONAL so the engineer investigates.
     if overall == "COMPATIBLE" and confidence < 0.5:
         overall = "CONDITIONAL"
     # Soft cap: CONDITIONAL verdict should not report overconfidence.
-    # An engineer reading "CONDITIONAL at 92%" will distrust both numbers.
+    # WHY 0.80: An engineer reading "CONDITIONAL at 92%" will distrust both
+    # the verdict and the confidence. 80% is the empirical ceiling where
+    # "conditional" still feels honest. Calibrated with Joe/Dr. Wilde.
     if overall == "CONDITIONAL" and confidence > 0.80:
         confidence = 0.80
     if safety_context == "oxygen" and overall == "COMPATIBLE":

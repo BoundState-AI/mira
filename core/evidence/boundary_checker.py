@@ -115,6 +115,12 @@ class BOKBoundaryChecker:
 
         These are the most critical limits that must NEVER be exceeded.
         In production, these should come from bok_numeric_limits table.
+
+        NOTE: These values are duplicated in core/models/bok_numeric_limits.py
+        (BOKLimitParser.get_hardcoded_limits) which has a richer schema
+        including material_variants and prohibition_text. If you update
+        limits here, update them there too — or preferably, migrate to
+        loading from bok_numeric_limits as the single source of truth.
         """
         return [
             # Aluminum limits (NASA-STD-6016C)

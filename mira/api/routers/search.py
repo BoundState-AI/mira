@@ -29,12 +29,16 @@ from core.query.engine import QueryEngine
 from core.infra.document_store import NullDocumentStore
 
 import logging
+import threading
 from pathlib import Path
 
 LOGGER = logging.getLogger(__name__)
 
-# Global query engine instance (will be replaced with proper DI)
+# Global query engine instance (will be replaced with proper DI).
+# Protected by _query_engine_lock to prevent duplicate initialization
+# when concurrent requests race through get_query_engine().
 _query_engine: Optional[QueryEngine] = None
+_query_engine_lock = threading.Lock()
 
 
 def _try_load_faiss_store():
@@ -65,21 +69,27 @@ def _try_load_faiss_store():
 
 
 def get_query_engine() -> QueryEngine:
-    """Dependency to get the QueryEngine instance."""
+    """Dependency to get the QueryEngine instance.
+
+    Uses double-check locking so only one thread initializes the engine
+    while subsequent callers return immediately without acquiring the lock.
+    """
     global _query_engine
     if _query_engine is None:
-        # Try to load FAISS, fall back to NullDocumentStore
-        store = _try_load_faiss_store()
-        if store is None:
-            store = NullDocumentStore()
-        _query_engine = QueryEngine(document_store=store)
+        with _query_engine_lock:
+            if _query_engine is None:
+                store = _try_load_faiss_store()
+                if store is None:
+                    store = NullDocumentStore()
+                _query_engine = QueryEngine(document_store=store)
     return _query_engine
 
 
 def set_query_engine(engine: QueryEngine) -> None:
     """Set the global QueryEngine instance (for testing/configuration)."""
     global _query_engine
-    _query_engine = engine
+    with _query_engine_lock:
+        _query_engine = engine
 
 
 router = APIRouter()

@@ -272,15 +272,23 @@ class HydrogenCompatibilityEngine:
             return 0.0
 
         mat_data = self.h2_database[material_key]
-        score = 0.5  # Base score for having H2 test data
+        # WHY 0.5 base: Having ANY H2 test data is a positive signal (better
+        # than 0.0 for untested materials). 0.5 = "we have data, but haven't
+        # evaluated quality yet."
+        score = 0.5
 
-        # Multiple test types boost confidence
+        # WHY 0.1 per test type, max 0.2: Multiple independent test types
+        # (slow strain rate, disk rupture, permeation) indicate broader
+        # characterization. Capped at 0.2 to prevent test-count inflation
+        # from dominating the score.
         test_type_count = len(mat_data['test_types'])
         score += min(0.2, test_type_count * 0.1)
 
-        # Rating boost
+        # WHY rating weights (A=0.3, B=0.2, C=0.1): NASA-STD-6001B ratings
+        # directly indicate H2 service suitability. "A" = fully compatible,
+        # so it gets the largest boost. "D" or unrated gets nothing.
         if mat_data['ratings']:
-            score += 0.1  # Has rating
+            score += 0.1  # Has any rating at all
             best_rating = min(mat_data['ratings'])  # A < B < C < D
             if best_rating == 'A':
                 score += 0.3
@@ -289,7 +297,8 @@ class HydrogenCompatibilityEngine:
             elif best_rating == 'C':
                 score += 0.1
 
-        # Cryogenic testing boost
+        # WHY -200°F threshold: Materials tested below -200°F have demonstrated
+        # cryogenic toughness, relevant for LH2 service at -423°F.
         min_temp = mat_data['temperature_range'].get('min_f')
         if min_temp and min_temp < -200:
             score += 0.1

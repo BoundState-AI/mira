@@ -271,56 +271,63 @@ def _resolve_via_provider(provider: str, prompt: str) -> tuple[dict, str]:
     raise RuntimeError(f"Unknown condition resolver provider: {provider}")
 
 
-def resolve_condition_label(
-    *,
-    raw_condition: Optional[str],
-    material_name: Optional[str],
-    source_document: Optional[str],
-) -> ConditionResolution:
-    raw_condition = (raw_condition or "").strip()
-    material_name = (material_name or "").strip()
-    source_document = (source_document or "").strip()
+def _try_fetch_from_pg(
+    raw_key: str, raw_text: str, provider: str, mem_key: str,
+) -> Optional[ConditionResolution]:
+    """Try to load a previously-resolved condition alias from PostgreSQL.
 
-    raw_text = raw_condition or material_name or _UNKNOWN_LABEL
-    raw_key = _normalize_key(raw_text) or _UNKNOWN_LABEL.lower()
-    if raw_key in _UNKNOWN_VALUES:
-        raw_key = _UNKNOWN_LABEL.lower()
-        raw_text = _UNKNOWN_LABEL
+    WHY PG before LLM: LLM calls are expensive ($) and non-deterministic.
+    If we've already resolved this condition label, reuse the stored result.
+    The confidence threshold in _is_persisted_alias_usable() ensures we
+    only reuse high-quality resolutions.
 
-    provider = _condition_provider()
-    mem_key = f"{provider}:{raw_key}"
-    with _CACHE_LOCK:
-        cached = _MEM_CACHE.get(mem_key)
-    if cached:
-        return cached
-
+    Returns None if no usable alias is found.
+    """
     backend = get_runtime_backend()
     _ensure_pg_table_if_needed()
-    if backend in {"pg", "hybrid"}:
-        try:
-            found = fetch_condition_alias(raw_key)
-            if found:
-                persisted = _coerce_resolution(
-                    raw_key=raw_key,
-                    raw_text=found.get("raw_text") or raw_text,
-                    provider=str(found.get("resolver_provider") or "cache"),
-                    model=str(found.get("resolver_model") or "cache"),
-                    payload={
-                        "is_condition": found.get("is_condition"),
-                        "canonical_condition": found.get("canonical_condition"),
-                        "display_label": found.get("display_label"),
-                        "confidence": found.get("confidence"),
-                    },
-                )
-                if _is_persisted_alias_usable(found) or provider == "off":
-                    with _CACHE_LOCK:
-                        _MEM_CACHE[mem_key] = persisted
-                    return persisted
-        except Exception as exc:
-            LOGGER.warning("Condition alias fetch failed (%s).", exc)
+    if backend not in {"pg", "hybrid"}:
+        return None
 
+    try:
+        found = fetch_condition_alias(raw_key)
+        if found:
+            persisted = _coerce_resolution(
+                raw_key=raw_key,
+                raw_text=found.get("raw_text") or raw_text,
+                provider=str(found.get("resolver_provider") or "cache"),
+                model=str(found.get("resolver_model") or "cache"),
+                payload={
+                    "is_condition": found.get("is_condition"),
+                    "canonical_condition": found.get("canonical_condition"),
+                    "display_label": found.get("display_label"),
+                    "confidence": found.get("confidence"),
+                },
+            )
+            if _is_persisted_alias_usable(found) or provider == "off":
+                with _CACHE_LOCK:
+                    _MEM_CACHE[mem_key] = persisted
+                return persisted
+    except Exception as exc:
+        LOGGER.warning("Condition alias fetch failed (%s).", exc)
+    return None
+
+
+def _resolve_via_llm_or_fallback(
+    raw_key: str, raw_text: str, raw_condition: Optional[str],
+    material_name: str, source_document: str, provider: str,
+) -> ConditionResolution:
+    """Resolve condition label via LLM provider, with deterministic fallback.
+
+    WHY fallback chain: LLM providers can fail (rate limits, network, cost).
+    The fallback produces a low-confidence result (0.35) that will be flagged
+    for human review — never silently trusted.
+
+    Provider "off" bypasses LLM entirely and returns a passthrough result
+    with 0.4 confidence (appropriate for batch ingestion where LLM cost
+    is prohibitive).
+    """
     if provider == "off":
-        res = _coerce_resolution(
+        return _coerce_resolution(
             raw_key=raw_key,
             raw_text=raw_text,
             provider="off",
@@ -332,32 +339,44 @@ def resolve_condition_label(
                 "confidence": 0.4 if raw_condition else 1.0,
             },
         )
-    else:
-        prompt = _build_prompt(raw_text, raw_condition, material_name, source_document)
-        try:
-            payload, model = _resolve_via_provider(provider, prompt)
-            res = _coerce_resolution(
-                raw_key=raw_key,
-                raw_text=raw_text,
-                provider=provider,
-                model=model,
-                payload=payload,
-            )
-        except Exception as exc:
-            LOGGER.warning("Condition resolver %s failed for '%s': %s", provider, raw_text, exc)
-            res = _coerce_resolution(
-                raw_key=raw_key,
-                raw_text=raw_text,
-                provider=provider,
-                model="fallback",
-                payload={
-                    "is_condition": bool(raw_condition),
-                    "canonical_condition": raw_condition or _UNKNOWN_LABEL,
-                    "display_label": raw_condition or _UNKNOWN_LABEL,
-                    "confidence": 0.35 if raw_condition else 1.0,
-                },
-            )
 
+    prompt = _build_prompt(raw_text, raw_condition, material_name, source_document)
+    try:
+        payload, model = _resolve_via_provider(provider, prompt)
+        return _coerce_resolution(
+            raw_key=raw_key,
+            raw_text=raw_text,
+            provider=provider,
+            model=model,
+            payload=payload,
+        )
+    except Exception as exc:
+        LOGGER.warning("Condition resolver %s failed for '%s': %s", provider, raw_text, exc)
+        return _coerce_resolution(
+            raw_key=raw_key,
+            raw_text=raw_text,
+            provider=provider,
+            model="fallback",
+            payload={
+                "is_condition": bool(raw_condition),
+                "canonical_condition": raw_condition or _UNKNOWN_LABEL,
+                "display_label": raw_condition or _UNKNOWN_LABEL,
+                "confidence": 0.35 if raw_condition else 1.0,
+            },
+        )
+
+
+def _persist_resolution(
+    res: ConditionResolution, raw_key: str, raw_text: str,
+    source_document: str, material_name: str, mem_key: str,
+) -> None:
+    """Persist resolution to PG (if enabled) and in-memory cache.
+
+    WHY persist: Avoids re-resolving the same condition label on every
+    BOK ingestion run. The PG table acts as a shared cache across
+    workers and restarts.
+    """
+    backend = get_runtime_backend()
     if backend in {"pg", "hybrid"}:
         try:
             upsert_condition_alias(
@@ -378,4 +397,52 @@ def resolve_condition_label(
 
     with _CACHE_LOCK:
         _MEM_CACHE[mem_key] = res
+
+
+def resolve_condition_label(
+    *,
+    raw_condition: Optional[str],
+    material_name: Optional[str],
+    source_document: Optional[str],
+) -> ConditionResolution:
+    """Resolve a raw condition label to a canonical form.
+
+    Pipeline (each step is a named function):
+    1. Normalize — clean and key the input text
+    2. Cache check — return immediately if already resolved in-memory
+    3. PG fetch — check PostgreSQL for a previously-persisted resolution
+    4. LLM resolve — call haiku/ollama provider (or passthrough if "off")
+    5. Persist — store result in PG + in-memory cache for future calls
+    """
+    # Step 1: Normalize input.
+    raw_condition = (raw_condition or "").strip()
+    material_name = (material_name or "").strip()
+    source_document = (source_document or "").strip()
+
+    raw_text = raw_condition or material_name or _UNKNOWN_LABEL
+    raw_key = _normalize_key(raw_text) or _UNKNOWN_LABEL.lower()
+    if raw_key in _UNKNOWN_VALUES:
+        raw_key = _UNKNOWN_LABEL.lower()
+        raw_text = _UNKNOWN_LABEL
+
+    # Step 2: In-memory cache check.
+    provider = _condition_provider()
+    mem_key = f"{provider}:{raw_key}"
+    with _CACHE_LOCK:
+        cached = _MEM_CACHE.get(mem_key)
+    if cached:
+        return cached
+
+    # Step 3: Try PG-persisted alias.
+    pg_result = _try_fetch_from_pg(raw_key, raw_text, provider, mem_key)
+    if pg_result is not None:
+        return pg_result
+
+    # Step 4: Resolve via LLM or deterministic fallback.
+    res = _resolve_via_llm_or_fallback(
+        raw_key, raw_text, raw_condition, material_name, source_document, provider,
+    )
+
+    # Step 5: Persist to PG + cache.
+    _persist_resolution(res, raw_key, raw_text, source_document, material_name, mem_key)
     return res

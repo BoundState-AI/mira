@@ -949,6 +949,173 @@ class MaterialCodeLookupService:
 
         return None
 
+    def _fuzzy_lookup_fallback(
+        self,
+        designation_clean: str,
+        designation_lookup: Optional[str],
+        designation_upper: str,
+    ) -> Optional[MaterialMatch]:
+        """Fuzzy designation lookup for non-UNS materials (polymers, adhesives, etc.).
+
+        WHY: Materials like PCTFE, Viton, Kapton don't have UNS codes and
+        can't go through the alloy normalizer. This fallback uses token-overlap
+        scoring to disambiguate between candidates.
+
+        Scoring strategy:
+        - Core tokens (material identity, not qualifiers like "TYPE" or "GRADE")
+          are weighted higher than qualifier tokens.
+        - Candidates are ranked by: core overlap > total overlap > fewer extra
+          tokens > shorter designation (prefer specific over generic).
+        - A minimum 60% core overlap is required to accept a match.
+
+        Returns None if no fuzzy match is found (caller should return unresolved).
+        """
+        fuzzy_query = designation_lookup or designation_clean
+        fuzzy_candidates = self.lookup_by_designation(fuzzy_query)
+        if not fuzzy_candidates and designation_lookup and designation_lookup != designation_upper:
+            fuzzy_candidates = self.lookup_by_designation(designation_clean)
+        if not fuzzy_candidates:
+            return None
+
+        fuzzy_candidates.sort(key=lambda m: m.score, reverse=True)
+        best = fuzzy_candidates[0]
+        second = fuzzy_candidates[1] if len(fuzzy_candidates) > 1 else None
+        score_gap = (best.score - second.score) if second else best.score
+
+        filler_words = {'ALLOY', 'TYPE', 'GRADE', 'CLASS', 'SPEC', 'PER', 'THE', 'AND', 'OR'}
+
+        def _tokenize(text: str) -> set:
+            tokens = set(re.findall(r'\b([A-Z0-9][-A-Z0-9]*)\b', text.upper()))
+            tokens = tokens - filler_words
+            normalized = set()
+            for token in tokens:
+                if token in self.CANONICAL_ALIASES:
+                    normalized.add(self.CANONICAL_ALIASES[token])
+                    continue
+                if token in self.MATERIAL_ALIASES:
+                    normalized.add(token)
+                    continue
+                canonical = None
+                for key, aliases in self.MATERIAL_ALIASES.items():
+                    if token in aliases:
+                        canonical = key
+                        break
+                normalized.add(canonical or token)
+            return {t for t in normalized if len(t) >= 3 or (len(t) == 2 and t.isalpha())}
+
+        query_tokens = _tokenize(designation_clean)
+        if not query_tokens:
+            return MaterialMatch(
+                material_code=None,
+                designation=designation_clean,
+                confidence='low',
+                method='ambiguous',
+                score=best.score,
+                specs=[],
+                candidates=fuzzy_candidates[:5],
+            )
+
+        qualifier_tokens = {
+            "FILLED", "UNFILLED", "VIRGIN", "TYPE", "GRADE", "CLASS",
+            "COND", "CONDITION", "DUROMETER",
+        }
+        core_tokens = {
+            t for t in query_tokens
+            if t not in qualifier_tokens and not t.isdigit()
+        }
+        if not core_tokens:
+            core_tokens = set(query_tokens)
+
+        # Fast path: single core token with strong score gap.
+        if len(core_tokens) == 1 and best.score >= 0.8 and score_gap >= 0.1:
+            logger.info(
+                f"Fuzzy match: '{designation_clean}' -> {best.material_code} "
+                f"(score={best.score:.2f})"
+            )
+            return MaterialMatch(
+                material_code=best.material_code,
+                designation=best.designation,
+                confidence='medium',
+                method='fuzzy_designation',
+                score=best.score,
+                specs=best.specs,
+            )
+
+        # Multi-token scoring: rank by core overlap, then total overlap,
+        # then fewer extra tokens, then shorter designation.
+        scored = []
+        for cand in fuzzy_candidates:
+            cand_tokens = _tokenize(cand.designation or "")
+            matched_query = set()
+            matched_candidate = set()
+            matched_core = set()
+            for qt in query_tokens:
+                for ct in cand_tokens:
+                    if (
+                        qt == ct
+                        or (len(qt) >= 3 and qt in ct)
+                        or (len(qt) == 2 and ct.endswith(qt))
+                    ):
+                        matched_query.add(qt)
+                        matched_candidate.add(ct)
+                        if qt in core_tokens:
+                            matched_core.add(qt)
+                        break
+            scored.append({
+                "core_overlap": len(matched_core),
+                "overlap": len(matched_query),
+                "extra": len(cand_tokens) - len(matched_candidate),
+                "length": len(cand.designation or ""),
+                "code": str(cand.material_code or ""),
+                "cand": cand,
+            })
+
+        scored.sort(
+            key=lambda x: (
+                -x["core_overlap"],
+                -x["overlap"],
+                x["extra"],
+                x["length"],
+                x["code"],
+            )
+        )
+        best_scored = scored[0]
+        second_scored = scored[1] if len(scored) > 1 else None
+        # WHY 60%: Below this threshold, the match is too ambiguous to trust.
+        # Calibrated against MIUL golden test set — 0.6 catches real matches
+        # while rejecting false positives like "316" matching "316L PLATE".
+        core_min_required = max(1, math.ceil(len(core_tokens) * 0.6))
+        if best_scored["core_overlap"] >= core_min_required and (
+            second_scored is None
+            or best_scored["core_overlap"] > second_scored["core_overlap"]
+            or best_scored["overlap"] > second_scored["overlap"]
+            or best_scored["extra"] < second_scored["extra"]
+            or best_scored["length"] < second_scored["length"]
+        ):
+            best_cand = best_scored["cand"]
+            logger.info(
+                f"Token match: '{designation_clean}' -> {best_cand.material_code} "
+                f"(core_overlap={best_scored['core_overlap']}/{len(core_tokens)})"
+            )
+            return MaterialMatch(
+                material_code=best_cand.material_code,
+                designation=best_cand.designation,
+                confidence='medium',
+                method='fuzzy_designation',
+                score=best_cand.score,
+                specs=best_cand.specs,
+            )
+
+        return MaterialMatch(
+            material_code=None,
+            designation=designation_clean,
+            confidence='low',
+            method='ambiguous',
+            score=best_scored["cand"].score,
+            specs=[],
+            candidates=fuzzy_candidates[:5],
+        )
+
     def lookup_material_code(
         self,
         designation: str,
@@ -1183,138 +1350,15 @@ class MaterialCodeLookupService:
                 candidates=candidates,
             )
 
-        # Step 4: Fuzzy lookup fallback (non-UNS materials like polymers)
-        fuzzy_query = designation_lookup or designation_clean
-        fuzzy_candidates = self.lookup_by_designation(fuzzy_query)
-        if not fuzzy_candidates and designation_lookup and designation_lookup != designation_upper:
-            fuzzy_candidates = self.lookup_by_designation(designation_clean)
-        if fuzzy_candidates:
-            fuzzy_candidates.sort(key=lambda m: m.score, reverse=True)
-            best = fuzzy_candidates[0]
-            second = fuzzy_candidates[1] if len(fuzzy_candidates) > 1 else None
-            score_gap = (best.score - second.score) if second else best.score
-            # Secondary heuristic: prefer candidates that cover query tokens with minimal extras.
-            filler_words = {'ALLOY', 'TYPE', 'GRADE', 'CLASS', 'SPEC', 'PER', 'THE', 'AND', 'OR'}
-
-            def _tokenize(text: str) -> set:
-                tokens = set(re.findall(r'\b([A-Z0-9][-A-Z0-9]*)\b', text.upper()))
-                tokens = tokens - filler_words
-                normalized = set()
-                for token in tokens:
-                    if token in self.CANONICAL_ALIASES:
-                        normalized.add(self.CANONICAL_ALIASES[token])
-                        continue
-                    if token in self.MATERIAL_ALIASES:
-                        normalized.add(token)
-                        continue
-                    canonical = None
-                    for key, aliases in self.MATERIAL_ALIASES.items():
-                        if token in aliases:
-                            canonical = key
-                            break
-                    normalized.add(canonical or token)
-                return {t for t in normalized if len(t) >= 3 or (len(t) == 2 and t.isalpha())}
-
-            query_tokens = _tokenize(designation_clean)
-            if query_tokens:
-                qualifier_tokens = {
-                    "FILLED", "UNFILLED", "VIRGIN", "TYPE", "GRADE", "CLASS",
-                    "COND", "CONDITION", "DUROMETER",
-                }
-                core_tokens = {
-                    t for t in query_tokens
-                    if t not in qualifier_tokens and not t.isdigit()
-                }
-                if not core_tokens:
-                    core_tokens = set(query_tokens)
-
-                # Fast path only when query is effectively a single core material token.
-                if len(core_tokens) == 1 and best.score >= 0.8 and score_gap >= 0.1:
-                    logger.info(
-                        f"Fuzzy match: '{designation_clean}' -> {best.material_code} "
-                        f"(score={best.score:.2f})"
-                    )
-                    return MaterialMatch(
-                        material_code=best.material_code,
-                        designation=best.designation,
-                        confidence='medium',
-                        method='fuzzy_designation',
-                        score=best.score,
-                        specs=best.specs,
-                    )
-
-                scored = []
-                for cand in fuzzy_candidates:
-                    cand_tokens = _tokenize(cand.designation or "")
-                    matched_query = set()
-                    matched_candidate = set()
-                    matched_core = set()
-                    for qt in query_tokens:
-                        for ct in cand_tokens:
-                            if (
-                                qt == ct
-                                or (len(qt) >= 3 and qt in ct)
-                                or (len(qt) == 2 and ct.endswith(qt))
-                            ):
-                                matched_query.add(qt)
-                                matched_candidate.add(ct)
-                                if qt in core_tokens:
-                                    matched_core.add(qt)
-                                break
-                    overlap = len(matched_query)
-                    core_overlap = len(matched_core)
-                    extra = len(cand_tokens) - len(matched_candidate)
-                    scored.append({
-                        "core_overlap": core_overlap,
-                        "overlap": overlap,
-                        "extra": extra,
-                        "length": len(cand.designation or ""),
-                        "code": str(cand.material_code or ""),
-                        "cand": cand,
-                    })
-
-                scored.sort(
-                    key=lambda x: (
-                        -x["core_overlap"],
-                        -x["overlap"],
-                        x["extra"],
-                        x["length"],
-                        x["code"],
-                    )
-                )
-                best = scored[0]
-                second = scored[1] if len(scored) > 1 else None
-                core_min_required = max(1, math.ceil(len(core_tokens) * 0.6))
-                if best["core_overlap"] >= core_min_required and (
-                    second is None
-                    or best["core_overlap"] > second["core_overlap"]
-                    or best["overlap"] > second["overlap"]
-                    or best["extra"] < second["extra"]
-                    or best["length"] < second["length"]
-                ):
-                    best_cand = best["cand"]
-                    logger.info(
-                        f"Token match: '{designation_clean}' -> {best_cand.material_code} "
-                        f"(core_overlap={best['core_overlap']}/{len(core_tokens)})"
-                    )
-                    return MaterialMatch(
-                        material_code=best_cand.material_code,
-                        designation=best_cand.designation,
-                        confidence='medium',
-                        method='fuzzy_designation',
-                        score=best_cand.score,
-                        specs=best_cand.specs,
-                    )
-
-            return MaterialMatch(
-                material_code=None,
-                designation=designation_clean,
-                confidence='low',
-                method='ambiguous',
-                score=best["cand"].score,
-                specs=[],
-                candidates=fuzzy_candidates[:5],
-            )
+        # Step 4: Fuzzy lookup fallback (non-UNS materials like polymers).
+        # WHY fuzzy: Materials like "PCTFE" or "VITON A" don't have UNS codes.
+        # The token-overlap scoring disambiguates between candidates when
+        # multiple partial matches exist (e.g., "VITON A" vs "VITON B").
+        fuzzy_result = self._fuzzy_lookup_fallback(
+            designation_clean, designation_lookup, designation_upper,
+        )
+        if fuzzy_result is not None:
+            return fuzzy_result
 
         # No match - unresolved
         logger.warning(f"Unresolved: '{designation_clean}' - no matching material found")
