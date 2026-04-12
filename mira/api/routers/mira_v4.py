@@ -32,6 +32,7 @@ import os
 import re
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
+import threading
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, HTTPException
@@ -45,7 +46,11 @@ router = APIRouter()
 
 # Thread pool for blocking Bedrock calls
 _executor = ThreadPoolExecutor(max_workers=4)
+
+# Heritage table initialization flag.  Protected by _heritage_lock so
+# concurrent requests don't race through table creation.
 _heritage_table_checked = False
+_heritage_lock = threading.Lock()
 
 
 def _ensure_heritage_table_ready() -> bool:
@@ -58,19 +63,24 @@ def _ensure_heritage_table_ready() -> bool:
     global _heritage_table_checked
     if _heritage_table_checked:
         return True
-    if os.getenv("MIRA_DISABLE_HERITAGE_DB", "").strip().lower() in {"1", "true", "yes"}:
-        LOGGER.info("[MIRA_V4] Heritage DB disabled; skipping table ensure.")
-        return False
 
-    try:
-        from mira.api.models.heritage_db import ensure_table as _ensure_heritage_table
+    with _heritage_lock:
+        if _heritage_table_checked:
+            return True
 
-        _ensure_heritage_table()
-        _heritage_table_checked = True
-        return True
-    except Exception as exc:
-        LOGGER.warning("[MIRA_V4] Heritage DB unavailable; override flow disabled: %s", exc)
-        return False
+        if os.getenv("MIRA_DISABLE_HERITAGE_DB", "").strip().lower() in {"1", "true", "yes"}:
+            LOGGER.info("[MIRA_V4] Heritage DB disabled; skipping table ensure.")
+            return False
+
+        try:
+            from mira.api.models.heritage_db import ensure_table as _ensure_heritage_table
+
+            _ensure_heritage_table()
+            _heritage_table_checked = True
+            return True
+        except Exception as exc:
+            LOGGER.warning("[MIRA_V4] Heritage DB unavailable; override flow disabled: %s", exc)
+            return False
 
 
 # =============================================================================

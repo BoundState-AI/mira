@@ -83,7 +83,10 @@ qualification_plan_generator = QualificationPlanGenerator()
 
 # In-progress investigation tracking (transient, not persisted).
 # Keyed by session_id.  Cleaned up after status is consumed.
+# Protected by _progress_lock to prevent race conditions when
+# concurrent requests read/write investigation state.
 _investigation_progress: dict[str, dict] = {}
+_progress_lock = asyncio.Lock()
 
 # Minimum explicit human-review share across precedent decisions.
 _MIN_HITL_PRECEDENT_FRACTION = 0.20
