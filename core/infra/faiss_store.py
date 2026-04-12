@@ -202,7 +202,11 @@ class FaissDocumentStore(DocumentStore):
             doc_id = f"{base_id}-{idx}"  # Unique per FAISS index
             title = meta.get("designation", meta.get("name", f"Document {idx}"))
             snippet = self._build_snippet(meta, query)
-            # Combine semantic score with keyword boost
+            # Combine semantic relevance (0-1) with keyword matches (0-unbounded).
+            # WHY 1/(1+dist): Sigmoid-like transform — dist=0 → score=1, dist→∞ → 0.
+            # WHY keyword_boost * 0.3: Keyword matches contribute up to 30% of final
+            # score. Tuned empirically — higher weight causes single exact-match
+            # keywords to dominate over strong semantic similarity.
             semantic_score = float(1.0 / (1.0 + dist))
             combined_score = min(1.0, semantic_score + keyword_boost * 0.3)
 

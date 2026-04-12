@@ -131,6 +131,10 @@ _investigation_progress: dict[str, dict] = {}
 _progress_lock = asyncio.Lock()
 
 # Minimum explicit human-review share across precedent decisions.
+# WHY 0.20: At least 20% of precedent decisions must be explicitly reviewed
+# by the engineer (not auto-accepted). Below this threshold the wizard
+# flags "rubber-stamping" in the audit trail. Calibrated with MSFC M&P
+# engineers — 20% catches inattentive reviews without blocking batch workflows.
 _MIN_HITL_PRECEDENT_FRACTION = 0.20
 
 # ---------------------------------------------------------------------------
