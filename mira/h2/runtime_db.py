@@ -13,7 +13,7 @@ from __future__ import annotations
 import os
 import json
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 try:
@@ -533,7 +533,7 @@ def insert_coverage_gap(
     timestamp_utc: Optional[str] = None,
 ) -> None:
     schema = schema or get_h2_schema()
-    ts = timestamp_utc or datetime.utcnow().isoformat()
+    ts = timestamp_utc or datetime.now(timezone.utc).isoformat()
     sql = f"""
     INSERT INTO {schema}.coverage_gaps(
       timestamp_utc, material, question, model, event, context_jsonb, source_file
