@@ -16,8 +16,11 @@ Compliance: SWE-013, NASA-STD-8739.8B
 Safety Critical: False
 """
 
+import logging
 import re
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 
 class MaterialConstraints:
@@ -121,6 +124,16 @@ class ConstraintInterpreter:
             elif unit == 'mpa':
                 value = value * 145.04
 
+            # Bounds check: aerospace pressures are typically < 50,000 psia.
+            # Values above this are almost certainly unit conversion errors
+            # or garbage input — log a warning but still store the value so
+            # the caller can decide how to handle it.
+            if value > 50000:
+                logger.warning(
+                    "Extracted pressure %.1f psia exceeds typical aerospace "
+                    "range (>50,000 psia) — possible unit error in query.",
+                    value,
+                )
             constraints.pressure_psi_max = value
 
         # Extract temperature (F, C, K)
@@ -135,6 +148,21 @@ class ConstraintInterpreter:
             elif unit == 'k':
                 value = value - 273.15
 
+            # Bounds check: aerospace temperatures range from ~-270°C (LHe)
+            # to ~2000°C (turbine blades). Values outside this are likely
+            # parsing errors.
+            if value < -273.15:
+                logger.warning(
+                    "Extracted temperature %.1f°C is below absolute zero — "
+                    "possible unit error in query.",
+                    value,
+                )
+            elif value > 3000:
+                logger.warning(
+                    "Extracted temperature %.1f°C exceeds typical aerospace "
+                    "range (>3000°C) — possible unit error in query.",
+                    value,
+                )
             constraints.temp_c_max = value
 
         return constraints

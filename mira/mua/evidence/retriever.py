@@ -21,7 +21,7 @@ LOGGER = logging.getLogger(__name__)
 
 try:  # pragma: no cover - optional dependency behavior
     import psycopg2
-except Exception:  # pragma: no cover
+except (ImportError, ModuleNotFoundError):  # pragma: no cover
     psycopg2 = None
 
 
