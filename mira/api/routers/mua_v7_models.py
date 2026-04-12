@@ -1,11 +1,22 @@
-"""MUA v7 API Router — Response and Request Models.
+#!/usr/bin/env python3
+"""
+Module: MUA v7 API Router — Response and Request Models
+Purpose: Pydantic models used by MUA v7 router endpoints.
 
-Pydantic models used exclusively by the mua_v7 router endpoints.
-Extracted from mua_v7.py to keep the router file focused on route
-handlers and reduce the god-class footprint.
+BoundState AI 2026
+Version: 7.0.0
+Classification: BoundState Proprietary
 
 Co-Authored-By: Claude "Atlas" <noreply@anthropic.com>
 Co-Authored-By: Dr. Joseph Wilde, BoundState AI
+
+Compliance: SWE-013, SWE-032
+Safety Critical: False
+
+Extracted from mua_v7.py to keep the router file focused on route
+handlers. Contains only data models (Pydantic BaseModel subclasses)
+and compiled regex patterns for material attribute inference.
+No business logic, no side effects.
 """
 
 from __future__ import annotations
