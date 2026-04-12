@@ -1719,7 +1719,10 @@ async def query_v4_laundered(request: V4QueryRequest) -> Dict[str, Any]:
     Compliance: SWE-013, SWE-033, NASA-STD-8739.8B
     """
     import sys
-    sys.path.insert(0, r"C:\BoundState")
+    from pathlib import Path
+    _repo_root = str(Path(__file__).resolve().parents[3])
+    if _repo_root not in sys.path:
+        sys.path.insert(0, _repo_root)
 
     try:
         from data_laundering.pipeline import DataLaunderingPipeline

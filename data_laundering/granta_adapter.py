@@ -34,10 +34,14 @@ from __future__ import annotations
 import logging
 import sys
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# Ensure mira_v4 is importable
-sys.path.insert(0, r"C:\BoundState")
+# Ensure mira_v4 is importable — resolve repo root relative to this
+# file so imports work on any machine (not just C:\BoundState).
+_REPO_ROOT = str(Path(__file__).resolve().parents[1])
+if _REPO_ROOT not in sys.path:
+    sys.path.insert(0, _REPO_ROOT)
 
 from mira_v4.confidence import ConfidenceCalculator
 from mira_v4.granta_client import DirtyDataClassifier, FilterRelaxer
