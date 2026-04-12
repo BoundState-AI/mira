@@ -397,13 +397,6 @@ def _check_cat_i_triggers(
             f"in O2 service per NASA-STD-6016C §4.2.1.4.1"
         )
 
-    # CAT1-004: Hydrogen service (embrittlement)
-    if media_upper in _H2_MEDIA:
-        triggers.append(
-            f"CAT1-004: Hydrogen service ({media_upper}) requires "
-            f"embrittlement assessment per NASA-STD-6016C §4.2.6.4"
-        )
-
     # CAT1-005: Prohibited material family in O2 service
     family_upper = material_family.upper().strip()
     if (is_o2_service or (o2_percent is not None and o2_percent >= _CAT_I_O2_THRESHOLD)):
@@ -430,12 +423,14 @@ def step6_assign_category(
     pressure_psia: float | None = None,
     temp_min_f: float | None = None,
     material_family: str = "",
-) -> tuple[MUACategorySpec | None, list[str]]:
+    *,
+    return_triggers: bool = False,
+) -> MUACategorySpec | None | tuple[MUACategorySpec | None, list[str]]:
     """Assign MUA category from type + environment triggers.
 
-    Returns (category, cat_i_triggers) where cat_i_triggers is a list of
-    rule IDs that fired. Environment triggers can only elevate Cat II → Cat I,
-    never demote.
+    Returns only the assigned category by default for compatibility with the
+    original public API. Internal callers that need the trigger trace can
+    request ``(category, cat_i_triggers)`` via ``return_triggers=True``.
 
     Per NASA-STD-6016C §4.1.6.1:
     - Cat I: Could affect safety AND must be used for functional reasons
@@ -445,7 +440,7 @@ def step6_assign_category(
 
     # No MUA needed (STANDARD, FLAG_FOR_HUMAN) — environment doesn't matter
     if base_category is None:
-        return None, []
+        return (None, []) if return_triggers else None
 
     # Check environment-based Cat I triggers
     cat_i_triggers = _check_cat_i_triggers(
@@ -458,10 +453,11 @@ def step6_assign_category(
 
     # Environment triggers can elevate Cat II → Cat I
     if cat_i_triggers and base_category == MUACategorySpec.II:
-        return MUACategorySpec.I, cat_i_triggers
+        category = MUACategorySpec.I
+        return (category, cat_i_triggers) if return_triggers else category
 
     # REAL_PROBLEM is already Cat I from the type map
-    return base_category, cat_i_triggers
+    return (base_category, cat_i_triggers) if return_triggers else base_category
 
 
 # =========================================================================
@@ -498,7 +494,7 @@ def _get_companion_ref(media_upper: str) -> str | None:
     """Return H2COMPAT companion MUA reference if in H2 service."""
     if media_upper in _H2_MEDIA:
         return (
-            "A separate hydrogen compatibility MUA is REQUIRED per "
+            "A separate H2COMPAT hydrogen compatibility MUA is REQUIRED per "
             "NASA-STD-6016C §4.2.6.4 [MPR 192/193] before hardware "
             "acceptance"
         )
@@ -691,6 +687,7 @@ def classify_mua(
         pressure_psia=pressure_psia,
         temp_min_f=temp_min_f,
         material_family=material_family,
+        return_triggers=True,
     )
     confidence = _TYPE_CONFIDENCE.get(mua_type, 0.0)
 
