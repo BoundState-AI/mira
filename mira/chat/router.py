@@ -886,7 +886,12 @@ def _build_parsed_input(parsed: ParsedQuery) -> dict[str, Any]:
                 service_context["total_pressure_min_psia"] = parsed.pressure_value
                 service_context["total_pressure_max_psia"] = parsed.pressure_value
                 if parsed.gas_service == "oxygen":
-                    service_context["oxygen_partial_pressure_psia"] = parsed.pressure_value
+                    # Preserve the invariant partial = o2_fraction * total. The inherited
+                    # service_context carries the workbench's o2_fraction (e.g. 0.21 for
+                    # compressed_air); multiplying here keeps MPR_67's 5 psi titanium gate
+                    # from tripping on total pressure instead of true oxygen partial.
+                    o2_fraction = service_context.get("o2_fraction", 1.0)
+                    service_context["oxygen_partial_pressure_psia"] = parsed.pressure_value * o2_fraction
 
             temperature_c = _temperature_celsius(parsed.temperature)
             if temperature_c is not None:
