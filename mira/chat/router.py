@@ -976,6 +976,7 @@ def _build_parsed_input(parsed: ParsedQuery) -> dict[str, Any]:
             "hazard_consequence",
             "load_path_type",
             "pressure_boundary",
+            "lifecycle_phase",
             "structural_role",
             "material_system",
             "specific_hardware_type",

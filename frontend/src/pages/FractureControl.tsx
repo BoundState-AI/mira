@@ -365,11 +365,14 @@ export default function FractureControl() {
   );
   const fractureCurrentStep = result ? 'review_classification' : fractureBlockers.length ? 'define_part_context' : 'ready_to_classify';
   const fractureCurrentStepLabel = result ? 'Classification review' : fractureBlockers.length ? 'Part context definition' : 'Ready to classify';
-  const fractureNextSteps = fractureBlockers.length
-    ? [`Complete ${fractureBlockers[0]}.`]
-    : result
-      ? ['Review the applicable requirements and material findings for the current classification.']
-      : ['Run the classifier for the current part context.'];
+  const fractureNextSteps = useMemo(
+    () => (fractureBlockers.length
+      ? [`Complete ${fractureBlockers[0]}.`]
+      : result
+        ? ['Review the applicable requirements and material findings for the current classification.']
+        : ['Run the classifier for the current part context.']),
+    [fractureBlockers, result],
+  );
   const fractureFocusSummary = activeChatField
     ? `Currently editing ${activeChatField.label}.`
     : fractureBlockers.length

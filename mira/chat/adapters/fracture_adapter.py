@@ -168,6 +168,7 @@ class FractureAdapter(EngineAdapter):
                 hazard_consequence=parsed_input.get("hazard_consequence", "UNKNOWN"),
                 load_path_type=parsed_input.get("load_path_type", "UNKNOWN"),
                 pressure_boundary=bool(parsed_input.get("pressure_boundary", False)),
+                lifecycle_phase=parsed_input.get("lifecycle_phase", "NEW_BUILD"),
                 structural_role=parsed_input.get("structural_role", _DEFAULT_STRUCTURAL_ROLE),
                 material_system=parsed_input.get("material_system", _DEFAULT_MATERIAL_SYSTEM),
                 specific_hardware_type=parsed_input.get("specific_hardware_type", "GENERAL"),
