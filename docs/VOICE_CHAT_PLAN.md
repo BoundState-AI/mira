@@ -4,6 +4,78 @@
 **Status:** Plan approved, pre-implementation
 **Last updated:** 2026-04-26
 
+> **Two tracks in this doc:**
+> - **Demo Mode** (next section) — leaner ~2.5-day build optimized for NASA SR management demo. Build this first.
+> - **Production target** (rest of doc) — full hardened design for 10 concurrent users in GovCloud. Build this *after* the demo if it lands.
+
+---
+
+## Demo Mode (NASA SR Management Presentation)
+
+The first deliverable is a demo-quality build. The production sections below are the eventual target if the demo lands and full rollout is funded.
+
+### What changes from production
+
+| Production plan | Demo build |
+|---|---|
+| 10 concurrent worker pool | 1-2 sessions, no pool |
+| AWS Polly (GovCloud-native) | **ElevenLabs Flash v2.5** — the wow factor matters here |
+| Whisper on SageMaker async endpoint | Whisper on a single warm GPU EC2 instance (or Deepgram trial) |
+| Auto-disable timers + persistent banner | Skip — demoer controls the mic |
+| GovCloud compliance review | Skip if demo environment is approved separately |
+| Page-aware greeting on all 5 domain pages | Polish 1-2 pages used in the demo |
+| Telemetry, rate limits, cost tracking | Skip |
+
+### What becomes critical
+
+1. **Voice quality and personality.** ElevenLabs >> Polly for this audience. Pick a calm, authoritative "Mira voice" and stick with it.
+2. **The proactive page-aware greeting.** This is the hero moment — *"I see you're at step 3 of the H2 compatibility check. Looks like the operating pressure isn't entered yet — want to walk through it?"*
+3. **First-word latency under 1.5s.** Sentence-buffered streaming + ElevenLabs Flash + pre-warmed Whisper. Anything over 2.5s feels like a science fair project.
+4. **Visual choreography.** Live transcription appearing as user speaks. Waveform pulse. Smooth thinking→speaking transitions. Subtle chime on barge-in. Polish > features.
+5. **Failsafe.** Pre-record a perfect run as video backup. Live voice demos fail in conference rooms.
+
+### Demo build sequence (~2.5 days)
+
+| Phase | Task | Effort |
+|---|---|---|
+| 1 | Backend voice WS — Whisper (warm GPU) + ElevenLabs streaming | 1 day |
+| 2 | Frontend voice session — capture, VAD, MediaSource, live transcription overlay | 1 day |
+| 3 | Page-aware greeting on 1-2 demo pages, scripted copy | ½ day |
+| 4 | Polish — waveform, transitions, voice selection, dry runs | ½ day |
+
+### Demo day recommendations
+
+- **Storyboard three ~30-second moments**, not a full product tour:
+  1. Mira greets contextually on a page
+  2. Hands-free question → watch it think and answer
+  3. Barge-in mid-sentence to show responsiveness
+- **Wired headset**, not laptop mic
+- **Wired ethernet** if available
+- **Pre-warm Whisper** before walking in (first inference is always slow)
+- **Record a perfect run** the day before as fallback video
+
+### Demo-mode env vars
+
+```
+WHISPER_ENDPOINT=<single warm GPU host>
+TTS_PROVIDER=elevenlabs
+ELEVENLABS_API_KEY=...
+ELEVENLABS_VOICE_ID=...        # the chosen "Mira voice"
+ELEVENLABS_MODEL=flash-v2.5
+VOICE_DEMO_MODE=true            # disables auto-shutoff, rate limits, worker pool
+```
+
+### Promotion to production
+
+When demo→production happens, the changes are mechanical:
+1. Swap `TTS_PROVIDER` from `elevenlabs` to `polly`
+2. Migrate Whisper from EC2 to SageMaker async endpoint
+3. Enable worker pool, rate limits, auto-disable timers, persistent banner
+4. Extend page-aware greeting to all 5 domain pages
+5. Run GovCloud compliance review (Polly is native; if keeping ElevenLabs, that's the long pole)
+
+The provider abstraction in `mira/voice/tts_client.py` should support both from day one to keep the swap trivial.
+
 ---
 
 ## Goals
