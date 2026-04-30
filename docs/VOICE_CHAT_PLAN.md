@@ -20,7 +20,7 @@ The first deliverable is a demo-quality build. The production sections below are
 |---|---|
 | 10 concurrent worker pool | 1-2 sessions, no pool |
 | AWS Polly (GovCloud-native) | **ElevenLabs Flash v2.5** — the wow factor matters here |
-| Whisper on SageMaker async endpoint | Whisper on a single warm GPU EC2 instance (or Deepgram trial) |
+| Whisper on SageMaker async endpoint | Whisper on a single warm GPU EC2 instance (no external STT — see outbound data policy below) |
 | Auto-disable timers + persistent banner | Skip — demoer controls the mic |
 | GovCloud compliance review | Skip if demo environment is approved separately |
 | Page-aware greeting on all 5 domain pages | Polish 1-2 pages used in the demo |
@@ -53,6 +53,22 @@ The first deliverable is a demo-quality build. The production sections below are
 - **Wired ethernet** if available
 - **Pre-warm Whisper** before walking in (first inference is always slow)
 - **Record a perfect run** the day before as fallback video
+
+### Demo-mode outbound data policy
+
+The demo runs in a less-controlled environment than production GovCloud, so egress paths must be explicit. Anything not listed is forbidden in demo.
+
+| Path | Direction | Data | Allowed? | Owner sign-off |
+|---|---|---|---|---|
+| Browser ↔ demo backend | bidirectional | raw 16 kHz PCM audio, transcripts, chat text | yes (in-environment) | — |
+| Demo backend → Whisper EC2 (same VPC) | outbound | raw audio | yes (in-environment) | — |
+| Demo backend → ElevenLabs API | outbound | **synthesis text only** (assistant response, post-redaction) | yes, conditional on classification review | Compliance lead |
+| Demo backend → any external STT (Deepgram, AssemblyAI, etc.) | outbound | raw user audio | **no** | — |
+| Demo backend → any other third-party SaaS | outbound | any | **no** | — |
+
+**Rule:** Raw user microphone audio never leaves the demo environment. The only payload that may egress is post-redaction TTS synthesis text destined for ElevenLabs, and only after the compliance lead has reviewed a representative sample of synthesis text for sensitive content. The same redaction filter applied before chat persistence (PII, internal codes) applies before TTS synthesis.
+
+**Implementation:** `mira/voice/redaction.py` runs on assistant text before it's handed to `tts_client.py`. Demo health check fails closed if redaction module is missing. Outbound URLs are pinned to ElevenLabs; any other host returns a hard error in `tts_client.py`.
 
 ### Demo-mode env vars
 
