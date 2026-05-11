@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
@@ -155,6 +155,42 @@ class EngineEnvelope(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# Caller identity — recorded with every audit record
+# ---------------------------------------------------------------------------
+
+
+class UserIdentity(BaseModel):
+    """Identity of the engineer who issued the chat turn.
+
+    Fields originate from Cognito claims. When Cognito is federated with a
+    PIV IdP (e.g. NASA Launchpad → SAML), the PIV-specific attributes are
+    surfaced via ``custom:edipi`` / ``custom:piv_subject`` / ``custom:agency``
+    on the Cognito user record and copied here verbatim. Absent PIV
+    federation, those fields stay empty and the record still captures the
+    Cognito ``sub`` / ``username`` / ``email`` chain of custody.
+    """
+
+    sub: str = Field(default="", description="Cognito immutable subject identifier.")
+    username: str = ""
+    email: str = ""
+    role: str = ""
+    groups: list[str] = Field(default_factory=list)
+    itar_access: str = ""
+    us_person_verified: Optional[bool] = None
+
+    # PIV / federated-identity attributes (populated via Cognito custom: claims)
+    edipi: str = ""
+    piv_subject: str = ""
+    agency: str = ""
+
+    # Authentication context
+    auth_method: str = Field(
+        default="cognito",
+        description="'cognito' for password flows, 'cognito+piv' when federated, 'anonymous' when auth is disabled.",
+    )
+
+
+# ---------------------------------------------------------------------------
 # Audit record — written after every engine execution
 # ---------------------------------------------------------------------------
 
@@ -193,3 +229,11 @@ class AuditRecord(BaseModel):
     authority_basis: list[str] = Field(default_factory=list)
     envelope_json: dict[str, Any] = Field(default_factory=dict)
     error_detail: Optional[str] = None
+
+    # Identity and modality (added for PIV-bound audit trail)
+    user_identity: Optional[UserIdentity] = None
+    turn_modality: Literal["text", "voice"] = "text"
+    client_metadata: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Optional client-side context (voice session id, request IP, etc.).",
+    )

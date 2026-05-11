@@ -102,3 +102,66 @@ def write_audit_record(record: AuditRecord) -> None:
     except Exception:
         # Audit failures must never crash the request pipeline.
         LOGGER.exception("Failed to write audit record %s", record.audit_id)
+
+
+# ---------------------------------------------------------------------------
+# Read (recent records, for in-app audit drawer)
+# ---------------------------------------------------------------------------
+
+
+def read_recent_audit_records(
+    *,
+    user_sub: str | None,
+    session_id: str | None = None,
+    limit: int = 20,
+) -> list[dict]:
+    """Return up to *limit* recent audit records, newest first.
+
+    Filtering:
+      - If *user_sub* is provided, only records whose
+        ``user_identity.sub`` matches are returned. Records lacking identity
+        are skipped so the demo never accidentally surfaces another user's
+        history.
+      - If *session_id* is provided, results are further filtered to that
+        session.
+
+    Notes:
+      - This reads the JSONL file in full — fine at demo volumes; replace
+        with an indexed store when audit volume grows.
+      - Returned dicts are the raw serialised model — no schema validation,
+        to keep this resilient to forward-compatible additions.
+    """
+    path = _audit_log_path()
+    if not path.exists():
+        return []
+
+    records: list[dict] = []
+    try:
+        with open(path, "r", encoding="utf-8") as fh:
+            for line in fh:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    entry = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                records.append(entry)
+    except OSError as exc:
+        LOGGER.warning("Failed to read audit log %s: %s", path, exc)
+        return []
+
+    def _matches(entry: dict) -> bool:
+        identity = entry.get("user_identity") if isinstance(entry, dict) else None
+        entry_sub = identity.get("sub") if isinstance(identity, dict) else None
+        if user_sub:
+            if not entry_sub or entry_sub != user_sub:
+                return False
+        if session_id:
+            if entry.get("session_id") != session_id:
+                return False
+        return True
+
+    filtered = [entry for entry in records if _matches(entry)]
+    filtered.reverse()
+    return filtered[:max(1, min(limit, 200))]

@@ -46,12 +46,14 @@ class SessionState(str, Enum):
 
 
 ChatStreamFactory = Callable[
-    [str, str, list[dict[str, Any]], dict[str, Any] | None],
+    ...,
     AsyncIterator[dict[str, Any]],
 ]
 """Factory that yields parsed chat stream events for a given user message.
 
-Signature: ``(message, session_id, history, module_context) -> AsyncIterator[dict]``
+Signature: ``(message, session_id, history, module_context, *, user_identity=None)
+-> AsyncIterator[dict]``. The trailing kwarg is used by the voice path to stamp
+the audit record with the WebSocket-validated caller identity.
 """
 
 
@@ -82,6 +84,7 @@ class VoiceSession:
         self.voice_id: str | None = None
         self.module_context: dict[str, Any] | None = None
         self.history: list[dict[str, Any]] = []
+        self.user_identity: Any | None = None
 
         self._current_turn: _Turn | None = None
         self._active_task: asyncio.Task[None] | None = None
@@ -220,6 +223,7 @@ class VoiceSession:
                 self.chat_session_id or self.session_id,
                 self.history,
                 self.module_context,
+                user_identity=self.user_identity,
             )
 
             async for event in chat_iter:

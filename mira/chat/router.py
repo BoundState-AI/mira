@@ -32,10 +32,11 @@ from datetime import datetime, timezone
 from typing import Any
 from uuid import uuid4
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
 
-from .audit import generate_audit_id, write_audit_record
+from .audit import generate_audit_id, read_recent_audit_records, write_audit_record
+from .audit_identity import build_user_identity_from_mira_user
 from .engine_adapter import EngineAdapter
 from .models import (
     AuditRecord,
@@ -45,6 +46,7 @@ from .models import (
     EngineEnvelope,
     Status,
     TaskMode,
+    UserIdentity,
 )
 from .module_context import resolve_module_context, extract_module_entities
 from .query_interpreter import ParsedQuery, interpret
@@ -153,8 +155,69 @@ async def ping() -> dict[str, str]:
     }
 
 
+@router.get("/whoami")
+async def whoami(http_request: Request) -> dict[str, Any]:
+    """Return the authenticated caller's identity for the chat surface.
+
+    Frontend renders the PIV chip from this payload. When auth is disabled
+    (local dev), returns ``{"auth_method": "anonymous"}``.
+    """
+    identity = _identity_from_http_request(http_request)
+    if identity is None:
+        return {
+            "auth_method": "anonymous",
+            "sub": "",
+            "username": "",
+            "email": "",
+            "edipi": "",
+            "piv_subject": "",
+            "agency": "",
+            "role": "",
+            "groups": [],
+            "itar_access": "",
+            "us_person_verified": None,
+        }
+    return identity.model_dump(mode="json")
+
+
+@router.get("/audit/recent")
+async def recent_audit(
+    http_request: Request,
+    limit: int = 20,
+    session_id: str | None = None,
+) -> dict[str, Any]:
+    """Return recent audit records for the authenticated caller.
+
+    Filtering is by ``user_identity.sub`` — callers can only read their own
+    audit history. Records without a recorded identity are excluded so an
+    accidental anonymous turn never leaks into another user's drawer.
+    """
+    identity = _identity_from_http_request(http_request)
+    sub = identity.sub if identity and identity.sub else None
+    records = read_recent_audit_records(
+        user_sub=sub,
+        session_id=session_id,
+        limit=limit,
+    )
+    return {
+        "user_sub": sub,
+        "count": len(records),
+        "records": records,
+    }
+
+
+def _identity_from_http_request(http_request: Request | None) -> UserIdentity | None:
+    """Pull the authenticated user identity off ``request.state`` (set by middleware)."""
+    if http_request is None:
+        return None
+    user = getattr(http_request.state, "user", None)
+    if user is None:
+        return None
+    return build_user_identity_from_mira_user(user)
+
+
 @router.post("/")
-async def chat(request: ChatRequest) -> ChatResponse:
+async def chat(request: ChatRequest, http_request: Request) -> ChatResponse:
     """
     Unified MIRA Chat endpoint — multi-turn, evidence-grounded.
 
@@ -170,13 +233,15 @@ async def chat(request: ChatRequest) -> ChatResponse:
     """
     request_id = f"req-{uuid4().hex[:12]}"
     session_id = request.session_id or f"session-{uuid4().hex[:8]}"
+    user_identity = _identity_from_http_request(http_request)
 
     LOGGER.info(
-        "[CHAT] request_id=%s session=%s message_length=%d history_turns=%d",
+        "[CHAT] request_id=%s session=%s message_length=%d history_turns=%d user=%s",
         request_id,
         session_id,
         len(request.message),
         len(request.history),
+        user_identity.username if user_identity else "anonymous",
     )
 
     # ------------------------------------------------------------------
@@ -429,6 +494,8 @@ async def chat(request: ChatRequest) -> ChatResponse:
                 if envelope.status == Status.ERROR
                 else None
             ),
+            user_identity=user_identity,
+            turn_modality="text",
         )
         write_audit_record(record)
     except Exception:
@@ -458,7 +525,10 @@ async def chat(request: ChatRequest) -> ChatResponse:
 
 
 @router.post("/stream")
-async def chat_stream(request: ChatRequest) -> StreamingResponse:
+async def chat_stream(
+    request: ChatRequest,
+    http_request: Request,
+) -> StreamingResponse:
     """SSE streaming endpoint per BS-SPEC-MIRA-CHAT-001-REV2 Section 11.3.
 
     Reuses the SAME pipeline as the synchronous ``POST /api/chat`` endpoint
@@ -469,17 +539,28 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
     After streaming completes, the audit record is written and the ``done``
     event carries the audit_id back to the frontend.
     """
+    user_identity = _identity_from_http_request(http_request)
+    # Voice WebSocket bridge sets this through the request scope so the
+    # audit record reflects the actual authenticated caller (the HTTP layer
+    # doesn't see the WS-validated identity otherwise).
+    if user_identity is None and http_request is not None:
+        injected = getattr(http_request.state, "voice_user_identity", None)
+        if isinstance(injected, UserIdentity):
+            user_identity = injected
+    turn_modality: str = "voice" if getattr(http_request.state, "voice_turn", False) else "text"
 
     async def _event_generator():  # noqa: C901 — complexity is inherent
         request_id = f"req-{uuid4().hex[:12]}"
         session_id = request.session_id or f"session-{uuid4().hex[:8]}"
 
         LOGGER.info(
-            "[CHAT-STREAM] request_id=%s session=%s message_length=%d history_turns=%d",
+            "[CHAT-STREAM] request_id=%s session=%s message_length=%d history_turns=%d user=%s modality=%s",
             request_id,
             session_id,
             len(request.message),
             len(request.history),
+            user_identity.username if user_identity else "anonymous",
+            turn_modality,
         )
 
         # --------------------------------------------------------------
@@ -779,6 +860,8 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
                     if envelope.status == Status.ERROR
                     else None
                 ),
+                user_identity=user_identity,
+                turn_modality=turn_modality,
             )
             write_audit_record(record)
         except Exception:

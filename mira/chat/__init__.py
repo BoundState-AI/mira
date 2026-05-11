@@ -10,6 +10,7 @@ from .models import (
     SideEffectLevel,
     Status,
     TaskMode,
+    UserIdentity,
 )
 from .router import router as chat_router
 
@@ -23,5 +24,6 @@ __all__ = [
     "SideEffectLevel",
     "Status",
     "TaskMode",
+    "UserIdentity",
     "chat_router",
 ]

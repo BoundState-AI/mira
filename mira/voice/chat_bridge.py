@@ -4,6 +4,11 @@ Voice is purely a transport layer — multi-turn state, query interpretation,
 engine dispatch, formatting, and auditing all live in the existing chat
 pipeline. This bridge invokes ``chat_stream`` in-process and yields parsed
 SSE event dicts so the voice session can react to them.
+
+Identity plumbing: the WebSocket validates the Cognito token at accept
+time. The resulting ``UserIdentity`` is injected onto a synthetic Starlette
+``Request`` scope so the chat router writes it (and ``turn_modality=voice``)
+into the audit record — same code path as HTTP turns.
 """
 
 from __future__ import annotations
@@ -12,7 +17,30 @@ import json
 import logging
 from typing import Any, AsyncIterator
 
+from starlette.requests import Request
+
 LOGGER = logging.getLogger(__name__)
+
+
+def _build_voice_request(user_identity: Any | None) -> Request:
+    """Construct a minimal Starlette Request that carries voice-turn identity."""
+    scope: dict[str, Any] = {
+        "type": "http",
+        "method": "POST",
+        "path": "/api/chat/stream",
+        "headers": [],
+        "query_string": b"",
+        "state": {},
+    }
+
+    async def _receive() -> dict[str, Any]:
+        return {"type": "http.disconnect"}
+
+    request = Request(scope, receive=_receive)
+    request.state.voice_turn = True
+    if user_identity is not None:
+        request.state.voice_user_identity = user_identity
+    return request
 
 
 async def stream_chat_events(
@@ -20,6 +48,8 @@ async def stream_chat_events(
     session_id: str | None,
     history: list[dict[str, Any]],
     module_context: dict[str, Any] | None,
+    *,
+    user_identity: Any | None = None,
 ) -> AsyncIterator[dict[str, Any]]:
     """Yield parsed SSE event dicts from the in-process chat stream pipeline."""
     from mira.chat.models import ChatMessage, ChatRequest
@@ -34,14 +64,15 @@ async def stream_chat_events(
         except Exception:
             LOGGER.debug("voice bridge: skipping malformed history entry")
 
-    request = ChatRequest(
+    chat_request = ChatRequest(
         message=message,
         session_id=session_id,
         history=history_models,
         module_context=module_context,
     )
 
-    response = await chat_stream(request)
+    voice_request = _build_voice_request(user_identity)
+    response = await chat_stream(chat_request, voice_request)
 
     buffer = b""
     async for chunk in response.body_iterator:

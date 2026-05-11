@@ -18,6 +18,9 @@ from typing import Any
 from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
 from starlette.websockets import WebSocketState
 
+from mira.chat.audit_identity import build_user_identity_from_claims
+from mira.chat.models import UserIdentity
+
 from .chat_bridge import stream_chat_events
 from .config import VoiceConfig, get_voice_config
 from .presence import build_greeting
@@ -45,20 +48,25 @@ async def _release_slot(session_id: str) -> None:
         _active_sessions.discard(session_id)
 
 
-async def _validate_token(token: str | None) -> bool:
-    """Lazy Cognito validation. When auth is disabled, always allow."""
+async def _resolve_identity(token: str | None) -> tuple[bool, UserIdentity | None]:
+    """Validate the Cognito token and surface the resulting identity.
+
+    Returns ``(allowed, identity)``. When auth is disabled, returns
+    ``(True, anonymous-identity)``. When auth is enabled, an invalid or
+    missing token returns ``(False, None)``.
+    """
     from mira.api.auth.cognito import auth_enabled, verify_token_string
 
     if not auth_enabled():
-        return True
+        return True, build_user_identity_from_claims(None, auth_method="anonymous")
     if not token:
-        return False
+        return False, None
     try:
-        await verify_token_string(token)
-        return True
+        claims = await verify_token_string(token)
     except Exception:
         LOGGER.warning("voice ws: token validation failed")
-        return False
+        return False, None
+    return True, build_user_identity_from_claims(claims)
 
 
 def _build_session(websocket: WebSocket, config: VoiceConfig) -> VoiceSession:
@@ -92,11 +100,13 @@ async def voice_endpoint(
         await websocket.close(code=1008, reason="voice disabled")
         return
 
-    if not await _validate_token(token):
+    allowed, identity = await _resolve_identity(token)
+    if not allowed:
         await websocket.close(code=4401, reason="unauthorized")
         return
 
     session = _build_session(websocket, config)
+    session.user_identity = identity
     if not await _try_acquire_slot(session.session_id, config.max_concurrent_sessions):
         await websocket.close(code=1013, reason="voice capacity full")
         return
