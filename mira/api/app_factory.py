@@ -124,7 +124,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-        response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+        response.headers["Permissions-Policy"] = "camera=(), microphone=(self), geolocation=()"
         if os.getenv("MIRA_ENV", "development").lower() == "production":
             response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         return response
@@ -191,6 +191,20 @@ def _register_direct_routers(app: FastAPI, chat_router: APIRouter | None) -> Non
     app.include_router(routers.test_classes_router, tags=["test-classes"])
     if chat_router is not None:
         app.include_router(chat_router, tags=["chat"])
+        _register_voice_router(app)
+
+
+def _register_voice_router(app: FastAPI) -> None:
+    """Register the voice WebSocket + voice config endpoints when available."""
+    try:
+        from mira.voice.ws_endpoint import router as voice_router
+    except Exception:
+        logging.getLogger("mira.startup").warning(
+            "Voice router unavailable; continuing without /api/chat/voice.",
+            exc_info=True,
+        )
+        return
+    app.include_router(voice_router, tags=["chat", "voice"])
 
 
 def _register_health_routes(app: FastAPI) -> None:
