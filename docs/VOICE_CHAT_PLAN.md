@@ -7,6 +7,10 @@
 > **Two tracks in this doc:**
 > - **Demo Mode** (next section) — leaner ~2.5-day build optimized for NASA SR management demo. Build this first.
 > - **Production target** (rest of doc) — full hardened design for 10 concurrent users in GovCloud. Build this *after* the demo if it lands.
+>
+> **Two narratives in the demo, both required:**
+> - *Voice* makes leadership pay attention (the "look how cool" moment)
+> - *PIV-bound audit trail* makes security / IT leadership pay attention (the "and we can prove it" moment)
 
 ---
 
@@ -116,25 +120,110 @@ With no env vars set, the system falls back to mock STT/TTS so the
 WebSocket pipeline + UI choreography can be exercised end-to-end without
 credentials or GPU.
 
+### PIV identity + audit trail (the Seemann / Tawnya beat)
+
+Voice is the headline; the audit story is the part that gets the program
+funded. Both ship in the same demo build.
+
+**What's built on this branch:**
+
+Backend:
+- `mira/chat/models.py` — `UserIdentity` model (sub, username, email,
+  EDIPI, PIV subject, agency, role, groups, ITAR, US-person, auth_method)
+  attached to every `AuditRecord`, plus a `turn_modality: "text" | "voice"`
+  field so the record distinguishes how the question was asked
+- `mira/chat/audit_identity.py` — converts Cognito claims (or a `MIRAUser`)
+  into a `UserIdentity`. When `custom:edipi` / `custom:piv_subject` are
+  present (Cognito federated with NASA Launchpad → SAML), `auth_method`
+  auto-flips to `cognito+piv`
+- `mira/chat/router.py` — both `/api/chat` and `/api/chat/stream` now read
+  `request.state.user` (set by the existing Cognito middleware) and write
+  the identity into the audit record. Voice turns are stamped
+  `turn_modality="voice"` via a synthetic Request scope the WS bridge
+  carries
+- `mira/voice/ws_endpoint.py` — WebSocket extracts the Cognito claims at
+  accept time and attaches the resulting `UserIdentity` to the
+  `VoiceSession`, which the chat bridge then carries into the audit write
+- New endpoints:
+  - `GET /api/chat/whoami` — current caller identity for the PIV chip
+  - `GET /api/chat/audit/recent?limit=&session_id=` — recent audit records
+    filtered to `user_identity.sub == caller.sub` (callers only see their
+    own history; records without identity are excluded so anonymous turns
+    never leak)
+
+Frontend:
+- `components/audit/PivIdentityChip.tsx` — emerald `ShieldCheck` chip with
+  EDIPI + agency when PIV-federated; tooltip exposes full PIV subject DN
+- `components/audit/AuditDrawer.tsx` — side sheet of recent turns, each
+  showing: audit ID, modality badge (text/voice), verdict, engine, the
+  question, citations, authority basis, truncated response hash, model,
+  session ID. Identity card at the top.
+- Wired into both `MiraChat` (page) and `MiraChatDock` (per-page floating).
+  Drawer auto-refreshes whenever a turn completes — text or voice.
+
+### The demo beat
+
+1. **Open a domain page.** Top of the dock shows the PIV chip:
+   *"J.Engineer · EDIPI 1234567890 · NASA-MAF"* with ShieldCheck.
+2. **Click voice on.** Ask: *"Is 316L compatible with GOX at 3000 psi?"*
+3. **Mira speaks the answer.** Citations stream in.
+4. **Click the audit-trail icon (📋).** Drawer slides in:
+   - Identity card: emerald, PIV subject DN visible
+   - Top record: `CHAT-2026-0511-042` · `voice` badge · `CONDITIONAL_PASS`
+     · `oca` · just now
+   - Question: "Is 316L compatible with GOX at 3000 psi?"
+   - Citations: NASA-STD-6001B §4.3.2, ASTM G88-13
+   - Authority basis: NASA-STD-6001B
+   - Hash: `sha256:8a4f…b2c1` · model: `claude-sonnet-4-5`
+5. **Compare with a keyboard turn.** Type the same question. New record
+   appears, identical shape, modality badge reads `text`.
+
+Message to the room: *same identity-bound, citation-grounded,
+content-hashed audit record regardless of input modality.*
+
+### PIV federation modes for the demo
+
+- **(a) Real PIV federation** — Cognito user pool federated with NASA
+  Launchpad (or equivalent PIV IdP). `custom:edipi`, `custom:piv_subject`,
+  `custom:agency` flow through SAML attribute mapping. Highest fidelity;
+  requires IT cooperation to set up.
+- **(b) Cognito custom attributes mimicking PIV** — set `custom:edipi`,
+  `custom:piv_subject`, `custom:agency` on the demo user records via the
+  Cognito admin API. Same code path on the read side; `auth_method`
+  auto-flips to `cognito+piv` so the chip still shows the emerald shield.
+
+For the demo, **(b) is sufficient and ships today.** Promote to (a) when
+the real PIV federation is wired.
+
 ### Demo day dry-run checklist
 
 The night before:
 - [ ] Confirm SageMaker endpoint is warm and responsive (`aws sagemaker-runtime invoke-endpoint`)
 - [ ] Confirm ElevenLabs API key works (`curl -H "xi-api-key: $KEY" https://api.elevenlabs.io/v1/voices`)
-- [ ] Run a full storyboard pass: page-aware greeting → hands-free Q → barge-in
+- [ ] Confirm demo user has PIV-shaped Cognito attributes (`custom:edipi`,
+      `custom:piv_subject`, `custom:agency`) — chip should be emerald
+- [ ] Confirm a fresh audit log exists; do one warm-up turn so the drawer
+      doesn't open empty
+- [ ] Run a full storyboard pass: page-aware greeting → hands-free Q →
+      barge-in → audit drawer reveal
 - [ ] Record a perfect run as MP4 backup
 - [ ] Test the wired headset on the actual demo laptop
 - [ ] Test from the actual demo network if possible
 
 Demo day, T-30:
 - [ ] Open the demo page; click voice on; speak one sentence to warm Whisper
-- [ ] Verify the persistent banner is visible
+- [ ] Click audit-trail icon; verify identity card renders emerald with EDIPI
+- [ ] Verify the persistent voice banner is visible
 - [ ] Verify barge-in latency is acceptable
 - [ ] Have the backup video queued up in a second tab
 
 If voice fails live:
 - Calmly switch tabs to the backup video
 - Continue narration over the video
+- **The audit story still works on a text turn** — fallback message: "Let
+  me type that one. Watch the audit record — same identity, same
+  citations, same hash, modality just changed to text." That's still the
+  Seemann/Tawnya beat.
 
 ### Promotion to production
 
