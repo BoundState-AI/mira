@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Bot, Compass, Expand, Loader2, MessageSquare, Minimize2, SendHorizonal, X } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -8,6 +8,11 @@ import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { fetchMiraChatPing, sendMiraChatStream, type MiraChatMessage } from "@/lib/chat-api";
+import { VoiceControl } from "@/components/voice/VoiceControl";
+import { VoiceEnableModal } from "@/components/voice/VoiceEnableModal";
+import { useVoiceSession } from "@/lib/voice/useVoiceSession";
+import { fetchPresenceGreeting } from "@/lib/voice/voiceApi";
+import type { VoiceTurnSummary } from "@/lib/voice/types";
 import {
   buildChatScopeSearch,
   conversationStorageKey,
@@ -221,6 +226,10 @@ export function MiraChatDock() {
   const [isSending, setIsSending] = useState(false);
   const [conversationLoaded, setConversationLoaded] = useState(false);
   const [serviceHealthy, setServiceHealthy] = useState(true);
+  const [voiceModalOpen, setVoiceModalOpen] = useState(false);
+  const [voiceId, setVoiceId] = useState<string | null>(null);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const greetedStepRef = useRef<string | null>(null);
   const conversationEndRef = useRef<HTMLDivElement | null>(null);
 
   const activeModuleLaunchState = useMemo(
@@ -314,6 +323,112 @@ export function MiraChatDock() {
       cancelled = true;
     };
   }, [open]);
+
+  // -----------------------------------------------------------------
+  // Voice integration (mic + speaker via /api/chat/voice WebSocket)
+  // -----------------------------------------------------------------
+  const appendVoiceTurn = useCallback((summary: VoiceTurnSummary) => {
+    if (!summary.userTranscript.trim() && !summary.assistantText.trim()) {
+      return;
+    }
+    const userId = messageId("user");
+    const assistantId = messageId("assistant");
+    setMessages((current) => {
+      const merged = [
+        ...current,
+        {
+          id: userId,
+          role: "user" as const,
+          content: summary.userTranscript,
+          entities: summary.entities,
+        },
+        {
+          id: assistantId,
+          role: "assistant" as const,
+          content: summary.assistantText,
+          engineUsed: summary.engineUsed,
+          verdict: (summary.verdict ?? null) as Verdict,
+          entities: summary.entities,
+          auditId: summary.auditId,
+          followUps: summary.followUps,
+        },
+      ];
+      return merged.slice(-MAX_STORED_MESSAGES);
+    });
+  }, []);
+
+  const voiceSession = useVoiceSession({
+    voiceId,
+    chatSessionId: sessionId,
+    moduleContext: activeModuleLaunchState?.moduleContext ?? null,
+    history: useMemo(() => toHistoryMessages(messages), [messages]),
+    onTurnComplete: appendVoiceTurn,
+    onError: (message) => setVoiceError(message),
+  });
+
+  const handleVoiceToggle = useCallback(() => {
+    if (voiceSession.state !== "idle" && voiceSession.state !== "error") {
+      void voiceSession.stop();
+      return;
+    }
+    setVoiceError(null);
+    setVoiceModalOpen(true);
+  }, [voiceSession]);
+
+  const handleVoiceConfirm = useCallback(async () => {
+    setVoiceModalOpen(false);
+    setVoiceError(null);
+    await voiceSession.start();
+  }, [voiceSession]);
+
+  const voiceActive = voiceSession.state !== "idle" && voiceSession.state !== "error";
+
+  // Disable voice automatically when the dock closes — prevents the user from
+  // forgetting that the mic is on after collapsing the panel.
+  useEffect(() => {
+    if (!open && voiceActive) {
+      void voiceSession.stop();
+    }
+  }, [open, voiceActive, voiceSession]);
+
+  // Proactive page-aware greeting: when the dock opens on a module page with
+  // a non-empty current_step, render a templated assistant message (and the
+  // voice pipeline will speak it if voice mode is on).
+  useEffect(() => {
+    if (!open) return;
+    if (!conversationLoaded) return;
+    if (messages.length > 0) return;
+    const moduleContext = activeModuleLaunchState?.moduleContext;
+    if (!moduleContext || typeof moduleContext !== "object") return;
+    const workflow = (moduleContext as { chat_workflow?: { current_step?: string } }).chat_workflow;
+    const currentStep = workflow?.current_step;
+    if (!currentStep) return;
+    if (greetedStepRef.current === currentStep) return;
+    greetedStepRef.current = currentStep;
+
+    let cancelled = false;
+    fetchPresenceGreeting({
+      module_context: moduleContext as Record<string, unknown>,
+      session_id: sessionId,
+    })
+      .then((greeting) => {
+        if (cancelled || !greeting) return;
+        const assistantId = messageId("assistant");
+        setMessages((current) => [
+          ...current,
+          {
+            id: assistantId,
+            role: "assistant",
+            content: greeting.text,
+            entities: {},
+          },
+        ]);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [activeModuleLaunchState, conversationLoaded, messages.length, open, sessionId]);
 
   if (location.pathname === "/chat") {
     return null;
@@ -441,6 +556,11 @@ export function MiraChatDock() {
 
   return (
     <div className="pointer-events-none fixed bottom-5 left-3 right-3 z-50 flex flex-col items-stretch gap-3 sm:left-auto sm:right-5 sm:max-w-[calc(100vw-1.5rem)] sm:items-end">
+      <VoiceEnableModal
+        open={voiceModalOpen}
+        onClose={() => setVoiceModalOpen(false)}
+        onConfirm={() => void handleVoiceConfirm()}
+      />
       {open ? (
         <Card className="pointer-events-auto flex h-[40rem] max-h-[calc(100vh-6.5rem)] w-full max-w-full flex-col overflow-hidden border-border/80 shadow-2xl sm:w-[28rem] sm:max-w-[calc(100vw-1.5rem)]">
           <div className="border-b border-border/70 bg-[radial-gradient(circle_at_top_left,_rgba(15,118,110,0.14),_transparent_40%),linear-gradient(135deg,_rgba(8,47,73,0.98),_rgba(15,23,42,0.98))] px-4 py-3 text-slate-50">
@@ -492,6 +612,33 @@ export function MiraChatDock() {
                 </Button>
               </div>
             </div>
+            <div className="mt-3">
+              <VoiceControl
+                enabled={voiceActive}
+                state={voiceSession.state}
+                onToggle={handleVoiceToggle}
+                onInterrupt={voiceSession.interrupt}
+              />
+            </div>
+            {voiceError ? (
+              <div className="mt-2 rounded-md border border-red-500/30 bg-red-500/10 px-2 py-1 text-[11px] text-red-100">
+                Voice: {voiceError}
+              </div>
+            ) : null}
+            {voiceActive && (voiceSession.liveTranscript || voiceSession.liveAssistantText) ? (
+              <div className="mt-2 space-y-1 rounded-md bg-white/8 px-2 py-1.5 text-[11px] text-slate-100">
+                {voiceSession.liveTranscript ? (
+                  <div>
+                    <span className="text-slate-300">You:</span> {voiceSession.liveTranscript}
+                  </div>
+                ) : null}
+                {voiceSession.liveAssistantText ? (
+                  <div>
+                    <span className="text-slate-300">Mira:</span> {voiceSession.liveAssistantText}
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
           </div>
 
           <ScrollArea className="min-h-0 flex-1 bg-[linear-gradient(180deg,rgba(248,250,252,0.98),rgba(241,245,249,0.96))]">
