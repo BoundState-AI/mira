@@ -54,27 +54,103 @@ The first deliverable is a demo-quality build. The production sections below are
 - **Pre-warm Whisper** before walking in (first inference is always slow)
 - **Record a perfect run** the day before as fallback video
 
+### Implementation status (demo build)
+
+Backend (`mira/voice/`):
+- `config.py` — `VoiceConfig` with env-driven provider/feature flags
+- `providers/` — `STTProvider` / `TTSProvider` base classes, plus
+  - `mock.py` (default; exercises the WS pipeline without keys/GPU)
+  - `whisper_sagemaker.py` (SageMaker async endpoint client)
+  - `elevenlabs_tts.py` (streaming via `httpx`)
+  - `polly_tts.py` (boto3 `synthesize_speech` with Generative engine)
+  - `factory.py` builds providers with graceful mock fallback when keys missing
+- `sentence_buffer.py` — clause/sentence flusher (min 40 / max 120 chars)
+- `session.py` — per-WS state machine (idle/listening/thinking/speaking)
+  with barge-in cancellation and history accumulation
+- `chat_bridge.py` — invokes existing `chat_stream` in-process and yields
+  parsed SSE event dicts; voice never reimplements multi-turn state
+- `presence.py` — templated page-aware greeting from `chat_workflow`
+- `ws_endpoint.py` — `/api/chat/voice` WS plus `/api/chat/voice/voices`,
+  `/api/chat/voice/status`, `/api/chat/presence` HTTP helpers
+- `mira/api/app_factory.py` — voice router registered, `Permissions-Policy`
+  changed from `microphone=()` to `microphone=(self)`
+
+Frontend (`frontend/src/lib/voice/`, `frontend/src/components/voice/`):
+- `public/voice/pcm-worklet.js` — AudioWorklet downsampler to 16 kHz Int16
+- `audioCapture.ts`, `vad.ts`, `audioPlayer.ts`, `voiceClient.ts`,
+  `useVoiceSession.ts`, `voiceApi.ts`
+- `VoiceControl`, `VoiceActiveBanner`, `VoiceEnableModal`, `VoiceSettings`
+- Integrated into `pages/MiraChat.tsx` (full-page chat) and
+  `components/mira/MiraChatDock.tsx` (per-page floating dock) — voice
+  applies to both the main chat surface and every page-wise chat
+
 ### Demo-mode env vars
 
 ```
-WHISPER_ENDPOINT=<single warm GPU host>
-TTS_PROVIDER=elevenlabs
-ELEVENLABS_API_KEY=...
-ELEVENLABS_VOICE_ID=...        # the chosen "Mira voice"
-ELEVENLABS_MODEL=flash-v2.5
-VOICE_DEMO_MODE=true            # disables auto-shutoff, rate limits, worker pool
+# Provider selection
+MIRA_VOICE_ENABLED=true
+MIRA_VOICE_DEMO_MODE=true              # disables some safeguards
+MIRA_VOICE_STT_PROVIDER=whisper        # or "mock"
+MIRA_VOICE_TTS_PROVIDER=elevenlabs     # or "polly" | "mock"
+
+# Whisper / SageMaker
+MIRA_VOICE_WHISPER_ENDPOINT=<sagemaker endpoint name>
+AWS_REGION=us-gov-west-1
+
+# ElevenLabs (demo TTS)
+MIRA_VOICE_ELEVENLABS_API_KEY=<key>
+MIRA_VOICE_ELEVENLABS_VOICE_ID=<chosen voice id>
+MIRA_VOICE_ELEVENLABS_MODEL=eleven_flash_v2_5
+
+# Polly (production TTS fallback / GovCloud-native)
+MIRA_VOICE_POLLY_VOICE_ID=Ruth
+MIRA_VOICE_POLLY_ENGINE=generative
+
+# Concurrency + sentence buffer tuning
+MIRA_VOICE_MAX_CONCURRENT=10
+MIRA_VOICE_FLUSH_MIN_CHARS=40
+MIRA_VOICE_FLUSH_MAX_CHARS=120
 ```
+
+With no env vars set, the system falls back to mock STT/TTS so the
+WebSocket pipeline + UI choreography can be exercised end-to-end without
+credentials or GPU.
+
+### Demo day dry-run checklist
+
+The night before:
+- [ ] Confirm SageMaker endpoint is warm and responsive (`aws sagemaker-runtime invoke-endpoint`)
+- [ ] Confirm ElevenLabs API key works (`curl -H "xi-api-key: $KEY" https://api.elevenlabs.io/v1/voices`)
+- [ ] Run a full storyboard pass: page-aware greeting → hands-free Q → barge-in
+- [ ] Record a perfect run as MP4 backup
+- [ ] Test the wired headset on the actual demo laptop
+- [ ] Test from the actual demo network if possible
+
+Demo day, T-30:
+- [ ] Open the demo page; click voice on; speak one sentence to warm Whisper
+- [ ] Verify the persistent banner is visible
+- [ ] Verify barge-in latency is acceptable
+- [ ] Have the backup video queued up in a second tab
+
+If voice fails live:
+- Calmly switch tabs to the backup video
+- Continue narration over the video
 
 ### Promotion to production
 
 When demo→production happens, the changes are mechanical:
-1. Swap `TTS_PROVIDER` from `elevenlabs` to `polly`
-2. Migrate Whisper from EC2 to SageMaker async endpoint
-3. Enable worker pool, rate limits, auto-disable timers, persistent banner
-4. Extend page-aware greeting to all 5 domain pages
-5. Run GovCloud compliance review (Polly is native; if keeping ElevenLabs, that's the long pole)
+1. Swap `MIRA_VOICE_TTS_PROVIDER` from `elevenlabs` to `polly`
+2. Confirm SageMaker is running with provisioned concurrency + autoscaling
+3. Flip `MIRA_VOICE_DEMO_MODE=false`; enables rate limits, auto-disable
+   timers, persistent banner (already coded — gated by flag)
+4. Extend page-aware greeting copy to all 5 domain pages
+5. Run GovCloud compliance review (Polly is native; if keeping ElevenLabs,
+   that's the long pole)
+6. (Optional) Swap energy VAD for `@ricky0123/vad-web` Silero in the
+   frontend if accuracy is a problem in the field
 
-The provider abstraction in `mira/voice/tts_client.py` should support both from day one to keep the swap trivial.
+The provider abstraction in `mira/voice/providers/` already supports both
+TTS backends; the swap is a single env var.
 
 ---
 
