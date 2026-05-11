@@ -29,6 +29,9 @@ import { VoiceSettings } from "@/components/voice/VoiceSettings";
 import { useVoiceSession } from "@/lib/voice/useVoiceSession";
 import { fetchPresenceGreeting } from "@/lib/voice/voiceApi";
 import type { VoiceTurnSummary } from "@/lib/voice/types";
+import { AuditDrawer } from "@/components/audit/AuditDrawer";
+import { PivIdentityChip } from "@/components/audit/PivIdentityChip";
+import { ClipboardList } from "lucide-react";
 
 const MAX_HISTORY_MESSAGES = 10;
 const MAX_STORED_MESSAGES = 24;
@@ -186,6 +189,8 @@ export default function MiraChat() {
   const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   const [voiceId, setVoiceId] = useState<string | null>(null);
   const [voiceError, setVoiceError] = useState<string | null>(null);
+  const [auditDrawerOpen, setAuditDrawerOpen] = useState(false);
+  const [auditRefreshKey, setAuditRefreshKey] = useState(0);
   const greetedStepRef = useRef<string | null>(null);
   const conversationEndRef = useRef<HTMLDivElement | null>(null);
   const starterPrompts = activeModuleLaunchState?.starterPrompts.length
@@ -268,6 +273,7 @@ export default function MiraChat() {
   // Voice integration
   // -----------------------------------------------------------------
   const appendVoiceTurn = useCallback((summary: VoiceTurnSummary) => {
+    setAuditRefreshKey((k) => k + 1);
     if (!summary.userTranscript.trim() && !summary.assistantText.trim()) {
       return;
     }
@@ -427,6 +433,7 @@ export default function MiraChat() {
             }
             case "done": {
               sawDone = true;
+              setAuditRefreshKey((k) => k + 1);
               const turnEntities = event.entities && typeof event.entities === "object"
                 ? event.entities as Record<string, unknown>
                 : {};
@@ -492,6 +499,12 @@ export default function MiraChat() {
         open={voiceModalOpen}
         onClose={() => setVoiceModalOpen(false)}
         onConfirm={() => void handleVoiceConfirm()}
+      />
+      <AuditDrawer
+        open={auditDrawerOpen}
+        onOpenChange={setAuditDrawerOpen}
+        sessionId={sessionId}
+        refreshKey={auditRefreshKey}
       />
       <Card className="overflow-hidden border-border/70">
         <div className="bg-[radial-gradient(circle_at_top_left,_rgba(15,118,110,0.18),_transparent_45%),linear-gradient(135deg,_rgba(8,47,73,0.96),_rgba(15,23,42,0.98))] px-6 py-6 text-slate-50">
@@ -577,6 +590,7 @@ export default function MiraChat() {
                   </Button>
                 </>
               ) : null}
+              <PivIdentityChip />
               <VoiceControl
                 enabled={voiceActive}
                 state={voiceSession.state}
@@ -588,6 +602,16 @@ export default function MiraChat() {
                 onVoiceIdChange={setVoiceId}
                 disabled={voiceActive}
               />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setAuditDrawerOpen(true)}
+                title="Show audit trail"
+              >
+                <ClipboardList className="mr-2 h-4 w-4" />
+                Show audit
+              </Button>
               <Button type="button" variant="outline" size="sm" onClick={clearConversation}>
                 <RotateCcw className="mr-2 h-4 w-4" />
                 New chat

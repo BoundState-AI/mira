@@ -1,5 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Bot, Compass, Expand, Loader2, MessageSquare, Minimize2, SendHorizonal, X } from "lucide-react";
+import {
+  Bot,
+  ClipboardList,
+  Compass,
+  Expand,
+  Loader2,
+  MessageSquare,
+  Minimize2,
+  SendHorizonal,
+  X,
+} from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +23,8 @@ import { VoiceEnableModal } from "@/components/voice/VoiceEnableModal";
 import { useVoiceSession } from "@/lib/voice/useVoiceSession";
 import { fetchPresenceGreeting } from "@/lib/voice/voiceApi";
 import type { VoiceTurnSummary } from "@/lib/voice/types";
+import { AuditDrawer } from "@/components/audit/AuditDrawer";
+import { PivIdentityChip } from "@/components/audit/PivIdentityChip";
 import {
   buildChatScopeSearch,
   conversationStorageKey,
@@ -229,6 +241,8 @@ export function MiraChatDock() {
   const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   const [voiceId, setVoiceId] = useState<string | null>(null);
   const [voiceError, setVoiceError] = useState<string | null>(null);
+  const [auditDrawerOpen, setAuditDrawerOpen] = useState(false);
+  const [auditRefreshKey, setAuditRefreshKey] = useState(0);
   const greetedStepRef = useRef<string | null>(null);
   const conversationEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -328,6 +342,7 @@ export function MiraChatDock() {
   // Voice integration (mic + speaker via /api/chat/voice WebSocket)
   // -----------------------------------------------------------------
   const appendVoiceTurn = useCallback((summary: VoiceTurnSummary) => {
+    setAuditRefreshKey((k) => k + 1);
     if (!summary.userTranscript.trim() && !summary.assistantText.trim()) {
       return;
     }
@@ -499,6 +514,7 @@ export function MiraChatDock() {
             }
             case "done": {
               sawDone = true;
+              setAuditRefreshKey((k) => k + 1);
               const turnEntities = event.entities && typeof event.entities === "object"
                 ? event.entities as Record<string, unknown>
                 : {};
@@ -561,6 +577,12 @@ export function MiraChatDock() {
         onClose={() => setVoiceModalOpen(false)}
         onConfirm={() => void handleVoiceConfirm()}
       />
+      <AuditDrawer
+        open={auditDrawerOpen}
+        onOpenChange={setAuditDrawerOpen}
+        sessionId={sessionId}
+        refreshKey={auditRefreshKey}
+      />
       {open ? (
         <Card className="pointer-events-auto flex h-[40rem] max-h-[calc(100vh-6.5rem)] w-full max-w-full flex-col overflow-hidden border-border/80 shadow-2xl sm:w-[28rem] sm:max-w-[calc(100vw-1.5rem)]">
           <div className="border-b border-border/70 bg-[radial-gradient(circle_at_top_left,_rgba(15,118,110,0.14),_transparent_40%),linear-gradient(135deg,_rgba(8,47,73,0.98),_rgba(15,23,42,0.98))] px-4 py-3 text-slate-50">
@@ -580,6 +602,16 @@ export function MiraChatDock() {
                 </div>
               </div>
               <div className="flex items-center gap-1">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-slate-100 hover:bg-white/10 hover:text-white"
+                  title="Show audit trail"
+                  onClick={() => setAuditDrawerOpen(true)}
+                >
+                  <ClipboardList className="h-4 w-4" />
+                </Button>
                 <Button
                   type="button"
                   variant="ghost"
@@ -611,6 +643,9 @@ export function MiraChatDock() {
                   <Minimize2 className="h-4 w-4" />
                 </Button>
               </div>
+            </div>
+            <div className="mt-2">
+              <PivIdentityChip compact />
             </div>
             <div className="mt-3">
               <VoiceControl
