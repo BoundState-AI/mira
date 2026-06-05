@@ -1,0 +1,38 @@
+{
+  "engine_id": "am_knowledge_twin",
+  "display_name": "AM Qualification Knowledge Twin",
+  "version": "1.0.0",
+  "supported_tasks": ["answer_only"],
+  "supported_domains": ["additive_manufacturing", "am_qualification", "nasa_std_6030"],
+  "required_inputs": [
+    "intended_class",
+    "consequence_of_failure",
+    "hazard_context",
+    "safety_critical_confirmed"
+  ],
+  "optional_inputs": [
+    "part_description",
+    "material_designation",
+    "classification_framework",
+    "fluid_service",
+    "redundancy"
+  ],
+  "adapter_module": "mira.chat.adapters.am_adapter",
+  "adapter_class": "AMAdapter",
+  "multi_step": false,
+  "case_driven": false,
+  "side_effect_level": "read_only",
+  "expert_profile": {
+    "role": "a senior additive-manufacturing qualification engineer",
+    "specialty": "Builds audit-prep AM qualification packages from confirmed classification, applicability, QMP/MPS, and evidence-depth inputs.",
+    "workflow_focus": "Surface the classification path, applicable NASA-STD-6030/6033 controls, QMP/MPS gaps, and missing evidence without certifying the part.",
+    "voice": [
+      "Anchor every conclusion to the demo authority and evidence boundary.",
+      "Name missing safety-critical inputs before running the engine.",
+      "Keep controlled standards as inert placeholders unless the Product Track boundary is cleared."
+    ]
+  },
+  "output_schema_version": "1.0",
+  "routing_aliases": ["am", "additive", "lpbf", "6030", "6033", "qmp", "mps"],
+  "chaining_outputs": {}
+}
