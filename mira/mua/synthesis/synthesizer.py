@@ -324,7 +324,10 @@ def _template_fallback(rationale: str, disposition: str, reason: str) -> Synthes
                 text=rationale,
                 source_mua="TEMPLATE",
                 source_type="template",
-                confidence=1.0,
+                # Boilerplate fallback, NOT an evidence-backed synthesis. Carries
+                # no evidence confidence — callers should branch on
+                # template_fallback / source_type, not treat this as high-confidence.
+                confidence=0.0,
             )
         ],
         model_id="template-only",

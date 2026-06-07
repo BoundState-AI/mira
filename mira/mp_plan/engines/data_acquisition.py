@@ -20,6 +20,7 @@ Safety Critical: False
 from __future__ import annotations
 
 import logging
+import os
 from datetime import datetime
 from typing import Optional
 
@@ -70,13 +71,24 @@ class DataAcquisitionEngine:
             try:
                 self._maptis_adapter = MaptisResolutionAdapter()
             except ValueError as e:
-                # Database credentials not available - use mock mode
-                LOGGER.warning(
-                    f"MAPTIS adapter not available ({e}). "
-                    "Running in mock mode without database connectivity."
-                )
-                self._mock_mode = True
-                self._maptis_adapter = None
+                # Database credentials not available. Do NOT silently fabricate
+                # all-"U" stub resolutions in a compliance context — that looks
+                # like a real (if unknown-rated) plan. Mock mode must be opted
+                # into explicitly (e.g. dev/tests); otherwise fail loudly.
+                if os.environ.get("MIRA_ALLOW_MOCK_MAPTIS", "").lower() in ("1", "true", "yes"):
+                    LOGGER.warning(
+                        f"MAPTIS adapter not available ({e}). "
+                        "MIRA_ALLOW_MOCK_MAPTIS set -> running in mock mode "
+                        "(stub 'U' resolutions, source='mock_mode')."
+                    )
+                    self._mock_mode = True
+                    self._maptis_adapter = None
+                else:
+                    raise RuntimeError(
+                        f"MAPTIS adapter unavailable ({e}) and mock mode not "
+                        "enabled. Set MIRA_ALLOW_MOCK_MAPTIS=1 to allow stub "
+                        "resolutions in non-production environments."
+                    ) from e
 
     def resolve_materials(
         self,

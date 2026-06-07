@@ -58,9 +58,10 @@ from typing import Any, Dict, List, Optional, Set
 import numpy as np
 from collections import Counter
 
-# DETERMINISM FIX: Set numpy random seed for reproducible results
-# This ensures that any numpy operations with randomness are consistent
-np.random.seed(42)
+# NOTE: This engine uses numpy only for deterministic TF-IDF / scoring math
+# (np.zeros, vector ops); it does not use np.random anywhere. A previous
+# `np.random.seed(42)` was removed because it controlled no actual randomness
+# and falsely implied results depended on an RNG.
 
 # Try to import BM25
 try:
