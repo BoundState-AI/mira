@@ -62,20 +62,10 @@ def _get_connection():
     if _heritage_db_disabled():
         raise RuntimeError("heritage DB disabled via MIRA_DISABLE_HERITAGE_DB")
 
-    try:
-        return open_db_connection()
-    except Exception:
-        logger.warning(
-            "[HERITAGE_DB] Could not load db_config; falling back to defaults"
-        )
-        import psycopg2
-        return psycopg2.connect(
-            host="localhost",
-            port=5432,
-            database="mira",
-            user="postgres",
-            password="postgres",
-        )
+    # Use the centralised, production-guarded config. Do NOT fall back to
+    # hardcoded postgres/postgres credentials — that silently degrades to a
+    # well-known default account. Surface the real failure instead.
+    return open_db_connection()
 
 
 def ensure_table() -> None:

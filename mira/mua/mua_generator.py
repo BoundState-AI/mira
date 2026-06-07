@@ -97,153 +97,25 @@ def route_category(miul: MIULRef, gaps: Dict[str, str]) -> Tuple[str, List[str]]
     return "II", []
 
 
-def _fake_retrieve(miul: MIULRef, gaps: Dict[str, str]) -> List[Mitigation]:
-    """Generate gap-specific mitigations when retriever unavailable."""
-    out: List[Mitigation] = []
-    material = miul.material_designator or miul.materialkey
-
-    if "TVS" in gaps:
-        rating = gaps["TVS"]
-        if rating == "B":
-            out.append(
-                Mitigation(
-                    text=f"Vacuum bake {material} components at 125\u00B0C for 24h prior to final assembly. Verify CVCM \u2264 0.10% and TML \u2264 1.00% via ASTM E595 testing on as-fabricated lot.",
-                    source_doc_id="NASA-STD-6016",
-                    clause_refs=[CLAUSE["tvs"], CLAUSE["verification"]],
-                    score=0.85,
-                    hazards=["miul:TVS"],
-                    acceptance={"cvcm_max": 0.1, "tml_max": 1.0},
-                )
-            )
-        else:  # U or worse
-            out.append(
-                Mitigation(
-                    text=f"Conduct ASTM E595 outgassing testing on {material} in as-fabricated configuration. Acceptance: CVCM \u2264 0.10%, TML \u2264 1.00%. If used near contamination-sensitive optics, require CVCM \u2264 0.01%.",
-                    source_doc_id="NASA-STD-6016",
-                    clause_refs=[CLAUSE["tvs"], CLAUSE["verification"]],
-                    score=0.82,
-                    hazards=["miul:TVS"],
-                    acceptance={"cvcm_max": 0.1, "tml_max": 1.0, "cvcm_max_tight": 0.01},
-                )
-            )
-
-    if "FLAMM" in gaps:
-        rating = gaps["FLAMM"]
-        o2_env = "oxygen-enriched" if (miul.environment.oxygen_pct or 0) >= 23.5 else "ambient air"
-        if rating == "B":
-            out.append(
-                Mitigation(
-                    text=f"Limit {material} to low-energy-ignition configurations. Conduct configuration-specific flammability testing per NASA-STD-6001 at worst-case O\u2082 concentration and operating temperature for {o2_env} environment.",
-                    source_doc_id="NASA-STD-6016",
-                    clause_refs=[CLAUSE["flammability_control"], CLAUSE["oxygen_compat"], CLAUSE["verification"]],
-                    score=0.80,
-                    hazards=["miul:FLAMM", "hazard:oxygen"],
-                )
-            )
-        else:
-            out.append(
-                Mitigation(
-                    text=f"Establish flammability rating for {material} via NASA-STD-6001 Test 1 (upward propagation). Limit use to encapsulated or low-oxygen areas (\u2264 21% O\u2082). Implement ignition source controls per \u00A74.2.1.4.",
-                    source_doc_id="NASA-STD-6016",
-                    clause_refs=[CLAUSE["flammability_control"], CLAUSE["oxygen_compat"], CLAUSE["verification"]],
-                    score=0.75,
-                    hazards=["miul:FLAMM"],
-                )
-            )
-
-    if "SCC" in gaps:
-        rating = gaps["SCC"]
-        if rating in ["B", "C"]:
-            out.append(
-                Mitigation(
-                    text=f"Evaluate {material} stress state and environment. Limit operating stress to \u2264 50% yield strength in corrosive environments. Conduct stress corrosion testing per ASTM G129 if high-stress service expected.",
-                    source_doc_id="MSFC-SPEC-522B",
-                    clause_refs=[CLAUSE["corrosion"], CLAUSE["verification"]],
-                    score=0.78,
-                    hazards=["miul:SCC"],
-                )
-            )
-        else:
-            out.append(
-                Mitigation(
-                    text=f"Conduct stress corrosion cracking assessment for {material} per MSFC-SPEC-522B. Establish material condition, stress levels, and environmental exposure. Perform coupon testing if moderate-to-high SCC risk identified.",
-                    source_doc_id="MSFC-SPEC-522B",
-                    clause_refs=[CLAUSE["corrosion"], CLAUSE["verification"]],
-                    score=0.72,
-                    hazards=["miul:SCC"],
-                )
-            )
-
-    if "CORR" in gaps:
-        rating = gaps["CORR"]
-        out.append(
-            Mitigation(
-                text=f"Protect {material} surfaces with corrosion-resistant coating or finish per MSFC-SPEC-250A. Verify coating integrity via visual inspection and adhesion testing. Alternative: demonstrate corrosion resistance via testing per ASTM B117 or G85.",
-                source_doc_id="NASA-STD-6016",
-                clause_refs=[CLAUSE["corrosion"], CLAUSE["verification"]],
-                score=0.76,
-                hazards=["miul:CORR"],
-            )
-        )
-
-    if "FS" in gaps:
-        rating = gaps["FS"]
-        fluid = miul.environment.fluid_medium or "service fluid"
-        out.append(
-            Mitigation(
-                text=f"Conduct fluid compatibility testing for {material} with {fluid} per NASA-STD-6001 Test 13 or ASTM G46. Verify no significant material degradation, swelling, or contamination. Document fluid exposure limits and service conditions.",
-                source_doc_id="NASA-STD-6016",
-                clause_refs=[CLAUSE["fluid_compat"], CLAUSE["verification"]],
-                score=0.80,
-                hazards=["miul:FS"],
-            )
-        )
-
-    if "TOX" in gaps:
-        rating = gaps["TOX"]
-        out.append(
-            Mitigation(
-                text=f"Evaluate toxicity hazards for {material} combustion products and decomposition. Implement ventilation controls for habitable volumes. Provide crew training on material hazards. Conduct toxicity testing per NASA-STD-6001 if significant crew exposure risk.",
-                source_doc_id="NASA-STD-6016",
-                clause_refs=[CLAUSE["offgassing"], CLAUSE["verification"]],
-                score=0.74,
-                hazards=["miul:TOX"],
-            )
-        )
-
-    # Add general engineering controls
-    if len(out) > 0:
-        out.append(
-            Mitigation(
-                text=f"Document {material} usage in hardware configuration control. Implement inspection and verification requirements in acceptance test procedures. Track material lot/batch traceability through manufacturing records.",
-                source_doc_id="NASA-STD-6016",
-                clause_refs=[CLAUSE["verification"]],
-                score=0.65,
-            )
-        )
-
-    if not out:
-        out.append(
-            Mitigation(
-                text=f"Perform engineering evaluation of {material} for gaps: {', '.join(gaps.keys())}. Add verification testing to demonstrate acceptability in as-used configuration per NASA-STD-6016 \u00A74.3.",
-                source_doc_id="NASA-STD-6016",
-                clause_refs=[CLAUSE["verification"]],
-                score=0.50,
-            )
-        )
-
-    out.sort(key=lambda m: m.score, reverse=True)
-    return out
-
-
 def estimate_confidence(mitigations: List[Mitigation]) -> Dict[str, Any]:
+    """Summarise retrieval coverage.
+
+    `mean_relevance` is the mean of the retriever's per-mitigation relevance
+    scores — a coverage indicator, NOT a calibrated probability. We deliberately
+    do NOT emit fabricated "68%/95% confidence intervals": those were a fixed
+    ±0.08 / ±0.15 around the mean with no statistical basis and were misleading
+    in a safety-critical draft.
+    """
     if not mitigations:
-        return {"global": 0.4, "notes": ["Low precedent coverage."]}
+        return {
+            "mean_relevance": None,
+            "basis": "no precedent-backed mitigations retrieved",
+            "known_unknowns": ["Low precedent coverage."],
+        }
     avg = sum(m.score for m in mitigations) / len(mitigations)
     return {
-        "global": round(min(0.95, max(0.3, avg)), 3),
-        "interval_68": [round(max(0.0, avg - 0.08), 3), round(min(1.0, avg + 0.08), 3)],
-        "interval_95": [round(max(0.0, avg - 0.15), 3), round(min(1.0, avg + 0.15), 3)],
+        "mean_relevance": round(avg, 3),
+        "basis": f"mean retriever relevance over {len(mitigations)} mitigations",
         "known_unknowns": [
             "Verify environment bounds match as-used configuration.",
             "Confirm latest MAPTIS evidence IDs and report revisions.",
@@ -379,11 +251,14 @@ def render_text(
             lines.append(
                 f"   - [MAPTIS] {r.evidence.map_tis_id or r.evidence.report_no}: {r.test_class}={r.rating}"
             )
-    lines.append("5) Confidence Summary")
-    lines.append(
-        f"   - global={confidence.get('global')} | 68%={confidence.get('interval_68')} | "
-        f"95%={confidence.get('interval_95')}"
-    )
+    lines.append("5) Retrieval Coverage Summary")
+    mean_rel = confidence.get("mean_relevance")
+    basis = confidence.get("basis", "")
+    if mean_rel is None:
+        lines.append(f"   - mean retriever relevance: n/a ({basis})")
+    else:
+        lines.append(f"   - mean retriever relevance: {mean_rel} ({basis})")
+    lines.append("   - Note: relevance is a coverage indicator, not a calibrated probability.")
     for note in confidence.get("known_unknowns", []):
         lines.append(f"   - {note}")
     lines.append("")

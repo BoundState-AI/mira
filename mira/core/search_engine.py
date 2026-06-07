@@ -2073,14 +2073,14 @@ class SemanticSearchEngine:
             
         Compliance: SWE-055 (Performance optimization)
         """
-        # This method would need access to embeddings which are in FAISS
-        # For now, return a placeholder
-        if not hasattr(self, 'materials') or not self.materials:
-            return []
-            
-        # Simple fallback - return random materials
-        results = [(i, 0.5) for i in range(len(self.materials)) if i != material_idx][:limit]
-        return results
+        # Real cosine/embedding similarity is not implemented here (the vectors
+        # live in FAISS). Do NOT return fabricated uniform 0.5 "similarity"
+        # scores that look computed — fail loudly so callers don't trust them.
+        raise NotImplementedError(
+            "get_similar_materials requires FAISS embedding lookup, which is not "
+            "implemented. Use the FAISS-backed semantic search path instead of "
+            "relying on placeholder similarity scores."
+        )
     
     async def search_cached(
         self,
