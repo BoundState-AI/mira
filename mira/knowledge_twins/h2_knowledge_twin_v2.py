@@ -61,6 +61,8 @@ from mira.knowledge_twins.h2_twin_v2_types import (
     MatchStats,
     AuditTrail,
     H2Response,
+    NI_PREDICTOR,
+    ELEVATED_TEMP_PEAK_MATERIALS,
 )
 
 # =============================================================================

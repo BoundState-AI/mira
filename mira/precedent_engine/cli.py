@@ -79,7 +79,7 @@ def index_corpus(
         from mira.precedent_engine.core.enrichment import enrich_mua_record
         from mira.precedent_engine.core.storage import VectorStore
         from mira.precedent_engine.utils.bedrock import create_bedrock_llm_call, create_mock_llm_call
-        from mira.precedent_engine.utils.maptis import MockMAPTISClient
+        from mira.precedent_engine.utils.maptis import MAPTISClient, MockMAPTISClient
 
         # Create LLM call function
         if use_mock_llm:
@@ -87,8 +87,8 @@ def index_corpus(
         else:
             llm_call = create_bedrock_llm_call(config)
 
-        # Create MAPTIS client (mock for now)
-        maptis = MockMAPTISClient()
+        # MAPTIS client: real DB-backed client unless mock mode is requested.
+        maptis = MockMAPTISClient() if use_mock_llm else MAPTISClient()
 
         # Initialize storage
         store = VectorStore(config)
@@ -178,7 +178,7 @@ def process_case(
         from mira.precedent_engine.core.runner import MUAPrecedentRunner
         from mira.precedent_engine.core.storage import VectorStore
         from mira.precedent_engine.utils.bedrock import create_bedrock_llm_call, create_mock_llm_call
-        from mira.precedent_engine.utils.maptis import MockMAPTISClient
+        from mira.precedent_engine.utils.maptis import MAPTISClient, MockMAPTISClient
 
         # Load case
         with open(case_json) as f:
@@ -194,7 +194,7 @@ def process_case(
             llm_call = create_bedrock_llm_call(config)
             narrator = NarratorLLM(config)
 
-        maptis = MockMAPTISClient()
+        maptis = MockMAPTISClient() if use_mock_llm else MAPTISClient()
         store = VectorStore(config)
 
         # Enrich case

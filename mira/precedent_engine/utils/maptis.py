@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import os
 from concurrent.futures import ThreadPoolExecutor
 from typing import Optional, Protocol
 import uuid
@@ -77,19 +76,11 @@ class MAPTISClient:
     def _get_conn_params(self) -> dict:
         """Get database connection parameters."""
         if self._conn_params is None:
-            # KNOWN RISK: Development defaults - see db_config.py security note
-            try:
-                from mira.core.db_config import get_db_connection_params
-                self._conn_params = get_db_connection_params()
-            except ImportError:
-                self._conn_params = {
-                    "host": os.environ.get("POSTGRES_HOST", "localhost"),
-                    "port": int(os.environ.get("POSTGRES_PORT", "5432")),
-                    "database": os.environ.get("POSTGRES_DB", "mira"),
-                    "user": os.environ.get("POSTGRES_USER", "postgres"),
-                    # KNOWN RISK: Hardcoded default password for development
-                    "password": os.environ.get("POSTGRES_PASSWORD", "postgres"),
-                }
+            # Always go through the centralised, production-guarded config.
+            # No hardcoded postgres/postgres fallback: a missing config is a
+            # real environment error and must not silently use a default account.
+            from mira.core.db_config import get_db_connection_params
+            self._conn_params = get_db_connection_params()
         return self._conn_params
 
     def _get_connection(self):
