@@ -108,6 +108,46 @@ compute is the single biggest issue here.
 
 ---
 
+---
+
+## Remediation status (this branch)
+
+### Fixed
+| Item | What changed |
+|---|---|
+| `h2_knowledge_twin_v2.py` NameError | Imported `NI_PREDICTOR` / `ELEVATED_TEMP_PEAK_MATERIALS`. |
+| `pipeline/boundary_check.py` H2 no-op | H2 boundary check now actually calls `evaluate_h2_compatibility`. |
+| `pipeline/boundary_check.py` silent defaults | Default pressure/temp now logged and surfaced in the rationale ("Assumptions: …"), not silently substituted. |
+| `mua_generator.py` fake intervals | Removed fabricated 68%/95% intervals; report mean retriever relevance + explicit "not a calibrated probability" note. Deleted dead `_fake_retrieve`. |
+| `core/search_engine.py:get_similar_materials` | Raises `NotImplementedError` instead of returning uniform `0.5`. |
+| `synthesis/synthesizer.py` template `confidence=1.0` | Template/boilerplate claim now `confidence=0.0` (branch on `template_fallback`). |
+| `o2/engine.py` `np.random.seed(42)` | Removed; engine uses no RNG (deterministic TF-IDF only). |
+| `mp_plan/data_acquisition.py` auto-mock | Mock MAPTIS no longer auto-engages on missing creds; requires `MIRA_ALLOW_MOCK_MAPTIS`, else raises. |
+| `heritage_db.py`, `precedent_engine/utils/maptis.py` creds | Removed `postgres/postgres` fallback; route through production-guarded `db_config`. |
+| `precedent_engine/cli.py` | Uses real `MAPTISClient` by default; mock only under `--use-mock-llm`. |
+
+### Verified HONEST after reading (agents overstated — left as-is)
+- `compliance/adapters/{o2,h2}_adapter.py` placeholder `confidence=1.0` — emits an explicit `MISSING_INPUT`/`UNKNOWN` gap ("engine unavailable, manual review required"); the 1.0 means "certain a gap exists," which is true.
+- `chat/adapters/gpcm_adapter.py` stub — returns `Status.INSUFFICIENT_DATA` ("Pending Full Analysis") with `missing_inputs`; honest degradation, not a fake pass.
+- `chat/adapters/am_adapter.py` — self-labels "Synthetic Demo Track output only … inert name-only placeholders."
+- `oca/maptis_stub.py` — looks up a bundled reference pack and carries provenance (`data_source`, `source`, match-quality confidence); fallback clearly tagged `oca_standalone_heuristic`.
+- `mp_plan/adapters/maptis_adapter.py:195` `confidence=0.95` — carries `confidence_basis="Direct MAPTIS database lookup"`; source-reliability value, not a fabricated computation.
+- `core/db_config.py` — `postgres/postgres` fallback is dev-only and already blocked in production via `require_production_credentials()`.
+- `galvanic/engine.py`, `o2/policy_engine.py` family gates — legitimate NASA-STD lookup values.
+
+### NOT fixed — needs a real calibration project (do NOT churn the numbers)
+These are pervasive fixed "rule strength" confidences keyed on a branch/category.
+Most carry a `confidence_basis` or are the actual scoring scheme. Making them
+genuinely evidence-derived is a calibration effort against the MUA corpus, not a
+mechanical edit — and jittering the literals would just be more fabrication.
+- `forge/compiler.py:1879-1940` + formulas `1121/1166/1439`; `forge_claude/question_gen/curator.py` value ladder.
+- `mp_plan/engines/compliance_eval*.py`, `mp_plan/gap_resolution/*`, `compliance/conductor.py` confidence literals.
+- `mua/classifier/classifier.py` confidence-by-type and 0-precedent requirements (changing these alters classification behavior — needs test coverage first).
+- `mua/v7/confidence.py` quantizations, `mua/historic_retrieval.py` env boosts (this IS the scoring model; needs calibration, not deletion).
+- `pipeline/materials_search.py` family→code dict, `o2/policy_engine.py:_compute_usage_score` — documented stopgaps awaiting Granta / MUA-DB integration.
+
+---
+
 ## Suggested remediation priority
 1. **Stop printing fabricated confidence.** Either compute it from evidence (precedent count, test recency, envelope overlap) or remove the field. At minimum, tag every non-computed value as `confidence_basis="heuristic"`.
 2. **Fix the live crash:** import `NI_PREDICTOR` / `ELEVATED_TEMP_PEAK_MATERIALS` in `h2_knowledge_twin_v2.py`.
