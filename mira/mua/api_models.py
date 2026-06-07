@@ -126,6 +126,14 @@ class MitigationClause(BaseModel):
         default=0,
         description="Number of similar precedents found",
     )
+    cited_precedents: List[str] = Field(
+        default_factory=list,
+        description="MUA numbers of historic precedents grounding this mitigation",
+    )
+    precedent_backed: bool = Field(
+        default=False,
+        description="True if grounded in historic MUA precedents; False = standards-only",
+    )
 
 
 class MuaGenerationResponse(BaseModel):
@@ -158,6 +166,14 @@ class MuaGenerationResponse(BaseModel):
     warnings: List[str] = Field(
         default_factory=list,
         description="Generation warnings",
+    )
+    precedents_considered: int = Field(
+        default=0,
+        description="Total historic MUA precedents retrieved from the corpus",
+    )
+    precedent_corpus_available: bool = Field(
+        default=False,
+        description="Whether the historic MUA precedent corpus was reachable",
     )
     generated_at: datetime = Field(
         default_factory=datetime.utcnow,
