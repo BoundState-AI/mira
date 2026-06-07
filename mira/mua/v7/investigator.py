@@ -129,13 +129,17 @@ _PG_FAMILY_ALIAS_MAP = {
 
 
 # ---------------------------------------------------------------------------
-# Dependency stubs (no real dependency service yet)
+# MUA dependency / revocation registry
 # ---------------------------------------------------------------------------
-# In production, dependency and revocation data will come from a dedicated
-# service.  For now, these are empty so _check_dependencies is a no-op.
+# Maps a precedent MUA number -> the parent MUA numbers it depends on, and the
+# set of revoked/cancelled MUA numbers. The corpus (mua_precedents_v7) has no
+# parent-linkage column yet, so these are intentionally empty: zombie-MUA
+# detection is INACTIVE (returns no warnings) until a dependency data source
+# exists, rather than fabricating dependency warnings.
+# TODO: populate from a dependency service or a corpus parent-linkage column.
 
-_MOCK_DEPENDENCIES: dict[str, list[str]] = {}
-_MOCK_REVOKED: set[str] = set()
+_MUA_DEPENDENCY_GRAPH: dict[str, list[str]] = {}
+_REVOKED_MUAS: set[str] = set()
 
 
 # MOCK DATA REMOVED -- _search_precedents() now queries mua_precedents_v7 via PG,
@@ -1489,9 +1493,9 @@ class MUAInvestigator:
         warnings: list[DependencyWarning] = []
 
         for p in precedents:
-            deps = _MOCK_DEPENDENCIES.get(p.mua_number, [])
+            deps = _MUA_DEPENDENCY_GRAPH.get(p.mua_number, [])
             for dep_mua in deps:
-                if dep_mua in _MOCK_REVOKED:
+                if dep_mua in _REVOKED_MUAS:
                     warnings.append(
                         DependencyWarning(
                             cited_mua=p.mua_number,
