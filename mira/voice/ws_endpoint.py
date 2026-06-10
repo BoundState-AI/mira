@@ -177,6 +177,8 @@ async def list_voices() -> dict[str, Any]:
 
 @router.get("/voice/status")
 async def voice_status() -> dict[str, Any]:
+    from .providers.factory import is_commercial_tts_provider
+
     config = get_voice_config()
     async with _sessions_lock:
         active = len(_active_sessions)
@@ -185,10 +187,80 @@ async def voice_status() -> dict[str, Any]:
         "demo_mode": config.demo_mode,
         "stt_provider": config.stt_provider,
         "tts_provider": config.tts_provider,
+        "tts_is_commercial": is_commercial_tts_provider(config.tts_provider),
         "active_sessions": active,
         "max_concurrent_sessions": config.max_concurrent_sessions,
         "has_real_stt": config.has_real_stt,
         "has_real_tts": config.has_real_tts,
+    }
+
+
+@router.get("/voice/egress-check")
+async def egress_check() -> dict[str, Any]:
+    """Verify the backend can reach commercial TTS providers.
+
+    Hits each provider's public endpoint without an API key. Any HTTP
+    response (including 401 / 403) proves the network allows the
+    connection — that's the egress question. A connect/timeout error means
+    the VPC is blocking the destination and the demo would silently hang.
+
+    The endpoint is unauthenticated reachability information only; it
+    sends no payload and reveals no secrets. Hit it with
+    ``curl https://<host>/api/chat/voice/egress-check``.
+    """
+    import httpx
+
+    from .providers.factory import COMMERCIAL_TTS_PROVIDERS
+
+    targets = {
+        "elevenlabs": "https://api.elevenlabs.io/v1/voices",
+        "cartesia": "https://api.cartesia.ai/voices",
+    }
+    results: dict[str, dict[str, Any]] = {}
+
+    async def _check(name: str, url: str) -> None:
+        try:
+            async with httpx.AsyncClient(
+                timeout=httpx.Timeout(5.0, connect=3.0),
+                follow_redirects=False,
+            ) as client:
+                response = await client.get(url)
+            results[name] = {
+                "reachable": True,
+                "host": COMMERCIAL_TTS_PROVIDERS.get(name, ""),
+                "status_code": response.status_code,
+                "note": "Any HTTP status (including 401/403) proves egress works.",
+            }
+        except httpx.ConnectTimeout:
+            results[name] = {
+                "reachable": False,
+                "host": COMMERCIAL_TTS_PROVIDERS.get(name, ""),
+                "error": "connect_timeout",
+                "note": "VPC egress likely blocked; check security groups / NAT.",
+            }
+        except (httpx.ConnectError, httpx.ReadTimeout) as exc:
+            results[name] = {
+                "reachable": False,
+                "host": COMMERCIAL_TTS_PROVIDERS.get(name, ""),
+                "error": type(exc).__name__,
+                "detail": str(exc)[:200],
+                "note": "VPC egress likely blocked; check security groups / NAT.",
+            }
+        except Exception as exc:
+            results[name] = {
+                "reachable": False,
+                "host": COMMERCIAL_TTS_PROVIDERS.get(name, ""),
+                "error": type(exc).__name__,
+                "detail": str(exc)[:200],
+            }
+
+    await asyncio.gather(*(_check(n, u) for n, u in targets.items()))
+
+    config = get_voice_config()
+    return {
+        "active_tts_provider": config.tts_provider,
+        "aws_region": config.aws_region,
+        "providers": results,
     }
 
 

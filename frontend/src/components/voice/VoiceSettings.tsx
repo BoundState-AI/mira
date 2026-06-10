@@ -16,7 +16,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { fetchVoiceList } from "@/lib/voice/voiceApi";
+import { useVoiceStatus } from "@/lib/voice/useVoiceStatus";
 import type { VoiceListEntry, VoiceListResponse } from "@/lib/voice/types";
+import { TtsProviderChip } from "./TtsProviderChip";
 
 interface VoiceSettingsProps {
   voiceId: string | null;
@@ -29,6 +31,7 @@ export function VoiceSettings({ voiceId, onVoiceIdChange, disabled }: VoiceSetti
   const [provider, setProvider] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const status = useVoiceStatus();
 
   // Fetch the catalog once per mount. Reading voiceId/onVoiceIdChange via a
   // ref keeps them out of the dependency array — otherwise selecting a voice
@@ -73,7 +76,16 @@ export function VoiceSettings({ voiceId, onVoiceIdChange, disabled }: VoiceSetti
           <Label className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
             TTS provider
           </Label>
-          <div className="text-sm font-medium">{provider || "—"}</div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">{provider || "—"}</span>
+            {status ? (
+              <TtsProviderChip
+                provider={status.tts_provider}
+                isCommercial={status.tts_is_commercial}
+                compact
+              />
+            ) : null}
+          </div>
         </div>
 
         <div className="space-y-1.5">

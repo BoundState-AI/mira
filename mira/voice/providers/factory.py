@@ -16,6 +16,18 @@ from .mock import MockSTT, MockTTS
 
 LOGGER = logging.getLogger(__name__)
 
+# Providers whose API endpoints sit outside the GovCloud boundary. Selecting
+# one is a deliberate split-serving choice — STT, LLM, and audit stay in
+# GovCloud; only the assistant's response text egresses to the named host.
+COMMERCIAL_TTS_PROVIDERS: dict[str, str] = {
+    "elevenlabs": "api.elevenlabs.io",
+    "cartesia": "api.cartesia.ai",
+}
+
+
+def is_commercial_tts_provider(provider: str) -> bool:
+    return (provider or "").lower() in COMMERCIAL_TTS_PROVIDERS
+
 
 # Providers are stateless wrappers around thread-safe clients (boto3 / httpx),
 # so one instance per config serves every session and request. Caching avoids
@@ -52,6 +64,12 @@ def build_tts_provider(config: VoiceConfig) -> TTSProvider:
                 "TTS provider=elevenlabs but API key or voice_id missing; using mock."
             )
             return MockTTS()
+        LOGGER.warning(
+            "TTS provider=elevenlabs — split-serving active. Response text "
+            "will egress from %s to api.elevenlabs.io (commercial cloud). "
+            "Mic audio, identity, and audit records stay in GovCloud.",
+            config.aws_region,
+        )
         from .elevenlabs_tts import ElevenLabsTTS
         return ElevenLabsTTS(
             api_key=config.elevenlabs_api_key,

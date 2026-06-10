@@ -49,6 +49,9 @@ class ElevenLabsTTS(TTSProvider):
             "xi-api-key": self._api_key,
             "Accept": "audio/mpeg",
             "Content-Type": "application/json",
+            # Opt out of input retention on plans that honor it; harmless
+            # on plans that don't. Demo TTS never trains a future model.
+            "xi-no-retention": "true",
         }
         body = {
             "text": text,

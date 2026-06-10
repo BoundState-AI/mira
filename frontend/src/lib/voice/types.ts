@@ -19,6 +19,7 @@ export interface VoiceConfigInfo {
   demo_mode: boolean;
   stt_provider: string;
   tts_provider: string;
+  tts_is_commercial?: boolean;
   active_sessions: number;
   max_concurrent_sessions: number;
   has_real_stt: boolean;
