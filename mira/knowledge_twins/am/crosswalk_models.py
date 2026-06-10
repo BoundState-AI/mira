@@ -152,6 +152,31 @@ class CrosswalkEdge(BaseModel):
         return self
 
 
+class PrecedenceRule(BaseModel):
+    """Approved rule for resolving a requirement conflict (Rev 5 §4.2)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    rule_id: str
+    basis: str
+    owner: str
+    approval_status: ApprovalStatus = ApprovalStatus.UNREVIEWED
+
+
+class ConflictSet(BaseModel):
+    """An identified conflict between requirements. Unresolved conflicts on
+    high-impact clauses cap the readiness verdict below PASS (Rev 5 §4.2)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    conflict_id: str
+    requirement_ids: list[str]
+    description: str
+    precedence_rule_id: Optional[str] = None
+    resolved: bool = False
+    high_impact: bool = False
+
+
 class CrosswalkGraph(BaseModel):
     """Validated crosswalk graph. Construction enforces the §4.2 rules."""
 

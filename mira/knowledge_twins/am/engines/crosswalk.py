@@ -51,7 +51,8 @@ from mira.knowledge_twins.am.crosswalk_models import (
 )
 
 # NASA-STD-6030/6033 controlled-artifact vocabulary (the standards' own
-# plan/record acronyms; see 6030 §4-§8 and 6033 EFCP).
+# plan/record acronyms; see 6030 §4-§8 and 6033 EFCP). "NDE" covers the
+# NDE procedure artifact type (Rev 5 §5.3) named throughout 6030 §4.8.
 CONTROLLED_ARTIFACT_TYPES: tuple[str, ...] = (
     "AMCP",
     "QMP",
@@ -63,6 +64,7 @@ CONTROLLED_ARTIFACT_TYPES: tuple[str, ...] = (
     "EIDP",
     "MUA",
     "CoC",
+    "NDE",
 )
 
 _SECTION_REF = re.compile(
@@ -86,7 +88,11 @@ def _artifact_pattern(acronym: str) -> re.Pattern[str]:
     return re.compile(rf"\b{re.escape(acronym)}\b")
 
 
-_ARTIFACT_PATTERNS = {a: _artifact_pattern(a) for a in CONTROLLED_ARTIFACT_TYPES}
+# Public: shared with the qmp_gap engine, which derives the required
+# document set from the same vocabulary (single source of truth).
+ARTIFACT_PATTERNS: dict[str, re.Pattern[str]] = {
+    a: _artifact_pattern(a) for a in CONTROLLED_ARTIFACT_TYPES
+}
 
 
 def build_crosswalk(
@@ -125,7 +131,7 @@ def build_crosswalk(
     for pack in packs:
         for req in pack.requirements:
             # documented_in edges from the artifact vocabulary.
-            for acronym, pattern in _ARTIFACT_PATTERNS.items():
+            for acronym, pattern in ARTIFACT_PATTERNS.items():
                 if pattern.search(req.shall_text):
                     artifact_id = f"ARTIFACT:{acronym}"
                     if artifact_id not in artifact_nodes:
