@@ -1,21 +1,31 @@
 """
-Module: MIRA Chat -- AM Knowledge Twin Adapter (PR-E)
-Purpose: Bridge the Powder AM Knowledge Twin Demo Track into the MIRA Chat
-         EngineEnvelope contract.
+Module: MIRA Chat -- AM Knowledge Twin Adapter
+Purpose: Bridge the Powder AM Knowledge Twin (BoundState-AI/powder, consumed
+         as an installed package dependency -- never via path imports) into
+         the MIRA Chat EngineEnvelope contract.
 
 BoundState AI 2026
 Classification: BoundState Proprietary
 
-Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+Co-Authored-By: Claude "Beth" <noreply@anthropic.com>
 Co-Authored-By: Dr. Joseph Wilde, BoundState AI
 
 Compliance: SWE-032 (Data validation), SWE-033 (Requirements Traceability)
 Safety Critical: True
+
+Notes:
+- powder runs its own server-side demo AccessContext and a PUBLIC-only
+  content store (deny-by-default enforced store-side); chat input never
+  selects an access boundary.
+- AM_DEMO_PROGRAM=1 attaches powder's seeded synthetic GRCop-42 registry
+  (assessed mode, labeled NON_AUTHORITATIVE). Default: checklist mode.
+- No confidence score: removed everywhere by owner decision (2026-06-09);
+  verdict_basis carries the named caps instead.
 """
 
 from __future__ import annotations
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 __safety_critical__ = True
 
 import logging
@@ -37,7 +47,7 @@ def _ensure_am_imports() -> bool:
         return _AM_AVAILABLE
 
     try:
-        from mira.knowledge_twins.am import (  # noqa: F401
+        from powder.am import (  # noqa: F401
             AMKnowledgeTwinEngine,
             AMPartClass,
             AMRequest,
@@ -47,8 +57,8 @@ def _ensure_am_imports() -> bool:
         )
 
         _AM_AVAILABLE = True
-    except Exception as exc:
-        LOGGER.warning("AM Knowledge Twin is not available: %s", exc)
+    except ImportError as exc:
+        LOGGER.warning("AM Knowledge Twin (powder) is not installed: %s", exc)
         _AM_AVAILABLE = False
     return _AM_AVAILABLE
 
@@ -63,6 +73,7 @@ _PART_CLASS_ALIASES = {
     "c": "Class C",
     "class c": "Class C",
     "class_c": "Class C",
+    "exempt": "Exempt",
 }
 
 _CONSEQUENCE_ALIASES = {
@@ -91,6 +102,20 @@ _HAZARD_ALIASES = {
     "hydrogen_compatible": "hydrogen_compatible",
 }
 
+# Chat phrasing -> powder AMProcess enum values.
+_PROCESS_ALIASES = {
+    "l-pbf": "laser_powder_bed_fusion",
+    "lpbf": "laser_powder_bed_fusion",
+    "l_pbf": "laser_powder_bed_fusion",
+    "laser_powder_bed_fusion": "laser_powder_bed_fusion",
+    "eb-pbf": "electron_beam_powder_bed_fusion",
+    "eb_pbf": "electron_beam_powder_bed_fusion",
+    "electron_beam_powder_bed_fusion": "electron_beam_powder_bed_fusion",
+    "ded": "directed_energy_deposition",
+    "directed_energy_deposition": "directed_energy_deposition",
+    "binder_jet": "binder_jet",
+}
+
 
 class AMAdapter(EngineAdapter):
     """Adapter for the AM Knowledge Twin Demo Track."""
@@ -105,7 +130,7 @@ class AMAdapter(EngineAdapter):
         parsed_input: dict[str, Any],
         session_context: dict[str, Any],
     ) -> EngineEnvelope:
-        """Build an AMRequest from confirmed parsed input and run the engine."""
+        """Build a powder AMRequest from confirmed parsed input and run it."""
         missing = self._missing_inputs(parsed_input)
         safety_confirmed = bool(parsed_input.get("safety_critical_confirmed"))
         if missing or not safety_confirmed:
@@ -115,8 +140,8 @@ class AMAdapter(EngineAdapter):
             return self.wrap_envelope(
                 status=Status.INSUFFICIENT_DATA,
                 response_text=(
-                    "AM evaluation requires confirmed safety-critical classification "
-                    "inputs before the engine can run."
+                    "AM evaluation requires confirmed safety-critical "
+                    "classification inputs before the engine can run."
                 ),
                 missing_inputs=missing_inputs,
                 authority_basis=["NASA-STD-6030", "NASA-STD-6033"],
@@ -128,16 +153,13 @@ class AMAdapter(EngineAdapter):
 
         if not _ensure_am_imports():
             return self.wrap_error(
-                exc=RuntimeError("AM Knowledge Twin is not available on this instance."),
+                exc=RuntimeError(
+                    "AM Knowledge Twin is not available: the 'powder' package "
+                    "is not installed on this instance."
+                ),
             )
 
-        from mira.knowledge_twins.am import (
-            AccessContext,
-            AMKnowledgeTwinEngine,
-            AMRequest,
-            ClassificationInput,
-            DataClassification,
-        )
+        from powder.am import AMKnowledgeTwinEngine, AMRequest, ClassificationInput
 
         try:
             classification = ClassificationInput(
@@ -159,31 +181,32 @@ class AMAdapter(EngineAdapter):
                 safety_critical_confirmed=safety_confirmed,
             )
 
-            request = AMRequest(
-                part_description=(
+            request_kwargs: dict[str, Any] = {
+                "part_description": (
                     parsed_input.get("part_description")
                     or parsed_input.get("query")
                     or "Synthetic GRCop-42 LPBF combustion liner"
                 ),
-                material_designation=parsed_input.get(
+                "material_designation": parsed_input.get(
                     "material_designation",
                     "GRCop-42",
                 ),
-                classification=classification,
-                am_process=self._parse_process(parsed_input.get("am_process")),
-                material_type=self._parse_material_type(
-                    parsed_input.get("material_type")
-                ),
-                access=self._build_access_context(session_context, AccessContext),
-                # Chat-sourced demo requests are PUBLIC by explicit
-                # declaration, never by inference: the demo corpus and the
-                # synthetic scenario carry no controlled data (Rev 5 §0.5).
-                # Controlled-data intake does not come through this adapter.
-                data_classification=DataClassification.PUBLIC,
-                safety_critical_confirmed=safety_confirmed,
-                program=self._demo_program_if_enabled(),
+                "classification": classification,
+                "safety_critical_confirmed": safety_confirmed,
+            }
+            am_process = self._parse_process(parsed_input.get("am_process"))
+            if am_process is not None:
+                request_kwargs["am_process"] = am_process
+            material_type = self._parse_material_type(
+                parsed_input.get("material_type")
             )
+            if material_type is not None:
+                request_kwargs["material_type"] = material_type
+            program = self._demo_program_if_enabled()
+            if program is not None:
+                request_kwargs["program_context"] = program
 
+            request = AMRequest(**request_kwargs)
             package = AMKnowledgeTwinEngine().evaluate_am_package(request)
         except Exception as exc:
             LOGGER.error("AM Knowledge Twin evaluation failed: %s", exc, exc_info=True)
@@ -198,12 +221,12 @@ class AMAdapter(EngineAdapter):
 
         evidence = [
             {
-                "source_id": "powder.am.demo",
+                "source_id": "powder.am",
                 "location": "classification",
                 "summary": package.classification.reason,
             },
             {
-                "source_id": "powder.am.demo",
+                "source_id": "powder.am",
                 "location": "coverage",
                 "summary": package.applicability.coverage_statement,
             },
@@ -211,7 +234,8 @@ class AMAdapter(EngineAdapter):
 
         recommended_actions = [
             "Review all QMP/MPS/document gaps with the responsible M&P engineer.",
-            "Use controlled standards only inside a cleared, licensed Product Track boundary.",
+            "Use controlled standards only inside a cleared, licensed Product "
+            "Track boundary.",
         ]
         if package.test_matrix.enrichment_notice:
             recommended_actions.append(package.test_matrix.enrichment_notice)
@@ -225,8 +249,8 @@ class AMAdapter(EngineAdapter):
             recommended_actions=recommended_actions,
             domain_payload={
                 "engine_verdict": package.overall_verdict,
+                "verdict_basis": list(package.verdict_basis),
                 "classification_verdict": package.classification.verdict,
-                "confidence": package.confidence,
                 "gap_counts": {
                     "qmp": len(package.gap_analysis.qmp_gaps),
                     "mps": len(package.gap_analysis.mps_gaps),
@@ -245,19 +269,19 @@ class AMAdapter(EngineAdapter):
         return [key for key in required if parsed_input.get(key) in (None, "", [])]
 
     def _parse_part_class(self, value: Any) -> Any:
-        from mira.knowledge_twins.am import AMPartClass
+        from powder.am import AMPartClass
 
         normalized = _PART_CLASS_ALIASES.get(str(value).strip().lower(), value)
         return AMPartClass(normalized)
 
     def _parse_consequence(self, value: Any) -> Any:
-        from mira.knowledge_twins.am import ConsequenceTier
+        from powder.am import ConsequenceTier
 
         normalized = _CONSEQUENCE_ALIASES.get(str(value).strip().lower(), value)
         return ConsequenceTier(normalized)
 
     def _parse_hazards(self, values: Any) -> list[Any]:
-        from mira.knowledge_twins.am import HazardFlag
+        from powder.am import HazardFlag
 
         if isinstance(values, str):
             values = [part.strip() for part in values.split(",") if part.strip()]
@@ -269,57 +293,34 @@ class AMAdapter(EngineAdapter):
     def _parse_process(self, value: Any) -> Any:
         if value in (None, ""):
             return None
-        from mira.knowledge_twins.am import AMProcess
+        from powder.am import AMProcess
 
-        normalized = str(value).strip().upper().replace("_", "-")
+        normalized = _PROCESS_ALIASES.get(str(value).strip().lower(), value)
         return AMProcess(normalized)
 
     def _parse_material_type(self, value: Any) -> Any:
         if value in (None, ""):
             return None
-        from mira.knowledge_twins.am import MaterialType
+        from powder.am import MaterialType
 
         return MaterialType(str(value).strip().lower())
 
-    def _build_access_context(
-        self, session_context: dict[str, Any], access_cls: Any
-    ) -> Any:
-        """Build the Demo Track AccessContext (Rev 5 §0.5).
-
-        The boundary and classification ceiling are PINNED to the demo
-        public box -- chat session input is never trusted to select a
-        deployment boundary. Authenticated, session-derived boundaries are
-        Product Track work (Rev 5 §4.5/§8) and require a real identity
-        layer, not dict keys. tenant_id is used for labeling only; the
-        content store enforces deny-by-default regardless of what callers
-        claim.
-        """
-        from mira.knowledge_twins.am import DataClassification
-
-        return access_cls(
-            tenant_id=str(session_context.get("tenant_id") or "boundstate-demo"),
-            program_ids=["demo"],
-            permitted_source_classes=["public", "boundstate_owned"],
-            deployment_boundary="demo-public-box",
-            max_data_classification=DataClassification.PUBLIC,
-        )
-
     def _demo_program_if_enabled(self) -> Any:
-        """Attach the seeded synthetic GRCop-42 registry when the demo flag
-        is set (assessed mode, labeled NON_AUTHORITATIVE). Default: off."""
+        """Attach powder's seeded synthetic GRCop-42 registry when the demo
+        flag is set (assessed mode, labeled NON_AUTHORITATIVE). Default: off."""
         if os.environ.get("AM_DEMO_PROGRAM", "").strip() not in ("1", "true", "True"):
             return None
-        from mira.knowledge_twins.am.synthetic_demo import demo_program_context
+        from powder.am.synthetic_demo import demo_program_context
 
         return demo_program_context()
 
     def _format_package(self, package: Any) -> str:
-        if package.overall_verdict == "BLOCKED":
+        if package.overall_verdict.startswith("BLOCKED"):
             # A gate block is not a classification failure; render it as
             # what it is instead of echoing CANNOT_VALIDATE.
             return "\n".join(
                 [
-                    "AM Qualification Package - BLOCKED (evaluation gate)",
+                    f"AM Qualification Package - {package.overall_verdict}",
                     *package.verdict_basis,
                     "",
                     package.classification.reason,
@@ -354,8 +355,13 @@ class AMAdapter(EngineAdapter):
         lines.extend(["", "Baseline Test Matrix"])
         lines.extend(
             f"- {item.test_id}: {item.description} ({item.evidence_depth.value})"
-            for item in package.test_matrix.items
+            for item in package.test_matrix.items[:10]
         )
+        if len(package.test_matrix.items) > 10:
+            lines.append(
+                f"- {len(package.test_matrix.items) - 10} additional matrix "
+                "items omitted from chat view"
+            )
 
         if package.test_matrix.enrichment_notice:
             lines.extend(["", f"Enrichment Notice: {package.test_matrix.enrichment_notice}"])
@@ -374,11 +380,12 @@ class AMAdapter(EngineAdapter):
         return "\n".join(lines)
 
     def _map_verdict_to_status(self, verdict: str) -> Status:
+        if verdict.startswith("BLOCKED"):
+            return Status.INSUFFICIENT_DATA
         mapping = {
             "PASS": Status.PASS,
             "CONDITIONAL_PASS_WITH_GAPS": Status.CONDITIONAL_PASS,
-            "REQUIRES_ADDITIONAL_EVIDENCE": Status.CONDITIONAL_PASS,
-            "BLOCKED": Status.INSUFFICIENT_DATA,
+            "INSUFFICIENT_DATA": Status.INSUFFICIENT_DATA,
             "CANNOT_VALIDATE": Status.INSUFFICIENT_DATA,
         }
         return mapping.get(verdict, Status.ERROR)
