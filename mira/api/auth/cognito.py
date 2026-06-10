@@ -187,6 +187,11 @@ class MIRAUser:
     role: str
     itar_access: str
     us_person_verified: Optional[bool]
+    # PIV / federated-identity attributes; populated when Cognito is
+    # federated with a PIV IdP (e.g. Launchpad -> SAML attribute mapping).
+    edipi: str = ""
+    piv_subject: str = ""
+    agency: str = ""
 
     @classmethod
     def from_claims(cls, claims: dict[str, Any]) -> "MIRAUser":
@@ -210,6 +215,9 @@ class MIRAUser:
             role=str(claims.get("custom:role") or ""),
             itar_access=str(claims.get("custom:itar_access") or ""),
             us_person_verified=us_person_verified,
+            edipi=str(claims.get("custom:edipi") or ""),
+            piv_subject=str(claims.get("custom:piv_subject") or ""),
+            agency=str(claims.get("custom:agency") or ""),
         )
 
     @property

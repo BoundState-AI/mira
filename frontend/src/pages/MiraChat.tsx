@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Bot, Compass, Loader2, RotateCcw, SendHorizonal, User2 } from "lucide-react";
+import { ArrowLeft, Bot, ClipboardList, Compass, Loader2, RotateCcw, SendHorizonal, User2 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { Badge } from "@/components/ui/badge";
@@ -7,7 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import { fetchMiraChatPing, sendMiraChatStream, type MiraChatMessage } from "@/lib/chat-api";
+import { fetchMiraChatPing, sendMiraChatStream } from "@/lib/chat-api";
+import {
+  assistantScopeLabel,
+  messageId,
+  toHistoryMessages,
+  verdictVariant,
+  MAX_STORED_MESSAGES,
+  type ChatUiMessage,
+  type Verdict,
+} from "@/lib/chat-utils";
 import {
   conversationStorageKey,
   isMiraModuleChatLaunchState,
@@ -18,7 +27,6 @@ import {
   persistModuleChatLaunchState,
   saveStoredConversation,
   type MiraChatStoredConversation,
-  type MiraChatStoredMessage,
   type MiraModuleChatLaunchState,
 } from "@/lib/mira-chat-context";
 import { cn } from "@/lib/utils";
@@ -26,75 +34,17 @@ import { VoiceControl } from "@/components/voice/VoiceControl";
 import { VoiceActiveBanner } from "@/components/voice/VoiceActiveBanner";
 import { VoiceEnableModal } from "@/components/voice/VoiceEnableModal";
 import { VoiceSettings } from "@/components/voice/VoiceSettings";
-import { useVoiceSession } from "@/lib/voice/useVoiceSession";
-import { fetchPresenceGreeting } from "@/lib/voice/voiceApi";
+import { useVoiceChatIntegration } from "@/lib/voice/useVoiceChatIntegration";
 import type { VoiceTurnSummary } from "@/lib/voice/types";
 import { AuditDrawer } from "@/components/audit/AuditDrawer";
 import { PivIdentityChip } from "@/components/audit/PivIdentityChip";
-import { ClipboardList } from "lucide-react";
 
-const MAX_HISTORY_MESSAGES = 10;
-const MAX_STORED_MESSAGES = 24;
 const GLOBAL_EXAMPLE_PROMPTS = [
   "Is 316L compatible with GOX at 3000 psi?",
   "What galvanic risk do I have between 7075-T73 and CRES 304 in seawater proxy?",
   "Can you compare hydrogen compatibility for Inconel 718 and A286?",
   "What MAPTIS evidence exists for Inconel 625 in aged versus cast condition?",
 ];
-
-type Verdict = "PASS" | "CONDITIONAL_PASS" | "FAIL" | "REFUSE" | "INSUFFICIENT_DATA" | "ERROR" | null;
-
-type ChatUiMessage = MiraChatStoredMessage & { verdict?: Verdict };
-
-const ENGINE_LABELS: Record<string, string> = {
-  knowledge_twins: "Knowledge Twins",
-  miul: "MIUL Builder",
-  mua: "MUA Writer",
-  mp_plan: "M&P Plan",
-  galvanic: "Galvanic",
-  fracture: "Fracture Control",
-  h2: "Hydrogen",
-  oca: "Oxygen Compatibility",
-  gpcm: "GPCM",
-  maptis_search: "MAPTIS Search",
-  forge_build: "FORGE Build",
-  forge_explorer: "FORGE Explorer",
-  tocr: "TOCR Review",
-  bsmh: "MIRA",
-};
-
-function verdictVariant(verdict: Verdict): "default" | "secondary" | "destructive" | "outline" {
-  if (verdict === "PASS") return "default";
-  if (verdict === "FAIL" || verdict === "ERROR" || verdict === "REFUSE") return "destructive";
-  if (verdict === "CONDITIONAL_PASS") return "secondary";
-  return "outline";
-}
-
-function toHistoryMessages(messages: ChatUiMessage[]): MiraChatMessage[] {
-  return messages.slice(-MAX_HISTORY_MESSAGES).map((message) => ({
-    role: message.role,
-    content: message.content,
-    engine_used: message.engineUsed ?? undefined,
-    entities: message.entities,
-  }));
-}
-
-function messageId(prefix: "user" | "assistant"): string {
-  return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
-}
-
-function assistantScopeLabel(
-  activeModuleLaunchState: MiraModuleChatLaunchState | null,
-  engineUsed?: string | null,
-): string {
-  if (activeModuleLaunchState?.moduleLabel) {
-    return activeModuleLaunchState.moduleLabel;
-  }
-  if (engineUsed && ENGINE_LABELS[engineUsed]) {
-    return ENGINE_LABELS[engineUsed];
-  }
-  return "MIRA";
-}
 
 function renderInlineText(text: string) {
   const matches = Array.from(text.matchAll(/\*\*(.+?)\*\*/g));
@@ -186,12 +136,8 @@ export default function MiraChat() {
   const [adapters, setAdapters] = useState<string[]>([]);
   const [pingError, setPingError] = useState<string | null>(null);
   const [conversationLoaded, setConversationLoaded] = useState(false);
-  const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   const [voiceId, setVoiceId] = useState<string | null>(null);
-  const [voiceError, setVoiceError] = useState<string | null>(null);
   const [auditDrawerOpen, setAuditDrawerOpen] = useState(false);
-  const [auditRefreshKey, setAuditRefreshKey] = useState(0);
-  const greetedStepRef = useRef<string | null>(null);
   const conversationEndRef = useRef<HTMLDivElement | null>(null);
   const starterPrompts = activeModuleLaunchState?.starterPrompts.length
     ? activeModuleLaunchState.starterPrompts
@@ -261,7 +207,6 @@ export default function MiraChat() {
     setMessages([]);
     setDraft("");
     setError(null);
-    greetedStepRef.current = null;
     saveStoredConversation(
       storageKey,
       { sessionId: null, messages: [] },
@@ -270,26 +215,23 @@ export default function MiraChat() {
   };
 
   // -----------------------------------------------------------------
-  // Voice integration
+  // Voice + audit integration (shared hook with MiraChatDock)
   // -----------------------------------------------------------------
   const appendVoiceTurn = useCallback((summary: VoiceTurnSummary) => {
-    setAuditRefreshKey((k) => k + 1);
     if (!summary.userTranscript.trim() && !summary.assistantText.trim()) {
       return;
     }
-    const userId = messageId("user");
-    const assistantId = messageId("assistant");
     setMessages((current) => {
       const merged = [
         ...current,
         {
-          id: userId,
+          id: messageId("user"),
           role: "user" as const,
           content: summary.userTranscript,
           entities: summary.entities,
         },
         {
-          id: assistantId,
+          id: messageId("assistant"),
           role: "assistant" as const,
           content: summary.assistantText,
           engineUsed: summary.engineUsed,
@@ -303,70 +245,39 @@ export default function MiraChat() {
     });
   }, []);
 
-  const voiceSession = useVoiceSession({
-    voiceId,
-    chatSessionId: sessionId,
-    moduleContext: activeModuleLaunchState?.moduleContext ?? null,
+  const appendGreeting = useCallback((text: string) => {
+    setMessages((current) => [
+      ...current,
+      {
+        id: messageId("assistant"),
+        role: "assistant" as const,
+        content: text,
+        entities: {},
+      },
+    ]);
+  }, []);
+
+  const {
+    voiceSession,
+    voiceActive,
+    voiceError,
+    voiceModalOpen,
+    closeVoiceModal,
+    handleVoiceToggle,
+    handleVoiceConfirm,
+    auditRefreshKey,
+    bumpAuditRefresh,
+  } = useVoiceChatIntegration({
+    sessionId,
     history: useMemo(() => toHistoryMessages(messages), [messages]),
-    onTurnComplete: appendVoiceTurn,
-    onError: (message) => setVoiceError(message),
+    moduleContext: activeModuleLaunchState?.moduleContext ?? null,
+    conversationLoaded,
+    hasMessages: messages.length > 0,
+    surfaceOpen: true,
+    voiceId,
+    onVoiceTurn: appendVoiceTurn,
+    onGreeting: appendGreeting,
   });
-
-  const handleVoiceToggle = useCallback(() => {
-    if (voiceSession.state !== "idle" && voiceSession.state !== "error") {
-      void voiceSession.stop();
-      return;
-    }
-    setVoiceError(null);
-    setVoiceModalOpen(true);
-  }, [voiceSession]);
-
-  const handleVoiceConfirm = useCallback(async () => {
-    setVoiceModalOpen(false);
-    setVoiceError(null);
-    await voiceSession.start();
-  }, [voiceSession]);
-
-  const voiceActive = voiceSession.state !== "idle" && voiceSession.state !== "error";
-
-  // Page-aware proactive greeting: fire when chat opens and current_step is set.
-  // Throttle by step key so we don't repeat on focus changes.
-  useEffect(() => {
-    if (!conversationLoaded) return;
-    if (messages.length > 0) return;
-    const moduleContext = activeModuleLaunchState?.moduleContext;
-    if (!moduleContext || typeof moduleContext !== "object") return;
-    const workflow = (moduleContext as { chat_workflow?: { current_step?: string } }).chat_workflow;
-    const currentStep = workflow?.current_step;
-    if (!currentStep) return;
-    if (greetedStepRef.current === currentStep) return;
-    greetedStepRef.current = currentStep;
-
-    let cancelled = false;
-    fetchPresenceGreeting({
-      module_context: moduleContext as Record<string, unknown>,
-      session_id: sessionId,
-    })
-      .then((greeting) => {
-        if (cancelled || !greeting) return;
-        const assistantId = messageId("assistant");
-        setMessages((current) => [
-          ...current,
-          {
-            id: assistantId,
-            role: "assistant",
-            content: greeting.text,
-            entities: {},
-          },
-        ]);
-      })
-      .catch(() => {
-        // presence is a nice-to-have; ignore failures
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [activeModuleLaunchState, conversationLoaded, messages.length, sessionId]);
 
   const submitMessage = async (rawMessage: string) => {
     const message = rawMessage.trim();
@@ -433,7 +344,7 @@ export default function MiraChat() {
             }
             case "done": {
               sawDone = true;
-              setAuditRefreshKey((k) => k + 1);
+              bumpAuditRefresh();
               const turnEntities = event.entities && typeof event.entities === "object"
                 ? event.entities as Record<string, unknown>
                 : {};
@@ -497,7 +408,7 @@ export default function MiraChat() {
       />
       <VoiceEnableModal
         open={voiceModalOpen}
-        onClose={() => setVoiceModalOpen(false)}
+        onClose={closeVoiceModal}
         onConfirm={() => void handleVoiceConfirm()}
       />
       <AuditDrawer

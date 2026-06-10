@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Settings2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,12 @@ export function VoiceSettings({ voiceId, onVoiceIdChange, disabled }: VoiceSetti
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch the catalog once per mount. Reading voiceId/onVoiceIdChange via a
+  // ref keeps them out of the dependency array — otherwise selecting a voice
+  // (or a parent re-render recreating the callback) re-fetches the list.
+  const latestRef = useRef({ voiceId, onVoiceIdChange });
+  latestRef.current = { voiceId, onVoiceIdChange };
+
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
@@ -38,8 +44,8 @@ export function VoiceSettings({ voiceId, onVoiceIdChange, disabled }: VoiceSetti
         if (cancelled) return;
         setVoices(data.voices);
         setProvider(data.provider);
-        if (!voiceId && data.default_voice_id) {
-          onVoiceIdChange(data.default_voice_id);
+        if (!latestRef.current.voiceId && data.default_voice_id) {
+          latestRef.current.onVoiceIdChange(data.default_voice_id);
         }
       })
       .catch((err: unknown) => {
@@ -52,7 +58,7 @@ export function VoiceSettings({ voiceId, onVoiceIdChange, disabled }: VoiceSetti
     return () => {
       cancelled = true;
     };
-  }, [onVoiceIdChange, voiceId]);
+  }, []);
 
   return (
     <Popover>

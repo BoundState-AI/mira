@@ -8,6 +8,7 @@ still exercises end-to-end during dev / dry runs.
 from __future__ import annotations
 
 import logging
+from functools import lru_cache
 
 from ..config import VoiceConfig
 from .base import STTProvider, TTSProvider
@@ -16,6 +17,11 @@ from .mock import MockSTT, MockTTS
 LOGGER = logging.getLogger(__name__)
 
 
+# Providers are stateless wrappers around thread-safe clients (boto3 / httpx),
+# so one instance per config serves every session and request. Caching avoids
+# rebuilding boto3 clients (credential resolution, endpoint discovery) on each
+# WebSocket connection. VoiceConfig is a frozen dataclass, hence hashable.
+@lru_cache(maxsize=4)
 def build_stt_provider(config: VoiceConfig) -> STTProvider:
     provider = (config.stt_provider or "mock").lower()
 
@@ -36,6 +42,7 @@ def build_stt_provider(config: VoiceConfig) -> STTProvider:
     return MockSTT()
 
 
+@lru_cache(maxsize=4)
 def build_tts_provider(config: VoiceConfig) -> TTSProvider:
     provider = (config.tts_provider or "mock").lower()
 

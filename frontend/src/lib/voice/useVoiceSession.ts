@@ -17,7 +17,6 @@ export interface UseVoiceSessionOptions {
 
 export interface UseVoiceSessionResult {
   state: VoiceState;
-  enabled: boolean;
   liveTranscript: string;
   liveAssistantText: string;
   start: () => Promise<void>;
@@ -53,7 +52,14 @@ export function useVoiceSession(opts: UseVoiceSessionOptions): UseVoiceSessionRe
   }, [opts.voiceId]);
 
   const start = useCallback(async () => {
-    if (clientRef.current) return;
+    // A client left over from a failed session blocks restart — tear it
+    // down and build fresh so the toggle recovers after an error.
+    if (clientRef.current) {
+      if (clientRef.current.currentState !== "error") return;
+      const stale = clientRef.current;
+      clientRef.current = null;
+      await stale.stop().catch(() => undefined);
+    }
     setLiveTranscript("");
     setLiveAssistantText("");
     const client = new VoiceClient({
@@ -109,7 +115,6 @@ export function useVoiceSession(opts: UseVoiceSessionOptions): UseVoiceSessionRe
 
   return {
     state,
-    enabled: clientRef.current !== null,
     liveTranscript,
     liveAssistantText,
     start,

@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import asyncio
 import base64
+import contextlib
 import logging
 from dataclasses import dataclass, field
 from enum import Enum
@@ -106,6 +107,8 @@ class VoiceSession:
             await self._on_utterance_end()
         elif msg_type == "interrupt":
             await self._on_interrupt()
+        elif msg_type == "update_context":
+            self._on_update_context(message)
         elif msg_type == "end":
             await self.close()
         else:
@@ -145,6 +148,23 @@ class VoiceSession:
                 "audio_mime": self._tts.audio_mime_type,
             }
         )
+
+    def _on_update_context(self, message: dict[str, Any]) -> None:
+        """Refresh module context mid-session.
+
+        Pages re-publish their workflow state (current step, blockers, active
+        field) as the user works; the client forwards it here so the next
+        voice turn answers against the live step, not the one captured at
+        WebSocket start.
+        """
+        module_context = message.get("module_context")
+        if isinstance(module_context, dict):
+            self.module_context = module_context
+        elif module_context is None and "module_context" in message:
+            self.module_context = None
+        voice_id = message.get("voice_id")
+        if isinstance(voice_id, str) and voice_id.strip():
+            self.voice_id = voice_id.strip()
 
     async def _on_audio_chunk(self, message: dict[str, Any]) -> None:
         if self.state == SessionState.SPEAKING:
@@ -297,7 +317,10 @@ class VoiceSession:
                 }
             )
         except asyncio.CancelledError:
-            await self._send({"type": "turn_cancelled"})
+            # Shield the notification: awaits inside a cancelling task are
+            # themselves cancelled, which would silently drop this send and
+            # leave the client spinner stuck.
+            await asyncio.shield(self._send({"type": "turn_cancelled"}))
             raise
         except Exception as exc:
             LOGGER.exception("voice turn failed: %s", exc)
@@ -305,7 +328,8 @@ class VoiceSession:
         finally:
             if self.state != SessionState.CLOSED:
                 self.state = SessionState.READY
-                await self._emit_state()
+                with contextlib.suppress(asyncio.CancelledError):
+                    await asyncio.shield(self._emit_state())
 
     async def _stream_tts_clause(self, clause: str) -> None:
         text = clause.strip()

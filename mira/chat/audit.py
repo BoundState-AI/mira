@@ -114,14 +114,18 @@ def read_recent_audit_records(
     user_sub: str | None,
     session_id: str | None = None,
     limit: int = 20,
+    allow_unscoped: bool = False,
 ) -> list[dict]:
     """Return up to *limit* recent audit records, newest first.
 
     Filtering:
       - If *user_sub* is provided, only records whose
         ``user_identity.sub`` matches are returned. Records lacking identity
-        are skipped so the demo never accidentally surfaces another user's
-        history.
+        are skipped so the drawer never surfaces another user's history.
+      - If *user_sub* is empty/None, the read returns nothing unless the
+        caller explicitly opts into unscoped access with *allow_unscoped*
+        (the endpoint does this only when authentication is disabled —
+        i.e. local development). Identity scoping never silently degrades.
       - If *session_id* is provided, results are further filtered to that
         session.
 
@@ -131,6 +135,9 @@ def read_recent_audit_records(
       - Returned dicts are the raw serialised model — no schema validation,
         to keep this resilient to forward-compatible additions.
     """
+    if not user_sub and not allow_unscoped:
+        return []
+
     path = _audit_log_path()
     if not path.exists():
         return []

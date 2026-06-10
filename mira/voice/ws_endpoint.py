@@ -140,11 +140,29 @@ async def voice_endpoint(
 # ---------------------------------------------------------------------------
 
 
+# Voice catalogs change rarely; cache the upstream list_voices() call so
+# opening voice settings doesn't hit Polly/ElevenLabs every time.
+_VOICES_CACHE_TTL_SECONDS = 300.0
+_voices_cache: tuple[float, str, list[dict[str, str]]] | None = None
+
+
 @router.get("/voice/voices")
 async def list_voices() -> dict[str, Any]:
+    global _voices_cache
     config = get_voice_config()
     tts = build_tts_provider(config)
-    voices = await tts.list_voices()
+
+    now = asyncio.get_event_loop().time()
+    if (
+        _voices_cache is not None
+        and _voices_cache[1] == tts.provider_id
+        and now - _voices_cache[0] < _VOICES_CACHE_TTL_SECONDS
+    ):
+        voices = _voices_cache[2]
+    else:
+        voices = await tts.list_voices()
+        _voices_cache = (now, tts.provider_id, voices)
+
     return {
         "provider": tts.provider_id,
         "voices": voices,

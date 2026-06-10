@@ -66,8 +66,8 @@ export class VoiceClient {
     engineUsed: null as string | null,
     verdict: null as string | null,
   };
-  private utteranceFrames: ArrayBuffer[] = [];
   private capturingUtterance = false;
+  private intentionalClose = false;
   private chatSessionId: string | null;
   private history: MiraChatMessage[];
 
@@ -97,6 +97,11 @@ export class VoiceClient {
     try {
       await this.capture.start();
     } catch (err) {
+      // Close the socket too, or the server holds a concurrency slot for a
+      // session that will never send audio.
+      this.intentionalClose = true;
+      this.ws?.close();
+      this.ws = null;
       this.fail(`Microphone error: ${(err as Error).message}`);
       return;
     }
@@ -111,8 +116,10 @@ export class VoiceClient {
   }
 
   async stop(): Promise<void> {
+    // Mark before closing so the onclose handler doesn't surface a
+    // spurious "WebSocket closed" error for a user-initiated stop.
+    this.intentionalClose = true;
     this.capturingUtterance = false;
-    this.utteranceFrames = [];
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       try {
         this.ws.send(JSON.stringify({ type: "end" }));
@@ -137,10 +144,21 @@ export class VoiceClient {
 
   setVoiceId(voiceId: string | null): void {
     this.options.voiceId = voiceId;
+    this.sendJson({ type: "update_context", voice_id: voiceId });
   }
 
   setModuleContext(context: Record<string, unknown> | null): void {
+    // Pages rebuild this object every render; only forward genuine changes
+    // so the WebSocket isn't spammed on unrelated re-renders.
+    const serialized = JSON.stringify(context ?? null);
+    if (serialized === JSON.stringify(this.options.moduleContext ?? null)) {
+      return;
+    }
     this.options.moduleContext = context;
+    // Forward live so mid-session step changes (e.g. galvanic moving from
+    // define_material_couple to review_galvanic_screen) reach the server
+    // before the next voice turn.
+    this.sendJson({ type: "update_context", module_context: context });
   }
 
   setHistory(history: MiraChatMessage[]): void {
@@ -169,6 +187,7 @@ export class VoiceClient {
         // The 'close' handler will pick up the actual reason.
       };
       ws.onclose = (event) => {
+        if (this.intentionalClose) return;
         if (this.state === "connecting") {
           reject(new Error(`Voice WebSocket closed (${event.code})`));
         } else if (this.state !== "idle") {
@@ -305,7 +324,6 @@ export class VoiceClient {
   private onCaptureFrame(frame: CaptureFrame): void {
     this.vad?.feed(frame.rms);
     if (!this.capturingUtterance) return;
-    this.utteranceFrames.push(frame.pcm);
     this.sendJson({
       type: "audio",
       data: encodePcmFrameToBase64(frame.pcm),
@@ -320,14 +338,12 @@ export class VoiceClient {
         this.sendJson({ type: "interrupt" });
       }
       this.capturingUtterance = true;
-      this.utteranceFrames = [];
       this.setState("listening");
       return;
     }
 
     if (!this.capturingUtterance) return;
     this.capturingUtterance = false;
-    this.utteranceFrames = [];
     this.sendJson({ type: "utterance_end" });
   }
 

@@ -17,11 +17,19 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import { fetchMiraChatPing, sendMiraChatStream, type MiraChatMessage } from "@/lib/chat-api";
+import { fetchMiraChatPing, sendMiraChatStream } from "@/lib/chat-api";
+import {
+  assistantScopeLabel,
+  messageId,
+  toHistoryMessages,
+  verdictVariant,
+  MAX_STORED_MESSAGES,
+  type ChatUiMessage,
+  type Verdict,
+} from "@/lib/chat-utils";
 import { VoiceControl } from "@/components/voice/VoiceControl";
 import { VoiceEnableModal } from "@/components/voice/VoiceEnableModal";
-import { useVoiceSession } from "@/lib/voice/useVoiceSession";
-import { fetchPresenceGreeting } from "@/lib/voice/voiceApi";
+import { useVoiceChatIntegration } from "@/lib/voice/useVoiceChatIntegration";
 import type { VoiceTurnSummary } from "@/lib/voice/types";
 import { AuditDrawer } from "@/components/audit/AuditDrawer";
 import { PivIdentityChip } from "@/components/audit/PivIdentityChip";
@@ -36,70 +44,14 @@ import {
   MIRA_CHAT_ROUTE_STATE_EVENT,
   saveStoredConversation,
   type MiraChatStoredConversation,
-  type MiraChatStoredMessage,
   type MiraModuleChatLaunchState,
 } from "@/lib/mira-chat-context";
 import { cn } from "@/lib/utils";
 
-const MAX_HISTORY_MESSAGES = 10;
-const MAX_STORED_MESSAGES = 24;
 const GLOBAL_WIDGET_PROMPTS = [
   "Is 316L compatible with GOX at 3000 psi?",
   "What galvanic risk do I have between 7075-T73 and CRES 304?",
 ];
-
-type Verdict = "PASS" | "CONDITIONAL_PASS" | "FAIL" | "REFUSE" | "INSUFFICIENT_DATA" | "ERROR" | null;
-type ChatUiMessage = MiraChatStoredMessage & { verdict?: Verdict };
-
-const ENGINE_LABELS: Record<string, string> = {
-  knowledge_twins: "Knowledge Twins",
-  miul: "MIUL Builder",
-  mua: "MUA Writer",
-  mp_plan: "M&P Plan",
-  galvanic: "Galvanic",
-  fracture: "Fracture Control",
-  h2: "Hydrogen",
-  oca: "Oxygen Compatibility",
-  gpcm: "GPCM",
-  maptis_search: "MAPTIS Search",
-  forge_build: "FORGE Build",
-  forge_explorer: "FORGE Explorer",
-  tocr: "TOCR Review",
-  bsmh: "MIRA",
-};
-
-function verdictVariant(verdict: Verdict): "default" | "secondary" | "destructive" | "outline" {
-  if (verdict === "PASS") return "default";
-  if (verdict === "FAIL" || verdict === "ERROR" || verdict === "REFUSE") return "destructive";
-  if (verdict === "CONDITIONAL_PASS") return "secondary";
-  return "outline";
-}
-
-function messageId(prefix: "user" | "assistant"): string {
-  return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
-}
-
-function toHistoryMessages(messages: ChatUiMessage[]): MiraChatMessage[] {
-  return messages.slice(-MAX_HISTORY_MESSAGES).map((message) => ({
-    role: message.role,
-    content: message.content,
-    engine_used: message.engineUsed ?? undefined,
-    entities: message.entities,
-  }));
-}
-
-function assistantScopeLabel(
-  activeModuleLaunchState: MiraModuleChatLaunchState | null,
-  engineUsed?: string | null,
-): string {
-  if (activeModuleLaunchState?.moduleLabel) {
-    return activeModuleLaunchState.moduleLabel;
-  }
-  if (engineUsed && ENGINE_LABELS[engineUsed]) {
-    return ENGINE_LABELS[engineUsed];
-  }
-  return "MIRA";
-}
 
 function fallbackLaunchState(pathname: string): MiraModuleChatLaunchState | null {
   switch (pathname) {
@@ -238,12 +190,8 @@ export function MiraChatDock() {
   const [isSending, setIsSending] = useState(false);
   const [conversationLoaded, setConversationLoaded] = useState(false);
   const [serviceHealthy, setServiceHealthy] = useState(true);
-  const [voiceModalOpen, setVoiceModalOpen] = useState(false);
-  const [voiceId, setVoiceId] = useState<string | null>(null);
-  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const [voiceId] = useState<string | null>(null);
   const [auditDrawerOpen, setAuditDrawerOpen] = useState(false);
-  const [auditRefreshKey, setAuditRefreshKey] = useState(0);
-  const greetedStepRef = useRef<string | null>(null);
   const conversationEndRef = useRef<HTMLDivElement | null>(null);
 
   const activeModuleLaunchState = useMemo(
@@ -339,26 +287,25 @@ export function MiraChatDock() {
   }, [open]);
 
   // -----------------------------------------------------------------
-  // Voice integration (mic + speaker via /api/chat/voice WebSocket)
+  // Voice + audit integration (shared hook with the MiraChat page).
+  // surfaceOpen={open} also auto-stops voice when the dock collapses, so a
+  // hidden dock never keeps the mic open.
   // -----------------------------------------------------------------
   const appendVoiceTurn = useCallback((summary: VoiceTurnSummary) => {
-    setAuditRefreshKey((k) => k + 1);
     if (!summary.userTranscript.trim() && !summary.assistantText.trim()) {
       return;
     }
-    const userId = messageId("user");
-    const assistantId = messageId("assistant");
     setMessages((current) => {
       const merged = [
         ...current,
         {
-          id: userId,
+          id: messageId("user"),
           role: "user" as const,
           content: summary.userTranscript,
           entities: summary.entities,
         },
         {
-          id: assistantId,
+          id: messageId("assistant"),
           role: "assistant" as const,
           content: summary.assistantText,
           engineUsed: summary.engineUsed,
@@ -372,78 +319,39 @@ export function MiraChatDock() {
     });
   }, []);
 
-  const voiceSession = useVoiceSession({
-    voiceId,
-    chatSessionId: sessionId,
-    moduleContext: activeModuleLaunchState?.moduleContext ?? null,
+  const appendGreeting = useCallback((text: string) => {
+    setMessages((current) => [
+      ...current,
+      {
+        id: messageId("assistant"),
+        role: "assistant" as const,
+        content: text,
+        entities: {},
+      },
+    ]);
+  }, []);
+
+  const {
+    voiceSession,
+    voiceActive,
+    voiceError,
+    voiceModalOpen,
+    closeVoiceModal,
+    handleVoiceToggle,
+    handleVoiceConfirm,
+    auditRefreshKey,
+    bumpAuditRefresh,
+  } = useVoiceChatIntegration({
+    sessionId,
     history: useMemo(() => toHistoryMessages(messages), [messages]),
-    onTurnComplete: appendVoiceTurn,
-    onError: (message) => setVoiceError(message),
+    moduleContext: activeModuleLaunchState?.moduleContext ?? null,
+    conversationLoaded,
+    hasMessages: messages.length > 0,
+    surfaceOpen: open,
+    voiceId,
+    onVoiceTurn: appendVoiceTurn,
+    onGreeting: appendGreeting,
   });
-
-  const handleVoiceToggle = useCallback(() => {
-    if (voiceSession.state !== "idle" && voiceSession.state !== "error") {
-      void voiceSession.stop();
-      return;
-    }
-    setVoiceError(null);
-    setVoiceModalOpen(true);
-  }, [voiceSession]);
-
-  const handleVoiceConfirm = useCallback(async () => {
-    setVoiceModalOpen(false);
-    setVoiceError(null);
-    await voiceSession.start();
-  }, [voiceSession]);
-
-  const voiceActive = voiceSession.state !== "idle" && voiceSession.state !== "error";
-
-  // Disable voice automatically when the dock closes — prevents the user from
-  // forgetting that the mic is on after collapsing the panel.
-  useEffect(() => {
-    if (!open && voiceActive) {
-      void voiceSession.stop();
-    }
-  }, [open, voiceActive, voiceSession]);
-
-  // Proactive page-aware greeting: when the dock opens on a module page with
-  // a non-empty current_step, render a templated assistant message (and the
-  // voice pipeline will speak it if voice mode is on).
-  useEffect(() => {
-    if (!open) return;
-    if (!conversationLoaded) return;
-    if (messages.length > 0) return;
-    const moduleContext = activeModuleLaunchState?.moduleContext;
-    if (!moduleContext || typeof moduleContext !== "object") return;
-    const workflow = (moduleContext as { chat_workflow?: { current_step?: string } }).chat_workflow;
-    const currentStep = workflow?.current_step;
-    if (!currentStep) return;
-    if (greetedStepRef.current === currentStep) return;
-    greetedStepRef.current = currentStep;
-
-    let cancelled = false;
-    fetchPresenceGreeting({
-      module_context: moduleContext as Record<string, unknown>,
-      session_id: sessionId,
-    })
-      .then((greeting) => {
-        if (cancelled || !greeting) return;
-        const assistantId = messageId("assistant");
-        setMessages((current) => [
-          ...current,
-          {
-            id: assistantId,
-            role: "assistant",
-            content: greeting.text,
-            entities: {},
-          },
-        ]);
-      })
-      .catch(() => undefined);
-    return () => {
-      cancelled = true;
-    };
-  }, [activeModuleLaunchState, conversationLoaded, messages.length, open, sessionId]);
 
   if (location.pathname === "/chat") {
     return null;
@@ -514,7 +422,7 @@ export function MiraChatDock() {
             }
             case "done": {
               sawDone = true;
-              setAuditRefreshKey((k) => k + 1);
+              bumpAuditRefresh();
               const turnEntities = event.entities && typeof event.entities === "object"
                 ? event.entities as Record<string, unknown>
                 : {};
@@ -574,7 +482,7 @@ export function MiraChatDock() {
     <div className="pointer-events-none fixed bottom-5 left-3 right-3 z-50 flex flex-col items-stretch gap-3 sm:left-auto sm:right-5 sm:max-w-[calc(100vw-1.5rem)] sm:items-end">
       <VoiceEnableModal
         open={voiceModalOpen}
-        onClose={() => setVoiceModalOpen(false)}
+        onClose={closeVoiceModal}
         onConfirm={() => void handleVoiceConfirm()}
       />
       <AuditDrawer

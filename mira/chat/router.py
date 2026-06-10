@@ -189,15 +189,19 @@ async def recent_audit(
     """Return recent audit records for the authenticated caller.
 
     Filtering is by ``user_identity.sub`` — callers can only read their own
-    audit history. Records without a recorded identity are excluded so an
-    accidental anonymous turn never leaks into another user's drawer.
+    audit history. With auth enabled, a missing identity yields an empty
+    result. Unscoped reads are only permitted when authentication is
+    disabled (local development), and that opt-in is explicit.
     """
+    from mira.api.auth.cognito import auth_enabled
+
     identity = _identity_from_http_request(http_request)
     sub = identity.sub if identity and identity.sub else None
     records = read_recent_audit_records(
         user_sub=sub,
         session_id=session_id,
         limit=limit,
+        allow_unscoped=not auth_enabled(),
     )
     return {
         "user_sub": sub,

@@ -26,7 +26,6 @@ export class StreamingAudioPlayer {
   private pending: QueueEntry | null = null;
   private playing = false;
   private currentSource: AudioBufferSourceNode | null = null;
-  private currentGain: GainNode | null = null;
   private readonly callbacks: AudioPlayerCallbacks;
 
   constructor(callbacks: AudioPlayerCallbacks = {}) {
@@ -78,12 +77,6 @@ export class StreamingAudioPlayer {
       } catch {}
       this.currentSource = null;
     }
-    if (this.currentGain) {
-      try {
-        this.currentGain.disconnect();
-      } catch {}
-      this.currentGain = null;
-    }
     if (this.playing) {
       this.playing = false;
       this.callbacks.onSpeakingEnd?.();
@@ -123,12 +116,9 @@ export class StreamingAudioPlayer {
       const audioBuffer = await ctx.decodeAudioData(merged.buffer.slice(0));
       const source = ctx.createBufferSource();
       source.buffer = audioBuffer;
-      const gain = ctx.createGain();
-      gain.gain.value = 1;
-      source.connect(gain).connect(ctx.destination);
+      source.connect(ctx.destination);
 
       this.currentSource = source;
-      this.currentGain = gain;
 
       await new Promise<void>((resolve) => {
         source.onended = () => resolve();
@@ -145,7 +135,6 @@ export class StreamingAudioPlayer {
       this.callbacks.onError?.(err as Error);
     } finally {
       this.currentSource = null;
-      this.currentGain = null;
       this.playing = false;
       if (this.queue.length > 0) {
         void this.drain();

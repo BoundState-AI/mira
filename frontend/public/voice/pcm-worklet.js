@@ -36,7 +36,8 @@ class PcmDownsampleProcessor extends AudioWorkletProcessor {
       this.buffer[this.bufferIdx++] = clamped < 0 ? clamped * 0x8000 : clamped * 0x7fff;
 
       if (this.bufferIdx >= FRAME_SAMPLES) {
-        this.port.postMessage(this.buffer.slice(0, this.bufferIdx).buffer, [this.buffer.slice(0, this.bufferIdx).buffer]);
+        const frame = this.buffer.slice(0, this.bufferIdx).buffer;
+        this.port.postMessage(frame, [frame]);
         this.bufferIdx = 0;
       }
       pos += this.ratio;

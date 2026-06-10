@@ -16,8 +16,16 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+# Curated labels for known step keys — an enhancement, not a contract.
+# Unknown keys gracefully degrade to the humanized form (underscores to
+# spaces) in _humanize_step, so new frontend workflows never need to update
+# this table for presence greetings to keep working. Add entries here only
+# when the auto-humanized phrasing reads poorly.
 _STEP_LABELS: dict[str, str] = {
     "review_decision": "review of the decision",
+    "define_material_couple": "defining the material couple",
+    "ready_to_run_galvanic_screen": "ready to run the galvanic screen",
+    "review_galvanic_screen": "reviewing the galvanic screen result",
     "review_precheck": "the OCA precheck review",
     "complete_required_inputs": "completing the required inputs",
     "ready_to_run_screening": "ready to run screening",
