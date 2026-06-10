@@ -36,7 +36,7 @@ def _ensure_am_imports() -> bool:
         return _AM_AVAILABLE
 
     try:
-        from powder.am import (  # noqa: F401
+        from mira.knowledge_twins.am import (  # noqa: F401
             AMKnowledgeTwinEngine,
             AMPartClass,
             AMRequest,
@@ -130,7 +130,11 @@ class AMAdapter(EngineAdapter):
                 exc=RuntimeError("AM Knowledge Twin is not available on this instance."),
             )
 
-        from powder.am import AMKnowledgeTwinEngine, AMRequest, ClassificationInput
+        from mira.knowledge_twins.am import (
+            AMKnowledgeTwinEngine,
+            AMRequest,
+            ClassificationInput,
+        )
 
         try:
             classification = ClassificationInput(
@@ -223,19 +227,19 @@ class AMAdapter(EngineAdapter):
         return [key for key in required if parsed_input.get(key) in (None, "", [])]
 
     def _parse_part_class(self, value: Any) -> Any:
-        from powder.am import AMPartClass
+        from mira.knowledge_twins.am import AMPartClass
 
         normalized = _PART_CLASS_ALIASES.get(str(value).strip().lower(), value)
         return AMPartClass(normalized)
 
     def _parse_consequence(self, value: Any) -> Any:
-        from powder.am import ConsequenceTier
+        from mira.knowledge_twins.am import ConsequenceTier
 
         normalized = _CONSEQUENCE_ALIASES.get(str(value).strip().lower(), value)
         return ConsequenceTier(normalized)
 
     def _parse_hazards(self, values: Any) -> list[Any]:
-        from powder.am import HazardFlag
+        from mira.knowledge_twins.am import HazardFlag
 
         if isinstance(values, str):
             values = [part.strip() for part in values.split(",") if part.strip()]
