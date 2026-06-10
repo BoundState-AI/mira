@@ -19,6 +19,7 @@ __version__ = "1.0.0"
 __safety_critical__ = True
 
 import logging
+import os
 from typing import Any, Optional
 
 from mira.chat.engine_adapter import EngineAdapter
@@ -131,9 +132,11 @@ class AMAdapter(EngineAdapter):
             )
 
         from mira.knowledge_twins.am import (
+            AccessContext,
             AMKnowledgeTwinEngine,
             AMRequest,
             ClassificationInput,
+            DataClassification,
         )
 
         try:
@@ -149,6 +152,10 @@ class AMAdapter(EngineAdapter):
                 hazard_context=self._parse_hazards(parsed_input.get("hazard_context", [])),
                 fluid_service=parsed_input.get("fluid_service"),
                 redundancy=parsed_input.get("redundancy"),
+                mission_critical=parsed_input.get("mission_critical"),
+                class_c_criteria_confirmed=parsed_input.get(
+                    "class_c_criteria_confirmed"
+                ),
                 safety_critical_confirmed=safety_confirmed,
             )
 
@@ -163,7 +170,18 @@ class AMAdapter(EngineAdapter):
                     "GRCop-42",
                 ),
                 classification=classification,
+                am_process=self._parse_process(parsed_input.get("am_process")),
+                material_type=self._parse_material_type(
+                    parsed_input.get("material_type")
+                ),
+                access=self._build_access_context(session_context, AccessContext),
+                # Chat-sourced demo requests are PUBLIC by explicit
+                # declaration, never by inference: the demo corpus and the
+                # synthetic scenario carry no controlled data (Rev 5 §0.5).
+                # Controlled-data intake does not come through this adapter.
+                data_classification=DataClassification.PUBLIC,
                 safety_critical_confirmed=safety_confirmed,
+                program=self._demo_program_if_enabled(),
             )
 
             package = AMKnowledgeTwinEngine().evaluate_am_package(request)
@@ -248,7 +266,65 @@ class AMAdapter(EngineAdapter):
             for value in values
         ]
 
+    def _parse_process(self, value: Any) -> Any:
+        if value in (None, ""):
+            return None
+        from mira.knowledge_twins.am import AMProcess
+
+        normalized = str(value).strip().upper().replace("_", "-")
+        return AMProcess(normalized)
+
+    def _parse_material_type(self, value: Any) -> Any:
+        if value in (None, ""):
+            return None
+        from mira.knowledge_twins.am import MaterialType
+
+        return MaterialType(str(value).strip().lower())
+
+    def _build_access_context(
+        self, session_context: dict[str, Any], access_cls: Any
+    ) -> Any:
+        """Build the Demo Track AccessContext (Rev 5 §0.5).
+
+        The boundary and classification ceiling are PINNED to the demo
+        public box -- chat session input is never trusted to select a
+        deployment boundary. Authenticated, session-derived boundaries are
+        Product Track work (Rev 5 §4.5/§8) and require a real identity
+        layer, not dict keys. tenant_id is used for labeling only; the
+        content store enforces deny-by-default regardless of what callers
+        claim.
+        """
+        from mira.knowledge_twins.am import DataClassification
+
+        return access_cls(
+            tenant_id=str(session_context.get("tenant_id") or "boundstate-demo"),
+            program_ids=["demo"],
+            permitted_source_classes=["public", "boundstate_owned"],
+            deployment_boundary="demo-public-box",
+            max_data_classification=DataClassification.PUBLIC,
+        )
+
+    def _demo_program_if_enabled(self) -> Any:
+        """Attach the seeded synthetic GRCop-42 registry when the demo flag
+        is set (assessed mode, labeled NON_AUTHORITATIVE). Default: off."""
+        if os.environ.get("AM_DEMO_PROGRAM", "").strip() not in ("1", "true", "True"):
+            return None
+        from mira.knowledge_twins.am.synthetic_demo import demo_program_context
+
+        return demo_program_context()
+
     def _format_package(self, package: Any) -> str:
+        if package.overall_verdict == "BLOCKED":
+            # A gate block is not a classification failure; render it as
+            # what it is instead of echoing CANNOT_VALIDATE.
+            return "\n".join(
+                [
+                    "AM Qualification Package - BLOCKED (evaluation gate)",
+                    *package.verdict_basis,
+                    "",
+                    package.classification.reason,
+                ]
+            )
         lines = [
             f"AM Qualification Package - {package.overall_verdict}",
             f"Mode: {package.mode}",

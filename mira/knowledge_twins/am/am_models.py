@@ -259,6 +259,10 @@ class ProgramContext(BaseModel):
 
     ``registry_source`` None means manual entry: output is labeled
     NON_AUTHORITATIVE and system-sourced labels are withheld.
+    ``recorded_conflicts`` carries requirement conflicts identified for this
+    program (Rev 5 §4.2); unresolved high-impact conflicts cap the verdict.
+    Stored as dicts validated into ConflictSet at evaluation time to avoid a
+    circular import with crosswalk_models.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -268,6 +272,7 @@ class ProgramContext(BaseModel):
     evidence_records: list[EvidenceRecord] = Field(default_factory=list)
     applicable_standards: list[str] = Field(default_factory=list)
     registry_source: Optional[str] = None
+    recorded_conflicts: list[dict] = Field(default_factory=list)
 
 
 class AMRequest(BaseModel):

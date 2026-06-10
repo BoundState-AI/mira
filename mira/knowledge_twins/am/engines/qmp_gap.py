@@ -88,7 +88,7 @@ class SatisfiedArtifact(BaseModel):
 
     artifact_type: str
     artifact_id: Optional[str]
-    evidence_depth: int  # 1..3 (Rev 5 §5.3); never inflated
+    evidence_depth: int = Field(ge=1, le=3)  # Rev 5 §5.3; never inflated
     detail: str
 
 

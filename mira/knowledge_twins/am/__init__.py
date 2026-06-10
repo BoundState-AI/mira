@@ -32,6 +32,11 @@ from mira.knowledge_twins.am.am_models import (
     MaterialType,
     RulePackRef,
 )
+from mira.knowledge_twins.am.engine import (
+    AMKnowledgeTwinEngine,
+    AMQualificationPackage,
+    evaluate_am_package,
+)
 from mira.knowledge_twins.am.rule_pack_models import (
     ClauseRef,
     CorpusManifest,
@@ -43,9 +48,12 @@ from mira.knowledge_twins.am.rule_pack_models import (
 
 __all__ = [
     "AccessContext",
+    "AMKnowledgeTwinEngine",
     "AMPartClass",
     "AMProcess",
+    "AMQualificationPackage",
     "AMRequest",
+    "evaluate_am_package",
     "ClassificationInput",
     "ClassificationPolicy",
     "ClauseRef",

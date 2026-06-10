@@ -139,6 +139,7 @@ def demo_program_context() -> ProgramContext:
         evidence_records=evidence,
         applicable_standards=["NASA-STD-6030", "NASA-STD-6033"],
         registry_source=None,  # manual entry => NON_AUTHORITATIVE (Rev 5 §5.2)
+        recorded_conflicts=[c.model_dump(mode="json") for c in demo_conflicts()],
     )
 
 
